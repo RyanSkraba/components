@@ -1,6 +1,16 @@
 
 #![alt text](http://www.talend.com/sites/all/themes/talend_responsive/images/logo.png "Talend") Components  
 
+## Instructions for testing
+
+In the top level folder:
+
+```
+mvn clean install
+mvn spring-boot:run
+```
+
+
 ## Folders description
 | _Project_                                          | _Description_                                                        |
 |:---------------------------------------------------|----------------------------------------------------------------------|
