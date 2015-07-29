@@ -11,7 +11,7 @@ class ComponentPropertiesSerializer extends JsonSerializer<ComponentProperties> 
 
 	@Override
 	public void serialize(ComponentProperties cp, JsonGenerator jsonGenerator,
-			SerializerProvider sp) throws IOException, JsonProcessingException {
+			SerializerProvider sp) throws IOException {
 
 		// FIXME
 

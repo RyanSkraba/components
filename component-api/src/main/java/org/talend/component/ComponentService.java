@@ -31,6 +31,7 @@ public class ComponentService {
 	
 	@Autowired
 	public ComponentService(ComponentDesign design) {
+		System.out.println("design: " + design);
 		this.design = design;
 	}
 	

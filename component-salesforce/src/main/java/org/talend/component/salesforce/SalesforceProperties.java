@@ -15,7 +15,7 @@ public class SalesforceProperties extends ComponentProperties {
 
 	public enum LoginType {
 		BASIC, OAUTH
-	};
+	}
 
 	protected static final String LOGIN = "login";
 	protected static final String MAIN = "main";

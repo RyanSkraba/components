@@ -14,7 +14,7 @@ public abstract class ComponentDesign {
 
 	public enum Family {
 		BUSINESS, CLOUD
-	};
+	}
 
 	public abstract ComponentProperties createProperties();
 
