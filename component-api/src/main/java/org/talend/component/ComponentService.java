@@ -14,48 +14,58 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiParam;
 
-@RestController
-@Api(value = "components", basePath = "/components", description = "Component services")
-@Service
-public class ComponentService {
+@RestController @Api(value = "components", basePath = "/components", description = "Component services") @Service public class ComponentService {
 
-	/**
-	 * Injected, this is temporary only for testing, we need to have a means of binding the component name
-	 * with multiple instances of ComponentDesign.
-	 */
-	protected ComponentDesign design;
-	
-	protected int nextId;
-	
-	protected Map<Integer, ComponentProperties> propertiesMap = new HashMap<Integer, ComponentProperties>();
-	
-	@Autowired
-	public ComponentService(ComponentDesign design) {
-		System.out.println("design: " + design);
-		this.design = design;
-	}
-	
-	@RequestMapping(value = "/components/{name}/newProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ComponentProperties newComponentProperties(
-			@PathVariable(value = "name") @ApiParam(name = "name", value = "Name of the component") String componentName) {
-		ComponentProperties cp =  getDesign().createProperties();
-		cp.setId(++nextId);
-		propertiesMap.put(cp.getId(), cp);
-		return cp;
-	}
+    /**
+     * Injected, this is temporary only for testing, we need to have a means of binding the component name
+     * with multiple instances of ComponentDesign.
+     */
+    protected ComponentDesign design;
 
-	@RequestMapping(value = "/components/{id}/existingProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ComponentProperties existingComponentProperties(
-			@PathVariable(value = "id") @ApiParam(name = "id", value = "Id of ComponentProperties") int id) {
-		return propertiesMap.get(id);
-	}
+    protected int nextId;
 
-	public ComponentDesign getDesign() {
-		return design;
-	}
+    protected Map<Integer, ComponentProperties> propertiesMap = new HashMap<Integer, ComponentProperties>();
 
-	public void setDesign(ComponentDesign design) {
-		this.design = design;
-	}
+    /**
+     * Temporary for testing a single component which is autowired
+     *
+     * @param design
+     */
+    @Autowired public ComponentService(ComponentDesign design) {
+        this.design = design;
+    }
+
+    @RequestMapping(value = "/components/{name}/newProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE) public ComponentProperties newComponentProperties(
+            @PathVariable(value = "name") @ApiParam(name = "name", value = "Name of the component") String componentName) {
+        ComponentProperties cp = getDesign().createProperties();
+        cp.setId(++nextId);
+        propertiesMap.put(cp.getId(), cp);
+        return cp;
+    }
+
+    @RequestMapping(value = "/components/{id}/existingProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE) public ComponentProperties existingComponentProperties(
+            @PathVariable(value = "id") @ApiParam(name = "id", value = "Id of ComponentProperties") int id) {
+        return propertiesMap.get(id);
+    }
+
+    @RequestMapping(value = "/components/{id}/validateProperty/{propName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE) public ComponentProperties validateProperty(
+            @PathVariable(value = "id") @ApiParam(name = "id", value = "Id of ComponentProperties") int id,
+            @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
+         @ApiParam(name = "value", value = "Value of property") String value) {
+        ComponentProperties props = propertiesMap.get(id);
+        if (props == null) {
+            throw new RuntimeException("Not found");
+        }
+        // How to we communicate the propery is invalid, need to mark the properties object somehowh
+        return props;
+    }
+
+    public ComponentDesign getDesign() {
+        return design;
+    }
+
+    public void setDesign(ComponentDesign design) {
+        this.design = design;
+    }
 
 }

@@ -1,13 +1,14 @@
-package org.talend.component.salesforce;
+package org.talend.component.salesforce.tsalesforceconnect;
 
 import org.springframework.stereotype.Service;
 import org.talend.component.ComponentConnector;
 import org.talend.component.ComponentConnector.Type;
 import org.talend.component.ComponentDesign;
 import org.talend.component.ComponentProperties;
+import org.talend.component.salesforce.SalesforceConnectionProperties;
 
 @Service
-public class SalesforceDesign extends ComponentDesign {
+public class TSalesforceConnectDesign extends ComponentDesign {
 
 	protected ComponentConnector[] connectors = {
 			new ComponentConnector(Type.FLOW, 0, 0),
@@ -15,11 +16,11 @@ public class SalesforceDesign extends ComponentDesign {
 			new ComponentConnector(Type.SUBJOB_OK, 1, 0),
 			new ComponentConnector(Type.SUBJOB_ERROR, 1, 0) };
 
-	protected SalesforceProperties properties;
+	protected SalesforceConnectionProperties properties;
 
 	@Override
 	public ComponentProperties createProperties() {
-		return new SalesforceProperties();
+		return new SalesforceConnectionProperties();
 	}
 
 	@Override
