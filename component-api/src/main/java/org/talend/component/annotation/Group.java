@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Page {
+public @interface Group {
 
     String value();
 }

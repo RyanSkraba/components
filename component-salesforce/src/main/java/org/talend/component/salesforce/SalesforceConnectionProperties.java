@@ -2,7 +2,7 @@ package org.talend.component.salesforce;
 
 import org.talend.component.ComponentProperties;
 import org.talend.component.annotation.Order;
-import org.talend.component.annotation.Page;
+import org.talend.component.annotation.Group;
 import org.talend.component.annotation.Required;
 import org.talend.component.annotation.Row;
 import org.talend.component.common.OauthProperties;
@@ -37,9 +37,9 @@ import java.util.List;
 
     public static final String USERPASSWORD = "userPassword";
 
-    @Order(1) @Row(1) @Required @Page(PAGE_WIZARD_LOGIN) public String endPoint;
+    @Order(1) @Row(1) @Required @Group(PAGE_WIZARD_LOGIN) public String endPoint;
 
-    @Row(2) @Required @Page(PAGE_WIZARD_LOGIN) public LoginType loginType;
+    @Row(2) @Required @Group(PAGE_WIZARD_LOGIN)  public LoginType loginType = LoginType.BASIC;
 
     public boolean validateLoginType(LoginType loginType) {
         System.out.println("validateLogintype: " + getLoginType());
@@ -47,11 +47,11 @@ import java.util.List;
         return true;
     }
 
-    @Row(3) @Required @Page(PAGE_WIZARD_LOGIN) public OauthProperties oauth;
+    @Row(3) @Required @Group(PAGE_WIZARD_LOGIN) public OauthProperties oauth;
 
-    @Row(3) @Required @Page(PAGE_WIZARD_LOGIN) public UserPasswordProperties userPassword;
+    @Row(3) @Required @Group(PAGE_WIZARD_LOGIN) public UserPasswordProperties userPassword;
 
-    @Row(4) @Page(PAGE_WIZARD_LOGIN) public boolean bulkConnection;
+    @Row(4) @Group(PAGE_WIZARD_LOGIN) public boolean bulkConnection;
 
     public String apiVersion;
 

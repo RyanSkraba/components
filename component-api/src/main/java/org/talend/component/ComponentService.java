@@ -18,9 +18,9 @@ import com.wordnik.swagger.annotations.ApiParam;
 
     /**
      * Injected, this is temporary only for testing, we need to have a means of binding the component name
-     * with multiple instances of ComponentDesign.
+     * with multiple instances of ComponentDefinition.
      */
-    protected ComponentDesign design;
+    protected ComponentDefinition design;
 
     protected int nextId;
 
@@ -31,7 +31,7 @@ import com.wordnik.swagger.annotations.ApiParam;
      *
      * @param design
      */
-    @Autowired public ComponentService(ComponentDesign design) {
+    @Autowired public ComponentService(ComponentDefinition design) {
         this.design = design;
     }
 
@@ -60,11 +60,11 @@ import com.wordnik.swagger.annotations.ApiParam;
         return props;
     }
 
-    public ComponentDesign getDesign() {
+    public ComponentDefinition getDesign() {
         return design;
     }
 
-    public void setDesign(ComponentDesign design) {
+    public void setDesign(ComponentDefinition design) {
         this.design = design;
     }
 
