@@ -1,31 +1,42 @@
 package org.talend.component.salesforce.tsalesforceconnect;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.talend.component.ComponentConnector;
 import org.talend.component.ComponentConnector.Type;
 import org.talend.component.ComponentDefinition;
 import org.talend.component.ComponentProperties;
+import org.talend.component.Constants;
 import org.talend.component.salesforce.SalesforceConnectionProperties;
 
-@Service
+@Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceConnectDefinition.COMPONENT_NAME)
 public class TSalesforceConnectDefinition extends ComponentDefinition {
 
-	protected ComponentConnector[] connectors = {
-			new ComponentConnector(Type.FLOW, 0, 0),
-			new ComponentConnector(Type.ITERATE, 1, 0),
-			new ComponentConnector(Type.SUBJOB_OK, 1, 0),
-			new ComponentConnector(Type.SUBJOB_ERROR, 1, 0) };
+    public static final String COMPONENT_NAME = "SalesForceConnect"; //$NON-NLS-1$
 
-	protected SalesforceConnectionProperties properties;
+    protected ComponentConnector[] connectors = { new ComponentConnector(Type.FLOW, 0, 0),
+            new ComponentConnector(Type.ITERATE, 1, 0), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
+            new ComponentConnector(Type.SUBJOB_ERROR, 1, 0) };
 
-	@Override
-	public ComponentProperties createProperties() {
-		return new SalesforceConnectionProperties();
-	}
+    protected SalesforceConnectionProperties properties;
 
-	@Override
-	public Family[] getSupportedFamilies() {
-		return new Family[] { Family.BUSINESS, Family.CLOUD };
-	}
+    @Override
+    public ComponentProperties createProperties() {
+        return new SalesforceConnectionProperties();
+    }
+
+    @Override
+    public Family[] getSupportedFamilies() {
+        return new Family[] { Family.BUSINESS, Family.CLOUD };
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.talend.component.ComponentDefinition#getName()
+     */
+    @Override
+    public String getName() {
+        return COMPONENT_NAME;
+    }
 
 }

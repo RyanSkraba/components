@@ -1,170 +1,80 @@
 package org.talend.component.salesforce;
 
 import org.talend.component.ComponentProperties;
-import org.talend.component.annotation.Order;
-import org.talend.component.annotation.Group;
-import org.talend.component.annotation.Required;
-import org.talend.component.annotation.Row;
 import org.talend.component.common.OauthProperties;
 import org.talend.component.common.ProxyProperties;
 import org.talend.component.common.UserPasswordProperties;
+import org.talend.component.properties.Property;
+import org.talend.component.properties.layout.Layout;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-@JsonRootName("salesforceConnectionProperties") public class SalesforceConnectionProperties extends ComponentProperties {
-
-    public enum LoginType {
-        BASIC, OAUTH
-    }
+@JsonRootName("salesforceConnectionProperties")
+public class SalesforceConnectionProperties extends ComponentProperties {
 
     protected static final String PAGE_WIZARD_LOGIN = "wizardLogin";
 
+    // public String apiVersion;
+    public Property<String> url = new Property<String>("url", "Salesforce URL", "https://www.salesforce.com/services/Soap/u/25.0",
+            true);
+
+    public enum LoginType {
+                           BASIC,
+                           OAUTH
+    }
+
+    public Property<LoginType> loginType = new Property<LoginType>("logintype", "Connection type", LoginType.BASIC, true); //$NON-NLS-1$//$NON-NLS-2$
+
+    public Property<OauthProperties> oauth = new Property<OauthProperties>("oauth", "OAuth connection", new OauthProperties(),
+            false);
+
+    public Property<UserPasswordProperties> userPassword = new Property<UserPasswordProperties>("userPassword",
+            "Basic connection", new UserPasswordProperties(), false);
+
+    public Property<Boolean> bulkConnection = new Property<Boolean>("bulkConnection", "Bulk Connection", false, false);
+
     public SalesforceConnectionProperties() {
-        proxy = new ProxyProperties();
-        oauth = new OauthProperties();
-        userPassword = new UserPasswordProperties();
+        setupLayout();
     }
 
-    public static final String ENDPOINT = "endPoint";
+    public Property<Boolean> needCompression = new Property<Boolean>("needCompression", "Need compression", false, false);
 
-    public static final String LOGINTYPE = "loginType";
+    public Property<Integer> timeout = new Property<Integer>("timeout", "Timeout", 0, false);
 
-    public static final String OAUTH = "oauth";
+    public Property<Boolean> httpTraceMessage = new Property<Boolean>("httpTraceMessage", "Trace HTTP message", false, false);
 
-    public static final String USERPASSWORD = "userPassword";
+    public Property<String> clientId = new Property<String>("clientId", "Client Id", null, false);;
 
-    @Order(1) @Row(1) @Required @Group(PAGE_WIZARD_LOGIN) public String endPoint;
+    public Property<ProxyProperties> proxy = new Property<ProxyProperties>("proxy", "Proxy", new ProxyProperties(), false);;
 
-    @Row(2) @Required @Group(PAGE_WIZARD_LOGIN)  public LoginType loginType = LoginType.BASIC;
-
-    public boolean validateLoginType(LoginType loginType) {
-        System.out.println("validateLogintype: " + getLoginType());
-        // Need to reset the required fields... Maybe could just pass the entire properties object back.
-        return true;
+    /**
+     * DOC sgandon Comment method "setupLayout".
+     */
+    private void setupLayout() {
+        url.setLayout(Layout.create().setGroup(PAGE_WIZARD_LOGIN).setOrder(1).setRow(1));
+        loginType.setLayout(Layout.create().setGroup(PAGE_WIZARD_LOGIN).setRow(2));
+        // tell the client to call back on change value
+        loginType.setRequestRefreshLayoutOnChange(true);
+        oauth.setLayout(Layout.create().setGroup(PAGE_WIZARD_LOGIN).setRow(3));
+        userPassword.setLayout(Layout.create().setGroup(PAGE_WIZARD_LOGIN).setRow(3));
+        bulkConnection.setLayout(Layout.create().setGroup(PAGE_WIZARD_LOGIN).setRow(4));
+        proxy.setLayout(Layout.create().setGroup(PAGE_WIZARD_LOGIN).setOrder(3));
     }
 
-    @Row(3) @Required @Group(PAGE_WIZARD_LOGIN) public OauthProperties oauth;
-
-    @Row(3) @Required @Group(PAGE_WIZARD_LOGIN) public UserPasswordProperties userPassword;
-
-    @Row(4) @Group(PAGE_WIZARD_LOGIN) public boolean bulkConnection;
-
-    public String apiVersion;
-
-    public boolean needCompression;
-
-    public int timeout;
-
-    public boolean httpTraceMessage;
-
-    public String clientId;
-
-    @Order(3) public ProxyProperties proxy;
-
-    @Override public String[] getProperties(String page) {
-        List<String> props = new ArrayList();
-        props.add(ENDPOINT);
-        if (page.equals(PAGE_WIZARD_LOGIN)) {
-            if (loginType == LoginType.OAUTH) {
-                Collections.addAll(props, oauth.getProperties(null));
-            } else if (loginType == LoginType.BASIC) {
-                Collections.addAll(props, userPassword.getProperties(null));
-            }
+    @Override
+    public void refreshLayout() {
+        switch (loginType.getValue()) {
+        case OAUTH:
+            oauth.getLayout().setVisible(true);
+            userPassword.getLayout().setVisible(false);
+            break;
+        case BASIC:
+            oauth.getLayout().setVisible(false);
+            userPassword.getLayout().setVisible(true);
+            break;
+        default:
+            throw new RuntimeException("Enum value should be handled :" + loginType.getValue());
         }
-
-        return (String[]) props.toArray();
-    }
-
-    public LoginType getLoginType() {
-        return loginType;
-    }
-
-    public void setLoginType(LoginType loginType) {
-        this.loginType = loginType;
-    }
-
-    public boolean isBulkConnection() {
-        return bulkConnection;
-    }
-
-    public void setBulkConnection(boolean bulkConnection) {
-        this.bulkConnection = bulkConnection;
-    }
-
-    public String getApiVersion() {
-        return apiVersion;
-    }
-
-    public void setApiVersion(String apiVersion) {
-        this.apiVersion = apiVersion;
-    }
-
-    public String getEndPoint() {
-        return endPoint;
-    }
-
-    public void setEndPoint(String endPoint) {
-        this.endPoint = endPoint;
-    }
-
-    public boolean isNeedCompression() {
-        return needCompression;
-    }
-
-    public void setNeedCompression(boolean needCompression) {
-        this.needCompression = needCompression;
-    }
-
-    public int getTimeout() {
-        return timeout;
-    }
-
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
-    }
-
-    public boolean isHttpTraceMessage() {
-        return httpTraceMessage;
-    }
-
-    public void setHttpTraceMessage(boolean httpTraceMessage) {
-        this.httpTraceMessage = httpTraceMessage;
-    }
-
-    public String getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
-    public ProxyProperties getProxy() {
-        return proxy;
-    }
-
-    public void setProxy(ProxyProperties proxy) {
-        this.proxy = proxy;
-    }
-
-    public OauthProperties getOauth() {
-        return oauth;
-    }
-
-    public void setOauth(OauthProperties oauth) {
-        this.oauth = oauth;
-    }
-
-    public UserPasswordProperties getUserPassword() {
-        return userPassword;
-    }
-
-    public void setUserPassword(UserPasswordProperties userPassword) {
-        this.userPassword = userPassword;
     }
 
 }

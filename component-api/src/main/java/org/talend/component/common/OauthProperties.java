@@ -1,65 +1,27 @@
 package org.talend.component.common;
 
 import org.talend.component.ComponentProperties;
+import org.talend.component.properties.Property;
+import org.talend.component.properties.layout.Layout;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonRootName;
-
-@JsonRootName("oauthProperties")
 public class OauthProperties extends ComponentProperties {
 
-	@JsonProperty
-	public String clientId;
-	
-	@JsonProperty
-	public String clientSecret;
-	
-	@JsonProperty
-	public String callbackHost;
-	
-	@JsonProperty
-	public int callbackPort;
+    public Property<String> clientId = new Property<String>("clientId", "Client Id", null, true);
 
-	@JsonProperty
-	public String tokenFile;
+    public Property<String> clientSecret = new Property<String>("clientSecret", "Client Secret", null, true);
 
-	public String getClientId() {
-		return clientId;
-	}
+    public Property<String> callbackHost = new Property<String>("callbackHost", "Callback Host", null, true);
 
-	public void setClientId(String clientId) {
-		this.clientId = clientId;
-	}
+    public Property<Integer> callbackPort = new Property<Integer>("callbackPort", "Callback Port", null, true);
 
-	public String getClientSecret() {
-		return clientSecret;
-	}
+    public Property<String> tokenFile = new Property<String>("tokenFile", "Token File", null, true);
 
-	public void setClientSecret(String clientSecret) {
-		this.clientSecret = clientSecret;
-	}
+    public OauthProperties() {
+        clientId.setLayout(Layout.create().setRow(0));
+        clientSecret.setLayout(Layout.create().setRow(1));
+        callbackHost.setLayout(Layout.create().setRow(2));
+        callbackPort.setLayout(Layout.create().setRow(3));
+        tokenFile.setLayout(Layout.create().setRow(4));
+    }
 
-	public String getCallbackHost() {
-		return callbackHost;
-	}
-
-	public void setCallbackHost(String callbackHost) {
-		this.callbackHost = callbackHost;
-	}
-
-	public int getCallbackPort() {
-		return callbackPort;
-	}
-
-	public void setCallbackPort(int callbackPort) {
-		this.callbackPort = callbackPort;
-	}
-
-	public String getTokenFile() {
-		return tokenFile;
-	}
-
-	public void setTokenFile(String tokenFile) {
-		this.tokenFile = tokenFile;
-	}
 }
