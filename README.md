@@ -7,6 +7,7 @@ In the top level folder:
 
 ```
 mvn clean install
+cd component-testservice
 mvn spring-boot:run
 ```
 
