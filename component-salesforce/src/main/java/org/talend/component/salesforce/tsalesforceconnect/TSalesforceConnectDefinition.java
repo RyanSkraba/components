@@ -11,7 +11,7 @@ import org.talend.component.salesforce.SalesforceConnectionProperties;
 @Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceConnectDefinition.COMPONENT_NAME)
 public class TSalesforceConnectDefinition extends ComponentDefinition {
 
-    public static final String COMPONENT_NAME = "SalesForceConnect"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "SalesforceConnect"; //$NON-NLS-1$
 
     protected ComponentConnector[] connectors = { new ComponentConnector(Type.FLOW, 0, 0),
             new ComponentConnector(Type.ITERATE, 1, 0), new ComponentConnector(Type.SUBJOB_OK, 1, 0),

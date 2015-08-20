@@ -12,7 +12,7 @@ mvn spring-boot:run
 
 Recommend using [Google Postman](https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en) as the web client.
 
-Use [http://localhost:8080/components/salesforce/newProperties](http://localhost:8080/components/salesforce/newProperties) after starting the server.
+Use [http://localhost:8080/components/SalesforceConnect/properties](http://localhost:8080/components/SalesforceConnect/properties) after starting the server.
 
 
 ## Folders description
