@@ -13,6 +13,11 @@
     <packaging>jar</packaging>
     <name>Talend Component API</name>
     <dependencies>
+    <dependency>
+    	<groupId>net.jodah</groupId>
+    	<artifactId>typetools</artifactId>
+    	<version>0.4.2</version>
+    </dependency>
     </dependencies>
     <repositories>
     </repositories>
