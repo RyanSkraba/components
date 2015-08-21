@@ -1,58 +1,24 @@
 package org.talend.component.common;
 
 import org.talend.component.ComponentProperties;
+import org.talend.component.properties.Property;
+import org.talend.component.properties.layout.Layout;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonRootName;
-
-@JsonRootName("oauthProperties")
 public class ProxyProperties extends ComponentProperties {
-	
-	@JsonProperty
-	public boolean useProxy;
 
-	@JsonProperty
-	public String host;
+    public Property<Boolean> useProxy = new Property<Boolean>("useProxy", "Use Proxy", false, false);
 
-	@JsonProperty
-	public int port;
+    public Property<String> host = new Property<String>("host", "Host", null, true);
 
-	@JsonProperty
-	public String userName;
+    public Property<String> userName = new Property<String>("userName", "User name", null, true);
 
-	@JsonProperty
-	public String password;
-	
-	public boolean isUseProxy() {
-		return useProxy;
-	}
-	public void setUseProxy(boolean useProxy) {
-		this.useProxy = useProxy;
-	}
-	public String getHost() {
-		return host;
-	}
-	public void setHost(String host) {
-		this.host = host;
-	}
-	public int getPort() {
-		return port;
-	}
-	public void setPort(int port) {
-		this.port = port;
-	}
-	public String getUserName() {
-		return userName;
-	}
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public Property<String> password = new Property<String>("password", "Password", null, true);
 
+    public ProxyProperties() {
+        useProxy.setLayout(Layout.create().setRow(0));
+        host.setLayout(Layout.create().setRow(1));
+        userName.setLayout(Layout.create().setRow(2));
+        password.setLayout(Layout.create().setRow(3));
+    }
 
 }

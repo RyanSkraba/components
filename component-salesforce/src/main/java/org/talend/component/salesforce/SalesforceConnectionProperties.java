@@ -35,6 +35,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
     public SalesforceConnectionProperties() {
         setupLayout();
+        refreshLayout();
     }
 
     public Property<Boolean> needCompression = new Property<Boolean>("needCompression", "Need compression", false, false);
