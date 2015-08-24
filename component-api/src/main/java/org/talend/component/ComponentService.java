@@ -24,7 +24,7 @@ public class ComponentService {
      * Injected, this is temporary only for testing, we need to have a means of binding the component name with multiple
      * instances of ComponentDefinition.
      */
-    protected ComponentDefinition design;
+    protected ComponentDefinition definition;
 
     protected int nextId;
 
@@ -40,10 +40,10 @@ public class ComponentService {
      */
     @Autowired
     public ComponentService(ComponentDefinition design) {
-        this.design = design;
+        this.definition = design;
     }
 
-    @RequestMapping(value = "/components/{name}/properties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{name}/definition/getProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ComponentProperties existingComponentProperties(
             @PathVariable(value = "name") @ApiParam(name = "name", value = "name of the component") String name) {
         final String beanName = Constants.COMPONENT_BEAN_PREFIX + name;
@@ -66,12 +66,12 @@ public class ComponentService {
         return props;
     }
 
-    public ComponentDefinition getDesign() {
-        return design;
+    public ComponentDefinition getDefinition() {
+        return definition;
     }
 
-    public void setDesign(ComponentDefinition design) {
-        this.design = design;
+    public void setDefinition(ComponentDefinition definition) {
+        this.definition = definition;
     }
 
 }

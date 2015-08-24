@@ -32,25 +32,24 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     public Property<UserPasswordProperties> userPassword = new Property<UserPasswordProperties>("userPassword",
             "Basic connection").setValue(new UserPasswordProperties());
 
-    public Property<Boolean> bulkConnection = new Property<Boolean>("bulkConnection", "Bulk Connection").setValue(false);
+    public Property<Boolean> bulkConnection = new Property<Boolean>("bulkConnection", "Bulk Connection");
 
     public SalesforceConnectionProperties() {
         setupLayout();
     }
 
-    public Property<Boolean> needCompression = new Property<Boolean>("needCompression", "Need compression").setValue(false);
+    public Property<Boolean> needCompression = new Property<Boolean>("needCompression", "Need compression");
+
+    public Property<Boolean> testConnection = new Property<Boolean>("testConnection", "Test connection");
 
     public Property<Integer> timeout = new Property<Integer>("timeout", "Timeout").setValue(0);
 
-    public Property<Boolean> httpTraceMessage = new Property<Boolean>("httpTraceMessage", "Trace HTTP message").setValue(false);
+    public Property<Boolean> httpTraceMessage = new Property<Boolean>("httpTraceMessage", "Trace HTTP message");
 
     public Property<String> clientId = new Property<String>("clientId", "Client Id");
 
     public Property<ProxyProperties> proxy = new Property<ProxyProperties>("proxy", "Proxy").setValue(new ProxyProperties());
 
-    /**
-     * DOC sgandon Comment method "setupLayout".
-     */
     private void setupLayout() {
         url.setLayout(Layout.create().setGroup(PAGE_WIZARD_LOGIN).setOrder(1).setRow(1));
         loginType.setLayout(Layout.create().setGroup(PAGE_WIZARD_LOGIN).setRow(2));

@@ -1,7 +1,7 @@
 package org.talend.component;
 
 /**
- * Component design service.
+ * Component definition service.
  * <p>
  * An instance of this class handles the setup of the properties associated with a component.
  *

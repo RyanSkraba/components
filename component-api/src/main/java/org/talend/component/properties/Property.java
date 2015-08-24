@@ -16,10 +16,6 @@ import org.talend.component.properties.layout.Layout;
 
 import net.jodah.typetools.TypeResolver;
 
-/**
- * created by sgandon on 12 août 2015 Detailled comment
- *
- */
 public class Property<T> {
 
     private String name;
@@ -27,6 +23,12 @@ public class Property<T> {
     private T value = null;
 
     private Layout layout;
+
+    private boolean required;
+
+    private String displayName;
+
+    private boolean requestRefreshLayoutOnChange;
 
     // private Class<T> persistentClass;
 
@@ -36,51 +38,25 @@ public class Property<T> {
         // getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
-    /**
-     * Getter for layout.
-     * 
-     * @return the layout
-     */
-    public Layout getLayout() {
-        return this.layout;
-    }
-
-    /**
-     * Sets the layout.
-     * 
-     * @param layout the layout to set
-     */
-    public Property<T> setLayout(Layout layout) {
-        this.layout = layout;
-        return this;
-    }
-
-    /**
-     * Getter for required.
-     * 
-     * @return the required, default is false
-     */
-    public boolean isRequired() {
-        return this.required;
-    }
-
-    private boolean required;
-
-    private String displayName;
-
-    private boolean requestRefreshLayoutOnChange;
-
     public Property(String name, String displayName) {
         this();
         this.name = name;
         this.displayName = displayName;
     }
 
-    /**
-     * Getter for value.
-     * 
-     * @return the value, default value is null
-     */
+    public Layout getLayout() {
+        return this.layout;
+    }
+
+    public Property<T> setLayout(Layout layout) {
+        this.layout = layout;
+        return this;
+    }
+
+    public boolean isRequired() {
+        return this.required;
+    }
+
     public T getValue() {
         return this.value;
     }
@@ -95,30 +71,14 @@ public class Property<T> {
         return this;
     }
 
-    /**
-     * Getter for name.
-     * 
-     * @return the name
-     */
     public String getName() {
         return this.name;
     }
 
-    /**
-     * Getter for displayName.
-     * 
-     * @return the displayName
-     */
     public String getDisplayName() {
         return this.displayName;
     }
 
-    /**
-     * Set whether this property is required or not
-     * 
-     * @param required
-     * @return this
-     */
     public Property<T> setRequired(boolean required) {
         this.required = required;
         return this;
