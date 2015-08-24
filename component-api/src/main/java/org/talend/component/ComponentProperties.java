@@ -15,6 +15,8 @@ public abstract class ComponentProperties {
 
     public static final String PAGE_ADVANCED = "advanced";
 
+    protected static final boolean REQUIRED = true;
+
     /**
      * Unique identification of the this object for the lifetime of the ComponentService. Used to reference the current
      * value of the ComponentProperties on the server.

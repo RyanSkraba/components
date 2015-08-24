@@ -24,7 +24,7 @@ public class Property<T> {
 
     private String name;
 
-    private T value;
+    private T value = null;
 
     private Layout layout;
 
@@ -50,26 +50,18 @@ public class Property<T> {
      * 
      * @param layout the layout to set
      */
-    public void setLayout(Layout layout) {
+    public Property<T> setLayout(Layout layout) {
         this.layout = layout;
+        return this;
     }
 
     /**
      * Getter for required.
      * 
-     * @return the required
+     * @return the required, default is false
      */
     public boolean isRequired() {
         return this.required;
-    }
-
-    /**
-     * Sets the required.
-     * 
-     * @param required the required to set
-     */
-    public void setRequired(boolean required) {
-        this.required = required;
     }
 
     private boolean required;
@@ -78,36 +70,16 @@ public class Property<T> {
 
     private boolean requestRefreshLayoutOnChange;
 
-    /**
-     * Getter for displayName.
-     * 
-     * @return the displayName
-     */
-    public String getDisplayName() {
-        return this.displayName;
-    }
-
-    /**
-     * Sets the displayName.
-     * 
-     * @param displayName the displayName to set
-     */
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public Property(String name, String displayName, T defaultValue, boolean required) {
+    public Property(String name, String displayName) {
         this();
         this.name = name;
         this.displayName = displayName;
-        this.value = defaultValue;
-        this.required = required;
     }
 
     /**
      * Getter for value.
      * 
-     * @return the value
+     * @return the value, default value is null
      */
     public T getValue() {
         return this.value;
@@ -118,8 +90,9 @@ public class Property<T> {
      * 
      * @param value the value to set
      */
-    public void setValue(T value) {
+    public Property<T> setValue(T value) {
         this.value = value;
+        return this;
     }
 
     /**
@@ -132,12 +105,23 @@ public class Property<T> {
     }
 
     /**
-     * Sets the name.
+     * Getter for displayName.
      * 
-     * @param name the name to set
+     * @return the displayName
      */
-    public void setName(String name) {
-        this.name = name;
+    public String getDisplayName() {
+        return this.displayName;
+    }
+
+    /**
+     * Set whether this property is required or not
+     * 
+     * @param required
+     * @return this
+     */
+    public Property<T> setRequired(boolean required) {
+        this.required = required;
+        return this;
     }
 
     public String getTypeName() {
