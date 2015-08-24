@@ -37,7 +37,7 @@ public class TSalesforceInputDefinition extends ComponentDefinition {
 
     @Override
     public ComponentProperties createProperties() {
-        return new TSalesForceInputProperties();
+        return new TSalesforceInputProperties();
     }
 
     @Override
