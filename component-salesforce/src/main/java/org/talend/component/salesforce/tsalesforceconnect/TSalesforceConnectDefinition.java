@@ -21,7 +21,7 @@ public class TSalesforceConnectDefinition extends ComponentDefinition {
 
     @Override
     public ComponentProperties createProperties() {
-        return new TSalesForceConnectProperties();
+        return new TSalesforceConnectProperties();
     }
 
     @Override

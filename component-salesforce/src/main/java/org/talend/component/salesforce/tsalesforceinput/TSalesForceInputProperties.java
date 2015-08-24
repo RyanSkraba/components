@@ -15,7 +15,7 @@ package org.talend.component.salesforce.tsalesforceinput;
 import org.talend.component.ComponentProperties;
 import org.talend.component.properties.Property;
 import org.talend.component.properties.layout.Layout;
-import org.talend.component.salesforce.tsalesforceconnect.TSalesForceConnectProperties;
+import org.talend.component.salesforce.tsalesforceconnect.TSalesforceConnectProperties;
 
 /**
  * created by sgandon on 21 août 2015 Detailled comment
@@ -23,8 +23,8 @@ import org.talend.component.salesforce.tsalesforceconnect.TSalesForceConnectProp
  */
 public class TSalesForceInputProperties extends ComponentProperties {
 
-    Property<TSalesForceConnectProperties> connection = new Property<TSalesForceConnectProperties>("connection", "Connection")
-            .setRequired(true).setValue(new TSalesForceConnectProperties());
+    Property<TSalesforceConnectProperties> connection = new Property<TSalesforceConnectProperties>("connection", "Connection")
+            .setRequired(true).setValue(new TSalesforceConnectProperties());
 
     Property<String> module = new Property<String>("module", "Module").setRequired(true);
 
