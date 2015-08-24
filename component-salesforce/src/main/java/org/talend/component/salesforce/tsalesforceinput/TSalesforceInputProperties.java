@@ -15,26 +15,20 @@ package org.talend.component.salesforce.tsalesforceinput;
 import org.talend.component.ComponentProperties;
 import org.talend.component.properties.Property;
 import org.talend.component.properties.layout.Layout;
+import org.talend.component.salesforce.SalesforceConnectionProperties;
 import org.talend.component.salesforce.tsalesforceconnect.TSalesforceConnectProperties;
 
-/**
- * created by sgandon on 21 août 2015 Detailled comment
- *
- */
-public class TSalesForceInputProperties extends ComponentProperties {
+public class TSalesforceInputProperties extends ComponentProperties {
 
-    Property<TSalesforceConnectProperties> connection = new Property<TSalesforceConnectProperties>("connection", "Connection")
+    Property<SalesforceConnectionProperties> connection = new Property<SalesforceConnectionProperties>("connection", "Connection")
             .setRequired(true).setValue(new TSalesforceConnectProperties());
 
     Property<String> module = new Property<String>("module", "Module").setRequired(true);
 
-    public TSalesForceInputProperties() {
+    public TSalesforceInputProperties() {
         setupLayout();
     }
 
-    /**
-     * DOC sgandon Comment method "setupLayout".
-     */
     public void setupLayout() {
         connection.setLayout(Layout.create().setGroup(PAGE_MAIN).setRow(1));
         module.setLayout(Layout.create().setGroup(PAGE_MAIN).setRow(2));

@@ -24,8 +24,8 @@ import org.talend.component.salesforce.SalesforceConnectionProperties;
  * Component that can connect to a salesforce system and get some data out of it.
  *
  */
-@Component(Constants.COMPONENT_BEAN_PREFIX + TSalesForceInputDefinition.COMPONENT_NAME)
-public class TSalesForceInputDefinition extends ComponentDefinition {
+@Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceInputDefinition.COMPONENT_NAME)
+public class TSalesforceInputDefinition extends ComponentDefinition {
 
     public static final String COMPONENT_NAME = "SalesforceInput"; //$NON-NLS-1$
 
