@@ -13,10 +13,10 @@ mvn spring-boot:run
 
 Recommend using [Google Postman](https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en) as the web client.
 
-Use [http://localhost:8080/components/SalesforceConnect/properties](http://localhost:8080/components/SalesforceConnect/properties) after starting the server.
+Use [http://localhost:8080/SalesforceConnect/definition/getProperties](http://localhost:8080/SalesforceConnect/definition/getProperties) after starting the server.
 
 
-## Folders description
+## Folders displayName
 | _Project_                                          | _Description_                                                        |
 |:---------------------------------------------------|----------------------------------------------------------------------|
 | [components-api](components-api)                   | *API used to define and access component*                            |

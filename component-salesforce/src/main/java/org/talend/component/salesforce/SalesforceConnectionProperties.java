@@ -5,22 +5,26 @@ import org.talend.component.common.OauthProperties;
 import org.talend.component.common.ProxyProperties;
 import org.talend.component.common.UserPasswordProperties;
 import org.talend.component.properties.Property;
-import org.talend.component.properties.layout.Layout;
+import org.talend.component.properties.ValidationResult;
+import org.talend.component.properties.presentation.Form;
+import org.talend.component.properties.presentation.Layout;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
+import org.talend.component.properties.presentation.Wizard;
 
-@JsonRootName("salesforceConnectionProperties")
-public class SalesforceConnectionProperties extends ComponentProperties {
+@JsonRootName("salesforceConnectionProperties") public class SalesforceConnectionProperties extends ComponentProperties {
 
-    protected static final String PAGE_WIZARD_LOGIN = "wizardLogin"; //$NON-NLS-1$
+    public SalesforceConnectionProperties() {
+        setupLayout();
+    }
 
     // public String apiVersion;
     public Property<String> url = new Property<String>("url", "Salesforce URL").setRequired(true) //$NON-NLS-1$//$NON-NLS-2$
             .setValue("https://www.salesforce.com/services/Soap/u/25.0"); //$NON-NLS-1$
 
     public enum LoginType {
-                           BASIC,
-                           OAUTH
+        BASIC,
+        OAUTH
     }
 
     public Property<LoginType> loginType = new Property<LoginType>("logintype", "Connection type").setRequired(true)
@@ -33,10 +37,6 @@ public class SalesforceConnectionProperties extends ComponentProperties {
             "Basic connection").setValue(new UserPasswordProperties());
 
     public Property<Boolean> bulkConnection = new Property<Boolean>("bulkConnection", "Bulk Connection");
-
-    public SalesforceConnectionProperties() {
-        setupLayout();
-    }
 
     public Property<Boolean> needCompression = new Property<Boolean>("needCompression", "Need compression");
 
@@ -51,21 +51,48 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     public Property<ProxyProperties> proxy = new Property<ProxyProperties>("proxy", "Proxy").setValue(new ProxyProperties());
 
     private void setupLayout() {
-        url.setLayout(Layout.create().setGroup(PAGE_WIZARD_LOGIN).setOrder(1).setRow(1));
-        loginType.setLayout(Layout.create().setGroup(PAGE_WIZARD_LOGIN).setRow(2));
-        // tell the client to call back on change value
-        loginType.setRequestRefreshLayoutOnChange(true);
-        // we use the same row for the 2 following properties because one of them shall be set (in)visible in the
-        // refreshLayout() call.
-        oauth.setLayout(Layout.create().setGroup(PAGE_WIZARD_LOGIN).setRow(3));
-        userPassword.setLayout(Layout.create().setGroup(PAGE_WIZARD_LOGIN).setRow(3));
-        bulkConnection.setLayout(Layout.create().setGroup(PAGE_WIZARD_LOGIN).setRow(4));
-        proxy.setLayout(Layout.create().setGroup(PAGE_WIZARD_LOGIN).setOrder(3));
+        Form form;
+        Wizard wizard;
+
+        form = Form.create("Connection", "Salesforce Connection Settings");
+        forms.add(form);
+        form.addProperty(url.setLayout(Layout.create().setOrder(1).setRow(1)));
+        form.addProperty(loginType.setLayout(Layout.create().setRow(2)));
+
+        // Only one of these is visible at a time
+        form.addProperty(oauth.setLayout(Layout.create().setRow(3)));
+        form.addProperty(userPassword.setLayout(Layout.create().setRow(3)));
+
+        form.addProperty(testConnection.setLayout(Layout.create().setOrder(99)));
+
+        form = Form.create("Advanced", "Advanced Connection Settings");
+        forms.add(form);
+        form.addProperty(bulkConnection.setLayout(Layout.create().setRow(1)));
+        form.addProperty(needCompression.setLayout(Layout.create().setRow(2)));
+        form.addProperty(httpTraceMessage.setLayout(Layout.create().setRow(3)));
+        form.addProperty(clientId.setLayout(Layout.create().setRow(4)));
+        form.addProperty(timeout.setLayout(Layout.create().setRow(5)));
+        form.addProperty(proxy.setLayout(Layout.create().setRow(5)));
+
+        wizard = Wizard.create("Connection", "Salesforce Connection");
+        wizards.add(wizard);
+        wizard.addForm(form);
+
         refreshLayout();
     }
 
-    @Override
-    public void refreshLayout() {
+    public ValidationResult validateLoginType() {
+        refreshLayout();
+        return new ValidationResult();
+    }
+
+    public ValidationResult validateTestConnection() {
+        // Do the actions to get the connection and return if it worked
+        return new ValidationResult();
+    }
+
+
+    @Override public void refreshLayout() {
         switch (loginType.getValue()) {
         case OAUTH:
             oauth.getLayout().setVisible(true);

@@ -12,17 +12,24 @@
 // ============================================================================
 package org.talend.component.properties;
 
-import org.talend.component.properties.layout.Layout;
+import org.talend.component.properties.presentation.Layout;
 
 import net.jodah.typetools.TypeResolver;
+
+import java.util.List;
 
 public class Property<T> {
 
     private String name;
 
+    // TODO - what about properties that have an array of values (like selected tables)
     private T value = null;
 
+    private List<T> possibleValues;
+
     private Layout layout;
+
+    private ValidationResult validationResult;
 
     private boolean required;
 

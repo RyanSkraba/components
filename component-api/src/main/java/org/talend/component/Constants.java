@@ -13,7 +13,6 @@
 package org.talend.component;
 
 /**
- * created by sgandon on 12 août 2015 Detailled comment
  *
  */
 public class Constants {

@@ -25,7 +25,7 @@ import org.talend.component.salesforce.SalesforceConnectionProperties;
  *
  */
 @Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceInputDefinition.COMPONENT_NAME)
-public class TSalesforceInputDefinition extends ComponentDefinition {
+public class TSalesforceInputDefinition /* extends ComponentDefinition */ {
 
     public static final String COMPONENT_NAME = "SalesforceInput"; //$NON-NLS-1$
 
@@ -35,22 +35,25 @@ public class TSalesforceInputDefinition extends ComponentDefinition {
 
     protected SalesforceConnectionProperties properties;
 
-    @Override
+
+//    @Override
     public ComponentProperties createProperties() {
-        return new TSalesforceInputProperties();
+        return null;
+        // FIXME
+//        return new TSalesforceInputProperties();
     }
 
-    @Override
-    public Family[] getSupportedFamilies() {
-        return new Family[] { Family.BUSINESS, Family.CLOUD };
-    }
+  //  @Override
+    //public Family[] getSupportedFamilies() {
+      //  return new Family[] { Family.BUSINESS, Family.CLOUD };
+    //}
 
     /*
      * (non-Javadoc)
      * 
      * @see org.talend.component.ComponentDefinition#getName()
      */
-    @Override
+    //@Override
     public String getName() {
         return COMPONENT_NAME;
     }

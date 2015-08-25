@@ -14,11 +14,12 @@ package org.talend.component.salesforce.tsalesforceinput;
 
 import org.talend.component.ComponentProperties;
 import org.talend.component.properties.Property;
-import org.talend.component.properties.layout.Layout;
+import org.talend.component.properties.presentation.Layout;
 import org.talend.component.salesforce.SalesforceConnectionProperties;
 import org.talend.component.salesforce.tsalesforceconnect.TSalesforceConnectProperties;
 
-public class TSalesforceInputProperties extends ComponentProperties {
+// FIXME - this breaks the boot hack because there are multiple sets of properties
+public class TSalesforceInputProperties /*extends ComponentProperties*/ {
 
     Property<SalesforceConnectionProperties> connection = new Property<SalesforceConnectionProperties>("connection", "Connection")
             .setRequired(true).setValue(new TSalesforceConnectProperties());
@@ -30,7 +31,7 @@ public class TSalesforceInputProperties extends ComponentProperties {
     }
 
     public void setupLayout() {
-        connection.setLayout(Layout.create().setGroup(PAGE_MAIN).setRow(1));
-        module.setLayout(Layout.create().setGroup(PAGE_MAIN).setRow(2));
+        connection.setLayout(Layout.create().setRow(1));
+        module.setLayout(Layout.create().setRow(2));
     }
 }

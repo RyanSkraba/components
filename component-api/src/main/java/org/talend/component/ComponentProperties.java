@@ -1,10 +1,14 @@
 package org.talend.component;
 
 import org.talend.component.properties.Property;
-import org.talend.component.properties.layout.Layout;
+import org.talend.component.properties.presentation.Form;
+import org.talend.component.properties.presentation.Layout;
+import org.talend.component.properties.presentation.Wizard;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The {@code ComponentProperties} class contains the definitions of the properties associated
@@ -15,30 +19,50 @@ import java.lang.reflect.Method;
  * can be defined include those for desktop (Eclipse), web, and scripting. All of these
  * will use the code defined here for their construction and validation.
  * <p>
- * All aspects of the properties are defined in a subclass of this
- * class using the {@link Property} and {@link Layout} classes. In addition in cases where
- * user interface decisions are made in code, methods can be added to the subclass
+ * All aspects of the properties are defined in a subclass of this
+ * class using the {@link Property}, {@link Layout}, {@link Form}, and {@link Wizard} classes.
+ * In addition in cases where user interface decisions are made in code, methods can be added to the subclass
  * to influence the flow of the user interface and help with validation.
  * <p>
  * Each property can be a Java type, both simple types and collections are permitted.
  * In addition, {@code ComponentProperties} classes can be composed allowing hierarchies
  * of properties and collections of properties to be reused.
  * <p>
- * Properties can be grouped into forms which can be presented in various ways
- * by the user interface (for example, a wizard page, a tab in a property sheet, or a dialog).
- * A wizard can be defined which is a sequence of forms.
- *
+ * Properties can be grouped into {@link Form} objects
+ * which can be presented in various ways by the user interface (for example, a wizard page, a
+ * tab in a property sheet, or a dialog).
+ * <p>
+ * A {@link Wizard} can be defined which is a sequence of forms.
+ * <p>
+ * Methods can be added in subclasses according to the conventions below to help direct the UI. These methods
+ * will be automatically called by the UI code.
+ * <ul>
+ * <li>{@code before&lt;PropertyName&gt;} - Called before the property is presented in the UI. This
+ * can be used to compute anything required to display the property.
+ * </li>
+ * <li>{@code validate&lt;PropertyName&gt;} - Called after the property value has been entered in the UI.
+ * This will return a {@link org.talend.component.properties.ValidationResult} object with any error information.
+ * </li>
+ * <li>{@code beforeForm&lt;FormName&gt;} - Called before the form is displayed.
+ * </li>
+ * </ul>
  */
 
 // @JsonSerialize(using = ComponentPropertiesSerializer.class)
 public abstract class ComponentProperties {
 
-    public static final String PAGE_MAIN = "main";
+    protected List<Form> forms;
+    protected List<Wizard> wizards;
 
-    public static final String PAGE_ADVANCED = "advanced";
+    public ComponentProperties() {
+        forms = new ArrayList<Form>();
+        wizards = new ArrayList<Wizard>();
+    }
+
+    // TODO - do we need something indicating the form is to be refreshed. This should be at the Form level.
 
     /**
-     * This is called every time the layout of the component properties needs to be updated
+     * This is called every time the presentation of the component properties needs to be updated
      */
     public void refreshLayout() {
         // do nothing by default
