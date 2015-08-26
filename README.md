@@ -24,16 +24,16 @@ Recommend using [Google Postman](https://chrome.google.com/webstore/detail/postm
 Use [http://localhost:8080/SalesforceConnect/definition/getProperties](http://localhost:8080/SalesforceConnect/definition/getProperties) after starting the server.
 
 
-## Modules
+## Folders/Modules/Maven
 
-| Folder                | Module              | Group               | Artifact           | Description                                   |
-|:---------------------:|:-------------------:|:-------------------:|:------------------:|:----------------------------------------------------:|
-| root                    | component-parent      | org.talend.component  | component             | *This whole thing*                               |
-| [component-api]         | component-api         | org.talend.component  | component-api         | *API used to define and access component*        |
-| [components-common]     | components-common     | org.talend.components | components-common     | *Code shared by multiple components*             |
-| [components-salesforce] | components-salesforce | org.talend.components | components-salesforce | *SFDC components*                                |
-| [component-testservice] | component-testservice | org.talend.component  | component-testservice | *Temporary web test service*                     |
-| [tooling]               | tooling               |                       |                       | *IDE specific config files + some other stuff*   |
+| Folder                                         | Module                | Group                 | Artifact              | Description                                      |
+|:----------------------------------------------:|:---------------------:|:---------------------:|:---------------------:|:------------------------------------------------:|
+| root                                           | component-parent      | org.talend.component  | component             | *This whole thing*                               |
+| [component-api](component-api)                 | component-api         | org.talend.component  | component-api         | *API used to define and access component*        |
+| [components-common](components-common)         | components-common     | org.talend.components | components-common     | *Code shared by multiple components*             |
+| [components-salesforce](components-salesforce) | components-salesforce | org.talend.components | components-salesforce | *SFDC components*                                |
+| [component-testservice](components-testservice)| component-testservice | org.talend.component  | component-testservice | *Temporary web test service*                     |
+| [tooling]                                      | tooling               |                       |                       | *IDE specific config files + some other stuff*   |
 
 ## Build
 - Build is maven based and there is a top-level pom that builds everything.
