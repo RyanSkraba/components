@@ -9,13 +9,6 @@ This consists of two packages:
 Component developers will generally never need to modify this code.
 - org.talend.components - All of the components go here.
 
-The maven group id is org.talend.component and the artifact ids are:
-
-- component-api (org.talend.component) - The base/framework classes.
-- components-common (org.talend.components.commnon) - Component code that's shared among different components.
-- components-salesforce (org.talend.components.salesforce) - All Salesforce components.
-
-
 ## Instructions for testing
 
 In the top level folder:
@@ -33,8 +26,8 @@ Use [http://localhost:8080/SalesforceConnect/definition/getProperties](http://lo
 
 ## Modules
 
-| _Folder_                | _Module_              | _Group_               | _Artifact_            | _Description_                                    |
-|:------------------------|-----------------------|-----------------------|--------------------------------------------------------------------------|
+| Folder                | Module              | Group               | Artifact           | Description                                   |
+|:---------------------:|:-------------------:|:-------------------:|:------------------:|:----------------------------------------------------:|
 | root                    | component-parent      | org.talend.component  | component             | *This whole thing*                               |
 | [component-api]         | component-api         | org.talend.component  | component-api         | *API used to define and access component*        |
 | [components-common]     | components-common     | org.talend.components | components-common     | *Code shared by multiple components*             |
