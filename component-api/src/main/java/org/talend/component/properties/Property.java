@@ -51,6 +51,14 @@ public class Property<T> {
         this.displayName = displayName;
     }
 
+    public String getName() {
+        return this.name;
+    }
+
+    public String getDisplayName() {
+        return this.displayName;
+    }
+
     public Layout getLayout() {
         return this.layout;
     }
@@ -68,22 +76,9 @@ public class Property<T> {
         return this.value;
     }
 
-    /**
-     * Sets the value.
-     * 
-     * @param value the value to set
-     */
     public Property<T> setValue(T value) {
         this.value = value;
         return this;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public String getDisplayName() {
-        return this.displayName;
     }
 
     public Property<T> setRequired(boolean required) {
@@ -93,6 +88,14 @@ public class Property<T> {
 
     public String getTypeName() {
         return TypeResolver.resolveRawArgument(Property.class, getClass()).getTypeName();
+    }
+
+    public ValidationResult getValidationResult() {
+        return validationResult;
+    }
+
+    public void setValidationResult(ValidationResult validationResult) {
+        this.validationResult = validationResult;
     }
 
     /**

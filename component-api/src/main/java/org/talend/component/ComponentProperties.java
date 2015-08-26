@@ -1,6 +1,7 @@
 package org.talend.component;
 
 import org.talend.component.properties.Property;
+import org.talend.component.properties.ValidationResult;
 import org.talend.component.properties.presentation.Form;
 import org.talend.component.properties.presentation.Layout;
 import org.talend.component.properties.presentation.Wizard;
@@ -41,7 +42,7 @@ import java.util.List;
  * can be used to compute anything required to display the property.
  * </li>
  * <li>{@code validate&lt;PropertyName&gt;} - Called after the property value has been entered in the UI.
- * This will return a {@link org.talend.component.properties.ValidationResult} object with any error information.
+ * This will return a {@link ValidationResult} object with any error information.
  * </li>
  * <li>{@code beforeForm&lt;FormName&gt;} - Called before the form is displayed.
  * </li>
