@@ -21,11 +21,8 @@ package org.talend.component.properties.presentation;
  */
 public class Layout {
 
-    /**
-     * The type of widget to be used to express this property.
-     */
     public enum WidgetType {
-        DEFAULT, TEXT_FIELD, LIST
+        DEFAULT, TEXT_FIELD, TEXT_AREA, LIST, COMBOBOX, RADIOBUTTONS, LISTBOX
     }
 
     /**
@@ -41,6 +38,12 @@ public class Layout {
     private boolean visible = true;
 
     /**
+     * The type of widget to be used to express this property. This is used only if there is
+     * a choice given the type of property.
+     */
+    private WidgetType widgetType = WidgetType.DEFAULT;
+
+    /**
      * Is the validation associated with this expected to be long running (so that the UI
      * should give a wait indication. This is for things like doing a connection or loading
      * data from a database.
@@ -48,6 +51,13 @@ public class Layout {
      * TODO - perhaps in the future we can have some notion of progress.
      */
     private boolean longRunning;
+
+    /**
+     * This property is to be deemphasized in the UI. For example, it can be right-justified (in a LtoR UI)
+     * to keep the description out of the column of the descriptions of the other properties that might be
+     * in a column.
+     */
+    private boolean deemphasize;
 
     public static Layout create() {
         return new Layout();
@@ -71,12 +81,22 @@ public class Layout {
         return this;
     }
 
-    public void setVisible(boolean visible) {
+    public Layout setVisible(boolean visible) {
         this.visible = visible;
+        return this;
     }
 
-    public boolean getVisible() {
+    public boolean isVisible() {
         return visible;
+    }
+
+    public WidgetType getWidgetType() {
+        return widgetType;
+    }
+
+    public Layout setWidgetType(WidgetType widgetType) {
+        this.widgetType = widgetType;
+        return this;
     }
 
     public boolean isLongRunning() {
@@ -85,6 +105,15 @@ public class Layout {
 
     public Layout setLongRunning(boolean longRunning) {
         this.longRunning = longRunning;
+        return this;
+    }
+
+    public boolean isDeemphasize() {
+        return deemphasize;
+    }
+
+    public Layout setDeemphasize(boolean deemphasize) {
+        this.deemphasize = deemphasize;
         return this;
     }
 }

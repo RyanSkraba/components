@@ -52,9 +52,17 @@ import java.util.List;
 // @JsonSerialize(using = ComponentPropertiesSerializer.class)
 public abstract class ComponentProperties {
 
+    // Not a component property
+    // TODO - consider moving this
     protected List<Form> forms;
 
+    // Not a component property
+    // TODO - consider moving this
     protected List<Wizard> wizards;
+
+
+    public Property<String> name = new Property<String>("name", "Name");
+    public Property<String> description = new Property<String>("description", "Descripton");
 
     public ComponentProperties() {
         forms = new ArrayList<Form>();
@@ -70,6 +78,16 @@ public abstract class ComponentProperties {
     }
 
     // TODO - do we need something indicating the form is to be refreshed. This should be at the Form level.
+
+    /**
+     * Declare the layout information for each of the properties
+     */
+    protected void setupLayout() {
+        name.setLayout(Layout.create().setRow(1));
+
+        // TODO - We want this on the form (maybe), or perhaps on a different form, but not in the wizard
+        description.setLayout(Layout.create().setRow(99).setWidgetType(Layout.WidgetType.TEXT_AREA));
+    }
 
     /**
      * This is called every time the presentation of the components properties needs to be updated

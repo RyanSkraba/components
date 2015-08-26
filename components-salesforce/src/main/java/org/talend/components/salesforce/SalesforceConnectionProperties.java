@@ -15,6 +15,7 @@ import org.talend.component.properties.presentation.Wizard;
 @JsonRootName("salesforceConnectionProperties") public class SalesforceConnectionProperties extends ComponentProperties {
 
     public SalesforceConnectionProperties() {
+        super();
         setupLayout();
     }
 
@@ -40,6 +41,10 @@ import org.talend.component.properties.presentation.Wizard;
 
     public Property<Boolean> needCompression = new Property<Boolean>("needCompression", "Need compression");
 
+    // TODO - I'm not happy with this and "advanced" as properties. We need to have a way to express
+    // something that's not a property (current buttons and text that needs to go on the form).
+    // Perhaps make a superclass of Property which contains both Property and UIThing. The callbacks
+    // need to be easy and uniform for both
     public Property<Boolean> testConnection = new Property<Boolean>("testConnection", "Test connection");
 
     public Property<Boolean> advanced = new Property<Boolean>("advanced", "Advanced...");
@@ -52,21 +57,29 @@ import org.talend.component.properties.presentation.Wizard;
 
     public Property<ProxyProperties> proxy = new Property<ProxyProperties>("proxy", "Proxy").setValue(new ProxyProperties());
 
-    private void setupLayout() {
+    @Override
+    protected void setupLayout() {
         Form form;
         Wizard wizard;
 
+        super.setupLayout();
+
+        // TODO - we might want to allow the same property in different positions on different forms, so the
+        // Layout might be per Property per Form.
+
         form = Form.create("Connection", "Salesforce Connection Settings");
         forms.add(form);
-        form.addProperty(url.setLayout(Layout.create().setRow(1)));
-        form.addProperty(loginType.setLayout(Layout.create().setRow(2)));
+        form.addProperty(name.setLayout(Layout.create().setRow(1)));
+        form.addProperty(loginType.setLayout(Layout.create().setRow(2).setDeemphasize(true)));
 
         // Only one of these is visible at a time
         form.addProperty(oauth.setLayout(Layout.create().setRow(3)));
         form.addProperty(userPassword.setLayout(Layout.create().setRow(3)));
 
+        form.addProperty(url.setLayout(Layout.create().setRow(4)));
+
         form.addProperty(advanced.setLayout(Layout.create().setRow(5).setOrder(1)));
-        form.addProperty(testConnection.setLayout(Layout.create().setRow(5).setOrder(2)));
+        form.addProperty(testConnection.setLayout(Layout.create().setRow(5).setOrder(2).setLongRunning(true)));
 
         form = Form.create("Advanced", "Advanced Connection Settings");
         forms.add(form);
@@ -78,6 +91,7 @@ import org.talend.component.properties.presentation.Wizard;
         form.addProperty(proxy.setLayout(Layout.create().setRow(5)));
 
         wizard = Wizard.create("Connection", "Salesforce Connection");
+        // TODO - need to set the icon for the wizard
         wizards.add(wizard);
         wizard.addForm(form);
 
@@ -90,7 +104,7 @@ import org.talend.component.properties.presentation.Wizard;
     }
 
     public ValidationResult validateTestConnection() {
-        // Do the actions to get the connection and return if it worked
+        // TODO - Do the actions to get the connection and return if it worked
         return new ValidationResult();
     }
 
