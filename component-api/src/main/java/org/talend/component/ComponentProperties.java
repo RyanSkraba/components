@@ -19,7 +19,7 @@ import java.util.List;
  * can be defined include those for desktop (Eclipse), web, and scripting. All of these
  * will use the code defined here for their construction and validation.
  * <p>
- * All aspects of the properties are defined in a subclass of this
+ * All aspects of the properties are defined in a subclass of this
  * class using the {@link Property}, {@link Layout}, {@link Form}, and {@link Wizard} classes.
  * In addition in cases where user interface decisions are made in code, methods can be added to the subclass
  * to influence the flow of the user interface and help with validation.
