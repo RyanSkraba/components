@@ -22,6 +22,8 @@ public class Property<T> {
 
     private String name;
 
+    private String displayName;
+
     // TODO - what about properties that have an array of values (like selected tables)
     private T value = null;
 
@@ -32,8 +34,6 @@ public class Property<T> {
     private ValidationResult validationResult;
 
     private boolean required;
-
-    private String displayName;
 
     private boolean requestRefreshLayoutOnChange;
 

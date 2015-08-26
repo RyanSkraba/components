@@ -10,9 +10,9 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.component.salesforce.tsalesforceconnect;
+package org.talend.components.salesforce.tsalesforceconnect;
 
-import org.talend.component.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
 
 
 public class TSalesforceConnectProperties extends SalesforceConnectionProperties {

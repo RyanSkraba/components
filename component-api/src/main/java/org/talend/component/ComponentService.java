@@ -32,36 +32,20 @@ import com.wordnik.swagger.annotations.ApiParam;
 @Service
 public class ComponentService {
 
-    /**
-     * Injected, this is temporary only for testing, we need to have a means of binding the component name with multiple
-     * instances of ComponentDefinition.
-     */
-    protected ComponentDefinition definition;
-
-    protected int nextId;
-
     protected Map<Integer, ComponentProperties> propertiesMap = new HashMap<Integer, ComponentProperties>();
 
     @Autowired
     private ApplicationContext context;
 
-    /**
-     * Temporary for testing a single component which is autowired
-     *
-     * @param design
-     */
-    @Autowired
-    public ComponentService(ComponentDefinition design) {
-        this.definition = design;
+    public ComponentService() {
     }
 
     @RequestMapping(value = "/{name}/definition/getProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ComponentProperties existingComponentProperties(
-            @PathVariable(value = "name") @ApiParam(name = "name", value = "name of the component") String name) {
+    public ComponentProperties getComponentProperties(
+            @PathVariable(value = "name") @ApiParam(name = "name", value = "name of the components") String name) {
         final String beanName = Constants.COMPONENT_BEAN_PREFIX + name;
         final ComponentDefinition compDef = context.getBean(beanName, ComponentDefinition.class);
         ComponentProperties properties = compDef.createProperties();
-        properties.refreshLayout();
         return properties;
     }
 
@@ -76,14 +60,6 @@ public class ComponentService {
         }
         // How to we communicate the propery is invalid, need to mark the properties object somehowh
         return props;
-    }
-
-    public ComponentDefinition getDefinition() {
-        return definition;
-    }
-
-    public void setDefinition(ComponentDefinition definition) {
-        this.definition = definition;
     }
 
 }

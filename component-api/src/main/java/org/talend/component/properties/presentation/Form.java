@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a collection of component {@link org.talend.component.properties.Property} objects
+ * Represents a collection of components {@link org.talend.component.properties.Property} objects
  * that are grouped into a form for display. This form can be manifested for example as a tab in a view,
  * a dialog, or a page in a wizard.
  */

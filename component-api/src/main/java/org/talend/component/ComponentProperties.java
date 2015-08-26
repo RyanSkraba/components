@@ -12,9 +12,9 @@ import java.util.List;
 
 /**
  * The {@code ComponentProperties} class contains the definitions of the properties associated
- * with a component. These definitions contain enough information to automatically
+ * with a components. These definitions contain enough information to automatically
  * construct a nice looking user interface (UI) to populate and validate the properties. The objective
- * is that no actual (graphical) UI code is included in the component's definition
+ * is that no actual (graphical) UI code is included in the components's definition
  * and as well no custom graphical UI is required for most components. The types of UIs that
  * can be defined include those for desktop (Eclipse), web, and scripting. All of these
  * will use the code defined here for their construction and validation.
@@ -52,6 +52,7 @@ import java.util.List;
 public abstract class ComponentProperties {
 
     protected List<Form> forms;
+
     protected List<Wizard> wizards;
 
     public ComponentProperties() {
@@ -59,10 +60,18 @@ public abstract class ComponentProperties {
         wizards = new ArrayList<Wizard>();
     }
 
+    public List<Form> getForms() {
+        return forms;
+    }
+
+    public List<Wizard> getWizards() {
+        return wizards;
+    }
+
     // TODO - do we need something indicating the form is to be refreshed. This should be at the Form level.
 
     /**
-     * This is called every time the presentation of the component properties needs to be updated
+     * This is called every time the presentation of the components properties needs to be updated
      */
     public void refreshLayout() {
         // do nothing by default
@@ -72,14 +81,14 @@ public abstract class ComponentProperties {
      * Component properties, can we have each property assocaited with multiple pages? There should be a default page
      * which is the standard property sheet (if no other page is associated).
      * <p>
-     * Split this into component properties which is the actual container, and ComponentPropertiesDesigner which
-     * contains the instructions for the designer (which might be updated by the component service).
+     * Split this into components properties which is the actual container, and ComponentPropertiesDesigner which
+     * contains the instructions for the designer (which might be updated by the components service).
      * <p>
      * Also, abstract schema handling stuff from this.
      */
 
     ComponentProperties validateProperty(String propName, String value) {
-        // Need to see if there is a method in the component properties that handles this validation and dispatch it.
+        // Need to see if there is a method in the components properties that handles this validation and dispatch it.
         propName = propName.substring(0, 1).toUpperCase() + propName.substring(1);
         Method[] methods = getClass().getMethods();
         for (Method m : methods) {

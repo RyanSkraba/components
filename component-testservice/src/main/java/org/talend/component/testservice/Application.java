@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "org.talend.component")
+@ComponentScan(basePackages = "org.talend.components,org.talend.component")
 public class Application {
 
 	public static void main(String[] args) {

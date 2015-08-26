@@ -10,16 +10,15 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.component.salesforce.tsalesforceinput;
+package org.talend.components.salesforce.tsalesforceinput;
 
 import org.talend.component.ComponentProperties;
 import org.talend.component.properties.Property;
 import org.talend.component.properties.presentation.Layout;
-import org.talend.component.salesforce.SalesforceConnectionProperties;
-import org.talend.component.salesforce.tsalesforceconnect.TSalesforceConnectProperties;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectProperties;
 
-// FIXME - this breaks the boot hack because there are multiple sets of properties
-public class TSalesforceInputProperties /*extends ComponentProperties*/ {
+public class TSalesforceInputProperties extends ComponentProperties {
 
     Property<SalesforceConnectionProperties> connection = new Property<SalesforceConnectionProperties>("connection", "Connection")
             .setRequired(true).setValue(new TSalesforceConnectProperties());

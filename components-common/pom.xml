@@ -11,8 +11,8 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.talend.component</groupId>
-    <artifactId>component-testservice</artifactId>
+    <groupId>org.talend.components</groupId>
+    <artifactId>components-common</artifactId>
     <version>0.1-SNAPSHOT</version>
 
     <dependencies>
@@ -21,15 +21,6 @@
             <artifactId>component-api</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-common</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-salesforce</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
     </dependencies>
+
 </project>

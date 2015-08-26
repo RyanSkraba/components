@@ -1,9 +1,9 @@
-package org.talend.component.salesforce;
+package org.talend.components.salesforce;
 
 import org.talend.component.ComponentProperties;
-import org.talend.component.common.OauthProperties;
-import org.talend.component.common.ProxyProperties;
-import org.talend.component.common.UserPasswordProperties;
+import org.talend.components.common.OauthProperties;
+import org.talend.components.common.ProxyProperties;
+import org.talend.components.common.UserPasswordProperties;
 import org.talend.component.properties.Property;
 import org.talend.component.properties.ValidationResult;
 import org.talend.component.properties.presentation.Form;
@@ -42,6 +42,8 @@ import org.talend.component.properties.presentation.Wizard;
 
     public Property<Boolean> testConnection = new Property<Boolean>("testConnection", "Test connection");
 
+    public Property<Boolean> advanced = new Property<Boolean>("advanced", "Advanced...");
+
     public Property<Integer> timeout = new Property<Integer>("timeout", "Timeout").setValue(0);
 
     public Property<Boolean> httpTraceMessage = new Property<Boolean>("httpTraceMessage", "Trace HTTP message");
@@ -56,14 +58,15 @@ import org.talend.component.properties.presentation.Wizard;
 
         form = Form.create("Connection", "Salesforce Connection Settings");
         forms.add(form);
-        form.addProperty(url.setLayout(Layout.create().setOrder(1).setRow(1)));
+        form.addProperty(url.setLayout(Layout.create().setRow(1)));
         form.addProperty(loginType.setLayout(Layout.create().setRow(2)));
 
         // Only one of these is visible at a time
         form.addProperty(oauth.setLayout(Layout.create().setRow(3)));
         form.addProperty(userPassword.setLayout(Layout.create().setRow(3)));
 
-        form.addProperty(testConnection.setLayout(Layout.create().setOrder(99)));
+        form.addProperty(advanced.setLayout(Layout.create().setRow(5).setOrder(1)));
+        form.addProperty(testConnection.setLayout(Layout.create().setRow(5).setOrder(2)));
 
         form = Form.create("Advanced", "Advanced Connection Settings");
         forms.add(form);

@@ -1,4 +1,4 @@
-package org.talend.component;
+package org.talend.components;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.component.salesforce.tsalesforceinput;
+package org.talend.components.salesforce.tsalesforceinput;
 
 import org.springframework.stereotype.Component;
 import org.talend.component.ComponentConnector;
@@ -18,16 +18,15 @@ import org.talend.component.ComponentConnector.Type;
 import org.talend.component.ComponentDefinition;
 import org.talend.component.ComponentProperties;
 import org.talend.component.Constants;
-import org.talend.component.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
 
 /**
  * Component that can connect to a salesforce system and get some data out of it.
- *
  */
-@Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceInputDefinition.COMPONENT_NAME)
-public class TSalesforceInputDefinition /* extends ComponentDefinition */ {
+@Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceInputDefinition.COMPONENT_NAME) public class TSalesforceInputDefinition
+        extends ComponentDefinition {
 
-    public static final String COMPONENT_NAME = "SalesforceInput"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tSalesforceInput"; //$NON-NLS-1$
 
     protected ComponentConnector[] connectors = { new ComponentConnector(Type.FLOW, 0, 0),
             new ComponentConnector(Type.ITERATE, 1, 0), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
@@ -35,24 +34,14 @@ public class TSalesforceInputDefinition /* extends ComponentDefinition */ {
 
     protected SalesforceConnectionProperties properties;
 
-
-//    @Override
-    public ComponentProperties createProperties() {
-        return null;
-        // FIXME
-//        return new TSalesforceInputProperties();
+    @Override public ComponentProperties createProperties() {
+        return new TSalesforceInputProperties();
     }
 
-  //  @Override
-    //public Family[] getSupportedFamilies() {
-      //  return new Family[] { Family.BUSINESS, Family.CLOUD };
-    //}
+    @Override public Family[] getSupportedFamilies() {
+        return new Family[] { Family.BUSINESS, Family.CLOUD };
+    }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.talend.component.ComponentDefinition#getName()
-     */
     //@Override
     public String getName() {
         return COMPONENT_NAME;

@@ -15,7 +15,7 @@ package org.talend.component.properties;
 import org.talend.component.ComponentProperties;
 
 /**
- * Contains the result of the validation of a component property.
+ * Contains the result of the validation of a components property.
  * <p>
  * This is to be returned from the {@code validate} methods in {@link ComponentProperties}.
  */

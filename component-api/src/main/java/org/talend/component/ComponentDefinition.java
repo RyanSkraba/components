@@ -15,7 +15,7 @@ package org.talend.component;
 /**
  * Component definition service.
  * <p>
- * An instance of this class handles the setup of the properties associated with a component.
+ * An instance of this class handles the setup of the properties associated with a components.
  *
  * @author Francis Upton
  */
