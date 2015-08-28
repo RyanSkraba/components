@@ -1,18 +1,19 @@
 package org.talend.components.salesforce;
 
 import org.talend.component.ComponentProperties;
-import org.talend.components.common.OauthProperties;
-import org.talend.components.common.ProxyProperties;
-import org.talend.components.common.UserPasswordProperties;
 import org.talend.component.properties.Property;
 import org.talend.component.properties.ValidationResult;
 import org.talend.component.properties.presentation.Form;
 import org.talend.component.properties.presentation.Layout;
+import org.talend.component.properties.presentation.Wizard;
+import org.talend.components.common.OauthProperties;
+import org.talend.components.common.ProxyProperties;
+import org.talend.components.common.UserPasswordProperties;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
-import org.talend.component.properties.presentation.Wizard;
 
-@JsonRootName("salesforceConnectionProperties") public class SalesforceConnectionProperties extends ComponentProperties {
+@JsonRootName("salesforceConnectionProperties")
+public class SalesforceConnectionProperties extends ComponentProperties {
 
     public SalesforceConnectionProperties() {
         super();
@@ -24,38 +25,39 @@ import org.talend.component.properties.presentation.Wizard;
             .setValue("https://www.salesforce.com/services/Soap/u/25.0"); //$NON-NLS-1$
 
     public enum LoginType {
-        BASIC,
-        OAUTH
+                           BASIC,
+                           OAUTH
     }
 
-    public Property<LoginType> loginType = new Property<LoginType>("logintype", "Connection type").setRequired(true)
-            .setValue(LoginType.BASIC);
+    public Property<LoginType>              loginType        = new Property<LoginType>("logintype", "Connection type")
+            .setRequired(true).setValue(LoginType.BASIC);
 
-    public Property<OauthProperties> oauth = new Property<OauthProperties>("oauth", "OAuth connection")
+    public Property<OauthProperties>        oauth            = new Property<OauthProperties>("oauth", "OAuth connection")
             .setValue(new OauthProperties());
 
-    public Property<UserPasswordProperties> userPassword = new Property<UserPasswordProperties>("userPassword",
+    public Property<UserPasswordProperties> userPassword     = new Property<UserPasswordProperties>("userPassword",
             "Basic connection").setValue(new UserPasswordProperties());
 
-    public Property<Boolean> bulkConnection = new Property<Boolean>("bulkConnection", "Bulk Connection");
+    public Property<Boolean>                bulkConnection   = new Property<Boolean>("bulkConnection", "Bulk Connection");
 
-    public Property<Boolean> needCompression = new Property<Boolean>("needCompression", "Need compression");
+    public Property<Boolean>                needCompression  = new Property<Boolean>("needCompression", "Need compression");
 
     // TODO - I'm not happy with this and "advanced" as properties. We need to have a way to express
     // something that's not a property (current buttons and text that needs to go on the form).
     // Perhaps make a superclass of Property which contains both Property and UIThing. The callbacks
     // need to be easy and uniform for both
-    public Property<Boolean> testConnection = new Property<Boolean>("testConnection", "Test connection");
+    public Property<Boolean>                testConnection   = new Property<Boolean>("testConnection", "Test connection");
 
-    public Property<Boolean> advanced = new Property<Boolean>("advanced", "Advanced...");
+    public Property<Boolean>                advanced         = new Property<Boolean>("advanced", "Advanced...");
 
-    public Property<Integer> timeout = new Property<Integer>("timeout", "Timeout").setValue(0);
+    public Property<Integer>                timeout          = new Property<Integer>("timeout", "Timeout").setValue(0);
 
-    public Property<Boolean> httpTraceMessage = new Property<Boolean>("httpTraceMessage", "Trace HTTP message");
+    public Property<Boolean>                httpTraceMessage = new Property<Boolean>("httpTraceMessage", "Trace HTTP message");
 
-    public Property<String> clientId = new Property<String>("clientId", "Client Id");
+    public Property<String>                 clientId         = new Property<String>("clientId", "Client Id");
 
-    public Property<ProxyProperties> proxy = new Property<ProxyProperties>("proxy", "Proxy").setValue(new ProxyProperties());
+    public Property<ProxyProperties>        proxy            = new Property<ProxyProperties>("proxy", "Proxy")
+            .setValue(new ProxyProperties());
 
     @Override
     protected void setupLayout() {
@@ -69,26 +71,26 @@ import org.talend.component.properties.presentation.Wizard;
 
         form = Form.create("Connection", "Salesforce Connection Settings");
         forms.add(form);
-        form.addProperty(name.setLayout(Layout.create().setRow(1)));
-        form.addProperty(loginType.setLayout(Layout.create().setRow(2).setDeemphasize(true)));
+        form.addProperty(name, Layout.create().setRow(1));
+        form.addProperty(loginType, Layout.create().setRow(2).setDeemphasize(true));
 
         // Only one of these is visible at a time
-        form.addProperty(oauth.setLayout(Layout.create().setRow(3)));
-        form.addProperty(userPassword.setLayout(Layout.create().setRow(3)));
+        form.addProperty(oauth, Layout.create().setRow(3));
+        form.addProperty(userPassword, Layout.create().setRow(3));
 
-        form.addProperty(url.setLayout(Layout.create().setRow(4)));
+        form.addProperty(url, Layout.create().setRow(4));
 
-        form.addProperty(advanced.setLayout(Layout.create().setRow(5).setOrder(1)));
-        form.addProperty(testConnection.setLayout(Layout.create().setRow(5).setOrder(2).setLongRunning(true)));
+        form.addProperty(advanced, Layout.create().setRow(5).setOrder(1));
+        form.addProperty(testConnection, Layout.create().setRow(5).setOrder(2).setLongRunning(true));
 
         form = Form.create("Advanced", "Advanced Connection Settings");
         forms.add(form);
-        form.addProperty(bulkConnection.setLayout(Layout.create().setRow(1)));
-        form.addProperty(needCompression.setLayout(Layout.create().setRow(2)));
-        form.addProperty(httpTraceMessage.setLayout(Layout.create().setRow(3)));
-        form.addProperty(clientId.setLayout(Layout.create().setRow(4)));
-        form.addProperty(timeout.setLayout(Layout.create().setRow(5)));
-        form.addProperty(proxy.setLayout(Layout.create().setRow(5)));
+        form.addProperty(bulkConnection, Layout.create().setRow(1));
+        form.addProperty(needCompression, Layout.create().setRow(2));
+        form.addProperty(httpTraceMessage, Layout.create().setRow(3));
+        form.addProperty(clientId, Layout.create().setRow(4));
+        form.addProperty(timeout, Layout.create().setRow(5));
+        form.addProperty(proxy, Layout.create().setRow(5));
 
         wizard = Wizard.create("Connection", "Salesforce Connection");
         // TODO - need to set the icon for the wizard
@@ -108,20 +110,20 @@ import org.talend.component.properties.presentation.Wizard;
         return new ValidationResult();
     }
 
-
-    @Override public void refreshLayout() {
-        switch (loginType.getValue()) {
-        case OAUTH:
-            oauth.getLayout().setVisible(true);
-            userPassword.getLayout().setVisible(false);
-            break;
-        case BASIC:
-            oauth.getLayout().setVisible(false);
-            userPassword.getLayout().setVisible(true);
-            break;
-        default:
-            throw new RuntimeException("Enum value should be handled :" + loginType.getValue());
-        }
+    @Override
+    public void refreshLayout() {
+        // switch (loginType.getValue()) {
+        // case OAUTH:
+        // oauth.getLayout().setVisible(true);
+        // userPassword.getLayout().setVisible(false);
+        // break;
+        // case BASIC:
+        // oauth.getLayout().setVisible(false);
+        // userPassword.getLayout().setVisible(true);
+        // break;
+        // default:
+        // throw new RuntimeException("Enum value should be handled :" + loginType.getValue());
+        // }
     }
 
 }

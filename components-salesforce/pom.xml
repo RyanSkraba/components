@@ -11,8 +11,6 @@
 
     <groupId>org.talend.components</groupId>
     <artifactId>components-salesforce</artifactId>
-    <version>0.1-SNAPSHOT</version>
-
     <name>Salesforce Components</name>
 
     <dependencies>

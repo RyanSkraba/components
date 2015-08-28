@@ -12,28 +12,27 @@
 // ============================================================================
 package org.talend.component.properties.presentation;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.talend.component.properties.Property;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Represents a collection of components {@link org.talend.component.properties.Property} objects
- * that are grouped into a form for display. This form can be manifested for example as a tab in a view,
- * a dialog, or a page in a wizard.
+ * Represents a collection of components {@link org.talend.component.properties.Property} objects that are grouped into
+ * a form for display. This form can be manifested for example as a tab in a view, a dialog, or a page in a wizard.
  */
 public class Form {
 
-    private String name;
+    private String                   name;
 
-    private String displayName;
+    private String                   displayName;
 
-    private List<Property> properties;
+    private Map<Property<?>, Layout> properties;
 
     public Form(String name, String displayName) {
         this.name = name;
         this.displayName = displayName;
-        properties = new ArrayList<Property>();
+        properties = new HashMap<Property<?>, Layout>();
     }
 
     public static Form create(String name, String displayName) {
@@ -56,16 +55,16 @@ public class Form {
         this.displayName = displayName;
     }
 
-    public List<Property> getProperties() {
+    public Map<Property<?>, Layout> getProperties() {
         return properties;
     }
 
-    public void setProperties(List<Property> properties) {
+    public void setProperties(Map<Property<?>, Layout> properties) {
         this.properties = properties;
     }
 
-    public Form addProperty(Property property) {
-        properties.add(property);
+    public Form addProperty(Property<?> property, Layout layout) {
+        properties.put(property, layout);
         return this;
     }
 
