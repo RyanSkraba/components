@@ -17,12 +17,12 @@ package org.talend.components.base.properties.presentation;
  * its {@link Form}.
  * <p>
  * TODO - I think the name layout is not quite right here, this encompasses all declarative
- * property-specific presentation properties.
+ * property-specific presentation layoutMap.
  */
 public class Layout {
 
     public enum WidgetType {
-        DEFAULT, TEXT_FIELD, TEXT_AREA, LIST, COMBOBOX, RADIOBUTTONS, LISTBOX
+        DEFAULT, TEXT_FIELD, TEXT_AREA, LIST, COMBOBOX, RADIOBUTTONS, LISTBOX, BUTTON
     }
 
     /**
@@ -54,7 +54,7 @@ public class Layout {
 
     /**
      * This property is to be deemphasized in the UI. For example, it can be right-justified (in a LtoR UI)
-     * to keep the description out of the column of the descriptions of the other properties that might be
+     * to keep the description out of the column of the descriptions of the other layoutMap that might be
      * in a column.
      */
     private boolean deemphasize;

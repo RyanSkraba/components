@@ -14,6 +14,7 @@ package org.talend.components.common;
 
 import org.talend.components.base.ComponentProperties;
 import org.talend.components.base.properties.Property;
+import org.talend.components.base.properties.presentation.Form;
 import org.talend.components.base.properties.presentation.Layout;
 
 public class OauthProperties extends ComponentProperties {
@@ -28,12 +29,15 @@ public class OauthProperties extends ComponentProperties {
 
     public Property<String> tokenFile = new Property<String>("tokenFile", "Token File").setRequired(true);
 
+    public static final String OAUTH = "OAuth";
+
     public OauthProperties() {
-        clientId.setLayout(Layout.create().setRow(0));
-        clientSecret.setLayout(Layout.create().setRow(1));
-        callbackHost.setLayout(Layout.create().setRow(2));
-        callbackPort.setLayout(Layout.create().setRow(3));
-        tokenFile.setLayout(Layout.create().setRow(4));
+        Form form = new Form(this, OAUTH, "OAuth Parameters");
+        form.addChild(clientId, Layout.create().setRow(1).setOrder(1));
+        form.addChild(clientSecret, Layout.create().setRow(1).setOrder(2));
+        form.addChild(callbackHost, Layout.create().setRow(2).setOrder(1));
+        form.addChild(callbackPort, Layout.create().setRow(2).setOrder(2));
+        form.addChild(tokenFile, Layout.create().setRow(3));
     }
 
 }

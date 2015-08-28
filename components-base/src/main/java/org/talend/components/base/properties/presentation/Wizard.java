@@ -12,6 +12,9 @@
 // ============================================================================
 package org.talend.components.base.properties.presentation;
 
+import org.talend.components.base.ComponentProperties;
+import org.talend.components.base.properties.NamedThing;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,40 +22,20 @@ import java.util.List;
  * Represents the definitions for a wizard to help direct the UI of
  * one of more {@link Form} objects.
  */
-public class Wizard {
-
-    private String name;
-
-    private String displayName;
+public class Wizard extends NamedThing {
 
     private Form currentForm;
 
     private List<Form> forms;
 
-    public Wizard(String name, String description) {
-        this.name = name;
-        this.displayName = description;
+    public Wizard(ComponentProperties props, String name, String description) {
+        super(name, description);
         forms = new ArrayList<Form>();
+        props.addWizard(this);
     }
 
-    public static Wizard create(String name, String displayName) {
-        return new Wizard(name, displayName);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
+    public static Wizard create(ComponentProperties props, String name, String displayName) {
+        return new Wizard(props, name, displayName);
     }
 
     public Form getCurrentForm() {
@@ -71,6 +54,5 @@ public class Wizard {
         forms.add(form);
         return this;
     }
-
 
 }

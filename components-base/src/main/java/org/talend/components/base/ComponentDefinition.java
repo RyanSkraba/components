@@ -15,7 +15,7 @@ package org.talend.components.base;
 /**
  * Component definition service.
  * <p>
- * An instance of this class handles the setup of the properties associated with a components.
+ * An instance of this class handles the setup of the layoutMap associated with a components.
  *
  * @author Francis Upton
  */
@@ -27,8 +27,8 @@ public abstract class ComponentDefinition {
      * then which family.
      */
     public enum Family {
-                        BUSINESS,
-                        CLOUD
+        BUSINESS,
+        CLOUD
     }
 
     /*
@@ -36,10 +36,10 @@ public abstract class ComponentDefinition {
      */
 
     /*
-     * Intercomponent property references - need examples for this. - shared clumps of properties, referring to
-     * properties in the same job, refers to properties upstream in the connection.
+     * Intercomponent property references - need examples for this. - shared clumps of layoutMap, referring to
+     * layoutMap in the same job, refers to layoutMap upstream in the connection.
      * 
-     * all properties should support context variables (non-text properties need this).
+     * all layoutMap should support context variables (non-text layoutMap need this).
      */
 
     public abstract ComponentProperties createProperties();

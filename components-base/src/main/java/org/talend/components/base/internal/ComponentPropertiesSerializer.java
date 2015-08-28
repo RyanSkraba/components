@@ -9,12 +9,11 @@ import org.talend.components.base.ComponentProperties;
 
 class ComponentPropertiesSerializer extends JsonSerializer<ComponentProperties> {
 
-	@Override
-	public void serialize(ComponentProperties cp, JsonGenerator jsonGenerator,
-			SerializerProvider sp) throws IOException {
+    @Override public void serialize(ComponentProperties cp, JsonGenerator jsonGenerator, SerializerProvider sp)
+            throws IOException {
 
-		// FIXME
+        // FIXME
 
-	}
+    }
 
 }

@@ -14,14 +14,14 @@ package org.talend.components.salesforce.tsalesforceinput;
 
 import org.talend.components.base.ComponentProperties;
 import org.talend.components.base.properties.Property;
+import org.talend.components.base.properties.presentation.Form;
 import org.talend.components.base.properties.presentation.Layout;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectProperties;
 
 public class TSalesforceInputProperties extends ComponentProperties {
 
-    Property<SalesforceConnectionProperties> connection = new Property<SalesforceConnectionProperties>("connection", "Connection")
-            .setRequired(true).setValue(new TSalesforceConnectProperties());
+    SalesforceConnectionProperties connection = new SalesforceConnectionProperties();
 
     Property<String> module = new Property<String>("module", "Module").setRequired(true);
 
@@ -29,8 +29,12 @@ public class TSalesforceInputProperties extends ComponentProperties {
         setupLayout();
     }
 
+    public static final String INPUT = "Input";
+
     public void setupLayout() {
-        connection.setLayout(Layout.create().setRow(1));
-        module.setLayout(Layout.create().setRow(2));
+        addForm(connection.getForm(SalesforceConnectionProperties.CONNECTION));
+
+        Form inputForm = Form.create(this, INPUT, "Salesforce Input Module");
+        inputForm.addChild(module, Layout.create().setRow(1));
     }
 }

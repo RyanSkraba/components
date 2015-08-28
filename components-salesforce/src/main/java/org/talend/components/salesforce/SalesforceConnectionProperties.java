@@ -1,6 +1,7 @@
 package org.talend.components.salesforce;
 
 import org.talend.components.base.ComponentProperties;
+import org.talend.components.base.properties.PresentationItem;
 import org.talend.components.base.properties.Property;
 import org.talend.components.base.properties.ValidationResult;
 import org.talend.components.base.properties.presentation.Form;
@@ -12,90 +13,89 @@ import org.talend.components.common.UserPasswordProperties;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 
-@JsonRootName("salesforceConnectionProperties")
-public class SalesforceConnectionProperties extends ComponentProperties {
+import java.util.AbstractCollection;
+
+@JsonRootName("salesforceConnectionProperties") public class SalesforceConnectionProperties extends ComponentProperties {
 
     public SalesforceConnectionProperties() {
         super();
         setupLayout();
     }
 
+    //
+    // Properties
+    //
+
     // public String apiVersion;
     public Property<String> url = new Property<String>("url", "Salesforce URL").setRequired(true) //$NON-NLS-1$//$NON-NLS-2$
             .setValue("https://www.salesforce.com/services/Soap/u/25.0"); //$NON-NLS-1$
 
     public enum LoginType {
-                           BASIC,
-                           OAUTH
+        BASIC,
+        OAUTH
     }
 
-    public Property<LoginType>              loginType        = new Property<LoginType>("logintype", "Connection type")
-            .setRequired(true).setValue(LoginType.BASIC);
+    public Property<LoginType> loginType = new Property<LoginType>("logintype", "Connection type").setRequired(true)
+            .setValue(LoginType.BASIC);
 
-    public Property<OauthProperties>        oauth            = new Property<OauthProperties>("oauth", "OAuth connection")
-            .setValue(new OauthProperties());
+    public Property<Boolean> bulkConnection = new Property<Boolean>("bulkConnection", "Bulk Connection");
 
-    public Property<UserPasswordProperties> userPassword     = new Property<UserPasswordProperties>("userPassword",
-            "Basic connection").setValue(new UserPasswordProperties());
+    public Property<Boolean> needCompression = new Property<Boolean>("needCompression", "Need compression");
 
-    public Property<Boolean>                bulkConnection   = new Property<Boolean>("bulkConnection", "Bulk Connection");
+    public Property<Integer> timeout = new Property<Integer>("timeout", "Timeout").setValue(0);
 
-    public Property<Boolean>                needCompression  = new Property<Boolean>("needCompression", "Need compression");
+    public Property<Boolean> httpTraceMessage = new Property<Boolean>("httpTraceMessage", "Trace HTTP message");
 
-    // TODO - I'm not happy with this and "advanced" as properties. We need to have a way to express
-    // something that's not a property (current buttons and text that needs to go on the form).
-    // Perhaps make a superclass of Property which contains both Property and UIThing. The callbacks
-    // need to be easy and uniform for both
-    public Property<Boolean>                testConnection   = new Property<Boolean>("testConnection", "Test connection");
+    public Property<String> clientId = new Property<String>("clientId", "Client Id");
 
-    public Property<Boolean>                advanced         = new Property<Boolean>("advanced", "Advanced...");
+    public Property<ProxyProperties> proxy = new Property<ProxyProperties>("proxy", "Proxy").setValue(new ProxyProperties());
 
-    public Property<Integer>                timeout          = new Property<Integer>("timeout", "Timeout").setValue(0);
+    //
+    // Presentation items
+    //
+    public PresentationItem testConnection = new PresentationItem("testConnection", "Test connection");
 
-    public Property<Boolean>                httpTraceMessage = new Property<Boolean>("httpTraceMessage", "Trace HTTP message");
+    public PresentationItem advanced = new PresentationItem("advanced", "Advanced...");
 
-    public Property<String>                 clientId         = new Property<String>("clientId", "Client Id");
+    //
+    // Nested property collections
+    //
+    public OauthProperties oauth = new OauthProperties();
 
-    public Property<ProxyProperties>        proxy            = new Property<ProxyProperties>("proxy", "Proxy")
-            .setValue(new ProxyProperties());
+    public UserPasswordProperties userPassword = new UserPasswordProperties();
 
-    @Override
-    protected void setupLayout() {
-        Form form;
-        Wizard wizard;
+    public static final String CONNECTION = "Connection";
 
+    public static final String ADVANCED = "Advanced";
+
+    @Override protected void setupLayout() {
         super.setupLayout();
 
-        // TODO - we might want to allow the same property in different positions on different forms, so the
-        // Layout might be per Property per Form.
-
-        form = Form.create("Connection", "Salesforce Connection Settings");
-        forms.add(form);
-        form.addProperty(name, Layout.create().setRow(1));
-        form.addProperty(loginType, Layout.create().setRow(2).setDeemphasize(true));
+        Form connectionForm = Form.create(this, CONNECTION, "Salesforce Connection Settings");
+        connectionForm.addChild(name, Layout.create().setRow(1));
+        connectionForm.addChild(loginType, Layout.create().setRow(2).setDeemphasize(true));
 
         // Only one of these is visible at a time
-        form.addProperty(oauth, Layout.create().setRow(3));
-        form.addProperty(userPassword, Layout.create().setRow(3));
+        connectionForm.addChild(oauth.getForm(OauthProperties.OAUTH), Layout.create().setRow(3));
+        connectionForm.addChild(userPassword.getForm(UserPasswordProperties.USERPASSWORD), Layout.create().setRow(3));
 
-        form.addProperty(url, Layout.create().setRow(4));
+        connectionForm.addChild(url, Layout.create().setRow(4));
 
-        form.addProperty(advanced, Layout.create().setRow(5).setOrder(1));
-        form.addProperty(testConnection, Layout.create().setRow(5).setOrder(2).setLongRunning(true));
+        connectionForm.addChild(advanced, Layout.create().setRow(5).setOrder(1).setWidgetType(Layout.WidgetType.BUTTON));
+        connectionForm.addChild(testConnection,
+                Layout.create().setRow(5).setOrder(2).setLongRunning(true).setWidgetType(Layout.WidgetType.BUTTON));
 
-        form = Form.create("Advanced", "Advanced Connection Settings");
-        forms.add(form);
-        form.addProperty(bulkConnection, Layout.create().setRow(1));
-        form.addProperty(needCompression, Layout.create().setRow(2));
-        form.addProperty(httpTraceMessage, Layout.create().setRow(3));
-        form.addProperty(clientId, Layout.create().setRow(4));
-        form.addProperty(timeout, Layout.create().setRow(5));
-        form.addProperty(proxy, Layout.create().setRow(5));
+        Form advancedForm = Form.create(this, ADVANCED, "Advanced Connection Settings");
+        advancedForm.addChild(bulkConnection, Layout.create().setRow(1));
+        advancedForm.addChild(needCompression, Layout.create().setRow(2));
+        advancedForm.addChild(httpTraceMessage, Layout.create().setRow(3));
+        advancedForm.addChild(clientId, Layout.create().setRow(4));
+        advancedForm.addChild(timeout, Layout.create().setRow(5));
+        advancedForm.addChild(proxy, Layout.create().setRow(5));
 
-        wizard = Wizard.create("Connection", "Salesforce Connection");
+        Wizard wizard = Wizard.create(this, "Connection", "Salesforce Connection");
         // TODO - need to set the icon for the wizard
-        wizards.add(wizard);
-        wizard.addForm(form);
+        wizard.addForm(advancedForm);
 
         refreshLayout();
     }
@@ -110,8 +110,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         return new ValidationResult();
     }
 
-    @Override
-    public void refreshLayout() {
+    @Override public void refreshLayout() {
         // switch (loginType.getValue()) {
         // case OAUTH:
         // oauth.getLayout().setVisible(true);

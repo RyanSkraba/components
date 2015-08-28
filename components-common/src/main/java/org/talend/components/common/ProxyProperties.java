@@ -14,6 +14,7 @@ package org.talend.components.common;
 
 import org.talend.components.base.ComponentProperties;
 import org.talend.components.base.properties.Property;
+import org.talend.components.base.properties.presentation.Form;
 import org.talend.components.base.properties.presentation.Layout;
 
 public class ProxyProperties extends ComponentProperties {
@@ -22,15 +23,15 @@ public class ProxyProperties extends ComponentProperties {
 
     public Property<String> host = new Property<String>("host", "Host").setRequired(true);
 
-    public Property<String> userName = new Property<String>("userName", "User name").setRequired(true);
+    public UserPasswordProperties userPassword = new UserPasswordProperties();
 
-    public Property<String> password = new Property<String>("password", "Password").setRequired(true);
+    public static final String PROXY = "Proxy";
 
     public ProxyProperties() {
-        useProxy.setLayout(Layout.create().setRow(0));
-        host.setLayout(Layout.create().setRow(1));
-        userName.setLayout(Layout.create().setRow(2));
-        password.setLayout(Layout.create().setRow(3));
+        Form form = new Form(this, PROXY, "Proxy Parameters");
+        form.addChild(useProxy, Layout.create().setRow(1));
+        form.addChild(host, Layout.create().setRow(2));
+        form.addChild(userPassword.getForm(UserPasswordProperties.USERPASSWORD), Layout.create().setRow(3));
     }
 
 }

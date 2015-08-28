@@ -12,59 +12,52 @@
 // ============================================================================
 package org.talend.components.base.properties.presentation;
 
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.talend.components.base.ComponentProperties;
+import org.talend.components.base.properties.NamedThing;
 import org.talend.components.base.properties.Property;
+
+import javax.validation.constraints.Null;
 
 /**
  * Represents a collection of components {@link Property} objects that are grouped into
  * a form for display. This form can be manifested for example as a tab in a view, a dialog, or a page in a wizard.
  */
-public class Form {
+public class Form extends NamedThing {
 
-    private String                   name;
+    protected List<NamedThing> children;
 
-    private String                   displayName;
+    protected Map<NamedThing, Layout> layoutMap;
 
-    private Map<Property<?>, Layout> properties;
-
-    public Form(String name, String displayName) {
-        this.name = name;
-        this.displayName = displayName;
-        properties = new HashMap<Property<?>, Layout>();
+    public Form(ComponentProperties props, String name, String displayName) {
+        super(name, displayName);
+        children = new ArrayList();
+        layoutMap = new HashMap<NamedThing, Layout>();
+        props.addForm(this);
     }
 
-    public static Form create(String name, String displayName) {
-        return new Form(name, displayName);
+    public static Form create(ComponentProperties props, String name, String displayName) {
+        return new Form(props, name, displayName);
     }
 
-    public String getName() {
-        return name;
+    public Map<NamedThing, Layout> getLayoutMap() {
+        return layoutMap;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setLayoutMap(Map<NamedThing, Layout> layoutMap) {
+        this.layoutMap = layoutMap;
     }
 
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public Map<Property<?>, Layout> getProperties() {
-        return properties;
-    }
-
-    public void setProperties(Map<Property<?>, Layout> properties) {
-        this.properties = properties;
-    }
-
-    public Form addProperty(Property<?> property, Layout layout) {
-        properties.put(property, layout);
+    public Form addChild(NamedThing child, Layout layout) {
+        if (child == null)
+            throw new NullPointerException();
+        layoutMap.put(child, layout);
+        children.add(child);
         return this;
     }
 

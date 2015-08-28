@@ -27,21 +27,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiParam;
 
-@RestController
-@Api(value = "components", basePath = "/components", description = "Component services")
-@Service
-public class ComponentService {
+@RestController @Api(value = "components", basePath = "/components", description = "Component services") @Service public class ComponentService {
 
     protected Map<Integer, ComponentProperties> propertiesMap = new HashMap<Integer, ComponentProperties>();
 
-    @Autowired
-    private ApplicationContext context;
+    @Autowired private ApplicationContext context;
 
     public ComponentService() {
     }
 
-    @RequestMapping(value = "/components/{name}/properties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ComponentProperties getComponentProperties(
+    @RequestMapping(value = "/components/{name}/properties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE) public ComponentProperties getComponentProperties(
             @PathVariable(value = "name") @ApiParam(name = "name", value = "name of the components") String name) {
         final String beanName = Constants.COMPONENT_BEAN_PREFIX + name;
         final ComponentDefinition compDef = context.getBean(beanName, ComponentDefinition.class);
@@ -49,8 +44,7 @@ public class ComponentService {
         return properties;
     }
 
-    @RequestMapping(value = "/components/{id}/validateProperty/{propName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ComponentProperties validateProperty(
+    @RequestMapping(value = "/components/{id}/validateProperty/{propName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE) public ComponentProperties validateProperty(
             @PathVariable(value = "id") @ApiParam(name = "id", value = "Id of ComponentProperties") int id,
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
             @ApiParam(name = "value", value = "Value of property") String value) {
@@ -58,7 +52,7 @@ public class ComponentService {
         if (props == null) {
             throw new RuntimeException("Not found");
         }
-        // How to we communicate the propery is invalid, need to mark the properties object somehowh
+        // How to we communicate the propery is invalid, need to mark the layoutMap object somehowh
         return props;
     }
 

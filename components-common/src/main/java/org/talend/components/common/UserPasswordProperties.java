@@ -16,27 +16,23 @@ import org.talend.components.base.ComponentProperties;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
+import org.talend.components.base.properties.Property;
+import org.talend.components.base.properties.presentation.Form;
+import org.talend.components.base.properties.presentation.Layout;
 
-@JsonRootName("userPasswordProperties")
-public class UserPasswordProperties extends ComponentProperties {
+@JsonRootName("userPasswordProperties") public class UserPasswordProperties extends ComponentProperties {
 
-	@JsonProperty
-	public String userId;
+    public Property<String> userId = new Property<String>("userId", "User Id").setRequired(true);
 
-	@JsonProperty
-	public String password;
-	
-	public String getUserId() {
-		return userId;
-	}
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public Property<String> password = new Property<String>("password", "Password").setRequired(true);
+
+    public static final String USERPASSWORD = "UserPassword";
+
+    public UserPasswordProperties() {
+        Form form = new Form(this, USERPASSWORD, "User Password");
+        form.addChild(userId, Layout.create().setRow(1));
+        form.addChild(password, Layout.create().setRow(2));
+
+    }
 
 }
