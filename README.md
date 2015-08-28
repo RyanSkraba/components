@@ -18,14 +18,16 @@ Use [http://localhost:8080/components/tSalesforceConnect/layoutMap](http://local
 
 ## Folders/Modules/Maven
 
-| Folder                                         | Module                | Group                 | Artifact              | Description                                      |
-|:----------------------------------------------:|:---------------------:|:---------------------:|:---------------------:|:------------------------------------------------:|
-| root                                           | components-parent     | org.talend.components | component             | *This whole thing*                               |
-| [components-base](components-base)             | components-base       | org.talend.components | components-base       | *API used to define and access component*        |
-| [components-common](components-common)         | components-common     | org.talend.components | components-common     | *Code shared by multiple components*             |
-| [components-salesforce](components-salesforce) | components-salesforce | org.talend.components | components-salesforce | *SFDC components*                                |
-| [components-testservice](components-testservice)| component-testservice | org.talend.components | components-testservice | *Temporary web test service*                     |
-| [tooling]                                      | tooling               |                       |                       | *IDE specific config files + some other stuff*   |
+The group is: org.talend.components.
+
+| Folder                                         | Module                | Artifact              | Description                                      |
+|:----------------------------------------------:|:---------------------:|:---------------------:|:------------------------------------------------:|
+| root                                           | components-parent     | component             | *This whole thing*                               |
+| [components-base](components-base)             | components-base       | components-base       | *API used to define and access component*        |
+| [components-common](components-common)         | components-common     | components-common     | *Code shared by multiple components*             |
+| [components-salesforce](components-salesforce) | components-salesforce  | components-salesforce | *SFDC components*                                |
+| [components-testservice](components-testservice)| component-testservice | components-testservice | *Temporary web test service*                     |
+| [tooling]                                      | tooling               |                       | *IDE specific config files + some other stuff*   |
 
 ## Build
 - Build is maven based and there is a top-level pom that builds everything.
