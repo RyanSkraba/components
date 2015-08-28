@@ -12,9 +12,9 @@
 // ============================================================================
 package org.talend.components.common;
 
-import org.talend.component.ComponentProperties;
-import org.talend.component.properties.Property;
-import org.talend.component.properties.presentation.Layout;
+import org.talend.components.base.ComponentProperties;
+import org.talend.components.base.properties.Property;
+import org.talend.components.base.properties.presentation.Layout;
 
 public class OauthProperties extends ComponentProperties {
 

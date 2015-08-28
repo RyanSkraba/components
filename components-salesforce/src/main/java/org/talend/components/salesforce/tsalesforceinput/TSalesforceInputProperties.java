@@ -12,9 +12,9 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceinput;
 
-import org.talend.component.ComponentProperties;
-import org.talend.component.properties.Property;
-import org.talend.component.properties.presentation.Layout;
+import org.talend.components.base.ComponentProperties;
+import org.talend.components.base.properties.Property;
+import org.talend.components.base.properties.presentation.Layout;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectProperties;
 

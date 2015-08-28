@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.talend.component</groupId>
+        <groupId>org.talend.components</groupId>
         <artifactId>components</artifactId>
         <version>0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
@@ -15,8 +15,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.talend.component</groupId>
-            <artifactId>component-api</artifactId>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-base</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
         <dependency>

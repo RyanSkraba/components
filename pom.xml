@@ -2,15 +2,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.talend.component</groupId>
+    <groupId>org.talend.components</groupId>
     <artifactId>components</artifactId>
     <packaging>pom</packaging>
     <version>0.1-SNAPSHOT</version>
 
     <name>Talend Component Framework and Components</name>
     <modules>
-        <module>component-api</module>
-        <module>component-testservice</module>
+        <module>components-base</module>
+        <module>components-testservice</module>
         <module>components-common</module>
         <module>components-salesforce</module>
     </modules>

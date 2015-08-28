@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.common;
 
-import org.talend.component.ComponentProperties;
+import org.talend.components.base.ComponentProperties;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;

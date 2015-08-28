@@ -1,11 +1,11 @@
 package org.talend.components.salesforce.tsalesforceconnect;
 
 import org.springframework.stereotype.Component;
-import org.talend.component.ComponentConnector;
-import org.talend.component.ComponentConnector.Type;
-import org.talend.component.ComponentDefinition;
-import org.talend.component.ComponentProperties;
-import org.talend.component.Constants;
+import org.talend.components.base.ComponentConnector;
+import org.talend.components.base.ComponentConnector.Type;
+import org.talend.components.base.ComponentDefinition;
+import org.talend.components.base.ComponentProperties;
+import org.talend.components.base.Constants;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 
 @Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceConnectDefinition.COMPONENT_NAME)

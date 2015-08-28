@@ -1,11 +1,11 @@
 package org.talend.components.salesforce;
 
-import org.talend.component.ComponentProperties;
-import org.talend.component.properties.Property;
-import org.talend.component.properties.ValidationResult;
-import org.talend.component.properties.presentation.Form;
-import org.talend.component.properties.presentation.Layout;
-import org.talend.component.properties.presentation.Wizard;
+import org.talend.components.base.ComponentProperties;
+import org.talend.components.base.properties.Property;
+import org.talend.components.base.properties.ValidationResult;
+import org.talend.components.base.properties.presentation.Form;
+import org.talend.components.base.properties.presentation.Layout;
+import org.talend.components.base.properties.presentation.Wizard;
 import org.talend.components.common.OauthProperties;
 import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.UserPasswordProperties;
