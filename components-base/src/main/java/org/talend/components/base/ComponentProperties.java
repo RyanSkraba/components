@@ -14,15 +14,15 @@ import java.util.List;
 
 /**
  * The {@code ComponentProperties} class contains the definitions of the properties associated
- * with a components. These definitions contain enough information to automatically
+ * with a component. These definitions contain enough information to automatically
  * construct a nice looking user interface (UI) to populate and validate the properties. The objective
- * is that no actual (graphical) UI code is included in the components's definition
+ * is that no actual (graphical) UI code is included in the component's definition
  * and as well no custom graphical UI is required for most components. The types of UIs that
  * can be defined include those for desktop (Eclipse), web, and scripting. All of these
  * will use the code defined here for their construction and validation.
  * <p>
  * All aspects of the properties are defined in a subclass of this
- * class using the {@link Property}, {@link Layout}, {@link Form}, and {@link Wizard} classes.
+ * class using the {@link Property}, {@Link PresentationItem}, {@link Layout}, {@link Form}, and {@link Wizard} classes.
  * In addition in cases where user interface decisions are made in code, methods can be added to the subclass
  * to influence the flow of the user interface and help with validation.
  * <p>
@@ -30,9 +30,9 @@ import java.util.List;
  * In addition, {@code ComponentProperties} classes can be composed allowing hierarchies
  * of properties and collections of properties to be reused.
  * <p>
- * Properties can be grouped into {@link Form} objects
+ * Properties are be grouped into {@link Form} objects
  * which can be presented in various ways by the user interface (for example, a wizard page, a
- * tab in a property sheet, or a dialog).
+ * tab in a property sheet, or a dialog). The same property can appear in multiple forms.
  * <p>
  * A {@link Wizard} can be defined which is a sequence of forms.
  * <p>
@@ -42,7 +42,10 @@ import java.util.List;
  * <li>{@code before&lt;PropertyName&gt;} - Called before the property is presented in the UI. This
  * can be used to compute anything required to display the property.
  * </li>
- * <li>{@code validate&lt;PropertyName&gt;} - Called after the property value has been entered in the UI.
+ * <li>{@code after&lt;PropertyName&gt;} - Called after the property is presented and validated in the UI. This
+ * can be used to update the properties state to consider the changed in this property.
+ * </li>
+ * <li>{@code validate&lt;PropertyName&gt;} - Called to validate the property value that has been entered in the UI.
  * This will return a {@link ValidationResult} object with any error information.
  * </li>
  * <li>{@code beforeForm&lt;FormName&gt;} - Called before the form is displayed.
@@ -56,9 +59,12 @@ public abstract class ComponentProperties {
     // Not a component property
     protected ComponentPropertiesInternal internal;
 
+
     public Property<String> name = new Property<String>("name", "Name");
 
     public Property<String> description = new Property<String>("description", "Descripton");
+
+
 
     public ComponentProperties() {
         internal = new ComponentPropertiesInternal();
@@ -84,8 +90,6 @@ public abstract class ComponentProperties {
         internal.getWizards().add(wizard);
     }
 
-    // TODO - do we need something indicating the form is to be refreshed. This should be at the Form level.
-
     /**
      * Declare the layout information for each of the properties
      */
@@ -95,7 +99,7 @@ public abstract class ComponentProperties {
     /**
      * This is called every time the presentation of the components properties needs to be updated
      */
-    public void refreshLayout() {
+    public void refreshLayout(Form form) {
         // do nothing by default
     }
 

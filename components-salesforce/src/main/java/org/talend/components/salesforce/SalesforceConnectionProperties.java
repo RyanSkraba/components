@@ -53,6 +53,9 @@ import java.util.AbstractCollection;
     //
     // Presentation items
     //
+    public PresentationItem connectionDesc = new PresentationItem("connectionDesc",
+            "Complete these fields in order to connect to your Salesforce account");
+
     public PresentationItem testConnection = new PresentationItem("testConnection", "Test connection");
 
     public PresentationItem advanced = new PresentationItem("advanced", "Advanced...");
@@ -72,18 +75,22 @@ import java.util.AbstractCollection;
         super.setupLayout();
 
         Form connectionForm = Form.create(this, CONNECTION, "Salesforce Connection Settings");
-        connectionForm.addChild(name, Layout.create().setRow(1));
-        connectionForm.addChild(loginType, Layout.create().setRow(2).setDeemphasize(true));
+
+        connectionForm.addChild(connectionDesc, Layout.create().setRow(1));
+
+        connectionForm.addChild(name, Layout.create().setRow(2));
+        connectionForm.addChild(loginType, Layout.create().setRow(3).setDeemphasize(true));
 
         // Only one of these is visible at a time
-        connectionForm.addChild(oauth.getForm(OauthProperties.OAUTH), Layout.create().setRow(3));
-        connectionForm.addChild(userPassword.getForm(UserPasswordProperties.USERPASSWORD), Layout.create().setRow(3));
+        connectionForm.addChild(oauth.getForm(OauthProperties.OAUTH), Layout.create().setRow(4));
+        connectionForm.addChild(userPassword.getForm(UserPasswordProperties.USERPASSWORD), Layout.create().setRow(4));
 
-        connectionForm.addChild(url, Layout.create().setRow(4));
+        connectionForm.addChild(url, Layout.create().setRow(5));
 
-        connectionForm.addChild(advanced, Layout.create().setRow(5).setOrder(1).setWidgetType(Layout.WidgetType.BUTTON));
+        connectionForm.addChild(advanced, Layout.create().setRow(6).setOrder(1).setWidgetType(Layout.WidgetType.BUTTON));
         connectionForm.addChild(testConnection,
-                Layout.create().setRow(5).setOrder(2).setLongRunning(true).setWidgetType(Layout.WidgetType.BUTTON));
+                Layout.create().setRow(6).setOrder(2).setLongRunning(true).setWidgetType(Layout.WidgetType.BUTTON));
+        refreshLayout(connectionForm);
 
         Form advancedForm = Form.create(this, ADVANCED, "Advanced Connection Settings");
         advancedForm.addChild(bulkConnection, Layout.create().setRow(1));
@@ -92,17 +99,15 @@ import java.util.AbstractCollection;
         advancedForm.addChild(clientId, Layout.create().setRow(4));
         advancedForm.addChild(timeout, Layout.create().setRow(5));
         advancedForm.addChild(proxy, Layout.create().setRow(5));
+        refreshLayout(advancedForm);
 
         Wizard wizard = Wizard.create(this, "Connection", "Salesforce Connection");
         // TODO - need to set the icon for the wizard
         wizard.addForm(advancedForm);
-
-        refreshLayout();
     }
 
-    public ValidationResult validateLoginType() {
-        refreshLayout();
-        return new ValidationResult();
+    public void afterLoginType() {
+        refreshLayout(getForm(CONNECTION));
     }
 
     public ValidationResult validateTestConnection() {
@@ -110,19 +115,23 @@ import java.util.AbstractCollection;
         return new ValidationResult();
     }
 
-    @Override public void refreshLayout() {
-        // switch (loginType.getValue()) {
-        // case OAUTH:
-        // oauth.getLayout().setVisible(true);
-        // userPassword.getLayout().setVisible(false);
-        // break;
-        // case BASIC:
-        // oauth.getLayout().setVisible(false);
-        // userPassword.getLayout().setVisible(true);
-        // break;
-        // default:
-        // throw new RuntimeException("Enum value should be handled :" + loginType.getValue());
-        // }
+    @Override public void refreshLayout(Form form) {
+        if (form.getName().equals(CONNECTION)) {
+            // TODO - need a way to tell the UI that the form's layout needs to be refreshed
+            // based on this change
+            switch (loginType.getValue()) {
+            case OAUTH:
+                form.getLayout(OauthProperties.OAUTH).setVisible(true);
+                form.getLayout(UserPasswordProperties.USERPASSWORD).setVisible(false);
+                break;
+            case BASIC:
+                form.getLayout(OauthProperties.OAUTH).setVisible(false);
+                form.getLayout(UserPasswordProperties.USERPASSWORD).setVisible(true);
+                break;
+            default:
+                throw new RuntimeException("Enum value should be handled :" + loginType.getValue());
+            }
+        }
     }
 
 }

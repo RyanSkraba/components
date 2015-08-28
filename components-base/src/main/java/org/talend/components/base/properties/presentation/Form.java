@@ -32,12 +32,12 @@ public class Form extends NamedThing {
 
     protected List<NamedThing> children;
 
-    protected Map<NamedThing, Layout> layoutMap;
+    protected Map<String, Layout> layoutMap;
 
     public Form(ComponentProperties props, String name, String displayName) {
         super(name, displayName);
         children = new ArrayList();
-        layoutMap = new HashMap<NamedThing, Layout>();
+        layoutMap = new HashMap<String, Layout>();
         props.addForm(this);
     }
 
@@ -45,20 +45,25 @@ public class Form extends NamedThing {
         return new Form(props, name, displayName);
     }
 
-    public Map<NamedThing, Layout> getLayoutMap() {
-        return layoutMap;
+    public List<NamedThing> getChildren() {
+        return children;
     }
 
-    public void setLayoutMap(Map<NamedThing, Layout> layoutMap) {
-        this.layoutMap = layoutMap;
+    // FIXME - only here for JSON
+    public Map<String, Layout> getLayoutMap() {
+        return layoutMap;
     }
 
     public Form addChild(NamedThing child, Layout layout) {
         if (child == null)
             throw new NullPointerException();
-        layoutMap.put(child, layout);
+        layoutMap.put(child.getName(), layout);
         children.add(child);
         return this;
+    }
+
+    public Layout getLayout(String child) {
+        return layoutMap.get(child);
     }
 
 }
