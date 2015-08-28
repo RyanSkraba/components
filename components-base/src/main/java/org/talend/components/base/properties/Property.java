@@ -20,7 +20,7 @@ import java.util.List;
 
 public class Property<T> extends NamedThing {
 
-    // TODO - what about layoutMap that have an array of values (like selected tables)
+    // TODO - what about properties that have an array of values (like selected tables)
     private T value = null;
 
     private List<T> possibleValues;

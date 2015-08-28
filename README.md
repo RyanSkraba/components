@@ -13,7 +13,7 @@ mvn spring-boot:run
 
 Recommend using [Google Postman](https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en) as the web client.
 
-Use [http://localhost:8080/components/tSalesforceConnect/layoutMap](http://localhost:8080/components/tSalesforceConnect/layoutMap) after starting the server.
+Use [http://localhost:8080/components/tSalesforceConnect/properties](http://localhost:8080/components/tSalesforceConnect/properties) after starting the server.
 
 
 ## Folders/Modules/Maven

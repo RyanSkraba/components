@@ -52,7 +52,7 @@ import com.wordnik.swagger.annotations.ApiParam;
         if (props == null) {
             throw new RuntimeException("Not found");
         }
-        // How to we communicate the propery is invalid, need to mark the layoutMap object somehowh
+        // How to we communicate the propery is invalid, need to mark the properties object somehowh
         return props;
     }
 
