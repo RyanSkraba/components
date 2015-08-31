@@ -59,6 +59,16 @@ public class Layout {
      */
     private boolean deemphasize;
 
+
+    //
+    // Internal properties set by the component framework
+    //
+
+    private boolean callBefore;
+    private boolean callValidate;
+    private boolean callAfter;
+
+
     public static Layout create() {
         return new Layout();
     }
@@ -115,5 +125,35 @@ public class Layout {
     public Layout setDeemphasize(boolean deemphasize) {
         this.deemphasize = deemphasize;
         return this;
+    }
+
+
+    //
+    // These are automatically set by the component framework; they
+    // are not to be specified by the user.
+    //
+
+    public boolean isCallBefore() {
+        return callBefore;
+    }
+
+    public void setCallBefore(boolean callBefore) {
+        this.callBefore = callBefore;
+    }
+
+    public boolean isCallValidate() {
+        return callValidate;
+    }
+
+    public void setCallValidate(boolean callValidate) {
+        this.callValidate = callValidate;
+    }
+
+    public boolean isCallAfter() {
+        return callAfter;
+    }
+
+    public void setCallAfter(boolean callAfter) {
+        this.callAfter = callAfter;
     }
 }

@@ -7,7 +7,7 @@ In the top level folder:
 
 ```
 mvn clean install
-cd component-testservice
+cd component-salesforce
 mvn spring-boot:run
 ```
 
@@ -26,7 +26,6 @@ The group is: org.talend.components.
 | [components-base](components-base)             | components-base       | components-base       | *API used to define and access component*        |
 | [components-common](components-common)         | components-common     | components-common     | *Code shared by multiple components*             |
 | [components-salesforce](components-salesforce) | components-salesforce  | components-salesforce | *SFDC components*                                |
-| [components-testservice](components-testservice)| component-testservice | components-testservice | *Temporary web test service*                     |
 | [tooling]                                      | tooling               |                       | *IDE specific config files + some other stuff*   |
 
 ## Build

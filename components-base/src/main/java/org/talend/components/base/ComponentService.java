@@ -19,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -36,24 +33,30 @@ import com.wordnik.swagger.annotations.ApiParam;
     public ComponentService() {
     }
 
-    @RequestMapping(value = "/components/{name}/properties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE) public ComponentProperties getComponentProperties(
+    /**
+     * Used to get a new {@link ComponentProperties} object for the specified component.
+     * <p>
+     * The {@code ComponentProperties} has everything required to render a UI and as well
+     * capture and validate the values of the properties associated with the component, based
+     * on interactions with this service.
+     *
+     * @param name the name of the component
+     * @return a {@code ComponentProperties} object.
+     */
+    @RequestMapping(value = "/components/{name}/properties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE) public @ResponseBody ComponentProperties getComponentProperties(
             @PathVariable(value = "name") @ApiParam(name = "name", value = "name of the components") String name) {
         final String beanName = Constants.COMPONENT_BEAN_PREFIX + name;
+        Object beans = context.getBeansOfType(Object.class);
         final ComponentDefinition compDef = context.getBean(beanName, ComponentDefinition.class);
         ComponentProperties properties = compDef.createProperties();
         return properties;
     }
 
-    @RequestMapping(value = "/components/{id}/validateProperty/{propName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE) public ComponentProperties validateProperty(
-            @PathVariable(value = "id") @ApiParam(name = "id", value = "Id of ComponentProperties") int id,
+    @RequestMapping(value = "/components/validateProperty/{propName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE) public @ResponseBody ComponentProperties validateProperty(
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
-            @ApiParam(name = "value", value = "Value of property") String value) {
-        ComponentProperties props = propertiesMap.get(id);
-        if (props == null) {
-            throw new RuntimeException("Not found");
-        }
-        // How to we communicate the propery is invalid, need to mark the properties object somehowh
-        return props;
+            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties) {
+        properties.validateProperty(propName);
+        return properties;
     }
 
 }

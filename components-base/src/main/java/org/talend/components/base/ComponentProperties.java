@@ -59,12 +59,9 @@ public abstract class ComponentProperties {
     // Not a component property
     protected ComponentPropertiesInternal internal;
 
-
     public Property<String> name = new Property<String>("name", "Name");
 
     public Property<String> description = new Property<String>("description", "Descripton");
-
-
 
     public ComponentProperties() {
         internal = new ComponentPropertiesInternal();
@@ -91,6 +88,15 @@ public abstract class ComponentProperties {
     }
 
     /**
+     * Returns the {@link ValidationResult} for the property being validated if requested.
+     *
+     * @return a ValidationResult
+     */
+    public ValidationResult getValidationResult() {
+        return internal.getValidationResult();
+    }
+
+    /**
      * Declare the layout information for each of the properties
      */
     protected void setupLayout() {
@@ -113,17 +119,16 @@ public abstract class ComponentProperties {
      * Also, abstract schema handling stuff from this.
      */
 
-    ComponentProperties validateProperty(String propName, String value) {
+    void validateProperty(String propName) {
         // Need to see if there is a method in the components properties that handles this validation and dispatch it.
         propName = propName.substring(0, 1).toUpperCase() + propName.substring(1);
+        String methodName = "validate" + propName;
         Method[] methods = getClass().getMethods();
         for (Method m : methods) {
-            if (m.getName().endsWith(propName)) {
+            if (m.getName().equals(methodName)) {
                 try {
-
-                    // TODO: Convert the value to the correct type
-
-                    m.invoke(this, value);
+                    ValidationResult validationResult = (ValidationResult) m.invoke(this);
+                    internal.setValidationResult(validationResult);
                     break;
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
@@ -132,7 +137,6 @@ public abstract class ComponentProperties {
                 }
             }
         }
-        return this;
     }
 
 }

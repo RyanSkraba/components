@@ -1,5 +1,6 @@
 package org.talend.components.base.internal;
 
+import org.talend.components.base.properties.ValidationResult;
 import org.talend.components.base.properties.presentation.Form;
 import org.talend.components.base.properties.presentation.Wizard;
 
@@ -11,6 +12,8 @@ public class ComponentPropertiesInternal {
     protected List<Form> forms;
 
     protected List<Wizard> wizards;
+
+    protected ValidationResult validationResult;
 
     public ComponentPropertiesInternal() {
         forms = new ArrayList<Form>();
@@ -33,4 +36,11 @@ public class ComponentPropertiesInternal {
         return null;
     }
 
+    public ValidationResult getValidationResult() {
+        return validationResult;
+    }
+
+    public void setValidationResult(ValidationResult validationResult) {
+        this.validationResult = validationResult;
+    }
 }

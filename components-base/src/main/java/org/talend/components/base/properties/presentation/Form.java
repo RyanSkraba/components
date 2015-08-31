@@ -34,6 +34,12 @@ public class Form extends NamedThing {
 
     protected Map<String, Layout> layoutMap;
 
+    /**
+     * Indicate that some {@link Layout} objects for this form have changed and the UI should
+     * be re-rendered to reflect the changed layout.
+     */
+    protected boolean refreshUI;
+
     public Form(ComponentProperties props, String name, String displayName) {
         super(name, displayName);
         children = new ArrayList();
@@ -66,4 +72,11 @@ public class Form extends NamedThing {
         return layoutMap.get(child);
     }
 
+    public boolean isRefreshUI() {
+        return refreshUI;
+    }
+
+    public void setRefreshUI(boolean refreshUI) {
+        this.refreshUI = refreshUI;
+    }
 }
