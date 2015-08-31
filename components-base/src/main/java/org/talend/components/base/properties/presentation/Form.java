@@ -22,8 +22,6 @@ import org.talend.components.base.ComponentProperties;
 import org.talend.components.base.properties.NamedThing;
 import org.talend.components.base.properties.Property;
 
-import javax.validation.constraints.Null;
-
 /**
  * Represents a collection of components {@link Property} objects that are grouped into
  * a form for display. This form can be manifested for example as a tab in a view, a dialog, or a page in a wizard.

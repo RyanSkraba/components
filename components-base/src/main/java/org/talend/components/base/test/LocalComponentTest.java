@@ -3,19 +3,26 @@ package org.talend.components.base.test;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
+import org.talend.components.base.ComponentProperties;
+import org.talend.components.base.ComponentService;
+import org.talend.components.base.test.testcomponent.TestComponentDefinition;
 
-public class LocalComponentTest extends TestCase {
+@RunWith(SpringJUnit4ClassRunner.class) @ContextConfiguration(classes = { ComponentService.class,
+        TestComponentDefinition.class }, loader = AnnotationConfigContextLoader.class) public class LocalComponentTest {
 
-    public LocalComponentTest(String testName) {
-        super(testName);
+    @Autowired protected ComponentService componentService;
+
+    public LocalComponentTest() {
     }
 
-    public static Test suite() {
-        return new TestSuite(LocalComponentTest.class);
-    }
-
-    public void testApp() {
-        assertTrue(true);
+    @org.junit.Test public void testGetProps() {
+        ComponentProperties props = componentService.getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
+        System.out.println(props);
     }
 
 }
