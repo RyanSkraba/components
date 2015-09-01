@@ -28,6 +28,8 @@ import org.talend.components.base.properties.Property;
  */
 public class Form extends NamedThing {
 
+    protected ComponentProperties properties;
+
     protected List<NamedThing> children;
 
     protected Map<String, Layout> layoutMap;
@@ -43,6 +45,7 @@ public class Form extends NamedThing {
         children = new ArrayList();
         layoutMap = new HashMap<String, Layout>();
         props.addForm(this);
+        properties = props;
     }
 
     public static Form create(ComponentProperties props, String name, String displayName) {
@@ -63,6 +66,7 @@ public class Form extends NamedThing {
             throw new NullPointerException();
         layoutMap.put(child.getName(), layout);
         children.add(child);
+        properties.setLayoutMethods(child.getName(), layout);
         return this;
     }
 

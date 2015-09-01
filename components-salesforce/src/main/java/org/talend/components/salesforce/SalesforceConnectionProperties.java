@@ -35,7 +35,7 @@ import java.util.AbstractCollection;
         OAUTH
     }
 
-    public Property<LoginType> loginType = new Property<LoginType>("logintype", "Connection type").setRequired(true)
+    public Property<LoginType> loginType = new Property<LoginType>("loginType", "Connection type").setRequired(true)
             .setValue(LoginType.BASIC);
 
     public Property<Boolean> bulkConnection = new Property<Boolean>("bulkConnection", "Bulk Connection");
@@ -116,6 +116,7 @@ import java.util.AbstractCollection;
     }
 
     @Override public void refreshLayout(Form form) {
+        super.refreshLayout(form);
         if (form.getName().equals(CONNECTION)) {
             // TODO - need a way to tell the UI that the form's layout needs to be refreshed
             // based on this change

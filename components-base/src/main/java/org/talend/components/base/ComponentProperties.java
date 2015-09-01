@@ -56,6 +56,10 @@ import java.util.List;
 // @JsonSerialize(using = ComponentPropertiesSerializer.class)
 public abstract class ComponentProperties {
 
+    static final String METHOD_BEFORE = "before";
+    static final String METHOD_AFTER = "after";
+    static final String METHOD_VALIDATE = "validate";
+
     // Not a component property
     protected ComponentPropertiesInternal internal;
 
@@ -106,37 +110,62 @@ public abstract class ComponentProperties {
      * This is called every time the presentation of the components properties needs to be updated
      */
     public void refreshLayout(Form form) {
-        // do nothing by default
+        form.setRefreshUI(true);
     }
 
-    /**
-     * Component properties, can we have each property assocaited with multiple pages? There should be a default page
-     * which is the standard property sheet (if no other page is associated).
-     * <p>
-     * Split this into components properties which is the actual container, and ComponentPropertiesDesigner which
-     * contains the instructions for the designer (which might be updated by the components service).
-     * <p>
-     * Also, abstract schema handling stuff from this.
-     */
+    // Internal - not API
+    public void setLayoutMethods(String property, Layout layout) {
+        Method m;
+        m = findMethod(METHOD_BEFORE, property);
+        if (m != null)
+            layout.setCallBefore(true);
+        m = findMethod(METHOD_AFTER, property);
+        if (m != null)
+            layout.setCallAfter(true);
+        m = findMethod(METHOD_VALIDATE, property);
+        if (m != null)
+            layout.setCallValidate(true);
+    }
 
-    void validateProperty(String propName) {
-        // Need to see if there is a method in the components properties that handles this validation and dispatch it.
+
+    Method findMethod(String type, String propName) {
         propName = propName.substring(0, 1).toUpperCase() + propName.substring(1);
-        String methodName = "validate" + propName;
+        String methodName = type + propName;
         Method[] methods = getClass().getMethods();
         for (Method m : methods) {
             if (m.getName().equals(methodName)) {
-                try {
-                    ValidationResult validationResult = (ValidationResult) m.invoke(this);
-                    internal.setValidationResult(validationResult);
-                    break;
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                }
+                return m;
+            }
+        }
+        return null;
+    }
+
+    void validateProperty(String propName) {
+        Method m = findMethod("validate", propName);
+        if (m != null) {
+            try {
+                ValidationResult validationResult = (ValidationResult) m.invoke(this);
+                internal.setValidationResult(validationResult);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
             }
         }
     }
+
+    void afterProperty(String propName) {
+        Method m = findMethod("after", propName);
+        if (m != null) {
+            try {
+                m.invoke(this);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
 }
