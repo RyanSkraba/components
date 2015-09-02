@@ -10,8 +10,6 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.talend.components.base.ComponentProperties;
 import org.talend.components.base.ComponentService;
 import org.talend.components.base.properties.presentation.Form;
-import org.talend.components.base.test.testcomponent.TestComponentDefinition;
-import org.talend.components.base.test.testcomponent.TestComponentProperties;
 import org.talend.components.common.OauthProperties;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;

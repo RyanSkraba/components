@@ -8,7 +8,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class RestComponentTest extends TestCase {
+public class RestComponentTest /*extends TestCase*/ {
+    /*
 
     public static final String SERVER_URI = "http://localhost:8080/components/";
 
@@ -19,6 +20,9 @@ public class RestComponentTest extends TestCase {
     public static Test suite() {
         return new TestSuite(RestComponentTest.class);
     }
+
+
+    FIXME - finish this
 
     public void testApp() {
         RestTemplate restTemplate = new RestTemplate();
@@ -31,4 +35,5 @@ public class RestComponentTest extends TestCase {
             ;
         }
     }
+    */
 }
