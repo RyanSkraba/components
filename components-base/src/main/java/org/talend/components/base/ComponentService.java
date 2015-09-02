@@ -54,14 +54,14 @@ import com.wordnik.swagger.annotations.ApiParam;
 
     @RequestMapping(value = "/components/validateProperty/{propName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE) public @ResponseBody ComponentProperties validateProperty(
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties) {
+            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties) throws Throwable {
         properties.validateProperty(propName);
         return properties;
     }
 
     @RequestMapping(value = "/components/afterProperty/{propName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE) public @ResponseBody ComponentProperties afterProperty(
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties) {
+            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties) throws Throwable {
         properties.afterProperty(propName);
         return properties;
     }

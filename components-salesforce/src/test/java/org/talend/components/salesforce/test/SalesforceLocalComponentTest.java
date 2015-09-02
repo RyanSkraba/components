@@ -1,3 +1,15 @@
+// ============================================================================
+//
+// Copyright (C) 2006-2015 Talend Inc. - www.talend.com
+//
+// This source code is available under agreement available at
+// %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
+//
+// You should have received a copy of the agreement
+// along with this program; if not, write to Talend SA
+// 9 rue Pages 92150 Suresnes, France
+//
+// ============================================================================
 package org.talend.components.salesforce.test;
 
 import junit.framework.TestCase;
@@ -9,6 +21,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.talend.components.base.ComponentProperties;
 import org.talend.components.base.ComponentService;
+import org.talend.components.base.properties.ValidationResult;
 import org.talend.components.base.properties.presentation.Form;
 import org.talend.components.common.OauthProperties;
 import org.talend.components.common.UserPasswordProperties;
@@ -32,7 +45,7 @@ import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectPro
         System.out.println(props);
     }
 
-    @Test public void testAfterLoginType() {
+    @Test public void testAfterLoginType() throws Throwable {
         SalesforceConnectionProperties props;
         Form f;
 
@@ -53,6 +66,19 @@ import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectPro
         assertFalse(f.getLayout(UserPasswordProperties.USERPASSWORD).isVisible());
         assertTrue(f.getLayout(OauthProperties.OAUTH).isVisible());
 
+    }
+
+    @Test public void testLogin() throws Throwable {
+        SalesforceConnectionProperties props;
+
+        // FIXME - not working yet
+        /*
+        props = (SalesforceConnectionProperties) componentService
+                .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
+        assertEquals(SalesforceConnectionProperties.LoginType.BASIC, props.loginType.getValue());
+        props = (SalesforceConnectionProperties) componentService.validateProperty("testConnection", props);
+        System.out.println(props.getValidationResult());
+        */
     }
 
 }

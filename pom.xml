@@ -74,6 +74,10 @@
             <name>Central Repository</name>
             <url>http://repo.maven.apache.org/maven2</url>
         </repository>
+        <repository>
+            <id>talend_nexus_deployment</id>
+            <url>http://newbuild.talend.com:8081/nexus/content/repositories/releases</url>
+        </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>

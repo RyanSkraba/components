@@ -140,29 +140,25 @@ public abstract class ComponentProperties {
         return null;
     }
 
-    void validateProperty(String propName) {
+    void validateProperty(String propName) throws Throwable {
         Method m = findMethod("validate", propName);
         if (m != null) {
             try {
                 ValidationResult validationResult = (ValidationResult) m.invoke(this);
                 internal.setValidationResult(validationResult);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
             } catch (InvocationTargetException e) {
-                e.printStackTrace();
+                throw e.getTargetException();
             }
         }
     }
 
-    void afterProperty(String propName) {
+    void afterProperty(String propName) throws Throwable {
         Method m = findMethod("after", propName);
         if (m != null) {
             try {
                 m.invoke(this);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
             } catch (InvocationTargetException e) {
-                e.printStackTrace();
+                throw e.getTargetException();
             }
         }
     }
