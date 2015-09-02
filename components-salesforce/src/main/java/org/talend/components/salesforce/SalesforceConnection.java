@@ -22,7 +22,8 @@ public class SalesforceConnection {
                 properties.userPassword.userId.getValue(), properties.userPassword.password.getValue());
         if (properties.timeout.getValue() > 0)
             builder.setTimeout(properties.timeout.getValue());
-        builder.needCompression(properties.needCompression.getValue());
+        if (properties.needCompression.getValue() != null)
+            builder.needCompression(properties.needCompression.getValue());
         if (properties.clientId.getValue() != null)
             builder.setClientID(properties.clientId.getValue());
 
