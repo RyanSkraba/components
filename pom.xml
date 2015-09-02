@@ -9,7 +9,7 @@
 
     <name>Talend Component Framework and Components</name>
     <modules>
-        <module>components-base</module>
+        <module>components-api</module>
         <module>components-common</module>
         <module>components-salesforce</module>
     </modules>
