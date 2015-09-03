@@ -24,6 +24,7 @@ public class UserPasswordProperties extends ComponentProperties {
 
     public Property<String>    userId       = new Property<String>("userId", "User Id").setRequired(true);
 
+    // FIXME - this needs to be encrypted, need to think about how to handle that
     public Property<String>    password     = new Property<String>("password", "Password").setRequired(true);
 
     public static final String USERPASSWORD = "UserPassword";

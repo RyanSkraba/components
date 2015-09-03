@@ -72,16 +72,29 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     }
 
-    @Test
-    public void testLogin() throws Throwable {
+    private SalesforceConnectionProperties setupProps() {
         SalesforceConnectionProperties props;
 
         props = (SalesforceConnectionProperties) componentService
                 .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
-        assertEquals(SalesforceConnectionProperties.LoginType.BASIC, props.loginType.getValue());
         System.out.println("URI:" + props.url.getValue());
         props.userPassword.userId.setValue("fupton@talend.com");
         props.userPassword.password.setValue("talendsal99QSCzLBQgrkEq9w9EXiOt1BSy");
+        return props;
+    }
+
+    @Test
+    public void testLogin() throws Throwable {
+        SalesforceConnectionProperties props = setupProps();
+
+        props = (SalesforceConnectionProperties) componentService.validateProperty("testConnection", props);
+        System.out.println(props.getValidationResult());
+    }
+
+    @Test
+    public void testBulkLogin() throws Throwable {
+        SalesforceConnectionProperties props = setupProps();
+        props.bulkConnection.setValue(true);
 
         props = (SalesforceConnectionProperties) componentService.validateProperty("testConnection", props);
         System.out.println(props.getValidationResult());
