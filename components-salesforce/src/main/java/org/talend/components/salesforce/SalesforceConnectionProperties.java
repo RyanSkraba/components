@@ -124,8 +124,9 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     }
 
     public ValidationResult validateTestConnection() throws Exception {
-        SalesforceConnection conn = new SalesforceConnection();
+        SalesforceRuntime conn = new SalesforceRuntime();
         conn.connect(this);
+        // FIXME - handle the error catching
         return new ValidationResult();
     }
 

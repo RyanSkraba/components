@@ -29,8 +29,6 @@ public class TSalesforceConnectDefinition extends ComponentDefinition {
             new ComponentConnector(Type.ITERATE, 1, 0), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
             new ComponentConnector(Type.SUBJOB_ERROR, 1, 0) };
 
-    protected SalesforceConnectionProperties properties;
-
     @Override
     public ComponentProperties createProperties() {
         return new TSalesforceConnectProperties();

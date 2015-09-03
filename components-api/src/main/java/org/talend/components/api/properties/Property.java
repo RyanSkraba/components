@@ -68,4 +68,11 @@ public class Property<T> extends NamedThing {
         this.validationResult = validationResult;
     }
 
+    public List<T> getPossibleValues() {
+        return possibleValues;
+    }
+
+    public void setPossibleValues(List<T> possibleValues) {
+        this.possibleValues = possibleValues;
+    }
 }

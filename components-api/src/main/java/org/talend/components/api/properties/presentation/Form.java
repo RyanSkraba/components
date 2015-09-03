@@ -12,10 +12,7 @@
 // ============================================================================
 package org.talend.components.api.properties.presentation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.properties.NamedThing;
@@ -29,7 +26,7 @@ public class Form extends NamedThing {
 
     protected ComponentProperties properties;
 
-    protected List<NamedThing> children;
+    protected Map<String, NamedThing> children;
 
     protected Map<String, Layout> layoutMap;
 
@@ -41,7 +38,7 @@ public class Form extends NamedThing {
 
     public Form(ComponentProperties props, String name, String displayName) {
         super(name, displayName);
-        children = new ArrayList();
+        children = new HashMap<String, NamedThing>();
         layoutMap = new HashMap<String, Layout>();
         props.addForm(this);
         properties = props;
@@ -51,8 +48,16 @@ public class Form extends NamedThing {
         return new Form(props, name, displayName);
     }
 
-    public List<NamedThing> getChildren() {
-        return children;
+    public Collection<NamedThing> getChildren() {
+        return children.values();
+    }
+
+    public NamedThing getChild(String name) {
+        return children.get(name);
+    }
+
+    public ComponentProperties getProperties() {
+        return properties;
     }
 
     // FIXME - only here for JSON
@@ -64,7 +69,7 @@ public class Form extends NamedThing {
         if (child == null)
             throw new NullPointerException();
         layoutMap.put(child.getName(), layout);
-        children.add(child);
+        children.put(child.getName(), child);
         properties.setLayoutMethods(child.getName(), layout);
         return this;
     }

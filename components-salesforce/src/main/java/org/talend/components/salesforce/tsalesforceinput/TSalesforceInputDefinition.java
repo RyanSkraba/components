@@ -32,8 +32,6 @@ public class TSalesforceInputDefinition extends ComponentDefinition {
             new ComponentConnector(Type.ITERATE, 1, 0), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
             new ComponentConnector(Type.SUBJOB_ERROR, 1, 0) };
 
-    protected SalesforceConnectionProperties properties;
-
     @Override
     public ComponentProperties createProperties() {
         return new TSalesforceInputProperties();
@@ -44,7 +42,6 @@ public class TSalesforceInputDefinition extends ComponentDefinition {
         return new Family[] { Family.BUSINESS, Family.CLOUD };
     }
 
-    // @Override
     @Override
     public String getName() {
         return COMPONENT_NAME;

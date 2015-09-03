@@ -59,11 +59,19 @@ import com.wordnik.swagger.annotations.ApiParam;
         return properties;
     }
 
+    @RequestMapping(value = "/components/beforeProperty/{propName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE) public @ResponseBody ComponentProperties beforeProperty(
+            @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
+            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties) throws Throwable {
+        properties.beforeProperty(propName);
+        return properties;
+    }
+
     @RequestMapping(value = "/components/afterProperty/{propName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE) public @ResponseBody ComponentProperties afterProperty(
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
             @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties) throws Throwable {
         properties.afterProperty(propName);
         return properties;
     }
+
 
 }

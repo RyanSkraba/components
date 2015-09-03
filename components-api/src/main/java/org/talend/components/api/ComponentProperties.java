@@ -56,7 +56,9 @@ import java.util.List;
 public abstract class ComponentProperties {
 
     static final String METHOD_BEFORE = "before";
+
     static final String METHOD_AFTER = "after";
+
     static final String METHOD_VALIDATE = "validate";
 
     // Not a component property
@@ -126,7 +128,6 @@ public abstract class ComponentProperties {
             layout.setCallValidate(true);
     }
 
-
     Method findMethod(String type, String propName) {
         propName = propName.substring(0, 1).toUpperCase() + propName.substring(1);
         String methodName = type + propName;
@@ -151,6 +152,17 @@ public abstract class ComponentProperties {
         }
     }
 
+    void beforeProperty(String propName) throws Throwable {
+        Method m = findMethod("before", propName);
+        if (m == null)
+            throw new IllegalStateException("before method not found for: " + propName);
+        try {
+            m.invoke(this);
+        } catch (InvocationTargetException e) {
+            throw e.getTargetException();
+        }
+    }
+
     void afterProperty(String propName) throws Throwable {
         Method m = findMethod("after", propName);
         if (m != null) {
@@ -161,6 +173,5 @@ public abstract class ComponentProperties {
             }
         }
     }
-
 
 }

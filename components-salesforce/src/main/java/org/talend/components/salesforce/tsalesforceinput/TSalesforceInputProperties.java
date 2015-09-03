@@ -17,24 +17,20 @@ import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Layout;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.SalesforceModuleProperties;
 
 public class TSalesforceInputProperties extends ComponentProperties {
 
-    SalesforceConnectionProperties connection = new SalesforceConnectionProperties();
+    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties();
 
-    Property<String>               module     = new Property<String>("module", "Module").setRequired(true);
+    public SalesforceModuleProperties module = new SalesforceModuleProperties(connection);
 
     public TSalesforceInputProperties() {
         setupLayout();
     }
 
-    public static final String INPUT = "Input";
-
-    @Override
-    public void setupLayout() {
+    @Override public void setupLayout() {
         addForm(connection.getForm(SalesforceConnectionProperties.CONNECTION));
-
-        Form inputForm = Form.create(this, INPUT, "Salesforce Input Module");
-        inputForm.addChild(module, Layout.create().setRow(1));
+        addForm(module.getForm(SalesforceModuleProperties.MODULE));
     }
 }
