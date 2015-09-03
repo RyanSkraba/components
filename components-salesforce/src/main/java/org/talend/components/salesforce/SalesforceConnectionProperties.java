@@ -19,7 +19,7 @@ import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Layout;
 import org.talend.components.api.properties.presentation.Wizard;
-import org.talend.components.common.OauthProperties;
+import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.UserPasswordProperties;
 
@@ -39,7 +39,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
     // public String apiVersion;
     public Property<String> url = new Property<String>("url", "Salesforce URL").setRequired(true) //$NON-NLS-1$//$NON-NLS-2$
-            .setValue("https://www.salesforce.com/services/Soap/u/25.0"); //$NON-NLS-1$
+            .setValue("https://www.salesforce.com/services/Soap/u/34.0"); //$NON-NLS-1$
 
     public enum LoginType {
                            BASIC,

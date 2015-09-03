@@ -12,22 +12,25 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import org.talend.salesforce.SforceBasicConnection;
+import com.sforce.soap.partner.Connector;
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.ws.ConnectorConfig;
 
 public class SalesforceConnection {
 
     public void connect(SalesforceConnectionProperties properties) throws Exception {
 
-        SforceBasicConnection.Builder builder = new SforceBasicConnection.Builder(properties.url.getValue(),
-                properties.userPassword.userId.getValue(), properties.userPassword.password.getValue());
+        ConnectorConfig config = new ConnectorConfig();
+        config.setUsername(properties.userPassword.userId.getValue());
+        config.setPassword(properties.userPassword.password.getValue());
         if (properties.timeout.getValue() > 0)
-            builder.setTimeout(properties.timeout.getValue());
+            config.setConnectionTimeout(properties.timeout.getValue());
         if (properties.needCompression.getValue() != null)
-            builder.needCompression(properties.needCompression.getValue());
-        if (properties.clientId.getValue() != null)
-            builder.setClientID(properties.clientId.getValue());
+            config.setCompression(properties.needCompression.getValue());
+        config.setTraceMessage(true);
 
-        SforceBasicConnection sforceConn = builder.build();
-        System.out.println("conn: " + sforceConn);
+        PartnerConnection connection = Connector.newConnection(config);
+
+        System.out.println("conn: " + connection);
     }
 }

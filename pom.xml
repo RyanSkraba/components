@@ -12,6 +12,7 @@
         <module>components-api</module>
         <module>components-common</module>
         <module>components-salesforce</module>
+        <module>components-common-oauth</module>
     </modules>
 
 	<dependencyManagement>

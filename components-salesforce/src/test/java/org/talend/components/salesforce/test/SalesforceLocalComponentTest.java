@@ -21,7 +21,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.ComponentService;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.common.OauthProperties;
+import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectDefinition;
