@@ -12,18 +12,17 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceinput;
 
-import org.talend.components.base.ComponentProperties;
-import org.talend.components.base.properties.Property;
-import org.talend.components.base.properties.presentation.Form;
-import org.talend.components.base.properties.presentation.Layout;
+import org.talend.components.api.ComponentProperties;
+import org.talend.components.api.properties.Property;
+import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.properties.presentation.Layout;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
-import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectProperties;
 
 public class TSalesforceInputProperties extends ComponentProperties {
 
     SalesforceConnectionProperties connection = new SalesforceConnectionProperties();
 
-    Property<String> module = new Property<String>("module", "Module").setRequired(true);
+    Property<String>               module     = new Property<String>("module", "Module").setRequired(true);
 
     public TSalesforceInputProperties() {
         setupLayout();
@@ -31,6 +30,7 @@ public class TSalesforceInputProperties extends ComponentProperties {
 
     public static final String INPUT = "Input";
 
+    @Override
     public void setupLayout() {
         addForm(connection.getForm(SalesforceConnectionProperties.CONNECTION));
 

@@ -12,19 +12,19 @@
 // ============================================================================
 package org.talend.components.common;
 
-import org.talend.components.base.ComponentProperties;
+import org.talend.components.api.ComponentProperties;
+import org.talend.components.api.properties.Property;
+import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.properties.presentation.Layout;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
-import org.talend.components.base.properties.Property;
-import org.talend.components.base.properties.presentation.Form;
-import org.talend.components.base.properties.presentation.Layout;
 
-@JsonRootName("userPasswordProperties") public class UserPasswordProperties extends ComponentProperties {
+@JsonRootName("userPasswordProperties")
+public class UserPasswordProperties extends ComponentProperties {
 
-    public Property<String> userId = new Property<String>("userId", "User Id").setRequired(true);
+    public Property<String>    userId       = new Property<String>("userId", "User Id").setRequired(true);
 
-    public Property<String> password = new Property<String>("password", "Password").setRequired(true);
+    public Property<String>    password     = new Property<String>("password", "Password").setRequired(true);
 
     public static final String USERPASSWORD = "UserPassword";
 

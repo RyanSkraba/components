@@ -13,11 +13,11 @@
 package org.talend.components.salesforce.tsalesforceinput;
 
 import org.springframework.stereotype.Component;
-import org.talend.components.base.ComponentConnector;
-import org.talend.components.base.ComponentConnector.Type;
-import org.talend.components.base.ComponentDefinition;
-import org.talend.components.base.ComponentProperties;
-import org.talend.components.base.Constants;
+import org.talend.components.api.ComponentConnector;
+import org.talend.components.api.ComponentConnector.Type;
+import org.talend.components.api.ComponentDefinition;
+import org.talend.components.api.ComponentProperties;
+import org.talend.components.api.Constants;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 
 /**

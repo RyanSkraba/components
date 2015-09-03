@@ -12,20 +12,20 @@
 // ============================================================================
 package org.talend.components.common;
 
-import org.talend.components.base.ComponentProperties;
-import org.talend.components.base.properties.Property;
-import org.talend.components.base.properties.presentation.Form;
-import org.talend.components.base.properties.presentation.Layout;
+import org.talend.components.api.ComponentProperties;
+import org.talend.components.api.properties.Property;
+import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.properties.presentation.Layout;
 
 public class ProxyProperties extends ComponentProperties {
 
-    public Property<Boolean> useProxy = new Property<Boolean>("useProxy", "Use Proxy").setRequired(true);
+    public Property<Boolean>      useProxy     = new Property<Boolean>("useProxy", "Use Proxy").setRequired(true);
 
-    public Property<String> host = new Property<String>("host", "Host").setRequired(true);
+    public Property<String>       host         = new Property<String>("host", "Host").setRequired(true);
 
     public UserPasswordProperties userPassword = new UserPasswordProperties();
 
-    public static final String PROXY = "Proxy";
+    public static final String    PROXY        = "Proxy";
 
     public ProxyProperties() {
         Form form = new Form(this, PROXY, "Proxy Parameters");

@@ -9,10 +9,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.talend.components</groupId>
     <artifactId>components-salesforce</artifactId>
-    <version>0.1-SNAPSHOT</version>
-
     <name>Salesforce Components</name>
 
     <dependencies>
@@ -82,7 +79,7 @@
 
         <dependency>
             <groupId>org.talend.components</groupId>
-            <artifactId>components-base</artifactId>
+            <artifactId>components-api</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
