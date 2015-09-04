@@ -18,7 +18,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
- * Main Spring application to lauch the component service
+ * Main Spring application to launch the component service
  *
  */
 @SpringBootApplication
@@ -29,11 +29,6 @@ public class SpringApp implements DisposableBean {
         SpringApplication.run(SpringApp.class, args);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.springframework.beans.factory.DisposableBean#destroy()
-     */
     public void destroy() throws Exception {
         // nothing to be done yet.
     }
