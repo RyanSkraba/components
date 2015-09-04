@@ -12,66 +12,27 @@
 // ============================================================================
 package org.talend.components.api;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
-
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiParam;
-
-@RestController @Api(value = "components", basePath = "/components", description = "Component services") @Service public class ComponentService {
-
-    protected Map<Integer, ComponentProperties> propertiesMap = new HashMap<Integer, ComponentProperties>();
-
-    @Autowired private ApplicationContext context;
-
-    public ComponentService() {
-    }
+/**
+ * created by sgandon on 3 sept. 2015 Detailled comment
+ *
+ */
+public interface ComponentService {
 
     /**
      * Used to get a new {@link ComponentProperties} object for the specified component.
      * <p>
-     * The {@code ComponentProperties} has everything required to render a UI and as well
-     * capture and validate the values of the properties associated with the component, based
-     * on interactions with this service.
+     * The {@code ComponentProperties} has everything required to render a UI and as well capture and validate the
+     * values of the properties associated with the component, based on interactions with this service.
      *
      * @param name the name of the component
      * @return a {@code ComponentProperties} object.
      */
-    @RequestMapping(value = "/components/{name}/properties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE) public @ResponseBody ComponentProperties getComponentProperties(
-            @PathVariable(value = "name") @ApiParam(name = "name", value = "name of the components") String name) {
-        final String beanName = Constants.COMPONENT_BEAN_PREFIX + name;
-        Object beans = context.getBeansOfType(Object.class);
-        final ComponentDefinition compDef = context.getBean(beanName, ComponentDefinition.class);
-        ComponentProperties properties = compDef.createProperties();
-        return properties;
-    }
+    ComponentProperties getComponentProperties(String name);
 
-    @RequestMapping(value = "/components/validateProperty/{propName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE) public @ResponseBody ComponentProperties validateProperty(
-            @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties) throws Throwable {
-        properties.validateProperty(propName);
-        return properties;
-    }
+    ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable;
 
-    @RequestMapping(value = "/components/beforeProperty/{propName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE) public @ResponseBody ComponentProperties beforeProperty(
-            @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties) throws Throwable {
-        properties.beforeProperty(propName);
-        return properties;
-    }
+    ComponentProperties beforeProperty(String propName, ComponentProperties properties) throws Throwable;
 
-    @RequestMapping(value = "/components/afterProperty/{propName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE) public @ResponseBody ComponentProperties afterProperty(
-            @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties) throws Throwable {
-        properties.afterProperty(propName);
-        return properties;
-    }
-
+    ComponentProperties afterProperty(String propName, ComponentProperties properties) throws Throwable;
 
 }

@@ -15,12 +15,13 @@ package org.talend.components.salesforce.test;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.ComponentService;
 import org.talend.components.api.properties.Property;
+import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.common.UserPasswordProperties;
@@ -33,11 +34,10 @@ import junit.framework.TestCase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
-// FIXME - do something where we don't have to specify this list of classes here for the injection
-@RunWith(SpringJUnit4ClassRunner.class) @ContextConfiguration(classes = { ComponentService.class,
-        TSalesforceConnectDefinition.class,
-        TSalesforceInputDefinition.class }, loader = AnnotationConfigContextLoader.class) public class SalesforceLocalComponentTest
-        extends TestCase {
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = SpringApp.class)
+public class SalesforceLocalComponentTest extends TestCase {
 
     @Autowired protected ComponentService componentService;
 

@@ -20,15 +20,15 @@ package org.talend.components.api;
  * @author Francis Upton
  */
 
-public abstract class ComponentDefinition {
+public interface ComponentDefinition {
 
     /**
      * Component categorization - this is an issue that wants further study. - which designer (big data, di, etc) and
      * then which family.
      */
     public enum Family {
-        BUSINESS,
-        CLOUD
+                        BUSINESS,
+                        CLOUD
     }
 
     /*
@@ -42,14 +42,12 @@ public abstract class ComponentDefinition {
      * all properties should support context variables (non-text properties need this).
      */
 
-    public abstract ComponentProperties createProperties();
+    public ComponentProperties createProperties();
 
-    public void setDesignerFamily(Family family) {
+    // public void setDesignerFamily(Family family);
 
-    }
+    public Family[] getSupportedFamilies();
 
-    public abstract Family[] getSupportedFamilies();
-
-    public abstract String getName();
+    public String getName();
 
 }

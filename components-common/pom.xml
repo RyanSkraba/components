@@ -14,6 +14,7 @@
     <groupId>org.talend.components</groupId>
     <artifactId>components-common</artifactId>
     <version>0.1-SNAPSHOT</version>
+    <packaging>bundle</packaging>
 
     <name>Components - Shared Component Parts</name>
 
@@ -29,5 +30,19 @@
             <version>0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
+    <build>
+       <plugins>
+         <plugin>
+           <groupId>org.apache.felix</groupId>
+           <artifactId>maven-bundle-plugin</artifactId>
+           <extensions>true</extensions>
+           <configuration>
+             <instructions>
+                <Embed-Dependency>*;scope=runtime</Embed-Dependency>
+             </instructions>
+           </configuration>
+         </plugin>
+       </plugins>
+    </build>
 
 </project>

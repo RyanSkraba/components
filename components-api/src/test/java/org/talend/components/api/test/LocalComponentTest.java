@@ -12,29 +12,32 @@
 // ============================================================================
 package org.talend.components.api.test;
 
-import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.talend.components.api.ComponentProperties;
-import org.talend.components.api.test.testcomponent.TestComponentDefinition;
 import org.talend.components.api.ComponentService;
+import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.test.testcomponent.TestComponentDefinition;
 import org.talend.components.api.test.testcomponent.TestComponentProperties;
 
-@RunWith(SpringJUnit4ClassRunner.class) @ContextConfiguration(classes = { ComponentService.class,
-        TestComponentDefinition.class }, loader = AnnotationConfigContextLoader.class) public class LocalComponentTest
-        extends TestCase {
+import junit.framework.TestCase;
 
-    @Autowired protected ComponentService componentService;
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = SpringApp.class)
+public class LocalComponentTest extends TestCase {
+
+    @Autowired
+    protected ComponentService componentService;
 
     public LocalComponentTest() {
     }
 
-    @Test public void testGetProps() {
+    @Test
+    public void testGetProps() {
         ComponentProperties props = componentService.getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
         Form f = props.getForm(TestComponentProperties.TESTCOMPONENT);
         assertTrue(f.getLayout("userId").isVisible());

@@ -140,7 +140,7 @@ public abstract class ComponentProperties {
         return null;
     }
 
-    void validateProperty(String propName) throws Throwable {
+    public void validateProperty(String propName) throws Throwable {
         Method m = findMethod("validate", propName);
         if (m != null) {
             try {
@@ -152,7 +152,7 @@ public abstract class ComponentProperties {
         }
     }
 
-    void beforeProperty(String propName) throws Throwable {
+    public void beforeProperty(String propName) throws Throwable {
         Method m = findMethod("before", propName);
         if (m == null)
             throw new IllegalStateException("before method not found for: " + propName);
@@ -163,7 +163,7 @@ public abstract class ComponentProperties {
         }
     }
 
-    void afterProperty(String propName) throws Throwable {
+    public void afterProperty(String propName) throws Throwable {
         Method m = findMethod("after", propName);
         if (m != null) {
             try {
