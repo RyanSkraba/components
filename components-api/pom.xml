@@ -11,7 +11,7 @@
 
     <artifactId>components-api</artifactId>
 
-    <name>Talend Component API</name>
+    <name>Component API</name>
     <dependencies>
             <dependency>
                 <groupId>org.springframework</groupId>

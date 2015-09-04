@@ -15,7 +15,7 @@
     <artifactId>components-common</artifactId>
     <version>0.1-SNAPSHOT</version>
 
-    <name>Talend Components - Shared Component Parts</name>
+    <name>Components - Shared Component Parts</name>
 
     <dependencies>
         <dependency>

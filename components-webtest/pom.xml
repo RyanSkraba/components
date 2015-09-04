@@ -3,33 +3,28 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>components</artifactId>
         <groupId>org.talend.components</groupId>
+        <artifactId>components</artifactId>
         <version>0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.talend.components</groupId>
-    <artifactId>components-common-oauth</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <artifactId>components-webtest</artifactId>
+    <name>Component web test service</name>
 
-    <name>Components - OAuth</name>
 
     <dependencies>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.oltu.oauth2</groupId>
-            <artifactId>org.apache.oltu.oauth2.client</artifactId>
-            <version>1.0.0</version>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api</artifactId>
+            <version>0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.talend.components</groupId>
-            <artifactId>components-api</artifactId>
+            <artifactId>components-salesforce</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
