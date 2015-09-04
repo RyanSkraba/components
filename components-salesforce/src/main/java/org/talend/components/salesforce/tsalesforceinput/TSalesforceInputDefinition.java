@@ -12,13 +12,11 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceinput;
 
-import org.springframework.stereotype.Component;
 import org.talend.components.api.ComponentConnector;
 import org.talend.components.api.ComponentConnector.Type;
 import org.talend.components.api.ComponentDefinition;
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.Constants;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
 
 /**
  * Component that can connect to a salesforce system and get some data out of it.
@@ -28,9 +26,9 @@ import org.talend.components.salesforce.SalesforceConnectionProperties;
 @aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceInputDefinition.COMPONENT_NAME)
 public class TSalesforceInputDefinition implements ComponentDefinition {
 
-    public static final String               COMPONENT_NAME = "tSalesforceInput";                       //$NON-NLS-1$
+    public static final String     COMPONENT_NAME = "tSalesforceInput";                              //$NON-NLS-1$
 
-    protected ComponentConnector[]           connectors     = { new ComponentConnector(Type.FLOW, 0, 0),
+    protected ComponentConnector[] connectors     = { new ComponentConnector(Type.FLOW, 0, 0),
             new ComponentConnector(Type.ITERATE, 1, 0), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
             new ComponentConnector(Type.SUBJOB_ERROR, 1, 0) };
 
@@ -42,7 +40,6 @@ public class TSalesforceInputDefinition implements ComponentDefinition {
         return new Family[] { Family.BUSINESS, Family.CLOUD };
     }
 
-    @Override
     public String getName() {
         return COMPONENT_NAME;
     }
