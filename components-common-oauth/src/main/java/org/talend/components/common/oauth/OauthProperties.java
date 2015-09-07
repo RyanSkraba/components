@@ -32,6 +32,12 @@ public class OauthProperties extends ComponentProperties {
     public static final String OAUTH        = "OAuth";
 
     public OauthProperties() {
+        setupLayout();
+    }
+
+    @Override
+    protected void setupLayout() {
+        super.setupLayout();
         Form form = new Form(this, OAUTH, "OAuth Parameters");
         form.addChild(clientId, Layout.create().setRow(1).setOrder(1));
         form.addChild(clientSecret, Layout.create().setRow(1).setOrder(2));
@@ -39,5 +45,4 @@ public class OauthProperties extends ComponentProperties {
         form.addChild(callbackPort, Layout.create().setRow(2).setOrder(2));
         form.addChild(tokenFile, Layout.create().setRow(3));
     }
-
 }

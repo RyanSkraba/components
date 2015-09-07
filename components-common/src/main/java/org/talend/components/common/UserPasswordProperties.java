@@ -30,10 +30,15 @@ public class UserPasswordProperties extends ComponentProperties {
     public static final String USERPASSWORD = "UserPassword";
 
     public UserPasswordProperties() {
+        setupLayout();
+    }
+
+    @Override
+    protected void setupLayout() {
+        super.setupLayout();
         Form form = new Form(this, USERPASSWORD, "User Password");
         form.addChild(userId, Layout.create().setRow(1));
         form.addChild(password, Layout.create().setRow(2));
-
     }
 
 }

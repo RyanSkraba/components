@@ -48,9 +48,8 @@ import java.util.List;
     @Override protected void setupLayout() {
         super.setupLayout();
 
-        Form connectionForm = Form.create(this, MODULE, "Salesforce Module");
-
-        connectionForm.addChild(moduleName, Layout.create().setRow(1).setWidgetType(Layout.WidgetType.LISTBOX));
+        Form moduleForm = Form.create(this, MODULE, "Salesforce Module");
+        moduleForm.addChild(moduleName, Layout.create().setRow(1).setWidgetType(Layout.WidgetType.LISTBOX));
     }
 
     public void beforeModuleName() throws Exception {

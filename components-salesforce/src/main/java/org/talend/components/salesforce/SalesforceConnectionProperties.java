@@ -116,7 +116,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
         Wizard wizard = Wizard.create(this, "Connection", "Salesforce Connection");
         // TODO - need to set the icon for the wizard
-        wizard.addForm(advancedForm);
+        wizard.addForm(connectionForm);
     }
 
     public void afterLoginType() {
