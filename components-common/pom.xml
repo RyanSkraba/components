@@ -38,7 +38,9 @@
            <extensions>true</extensions>
            <configuration>
              <instructions>
-                <Embed-Dependency>*;scope=runtime</Embed-Dependency>
+                <Import-Package>org.talend*</Import-Package>
+                <Service-Component>*</Service-Component>
+                 <Embed-Dependency>!components*|com.fasterxml;scope=compile|runtime</Embed-Dependency>
              </instructions>
            </configuration>
          </plugin>

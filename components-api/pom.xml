@@ -57,6 +57,7 @@
             	<groupId>org.osgi</groupId>
             	<artifactId>org.osgi.core</artifactId>
             	<version>5.0.0</version>
+            	<scope>compile</scope>
             </dependency>
     </dependencies>
     <build>
@@ -67,8 +68,12 @@
            <extensions>true</extensions>
            <configuration>
              <instructions>
-              <Service-Component>*</Service-Component>
-                  <Embed-Dependency>*;scope=runtime;inline=true</Embed-Dependency>
+                <Export-Package>org.talend.components.*</Export-Package>
+                <Private-Package>org.talend.components.api.internal</Private-Package>
+                <Service-Component>*</Service-Component>
+                <Import-Package>org.osgi*</Import-Package>
+                <Embed-Transitive>true</Embed-Transitive>
+                 <Embed-Dependency>!org.osgi.core;scope=compile|runtime</Embed-Dependency>
              </instructions>
            </configuration>
          </plugin>
