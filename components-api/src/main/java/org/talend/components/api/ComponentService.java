@@ -15,8 +15,8 @@ package org.talend.components.api;
 import java.util.Set;
 
 /**
- * created by sgandon on 3 sept. 2015 Detailled comment
- *
+ * The Main service provided by this project to get access to all registered components and their properties.
+ * 
  */
 public interface ComponentService {
 
@@ -32,12 +32,16 @@ public interface ComponentService {
     ComponentProperties getComponentProperties(String name);
 
     /**
-     * @return return the list of components name
+     * Get the list of all the components name that are registered
+     * 
+     * @return return the list of components name, never null
      */
     Set<String> getAllComponentsName();
 
     /**
-     * @return return the list of components
+     * Get the list of all the components {@link ComponentDefinition} that are registered
+     * 
+     * @return return the list of components definition, never null.
      */
     Set<ComponentDefinition> getAllComponents();
 

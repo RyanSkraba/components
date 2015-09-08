@@ -17,7 +17,7 @@ import java.util.Map;
 import org.talend.components.api.ComponentDefinition;
 
 /**
- * created by sgandon on 7 sept. 2015 Detailled comment
+ * interface for the internal component registry that will have a specific implementation for OSGI and Spring
  *
  */
 public interface ComponentRegistry {

@@ -12,23 +12,26 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import com.sforce.async.BulkConnection;
-import com.sforce.soap.partner.*;
-import com.sforce.soap.partner.sobject.SObject;
-import com.sforce.ws.ConnectionException;
-import com.sforce.ws.ConnectorConfig;
-import org.talend.components.api.ComponentRuntime;
-import org.talend.components.api.ComponentSchemaElement;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import org.talend.components.api.ComponentRuntime;
+import org.talend.components.api.ComponentSchemaElement;
+
+import com.sforce.async.BulkConnection;
+import com.sforce.soap.partner.DescribeGlobalResult;
+import com.sforce.soap.partner.DescribeGlobalSObjectResult;
+import com.sforce.soap.partner.GetServerTimestampResult;
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.ws.ConnectionException;
+import com.sforce.ws.ConnectorConfig;
 
 public class SalesforceRuntime extends ComponentRuntime {
 
     PartnerConnection connection;
 
-    BulkConnection bulkConnection;
+    BulkConnection    bulkConnection;
 
     public void connect(SalesforceConnectionProperties properties) throws Exception {
 
@@ -37,10 +40,12 @@ public class SalesforceRuntime extends ComponentRuntime {
         config.setPassword(properties.userPassword.password.getValue());
         config.setAuthEndpoint(properties.url.getValue());
 
-        if (properties.timeout.getValue() > 0)
+        if (properties.timeout.getValue() > 0) {
             config.setConnectionTimeout(properties.timeout.getValue());
-        if (properties.needCompression.getValue() != null)
+        }
+        if (properties.needCompression.getValue() != null) {
             config.setCompression(properties.needCompression.getValue());
+        }
 
         config.setTraceMessage(true);
 
@@ -98,7 +103,6 @@ public class SalesforceRuntime extends ComponentRuntime {
         root.setChildren(children);
         return root;
     }
-
 
     public Calendar getServerTimestamp() throws ConnectionException {
         GetServerTimestampResult result = connection.getServerTimestamp();

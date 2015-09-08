@@ -127,7 +127,7 @@ public class ComponentServiceSpring implements ComponentService {
      * @see org.talend.components.api.ComponentService#getAllComponents()
      */
     @Override
-    @RequestMapping(value = "/components/properties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/components/definition", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody Set<ComponentDefinition> getAllComponents() {
         return componentServiceDelegate.getAllComponents();
     }

@@ -21,6 +21,10 @@ import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.ComponentService;
 import org.talend.components.api.Constants;
 
+/**
+ * Main Component Service implementation that is not related to any framework (neither OSGI, nor Spring) it uses a
+ * ComponentRegistry implementation that will be provided by framework specific Service classes
+ */
 public class ComponentServiceImpl implements ComponentService {
 
     private ComponentRegistry componentRegistry;

@@ -30,7 +30,8 @@ import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
 
 /**
- * created by sgandon on 7 sept. 2015 Detailled comment
+ * This is the OSGI specific service implementation that completly delegates the implementation to the Framework
+ * agnostic ComponentServiceImpl
  *
  */
 @Component
