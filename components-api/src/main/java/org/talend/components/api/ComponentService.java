@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.api;
 
+import java.util.Set;
+
 /**
  * created by sgandon on 3 sept. 2015 Detailled comment
  *
@@ -28,6 +30,16 @@ public interface ComponentService {
      * @return a {@code ComponentProperties} object.
      */
     ComponentProperties getComponentProperties(String name);
+
+    /**
+     * @return return the list of components name
+     */
+    Set<String> getAllComponentsName();
+
+    /**
+     * @return return the list of components
+     */
+    Set<ComponentDefinition> getAllComponents();
 
     ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable;
 

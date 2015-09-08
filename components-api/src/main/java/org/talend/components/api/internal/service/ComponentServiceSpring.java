@@ -10,9 +10,10 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.internal;
+package org.talend.components.api.internal.service;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -48,6 +49,7 @@ public class ComponentServiceSpring implements ComponentService {
     public ComponentServiceSpring(final ApplicationContext context) {
         this.componentServiceDelegate = new ComponentServiceImpl(new ComponentRegistry() {
 
+            @Override
             public Map<String, ComponentDefinition> getComponents() {
                 return context.getBeansOfType(ComponentDefinition.class);
             }
@@ -59,6 +61,7 @@ public class ComponentServiceSpring implements ComponentService {
      * 
      * @see org.talend.components.api.internal.IComponentService#getComponentProperties(java.lang.String)
      */
+    @Override
     @RequestMapping(value = "/components/{name}/properties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ComponentProperties getComponentProperties(
             @PathVariable(value = "name") @ApiParam(name = "name", value = "name of the components") String name) {
@@ -71,6 +74,7 @@ public class ComponentServiceSpring implements ComponentService {
      * @see org.talend.components.api.internal.IComponentService#validateProperty(java.lang.String,
      * org.talend.components.api.ComponentProperties)
      */
+    @Override
     @RequestMapping(value = "/components/validateProperty/{propName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ComponentProperties validateProperty(
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
@@ -80,6 +84,7 @@ public class ComponentServiceSpring implements ComponentService {
         return properties;
     }
 
+    @Override
     @RequestMapping(value = "/components/beforeProperty/{propName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ComponentProperties beforeProperty(
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
@@ -95,6 +100,7 @@ public class ComponentServiceSpring implements ComponentService {
      * @see org.talend.components.api.internal.IComponentService#afterProperty(java.lang.String,
      * org.talend.components.api.ComponentProperties)
      */
+    @Override
     @RequestMapping(value = "/components/afterProperty/{propName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ComponentProperties afterProperty(
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
@@ -102,5 +108,27 @@ public class ComponentServiceSpring implements ComponentService {
                     throws Throwable {
         componentServiceDelegate.afterProperty(propName, properties);
         return properties;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.talend.components.api.ComponentService#getAllComponentsName()
+     */
+    @Override
+    @RequestMapping(value = "/components/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Set<String> getAllComponentsName() {
+        return componentServiceDelegate.getAllComponentsName();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.talend.components.api.ComponentService#getAllComponents()
+     */
+    @Override
+    @RequestMapping(value = "/components/properties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Set<ComponentDefinition> getAllComponents() {
+        return componentServiceDelegate.getAllComponents();
     }
 }

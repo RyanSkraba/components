@@ -10,11 +10,12 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.internal;
+package org.talend.components.api.internal.service;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -52,6 +53,7 @@ public class ComponentServiceOsgi implements ComponentService {
 
         private HashMap<String, ComponentDefinition> components;
 
+        @Override
         public Map<String, ComponentDefinition> getComponents() {
             if (components == null) {
                 try {
@@ -94,6 +96,7 @@ public class ComponentServiceOsgi implements ComponentService {
      * 
      * @see org.talend.components.api.ComponentService#getComponentProperties(java.lang.String)
      */
+    @Override
     public ComponentProperties getComponentProperties(String name) {
         return componentServiceDelegate.getComponentProperties(name);
     }
@@ -104,6 +107,7 @@ public class ComponentServiceOsgi implements ComponentService {
      * @see org.talend.components.api.ComponentService#validateProperty(java.lang.String,
      * org.talend.components.api.ComponentProperties)
      */
+    @Override
     public ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable {
         return componentServiceDelegate.validateProperty(propName, properties);
     }
@@ -114,6 +118,7 @@ public class ComponentServiceOsgi implements ComponentService {
      * @see org.talend.components.api.ComponentService#beforeProperty(java.lang.String,
      * org.talend.components.api.ComponentProperties)
      */
+    @Override
     public ComponentProperties beforeProperty(String propName, ComponentProperties properties) throws Throwable {
         return componentServiceDelegate.beforeProperty(propName, properties);
     }
@@ -124,8 +129,29 @@ public class ComponentServiceOsgi implements ComponentService {
      * @see org.talend.components.api.ComponentService#afterProperty(java.lang.String,
      * org.talend.components.api.ComponentProperties)
      */
+    @Override
     public ComponentProperties afterProperty(String propName, ComponentProperties properties) throws Throwable {
         return componentServiceDelegate.afterProperty(propName, properties);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.talend.components.api.ComponentService#getAllComponentsName()
+     */
+    @Override
+    public Set<String> getAllComponentsName() {
+        return componentServiceDelegate.getAllComponentsName();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.talend.components.api.ComponentService#getAllComponents()
+     */
+    @Override
+    public Set<ComponentDefinition> getAllComponents() {
+        return componentServiceDelegate.getAllComponents();
     }
 
 }
