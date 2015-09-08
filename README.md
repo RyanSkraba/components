@@ -32,6 +32,7 @@ The group is: org.talend.components.
 | [components-common-oauth](components-common-oauth) | components-common-oauth | components-common-oauth | *OAuth impolementation*             |
 | [components-salesforce](components-salesforce) | components-salesforce  | components-salesforce | *SFDC components*                                |
 | [components-webtest](components-webtest)       | components-webtest  | components-webtest | *Temporary code to start the web services for testing*                                |
+| [components-osgitest](components-osgitest)       | components-osgitest  | components-osgitest | *Integration tests for OSGI services*                                |
 | [tooling]                                      | tooling               |                       | *IDE specific config files + some other stuff*   |
 
 
