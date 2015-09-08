@@ -133,4 +133,12 @@ public class SalesforceLocalComponentTest extends TestCase {
         System.out.println(moduleProps.getValidationResult());
     }
 
+    @Test public void testSchema() throws Throwable {
+        TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
+                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
+        setupProps(props.connection);
+        props.module.moduleName.setValue("Account");
+        // FINISH this
+    }
+
 }

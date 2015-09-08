@@ -57,7 +57,8 @@ public class Property<T> extends NamedThing {
     }
 
     public String getTypeName() {
-        return TypeResolver.resolveRawArgument(Property.class, getClass()).getTypeName();
+        // FIXME - is this change right?
+        return TypeResolver.resolveRawArgument(Property.class, getClass()).getName();
     }
 
     public ValidationResult getValidationResult() {

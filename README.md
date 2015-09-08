@@ -7,7 +7,7 @@ In the top level folder:
 
 ```
 mvn clean install
-cd component-salesforce
+cd component-webtest
 mvn spring-boot:run
 ```
 
@@ -29,7 +29,9 @@ The group is: org.talend.components.
 | root                                           | components-parent     | component             | *This whole thing*                               |
 | [components-base](components-base)             | components-base       | components-base       | *API used to define and access component*        |
 | [components-common](components-common)         | components-common     | components-common     | *Code shared by multiple components*             |
+| [components-common-oauth](components-common-oauth) | components-common-oauth | components-common-oauth | *OAuth impolementation*             |
 | [components-salesforce](components-salesforce) | components-salesforce  | components-salesforce | *SFDC components*                                |
+| [components-webtest](components-webtest)       | components-webtest  | components-webtest | *Temporary code to start the web services for testing*                                |
 | [tooling]                                      | tooling               |                       | *IDE specific config files + some other stuff*   |
 
 Make sure the you can access the newbuild Nexus repositories as some artifacts are required from there. Here is code that you

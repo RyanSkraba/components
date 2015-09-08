@@ -17,12 +17,14 @@ import com.sforce.soap.partner.*;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
+import org.talend.components.api.ComponentRuntime;
+import org.talend.components.api.ComponentSchemaElement;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class SalesforceRuntime {
+public class SalesforceRuntime extends ComponentRuntime {
 
     PartnerConnection connection;
 
@@ -80,6 +82,11 @@ public class SalesforceRuntime {
         }
         return returnList;
     }
+
+    public ComponentSchemaElement getSchema(String module) {
+        return null;
+    }
+
 
     public Calendar getServerTimestamp() throws ConnectionException {
         GetServerTimestampResult result = connection.getServerTimestamp();
