@@ -92,6 +92,14 @@ public abstract class ComponentProperties {
         internal.getWizards().add(wizard);
     }
 
+    public ComponentDesigner getComponentDesigner() {
+        return internal.getDesigner();
+    }
+
+    public void setComponentDesigner(ComponentDesigner designer) {
+        internal.setDesigner(designer);
+    }
+
     /**
      * Returns the {@link ValidationResult} for the property being validated if requested.
      *

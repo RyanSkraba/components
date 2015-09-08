@@ -1,5 +1,6 @@
 package org.talend.components.api.internal;
 
+import org.talend.components.api.ComponentDesigner;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Wizard;
@@ -8,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ComponentPropertiesInternal {
+
+    protected ComponentDesigner designer;
 
     protected List<Form> forms;
 
@@ -34,6 +37,14 @@ public class ComponentPropertiesInternal {
                 return f;
         }
         return null;
+    }
+
+    public ComponentDesigner getDesigner() {
+        return designer;
+    }
+
+    public void setDesigner(ComponentDesigner designer) {
+        this.designer = designer;
     }
 
     public ValidationResult getValidationResult() {
