@@ -15,20 +15,21 @@ package org.talend.components.api.test.testcomponent;
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Layout;
+
+import static org.talend.components.api.properties.presentation.Layout.*;
 
 public class TestComponentProperties extends ComponentProperties {
 
-    public Property<String> userId = new Property<String>("userId", "User Id").setRequired(true);
+    public Property<String>    userId        = new Property<String>("userId", "User Id").setRequired(true);
 
-    public Property<String> password = new Property<String>("password", "Password").setRequired(true);
+    public Property<String>    password      = new Property<String>("password", "Password").setRequired(true);
 
     public static final String TESTCOMPONENT = "TestComponent";
 
     public TestComponentProperties() {
         Form form = new Form(this, TESTCOMPONENT, "Test Component");
-        form.addChild(userId, Layout.layout().setRow(1));
-        form.addChild(password, Layout.layout().setRow(2));
+        form.addChild(userId, layout().setRow(1));
+        form.addChild(password, layout().setRow(2));
 
     }
 }
