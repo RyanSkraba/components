@@ -22,6 +22,8 @@ import org.talend.components.api.ComponentSchemaElement;
 import com.sforce.async.BulkConnection;
 import com.sforce.soap.partner.DescribeGlobalResult;
 import com.sforce.soap.partner.DescribeGlobalSObjectResult;
+import com.sforce.soap.partner.DescribeSObjectResult;
+import com.sforce.soap.partner.Field;
 import com.sforce.soap.partner.GetServerTimestampResult;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.ws.ConnectionException;

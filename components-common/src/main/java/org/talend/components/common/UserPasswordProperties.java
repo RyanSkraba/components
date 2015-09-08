@@ -15,9 +15,10 @@ package org.talend.components.common;
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Layout;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
+
+import static org.talend.components.api.properties.presentation.Layout.*;
 
 @JsonRootName("userPasswordProperties")
 public class UserPasswordProperties extends ComponentProperties {
@@ -37,8 +38,8 @@ public class UserPasswordProperties extends ComponentProperties {
     protected void setupLayout() {
         super.setupLayout();
         Form form = new Form(this, USERPASSWORD, "User Password");
-        form.addChild(userId, Layout.create().setRow(1));
-        form.addChild(password, Layout.create().setRow(2));
+        form.addChild(userId, layout().setRow(1));
+        form.addChild(password, layout().setRow(2));
     }
 
 }

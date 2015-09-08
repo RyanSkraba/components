@@ -69,7 +69,7 @@ public class Layout {
     private boolean callAfter;
 
 
-    public static Layout create() {
+    public static Layout layout() {
         return new Layout();
     }
 

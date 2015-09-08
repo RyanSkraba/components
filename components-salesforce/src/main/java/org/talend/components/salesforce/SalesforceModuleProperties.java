@@ -12,33 +12,33 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
+import java.util.List;
+
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.ComponentSchemaElement;
 import org.talend.components.api.properties.Property;
-import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Layout;
-import org.talend.components.api.properties.presentation.Wizard;
-import org.talend.components.common.UserPasswordProperties;
-import org.talend.components.common.oauth.OauthProperties;
+import org.talend.components.api.properties.presentation.Layout.WidgetType;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
-@JsonRootName("salesforceModuleProperties") public class SalesforceModuleProperties extends ComponentProperties {
+import static org.talend.components.api.properties.presentation.Layout.*;
 
-    private SalesforceConnectionProperties connection;
+@JsonRootName("salesforceModuleProperties")
+public class SalesforceModuleProperties extends ComponentProperties {
+
+    private SalesforceConnectionProperties  connection;
 
     //
     // Properties
     //
-    public Property<String> moduleName = new Property<String>("moduleName", "Module Name");
+    public Property<String>                 moduleName = new Property<String>("moduleName", "Module Name");
 
-    public Property<ComponentSchemaElement> schema = new Property<ComponentSchemaElement>("schema", "Schema");
+    public Property<ComponentSchemaElement> schema     = new Property<ComponentSchemaElement>("schema", "Schema");
 
-    public static final String MODULE = "Module";
+    public static final String              MODULE     = "Module";
 
-    public static final String ADVANCED = "Advanced";
+    public static final String              ADVANCED   = "Advanced";
 
     // FIXME - OK what about if we are using a connection from a separate component
     // that defines the connection, how do we get that separate component?
@@ -48,12 +48,13 @@ import java.util.List;
         setupLayout();
     }
 
-    @Override protected void setupLayout() {
+    @Override
+    protected void setupLayout() {
         super.setupLayout();
 
         Form moduleForm = Form.create(this, MODULE, "Salesforce Module");
-        moduleForm.addChild(moduleName, Layout.create().setRow(1).setWidgetType(Layout.WidgetType.LISTBOX));
-        moduleForm.addChild(schema, Layout.create().setRow(2).setWidgetType(Layout.WidgetType.SCHEMA_ONE_LINE));
+        moduleForm.addChild(moduleName, layout().setRow(1).setWidgetType(WidgetType.LISTBOX));
+        moduleForm.addChild(schema, layout().setRow(2).setWidgetType(WidgetType.SCHEMA_ONE_LINE));
     }
 
     public void beforeModuleName() throws Exception {

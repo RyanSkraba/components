@@ -15,7 +15,8 @@ package org.talend.components.common.oauth;
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Layout;
+
+import static org.talend.components.api.properties.presentation.Layout.*;
 
 public class OauthProperties extends ComponentProperties {
 
@@ -39,10 +40,10 @@ public class OauthProperties extends ComponentProperties {
     protected void setupLayout() {
         super.setupLayout();
         Form form = new Form(this, OAUTH, "OAuth Parameters");
-        form.addChild(clientId, Layout.create().setRow(1).setOrder(1));
-        form.addChild(clientSecret, Layout.create().setRow(1).setOrder(2));
-        form.addChild(callbackHost, Layout.create().setRow(2).setOrder(1));
-        form.addChild(callbackPort, Layout.create().setRow(2).setOrder(2));
-        form.addChild(tokenFile, Layout.create().setRow(3));
+        form.addChild(clientId, layout().setRow(1).setOrder(1));
+        form.addChild(clientSecret, layout().setRow(1).setOrder(2));
+        form.addChild(callbackHost, layout().setRow(2).setOrder(1));
+        form.addChild(callbackPort, layout().setRow(2).setOrder(2));
+        form.addChild(tokenFile, layout().setRow(3));
     }
 }

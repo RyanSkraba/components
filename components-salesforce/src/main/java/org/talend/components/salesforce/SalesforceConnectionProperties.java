@@ -17,13 +17,15 @@ import org.talend.components.api.properties.PresentationItem;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Layout;
+import org.talend.components.api.properties.presentation.Layout.WidgetType;
 import org.talend.components.api.properties.presentation.Wizard;
-import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.UserPasswordProperties;
+import org.talend.components.common.oauth.OauthProperties;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
+
+import static org.talend.components.api.properties.presentation.Layout.*;
 
 @JsonRootName("salesforceConnectionProperties")
 public class SalesforceConnectionProperties extends ComponentProperties {
@@ -89,29 +91,29 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
         Form connectionForm = Form.create(this, CONNECTION, "Salesforce Connection Settings");
 
-        connectionForm.addChild(connectionDesc, Layout.create().setRow(1));
+        connectionForm.addChild(connectionDesc, layout().setRow(1));
 
-        connectionForm.addChild(name, Layout.create().setRow(2));
-        connectionForm.addChild(loginType, Layout.create().setRow(3).setDeemphasize(true));
+        connectionForm.addChild(name, layout().setRow(2));
+        connectionForm.addChild(loginType, layout().setRow(3).setDeemphasize(true));
 
         // Only one of these is visible at a time
-        connectionForm.addChild(oauth.getForm(OauthProperties.OAUTH), Layout.create().setRow(4));
-        connectionForm.addChild(userPassword.getForm(UserPasswordProperties.USERPASSWORD), Layout.create().setRow(4));
+        connectionForm.addChild(oauth.getForm(OauthProperties.OAUTH), layout().setRow(4));
+        connectionForm.addChild(userPassword.getForm(UserPasswordProperties.USERPASSWORD), layout().setRow(4));
 
-        connectionForm.addChild(url, Layout.create().setRow(5));
+        connectionForm.addChild(url, layout().setRow(5));
 
-        connectionForm.addChild(advanced, Layout.create().setRow(6).setOrder(1).setWidgetType(Layout.WidgetType.BUTTON));
+        connectionForm.addChild(advanced, layout().setRow(6).setOrder(1).setWidgetType(WidgetType.BUTTON));
         connectionForm.addChild(testConnection,
-                Layout.create().setRow(6).setOrder(2).setLongRunning(true).setWidgetType(Layout.WidgetType.BUTTON));
+                layout().setRow(6).setOrder(2).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
         refreshLayout(connectionForm);
 
         Form advancedForm = Form.create(this, ADVANCED, "Advanced Connection Settings");
-        advancedForm.addChild(bulkConnection, Layout.create().setRow(1));
-        advancedForm.addChild(needCompression, Layout.create().setRow(2));
-        advancedForm.addChild(httpTraceMessage, Layout.create().setRow(3));
-        advancedForm.addChild(clientId, Layout.create().setRow(4));
-        advancedForm.addChild(timeout, Layout.create().setRow(5));
-        advancedForm.addChild(proxy, Layout.create().setRow(5));
+        advancedForm.addChild(bulkConnection, layout().setRow(1));
+        advancedForm.addChild(needCompression, layout().setRow(2));
+        advancedForm.addChild(httpTraceMessage, layout().setRow(3));
+        advancedForm.addChild(clientId, layout().setRow(4));
+        advancedForm.addChild(timeout, layout().setRow(5));
+        advancedForm.addChild(proxy, layout().setRow(5));
         refreshLayout(advancedForm);
 
         Wizard wizard = Wizard.create(this, "Connection", "Salesforce Connection");
