@@ -42,10 +42,10 @@ public class TestComponentServiceWithComponents {
     public Option[] config() {
 
         return options(composite(PaxExamOptions.getOptions()),
-                bundle("reference:file:../components-common/target/components-common-0.1-SNAPSHOT.jar"),
-                bundle("reference:file:../components-common-oauth/target/components-common-oauth-0.1-SNAPSHOT.jar"),
-                bundle("reference:file:../components-salesforce/target/components-salesforce-0.1-SNAPSHOT.jar"), junitBundles(),
-                cleanCaches());
+                provision(mavenBundle().groupId("org.talend.components").artifactId("components-common"),
+                        mavenBundle().groupId("org.talend.components").artifactId("components-common-oauth"),
+                        mavenBundle().groupId("org.talend.components").artifactId("components-salesforce")),
+                junitBundles(), cleanCaches());
     }
 
     @Test
