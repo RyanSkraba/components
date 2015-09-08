@@ -34,33 +34,6 @@ The group is: org.talend.components.
 | [components-webtest](components-webtest)       | components-webtest  | components-webtest | *Temporary code to start the web services for testing*                                |
 | [tooling]                                      | tooling               |                       | *IDE specific config files + some other stuff*   |
 
-Make sure the you can access the newbuild Nexus repositories as some artifacts are required from there. Here is code that you
-can put in your ~/.m2/settings.xml file:
-
-    <settings>
-      <servers>
-      <!--
-        Below are the credentials to access Talend's Nexus.
-        -->
-      <server>
-        <id>snapshots</id>
-        <username>development</username>
-        <password>dev123</password>
-      </server>
-      <server>
-        <id>releases</id>
-        <username>development</username>
-        <password>dev123</password>
-      </server>
-      <server>
-        <id>talend_nexus_deployment</id>
-        <username>deployment</username>
-        <password>dep123</password>
-      </server>
-      </servers>
-     </settings>
-
-
 
 ## Build
 - Build is maven based and there is a top-level pom that builds everything.
