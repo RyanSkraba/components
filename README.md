@@ -11,6 +11,10 @@ cd component-salesforce
 mvn spring-boot:run
 ```
 
+*Currently the web part is not working, and probably won't for a while. This is because the default JSON serialization
+will not handle arbitrary object graphs, so some work is needed on that. As the web part is not an immediate requirement, 
+this will be delayed for a while until the Eclipse version gets finished for 6.1*
+
 Recommend using [Google Postman](https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en) as the web client.
 
 Use [http://localhost:8080/components/tSalesforceConnect/properties](http://localhost:8080/components/tSalesforceConnect/properties) after starting the server.
