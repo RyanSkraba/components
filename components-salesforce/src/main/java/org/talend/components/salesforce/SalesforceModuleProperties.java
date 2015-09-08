@@ -14,6 +14,7 @@ package org.talend.components.salesforce;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 import org.talend.components.api.ComponentProperties;
+import org.talend.components.api.ComponentSchemaElement;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
@@ -33,6 +34,8 @@ import java.util.List;
     //
     public Property<String> moduleName = new Property<String>("moduleName", "Module Name");
 
+    public Property<ComponentSchemaElement> schema = new Property<ComponentSchemaElement>("schema", "Schema");
+
     public static final String MODULE = "Module";
 
     public static final String ADVANCED = "Advanced";
@@ -50,13 +53,21 @@ import java.util.List;
 
         Form moduleForm = Form.create(this, MODULE, "Salesforce Module");
         moduleForm.addChild(moduleName, Layout.create().setRow(1).setWidgetType(Layout.WidgetType.LISTBOX));
+        moduleForm.addChild(schema, Layout.create().setRow(2).setWidgetType(Layout.WidgetType.SCHEMA_ONE_LINE));
     }
 
     public void beforeModuleName() throws Exception {
         SalesforceRuntime conn = new SalesforceRuntime();
         conn.connect(connection);
         List<String> moduleNames = conn.getModuleNames();
+        // FIXME - these are labels, need to have a corresponding actual values.
         moduleName.setPossibleValues(moduleNames);
+    }
+
+    public void afterModuleName() throws Exception {
+        SalesforceRuntime conn = new SalesforceRuntime();
+        conn.connect(connection);
+        schema.setValue(conn.getSchema(moduleName.getValue()));
     }
 
 }

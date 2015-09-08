@@ -1,7 +1,9 @@
 package org.talend.components.api;
 
+import java.util.List;
+
 /**
- * Created by fupton on 9/8/15.
+ *
  */
 public interface ComponentSchemaElement {
 
@@ -22,5 +24,8 @@ public interface ComponentSchemaElement {
     public int getSize();
 
     public void setSize(int size);
+
+    public List<ComponentSchemaElement> getChildren();
+    public void setChildren(List<ComponentSchemaElement> children);
 
 }

@@ -54,6 +54,10 @@ public class ComponentSchemaElementImpl implements ComponentSchemaElement {
         return children;
     }
 
+    public void setChildren(List<ComponentSchemaElement> children) {
+        this.children = children;
+    }
+
     public void addChild(ComponentSchemaElement child) {
         if (children == null)
             children = new ArrayList<ComponentSchemaElement>();

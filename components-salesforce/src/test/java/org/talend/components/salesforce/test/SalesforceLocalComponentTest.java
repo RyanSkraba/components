@@ -19,6 +19,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.talend.components.api.ComponentProperties;
+import org.talend.components.api.ComponentSchemaElement;
 import org.talend.components.api.ComponentService;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.internal.SpringApp;
@@ -134,11 +135,21 @@ public class SalesforceLocalComponentTest extends TestCase {
     }
 
     @Test public void testSchema() throws Throwable {
-        TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
-                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
+        TSalesforceInputProperties props = (TSalesforceInputProperties) componentService.getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
-        props.module.moduleName.setValue("Account");
-        // FINISH this
+
+        Form f = props.getForm(SalesforceModuleProperties.MODULE);
+        SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
+        moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
+        moduleProps.moduleName.setValue("Account");
+        moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
+        ComponentSchemaElement schemaRoot = moduleProps.schema.getValue();
+        System.out.println(schemaRoot);
+        for (ComponentSchemaElement child : schemaRoot.getChildren()) {
+            System.out.println(child.getName());
+        }
+        assertEquals("Id", schemaRoot.getChildren().get(0).getName());
+        assertTrue(schemaRoot.getChildren().size() > 50);
     }
 
 }

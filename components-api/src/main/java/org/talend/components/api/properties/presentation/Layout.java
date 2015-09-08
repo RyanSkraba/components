@@ -22,7 +22,7 @@ package org.talend.components.api.properties.presentation;
 public class Layout {
 
     public enum WidgetType {
-        DEFAULT, TEXT_FIELD, TEXT_AREA, LIST, COMBOBOX, RADIOBUTTONS, LISTBOX, BUTTON
+        DEFAULT, SCHEMA_ONE_LINE,  TEXT_FIELD, TEXT_AREA, LIST, COMBOBOX, RADIOBUTTONS, LISTBOX, BUTTON
     }
 
     /**

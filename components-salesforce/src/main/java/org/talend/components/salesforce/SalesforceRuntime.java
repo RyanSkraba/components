@@ -83,8 +83,20 @@ public class SalesforceRuntime extends ComponentRuntime {
         return returnList;
     }
 
-    public ComponentSchemaElement getSchema(String module) {
-        return null;
+    public ComponentSchemaElement getSchema(String module) throws ConnectionException {
+        ComponentSchemaElement root = getComponentSchemaElement();
+        root.setName("Root");
+        List<ComponentSchemaElement> children = new ArrayList<ComponentSchemaElement>();
+
+        DescribeSObjectResult[] describeSObjectResults = connection.describeSObjects(new String[] { module });
+        Field fields[] = describeSObjectResults[0].getFields();
+        for (Field field : fields) {
+            ComponentSchemaElement child = getComponentSchemaElement();
+            child.setName(field.getName());
+            children.add(child);
+        }
+        root.setChildren(children);
+        return root;
     }
 
 
