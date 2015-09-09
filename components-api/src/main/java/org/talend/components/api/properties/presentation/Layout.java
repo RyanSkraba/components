@@ -15,14 +15,53 @@ package org.talend.components.api.properties.presentation;
 /**
  * The {@code Layout} class defines the presentation characteristics of the property within
  * its {@link Form}.
- * <p>
+ * <p/>
  * TODO - I think the name layout is not quite right here, this encompasses all declarative
  * property-specific presentation properties.
  */
 public class Layout {
 
     public enum WidgetType {
-        DEFAULT, SCHEMA_ONE_LINE,  TEXT_FIELD, TEXT_AREA, LIST, COMBOBOX, RADIOBUTTONS, LISTBOX, BUTTON
+        /**
+         * No special widget is requested, the default for the property's type is to be used.
+         */
+        DEFAULT,
+
+        /**
+         * Presentation of a schema editor.
+         */
+        SCHEMA_EDITOR,
+
+        /**
+         * Presentation of a reference to a schema on one line. This shows the name of the schema
+         * and provides a button to open the schema editor/viewer in a dialog.
+         */
+        SCHEMA_REFERENCE,
+
+        /**
+         * Provides a means of selecting a name or name/description from a set of names, possibly
+         * arranged in a hierarchy. This is to be used for a large number of names, as this has
+         * search capability.
+         */
+        NAME_SELECTION_AREA,
+
+        /**
+         * A reference to a named selection. This just shows the selected name and a button to
+         * get a dialog that has the {@link NAME_SELECTION_AREA}.
+         */
+        NAME_SELECTION_REFERENCE,
+
+        /**
+         * A reference to a component. This could be a reference to this component, another single component
+         * in the enclosing scope's type, or a specified component instance. This is rendered as a single line
+         * with the type of reference in a combo box.
+         */
+        COMPONENT_REFERENCE,
+
+        /**
+         * A button
+         */
+        BUTTON
     }
 
     /**
@@ -47,7 +86,7 @@ public class Layout {
      * Is the validation associated with this expected to be long running (so that the UI
      * should give a wait indication. This is for things like doing a connection or loading
      * data from a database.
-     * <p>
+     * <p/>
      * TODO - perhaps in the future we can have some notion of progress.
      */
     private boolean longRunning;
@@ -59,15 +98,15 @@ public class Layout {
      */
     private boolean deemphasize;
 
-
     //
     // Internal properties set by the component framework
     //
 
     private boolean callBefore;
-    private boolean callValidate;
-    private boolean callAfter;
 
+    private boolean callValidate;
+
+    private boolean callAfter;
 
     public static Layout layout() {
         return new Layout();
@@ -126,7 +165,6 @@ public class Layout {
         this.deemphasize = deemphasize;
         return this;
     }
-
 
     //
     // These are automatically set by the component framework; they

@@ -23,6 +23,14 @@ import org.talend.components.api.properties.presentation.Layout.WidgetType;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
 import static org.talend.components.api.properties.presentation.Layout.*;
+import org.talend.components.api.properties.presentation.Layout;
+import org.talend.components.api.properties.presentation.Wizard;
+import org.talend.components.common.SchemaProperties;
+import org.talend.components.common.UserPasswordProperties;
+import org.talend.components.common.oauth.OauthProperties;
+
+import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 
 @JsonRootName("salesforceModuleProperties")
 public class SalesforceModuleProperties extends ComponentProperties {
@@ -34,9 +42,11 @@ public class SalesforceModuleProperties extends ComponentProperties {
     //
     public Property<String>                 moduleName = new Property<String>("moduleName", "Module Name");
 
-    public Property<ComponentSchemaElement> schema     = new Property<ComponentSchemaElement>("schema", "Schema");
+    public SchemaProperties schema = new SchemaProperties();
 
-    public static final String              MODULE     = "Module";
+    public static final String MAIN = "Main";
+
+    public static final String REFERENCE = "Reference";
 
     public static final String              ADVANCED   = "Advanced";
 
@@ -52,9 +62,15 @@ public class SalesforceModuleProperties extends ComponentProperties {
     protected void setupLayout() {
         super.setupLayout();
 
-        Form moduleForm = Form.create(this, MODULE, "Salesforce Module");
-        moduleForm.addChild(moduleName, layout().setRow(1).setWidgetType(WidgetType.LISTBOX));
-        moduleForm.addChild(schema, layout().setRow(2).setWidgetType(WidgetType.SCHEMA_ONE_LINE));
+        Form moduleForm = Form.create(this, MAIN, "Salesforce Module");
+        moduleForm.addChild(moduleName, layout().setRow(1).setWidgetType(Layout.WidgetType.NAME_SELECTION_AREA));
+        refreshLayout(moduleForm);
+
+        Form moduleRefForm = Form.create(this, REFERENCE, "Salesforce Module");
+        moduleRefForm.addChild(moduleName, layout().setRow(1).setWidgetType(Layout.WidgetType.NAME_SELECTION_REFERENCE));
+        moduleRefForm.addChild(schema.getForm(SchemaProperties.REFERENCE), layout().setRow(2));
+        refreshLayout(moduleRefForm);
+
     }
 
     public void beforeModuleName() throws Exception {
@@ -68,7 +84,7 @@ public class SalesforceModuleProperties extends ComponentProperties {
     public void afterModuleName() throws Exception {
         SalesforceRuntime conn = new SalesforceRuntime();
         conn.connect(connection);
-        schema.setValue(conn.getSchema(moduleName.getValue()));
+        schema.schema.setValue(conn.getSchema(moduleName.getValue()));
     }
 
 }

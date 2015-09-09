@@ -17,7 +17,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.ComponentSchemaElement;
 import org.talend.components.api.ComponentService;
@@ -62,7 +61,7 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     @Test public void testGetProps() {
         ComponentProperties props = componentService.getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
-        Form f = props.getForm(TSalesforceConnectProperties.CONNECTION);
+        Form f = props.getForm(TSalesforceConnectProperties.MAIN);
         System.out.println(f);
         System.out.println(props);
     }
@@ -74,13 +73,13 @@ public class SalesforceLocalComponentTest extends TestCase {
         props = (SalesforceConnectionProperties) componentService
                 .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
         assertEquals(SalesforceConnectionProperties.LoginType.BASIC, props.loginType.getValue());
-        f = props.getForm(TSalesforceConnectProperties.CONNECTION);
+        f = props.getForm(TSalesforceConnectProperties.MAIN);
         assertTrue(f.getLayout(UserPasswordProperties.USERPASSWORD).isVisible());
         assertFalse(f.getLayout(OauthProperties.OAUTH).isVisible());
 
         props.loginType.setValue(SalesforceConnectionProperties.LoginType.OAUTH);
         props = (SalesforceConnectionProperties) checkAndAfter(f, "loginType", props);
-        f = props.getForm(TSalesforceConnectProperties.CONNECTION);
+        f = props.getForm(TSalesforceConnectProperties.MAIN);
         assertTrue(f.isRefreshUI());
 
         assertFalse(f.getLayout(UserPasswordProperties.USERPASSWORD).isVisible());
@@ -100,7 +99,7 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     @Test public void testLogin() throws Throwable {
         SalesforceConnectionProperties props = setupProps(null);
-        Form f = props.getForm(TSalesforceConnectProperties.CONNECTION);
+        Form f = props.getForm(TSalesforceConnectProperties.MAIN);
         props = (SalesforceConnectionProperties) checkAndValidate(f, "testConnection", props);
         System.out.println(props.getValidationResult());
     }
@@ -108,7 +107,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     @Test public void testBulkLogin() throws Throwable {
         SalesforceConnectionProperties props = setupProps(null);
         props.bulkConnection.setValue(true);
-        Form f = props.getForm(TSalesforceConnectProperties.CONNECTION);
+        Form f = props.getForm(TSalesforceConnectProperties.MAIN);
         props = (SalesforceConnectionProperties) checkAndValidate(f, "testConnection", props);
         System.out.println(props.getValidationResult());
     }
@@ -118,11 +117,11 @@ public class SalesforceLocalComponentTest extends TestCase {
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
 
-        assertEquals(2, props.getForms().size());
-        assertEquals(SalesforceConnectionProperties.CONNECTION, props.getForms().get(0).getName());
-        assertEquals(SalesforceModuleProperties.MODULE, props.getForms().get(1).getName());
+        assertEquals(3, props.getForms().size());
+        assertEquals(SalesforceConnectionProperties.MAIN, props.getForms().get(0).getName());
+        assertEquals(SalesforceModuleProperties.REFERENCE, props.getForms().get(1).getName());
 
-        Form f = props.getForm(SalesforceModuleProperties.MODULE);
+        Form f = props.getForm(SalesforceModuleProperties.REFERENCE);
         assertTrue(f.getLayout("moduleName").isCallBefore());
         // The Form is bound to a Properties object that created it. The Forms might not always be associated with the properties object
         // they came from.
@@ -138,12 +137,12 @@ public class SalesforceLocalComponentTest extends TestCase {
         TSalesforceInputProperties props = (TSalesforceInputProperties) componentService.getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
 
-        Form f = props.getForm(SalesforceModuleProperties.MODULE);
+        Form f = props.getForm(SalesforceModuleProperties.REFERENCE);
         SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
         moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
         moduleProps.moduleName.setValue("Account");
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
-        ComponentSchemaElement schemaRoot = moduleProps.schema.getValue();
+        ComponentSchemaElement schemaRoot = moduleProps.schema.schema.getValue();
         System.out.println(schemaRoot);
         for (ComponentSchemaElement child : schemaRoot.getChildren()) {
             System.out.println(child.getName());

@@ -14,7 +14,7 @@ package org.talend.components.api;
 
 public class ComponentConnector {
 
-    public enum Type {FLOW, ITERATE, SUBJOB_OK, SUBJOB_ERROR, COMPONENT_OK, COMPONENT_ERROR, RUN_IF}
+    public enum Type {FLOW, MAIN, ITERATE, REJECT, SUBJOB_OK, SUBJOB_ERROR, COMPONENT_OK, COMPONENT_ERROR, RUN_IF}
 
     protected Type type;
 

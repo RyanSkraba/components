@@ -19,6 +19,8 @@ import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Layout.WidgetType;
 import org.talend.components.api.properties.presentation.Wizard;
+import org.talend.components.common.CommonProperties;
+import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.common.oauth.OauthProperties;
@@ -77,11 +79,12 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     //
     // Nested property collections
     //
+    public CommonProperties          common           = new CommonProperties();
     public OauthProperties           oauth            = new OauthProperties();
 
     public UserPasswordProperties    userPassword     = new UserPasswordProperties();
 
-    public static final String       CONNECTION       = "Connection";
+    public static final String MAIN = "Main";
 
     public static final String       ADVANCED         = "Advanced";
 
@@ -89,11 +92,10 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     protected void setupLayout() {
         super.setupLayout();
 
-        Form connectionForm = Form.create(this, CONNECTION, "Salesforce Connection Settings");
-
+        Form connectionForm = Form.create(this, MAIN, "Salesforce Connection Settings");
         connectionForm.addChild(connectionDesc, layout().setRow(1));
 
-        connectionForm.addChild(name, layout().setRow(2));
+        connectionForm.addChild(common.getForm(CommonProperties.MAIN), layout().setRow(2));
         connectionForm.addChild(loginType, layout().setRow(3).setDeemphasize(true));
 
         // Only one of these is visible at a time
@@ -122,7 +124,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     }
 
     public void afterLoginType() {
-        refreshLayout(getForm(CONNECTION));
+        refreshLayout(getForm(MAIN));
     }
 
     public ValidationResult validateTestConnection() throws Exception {
@@ -135,9 +137,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        if (form.getName().equals(CONNECTION)) {
-            // TODO - need a way to tell the UI that the form's layout needs to be refreshed
-            // based on this change
+        if (form.getName().equals(MAIN)) {
             switch (loginType.getValue()) {
             case OAUTH:
                 form.getLayout(OauthProperties.OAUTH).setVisible(true);

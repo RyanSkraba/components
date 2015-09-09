@@ -19,22 +19,22 @@ import java.util.List;
  * and as well no custom graphical UI is required for most components. The types of UIs that
  * can be defined include those for desktop (Eclipse), web, and scripting. All of these
  * will use the code defined here for their construction and validation.
- * <p>
+ * <p/>
  * All aspects of the properties are defined in a subclass of this
  * class using the {@link Property}, {@Link PresentationItem}, {@link Layout}, {@link Form}, and {@link Wizard} classes.
  * In addition in cases where user interface decisions are made in code, methods can be added to the subclass
  * to influence the flow of the user interface and help with validation.
- * <p>
+ * <p/>
  * Each property can be a Java type, both simple types and collections are permitted.
  * In addition, {@code ComponentProperties} classes can be composed allowing hierarchies
  * of properties and collections of properties to be reused.
- * <p>
+ * <p/>
  * Properties are be grouped into {@link Form} objects
  * which can be presented in various ways by the user interface (for example, a wizard page, a
  * tab in a property sheet, or a dialog). The same property can appear in multiple forms.
- * <p>
+ * <p/>
  * A {@link Wizard} can be defined which is a sequence of forms.
- * <p>
+ * <p/>
  * Methods can be added in subclasses according to the conventions below to help direct the UI. These methods
  * will be automatically called by the UI code.
  * <ul>
@@ -63,10 +63,6 @@ public abstract class ComponentProperties {
 
     // Not a component property
     protected ComponentPropertiesInternal internal;
-
-    public Property<String> name = new Property<String>("name", "Name");
-
-    public Property<String> description = new Property<String>("description", "Descripton");
 
     public ComponentProperties() {
         internal = new ComponentPropertiesInternal();
