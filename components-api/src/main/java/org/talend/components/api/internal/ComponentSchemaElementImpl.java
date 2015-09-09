@@ -1,21 +1,21 @@
 package org.talend.components.api.internal;
 
-import org.talend.components.api.ComponentSchemaElement;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.talend.components.api.ComponentSchemaElement;
 
 /**
  */
 public class ComponentSchemaElementImpl implements ComponentSchemaElement {
 
-    public String name;
+    public String                          name;
 
-    public String description;
+    public String                          description;
 
-    public Type type;
+    public Type                            type;
 
-    public int size;
+    public int                             size;
 
     protected List<ComponentSchemaElement> children;
 

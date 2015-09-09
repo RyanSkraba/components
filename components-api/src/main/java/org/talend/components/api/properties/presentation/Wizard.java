@@ -12,19 +12,18 @@
 // ============================================================================
 package org.talend.components.api.properties.presentation;
 
-import org.talend.components.api.ComponentProperties;
-import org.talend.components.api.properties.NamedThing;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.talend.components.api.ComponentProperties;
+import org.talend.components.api.properties.NamedThing;
+
 /**
- * Represents the definitions for a wizard to help direct the UI of
- * one of more {@link Form} objects.
+ * Represents the definitions for a wizard to help direct the UI of one of more {@link Form} objects.
  */
 public class Wizard extends NamedThing {
 
-    private Form currentForm;
+    private Form       currentForm;
 
     private List<Form> forms;
 

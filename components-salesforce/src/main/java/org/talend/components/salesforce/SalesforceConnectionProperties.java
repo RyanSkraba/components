@@ -12,7 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
+import static org.talend.components.api.properties.presentation.Layout.layout;
+
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.properties.PresentationItem;
 import org.talend.components.api.properties.Property;
@@ -25,9 +26,10 @@ import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.common.oauth.OauthProperties;
 
-import static org.talend.components.api.properties.presentation.Layout.layout;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
-@JsonRootName("salesforceConnectionProperties") public class SalesforceConnectionProperties extends ComponentProperties {
+@JsonRootName("salesforceConnectionProperties")
+public class SalesforceConnectionProperties extends ComponentProperties {
 
     public SalesforceConnectionProperties() {
         super();
@@ -40,27 +42,28 @@ import static org.talend.components.api.properties.presentation.Layout.layout;
 
     // public String apiVersion;
     public Property<String> url = new Property<String>("url", "Salesforce URL").setRequired(true) //$NON-NLS-1$//$NON-NLS-2$
-            .setValue("https://www.salesforce.com/services/Soap/u/34.0"); //$NON-NLS-1$
+                                        .setValue("https://www.salesforce.com/services/Soap/u/34.0"); //$NON-NLS-1$
 
     public enum LoginType {
         BASIC,
         OAUTH
     }
 
-    public Property<LoginType> loginType = new Property<LoginType>("loginType", "Connection type").setRequired(true)
-            .setValue(LoginType.BASIC);
+    public Property<LoginType>       loginType        = new Property<LoginType>("loginType", "Connection type").setRequired(true)
+                                                              .setValue(LoginType.BASIC);
 
-    public Property<Boolean> bulkConnection = new Property<Boolean>("bulkConnection", "Bulk Connection");
+    public Property<Boolean>         bulkConnection   = new Property<Boolean>("bulkConnection", "Bulk Connection");
 
-    public Property<Boolean> needCompression = new Property<Boolean>("needCompression", "Need compression");
+    public Property<Boolean>         needCompression  = new Property<Boolean>("needCompression", "Need compression");
 
-    public Property<Integer> timeout = new Property<Integer>("timeout", "Timeout").setValue(0);
+    public Property<Integer>         timeout          = new Property<Integer>("timeout", "Timeout").setValue(0);
 
-    public Property<Boolean> httpTraceMessage = new Property<Boolean>("httpTraceMessage", "Trace HTTP message");
+    public Property<Boolean>         httpTraceMessage = new Property<Boolean>("httpTraceMessage", "Trace HTTP message");
 
-    public Property<String> clientId = new Property<String>("clientId", "Client Id");
+    public Property<String>          clientId         = new Property<String>("clientId", "Client Id");
 
-    public Property<ProxyProperties> proxy = new Property<ProxyProperties>("proxy", "Proxy").setValue(new ProxyProperties());
+    public Property<ProxyProperties> proxy            = new Property<ProxyProperties>("proxy", "Proxy")
+                                                              .setValue(new ProxyProperties());
 
     //
     // Presentation items

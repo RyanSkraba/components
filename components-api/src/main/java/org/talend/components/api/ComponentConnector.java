@@ -14,13 +14,23 @@ package org.talend.components.api;
 
 public class ComponentConnector {
 
-    public enum Type {FLOW, MAIN, ITERATE, REJECT, SUBJOB_OK, SUBJOB_ERROR, COMPONENT_OK, COMPONENT_ERROR, RUN_IF}
+    public enum Type {
+        FLOW,
+        MAIN,
+        ITERATE,
+        REJECT,
+        SUBJOB_OK,
+        SUBJOB_ERROR,
+        COMPONENT_OK,
+        COMPONENT_ERROR,
+        RUN_IF
+    }
 
     protected Type type;
 
-    protected int maxInput;
+    protected int  maxInput;
 
-    protected int maxOutput;
+    protected int  maxOutput;
 
     public ComponentConnector(Type type, int maxInput, int maxOutput) {
         this.type = type;

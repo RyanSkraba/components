@@ -12,31 +12,32 @@
 // ============================================================================
 package org.talend.components.common.oauth;
 
+import static org.talend.components.api.properties.presentation.Layout.layout;
+
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 
-import static org.talend.components.api.properties.presentation.Layout.layout;
-
 public class OauthProperties extends ComponentProperties {
 
-    public Property<String> clientId = new Property<String>("clientId", "Client Id").setRequired(true);
+    public Property<String>    clientId     = new Property<String>("clientId", "Client Id").setRequired(true);
 
-    public Property<String> clientSecret = new Property<String>("clientSecret", "Client Secret").setRequired(true);
+    public Property<String>    clientSecret = new Property<String>("clientSecret", "Client Secret").setRequired(true);
 
-    public Property<String> callbackHost = new Property<String>("callbackHost", "Callback Host").setRequired(true);
+    public Property<String>    callbackHost = new Property<String>("callbackHost", "Callback Host").setRequired(true);
 
-    public Property<Integer> callbackPort = new Property<Integer>("callbackPort", "Callback Port").setRequired(true);
+    public Property<Integer>   callbackPort = new Property<Integer>("callbackPort", "Callback Port").setRequired(true);
 
-    public Property<String> tokenFile = new Property<String>("tokenFile", "Token File").setRequired(true);
+    public Property<String>    tokenFile    = new Property<String>("tokenFile", "Token File").setRequired(true);
 
-    public static final String OAUTH = "OAuth";
+    public static final String OAUTH        = "OAuth";
 
     public OauthProperties() {
         setupLayout();
     }
 
-    @Override protected void setupLayout() {
+    @Override
+    protected void setupLayout() {
         super.setupLayout();
         Form form = new Form(this, OAUTH, "OAuth Parameters");
         form.addChild(clientId, layout().setRow(1).setOrder(1));

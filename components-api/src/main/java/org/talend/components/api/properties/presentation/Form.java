@@ -12,31 +12,31 @@
 // ============================================================================
 package org.talend.components.api.properties.presentation;
 
-import org.talend.components.api.ComponentProperties;
-import org.talend.components.api.properties.NamedThing;
-import org.talend.components.api.properties.Property;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.talend.components.api.ComponentProperties;
+import org.talend.components.api.properties.NamedThing;
+import org.talend.components.api.properties.Property;
+
 /**
- * Represents a collection of components {@link Property} objects that are grouped into
- * a form for display. This form can be manifested for example as a tab in a view, a dialog, or a page in a wizard.
+ * Represents a collection of components {@link Property} objects that are grouped into a form for display. This form
+ * can be manifested for example as a tab in a view, a dialog, or a page in a wizard.
  */
 public class Form extends NamedThing {
 
-    protected ComponentProperties properties;
+    protected ComponentProperties     properties;
 
     protected Map<String, NamedThing> children;
 
-    protected Map<String, Layout> layoutMap;
+    protected Map<String, Layout>     layoutMap;
 
     /**
-     * Indicate that some {@link Layout} objects for this form have changed and the UI should
-     * be re-rendered to reflect the changed layout.
+     * Indicate that some {@link Layout} objects for this form have changed and the UI should be re-rendered to reflect
+     * the changed layout.
      */
-    protected boolean refreshUI;
+    protected boolean                 refreshUI;
 
     public Form(ComponentProperties props, String name, String displayName) {
         super(name, displayName);

@@ -1,5 +1,9 @@
 package org.talend.components.api;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
+
 import org.talend.components.api.internal.ComponentPropertiesInternal;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.ValidationResult;
@@ -7,59 +11,49 @@ import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Layout;
 import org.talend.components.api.properties.presentation.Wizard;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-
 /**
- * The {@code ComponentProperties} class contains the definitions of the properties associated
- * with a component. These definitions contain enough information to automatically
- * construct a nice looking user interface (UI) to populate and validate the properties. The objective
- * is that no actual (graphical) UI code is included in the component's definition
- * and as well no custom graphical UI is required for most components. The types of UIs that
- * can be defined include those for desktop (Eclipse), web, and scripting. All of these
- * will use the code defined here for their construction and validation.
+ * The {@code ComponentProperties} class contains the definitions of the properties associated with a component. These
+ * definitions contain enough information to automatically construct a nice looking user interface (UI) to populate and
+ * validate the properties. The objective is that no actual (graphical) UI code is included in the component's
+ * definition and as well no custom graphical UI is required for most components. The types of UIs that can be defined
+ * include those for desktop (Eclipse), web, and scripting. All of these will use the code defined here for their
+ * construction and validation.
  * <p/>
- * All aspects of the properties are defined in a subclass of this
- * class using the {@link Property}, {@Link PresentationItem}, {@link Layout}, {@link Form}, and {@link Wizard} classes.
- * In addition in cases where user interface decisions are made in code, methods can be added to the subclass
- * to influence the flow of the user interface and help with validation.
+ * All aspects of the properties are defined in a subclass of this class using the {@link Property}, {@Link
+ * PresentationItem}, {@link Layout}, {@link Form}, and {@link Wizard} classes. In addition in cases where user
+ * interface decisions are made in code, methods can be added to the subclass to influence the flow of the user
+ * interface and help with validation.
  * <p/>
- * Each property can be a Java type, both simple types and collections are permitted.
- * In addition, {@code ComponentProperties} classes can be composed allowing hierarchies
- * of properties and collections of properties to be reused.
+ * Each property can be a Java type, both simple types and collections are permitted. In addition,
+ * {@code ComponentProperties} classes can be composed allowing hierarchies of properties and collections of properties
+ * to be reused.
  * <p/>
- * Properties are be grouped into {@link Form} objects
- * which can be presented in various ways by the user interface (for example, a wizard page, a
- * tab in a property sheet, or a dialog). The same property can appear in multiple forms.
+ * Properties are be grouped into {@link Form} objects which can be presented in various ways by the user interface (for
+ * example, a wizard page, a tab in a property sheet, or a dialog). The same property can appear in multiple forms.
  * <p/>
  * A {@link Wizard} can be defined which is a sequence of forms.
  * <p/>
- * Methods can be added in subclasses according to the conventions below to help direct the UI. These methods
- * will be automatically called by the UI code.
+ * Methods can be added in subclasses according to the conventions below to help direct the UI. These methods will be
+ * automatically called by the UI code.
  * <ul>
- * <li>{@code before&lt;PropertyName&gt;} - Called before the property is presented in the UI. This
- * can be used to compute anything required to display the property.
- * </li>
- * <li>{@code after&lt;PropertyName&gt;} - Called after the property is presented and validated in the UI. This
- * can be used to update the properties state to consider the changed in this property.
- * </li>
+ * <li>{@code before&lt;PropertyName&gt;} - Called before the property is presented in the UI. This can be used to
+ * compute anything required to display the property.</li>
+ * <li>{@code after&lt;PropertyName&gt;} - Called after the property is presented and validated in the UI. This can be
+ * used to update the properties state to consider the changed in this property.</li>
  * <li>{@code validate&lt;PropertyName&gt;} - Called to validate the property value that has been entered in the UI.
- * This will return a {@link ValidationResult} object with any error information.
- * </li>
- * <li>{@code beforeForm&lt;FormName&gt;} - Called before the form is displayed.
- * </li>
+ * This will return a {@link ValidationResult} object with any error information.</li>
+ * <li>{@code beforeForm&lt;FormName&gt;} - Called before the form is displayed.</li>
  * </ul>
  */
 
 // @JsonSerialize(using = ComponentPropertiesSerializer.class)
 public abstract class ComponentProperties {
 
-    static final String METHOD_BEFORE = "before";
+    static final String                   METHOD_BEFORE   = "before";
 
-    static final String METHOD_AFTER = "after";
+    static final String                   METHOD_AFTER    = "after";
 
-    static final String METHOD_VALIDATE = "validate";
+    static final String                   METHOD_VALIDATE = "validate";
 
     // Not a component property
     protected ComponentPropertiesInternal internal;

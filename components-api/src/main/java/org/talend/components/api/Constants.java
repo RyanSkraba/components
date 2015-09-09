@@ -18,4 +18,5 @@ package org.talend.components.api;
 public class Constants {
 
     public static final String COMPONENT_BEAN_PREFIX = "components#";
+    public static final String COMPONENT_WIZARD_BEAN_PREFIX = "components#wizards#";
 }

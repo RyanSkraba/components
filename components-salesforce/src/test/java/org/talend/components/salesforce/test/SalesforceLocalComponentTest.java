@@ -13,6 +13,7 @@
 package org.talend.components.salesforce.test;
 
 import junit.framework.TestCase;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +34,12 @@ import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectPro
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
-@RunWith(SpringJUnit4ClassRunner.class) @SpringApplicationConfiguration(classes = SpringApp.class) public class SalesforceLocalComponentTest
-        extends TestCase {
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = SpringApp.class)
+public class SalesforceLocalComponentTest extends TestCase {
 
-    @Autowired protected ComponentService componentService;
+    @Autowired
+    protected ComponentService componentService;
 
     public SalesforceLocalComponentTest() {
     }
@@ -56,14 +59,16 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputPropert
         return componentService.validateProperty(propName, props);
     }
 
-    @Test public void testGetProps() {
+    @Test
+    public void testGetProps() {
         ComponentProperties props = componentService.getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
         Form f = props.getForm(TSalesforceConnectProperties.MAIN);
         System.out.println(f);
         System.out.println(props);
     }
 
-    @Test public void testAfterLoginType() throws Throwable {
+    @Test
+    public void testAfterLoginType() throws Throwable {
         SalesforceConnectionProperties props;
         Form f;
 
@@ -94,14 +99,16 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputPropert
         return props;
     }
 
-    @Test public void testLogin() throws Throwable {
+    @Test
+    public void testLogin() throws Throwable {
         SalesforceConnectionProperties props = setupProps(null);
         Form f = props.getForm(TSalesforceConnectProperties.MAIN);
         props = (SalesforceConnectionProperties) checkAndValidate(f, "testConnection", props);
         System.out.println(props.getValidationResult());
     }
 
-    @Test public void testBulkLogin() throws Throwable {
+    @Test
+    public void testBulkLogin() throws Throwable {
         SalesforceConnectionProperties props = setupProps(null);
         props.bulkConnection.setValue(true);
         Form f = props.getForm(TSalesforceConnectProperties.MAIN);
@@ -109,7 +116,8 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputPropert
         System.out.println(props.getValidationResult());
     }
 
-    @Test public void testModuleNames() throws Throwable {
+    @Test
+    public void testModuleNames() throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
@@ -120,7 +128,8 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputPropert
 
         Form f = props.getForm(SalesforceModuleProperties.REFERENCE);
         assertTrue(f.getLayout("moduleName").isCallBefore());
-        // The Form is bound to a Properties object that created it. The Forms might not always be associated with the properties object
+        // The Form is bound to a Properties object that created it. The Forms might not always be associated with the
+        // properties object
         // they came from.
         ComponentProperties moduleProps = f.getProperties();
         moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
@@ -130,7 +139,8 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputPropert
         System.out.println(moduleProps.getValidationResult());
     }
 
-    @Test public void testSchema() throws Throwable {
+    @Test
+    public void testSchema() throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);

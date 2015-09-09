@@ -12,12 +12,13 @@
 // ============================================================================
 package org.talend.components.api.internal.service;
 
-import org.talend.components.api.ComponentDefinition;
-
 import java.util.Map;
 
+import org.talend.components.api.ComponentDefinition;
+import org.talend.components.api.ComponentWizardDefinition;
+
 /**
- * interface for the internal component registry that will have a specific implementation for OSGI and Spring
+ * Interface for the internal component registry that will have a specific implementation for OSGi and Spring
  */
 public interface ComponentRegistry {
 
@@ -25,5 +26,10 @@ public interface ComponentRegistry {
      * @return a map of components using their name as a key, never null.
      */
     Map<String, ComponentDefinition> getComponents();
+
+    /**
+     * @return a map of component wizards using their name as a key, never null.
+     */
+    Map<String, ComponentWizardDefinition> getComponentWizards();
 
 }

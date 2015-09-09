@@ -31,18 +31,25 @@ public interface ComponentService {
     ComponentProperties getComponentProperties(String name);
 
     /**
-     * Get the list of all the components name that are registered
+     * Get the list of all the component names that are registered
      *
-     * @return return the list of components name, never null
+     * @return return the set of component names, never null
      */
-    Set<String> getAllComponentsName();
+    Set<String> getAllComponentNames();
 
     /**
      * Get the list of all the components {@link ComponentDefinition} that are registered
      *
-     * @return return the list of components definition, never null.
+     * @return return the set of component definitions, never null.
      */
     Set<ComponentDefinition> getAllComponents();
+
+    /**
+     * Return all top-level wizards that can be used to create component property sets.
+     * 
+     * @return the set of component wizards, never null.
+     */
+    Set<ComponentWizardDefinition> getTopLevelComponentWizards();
 
     ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable;
 

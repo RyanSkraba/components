@@ -12,6 +12,11 @@
 // ============================================================================
 package org.talend.components.api;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+import javax.inject.Inject;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -23,24 +28,24 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 
-import javax.inject.Inject;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
 /**
  * created by sgandon on 7 sept. 2015 Detailled comment
  */
-@RunWith(PaxExam.class) @ExamReactorStrategy(PerMethod.class) public class TestComponentService {
+@RunWith(PaxExam.class)
+@ExamReactorStrategy(PerMethod.class)
+public class TestComponentService {
 
-    @Inject private ComponentService componentService;
+    @Inject
+    private ComponentService componentService;
 
-    @Configuration public Option[] config() {
+    @Configuration
+    public Option[] config() {
 
         return PaxExamOptions.getOptions();
     }
 
-    @Test public void exampleOnHowToGetTheServiceUsingOsgiApis() {
+    @Test
+    public void exampleOnHowToGetTheServiceUsingOsgiApis() {
         // inside eclipse the bundle context can be retrieved from the Activator.start method or using the FrameworkUtil
         // class.
         BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
@@ -53,7 +58,8 @@ import static org.junit.Assert.fail;
         }
     }
 
-    @Test(expected = NullPointerException.class) public void getComponentService() {
+    @Test(expected = NullPointerException.class)
+    public void getComponentService() {
         assertNotNull(componentService);
         componentService.getComponentProperties("foo");
     }

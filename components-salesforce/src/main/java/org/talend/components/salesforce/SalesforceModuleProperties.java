@@ -12,33 +12,35 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
+import static org.talend.components.api.properties.presentation.Layout.layout;
+
+import java.util.List;
+
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Layout;
 import org.talend.components.common.SchemaProperties;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
-import static org.talend.components.api.properties.presentation.Layout.layout;
-
-@JsonRootName("salesforceModuleProperties") public class SalesforceModuleProperties extends ComponentProperties {
+@JsonRootName("salesforceModuleProperties")
+public class SalesforceModuleProperties extends ComponentProperties {
 
     private SalesforceConnectionProperties connection;
 
     //
     // Properties
     //
-    public Property<String> moduleName = new Property<String>("moduleName", "Module Name");
+    public Property<String>                moduleName = new Property<String>("moduleName", "Module Name");
 
-    public SchemaProperties schema = new SchemaProperties();
+    public SchemaProperties                schema     = new SchemaProperties();
 
-    public static final String MAIN = "Main";
+    public static final String             MAIN       = "Main";
 
-    public static final String REFERENCE = "Reference";
+    public static final String             REFERENCE  = "Reference";
 
-    public static final String ADVANCED = "Advanced";
+    public static final String             ADVANCED   = "Advanced";
 
     // FIXME - OK what about if we are using a connection from a separate component
     // that defines the connection, how do we get that separate component?
@@ -48,7 +50,8 @@ import static org.talend.components.api.properties.presentation.Layout.layout;
         setupLayout();
     }
 
-    @Override protected void setupLayout() {
+    @Override
+    protected void setupLayout() {
         super.setupLayout();
 
         Form moduleForm = Form.create(this, MAIN, "Salesforce Module");

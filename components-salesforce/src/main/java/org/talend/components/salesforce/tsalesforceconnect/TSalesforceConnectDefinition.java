@@ -18,14 +18,13 @@ import org.talend.components.api.ComponentDefinition;
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.Constants;
 
-@org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX
-        + TSalesforceConnectDefinition.COMPONENT_NAME) @aQute.bnd.annotation.component.Component(name =
-        Constants.COMPONENT_BEAN_PREFIX + TSalesforceConnectDefinition.COMPONENT_NAME) public class TSalesforceConnectDefinition
-        implements ComponentDefinition {
+@org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceConnectDefinition.COMPONENT_NAME)
+@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceConnectDefinition.COMPONENT_NAME)
+public class TSalesforceConnectDefinition implements ComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tSalesforceConnect";                     //$NON-NLS-1$
+    public static final String     COMPONENT_NAME = "tSalesforceConnect"; //$NON-NLS-1$
 
-    protected ComponentConnector[] connectors = { new ComponentConnector(Type.FLOW, 0, 0),
+    protected ComponentConnector[] connectors     = { new ComponentConnector(Type.FLOW, 0, 0),
             new ComponentConnector(Type.ITERATE, 1, 0), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
             new ComponentConnector(Type.SUBJOB_ERROR, 1, 0) };
 

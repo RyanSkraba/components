@@ -21,11 +21,15 @@ import org.talend.components.api.ComponentProperties;
  */
 public class ValidationResult {
 
-    public enum Result {OK, WARNING, ERROR}
+    public enum Result {
+        OK,
+        WARNING,
+        ERROR
+    }
 
     public Result status = Result.OK;
 
-    public int number;
+    public int    number;
 
     public Result getStatus() {
         return status;

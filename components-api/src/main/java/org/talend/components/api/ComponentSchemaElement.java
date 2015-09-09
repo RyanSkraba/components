@@ -7,7 +7,11 @@ import java.util.List;
  */
 public interface ComponentSchemaElement {
 
-    public enum Type {STRING, INT, DATE}
+    public enum Type {
+        STRING,
+        INT,
+        DATE
+    }
 
     public String getName();
 

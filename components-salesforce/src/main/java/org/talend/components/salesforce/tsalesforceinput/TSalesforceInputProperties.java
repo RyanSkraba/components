@@ -21,15 +21,16 @@ public class TSalesforceInputProperties extends ComponentProperties {
 
     public SalesforceConnectionProperties connection = new SalesforceConnectionProperties();
 
-    public SalesforceModuleProperties module = new SalesforceModuleProperties(connection);
+    public SalesforceModuleProperties     module     = new SalesforceModuleProperties(connection);
 
-    public SchemaProperties schema = new SchemaProperties();
+    public SchemaProperties               schema     = new SchemaProperties();
 
     public TSalesforceInputProperties() {
         setupLayout();
     }
 
-    @Override public void setupLayout() {
+    @Override
+    public void setupLayout() {
         addForm(connection.getForm(SalesforceConnectionProperties.MAIN));
         addForm(module.getForm(SalesforceModuleProperties.REFERENCE));
         addForm(schema.getForm(SchemaProperties.REFERENCE));

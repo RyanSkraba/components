@@ -12,8 +12,11 @@
 // ============================================================================
 package org.talend.components.api.internal.service;
 
-import aQute.bnd.annotation.component.Activate;
-import aQute.bnd.annotation.component.Component;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -22,17 +25,17 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.ComponentDefinition;
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.ComponentService;
+import org.talend.components.api.ComponentWizardDefinition;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import aQute.bnd.annotation.component.Activate;
+import aQute.bnd.annotation.component.Component;
 
 /**
- * This is the OSGI specific service implementation that completly delegates the implementation to the Framework
- * agnostic ComponentServiceImpl
+ * This is the OSGI specific service implementation that completely delegates the implementation to the Framework
+ * agnostic {@link ComponentServiceImpl}
  */
-@Component public class ComponentServiceOsgi implements ComponentService {
+@Component
+public class ComponentServiceOsgi implements ComponentService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ComponentServiceOsgi.class);
 
@@ -48,100 +51,89 @@ import java.util.Set;
 
         }
 
-        private HashMap<String, ComponentDefinition> components;
+        private Map<String, ComponentDefinition>       components;
 
-        @Override public Map<String, ComponentDefinition> getComponents() {
-            if (components == null) {
-                try {
-                    Collection<ServiceReference<ComponentDefinition>> serviceReferences = bc
-                            .getServiceReferences(ComponentDefinition.class, null);
-                    components = new HashMap<String, ComponentDefinition>();
-                    for (ServiceReference<ComponentDefinition> sr : serviceReferences) {
-                        ComponentDefinition componentDef = bc.getService(sr);
-                        Object nameProp = sr.getProperty("component.name"); //$NON-NLS-1$
-                        if (nameProp instanceof String) {
-                            components.put((String) nameProp, componentDef);
-                            LOGGER.info("Registred the component: " + nameProp + "(" + componentDef.getClass().getCanonicalName()
-                                    + ")");
-                        } else {// no name set so issue a warning
-                            LOGGER.warn(
-                                    "Failed to registrer the following component because it is unamed: " + componentDef.getClass()
-                                            .getCanonicalName());
-                        }
+        private Map<String, ComponentWizardDefinition> componentWizards;
+
+        protected Map populateMap(Class cls) {
+            Map map = new HashMap<String, Object>();
+            try {
+                Collection<ServiceReference<ComponentDefinition>> serviceReferences = bc.getServiceReferences(cls, null);
+                for (ServiceReference sr : serviceReferences) {
+                    Object service = bc.getService(sr);
+                    Object nameProp = sr.getProperty("component.name"); //$NON-NLS-1$
+                    if (nameProp instanceof String) {
+                        map.put((String) nameProp, service);
+                        LOGGER.info("Registered the component: " + nameProp + "(" + service.getClass().getCanonicalName() + ")");
+                    } else {// no name set so issue a warning
+                        LOGGER.warn("Failed to register the following component because it is unnamed: "
+                                + service.getClass().getCanonicalName());
                     }
-                    if (components.isEmpty()) {// warn if not comonents where registered
-                        LOGGER.warn("Could not find any registred components.");
-                    } // else everything is fine
-                } catch (InvalidSyntaxException e) {
-                    LOGGER.error("Failed to get ComponentDefinition services", e); //$NON-NLS-1$
+                    return map;
                 }
-            } // else already instanciated so return it.
+                if (components.isEmpty()) {// warn if not comonents where registered
+                    LOGGER.warn("Could not find any registered components.");
+                } // else everything is fine
+            } catch (InvalidSyntaxException e) {
+                LOGGER.error("Failed to get ComponentDefinition services", e); //$NON-NLS-1$
+            }
+            return map;
+        }
+
+        @Override
+        public Map<String, ComponentDefinition> getComponents() {
+            if (components == null)
+                components = populateMap(ComponentDefinition.class);
             return components;
         }
 
+        @Override
+        public Map<String, ComponentWizardDefinition> getComponentWizards() {
+            if (componentWizards == null)
+                componentWizards = populateMap(ComponentWizardDefinition.class);
+            return componentWizards;
+        }
     }
 
     private ComponentService componentServiceDelegate;
 
-    @Activate void activate(BundleContext bundleContext) throws InvalidSyntaxException {
+    @Activate
+    void activate(BundleContext bundleContext) throws InvalidSyntaxException {
         this.componentServiceDelegate = new ComponentServiceImpl(new ComponentRegistryOsgi(bundleContext));
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.talend.components.api.ComponentService#getComponentProperties(java.lang.String)
-     */
-    @Override public ComponentProperties getComponentProperties(String name) {
+    @Override
+    public ComponentProperties getComponentProperties(String name) {
         return componentServiceDelegate.getComponentProperties(name);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.talend.components.api.ComponentService#validateProperty(java.lang.String,
-     * org.talend.components.api.ComponentProperties)
-     */
-    @Override public ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable {
+    @Override
+    public ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable {
         return componentServiceDelegate.validateProperty(propName, properties);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.talend.components.api.ComponentService#beforeProperty(java.lang.String,
-     * org.talend.components.api.ComponentProperties)
-     */
-    @Override public ComponentProperties beforeProperty(String propName, ComponentProperties properties) throws Throwable {
+    @Override
+    public ComponentProperties beforeProperty(String propName, ComponentProperties properties) throws Throwable {
         return componentServiceDelegate.beforeProperty(propName, properties);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.talend.components.api.ComponentService#afterProperty(java.lang.String,
-     * org.talend.components.api.ComponentProperties)
-     */
-    @Override public ComponentProperties afterProperty(String propName, ComponentProperties properties) throws Throwable {
+    @Override
+    public ComponentProperties afterProperty(String propName, ComponentProperties properties) throws Throwable {
         return componentServiceDelegate.afterProperty(propName, properties);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.talend.components.api.ComponentService#getAllComponentsName()
-     */
-    @Override public Set<String> getAllComponentsName() {
-        return componentServiceDelegate.getAllComponentsName();
+    @Override
+    public Set<String> getAllComponentNames() {
+        return componentServiceDelegate.getAllComponentNames();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.talend.components.api.ComponentService#getAllComponents()
-     */
-    @Override public Set<ComponentDefinition> getAllComponents() {
+    @Override
+    public Set<ComponentDefinition> getAllComponents() {
         return componentServiceDelegate.getAllComponents();
+    }
+
+    @Override public Set<ComponentWizardDefinition> getTopLevelComponentWizards() {
+        return componentServiceDelegate.getTopLevelComponentWizards();
     }
 
 }

@@ -20,15 +20,20 @@ import org.talend.components.salesforce.SalesforceModuleProperties;
 
 public class TSalesforceOutputProperties extends ComponentProperties {
 
-    public enum OutputAction {INSERT, UPDATE, UPSERT, DELETE}
+    public enum OutputAction {
+        INSERT,
+        UPDATE,
+        UPSERT,
+        DELETE
+    }
 
-    public Property<OutputAction> outputAction = new Property<>("outputAction", "Output Action");
+    public Property<OutputAction>         outputAction    = new Property<>("outputAction", "Output Action");
 
-    public Property<String> upsertKeyColumn = new Property<String>("upsertKeyColumn", "Upsert Key Column");
+    public Property<String>               upsertKeyColumn = new Property<String>("upsertKeyColumn", "Upsert Key Column");
 
-    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties();
+    public SalesforceConnectionProperties connection      = new SalesforceConnectionProperties();
 
-    public SalesforceModuleProperties module = new SalesforceModuleProperties(connection);
+    public SalesforceModuleProperties     module          = new SalesforceModuleProperties(connection);
 
     public TSalesforceOutputProperties() {
         setupLayout();
@@ -36,7 +41,8 @@ public class TSalesforceOutputProperties extends ComponentProperties {
 
     public static final String MAIN = "Main";
 
-    @Override public void setupLayout() {
+    @Override
+    public void setupLayout() {
         Form connectionForm = Form.create(this, MAIN, "Salesforce Output");
 
     }

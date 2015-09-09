@@ -1,22 +1,22 @@
 package org.talend.components.api.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.talend.components.api.ComponentDesigner;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Wizard;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ComponentPropertiesInternal {
 
     protected ComponentDesigner designer;
 
-    protected List<Form> forms;
+    protected List<Form>        forms;
 
-    protected List<Wizard> wizards;
+    protected List<Wizard>      wizards;
 
-    protected ValidationResult validationResult;
+    protected ValidationResult  validationResult;
 
     public ComponentPropertiesInternal() {
         forms = new ArrayList<Form>();

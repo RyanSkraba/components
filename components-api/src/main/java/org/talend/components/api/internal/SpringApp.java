@@ -20,7 +20,9 @@ import org.springframework.context.annotation.ComponentScan;
 /**
  * Main Spring application to launch the component service
  */
-@SpringBootApplication @ComponentScan(basePackages = "org.talend.components") public class SpringApp implements DisposableBean {
+@SpringBootApplication
+@ComponentScan(basePackages = "org.talend.components")
+public class SpringApp implements DisposableBean {
 
     public static void main(String[] args) {
         SpringApplication.run(SpringApp.class, args);
