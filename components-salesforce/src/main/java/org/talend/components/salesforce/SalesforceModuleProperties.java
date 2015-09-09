@@ -23,6 +23,7 @@ import org.talend.components.api.properties.presentation.Layout.WidgetType;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
 import static org.talend.components.api.properties.presentation.Layout.*;
+
 import org.talend.components.api.properties.presentation.Layout;
 import org.talend.components.api.properties.presentation.Wizard;
 import org.talend.components.common.SchemaProperties;
@@ -32,15 +33,14 @@ import org.talend.components.common.oauth.OauthProperties;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
-@JsonRootName("salesforceModuleProperties")
-public class SalesforceModuleProperties extends ComponentProperties {
+@JsonRootName("salesforceModuleProperties") public class SalesforceModuleProperties extends ComponentProperties {
 
-    private SalesforceConnectionProperties  connection;
+    private SalesforceConnectionProperties connection;
 
     //
     // Properties
     //
-    public Property<String>                 moduleName = new Property<String>("moduleName", "Module Name");
+    public Property<String> moduleName = new Property<String>("moduleName", "Module Name");
 
     public SchemaProperties schema = new SchemaProperties();
 
@@ -48,7 +48,7 @@ public class SalesforceModuleProperties extends ComponentProperties {
 
     public static final String REFERENCE = "Reference";
 
-    public static final String              ADVANCED   = "Advanced";
+    public static final String ADVANCED = "Advanced";
 
     // FIXME - OK what about if we are using a connection from a separate component
     // that defines the connection, how do we get that separate component?
@@ -58,8 +58,7 @@ public class SalesforceModuleProperties extends ComponentProperties {
         setupLayout();
     }
 
-    @Override
-    protected void setupLayout() {
+    @Override protected void setupLayout() {
         super.setupLayout();
 
         Form moduleForm = Form.create(this, MAIN, "Salesforce Module");

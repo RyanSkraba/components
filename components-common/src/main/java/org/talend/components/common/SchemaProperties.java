@@ -18,6 +18,7 @@ import org.talend.components.api.ComponentSchemaElement;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Layout;
+import static org.talend.components.api.properties.presentation.Layout.*;
 
 import java.util.List;
 
@@ -41,11 +42,11 @@ import java.util.List;
         super.setupLayout();
 
         Form schema = Form.create(this, MAIN, "Schema");
-        schema.addChild(this.schema, Layout.create().setRow(2).setWidgetType(Layout.WidgetType.SCHEMA_EDITOR));
+        schema.addChild(this.schema, layout().setRow(2).setWidgetType(Layout.WidgetType.SCHEMA_EDITOR));
         refreshLayout(schema);
 
         Form schemaRef = Form.create(this, REFERENCE, "Schema");
-        schemaRef.addChild(this.schema, Layout.create().setRow(2).setWidgetType(Layout.WidgetType.SCHEMA_REFERENCE));
+        schemaRef.addChild(this.schema, layout().setRow(2).setWidgetType(Layout.WidgetType.SCHEMA_REFERENCE));
         refreshLayout(schemaRef);
     }
 

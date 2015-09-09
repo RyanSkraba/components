@@ -4,6 +4,7 @@ import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Layout;
+import static org.talend.components.api.properties.presentation.Layout.*;
 
 /**
  * Properties common to all components.
@@ -24,7 +25,7 @@ public class CommonProperties extends ComponentProperties {
         super.setupLayout();
 
         Form main = Form.create(this, MAIN, "Common");
-        main.addChild(componentName, Layout.create().setRow(1));
+        main.addChild(componentName, layout().setRow(1));
         refreshLayout(main);
     }
 }
