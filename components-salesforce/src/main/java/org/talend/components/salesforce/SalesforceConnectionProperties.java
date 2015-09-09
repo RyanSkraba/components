@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.properties.PresentationItem;
 import org.talend.components.api.properties.Property;
@@ -20,17 +21,13 @@ import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Layout.WidgetType;
 import org.talend.components.api.properties.presentation.Wizard;
 import org.talend.components.common.CommonProperties;
-import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.common.oauth.OauthProperties;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
+import static org.talend.components.api.properties.presentation.Layout.layout;
 
-import static org.talend.components.api.properties.presentation.Layout.*;
-
-@JsonRootName("salesforceConnectionProperties")
-public class SalesforceConnectionProperties extends ComponentProperties {
+@JsonRootName("salesforceConnectionProperties") public class SalesforceConnectionProperties extends ComponentProperties {
 
     public SalesforceConnectionProperties() {
         super();
@@ -46,50 +43,49 @@ public class SalesforceConnectionProperties extends ComponentProperties {
             .setValue("https://www.salesforce.com/services/Soap/u/34.0"); //$NON-NLS-1$
 
     public enum LoginType {
-                           BASIC,
-                           OAUTH
+        BASIC,
+        OAUTH
     }
 
-    public Property<LoginType>       loginType        = new Property<LoginType>("loginType", "Connection type").setRequired(true)
+    public Property<LoginType> loginType = new Property<LoginType>("loginType", "Connection type").setRequired(true)
             .setValue(LoginType.BASIC);
 
-    public Property<Boolean>         bulkConnection   = new Property<Boolean>("bulkConnection", "Bulk Connection");
+    public Property<Boolean> bulkConnection = new Property<Boolean>("bulkConnection", "Bulk Connection");
 
-    public Property<Boolean>         needCompression  = new Property<Boolean>("needCompression", "Need compression");
+    public Property<Boolean> needCompression = new Property<Boolean>("needCompression", "Need compression");
 
-    public Property<Integer>         timeout          = new Property<Integer>("timeout", "Timeout").setValue(0);
+    public Property<Integer> timeout = new Property<Integer>("timeout", "Timeout").setValue(0);
 
-    public Property<Boolean>         httpTraceMessage = new Property<Boolean>("httpTraceMessage", "Trace HTTP message");
+    public Property<Boolean> httpTraceMessage = new Property<Boolean>("httpTraceMessage", "Trace HTTP message");
 
-    public Property<String>          clientId         = new Property<String>("clientId", "Client Id");
+    public Property<String> clientId = new Property<String>("clientId", "Client Id");
 
-    public Property<ProxyProperties> proxy            = new Property<ProxyProperties>("proxy", "Proxy")
-            .setValue(new ProxyProperties());
+    public Property<ProxyProperties> proxy = new Property<ProxyProperties>("proxy", "Proxy").setValue(new ProxyProperties());
 
     //
     // Presentation items
     //
-    public PresentationItem          connectionDesc   = new PresentationItem("connectionDesc",
+    public PresentationItem connectionDesc = new PresentationItem("connectionDesc",
             "Complete these fields in order to connect to your Salesforce account");
 
-    public PresentationItem          testConnection   = new PresentationItem("testConnection", "Test connection");
+    public PresentationItem testConnection = new PresentationItem("testConnection", "Test connection");
 
-    public PresentationItem          advanced         = new PresentationItem("advanced", "Advanced...");
+    public PresentationItem advanced = new PresentationItem("advanced", "Advanced...");
 
     //
     // Nested property collections
     //
-    public CommonProperties          common           = new CommonProperties();
-    public OauthProperties           oauth            = new OauthProperties();
+    public CommonProperties common = new CommonProperties();
 
-    public UserPasswordProperties    userPassword     = new UserPasswordProperties();
+    public OauthProperties oauth = new OauthProperties();
+
+    public UserPasswordProperties userPassword = new UserPasswordProperties();
 
     public static final String MAIN = "Main";
 
-    public static final String       ADVANCED         = "Advanced";
+    public static final String ADVANCED = "Advanced";
 
-    @Override
-    protected void setupLayout() {
+    @Override protected void setupLayout() {
         super.setupLayout();
 
         Form connectionForm = Form.create(this, MAIN, "Salesforce Connection Settings");
@@ -105,8 +101,8 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         connectionForm.addChild(url, layout().setRow(5));
 
         connectionForm.addChild(advanced, layout().setRow(6).setOrder(1).setWidgetType(WidgetType.BUTTON));
-        connectionForm.addChild(testConnection,
-                layout().setRow(6).setOrder(2).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
+        connectionForm
+                .addChild(testConnection, layout().setRow(6).setOrder(2).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
         refreshLayout(connectionForm);
 
         Form advancedForm = Form.create(this, ADVANCED, "Advanced Connection Settings");
@@ -134,8 +130,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         return new ValidationResult();
     }
 
-    @Override
-    public void refreshLayout(Form form) {
+    @Override public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals(MAIN)) {
             switch (loginType.getValue()) {
