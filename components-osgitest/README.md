@@ -1,9 +1,7 @@
---
-This bundle uses pax-exam to launch OSGI test in a Felix container.
---
-
+## This bundle uses pax-exam to launch OSGI test in a Felix container.
 Look at the test example `org.talend.components.api.TestComponentService.exampleOnHowToGetTheServiceUsingOsgiApis()` ([see source](https://github.com/Talend/components/blob/master/components-osgitest/src/test/java/org/talend/components/api/TestComponentService.java#L48)) to findout how to discover the ComponentServices using the OSGI APIs.  
-
+## Run
+to run the test you must launch a `mvn install` from the repository root before launching the tests as it relies on artifact that are on the local .m2 maven repo.
 
 
 

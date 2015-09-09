@@ -55,24 +55,24 @@ public class ComponentServiceOsgi implements ComponentService {
 
         private Map<String, ComponentWizardDefinition> componentWizards;
 
-        protected Map populateMap(Class cls) {
-            Map map = new HashMap<String, Object>();
+        protected <T> Map<String, T> populateMap(Class<T> cls) {
+            Map<String, T> map = new HashMap<>();
             try {
-                Collection<ServiceReference<ComponentDefinition>> serviceReferences = bc.getServiceReferences(cls, null);
-                for (ServiceReference sr : serviceReferences) {
-                    Object service = bc.getService(sr);
+                String typeCanonicalName = cls.getCanonicalName();
+                Collection<ServiceReference<T>> serviceReferences = bc.getServiceReferences(cls, null);
+                for (ServiceReference<T> sr : serviceReferences) {
+                    T service = bc.getService(sr);
                     Object nameProp = sr.getProperty("component.name"); //$NON-NLS-1$
                     if (nameProp instanceof String) {
                         map.put((String) nameProp, service);
-                        LOGGER.info("Registered the component: " + nameProp + "(" + service.getClass().getCanonicalName() + ")");
+                        LOGGER.info("Registered the component: " + nameProp + "(" + service.getClass().getCanonicalName() + ")"); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
                     } else {// no name set so issue a warning
-                        LOGGER.warn("Failed to register the following component because it is unnamed: "
+                        LOGGER.warn("Failed to register the following component because it is unnamed: " //$NON-NLS-1$
                                 + service.getClass().getCanonicalName());
                     }
-                    return map;
                 }
-                if (components.isEmpty()) {// warn if not comonents where registered
-                    LOGGER.warn("Could not find any registered components.");
+                if (map.isEmpty()) {// warn if not comonents where registered
+                    LOGGER.warn("Could not find any registered components for type :" + typeCanonicalName); //$NON-NLS-1$
                 } // else everything is fine
             } catch (InvalidSyntaxException e) {
                 LOGGER.error("Failed to get ComponentDefinition services", e); //$NON-NLS-1$
@@ -82,15 +82,17 @@ public class ComponentServiceOsgi implements ComponentService {
 
         @Override
         public Map<String, ComponentDefinition> getComponents() {
-            if (components == null)
+            if (components == null) {
                 components = populateMap(ComponentDefinition.class);
+            }
             return components;
         }
 
         @Override
         public Map<String, ComponentWizardDefinition> getComponentWizards() {
-            if (componentWizards == null)
+            if (componentWizards == null) {
                 componentWizards = populateMap(ComponentWizardDefinition.class);
+            }
             return componentWizards;
         }
     }
@@ -132,7 +134,8 @@ public class ComponentServiceOsgi implements ComponentService {
         return componentServiceDelegate.getAllComponents();
     }
 
-    @Override public Set<ComponentWizardDefinition> getTopLevelComponentWizards() {
+    @Override
+    public Set<ComponentWizardDefinition> getTopLevelComponentWizards() {
         return componentServiceDelegate.getTopLevelComponentWizards();
     }
 
