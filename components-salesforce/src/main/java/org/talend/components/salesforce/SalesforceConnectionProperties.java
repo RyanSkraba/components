@@ -20,7 +20,6 @@ import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Layout.WidgetType;
-import org.talend.components.api.properties.presentation.Wizard;
 import org.talend.components.common.CommonProperties;
 import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.UserPasswordProperties;
@@ -116,10 +115,6 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         advancedForm.addChild(timeout, layout().setRow(5));
         advancedForm.addChild(proxy, layout().setRow(5));
         refreshLayout(advancedForm);
-
-        Wizard wizard = Wizard.create(this, "Connection", "Salesforce Connection");
-        // TODO - need to set the icon for the wizard
-        wizard.addForm(connectionForm);
     }
 
     public void afterLoginType() {

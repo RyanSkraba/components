@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.test;
 
+import java.util.Set;
+
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -19,15 +21,15 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.talend.components.api.ComponentProperties;
-import org.talend.components.api.ComponentSchemaElement;
-import org.talend.components.api.ComponentService;
+import org.talend.components.api.*;
 import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.SalesforceConnectionWizard;
+import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
 import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectDefinition;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectProperties;
@@ -57,6 +59,23 @@ public class SalesforceLocalComponentTest extends TestCase {
     protected ComponentProperties checkAndValidate(Form form, String propName, ComponentProperties props) throws Throwable {
         assertTrue(form.getLayout(propName).isCallValidate());
         return componentService.validateProperty(propName, props);
+    }
+
+    @Test
+    public void testWizard() {
+        Set<ComponentWizardDefinition> props = componentService.getTopLevelComponentWizards();
+        int count = 0;
+        ComponentWizardDefinition wizardDef = null;
+        for (ComponentWizardDefinition wizardDefinition : props) {
+            if (wizardDefinition instanceof SalesforceConnectionWizardDefinition) {
+                wizardDef = wizardDefinition;
+                count++;
+            }
+        }
+        assertEquals(1, count);
+        ComponentWizard wiz = wizardDef.createWizard(new Object());
+        assertNotNull(wiz);
+        assertTrue(wiz instanceof SalesforceConnectionWizard);
     }
 
     @Test

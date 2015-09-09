@@ -20,17 +20,6 @@ import java.util.Set;
 public interface ComponentService {
 
     /**
-     * Used to get a new {@link ComponentProperties} object for the specified component.
-     * <p/>
-     * The {@code ComponentProperties} has everything required to render a UI and as well capture and validate the
-     * values of the properties associated with the component, based on interactions with this service.
-     *
-     * @param name the name of the component
-     * @return a {@code ComponentProperties} object.
-     */
-    ComponentProperties getComponentProperties(String name);
-
-    /**
      * Get the list of all the component names that are registered
      *
      * @return return the set of component names, never null
@@ -46,10 +35,21 @@ public interface ComponentService {
 
     /**
      * Return all top-level wizards that can be used to create component property sets.
-     * 
+     *
      * @return the set of component wizards, never null.
      */
     Set<ComponentWizardDefinition> getTopLevelComponentWizards();
+
+    /**
+     * Used to get a new {@link ComponentProperties} object for the specified component.
+     * 
+     * The {@code ComponentProperties} has everything required to render a UI and as well capture and validate the
+     * values of the properties associated with the component, based on interactions with this service.
+     *
+     * @param name the name of the component
+     * @return a {@code ComponentProperties} object.
+     */
+    ComponentProperties getComponentProperties(String name);
 
     ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable;
 

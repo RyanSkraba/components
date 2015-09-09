@@ -9,7 +9,6 @@ import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Layout;
-import org.talend.components.api.properties.presentation.Wizard;
 
 /**
  * The {@code ComponentProperties} class contains the definitions of the properties associated with a component. These
@@ -20,7 +19,7 @@ import org.talend.components.api.properties.presentation.Wizard;
  * construction and validation.
  * <p/>
  * All aspects of the properties are defined in a subclass of this class using the {@link Property}, {@Link
- * PresentationItem}, {@link Layout}, {@link Form}, and {@link Wizard} classes. In addition in cases where user
+ * PresentationItem}, {@link Layout}, and {@link Form} classes. In addition in cases where user
  * interface decisions are made in code, methods can be added to the subclass to influence the flow of the user
  * interface and help with validation.
  * <p/>
@@ -30,8 +29,6 @@ import org.talend.components.api.properties.presentation.Wizard;
  * <p/>
  * Properties are be grouped into {@link Form} objects which can be presented in various ways by the user interface (for
  * example, a wizard page, a tab in a property sheet, or a dialog). The same property can appear in multiple forms.
- * <p/>
- * A {@link Wizard} can be defined which is a sequence of forms.
  * <p/>
  * Methods can be added in subclasses according to the conventions below to help direct the UI. These methods will be
  * automatically called by the UI code.
@@ -70,16 +67,8 @@ public abstract class ComponentProperties {
         return internal.getForm(formName);
     }
 
-    public List<Wizard> getWizards() {
-        return internal.getWizards();
-    }
-
     public void addForm(Form form) {
         internal.getForms().add(form);
-    }
-
-    public void addWizard(Wizard wizard) {
-        internal.getWizards().add(wizard);
     }
 
     public ComponentDesigner getComponentDesigner() {

@@ -1,5 +1,6 @@
 package org.talend.components.salesforce;
 
+import org.talend.components.api.ComponentWizard;
 import org.talend.components.api.ComponentWizardDefinition;
 import org.talend.components.api.Constants;
 
@@ -26,5 +27,9 @@ public class SalesforceConnectionWizardDefinition implements ComponentWizardDefi
     public Object getIcon() {
         // FIXME
         return null;
+    }
+
+    @Override public ComponentWizard createWizard(Object location) {
+        return new SalesforceConnectionWizard(location);
     }
 }
