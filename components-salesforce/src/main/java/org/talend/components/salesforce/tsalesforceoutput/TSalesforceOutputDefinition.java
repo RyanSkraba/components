@@ -14,17 +14,16 @@ package org.talend.components.salesforce.tsalesforceoutput;
 
 import org.talend.components.api.ComponentConnector;
 import org.talend.components.api.ComponentConnector.Type;
-import org.talend.components.api.ComponentDefinition;
-import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.Constants;
+import org.talend.components.api.properties.ComponentDefinition;
+import org.talend.components.api.properties.ComponentProperties;
 
 /**
  * Component that can connect to a salesforce system and put some data into it.
  */
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceOutputDefinition.COMPONENT_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition.COMPONENT_NAME)
+@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceOutputDefinition.COMPONENT_NAME)
 public class TSalesforceOutputDefinition implements ComponentDefinition {
 
     public static final String     COMPONENT_NAME = "tSalesforceOutput";                                    //$NON-NLS-1$
@@ -33,16 +32,29 @@ public class TSalesforceOutputDefinition implements ComponentDefinition {
             new ComponentConnector(Type.MAIN, 0, 1), new ComponentConnector(Type.REJECT, 0, 1),
             new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0) };
 
+    @Override
     public ComponentProperties createProperties() {
         return new TSalesforceOutputProperties();
     }
 
+    @Override
     public Family[] getSupportedFamilies() {
         return new Family[] { Family.BUSINESS, Family.CLOUD };
     }
 
+    @Override
     public String getName() {
         return COMPONENT_NAME;
+    }
+
+    @Override
+    public String getPngImagePath() {
+        return null;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return "tSalesforceOutput";
     }
 
 }

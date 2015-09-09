@@ -10,9 +10,15 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api;
+package org.talend.components.api.service;
 
+import java.io.InputStream;
 import java.util.Set;
+
+import org.talend.components.api.exception.ComponentException;
+import org.talend.components.api.properties.ComponentDefinition;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.wizard.ComponentWizardDefinition;
 
 /**
  * The Main service provided by this project to get access to all registered components and their properties.
@@ -56,5 +62,23 @@ public interface ComponentService {
     ComponentProperties beforeProperty(String propName, ComponentProperties properties) throws Throwable;
 
     ComponentProperties afterProperty(String propName, ComponentProperties properties) throws Throwable;
+
+    /**
+     * return the png image related to the given wizard
+     * 
+     * @param wizardName, name of the wizard to get the image for
+     * @return the png image stream or null if none was provided or an error occured
+     * @exception ComponentException thrown if the componentName is not registered in the service
+     */
+    InputStream getWizardPngImage(String wizardName);
+
+    /**
+     * return the png image related to the given component
+     * 
+     * @param componentName, name of the comonent to get the image for
+     * @return the png image stream or null if none was provided or an error occured
+     * @exception ComponentException thrown if the componentName is not registered in the service
+     */
+    InputStream getComponentPngImage(String componentName);
 
 }

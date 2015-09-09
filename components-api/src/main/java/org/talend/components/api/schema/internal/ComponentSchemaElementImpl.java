@@ -1,9 +1,9 @@
-package org.talend.components.api.internal;
+package org.talend.components.api.schema.internal;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.talend.components.api.ComponentSchemaElement;
+import org.talend.components.api.schema.ComponentSchemaElement;
 
 /**
  */

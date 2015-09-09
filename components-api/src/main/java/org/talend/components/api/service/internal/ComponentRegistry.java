@@ -10,12 +10,12 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.internal.service;
+package org.talend.components.api.service.internal;
 
 import java.util.Map;
 
-import org.talend.components.api.ComponentDefinition;
-import org.talend.components.api.ComponentWizardDefinition;
+import org.talend.components.api.properties.ComponentDefinition;
+import org.talend.components.api.wizard.ComponentWizardDefinition;
 
 /**
  * Interface for the internal component registry that will have a specific implementation for OSGi and Spring

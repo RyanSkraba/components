@@ -10,7 +10,9 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api;
+package org.talend.components.api.properties;
+
+import org.talend.components.api.TopLevelDefinition;
 
 /**
  * Component definition service.
@@ -20,15 +22,15 @@ package org.talend.components.api;
  * @author Francis Upton
  */
 
-public interface ComponentDefinition {
+public interface ComponentDefinition extends TopLevelDefinition {
 
     /**
      * Component categorization - this is an issue that wants further study. - which designer (big data, di, etc) and
      * then which family.
      */
     public enum Family {
-        BUSINESS,
-        CLOUD
+                        BUSINESS,
+                        CLOUD
     }
 
     /*
@@ -47,7 +49,5 @@ public interface ComponentDefinition {
     // public void setDesignerFamily(Family family);
 
     public Family[] getSupportedFamilies();
-
-    public String getName();
 
 }

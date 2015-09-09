@@ -16,19 +16,20 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.talend.components.api.ComponentProperties;
-import org.talend.components.api.properties.NamedThing;
+import org.talend.components.api.AbstractNamedThing;
+import org.talend.components.api.NamedThing;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 
 /**
  * Represents a collection of components {@link Property} objects that are grouped into a form for display. This form
  * can be manifested for example as a tab in a view, a dialog, or a page in a wizard.
  */
-public class Form extends NamedThing {
+public class Form extends AbstractNamedThing {
 
     protected ComponentProperties     properties;
 
-    protected Map<String, NamedThing> children;
+    protected Map<String, AbstractNamedThing> children;
 
     protected Map<String, Layout>     layoutMap;
 
@@ -40,7 +41,7 @@ public class Form extends NamedThing {
 
     public Form(ComponentProperties props, String name, String displayName) {
         super(name, displayName);
-        children = new HashMap<String, NamedThing>();
+        children = new HashMap<String, AbstractNamedThing>();
         layoutMap = new HashMap<String, Layout>();
         props.addForm(this);
         properties = props;
@@ -50,7 +51,7 @@ public class Form extends NamedThing {
         return new Form(props, name, displayName);
     }
 
-    public Collection<NamedThing> getChildren() {
+    public Collection<AbstractNamedThing> getChildren() {
         return children.values();
     }
 
@@ -67,7 +68,7 @@ public class Form extends NamedThing {
         return layoutMap;
     }
 
-    public Form addChild(NamedThing child, Layout layout) {
+    public Form addChild(AbstractNamedThing child, Layout layout) {
         if (child == null)
             throw new NullPointerException();
         layoutMap.put(child.getName(), layout);

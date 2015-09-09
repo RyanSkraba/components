@@ -1,8 +1,8 @@
-package org.talend.components.api.internal;
+package org.talend.components.api.properties.internal;
 
 import java.io.IOException;
 
-import org.talend.components.api.ComponentProperties;
+import org.talend.components.api.properties.ComponentProperties;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;

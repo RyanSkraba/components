@@ -15,6 +15,7 @@ package org.talend.components.api;
 import static org.junit.Assert.*;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
+import java.io.InputStream;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -26,6 +27,11 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerMethod;
+import org.talend.components.api.properties.ComponentDefinition;
+import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.wizard.ComponentWizardDefinition;
+import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
+import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 
 /**
  * created by sgandon on 7 sept. 2015 Detailled comment
@@ -75,6 +81,21 @@ public class TestComponentServiceWithComponents {
         assertNotNull(componentService);
         Set<ComponentDefinition> allComponents = componentService.getAllComponents();
         assertFalse(allComponents.isEmpty());
+    }
+
+    @Test
+    public void testWizardIconForSalesForce() {
+        assertNotNull(componentService);
+        InputStream wizardPngIconStream = componentService
+                .getWizardPngImage(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME);
+        assertNotNull(wizardPngIconStream);
+    }
+
+    @Test
+    public void testComponentImageForSalesforce() {
+        assertNotNull(componentService);
+        InputStream componentPngIconStream = componentService.getComponentPngImage(TSalesforceInputDefinition.COMPONENT_NAME);
+        assertNotNull(componentPngIconStream);
     }
 
 }

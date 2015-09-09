@@ -1,12 +1,11 @@
-package org.talend.components.api;
+package org.talend.components.api.properties;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.talend.components.api.internal.ComponentPropertiesInternal;
-import org.talend.components.api.properties.Property;
-import org.talend.components.api.properties.ValidationResult;
+import org.talend.components.api.ComponentDesigner;
+import org.talend.components.api.properties.internal.ComponentPropertiesInternal;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Layout;
 

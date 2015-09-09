@@ -1,21 +1,20 @@
 package org.talend.components.salesforce;
 
-import org.talend.components.api.ComponentWizard;
-import org.talend.components.api.ComponentWizardDefinition;
 import org.talend.components.api.Constants;
+import org.talend.components.api.wizard.ComponentWizard;
+import org.talend.components.api.wizard.ComponentWizardDefinition;
 
-/**
- *
- */
-@org.springframework.stereotype.Component(Constants.COMPONENT_WIZARD_BEAN_PREFIX + SalesforceConnectionWizardDefinition.NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_WIZARD_BEAN_PREFIX + SalesforceConnectionWizardDefinition.NAME)
+@org.springframework.stereotype.Component(Constants.COMPONENT_WIZARD_BEAN_PREFIX
+        + SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME)
+@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_WIZARD_BEAN_PREFIX
+        + SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME)
 public class SalesforceConnectionWizardDefinition implements ComponentWizardDefinition {
 
-    protected static final String NAME = "Salesforce";
+    public static final String COMPONENT_WIZARD_NAME = "salesforce"; //$NON-NLS-1$
 
     @Override
     public String getName() {
-        return "Salesforce";
+        return COMPONENT_WIZARD_NAME;
     }
 
     @Override
@@ -24,12 +23,17 @@ public class SalesforceConnectionWizardDefinition implements ComponentWizardDefi
     }
 
     @Override
-    public Object getIcon() {
-        // FIXME
-        return null;
+    public ComponentWizard createWizard(Object location) {
+        return new SalesforceConnectionWizard(location);
     }
 
-    @Override public ComponentWizard createWizard(Object location) {
-        return new SalesforceConnectionWizard(location);
+    @Override
+    public String getPngImagePath() {
+        return "connectionWizardIcon.png"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String getDisplayName() {
+        return "Salesforce";
     }
 }

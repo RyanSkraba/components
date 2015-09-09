@@ -39,6 +39,7 @@ The group is: org.talend.components.
 ## Build
 - Build is maven based and there is a top-level pom that builds everything.
 - Specific Maven settings are required. See instructions in [tooling](/tooling/).
+WARNING : make sure to launch `mvn clean install` and not (mvn test) because the OSGI tests are bases on the installed bundle and not the one in the current maven reactor.
 
 ## IDE setup
 See the [tooling](/tooling/) folder.

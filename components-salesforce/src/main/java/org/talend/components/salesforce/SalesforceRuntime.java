@@ -17,7 +17,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import org.talend.components.api.ComponentRuntime;
-import org.talend.components.api.ComponentSchemaElement;
+import org.talend.components.api.schema.ComponentSchemaElement;
 
 import com.sforce.async.BulkConnection;
 import com.sforce.soap.partner.*;

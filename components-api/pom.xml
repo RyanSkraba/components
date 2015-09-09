@@ -42,6 +42,11 @@
             <artifactId>jackson-annotations</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
@@ -68,8 +73,6 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Export-Package>org.talend.components.*</Export-Package>
-                        <Private-Package>org.talend.components.api.internal</Private-Package>
                         <Service-Component>*</Service-Component>
                         <Import-Package>org.osgi*</Import-Package>
                         <Embed-Transitive>true</Embed-Transitive>

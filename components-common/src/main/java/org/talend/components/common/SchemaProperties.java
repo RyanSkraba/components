@@ -14,11 +14,11 @@ package org.talend.components.common;
 
 import static org.talend.components.api.properties.presentation.Layout.layout;
 
-import org.talend.components.api.ComponentProperties;
-import org.talend.components.api.ComponentSchemaElement;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Layout;
+import org.talend.components.api.schema.ComponentSchemaElement;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 

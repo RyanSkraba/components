@@ -12,8 +12,6 @@
 // ============================================================================
 package org.talend.components.api.properties;
 
-import org.talend.components.api.ComponentProperties;
-
 /**
  * Contains the result of the validation of a components property.
  * <p/>

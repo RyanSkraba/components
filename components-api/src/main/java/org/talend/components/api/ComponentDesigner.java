@@ -1,5 +1,7 @@
 package org.talend.components.api;
 
+import org.talend.components.api.properties.ComponentProperties;
+
 /**
  * The ComponentDesigner is optionally implemented by the design-time client of the component service.
  * <p/>

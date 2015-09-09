@@ -1,4 +1,4 @@
-package org.talend.components.api.internal;
+package org.talend.components.api.properties.internal;
 
 import java.util.ArrayList;
 import java.util.List;

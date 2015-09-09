@@ -10,30 +10,35 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.properties;
+package org.talend.components.api;
+
+import org.talend.components.api.properties.PresentationItem;
+import org.talend.components.api.properties.Property;
 
 /**
  * Superclass for {@link Property} and {@link PresentationItem}.
  */
-public class NamedThing {
+public class AbstractNamedThing implements NamedThing {
 
     private String name;
 
     private String displayName;
 
-    public NamedThing() {
+    public AbstractNamedThing() {
     }
 
-    public NamedThing(String name, String displayName) {
+    public AbstractNamedThing(String name, String displayName) {
         this();
         this.name = name;
         this.displayName = displayName;
     }
 
+    @Override
     public String getName() {
         return this.name;
     }
 
+    @Override
     public String getDisplayName() {
         return this.displayName;
     }

@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceinput;
 
-import org.talend.components.api.ComponentProperties;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceModuleProperties;

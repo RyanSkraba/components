@@ -1,6 +1,7 @@
 package org.talend.components.api;
 
-import org.talend.components.api.internal.ComponentSchemaElementImpl;
+import org.talend.components.api.schema.ComponentSchemaElement;
+import org.talend.components.api.schema.internal.ComponentSchemaElementImpl;
 
 /**
  *

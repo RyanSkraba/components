@@ -10,8 +10,9 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.internal.service;
+package org.talend.components.api.service.internal;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,10 +23,10 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.ComponentDefinition;
-import org.talend.components.api.ComponentProperties;
-import org.talend.components.api.ComponentService;
-import org.talend.components.api.ComponentWizardDefinition;
+import org.talend.components.api.properties.ComponentDefinition;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.wizard.ComponentWizardDefinition;
 
 import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
@@ -137,6 +138,16 @@ public class ComponentServiceOsgi implements ComponentService {
     @Override
     public Set<ComponentWizardDefinition> getTopLevelComponentWizards() {
         return componentServiceDelegate.getTopLevelComponentWizards();
+    }
+
+    @Override
+    public InputStream getWizardPngImage(String wizardName) {
+        return componentServiceDelegate.getWizardPngImage(wizardName);
+    }
+
+    @Override
+    public InputStream getComponentPngImage(String componentName) {
+        return componentServiceDelegate.getComponentPngImage(componentName);
     }
 
 }

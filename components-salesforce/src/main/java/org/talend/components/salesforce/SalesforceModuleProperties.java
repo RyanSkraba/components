@@ -16,7 +16,7 @@ import static org.talend.components.api.properties.presentation.Layout.layout;
 
 import java.util.List;
 
-import org.talend.components.api.ComponentProperties;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Layout;

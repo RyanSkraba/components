@@ -1,6 +1,6 @@
 package org.talend.components.salesforce;
 
-import org.talend.components.api.ComponentWizard;
+import org.talend.components.api.wizard.ComponentWizard;
 
 /**
  *

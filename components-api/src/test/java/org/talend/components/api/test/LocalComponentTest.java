@@ -12,19 +12,23 @@
 // ============================================================================
 package org.talend.components.api.test;
 
-import junit.framework.TestCase;
+import java.io.InputStream;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.talend.components.api.ComponentProperties;
-import org.talend.components.api.ComponentService;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.internal.SpringApp;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.testcomponent.TestComponentDefinition;
 import org.talend.components.api.test.testcomponent.TestComponentProperties;
+import org.talend.components.api.test.testcomponent.TestComponentWizardDefinition;
+
+import junit.framework.TestCase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -43,4 +47,15 @@ public class LocalComponentTest extends TestCase {
         assertTrue(f.getLayout("userId").isVisible());
     }
 
+    @Test
+    public void testGetWizardIconOk() {
+        InputStream iconStream = componentService.getWizardPngImage(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME);
+        assertNotNull(iconStream);
+    }
+
+    @Test(expected = ComponentException.class)
+    public void testGetWizardIconWrongName() {
+        InputStream iconStream = componentService.getWizardPngImage("not an existing wizard name");
+        assertNull(iconStream);
+    }
 }

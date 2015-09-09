@@ -14,7 +14,7 @@ package org.talend.components.api.test.testcomponent;
 
 import static org.talend.components.api.properties.presentation.Layout.layout;
 
-import org.talend.components.api.ComponentProperties;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 

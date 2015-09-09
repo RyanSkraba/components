@@ -1,4 +1,4 @@
-package org.talend.components.api;
+package org.talend.components.api.schema;
 
 import java.util.List;
 

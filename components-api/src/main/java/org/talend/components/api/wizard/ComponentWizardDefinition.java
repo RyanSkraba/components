@@ -1,15 +1,14 @@
-package org.talend.components.api;
+package org.talend.components.api.wizard;
+
+import org.talend.components.api.ComponentDesigner;
+import org.talend.components.api.TopLevelDefinition;
+import org.talend.components.api.properties.ComponentProperties;
 
 /**
  */
-public interface ComponentWizardDefinition {
-
-    public String getName();
+public interface ComponentWizardDefinition extends TopLevelDefinition {
 
     public String getMenuItemName();
-
-    // FIXME
-    public Object getIcon();
 
     /**
      * Creates a {@link ComponentWizard} based on the this definition.

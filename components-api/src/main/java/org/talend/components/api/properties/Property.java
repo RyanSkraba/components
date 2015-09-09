@@ -14,9 +14,11 @@ package org.talend.components.api.properties;
 
 import java.util.List;
 
+import org.talend.components.api.AbstractNamedThing;
+
 import net.jodah.typetools.TypeResolver;
 
-public class Property<T> extends NamedThing {
+public class Property<T> extends AbstractNamedThing {
 
     // TODO - what about properties that have an array of values (like selected tables)
     private T                value = null;

@@ -10,13 +10,22 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.internal.service;
+package org.talend.components.api.service.internal;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.talend.components.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.talend.components.api.Constants;
+import org.talend.components.api.TopLevelDefinition;
+import org.talend.components.api.exception.ComponentException;
+import org.talend.components.api.properties.ComponentDefinition;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.wizard.ComponentWizardDefinition;
 
 /**
  * Main Component Service implementation that is not related to any framework (neither OSGI, nor Spring) it uses a
@@ -24,7 +33,9 @@ import org.talend.components.api.*;
  */
 public class ComponentServiceImpl implements ComponentService {
 
-    private ComponentRegistry componentRegistry;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ComponentServiceImpl.class);
+
+    private ComponentRegistry   componentRegistry;
 
     public ComponentServiceImpl(ComponentRegistry componentRegistry) {
         this.componentRegistry = componentRegistry;
@@ -75,6 +86,52 @@ public class ComponentServiceImpl implements ComponentService {
     public ComponentProperties afterProperty(String propName, ComponentProperties properties) throws Throwable {
         properties.afterProperty(propName);
         return properties;
+    }
+
+    @Override
+    public InputStream getWizardPngImage(String wizardName) {
+        TopLevelDefinition wizardDefinition = componentRegistry.getComponentWizards()
+                .get(Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);
+        if (wizardDefinition != null) {
+            return getImageStream(wizardDefinition);
+        } else {
+            throw new ComponentException("The Wizard with name [" + wizardName + "] does not exists."); //$NON-NLS-1$//$NON-NLS-2$
+        }
+
+    }
+
+    @Override
+    public InputStream getComponentPngImage(String componentName) {
+        TopLevelDefinition componentDefinition = componentRegistry.getComponents()
+                .get(Constants.COMPONENT_BEAN_PREFIX + componentName);
+        if (componentDefinition != null) {
+            return getImageStream(componentDefinition);
+        } else {
+            throw new ComponentException("The Component with name [" + componentName + "] does not exists."); //$NON-NLS-1$//$NON-NLS-2$
+        }
+    }
+
+    /**
+     * get the image stream or null
+     * 
+     * @param definition, must not be null
+     * @return
+     */
+    private InputStream getImageStream(TopLevelDefinition definition) {
+        InputStream result = null;
+        String pngIconPath = definition.getPngImagePath();
+        if (pngIconPath != null && !"".equals(pngIconPath)) { //$NON-NLS-1$
+            InputStream resourceAsStream = definition.getClass().getResourceAsStream(pngIconPath);
+            if (resourceAsStream == null) {// no resource found so this is an component error, so log it and return
+                                           // null
+                LOGGER.error("Failed to load the Wizard icon [" + definition.getName() + "," + pngIconPath + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            } else {
+                result = resourceAsStream;
+            }
+        } else {// no path provided so will return null but log it.
+            LOGGER.warn("The defintion of [" + definition.getName() + "] did not specify any icon"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        return result;
     }
 
 }
