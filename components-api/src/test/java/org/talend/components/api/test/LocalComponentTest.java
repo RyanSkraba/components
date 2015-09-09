@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.api.test;
 
+import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,20 +25,15 @@ import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.test.testcomponent.TestComponentDefinition;
 import org.talend.components.api.test.testcomponent.TestComponentProperties;
 
-import junit.framework.TestCase;
+@RunWith(SpringJUnit4ClassRunner.class) @SpringApplicationConfiguration(classes = SpringApp.class) public class LocalComponentTest
+        extends TestCase {
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SpringApp.class)
-public class LocalComponentTest extends TestCase {
-
-    @Autowired
-    protected ComponentService componentService;
+    @Autowired protected ComponentService componentService;
 
     public LocalComponentTest() {
     }
 
-    @Test
-    public void testGetProps() {
+    @Test public void testGetProps() {
         ComponentProperties props = componentService.getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
         Form f = props.getForm(TestComponentProperties.TESTCOMPONENT);
         assertTrue(f.getLayout("userId").isVisible());

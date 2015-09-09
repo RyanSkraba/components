@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.test;
 
+import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,24 +21,20 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.ComponentSchemaElement;
 import org.talend.components.api.ComponentService;
-import org.talend.components.api.properties.Property;
 import org.talend.components.api.internal.SpringApp;
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.common.UserPasswordProperties;
+import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectDefinition;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectProperties;
-
-import junit.framework.TestCase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
-
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SpringApp.class)
-public class SalesforceLocalComponentTest extends TestCase {
+@RunWith(SpringJUnit4ClassRunner.class) @SpringApplicationConfiguration(classes = SpringApp.class) public class SalesforceLocalComponentTest
+        extends TestCase {
 
     @Autowired protected ComponentService componentService;
 
@@ -134,7 +131,8 @@ public class SalesforceLocalComponentTest extends TestCase {
     }
 
     @Test public void testSchema() throws Throwable {
-        TSalesforceInputProperties props = (TSalesforceInputProperties) componentService.getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
+        TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
+                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
 
         Form f = props.getForm(SalesforceModuleProperties.REFERENCE);

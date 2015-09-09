@@ -17,7 +17,6 @@ import org.talend.components.api.ComponentConnector.Type;
 import org.talend.components.api.ComponentDefinition;
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.Constants;
-import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
 /**
  * Component that can connect to a salesforce system and put some data into it.

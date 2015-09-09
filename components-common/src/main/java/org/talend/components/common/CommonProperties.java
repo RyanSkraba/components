@@ -3,8 +3,8 @@ package org.talend.components.common;
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Layout;
-import static org.talend.components.api.properties.presentation.Layout.*;
+
+import static org.talend.components.api.properties.presentation.Layout.layout;
 
 /**
  * Properties common to all components.

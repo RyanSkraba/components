@@ -12,28 +12,22 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
+import com.sforce.async.BulkConnection;
+import com.sforce.soap.partner.*;
+import com.sforce.ws.ConnectionException;
+import com.sforce.ws.ConnectorConfig;
 import org.talend.components.api.ComponentRuntime;
 import org.talend.components.api.ComponentSchemaElement;
 
-import com.sforce.async.BulkConnection;
-import com.sforce.soap.partner.DescribeGlobalResult;
-import com.sforce.soap.partner.DescribeGlobalSObjectResult;
-import com.sforce.soap.partner.DescribeSObjectResult;
-import com.sforce.soap.partner.Field;
-import com.sforce.soap.partner.GetServerTimestampResult;
-import com.sforce.soap.partner.PartnerConnection;
-import com.sforce.ws.ConnectionException;
-import com.sforce.ws.ConnectorConfig;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 public class SalesforceRuntime extends ComponentRuntime {
 
     PartnerConnection connection;
 
-    BulkConnection    bulkConnection;
+    BulkConnection bulkConnection;
 
     public void connect(SalesforceConnectionProperties properties) throws Exception {
 

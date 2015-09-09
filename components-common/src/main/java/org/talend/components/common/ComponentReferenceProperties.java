@@ -14,10 +14,8 @@ package org.talend.components.common;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 import org.talend.components.api.ComponentProperties;
-import org.talend.components.api.ComponentSchemaElement;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Layout;
 
 /**
  * A reference to another component. This could be in one of the following states:
@@ -49,8 +47,8 @@ import org.talend.components.api.properties.presentation.Layout;
         super.setupLayout();
 
         Form reference = Form.create(this, REFERENCE, "Component");
-// FIXME - handle this with the Layout refactor
-//        reference.addChild(this.schema, Layout.create().setRow(2).setWidgetType(Layout.WidgetType.COMPONENT_REFERENCE));
+        // FIXME - handle this with the Layout refactor
+        //        reference.addChild(this.schema, Layout.create().setRow(2).setWidgetType(Layout.WidgetType.COMPONENT_REFERENCE));
         refreshLayout(reference);
     }
 

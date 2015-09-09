@@ -15,8 +15,6 @@ package org.talend.components.salesforce.tsalesforceoutput;
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Layout;
-import org.talend.components.common.ComponentReferenceProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceModuleProperties;
 
@@ -40,8 +38,6 @@ public class TSalesforceOutputProperties extends ComponentProperties {
 
     @Override public void setupLayout() {
         Form connectionForm = Form.create(this, MAIN, "Salesforce Output");
-
-
 
     }
 }

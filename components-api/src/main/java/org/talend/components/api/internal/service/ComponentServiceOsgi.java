@@ -12,11 +12,8 @@
 // ============================================================================
 package org.talend.components.api.internal.service;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
+import aQute.bnd.annotation.component.Activate;
+import aQute.bnd.annotation.component.Component;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -26,22 +23,21 @@ import org.talend.components.api.ComponentDefinition;
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.ComponentService;
 
-import aQute.bnd.annotation.component.Activate;
-import aQute.bnd.annotation.component.Component;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This is the OSGI specific service implementation that completly delegates the implementation to the Framework
  * agnostic ComponentServiceImpl
- *
  */
-@Component
-public class ComponentServiceOsgi implements ComponentService {
+@Component public class ComponentServiceOsgi implements ComponentService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ComponentServiceOsgi.class);
 
     /**
      * created by sgandon on 7 sept. 2015 Detailled comment
-     *
      */
     private final class ComponentRegistryOsgi implements ComponentRegistry {
 
@@ -54,8 +50,7 @@ public class ComponentServiceOsgi implements ComponentService {
 
         private HashMap<String, ComponentDefinition> components;
 
-        @Override
-        public Map<String, ComponentDefinition> getComponents() {
+        @Override public Map<String, ComponentDefinition> getComponents() {
             if (components == null) {
                 try {
                     Collection<ServiceReference<ComponentDefinition>> serviceReferences = bc
@@ -69,8 +64,9 @@ public class ComponentServiceOsgi implements ComponentService {
                             LOGGER.info("Registred the component: " + nameProp + "(" + componentDef.getClass().getCanonicalName()
                                     + ")");
                         } else {// no name set so issue a warning
-                            LOGGER.warn("Failed to registrer the following component because it is unamed: "
-                                    + componentDef.getClass().getCanonicalName());
+                            LOGGER.warn(
+                                    "Failed to registrer the following component because it is unamed: " + componentDef.getClass()
+                                            .getCanonicalName());
                         }
                     }
                     if (components.isEmpty()) {// warn if not comonents where registered
@@ -87,8 +83,7 @@ public class ComponentServiceOsgi implements ComponentService {
 
     private ComponentService componentServiceDelegate;
 
-    @Activate
-    void activate(BundleContext bundleContext) throws InvalidSyntaxException {
+    @Activate void activate(BundleContext bundleContext) throws InvalidSyntaxException {
         this.componentServiceDelegate = new ComponentServiceImpl(new ComponentRegistryOsgi(bundleContext));
     }
 
@@ -97,8 +92,7 @@ public class ComponentServiceOsgi implements ComponentService {
      * 
      * @see org.talend.components.api.ComponentService#getComponentProperties(java.lang.String)
      */
-    @Override
-    public ComponentProperties getComponentProperties(String name) {
+    @Override public ComponentProperties getComponentProperties(String name) {
         return componentServiceDelegate.getComponentProperties(name);
     }
 
@@ -108,8 +102,7 @@ public class ComponentServiceOsgi implements ComponentService {
      * @see org.talend.components.api.ComponentService#validateProperty(java.lang.String,
      * org.talend.components.api.ComponentProperties)
      */
-    @Override
-    public ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable {
+    @Override public ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable {
         return componentServiceDelegate.validateProperty(propName, properties);
     }
 
@@ -119,8 +112,7 @@ public class ComponentServiceOsgi implements ComponentService {
      * @see org.talend.components.api.ComponentService#beforeProperty(java.lang.String,
      * org.talend.components.api.ComponentProperties)
      */
-    @Override
-    public ComponentProperties beforeProperty(String propName, ComponentProperties properties) throws Throwable {
+    @Override public ComponentProperties beforeProperty(String propName, ComponentProperties properties) throws Throwable {
         return componentServiceDelegate.beforeProperty(propName, properties);
     }
 
@@ -130,8 +122,7 @@ public class ComponentServiceOsgi implements ComponentService {
      * @see org.talend.components.api.ComponentService#afterProperty(java.lang.String,
      * org.talend.components.api.ComponentProperties)
      */
-    @Override
-    public ComponentProperties afterProperty(String propName, ComponentProperties properties) throws Throwable {
+    @Override public ComponentProperties afterProperty(String propName, ComponentProperties properties) throws Throwable {
         return componentServiceDelegate.afterProperty(propName, properties);
     }
 
@@ -140,8 +131,7 @@ public class ComponentServiceOsgi implements ComponentService {
      * 
      * @see org.talend.components.api.ComponentService#getAllComponentsName()
      */
-    @Override
-    public Set<String> getAllComponentsName() {
+    @Override public Set<String> getAllComponentsName() {
         return componentServiceDelegate.getAllComponentsName();
     }
 
@@ -150,8 +140,7 @@ public class ComponentServiceOsgi implements ComponentService {
      * 
      * @see org.talend.components.api.ComponentService#getAllComponents()
      */
-    @Override
-    public Set<ComponentDefinition> getAllComponents() {
+    @Override public Set<ComponentDefinition> getAllComponents() {
         return componentServiceDelegate.getAllComponents();
     }
 

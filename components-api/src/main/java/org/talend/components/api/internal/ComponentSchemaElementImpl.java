@@ -10,6 +10,7 @@ import java.util.List;
 public class ComponentSchemaElementImpl implements ComponentSchemaElement {
 
     public String name;
+
     public String description;
 
     public Type type;

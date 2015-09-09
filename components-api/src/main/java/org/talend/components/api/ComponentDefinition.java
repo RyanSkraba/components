@@ -14,7 +14,7 @@ package org.talend.components.api;
 
 /**
  * Component definition service.
- * <p>
+ * <p/>
  * An instance of this class handles the setup of the properties associated with a components.
  *
  * @author Francis Upton
@@ -27,8 +27,8 @@ public interface ComponentDefinition {
      * then which family.
      */
     public enum Family {
-                        BUSINESS,
-                        CLOUD
+        BUSINESS,
+        CLOUD
     }
 
     /*

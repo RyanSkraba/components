@@ -16,7 +16,7 @@ import org.talend.components.api.ComponentProperties;
 
 /**
  * Contains the result of the validation of a components property.
- * <p>
+ * <p/>
  * This is to be returned from the {@code validate} methods in {@link ComponentProperties}.
  */
 public class ValidationResult {

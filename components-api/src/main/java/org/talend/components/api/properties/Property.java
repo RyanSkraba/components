@@ -12,25 +12,24 @@
 // ============================================================================
 package org.talend.components.api.properties;
 
-import java.util.List;
-
 import net.jodah.typetools.TypeResolver;
+
+import java.util.List;
 
 public class Property<T> extends NamedThing {
 
     // TODO - what about properties that have an array of values (like selected tables)
-    private T                value = null;
+    private T value = null;
 
-    private List<T>          possibleValues;
+    private List<T> possibleValues;
 
     private ValidationResult validationResult;
 
-    private boolean          required;
+    private boolean required;
 
     // private Class<T> persistentClass;
 
-    @SuppressWarnings("unchecked")
-    public Property() {
+    @SuppressWarnings("unchecked") public Property() {
         // this.persistentClass = (Class<T>) ((ParameterizedType)
         // getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
@@ -59,7 +58,7 @@ public class Property<T> extends NamedThing {
 
     /**
      * @return the canonical name of the type handled by this property instance.
-     * */
+     */
     public String getTypeName() {
         // FIXME - this is not working.
         return TypeResolver.resolveRawArgument(Property.class, getClass()).getName();

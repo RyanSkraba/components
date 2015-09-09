@@ -12,14 +12,6 @@
 // ============================================================================
 package org.talend.components.api.test;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-
 public class RestComponentTest /*extends TestCase*/ {
     /*
 

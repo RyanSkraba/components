@@ -12,26 +12,16 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonRootName;
 import org.talend.components.api.ComponentProperties;
-import org.talend.components.api.ComponentSchemaElement;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Layout.WidgetType;
-
-import com.fasterxml.jackson.annotation.JsonRootName;
-
-import static org.talend.components.api.properties.presentation.Layout.*;
-
 import org.talend.components.api.properties.presentation.Layout;
-import org.talend.components.api.properties.presentation.Wizard;
 import org.talend.components.common.SchemaProperties;
-import org.talend.components.common.UserPasswordProperties;
-import org.talend.components.common.oauth.OauthProperties;
 
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
+
+import static org.talend.components.api.properties.presentation.Layout.layout;
 
 @JsonRootName("salesforceModuleProperties") public class SalesforceModuleProperties extends ComponentProperties {
 

@@ -16,13 +16,12 @@ import java.util.Set;
 
 /**
  * The Main service provided by this project to get access to all registered components and their properties.
- * 
  */
 public interface ComponentService {
 
     /**
      * Used to get a new {@link ComponentProperties} object for the specified component.
-     * <p>
+     * <p/>
      * The {@code ComponentProperties} has everything required to render a UI and as well capture and validate the
      * values of the properties associated with the component, based on interactions with this service.
      *
@@ -33,14 +32,14 @@ public interface ComponentService {
 
     /**
      * Get the list of all the components name that are registered
-     * 
+     *
      * @return return the list of components name, never null
      */
     Set<String> getAllComponentsName();
 
     /**
      * Get the list of all the components {@link ComponentDefinition} that are registered
-     * 
+     *
      * @return return the list of components definition, never null.
      */
     Set<ComponentDefinition> getAllComponents();

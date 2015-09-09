@@ -12,13 +12,12 @@
 // ============================================================================
 package org.talend.components.api;
 
-import static org.ops4j.pax.exam.CoreOptions.*;
-
 import org.ops4j.pax.exam.Option;
+
+import static org.ops4j.pax.exam.CoreOptions.*;
 
 /**
  * created by sgandon on 8 sept. 2015 Detailled comment
- *
  */
 public class PaxExamOptions {
 

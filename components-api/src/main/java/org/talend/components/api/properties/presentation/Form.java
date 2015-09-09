@@ -12,11 +12,13 @@
 // ============================================================================
 package org.talend.components.api.properties.presentation;
 
-import java.util.*;
-
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.properties.NamedThing;
 import org.talend.components.api.properties.Property;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Represents a collection of components {@link Property} objects that are grouped into

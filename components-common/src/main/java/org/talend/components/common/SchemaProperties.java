@@ -18,9 +18,8 @@ import org.talend.components.api.ComponentSchemaElement;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Layout;
-import static org.talend.components.api.properties.presentation.Layout.*;
 
-import java.util.List;
+import static org.talend.components.api.properties.presentation.Layout.layout;
 
 @JsonRootName("schema") public class SchemaProperties extends ComponentProperties {
 

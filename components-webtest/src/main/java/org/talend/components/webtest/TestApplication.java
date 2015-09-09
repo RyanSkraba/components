@@ -19,11 +19,9 @@ import org.springframework.context.annotation.ComponentScan;
 /**
  * Used the test the component service and the Salesforce components with an external web service.
  */
-@SpringBootApplication
-@ComponentScan(basePackages = "org.talend.components")
-public class TestApplication {
+@SpringBootApplication @ComponentScan(basePackages = "org.talend.components") public class TestApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(TestApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(TestApplication.class, args);
+    }
 }

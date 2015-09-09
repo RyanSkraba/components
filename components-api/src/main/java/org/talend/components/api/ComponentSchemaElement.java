@@ -7,7 +7,7 @@ import java.util.List;
  */
 public interface ComponentSchemaElement {
 
-    public enum Type { STRING, INT, DATE }
+    public enum Type {STRING, INT, DATE}
 
     public String getName();
 
@@ -26,6 +26,7 @@ public interface ComponentSchemaElement {
     public void setSize(int size);
 
     public List<ComponentSchemaElement> getChildren();
+
     public void setChildren(List<ComponentSchemaElement> children);
 
 }

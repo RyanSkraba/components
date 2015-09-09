@@ -12,13 +12,12 @@
 // ============================================================================
 package org.talend.components.api.internal.service;
 
-import java.util.Map;
-
 import org.talend.components.api.ComponentDefinition;
+
+import java.util.Map;
 
 /**
  * interface for the internal component registry that will have a specific implementation for OSGI and Spring
- *
  */
 public interface ComponentRegistry {
 

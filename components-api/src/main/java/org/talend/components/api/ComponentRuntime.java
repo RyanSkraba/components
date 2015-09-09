@@ -7,12 +7,8 @@ import org.talend.components.api.internal.ComponentSchemaElementImpl;
  */
 public abstract class ComponentRuntime {
 
-    public ComponentSchemaElement getComponentSchemaElement()
-    {
+    public ComponentSchemaElement getComponentSchemaElement() {
         return new ComponentSchemaElementImpl();
     }
-
-
-
 
 }

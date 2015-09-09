@@ -12,21 +12,19 @@
 // ============================================================================
 package org.talend.components.common;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
 import org.talend.components.api.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
+import static org.talend.components.api.properties.presentation.Layout.layout;
 
-import static org.talend.components.api.properties.presentation.Layout.*;
+@JsonRootName("userPasswordProperties") public class UserPasswordProperties extends ComponentProperties {
 
-@JsonRootName("userPasswordProperties")
-public class UserPasswordProperties extends ComponentProperties {
-
-    public Property<String>    userId       = new Property<String>("userId", "User Id").setRequired(true);
+    public Property<String> userId = new Property<String>("userId", "User Id").setRequired(true);
 
     // FIXME - this needs to be encrypted, need to think about how to handle that
-    public Property<String>    password     = new Property<String>("password", "Password").setRequired(true);
+    public Property<String> password = new Property<String>("password", "Password").setRequired(true);
 
     public static final String USERPASSWORD = "UserPassword";
 
@@ -34,8 +32,7 @@ public class UserPasswordProperties extends ComponentProperties {
         setupLayout();
     }
 
-    @Override
-    protected void setupLayout() {
+    @Override protected void setupLayout() {
         super.setupLayout();
         Form form = new Form(this, USERPASSWORD, "User Password");
         form.addChild(userId, layout().setRow(1));

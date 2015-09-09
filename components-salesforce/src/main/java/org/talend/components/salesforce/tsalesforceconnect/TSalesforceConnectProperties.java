@@ -14,7 +14,6 @@ package org.talend.components.salesforce.tsalesforceconnect;
 
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 
-
 public class TSalesforceConnectProperties extends SalesforceConnectionProperties {
 
 }
