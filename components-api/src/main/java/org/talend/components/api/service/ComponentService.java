@@ -54,6 +54,7 @@ public interface ComponentService {
      *
      * @param name the name of the component
      * @return a {@code ComponentProperties} object.
+     * @exception ComponentException thrown if the component is not registered in the service
      */
     ComponentProperties getComponentProperties(String name);
 

@@ -66,6 +66,9 @@ public class ComponentServiceImpl implements ComponentService {
     public ComponentProperties getComponentProperties(String name) {
         final String beanName = Constants.COMPONENT_BEAN_PREFIX + name;
         ComponentDefinition compDef = componentRegistry.getComponents().get(beanName);
+        if (compDef == null) {
+            throw new ComponentException("Failed to find the component [" + beanName + "], it may not be registered."); //$NON-NLS-1$ //$NON-NLS-2$
+        }
         ComponentProperties properties = compDef.createProperties();
         return properties;
     }
@@ -90,8 +93,8 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     public InputStream getWizardPngImage(String wizardName) {
-        TopLevelDefinition wizardDefinition = componentRegistry.getComponentWizards().get(
-                Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);
+        TopLevelDefinition wizardDefinition = componentRegistry.getComponentWizards()
+                .get(Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);
         if (wizardDefinition != null) {
             return getImageStream(wizardDefinition);
         } else {
@@ -102,8 +105,8 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     public InputStream getComponentPngImage(String componentName) {
-        TopLevelDefinition componentDefinition = componentRegistry.getComponents().get(
-                Constants.COMPONENT_BEAN_PREFIX + componentName);
+        TopLevelDefinition componentDefinition = componentRegistry.getComponents()
+                .get(Constants.COMPONENT_BEAN_PREFIX + componentName);
         if (componentDefinition != null) {
             return getImageStream(componentDefinition);
         } else {
