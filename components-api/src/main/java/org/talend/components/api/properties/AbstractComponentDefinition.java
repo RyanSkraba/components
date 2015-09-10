@@ -9,7 +9,6 @@ public abstract class AbstractComponentDefinition implements ComponentDefinition
     private ComponentConnector[] connectors;
 
     public void setConnectors(ComponentConnector... conns) {
-        System.out.println("Creating... ********************* " + this.getClass());
         this.connectors = conns;
     }
 
