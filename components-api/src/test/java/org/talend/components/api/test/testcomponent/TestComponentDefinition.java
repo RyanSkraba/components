@@ -9,9 +9,9 @@ import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 
 @Component(Constants.COMPONENT_BEAN_PREFIX + TestComponentDefinition.COMPONENT_NAME)
-public class TestComponentDefinition extends AbstractComponentDefinition {
+public class TestComponentDefinition extends AbstractComponentDefinition implements ComponentDefinition {
 
-    public static final String        COMPONENT_NAME = "TestComponent"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "TestComponent"; //$NON-NLS-1$
 
     public TestComponentDefinition() {
         setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
