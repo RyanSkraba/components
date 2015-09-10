@@ -23,8 +23,8 @@ public class SalesforceConnectionWizardDefinition implements ComponentWizardDefi
     }
 
     @Override
-    public ComponentWizard createWizard(Object location) {
-        return new SalesforceConnectionWizard(location);
+    public ComponentWizard createWizard(String userData) {
+        return new SalesforceConnectionWizard(userData);
     }
 
     @Override

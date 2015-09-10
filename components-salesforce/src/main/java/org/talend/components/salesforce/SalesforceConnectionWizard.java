@@ -7,10 +7,9 @@ import org.talend.components.api.wizard.ComponentWizard;
  */
 public class SalesforceConnectionWizard extends ComponentWizard {
 
-    protected Object location;
+    SalesforceConnectionWizard(String userData) {
+        super(userData);
 
-    SalesforceConnectionWizard(Object location) {
-        super();
         // FIXME - need to add the forms
     }
 }

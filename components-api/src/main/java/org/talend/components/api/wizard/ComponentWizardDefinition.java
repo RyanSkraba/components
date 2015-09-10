@@ -13,12 +13,12 @@ public interface ComponentWizardDefinition extends TopLevelDefinition {
     /**
      * Creates a {@link ComponentWizard} based on the this definition.
      *
-     * Optionally asks the wizard to remembers an arbitrary object to allow the wizard to notify the
+     * Optionally asks the wizard to remembers an arbitrary string to allow the wizard to notify the
      * {@link ComponentDesigner} when {@link ComponentProperties} objects are created.
      *
-     * @param location
+     * @param userData optional user data to be used by the wizard
      * @return
      */
-    ComponentWizard createWizard(Object location);
+    ComponentWizard createWizard(String userData);
 
 }

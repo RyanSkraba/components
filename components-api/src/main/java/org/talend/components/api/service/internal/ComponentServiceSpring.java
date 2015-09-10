@@ -29,6 +29,7 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 
 import com.wordnik.swagger.annotations.Api;
@@ -68,8 +69,16 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @RequestMapping(value = BASE_PATH + "/properties/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ComponentProperties getComponentProperties(
-            @PathVariable(value = "name") @ApiParam(name = "name", value = "name of the components") String name) {
+            @PathVariable(value = "name") @ApiParam(name = "name", value = "Name of the component") String name) {
         return componentServiceDelegate.getComponentProperties(name);
+    }
+
+    @Override
+    @RequestMapping(value = BASE_PATH + "/wizard/{name}/{userData}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ComponentWizard getComponentWizard(
+            @PathVariable(value = "name") @ApiParam(name = "name", value = "Name of the component") String name,
+            @PathVariable(value = "userData") @ApiParam(name = "userData", value = "User data string") String userData) {
+        return componentServiceDelegate.getComponentWizard(name, userData);
     }
 
     @Override

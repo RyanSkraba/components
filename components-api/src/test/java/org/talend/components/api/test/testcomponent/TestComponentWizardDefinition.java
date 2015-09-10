@@ -17,10 +17,6 @@ import org.talend.components.api.Constants;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 
-/**
- * created by sgandon on 9 sept. 2015 Detailled comment
- *
- */
 @Component(Constants.COMPONENT_WIZARD_BEAN_PREFIX + TestComponentWizardDefinition.COMPONENT_WIZARD_NAME)
 public class TestComponentWizardDefinition implements ComponentWizardDefinition {
 
@@ -33,8 +29,7 @@ public class TestComponentWizardDefinition implements ComponentWizardDefinition 
 
     @Override
     public String getMenuItemName() {
-        // TODO Auto-generated method stub
-        return null;
+        return "menu item name";
     }
 
     @Override
@@ -43,9 +38,8 @@ public class TestComponentWizardDefinition implements ComponentWizardDefinition 
     }
 
     @Override
-    public ComponentWizard createWizard(Object location) {
-        // TODO Auto-generated method stub
-        return null;
+    public ComponentWizard createWizard(String location) {
+        return new TestComponentWizard(location);
     }
 
     @Override

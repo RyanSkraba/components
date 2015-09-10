@@ -29,7 +29,9 @@ import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.testcomponent.TestComponentDefinition;
 import org.talend.components.api.test.testcomponent.TestComponentProperties;
+import org.talend.components.api.test.testcomponent.TestComponentWizard;
 import org.talend.components.api.test.testcomponent.TestComponentWizardDefinition;
+import org.talend.components.api.wizard.ComponentWizard;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -66,5 +68,19 @@ public class LocalComponentTest extends TestCase {
     public void testGetWizardIconWrongName() {
         InputStream iconStream = componentService.getWizardPngImage("not an existing wizard name");
         assertNull(iconStream);
+    }
+
+    @Test()
+    public void testGetWizard() {
+        ComponentWizard wizard = componentService.getComponentWizard(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME,
+                "userdata");
+        assertTrue(wizard instanceof TestComponentWizard);
+        assertEquals("userdata", wizard.getUserData());
+    }
+
+    @Test(expected = ComponentException.class)
+    public void testGetWizardNotFound() {
+        ComponentWizard wizard = componentService.getComponentWizard("not found",
+                "userdata");
     }
 }

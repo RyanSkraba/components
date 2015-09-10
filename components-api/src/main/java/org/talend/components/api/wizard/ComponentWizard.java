@@ -11,14 +11,24 @@ import org.talend.components.api.properties.presentation.Form;
  */
 public abstract class ComponentWizard {
 
+    protected String     userData;
+
     protected List<Form> forms;
 
-    public ComponentWizard() {
+    public ComponentWizard(String userData) {
         forms = new ArrayList<Form>();
+        this.userData = userData;
     }
 
     public List<Form> getForms() {
         return forms;
     }
 
+    public String getUserData() {
+        return userData;
+    }
+
+    public void setUserData(String userData) {
+        this.userData = userData;
+    }
 }

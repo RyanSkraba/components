@@ -18,6 +18,7 @@ import java.util.Set;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 
 /**
@@ -57,6 +58,20 @@ public interface ComponentService {
      * @exception ComponentException thrown if the component is not registered in the service
      */
     ComponentProperties getComponentProperties(String name);
+
+    /**
+     * Creates a new instance of a {@link ComponentWizard} for the specified wizard name.
+     *
+     * Wizard names are globally unique. Non-top-level wizards should be named using the name of the top-level wizard.
+     * For example, the Salesforce wizard would be called "salesforce", and a wizard dealing with only the Salesforce
+     * modules would be called "salesforce.modules" in order to make sure the name is unique.
+     *
+     * @param name the name of the wizard
+     * @param userData an arbitrary userData string to optionally be used in the wizard processing.
+     * @return a {@code ComponentWizard} object.
+     * @exception ComponentException thrown if the wizard is not registered in the service
+     */
+    ComponentWizard getComponentWizard(String name, String userData);
 
     ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable;
 

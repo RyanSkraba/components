@@ -77,8 +77,10 @@ public class SalesforceLocalComponentTest extends TestCase {
             }
         }
         assertEquals(1, count);
-        ComponentWizard wiz = wizardDef.createWizard(new Object());
+        ComponentWizard wiz = componentService.getComponentWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
+                "userData");
         assertNotNull(wiz);
+        assertEquals("userData", wiz.getUserData());
         assertTrue(wiz instanceof SalesforceConnectionWizard);
     }
 

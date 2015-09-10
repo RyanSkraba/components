@@ -25,6 +25,7 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 
 /**
@@ -74,6 +75,17 @@ public class ComponentServiceImpl implements ComponentService {
     }
 
     @Override
+    public ComponentWizard getComponentWizard(String name, String location) {
+        final String beanName = Constants.COMPONENT_WIZARD_BEAN_PREFIX + name;
+        ComponentWizardDefinition wizardDefinition = componentRegistry.getComponentWizards().get(beanName);
+        if (wizardDefinition == null) {
+            throw new ComponentException("Failed to find the wizard [" + beanName + "], it may not be registered."); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        ComponentWizard wizard = wizardDefinition.createWizard(location);
+        return wizard;
+    }
+
+    @Override
     public ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable {
         properties.validateProperty(propName);
         return properties;
@@ -93,8 +105,8 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     public InputStream getWizardPngImage(String wizardName) {
-        TopLevelDefinition wizardDefinition = componentRegistry.getComponentWizards()
-                .get(Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);
+        TopLevelDefinition wizardDefinition = componentRegistry.getComponentWizards().get(
+                Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);
         if (wizardDefinition != null) {
             return getImageStream(wizardDefinition);
         } else {
@@ -105,8 +117,8 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     public InputStream getComponentPngImage(String componentName) {
-        TopLevelDefinition componentDefinition = componentRegistry.getComponents()
-                .get(Constants.COMPONENT_BEAN_PREFIX + componentName);
+        TopLevelDefinition componentDefinition = componentRegistry.getComponents().get(
+                Constants.COMPONENT_BEAN_PREFIX + componentName);
         if (componentDefinition != null) {
             return getImageStream(componentDefinition);
         } else {

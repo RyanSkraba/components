@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 
 import aQute.bnd.annotation.component.Activate;
@@ -108,6 +109,11 @@ public class ComponentServiceOsgi implements ComponentService {
     @Override
     public ComponentProperties getComponentProperties(String name) {
         return componentServiceDelegate.getComponentProperties(name);
+    }
+
+    @Override
+    public ComponentWizard getComponentWizard(String name, String userData) {
+        return componentServiceDelegate.getComponentWizard(name, userData);
     }
 
     @Override
