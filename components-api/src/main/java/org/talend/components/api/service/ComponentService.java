@@ -83,7 +83,7 @@ public interface ComponentService {
      * Return the png image related to the given wizard
      * 
      * @param wizardName, name of the wizard to get the image for
-     * @return the png image stream or null if none was provided or an error occurred
+     * @return the png image stream or null if none was provided or could not be found
      * @exception ComponentException thrown if the componentName is not registered in the service
      */
     InputStream getWizardPngImage(String wizardName);
