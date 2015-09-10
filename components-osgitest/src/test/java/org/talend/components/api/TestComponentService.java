@@ -12,8 +12,7 @@
 // ============================================================================
 package org.talend.components.api;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import javax.inject.Inject;
 
@@ -27,6 +26,7 @@ import org.ops4j.pax.exam.spi.reactors.PerMethod;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.service.ComponentService;
 
 /**
@@ -59,7 +59,7 @@ public class TestComponentService {
         }
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = ComponentException.class)
     public void getComponentService() {
         assertNotNull(componentService);
         componentService.getComponentProperties("foo");
