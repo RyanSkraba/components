@@ -7,7 +7,7 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 @org.springframework.stereotype.Component(Constants.COMPONENT_WIZARD_BEAN_PREFIX
         + SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME)
 @aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_WIZARD_BEAN_PREFIX
-        + SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME)
+        + SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, provide = ComponentWizardDefinition.class)
 public class SalesforceConnectionWizardDefinition implements ComponentWizardDefinition {
 
     public static final String COMPONENT_WIZARD_NAME = "salesforce"; //$NON-NLS-1$
