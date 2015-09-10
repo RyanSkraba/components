@@ -14,6 +14,8 @@ package org.talend.components.api.test;
 
 import java.io.InputStream;
 
+import junit.framework.TestCase;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +29,6 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.testcomponent.TestComponentDefinition;
 import org.talend.components.api.test.testcomponent.TestComponentProperties;
 import org.talend.components.api.test.testcomponent.TestComponentWizardDefinition;
-
-import junit.framework.TestCase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -44,7 +44,7 @@ public class LocalComponentTest extends TestCase {
     public void testGetProps() {
         ComponentProperties props = componentService.getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
         Form f = props.getForm(TestComponentProperties.TESTCOMPONENT);
-        assertTrue(f.getLayout("userId").isVisible());
+        assertTrue(f.getWidget("userId").isVisible());
     }
 
     @Test

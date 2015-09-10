@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.common.oauth;
 
-import static org.talend.components.api.properties.presentation.Layout.layout;
+import static org.talend.components.api.properties.presentation.Widget.widget;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
@@ -40,10 +40,10 @@ public class OauthProperties extends ComponentProperties {
     protected void setupLayout() {
         super.setupLayout();
         Form form = new Form(this, OAUTH, "OAuth Parameters");
-        form.addChild(clientId, layout().setRow(1).setOrder(1));
-        form.addChild(clientSecret, layout().setRow(1).setOrder(2));
-        form.addChild(callbackHost, layout().setRow(2).setOrder(1));
-        form.addChild(callbackPort, layout().setRow(2).setOrder(2));
-        form.addChild(tokenFile, layout().setRow(3));
+        form.addChild(widget(clientId).setRow(1).setOrder(1));
+        form.addChild(widget(clientSecret).setRow(1).setOrder(2));
+        form.addChild(widget(callbackHost).setRow(2).setOrder(1));
+        form.addChild(widget(callbackPort).setRow(2).setOrder(2));
+        form.addChild(widget(tokenFile).setRow(3));
     }
 }

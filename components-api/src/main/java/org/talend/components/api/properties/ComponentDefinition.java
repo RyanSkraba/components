@@ -29,8 +29,8 @@ public interface ComponentDefinition extends TopLevelDefinition {
      * then which family.
      */
     public enum Family {
-                        BUSINESS,
-                        CLOUD
+        BUSINESS,
+        CLOUD
     }
 
     /*

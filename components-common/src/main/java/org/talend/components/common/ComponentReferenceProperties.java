@@ -12,9 +12,12 @@
 // ============================================================================
 package org.talend.components.common;
 
+import static org.talend.components.api.properties.presentation.Widget.widget;
+
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.properties.presentation.Widget;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 
@@ -53,9 +56,8 @@ public class ComponentReferenceProperties extends ComponentProperties {
         super.setupLayout();
 
         Form reference = Form.create(this, REFERENCE, "Component");
-        // FIXME - handle this with the Layout refactor
-        // reference.addChild(this.schema,
-        // Layout.create().setRow(2).setWidgetType(Layout.WidgetType.COMPONENT_REFERENCE));
+        reference.addChild(widget(referenceType, componentType, componentInstanceId).setRow(1).setWidgetType(
+                Widget.WidgetType.COMPONENT_REFERENCE));
         refreshLayout(reference);
     }
 

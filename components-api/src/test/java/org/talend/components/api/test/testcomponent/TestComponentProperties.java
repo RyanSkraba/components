@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.api.test.testcomponent;
 
-import static org.talend.components.api.properties.presentation.Layout.layout;
+import static org.talend.components.api.properties.presentation.Widget.widget;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
@@ -28,8 +28,8 @@ public class TestComponentProperties extends ComponentProperties {
 
     public TestComponentProperties() {
         Form form = new Form(this, TESTCOMPONENT, "Test Component");
-        form.addChild(userId, layout().setRow(1));
-        form.addChild(password, layout().setRow(2));
+        form.addChild(widget(userId).setRow(1));
+        form.addChild(widget(password).setRow(2));
 
     }
 }

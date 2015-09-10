@@ -7,7 +7,7 @@ import java.util.List;
 import org.talend.components.api.ComponentDesigner;
 import org.talend.components.api.properties.internal.ComponentPropertiesInternal;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Layout;
+import org.talend.components.api.properties.presentation.Widget;
 
 /**
  * The {@code ComponentProperties} class contains the definitions of the properties associated with a component. These
@@ -18,9 +18,9 @@ import org.talend.components.api.properties.presentation.Layout;
  * construction and validation.
  * <p/>
  * All aspects of the properties are defined in a subclass of this class using the {@link Property}, {@Link
- * PresentationItem}, {@link Layout}, and {@link Form} classes. In addition in cases where user
- * interface decisions are made in code, methods can be added to the subclass to influence the flow of the user
- * interface and help with validation.
+ * PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface decisions are
+ * made in code, methods can be added to the subclass to influence the flow of the user interface and help with
+ * validation.
  * <p/>
  * Each property can be a Java type, both simple types and collections are permitted. In addition,
  * {@code ComponentProperties} classes can be composed allowing hierarchies of properties and collections of properties
@@ -88,7 +88,7 @@ public abstract class ComponentProperties {
     }
 
     /**
-     * Declare the layout information for each of the properties
+     * Declare the widget information for each of the properties
      */
     protected void setupLayout() {
     }
@@ -101,7 +101,7 @@ public abstract class ComponentProperties {
     }
 
     // Internal - not API
-    public void setLayoutMethods(String property, Layout layout) {
+    public void setLayoutMethods(String property, Widget layout) {
         Method m;
         m = findMethod(METHOD_BEFORE, property);
         if (m != null)

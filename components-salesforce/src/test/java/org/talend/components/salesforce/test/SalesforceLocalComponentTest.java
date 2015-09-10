@@ -21,7 +21,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.talend.components.api.*;
 import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
@@ -52,17 +51,17 @@ public class SalesforceLocalComponentTest extends TestCase {
     }
 
     protected ComponentProperties checkAndBefore(Form form, String propName, ComponentProperties props) throws Throwable {
-        assertTrue(form.getLayout(propName).isCallBefore());
+        assertTrue(form.getWidget(propName).isCallBefore());
         return componentService.beforeProperty(propName, props);
     }
 
     protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props) throws Throwable {
-        assertTrue(form.getLayout(propName).isCallAfter());
+        assertTrue(form.getWidget(propName).isCallAfter());
         return componentService.afterProperty(propName, props);
     }
 
     protected ComponentProperties checkAndValidate(Form form, String propName, ComponentProperties props) throws Throwable {
-        assertTrue(form.getLayout(propName).isCallValidate());
+        assertTrue(form.getWidget(propName).isCallValidate());
         return componentService.validateProperty(propName, props);
     }
 
@@ -100,16 +99,16 @@ public class SalesforceLocalComponentTest extends TestCase {
                 .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
         assertEquals(SalesforceConnectionProperties.LoginType.BASIC, props.loginType.getValue());
         f = props.getForm(TSalesforceConnectProperties.MAIN);
-        assertTrue(f.getLayout(UserPasswordProperties.USERPASSWORD).isVisible());
-        assertFalse(f.getLayout(OauthProperties.OAUTH).isVisible());
+        assertTrue(f.getWidget(UserPasswordProperties.USERPASSWORD).isVisible());
+        assertFalse(f.getWidget(OauthProperties.OAUTH).isVisible());
 
         props.loginType.setValue(SalesforceConnectionProperties.LoginType.OAUTH);
         props = (SalesforceConnectionProperties) checkAndAfter(f, "loginType", props);
         f = props.getForm(TSalesforceConnectProperties.MAIN);
         assertTrue(f.isRefreshUI());
 
-        assertFalse(f.getLayout(UserPasswordProperties.USERPASSWORD).isVisible());
-        assertTrue(f.getLayout(OauthProperties.OAUTH).isVisible());
+        assertFalse(f.getWidget(UserPasswordProperties.USERPASSWORD).isVisible());
+        assertTrue(f.getWidget(OauthProperties.OAUTH).isVisible());
     }
 
     private SalesforceConnectionProperties setupProps(SalesforceConnectionProperties props) {
@@ -151,7 +150,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         assertEquals(SalesforceModuleProperties.REFERENCE, props.getForms().get(1).getName());
 
         Form f = props.getForm(SalesforceModuleProperties.REFERENCE);
-        assertTrue(f.getLayout("moduleName").isCallBefore());
+        assertTrue(f.getWidget("moduleName").isCallBefore());
         // The Form is bound to a Properties object that created it. The Forms might not always be associated with the
         // properties object
         // they came from.

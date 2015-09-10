@@ -12,14 +12,14 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.presentation.Layout.layout;
+import static org.talend.components.api.properties.presentation.Widget.widget;
 
 import java.util.List;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Layout;
+import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.common.SchemaProperties;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
@@ -55,14 +55,13 @@ public class SalesforceModuleProperties extends ComponentProperties {
         super.setupLayout();
 
         Form moduleForm = Form.create(this, MAIN, "Salesforce Module");
-        moduleForm.addChild(moduleName, layout().setRow(1).setWidgetType(Layout.WidgetType.NAME_SELECTION_AREA));
+        moduleForm.addChild(widget(moduleName).setRow(1).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
         refreshLayout(moduleForm);
 
         Form moduleRefForm = Form.create(this, REFERENCE, "Salesforce Module");
-        moduleRefForm.addChild(moduleName, layout().setRow(1).setWidgetType(Layout.WidgetType.NAME_SELECTION_REFERENCE));
-        moduleRefForm.addChild(schema.getForm(SchemaProperties.REFERENCE), layout().setRow(2));
+        moduleRefForm.addChild(widget(moduleName).setRow(1).setWidgetType(Widget.WidgetType.NAME_SELECTION_REFERENCE));
+        moduleRefForm.addChild(widget(schema.getForm(SchemaProperties.REFERENCE)).setRow(2));
         refreshLayout(moduleRefForm);
-
     }
 
     public void beforeModuleName() throws Exception {

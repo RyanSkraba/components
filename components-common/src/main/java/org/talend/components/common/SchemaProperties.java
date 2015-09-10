@@ -12,12 +12,12 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.properties.presentation.Layout.layout;
+import static org.talend.components.api.properties.presentation.Widget.widget;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Layout;
+import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.schema.ComponentSchemaElement;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
@@ -43,13 +43,13 @@ public class SchemaProperties extends ComponentProperties {
     protected void setupLayout() {
         super.setupLayout();
 
-        Form schema = Form.create(this, MAIN, "Schema");
-        schema.addChild(this.schema, layout().setRow(2).setWidgetType(Layout.WidgetType.SCHEMA_EDITOR));
-        refreshLayout(schema);
+        Form schemaForm = Form.create(this, MAIN, "Schema");
+        schemaForm.addChild(widget(schema).setRow(2).setWidgetType(Widget.WidgetType.SCHEMA_EDITOR));
+        refreshLayout(schemaForm);
 
-        Form schemaRef = Form.create(this, REFERENCE, "Schema");
-        schemaRef.addChild(this.schema, layout().setRow(2).setWidgetType(Layout.WidgetType.SCHEMA_REFERENCE));
-        refreshLayout(schemaRef);
+        Form schemaRefForm = Form.create(this, REFERENCE, "Schema");
+        schemaRefForm.addChild(widget(schema).setRow(2).setWidgetType(Widget.WidgetType.SCHEMA_REFERENCE));
+        refreshLayout(schemaRefForm);
     }
 
 }

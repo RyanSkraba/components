@@ -21,7 +21,7 @@ public interface TopLevelDefinition extends NamedThing {
 
     /**
      * This shall be a path relative to the current Wizard definition, ideally is should just be the name of the png
-     * image if placed in the same resouce folder that the current class. This icon will be computed with the following
+     * image if placed in the same resource folder that the current class. This icon will be computed with the following
      * code
      * 
      * <pre>

@@ -26,7 +26,7 @@ import org.talend.components.api.properties.ComponentProperties;
 @aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceInputDefinition.COMPONENT_NAME)
 public class TSalesforceInputDefinition implements ComponentDefinition {
 
-    public static final String     COMPONENT_NAME = "tSalesforceInput";                              //$NON-NLS-1$
+    public static final String     COMPONENT_NAME = "tSalesforceInput"; //$NON-NLS-1$
 
     protected ComponentConnector[] connectors     = { new ComponentConnector(Type.FLOW, 0, 0),
             new ComponentConnector(Type.ITERATE, 1, 0), new ComponentConnector(Type.SUBJOB_OK, 1, 0),

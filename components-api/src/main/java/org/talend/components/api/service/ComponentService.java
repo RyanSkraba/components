@@ -64,19 +64,19 @@ public interface ComponentService {
     ComponentProperties afterProperty(String propName, ComponentProperties properties) throws Throwable;
 
     /**
-     * return the png image related to the given wizard
+     * Return the png image related to the given wizard
      * 
      * @param wizardName, name of the wizard to get the image for
-     * @return the png image stream or null if none was provided or an error occured
+     * @return the png image stream or null if none was provided or an error occurred
      * @exception ComponentException thrown if the componentName is not registered in the service
      */
     InputStream getWizardPngImage(String wizardName);
 
     /**
-     * return the png image related to the given component
+     * Return the png image related to the given component
      * 
      * @param componentName, name of the comonent to get the image for
-     * @return the png image stream or null if none was provided or an error occured
+     * @return the png image stream or null if none was provided or an error occurred
      * @exception ComponentException thrown if the componentName is not registered in the service
      */
     InputStream getComponentPngImage(String componentName);

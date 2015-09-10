@@ -14,9 +14,9 @@ package org.talend.components.api.properties;
 
 import java.util.List;
 
-import org.talend.components.api.AbstractNamedThing;
-
 import net.jodah.typetools.TypeResolver;
+
+import org.talend.components.api.AbstractNamedThing;
 
 public class Property<T> extends AbstractNamedThing {
 

@@ -12,9 +12,7 @@
 // ============================================================================
 package org.talend.components.api.properties.presentation;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.talend.components.api.AbstractNamedThing;
 import org.talend.components.api.NamedThing;
@@ -27,22 +25,25 @@ import org.talend.components.api.properties.Property;
  */
 public class Form extends AbstractNamedThing {
 
-    protected ComponentProperties     properties;
+    protected ComponentProperties             properties;
 
     protected Map<String, AbstractNamedThing> children;
 
-    protected Map<String, Layout>     layoutMap;
+    protected Map<String, Widget>             widgetMap;
+
+    protected List<Widget>                    widgets;
 
     /**
-     * Indicate that some {@link Layout} objects for this form have changed and the UI should be re-rendered to reflect
-     * the changed layout.
+     * Indicate that some {@link Widget} objects for this form have changed and the UI should be re-rendered to reflect
+     * the changed widget.
      */
-    protected boolean                 refreshUI;
+    protected boolean                         refreshUI;
 
     public Form(ComponentProperties props, String name, String displayName) {
         super(name, displayName);
         children = new HashMap<String, AbstractNamedThing>();
-        layoutMap = new HashMap<String, Layout>();
+        widgetMap = new HashMap<String, Widget>();
+        widgets = new ArrayList<Widget>();
         props.addForm(this);
         properties = props;
     }
@@ -64,21 +65,27 @@ public class Form extends AbstractNamedThing {
     }
 
     // FIXME - only here for JSON
-    public Map<String, Layout> getLayoutMap() {
-        return layoutMap;
+    public List<Widget> getWidgets() {
+        return widgets;
     }
 
-    public Form addChild(AbstractNamedThing child, Layout layout) {
-        if (child == null)
-            throw new NullPointerException();
-        layoutMap.put(child.getName(), layout);
-        children.put(child.getName(), child);
-        properties.setLayoutMethods(child.getName(), layout);
+    public Form addChild(AbstractNamedThing child) {
+        addChild(Widget.widget(child));
         return this;
     }
 
-    public Layout getLayout(String child) {
-        return layoutMap.get(child);
+    public Form addChild(Widget widget) {
+        widgets.add(widget);
+        for (AbstractNamedThing child : widget.getProperties()) {
+            widgetMap.put(child.getName(), widget);
+            children.put(child.getName(), child);
+            properties.setLayoutMethods(child.getName(), widget);
+        }
+        return this;
+    }
+
+    public Widget getWidget(String child) {
+        return widgetMap.get(child);
     }
 
     public boolean isRefreshUI() {

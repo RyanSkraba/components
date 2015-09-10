@@ -12,8 +12,6 @@
 // ============================================================================
 package org.talend.components.api.exception;
 
-import java.io.IOException;
-
 /**
  * created by sgandon on 9 sept. 2015 Detailled comment
  *

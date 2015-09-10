@@ -12,15 +12,14 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.presentation.Layout.layout;
+import static org.talend.components.api.properties.presentation.Widget.widget;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.PresentationItem;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Layout.WidgetType;
-import org.talend.components.common.CommonProperties;
+import org.talend.components.api.properties.presentation.Widget.WidgetType;
 import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.common.oauth.OauthProperties;
@@ -67,53 +66,51 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     //
     // Presentation items
     //
-    public PresentationItem connectionDesc = new PresentationItem("connectionDesc",
-            "Complete these fields in order to connect to your Salesforce account");
+    public PresentationItem          connectionDesc   = new PresentationItem("connectionDesc",
+                                                              "Complete these fields in order to connect to your Salesforce account");
 
-    public PresentationItem testConnection = new PresentationItem("testConnection", "Test connection");
+    public PresentationItem          testConnection   = new PresentationItem("testConnection", "Test connection");
 
-    public PresentationItem advanced = new PresentationItem("advanced", "Advanced...");
+    public PresentationItem          advanced         = new PresentationItem("advanced", "Advanced...");
 
     //
     // Nested property collections
     //
-    public CommonProperties common = new CommonProperties();
+    public OauthProperties           oauth            = new OauthProperties();
 
-    public OauthProperties oauth = new OauthProperties();
+    public UserPasswordProperties    userPassword     = new UserPasswordProperties();
 
-    public UserPasswordProperties userPassword = new UserPasswordProperties();
+    public static final String       MAIN             = "Main";
 
-    public static final String MAIN = "Main";
+    public static final String       ADVANCED         = "Advanced";
 
-    public static final String ADVANCED = "Advanced";
-
-    @Override protected void setupLayout() {
+    @Override
+    protected void setupLayout() {
         super.setupLayout();
 
         Form connectionForm = Form.create(this, MAIN, "Salesforce Connection Settings");
-        connectionForm.addChild(connectionDesc, layout().setRow(1));
+        connectionForm.addChild(widget(connectionDesc).setRow(1));
 
-        connectionForm.addChild(common.getForm(CommonProperties.MAIN), layout().setRow(2));
-        connectionForm.addChild(loginType, layout().setRow(3).setDeemphasize(true));
+        connectionForm.addChild(widget(loginType).setRow(3).setDeemphasize(true));
 
         // Only one of these is visible at a time
-        connectionForm.addChild(oauth.getForm(OauthProperties.OAUTH), layout().setRow(4));
-        connectionForm.addChild(userPassword.getForm(UserPasswordProperties.USERPASSWORD), layout().setRow(4));
+        connectionForm.addChild(widget(oauth.getForm(OauthProperties.OAUTH)).setRow(4));
+        connectionForm.addChild(widget(userPassword.getForm(UserPasswordProperties.USERPASSWORD)).setRow(4));
 
-        connectionForm.addChild(url, layout().setRow(5));
+        connectionForm.addChild(widget(url).setRow(5));
 
-        connectionForm.addChild(advanced, layout().setRow(6).setOrder(1).setWidgetType(WidgetType.BUTTON));
-        connectionForm
-                .addChild(testConnection, layout().setRow(6).setOrder(2).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
+        connectionForm.addChild(widget(advanced).setRow(6).setOrder(1).setWidgetType(WidgetType.BUTTON));
+        connectionForm.addChild(
+                widget(testConnection).setRow(6).setOrder(2).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
         refreshLayout(connectionForm);
 
         Form advancedForm = Form.create(this, ADVANCED, "Advanced Connection Settings");
-        advancedForm.addChild(bulkConnection, layout().setRow(1));
-        advancedForm.addChild(needCompression, layout().setRow(2));
-        advancedForm.addChild(httpTraceMessage, layout().setRow(3));
-        advancedForm.addChild(clientId, layout().setRow(4));
-        advancedForm.addChild(timeout, layout().setRow(5));
-        advancedForm.addChild(proxy, layout().setRow(5));
+        advancedForm.addChild(widget(bulkConnection).setRow(1));
+        advancedForm.addChild(widget(needCompression).setRow(2));
+        advancedForm.addChild(widget(httpTraceMessage).setRow(3));
+        advancedForm.addChild(widget(clientId).setRow(4));
+        advancedForm.addChild(widget(timeout).setRow(5));
+        advancedForm.addChild(widget(proxy).setRow(5));
         refreshLayout(advancedForm);
     }
 
@@ -128,17 +125,18 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         return new ValidationResult();
     }
 
-    @Override public void refreshLayout(Form form) {
+    @Override
+    public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals(MAIN)) {
             switch (loginType.getValue()) {
             case OAUTH:
-                form.getLayout(OauthProperties.OAUTH).setVisible(true);
-                form.getLayout(UserPasswordProperties.USERPASSWORD).setVisible(false);
+                form.getWidget(OauthProperties.OAUTH).setVisible(true);
+                form.getWidget(UserPasswordProperties.USERPASSWORD).setVisible(false);
                 break;
             case BASIC:
-                form.getLayout(OauthProperties.OAUTH).setVisible(false);
-                form.getLayout(UserPasswordProperties.USERPASSWORD).setVisible(true);
+                form.getWidget(OauthProperties.OAUTH).setVisible(false);
+                form.getWidget(UserPasswordProperties.USERPASSWORD).setVisible(true);
                 break;
             default:
                 throw new RuntimeException("Enum value should be handled :" + loginType.getValue());
