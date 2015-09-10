@@ -4,17 +4,19 @@ import org.springframework.stereotype.Component;
 import org.talend.components.api.ComponentConnector;
 import org.talend.components.api.ComponentConnector.Type;
 import org.talend.components.api.Constants;
+import org.talend.components.api.properties.AbstractComponentDefinition;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 
 @Component(Constants.COMPONENT_BEAN_PREFIX + TestComponentDefinition.COMPONENT_NAME)
-public class TestComponentDefinition implements ComponentDefinition {
+public class TestComponentDefinition extends AbstractComponentDefinition {
 
     public static final String        COMPONENT_NAME = "TestComponent"; //$NON-NLS-1$
 
-    protected ComponentConnector[]    connectors     = { new ComponentConnector(Type.FLOW, 0, 0),
-            new ComponentConnector(Type.ITERATE, 1, 0), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
-            new ComponentConnector(Type.SUBJOB_ERROR, 1, 0) };
+    public TestComponentDefinition() {
+        setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
+                new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
+    }
 
     protected TestComponentProperties properties;
 
@@ -24,8 +26,8 @@ public class TestComponentDefinition implements ComponentDefinition {
     }
 
     @Override
-    public Family[] getSupportedFamilies() {
-        return new Family[] { Family.BUSINESS, Family.CLOUD };
+    public String[] getSupportedFamilies() {
+        return new String[] { ComponentDefinition.FAMILY_BUSINESS, ComponentDefinition.FAMILY_CLOUD };
     }
 
     @Override

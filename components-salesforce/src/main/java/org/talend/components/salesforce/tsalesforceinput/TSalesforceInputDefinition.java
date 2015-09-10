@@ -15,6 +15,7 @@ package org.talend.components.salesforce.tsalesforceinput;
 import org.talend.components.api.ComponentConnector;
 import org.talend.components.api.ComponentConnector.Type;
 import org.talend.components.api.Constants;
+import org.talend.components.api.properties.AbstractComponentDefinition;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 
@@ -24,13 +25,14 @@ import org.talend.components.api.properties.ComponentProperties;
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceInputDefinition.COMPONENT_NAME)
 @aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceInputDefinition.COMPONENT_NAME)
-public class TSalesforceInputDefinition implements ComponentDefinition {
+public class TSalesforceInputDefinition extends AbstractComponentDefinition {
 
-    public static final String     COMPONENT_NAME = "tSalesforceInput"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tSalesforceInput"; //$NON-NLS-1$
 
-    protected ComponentConnector[] connectors     = { new ComponentConnector(Type.FLOW, 0, 0),
-            new ComponentConnector(Type.ITERATE, 1, 0), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
-            new ComponentConnector(Type.SUBJOB_ERROR, 1, 0) };
+    public TSalesforceInputDefinition() {
+        setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
+                new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
+    }
 
     @Override
     public ComponentProperties createProperties() {
@@ -38,8 +40,8 @@ public class TSalesforceInputDefinition implements ComponentDefinition {
     }
 
     @Override
-    public Family[] getSupportedFamilies() {
-        return new Family[] { Family.BUSINESS, Family.CLOUD };
+    public String[] getSupportedFamilies() {
+        return new String[] { ComponentDefinition.FAMILY_BUSINESS, ComponentDefinition.FAMILY_CLOUD };
     }
 
     @Override

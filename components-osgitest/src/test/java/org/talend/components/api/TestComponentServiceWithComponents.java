@@ -59,6 +59,7 @@ public class TestComponentServiceWithComponents {
 
     @Test
     public void testTSalesforceConnectExists() {
+        System.out.println("JUNIT test start.... *********************");
         assertNotNull(componentService);
         assertNotNull(componentService.getComponentProperties("tSalesforceConnect")); //$NON-NLS-1$
     }

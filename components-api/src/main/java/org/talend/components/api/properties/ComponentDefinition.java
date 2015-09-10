@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.api.properties;
 
+import org.talend.components.api.ComponentConnector;
 import org.talend.components.api.TopLevelDefinition;
 
 /**
@@ -28,10 +29,9 @@ public interface ComponentDefinition extends TopLevelDefinition {
      * Component categorization - this is an issue that wants further study. - which designer (big data, di, etc) and
      * then which family.
      */
-    public enum Family {
-        BUSINESS,
-        CLOUD
-    }
+    // FIXME - this needs to be corrected
+    public static final String FAMILY_BUSINESS = "Business/Salesforce";
+    public static final String FAMILY_CLOUD = "Cloud/Salesforce";
 
     /*
      * Where do we specify a wizard is required? Maybe list of groups that comprise wizard.
@@ -48,6 +48,8 @@ public interface ComponentDefinition extends TopLevelDefinition {
 
     // public void setDesignerFamily(Family family);
 
-    public Family[] getSupportedFamilies();
+    public String[] getSupportedFamilies();
+
+    public ComponentConnector[] getConnectors();
 
 }
