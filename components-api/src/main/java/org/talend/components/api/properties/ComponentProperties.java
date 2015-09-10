@@ -1,7 +1,9 @@
 package org.talend.components.api.properties;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.talend.components.api.ComponentDesigner;
@@ -76,6 +78,20 @@ public abstract class ComponentProperties {
 
     public void setComponentDesigner(ComponentDesigner designer) {
         internal.setDesigner(designer);
+    }
+
+    public Property[] getProperties() {
+        List<Property> properties = new ArrayList();
+        Field[] fields = getClass().getFields();
+        for (Field f : fields) {
+            if (Property.class.isAssignableFrom(f.getType()))
+                try {
+                    properties.add((Property) f.get(this));
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+        }
+        return (Property[]) properties.toArray(new Property[] {});
     }
 
     /**

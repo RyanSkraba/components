@@ -15,18 +15,20 @@ package org.talend.components.salesforce.tsalesforceconnect;
 import org.talend.components.api.ComponentConnector;
 import org.talend.components.api.ComponentConnector.Type;
 import org.talend.components.api.Constants;
+import org.talend.components.api.properties.AbstractComponentDefinition;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceConnectDefinition.COMPONENT_NAME)
 @aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceConnectDefinition.COMPONENT_NAME)
-public class TSalesforceConnectDefinition implements ComponentDefinition {
+public class TSalesforceConnectDefinition extends AbstractComponentDefinition {
 
-    public static final String     COMPONENT_NAME = "tSalesforceConnect"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tSalesforceConnect"; //$NON-NLS-1$
 
-    protected ComponentConnector[] connectors     = { new ComponentConnector(Type.FLOW, 0, 0),
-            new ComponentConnector(Type.ITERATE, 1, 0), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
-            new ComponentConnector(Type.SUBJOB_ERROR, 1, 0) };
+    public TSalesforceConnectDefinition() {
+        setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
+                new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
+    }
 
     @Override
     public ComponentProperties createProperties() {
@@ -34,8 +36,8 @@ public class TSalesforceConnectDefinition implements ComponentDefinition {
     }
 
     @Override
-    public Family[] getSupportedFamilies() {
-        return new Family[] { Family.BUSINESS, Family.CLOUD };
+    public String[] getSupportedFamilies() {
+        return new String[] { ComponentDefinition.FAMILY_BUSINESS, ComponentDefinition.FAMILY_CLOUD };
     }
 
     @Override

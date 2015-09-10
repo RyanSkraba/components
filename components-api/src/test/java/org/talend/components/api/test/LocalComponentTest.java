@@ -24,6 +24,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.testcomponent.TestComponentDefinition;
@@ -38,6 +39,14 @@ public class LocalComponentTest extends TestCase {
     protected ComponentService componentService;
 
     public LocalComponentTest() {
+    }
+
+    @Test
+    public void testGetPropsList() {
+        ComponentProperties props = componentService.getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
+        Property[] pList = props.getProperties();
+        assertTrue(pList[0] != null);
+        assertEquals(2, pList.length);
     }
 
     @Test
