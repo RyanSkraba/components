@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api;
+package org.talend.components.api.properties;
 
 public class ComponentConnector {
 

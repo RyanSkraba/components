@@ -10,7 +10,8 @@ public interface ComponentSchemaElement {
     public enum Type {
         STRING,
         INT,
-        DATE
+        DATE,
+        DYNAMIC
     }
 
     public String getName();

@@ -12,7 +12,6 @@
 // ============================================================================
 package org.talend.components.api.properties;
 
-import org.talend.components.api.ComponentConnector;
 import org.talend.components.api.TopLevelDefinition;
 
 /**

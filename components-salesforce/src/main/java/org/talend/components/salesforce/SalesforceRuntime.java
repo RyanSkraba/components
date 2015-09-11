@@ -16,9 +16,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import org.talend.components.api.ComponentRuntime;
-import org.talend.components.api.ComponentRuntimeContext;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.runtime.ComponentEnvironmentContext;
+import org.talend.components.api.runtime.ComponentRuntime;
+import org.talend.components.api.runtime.ComponentRuntimeContext;
 import org.talend.components.api.schema.ComponentSchema;
 import org.talend.components.api.schema.ComponentSchemaElement;
 import org.talend.components.api.schema.ComponentSchemaFactory;
@@ -27,6 +28,7 @@ import com.sforce.async.BulkConnection;
 import com.sforce.soap.partner.*;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
+import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 
 public class SalesforceRuntime extends ComponentRuntime {
 
@@ -93,7 +95,6 @@ public class SalesforceRuntime extends ComponentRuntime {
         ComponentSchema schema = ComponentSchemaFactory.getComponentSchema();
         ComponentSchemaElement root = ComponentSchemaFactory.getComponentSchemaElement("Root");
         schema.setRoot(root);
-        List<ComponentSchemaElement> children = new ArrayList<ComponentSchemaElement>();
 
         DescribeSObjectResult[] describeSObjectResults = connection.describeSObjects(new String[] { module });
         Field fields[] = describeSObjectResults[0].getFields();
@@ -104,15 +105,25 @@ public class SalesforceRuntime extends ComponentRuntime {
         return schema;
     }
 
-    public void outputBegin(ComponentProperties props, ComponentRuntimeContext context) {
+    class SalesforceRuntimeContext implements ComponentRuntimeContext {
+    }
+
+    public ComponentRuntimeContext outputBegin(ComponentProperties props, ComponentEnvironmentContext env) {
+        TSalesforceOutputProperties sprops = (TSalesforceOutputProperties) props;
+
+        SalesforceRuntimeContext context =  new SalesforceRuntimeContext();
+
+
+
+
+        return context;
+    }
+
+    public void outputMain(ComponentProperties props, ComponentRuntimeContext context, ComponentEnvironmentContext env) {
 
     }
 
-    public void outputMain(ComponentProperties props, ComponentRuntimeContext context) {
-
-    }
-
-    public void outputEnd(ComponentProperties props, ComponentRuntimeContext context) {
+    public void outputEnd(ComponentProperties props, ComponentRuntimeContext context, ComponentEnvironmentContext env) {
 
     }
 

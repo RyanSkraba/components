@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceconnect;
 
-import org.talend.components.api.ComponentConnector;
-import org.talend.components.api.ComponentConnector.Type;
+import org.talend.components.api.properties.ComponentConnector;
+import org.talend.components.api.properties.ComponentConnector.Type;
 import org.talend.components.api.Constants;
 import org.talend.components.api.properties.AbstractComponentDefinition;
 import org.talend.components.api.properties.ComponentDefinition;

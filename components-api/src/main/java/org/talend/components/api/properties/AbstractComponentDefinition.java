@@ -1,7 +1,5 @@
 package org.talend.components.api.properties;
 
-import org.talend.components.api.ComponentConnector;
-
 /**
  */
 public abstract class AbstractComponentDefinition implements ComponentDefinition {
