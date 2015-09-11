@@ -61,6 +61,14 @@ public class SalesforceRuntime extends ComponentRuntime {
         bulkConnection = new BulkConnection(bulkConfig);
     }
 
+    protected void doConnection(SalesforceConnectionProperties properties, ConnectorConfig config) throws AsyncApiException,
+            ConnectionException {
+        connection = new PartnerConnection(config);
+        if (properties.bulkConnection.getValue() != null && properties.bulkConnection.getValue()) {
+            connectBulk(properties, config);
+        }
+    }
+
     public void connect(final SalesforceConnectionProperties properties) throws Exception {
 
         ConnectorConfig config = new ConnectorConfig();
@@ -68,22 +76,20 @@ public class SalesforceRuntime extends ComponentRuntime {
         config.setPassword(properties.userPassword.password.getValue());
         config.setAuthEndpoint(properties.url.getValue());
         config.setSessionRenewer(new SessionRenewer() {
-
             @Override
             public SessionRenewalHeader renewSession(ConnectorConfig connectorConfig) throws ConnectionException {
                 SessionRenewalHeader header = new SessionRenewalHeader();
-                connection = new PartnerConnection(connectorConfig);
-                if (properties.bulkConnection.getValue() != null && properties.bulkConnection.getValue()) {
-                    try {
-                        connectBulk(properties, connectorConfig);
-                    } catch (AsyncApiException e) {
-                        // FIXME
-                        e.printStackTrace();
-                    }
+                try {
+                    doConnection(properties, connectorConfig);
+                } catch (AsyncApiException e) {
+                    // FIXME
+                    e.printStackTrace();
                 }
+
                 SessionHeader_element h = connection.getSessionHeader();
-                // FIXME - need to get the right urn
-                header.name = new QName("FIXME", "X-SFDC-Session");
+                // FIXME - one or the other, I have seen both
+                header.name = new QName("urn:partner.soap.sforce.com", "X-SFDC-Session");
+                header.name = new QName("urn:partner.soap.sforce.com", "SessionHeader");
                 header.headerElement = h.getSessionId();
                 return header;
             }
@@ -98,12 +104,7 @@ public class SalesforceRuntime extends ComponentRuntime {
 
         config.setTraceMessage(true);
 
-        connection = new PartnerConnection(config);
-
-        // FIXME - awkward (just this line for checking the boolean value)
-        if (properties.bulkConnection.getValue() != null && properties.bulkConnection.getValue()) {
-            connectBulk(properties, config);
-        }
+        doConnection(properties, config);
 
         System.out.println("Connection: " + connection);
         System.out.println("Bulk Connection: " + bulkConnection);
