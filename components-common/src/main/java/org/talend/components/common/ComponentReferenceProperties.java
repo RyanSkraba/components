@@ -26,7 +26,6 @@ import com.fasterxml.jackson.annotation.JsonRootName;
  * </li> <li>Reference a single instance of a given component type in the enclosing scope, e.g. Job</li> <li>Reference
  * to a particular instance of a component</li>
  */
-@JsonRootName("schema")
 public class ComponentReferenceProperties extends ComponentProperties {
 
     public enum ReferenceType {

@@ -105,7 +105,7 @@ public class TSalesforceOutputProperties extends ComponentProperties {
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
-        schemaFlow.schema.getValue().setChildren(null);
+        schemaFlow.schema.getValue().getRoot().setChildren(null);
         if (!extendInsert.getValue() && retrieveInsertId.getValue() != null && outputAction.getValue() == OutputAction.INSERT) {
             schemaFlow.addRow(ComponentSchemaFactory.getComponentSchemaElement("salesforce_id"));
         }

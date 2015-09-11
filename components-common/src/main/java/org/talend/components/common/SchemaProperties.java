@@ -18,6 +18,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
+import org.talend.components.api.schema.ComponentSchema;
 import org.talend.components.api.schema.ComponentSchemaElement;
 import org.talend.components.api.schema.ComponentSchemaFactory;
 
@@ -29,11 +30,11 @@ public class SchemaProperties extends ComponentProperties {
     //
     // Properties
     //
-    public Property<ComponentSchemaElement> schema    = new Property<ComponentSchemaElement>("schema", "Schema");
+    public Property<ComponentSchema> schema    = new Property<ComponentSchema>("schema", "Schema");
 
-    public static final String              MAIN      = "Main";
+    public static final String       MAIN      = "Main";
 
-    public static final String              REFERENCE = "Reference";
+    public static final String       REFERENCE = "Reference";
 
     public SchemaProperties() {
         super();
@@ -54,10 +55,13 @@ public class SchemaProperties extends ComponentProperties {
     }
 
     public ComponentSchemaElement addRow(ComponentSchemaElement row) {
-        ComponentSchemaElement root = schema.getValue();
+        ComponentSchema s = schema.getValue();
+        if (s == null)
+            s = ComponentSchemaFactory.getComponentSchema();
+        ComponentSchemaElement root = s.getRoot();
         if (root == null) {
             root = ComponentSchemaFactory.getComponentSchemaElement("Root");
-            schema.setValue(root);
+            s.setRoot(root);
         }
         root.addChild(row);
         return row;

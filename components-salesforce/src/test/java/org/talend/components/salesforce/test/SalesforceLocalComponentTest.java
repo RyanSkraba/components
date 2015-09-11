@@ -25,6 +25,7 @@ import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.schema.ComponentSchema;
 import org.talend.components.api.schema.ComponentSchemaElement;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
@@ -173,13 +174,13 @@ public class SalesforceLocalComponentTest extends TestCase {
         moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
         moduleProps.moduleName.setValue("Account");
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
-        ComponentSchemaElement schemaRoot = moduleProps.schema.schema.getValue();
-        System.out.println(schemaRoot);
-        for (ComponentSchemaElement child : schemaRoot.getChildren()) {
+        ComponentSchema schema = moduleProps.schema.schema.getValue();
+        System.out.println(schema);
+        for (ComponentSchemaElement child : schema.getRoot().getChildren()) {
             System.out.println(child.getName());
         }
-        assertEquals("Id", schemaRoot.getChildren().get(0).getName());
-        assertTrue(schemaRoot.getChildren().size() > 50);
+        assertEquals("Id", schema.getRoot().getChildren().get(0).getName());
+        assertTrue(schema.getRoot().getChildren().size() > 50);
     }
 
 }

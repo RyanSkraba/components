@@ -17,6 +17,9 @@ import java.util.Calendar;
 import java.util.List;
 
 import org.talend.components.api.ComponentRuntime;
+import org.talend.components.api.ComponentRuntimeContext;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.schema.ComponentSchema;
 import org.talend.components.api.schema.ComponentSchemaElement;
 import org.talend.components.api.schema.ComponentSchemaFactory;
 
@@ -86,8 +89,10 @@ public class SalesforceRuntime extends ComponentRuntime {
         return returnList;
     }
 
-    public ComponentSchemaElement getSchema(String module) throws ConnectionException {
+    public ComponentSchema getSchema(String module) throws ConnectionException {
+        ComponentSchema schema = ComponentSchemaFactory.getComponentSchema();
         ComponentSchemaElement root = ComponentSchemaFactory.getComponentSchemaElement("Root");
+        schema.setRoot(root);
         List<ComponentSchemaElement> children = new ArrayList<ComponentSchemaElement>();
 
         DescribeSObjectResult[] describeSObjectResults = connection.describeSObjects(new String[] { module });
@@ -96,7 +101,19 @@ public class SalesforceRuntime extends ComponentRuntime {
             ComponentSchemaElement child = ComponentSchemaFactory.getComponentSchemaElement(field.getName());
             root.addChild(child);
         }
-        return root;
+        return schema;
+    }
+
+    public void outputBegin(ComponentProperties props, ComponentRuntimeContext context) {
+
+    }
+
+    public void outputMain(ComponentProperties props, ComponentRuntimeContext context) {
+
+    }
+
+    public void outputEnd(ComponentProperties props, ComponentRuntimeContext context) {
+
     }
 
     public Calendar getServerTimestamp() throws ConnectionException {
