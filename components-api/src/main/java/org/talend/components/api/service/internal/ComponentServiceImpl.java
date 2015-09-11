@@ -82,7 +82,7 @@ public class ComponentServiceImpl implements ComponentService {
         final String beanName = Constants.COMPONENT_WIZARD_BEAN_PREFIX + name;
         ComponentWizardDefinition wizardDefinition = componentRegistry.getComponentWizards().get(beanName);
         if (wizardDefinition == null) {
-            throw new ComponentException("Failed to find the wizard [" + beanName + "], it may not be registered."); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new ComponentException(ComponentsErrorCode.WRONG_WIZARD_NAME, TalendExceptionContext.build().put("name", name)); //$NON-NLS-1$
         }
         ComponentWizard wizard = wizardDefinition.createWizard(location);
         return wizard;
@@ -108,8 +108,8 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     public InputStream getWizardPngImage(String wizardName) {
-        TopLevelDefinition wizardDefinition = componentRegistry.getComponentWizards().get(
-                Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);
+        TopLevelDefinition wizardDefinition = componentRegistry.getComponentWizards()
+                .get(Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);
         if (wizardDefinition != null) {
             return getImageStream(wizardDefinition);
         } else {
@@ -121,8 +121,8 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     public InputStream getComponentPngImage(String componentName) {
-        TopLevelDefinition componentDefinition = componentRegistry.getComponents().get(
-                Constants.COMPONENT_BEAN_PREFIX + componentName);
+        TopLevelDefinition componentDefinition = componentRegistry.getComponents()
+                .get(Constants.COMPONENT_BEAN_PREFIX + componentName);
         if (componentDefinition != null) {
             return getImageStream(componentDefinition);
         } else {
