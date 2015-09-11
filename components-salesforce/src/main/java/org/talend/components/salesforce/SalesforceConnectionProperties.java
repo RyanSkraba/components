@@ -89,27 +89,28 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         super.setupLayout();
 
         Form connectionForm = Form.create(this, MAIN, "Salesforce Connection Settings");
-        connectionForm.addChild(widget(connectionDesc).setRow(1));
+        connectionForm.addRow(connectionDesc);
 
-        connectionForm.addChild(widget(loginType).setRow(3).setDeemphasize(true));
+        connectionForm.addRow(widget(loginType).setDeemphasize(true));
 
         // Only one of these is visible at a time
-        connectionForm.addChild(widget(oauth.getForm(OauthProperties.OAUTH)).setRow(4));
-        connectionForm.addChild(widget(userPassword.getForm(UserPasswordProperties.USERPASSWORD)).setRow(4));
+        connectionForm.addRow(oauth.getForm(OauthProperties.OAUTH));
+        connectionForm.addRow(userPassword.getForm(UserPasswordProperties.USERPASSWORD));
 
-        connectionForm.addChild(widget(url).setRow(5));
+        connectionForm.addRow(url);
 
-        connectionForm.addChild(widget(advanced).setRow(6).setOrder(1).setWidgetType(WidgetType.BUTTON));
-        connectionForm.addChild(widget(testConnection).setRow(6).setOrder(2).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
+        connectionForm.addRow(widget(advanced).setWidgetType(WidgetType.BUTTON));
+        connectionForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
+        
         refreshLayout(connectionForm);
 
         Form advancedForm = Form.create(this, ADVANCED, "Advanced Connection Settings");
-        advancedForm.addChild(widget(bulkConnection).setRow(1));
-        advancedForm.addChild(widget(needCompression).setRow(2));
-        advancedForm.addChild(widget(httpTraceMessage).setRow(3));
-        advancedForm.addChild(widget(clientId).setRow(4));
-        advancedForm.addChild(widget(timeout).setRow(5));
-        advancedForm.addChild(widget(proxy).setRow(5));
+        advancedForm.addRow(bulkConnection);
+        advancedForm.addRow(needCompression);
+        advancedForm.addRow(httpTraceMessage);
+        advancedForm.addRow(clientId);
+        advancedForm.addRow(timeout);
+        advancedForm.addColumn(proxy);
         refreshLayout(advancedForm);
     }
 

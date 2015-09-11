@@ -55,12 +55,13 @@ public class SalesforceModuleProperties extends ComponentProperties {
         super.setupLayout();
 
         Form moduleForm = Form.create(this, MAIN, "Salesforce Module");
-        moduleForm.addChild(widget(moduleName).setRow(1).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
+        moduleForm.addRow(widget(moduleName).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
         refreshLayout(moduleForm);
 
         Form moduleRefForm = Form.create(this, REFERENCE, "Salesforce Module");
-        moduleRefForm.addChild(widget(moduleName).setRow(1).setWidgetType(Widget.WidgetType.NAME_SELECTION_REFERENCE));
-        moduleRefForm.addChild(widget(schema.getForm(SchemaProperties.REFERENCE)).setRow(2));
+        moduleRefForm.addRow(widget(moduleName).setWidgetType(Widget.WidgetType.NAME_SELECTION_REFERENCE));
+
+        moduleRefForm.addRow(schema.getForm(SchemaProperties.REFERENCE));
         refreshLayout(moduleRefForm);
     }
 

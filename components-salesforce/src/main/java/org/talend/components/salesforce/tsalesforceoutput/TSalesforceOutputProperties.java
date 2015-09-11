@@ -82,22 +82,22 @@ public class TSalesforceOutputProperties extends ComponentProperties {
     @Override
     public void setupLayout() {
         Form mainForm = Form.create(this, MAIN, "Salesforce Output");
-        mainForm.addChild(widget(connection.getForm(SalesforceConnectionProperties.MAIN)).setRow(1));
-        mainForm.addChild(widget(module.getForm(SalesforceModuleProperties.REFERENCE)).setRow(2));
-        mainForm.addChild(widget(schema.getForm(SchemaProperties.REFERENCE)).setRow(3));
-        mainForm.addChild(widget(outputAction).setRow(4));
+        mainForm.addRow(connection.getForm(SalesforceConnectionProperties.MAIN));
+        mainForm.addRow(module.getForm(SalesforceModuleProperties.REFERENCE));
+        mainForm.addRow(schema.getForm(SchemaProperties.REFERENCE));
+        mainForm.addRow(outputAction);
         refreshLayout(mainForm);
 
         Form advancedForm = Form.create(this, ADVANCED, "Advanced");
-        mainForm.addChild(widget(extendInsert).setRow(1));
-        mainForm.addChild(widget(ceaseForError).setRow(2));
-        mainForm.addChild(widget(ignoreNull).setRow(3));
-        mainForm.addChild(widget(commitLevel).setRow(4));
-        mainForm.addChild(widget(logFileName).setRow(5));
-        mainForm.addChild(widget(retrieveInsertId).setRow(5));
+        mainForm.addRow(extendInsert);
+        mainForm.addRow(ceaseForError);
+        mainForm.addRow(ignoreNull);
+        mainForm.addRow(commitLevel);
+        mainForm.addRow(logFileName);
+        mainForm.addColumn(retrieveInsertId);
         // FIXME - how is this labeled. Should we wrap this in a Property object?
-        mainForm.addChild(widget(schemaFlow.getForm(SchemaProperties.REFERENCE)).setRow(5));
-        mainForm.addChild(widget(schemaReject.getForm(SchemaProperties.REFERENCE)).setRow(5));
+        mainForm.addRow(schemaFlow.getForm(SchemaProperties.REFERENCE));
+        mainForm.addRow(schemaReject.getForm(SchemaProperties.REFERENCE));
         refreshLayout(mainForm);
     }
 

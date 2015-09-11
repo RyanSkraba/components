@@ -38,8 +38,8 @@ public class UserPasswordProperties extends ComponentProperties {
     protected void setupLayout() {
         super.setupLayout();
         Form form = Form.create(this, USERPASSWORD, "User Password");
-        form.addChild(widget(userId).setRow(1));
-        form.addChild(widget(password).setRow(2));
+        form.addRow(userId);
+        form.addRow(password);
     }
 
 }

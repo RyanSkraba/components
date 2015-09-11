@@ -39,8 +39,8 @@ public class TSalesforceInputProperties extends ComponentProperties {
     @Override
     public void setupLayout() {
         Form mainForm = Form.create(this, MAIN, "Salesforce Input");
-        mainForm.addChild(widget(connection.getForm(SalesforceConnectionProperties.MAIN)).setRow(1));
-        mainForm.addChild(widget(module.getForm(SalesforceModuleProperties.REFERENCE)).setRow(2));
-        mainForm.addChild(widget(schema.getForm(SchemaProperties.REFERENCE)).setRow(3));
+        mainForm.addRow(connection.getForm(SalesforceConnectionProperties.MAIN));
+        mainForm.addRow(module.getForm(SalesforceModuleProperties.REFERENCE));
+        mainForm.addRow(schema.getForm(SchemaProperties.REFERENCE));
     }
 }
