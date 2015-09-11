@@ -65,7 +65,16 @@ public abstract class ComponentProperties {
     }
 
     public Form getForm(String formName) {
-        return internal.getForm(formName);
+        return internal.getForm(setupFormName(formName));
+    }
+
+    public String getSimpleClassName() {
+        return getClass().getSimpleName();
+    }
+
+    // Qualify the formName by this class for debugging/testing
+    public String setupFormName(String formName) {
+        return getSimpleClassName() + formName;
     }
 
     public void addForm(Form form) {

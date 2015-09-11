@@ -29,7 +29,7 @@ public class ProxyProperties extends ComponentProperties {
     public static final String    PROXY        = "Proxy";
 
     public ProxyProperties() {
-        Form form = new Form(this, PROXY, "Proxy Parameters");
+        Form form = Form.create(this, PROXY, "Proxy Parameters");
         form.addChild(widget(useProxy).setRow(1));
         form.addChild(widget(host).setRow(2));
         form.addChild(widget(userPassword.getForm(UserPasswordProperties.USERPASSWORD)).setRow(3));

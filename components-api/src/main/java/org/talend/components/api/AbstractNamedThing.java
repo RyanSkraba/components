@@ -16,13 +16,15 @@ import org.talend.components.api.properties.PresentationItem;
 import org.talend.components.api.properties.Property;
 
 /**
- * Superclass for {@link Property} and {@link PresentationItem}.
+ * Something that is named.
  */
 public class AbstractNamedThing implements NamedThing {
 
     private String name;
 
     private String displayName;
+
+    private String title;
 
     public AbstractNamedThing() {
     }
@@ -31,6 +33,11 @@ public class AbstractNamedThing implements NamedThing {
         this();
         this.name = name;
         this.displayName = displayName;
+    }
+
+    public AbstractNamedThing(String name, String displayName, String title) {
+        this(name, displayName);
+        this.title = title;
     }
 
     @Override
@@ -43,4 +50,8 @@ public class AbstractNamedThing implements NamedThing {
         return this.displayName;
     }
 
+    @Override
+    public String getTitle() {
+        return title;
+    }
 }

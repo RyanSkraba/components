@@ -100,8 +100,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         connectionForm.addChild(widget(url).setRow(5));
 
         connectionForm.addChild(widget(advanced).setRow(6).setOrder(1).setWidgetType(WidgetType.BUTTON));
-        connectionForm.addChild(
-                widget(testConnection).setRow(6).setOrder(2).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
+        connectionForm.addChild(widget(testConnection).setRow(6).setOrder(2).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
         refreshLayout(connectionForm);
 
         Form advancedForm = Form.create(this, ADVANCED, "Advanced Connection Settings");
@@ -131,12 +130,12 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         if (form.getName().equals(MAIN)) {
             switch (loginType.getValue()) {
             case OAUTH:
-                form.getWidget(OauthProperties.OAUTH).setVisible(true);
-                form.getWidget(UserPasswordProperties.USERPASSWORD).setVisible(false);
+                form.getWidget(setupFormName(OauthProperties.OAUTH)).setVisible(true);
+                form.getWidget(setupFormName(UserPasswordProperties.USERPASSWORD)).setVisible(false);
                 break;
             case BASIC:
-                form.getWidget(OauthProperties.OAUTH).setVisible(false);
-                form.getWidget(UserPasswordProperties.USERPASSWORD).setVisible(true);
+                form.getWidget(setupFormName(OauthProperties.OAUTH)).setVisible(false);
+                form.getWidget(setupFormName(UserPasswordProperties.USERPASSWORD)).setVisible(true);
                 break;
             default:
                 throw new RuntimeException("Enum value should be handled :" + loginType.getValue());

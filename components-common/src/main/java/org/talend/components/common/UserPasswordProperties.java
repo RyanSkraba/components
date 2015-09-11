@@ -37,7 +37,7 @@ public class UserPasswordProperties extends ComponentProperties {
     @Override
     protected void setupLayout() {
         super.setupLayout();
-        Form form = new Form(this, USERPASSWORD, "User Password");
+        Form form = Form.create(this, USERPASSWORD, "User Password");
         form.addChild(widget(userId).setRow(1));
         form.addChild(widget(password).setRow(2));
     }

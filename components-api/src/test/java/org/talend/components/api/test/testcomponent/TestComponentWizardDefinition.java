@@ -44,7 +44,12 @@ public class TestComponentWizardDefinition implements ComponentWizardDefinition 
 
     @Override
     public String getDisplayName() {
-        return " A Name To Be Displayed";
+        return " DisplayName";
+    }
+
+    @Override
+    public String getTitle() {
+        return "The title";
     }
 
 }

@@ -19,6 +19,7 @@ import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.schema.ComponentSchemaElement;
+import org.talend.components.api.schema.ComponentSchemaFactory;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 
@@ -50,6 +51,16 @@ public class SchemaProperties extends ComponentProperties {
         Form schemaRefForm = Form.create(this, REFERENCE, "Schema");
         schemaRefForm.addChild(widget(schema).setRow(2).setWidgetType(Widget.WidgetType.SCHEMA_REFERENCE));
         refreshLayout(schemaRefForm);
+    }
+
+    public ComponentSchemaElement addRow(ComponentSchemaElement row) {
+        ComponentSchemaElement root = schema.getValue();
+        if (root == null) {
+            root = ComponentSchemaFactory.getComponentSchemaElement("Root");
+            schema.setValue(root);
+        }
+        root.addChild(row);
+        return row;
     }
 
 }

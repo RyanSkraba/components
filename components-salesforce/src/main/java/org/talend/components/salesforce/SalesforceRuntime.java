@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.talend.components.api.ComponentRuntime;
 import org.talend.components.api.schema.ComponentSchemaElement;
+import org.talend.components.api.schema.ComponentSchemaFactory;
 
 import com.sforce.async.BulkConnection;
 import com.sforce.soap.partner.*;
@@ -86,18 +87,15 @@ public class SalesforceRuntime extends ComponentRuntime {
     }
 
     public ComponentSchemaElement getSchema(String module) throws ConnectionException {
-        ComponentSchemaElement root = getComponentSchemaElement();
-        root.setName("Root");
+        ComponentSchemaElement root = ComponentSchemaFactory.getComponentSchemaElement("Root");
         List<ComponentSchemaElement> children = new ArrayList<ComponentSchemaElement>();
 
         DescribeSObjectResult[] describeSObjectResults = connection.describeSObjects(new String[] { module });
         Field fields[] = describeSObjectResults[0].getFields();
         for (Field field : fields) {
-            ComponentSchemaElement child = getComponentSchemaElement();
-            child.setName(field.getName());
-            children.add(child);
+            ComponentSchemaElement child = ComponentSchemaFactory.getComponentSchemaElement(field.getName());
+            root.addChild(child);
         }
-        root.setChildren(children);
         return root;
     }
 

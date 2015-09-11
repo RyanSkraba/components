@@ -33,4 +33,6 @@ public interface ComponentSchemaElement {
 
     public void setChildren(List<ComponentSchemaElement> children);
 
+    public void addChild(ComponentSchemaElement child);
+
 }

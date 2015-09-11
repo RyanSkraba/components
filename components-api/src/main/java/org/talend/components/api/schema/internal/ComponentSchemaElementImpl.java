@@ -9,6 +9,16 @@ import org.talend.components.api.schema.ComponentSchemaElement;
  */
 public class ComponentSchemaElementImpl implements ComponentSchemaElement {
 
+    public ComponentSchemaElementImpl() {
+        setType(Type.STRING);
+        setSize(-1);
+    }
+
+    public ComponentSchemaElementImpl(String name) {
+        this();
+        setName(name);
+    }
+
     public String                          name;
 
     public String                          description;
@@ -49,6 +59,12 @@ public class ComponentSchemaElementImpl implements ComponentSchemaElement {
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public boolean isSizeUnbounded() {
+        if (size == -1)
+            return true;
+        return false;
     }
 
     public List<ComponentSchemaElement> getChildren() {

@@ -12,7 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceinput;
 
+import static org.talend.components.api.properties.presentation.Widget.widget;
+
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceModuleProperties;
@@ -29,10 +32,15 @@ public class TSalesforceInputProperties extends ComponentProperties {
         setupLayout();
     }
 
+    public static final String MAIN     = "Main";
+
+    public static final String ADVANCED = "Advanced";
+
     @Override
     public void setupLayout() {
-        addForm(connection.getForm(SalesforceConnectionProperties.MAIN));
-        addForm(module.getForm(SalesforceModuleProperties.REFERENCE));
-        addForm(schema.getForm(SchemaProperties.REFERENCE));
+        Form mainForm = Form.create(this, MAIN, "Salesforce Input");
+        mainForm.addChild(widget(connection.getForm(SalesforceConnectionProperties.MAIN)).setRow(1));
+        mainForm.addChild(widget(module.getForm(SalesforceModuleProperties.REFERENCE)).setRow(2));
+        mainForm.addChild(widget(schema.getForm(SchemaProperties.REFERENCE)).setRow(3));
     }
 }

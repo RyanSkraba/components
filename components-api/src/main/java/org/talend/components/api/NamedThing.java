@@ -13,23 +13,30 @@
 package org.talend.components.api;
 
 /**
- * created by sgandon on 9 sept. 2015 Detailled comment
+ * Something that has a name.
  *
  */
 public interface NamedThing {
 
     /**
-     * This is a techinical name that shall be unique to identify the thing
+     * This is a technical name that shall be unique to identify the thing
      * 
      * @return a technical name
      */
     String getName();
 
     /**
-     * This is the name that will be displayed to the user, this may be internationnalized.
+     * This is the name that will be displayed to the user, this may be internationalized.
      * 
      * @return the name to be displayed to the user.
      */
     String getDisplayName();
+
+    /**
+     * A multiword title that describes the thing.
+     *
+     * @return the title
+     */
+    String getTitle();
 
 }

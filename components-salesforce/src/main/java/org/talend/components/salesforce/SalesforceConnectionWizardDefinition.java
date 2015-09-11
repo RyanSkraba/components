@@ -36,4 +36,9 @@ public class SalesforceConnectionWizardDefinition implements ComponentWizardDefi
     public String getDisplayName() {
         return "Salesforce";
     }
+
+    @Override
+    public String getTitle() {
+        return "Salesforce Connection";
+    }
 }

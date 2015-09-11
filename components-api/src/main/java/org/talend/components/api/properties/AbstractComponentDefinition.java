@@ -17,4 +17,13 @@ public abstract class AbstractComponentDefinition implements ComponentDefinition
         return connectors;
     }
 
+    // FIXME - this should get it from the message file - temporary implementation
+    public String getDisplayName() {
+        return getName();
+    }
+
+    // FIXME this should get it from the message file - temporary implementation
+    public String getTitle() {
+        return "Title: " + getName();
+    }
 }

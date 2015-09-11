@@ -39,8 +39,8 @@ public class Form extends AbstractNamedThing {
      */
     protected boolean                         refreshUI;
 
-    public Form(ComponentProperties props, String name, String displayName) {
-        super(name, displayName);
+    public Form(ComponentProperties props, String name, String displayName, String title) {
+        super(name, displayName, title);
         children = new HashMap<String, AbstractNamedThing>();
         widgetMap = new HashMap<String, Widget>();
         widgets = new ArrayList<Widget>();
@@ -48,8 +48,8 @@ public class Form extends AbstractNamedThing {
         properties = props;
     }
 
-    public static Form create(ComponentProperties props, String name, String displayName) {
-        return new Form(props, name, displayName);
+    public static Form create(ComponentProperties props, String name, String title) {
+        return new Form(props, props.setupFormName(name), name, title);
     }
 
     public Collection<AbstractNamedThing> getChildren() {
