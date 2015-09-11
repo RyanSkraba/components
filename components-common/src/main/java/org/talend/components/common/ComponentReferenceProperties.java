@@ -56,7 +56,7 @@ public class ComponentReferenceProperties extends ComponentProperties {
         super.setupLayout();
 
         Form reference = Form.create(this, REFERENCE, "Component");
-        reference.addChild(widget(referenceType, componentType, componentInstanceId).setRow(1).setWidgetType(
+        reference.addRow(widget(referenceType, componentType, componentInstanceId).setWidgetType(
                 Widget.WidgetType.COMPONENT_REFERENCE));
         refreshLayout(reference);
     }

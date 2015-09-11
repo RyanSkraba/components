@@ -28,8 +28,7 @@ public class TestComponentProperties extends ComponentProperties {
 
     public TestComponentProperties() {
         Form form = Form.create(this, TESTCOMPONENT, "Test Component");
-        form.addChild(widget(userId).setRow(1));
-        form.addChild(widget(password).setRow(2));
-
+        form.addRow(userId);
+        form.addRow(password);
     }
 }

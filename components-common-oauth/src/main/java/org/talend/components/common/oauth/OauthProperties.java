@@ -39,11 +39,14 @@ public class OauthProperties extends ComponentProperties {
     @Override
     protected void setupLayout() {
         super.setupLayout();
+        
         Form form = Form.create(this, OAUTH, "OAuth Parameters");
-        form.addChild(widget(clientId).setRow(1).setOrder(1));
-        form.addChild(widget(clientSecret).setRow(1).setOrder(2));
-        form.addChild(widget(callbackHost).setRow(2).setOrder(1));
-        form.addChild(widget(callbackPort).setRow(2).setOrder(2));
-        form.addChild(widget(tokenFile).setRow(3));
+        form.addRow(clientId);
+        form.addColumn(clientSecret);
+
+        form.addRow(callbackHost);
+        form.addColumn(callbackPort);
+
+        form.addRow(tokenFile);
     }
 }

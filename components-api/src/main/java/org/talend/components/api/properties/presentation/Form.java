@@ -33,6 +33,10 @@ public class Form extends AbstractNamedThing {
 
     protected List<Widget>                    widgets;
 
+    private int                               currentRow;
+
+    private int                               currentColumn;
+
     /**
      * Indicate that some {@link Widget} objects for this form have changed and the UI should be re-rendered to reflect
      * the changed widget.
@@ -69,19 +73,47 @@ public class Form extends AbstractNamedThing {
         return widgets;
     }
 
-    public Form addChild(AbstractNamedThing child) {
-        addChild(Widget.widget(child));
+    public Form addRow(AbstractNamedThing child) {
+        addRow(Widget.widget(child));
         return this;
     }
 
-    public Form addChild(Widget widget) {
-        widgets.add(widget);
+    public Form addColumn(AbstractNamedThing child) {
+        addColumn(Widget.widget(child));
+        return this;
+    }
+
+    /**
+     * Add the widget in the next row and first column, it's relative, only forward and step always is 1.
+     * 
+     * @param widget
+     * @return
+     */
+    public Form addRow(Widget widget) {
+        currentColumn = 1;
+        widgets.add(widget.setRow(++currentRow).setOrder(currentColumn));
+        fill(widget);
+        return this;
+    }
+
+    /**
+     * Add the widget in the next column of current row, it's relative, only forward and step always is 1.
+     * 
+     * @param widget
+     * @return
+     */
+    public Form addColumn(Widget widget) {
+        widgets.add(widget.setRow(currentRow).setOrder(++currentColumn));
+        fill(widget);
+        return this;
+    }
+
+    private void fill(Widget widget) {
         for (AbstractNamedThing child : widget.getProperties()) {
             widgetMap.put(child.getName(), widget);
             children.put(child.getName(), child);
             properties.setLayoutMethods(child.getName(), widget);
         }
-        return this;
     }
 
     public Widget getWidget(String child) {

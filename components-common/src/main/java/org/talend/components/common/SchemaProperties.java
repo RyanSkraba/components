@@ -45,11 +45,11 @@ public class SchemaProperties extends ComponentProperties {
         super.setupLayout();
 
         Form schemaForm = Form.create(this, MAIN, "Schema");
-        schemaForm.addChild(widget(schema).setRow(2).setWidgetType(Widget.WidgetType.SCHEMA_EDITOR));
+        schemaForm.addRow(widget(schema).setWidgetType(Widget.WidgetType.SCHEMA_EDITOR));
         refreshLayout(schemaForm);
 
         Form schemaRefForm = Form.create(this, REFERENCE, "Schema");
-        schemaRefForm.addChild(widget(schema).setRow(2).setWidgetType(Widget.WidgetType.SCHEMA_REFERENCE));
+        schemaRefForm.addRow(widget(schema).setWidgetType(Widget.WidgetType.SCHEMA_REFERENCE));
         refreshLayout(schemaRefForm);
     }
 
