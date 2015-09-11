@@ -127,15 +127,15 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        if (form.getName().equals(MAIN)) {
+        if (form.getName().equals(setupFormName(MAIN))) {
             switch (loginType.getValue()) {
             case OAUTH:
-                form.getWidget(setupFormName(OauthProperties.OAUTH)).setVisible(true);
-                form.getWidget(setupFormName(UserPasswordProperties.USERPASSWORD)).setVisible(false);
+                form.getWidget(oauth.setupFormName(OauthProperties.OAUTH)).setVisible(true);
+                form.getWidget(userPassword.setupFormName(UserPasswordProperties.USERPASSWORD)).setVisible(false);
                 break;
             case BASIC:
-                form.getWidget(setupFormName(OauthProperties.OAUTH)).setVisible(false);
-                form.getWidget(setupFormName(UserPasswordProperties.USERPASSWORD)).setVisible(true);
+                form.getWidget(oauth.setupFormName(OauthProperties.OAUTH)).setVisible(false);
+                form.getWidget(userPassword.setupFormName(UserPasswordProperties.USERPASSWORD)).setVisible(true);
                 break;
             default:
                 throw new RuntimeException("Enum value should be handled :" + loginType.getValue());

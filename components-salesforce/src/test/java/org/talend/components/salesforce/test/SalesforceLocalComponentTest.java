@@ -95,17 +95,14 @@ public class SalesforceLocalComponentTest extends TestCase {
     @Test
     public void testAfterLoginType() throws Throwable {
         SalesforceConnectionProperties props;
-        // FIXME - restore this test
-        /*
 
         props = (SalesforceConnectionProperties) componentService
                 .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
         assertEquals(SalesforceConnectionProperties.LoginType.BASIC, props.loginType.getValue());
         Form mainForm = props.getForm(TSalesforceConnectProperties.MAIN);
-        String userPassFormName = props.userPassword.getSimpleClassName()
-                + UserPasswordProperties.USERPASSWORD;
+        String userPassFormName = props.userPassword.setupFormName(UserPasswordProperties.USERPASSWORD);
         assertTrue(mainForm.getWidget(userPassFormName).isVisible());
-        String oauthFormName = props.oauth.getSimpleClassName() + OauthProperties.OAUTH;
+        String oauthFormName = props.oauth.setupFormName(OauthProperties.OAUTH);
         assertFalse(mainForm.getWidget(oauthFormName).isVisible());
 
         props.loginType.setValue(SalesforceConnectionProperties.LoginType.OAUTH);
@@ -115,7 +112,6 @@ public class SalesforceLocalComponentTest extends TestCase {
 
         assertFalse(mainForm.getWidget(userPassFormName).isVisible());
         assertTrue(mainForm.getWidget(oauthFormName).isVisible());
-        */
     }
 
     private SalesforceConnectionProperties setupProps(SalesforceConnectionProperties props) {
