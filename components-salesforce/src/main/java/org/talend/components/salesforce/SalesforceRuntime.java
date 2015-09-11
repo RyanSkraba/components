@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentEnvironmentContext;
 import org.talend.components.api.runtime.ComponentRuntime;
@@ -23,12 +25,14 @@ import org.talend.components.api.runtime.ComponentRuntimeContext;
 import org.talend.components.api.schema.ComponentSchema;
 import org.talend.components.api.schema.ComponentSchemaElement;
 import org.talend.components.api.schema.ComponentSchemaFactory;
+import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 
+import com.sforce.async.AsyncApiException;
 import com.sforce.async.BulkConnection;
 import com.sforce.soap.partner.*;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
-import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
+import com.sforce.ws.SessionRenewer;
 
 public class SalesforceRuntime extends ComponentRuntime {
 
@@ -36,12 +40,54 @@ public class SalesforceRuntime extends ComponentRuntime {
 
     BulkConnection    bulkConnection;
 
-    public void connect(SalesforceConnectionProperties properties) throws Exception {
+    protected void connectBulk(SalesforceConnectionProperties properties, ConnectorConfig config) throws AsyncApiException {
+        // When PartnerConnection is instantiated, a login is implicitly
+        // executed and, if successful,
+        // a valid session is stored in the ConnectorConfig instance.
+        // Use this key to initialize a BulkConnection:
+        ConnectorConfig bulkConfig = new ConnectorConfig();
+        bulkConfig.setSessionId(config.getSessionId());
+        // The endpoint for the Bulk API service is the same as for the normal
+        // SOAP uri until the /Soap/ part. From here it's '/async/versionNumber'
+        String soapEndpoint = config.getServiceEndpoint();
+        // FIXME - fix hardcoded version
+        String apiVersion = "34.0";
+        String restEndpoint = soapEndpoint.substring(0, soapEndpoint.indexOf("Soap/")) + "async/" + apiVersion;
+        bulkConfig.setRestEndpoint(restEndpoint);
+        // This should only be false when doing debugging.
+        bulkConfig.setCompression(true);
+        // Set this to true to see HTTP requests and responses on stdout
+        bulkConfig.setTraceMessage(false);
+        bulkConnection = new BulkConnection(bulkConfig);
+    }
+
+    public void connect(final SalesforceConnectionProperties properties) throws Exception {
 
         ConnectorConfig config = new ConnectorConfig();
         config.setUsername(properties.userPassword.userId.getValue());
         config.setPassword(properties.userPassword.password.getValue());
         config.setAuthEndpoint(properties.url.getValue());
+        config.setSessionRenewer(new SessionRenewer() {
+
+            @Override
+            public SessionRenewalHeader renewSession(ConnectorConfig connectorConfig) throws ConnectionException {
+                SessionRenewalHeader header = new SessionRenewalHeader();
+                connection = new PartnerConnection(connectorConfig);
+                if (properties.bulkConnection.getValue() != null && properties.bulkConnection.getValue()) {
+                    try {
+                        connectBulk(properties, connectorConfig);
+                    } catch (AsyncApiException e) {
+                        // FIXME
+                        e.printStackTrace();
+                    }
+                }
+                SessionHeader_element h = connection.getSessionHeader();
+                // FIXME - need to get the right urn
+                header.name = new QName("FIXME", "X-SFDC-Session");
+                header.headerElement = h.getSessionId();
+                return header;
+            }
+        });
 
         if (properties.timeout.getValue() > 0) {
             config.setConnectionTimeout(properties.timeout.getValue());
@@ -54,26 +100,9 @@ public class SalesforceRuntime extends ComponentRuntime {
 
         connection = new PartnerConnection(config);
 
-        // FIXME - awkward
+        // FIXME - awkward (just this line for checking the boolean value)
         if (properties.bulkConnection.getValue() != null && properties.bulkConnection.getValue()) {
-            // When PartnerConnection is instantiated, a login is implicitly
-            // executed and, if successful,
-            // a valid session is stored in the ConnectorConfig instance.
-            // Use this key to initialize a BulkConnection:
-            ConnectorConfig bulkConfig = new ConnectorConfig();
-            bulkConfig.setSessionId(config.getSessionId());
-            // The endpoint for the Bulk API service is the same as for the normal
-            // SOAP uri until the /Soap/ part. From here it's '/async/versionNumber'
-            String soapEndpoint = config.getServiceEndpoint();
-            // FIXME - fix hardcoded version
-            String apiVersion = "34.0";
-            String restEndpoint = soapEndpoint.substring(0, soapEndpoint.indexOf("Soap/")) + "async/" + apiVersion;
-            bulkConfig.setRestEndpoint(restEndpoint);
-            // This should only be false when doing debugging.
-            bulkConfig.setCompression(true);
-            // Set this to true to see HTTP requests and responses on stdout
-            bulkConfig.setTraceMessage(false);
-            bulkConnection = new BulkConnection(bulkConfig);
+            connectBulk(properties, config);
         }
 
         System.out.println("Connection: " + connection);
@@ -111,10 +140,7 @@ public class SalesforceRuntime extends ComponentRuntime {
     public ComponentRuntimeContext outputBegin(ComponentProperties props, ComponentEnvironmentContext env) {
         TSalesforceOutputProperties sprops = (TSalesforceOutputProperties) props;
 
-        SalesforceRuntimeContext context =  new SalesforceRuntimeContext();
-
-
-
+        SalesforceRuntimeContext context = new SalesforceRuntimeContext();
 
         return context;
     }
