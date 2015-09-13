@@ -75,6 +75,10 @@ public class SalesforceRuntime extends ComponentRuntime {
         config.setUsername(properties.userPassword.userId.getValue());
         config.setPassword(properties.userPassword.password.getValue());
         config.setAuthEndpoint(properties.url.getValue());
+
+// Notes on how to test this
+// http://thysmichels.com/2014/02/15/salesforce-wsc-partner-connection-session-renew-when-session-timeout/
+
         config.setSessionRenewer(new SessionRenewer() {
             @Override
             public SessionRenewalHeader renewSession(ConnectorConfig connectorConfig) throws ConnectionException {
@@ -88,7 +92,7 @@ public class SalesforceRuntime extends ComponentRuntime {
 
                 SessionHeader_element h = connection.getSessionHeader();
                 // FIXME - one or the other, I have seen both
-                header.name = new QName("urn:partner.soap.sforce.com", "X-SFDC-Session");
+                //header.name = new QName("urn:partner.soap.sforce.com", "X-SFDC-Session");
                 header.name = new QName("urn:partner.soap.sforce.com", "SessionHeader");
                 header.headerElement = h.getSessionId();
                 return header;
