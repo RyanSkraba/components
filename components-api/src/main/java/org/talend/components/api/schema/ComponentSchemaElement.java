@@ -11,6 +11,7 @@ public interface ComponentSchemaElement {
         STRING,
         INT,
         DATE,
+        BYTE_ARRAY,
         DYNAMIC
     }
 
