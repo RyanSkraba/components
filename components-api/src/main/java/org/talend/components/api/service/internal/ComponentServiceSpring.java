@@ -20,17 +20,25 @@ import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
+import org.talend.daikon.exception.error.CommonErrorCodes;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -45,6 +53,8 @@ import com.wordnik.swagger.annotations.ApiParam;
 @Api(value = "components", basePath = ComponentServiceSpring.BASE_PATH, description = "Component services")
 @Service
 public class ComponentServiceSpring implements ComponentService {
+
+    private static final Logger LOGGER    = LoggerFactory.getLogger(ComponentServiceSpring.class);
 
     static final String      BASE_PATH = "/components"; //$NON-NLS-1$
 
@@ -67,7 +77,8 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
-    @RequestMapping(value = BASE_PATH + "/properties/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = BASE_PATH
+            + "/properties/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ComponentProperties getComponentProperties(
             @PathVariable(value = "name") @ApiParam(name = "name", value = "Name of the component") String name) {
         return componentServiceDelegate.getComponentProperties(name);
@@ -82,7 +93,8 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
-    @RequestMapping(value = BASE_PATH + "/properties/validate/{propName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = BASE_PATH
+            + "/properties/validate/{propName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ComponentProperties validateProperty(
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
             @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
@@ -92,7 +104,8 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
-    @RequestMapping(value = BASE_PATH + "/properties/before/{propName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = BASE_PATH
+            + "/properties/before/{propName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ComponentProperties beforeProperty(
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
             @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
@@ -102,7 +115,8 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
-    @RequestMapping(value = BASE_PATH + "/properties/after/{propName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = BASE_PATH
+            + "/properties/after/{propName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ComponentProperties afterProperty(
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
             @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
@@ -123,7 +137,8 @@ public class ComponentServiceSpring implements ComponentService {
         return componentServiceDelegate.getAllComponents();
     }
 
-    @RequestMapping(value = BASE_PATH + "/wizards/definitions", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = BASE_PATH
+            + "/wizards/definitions", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
     public Set<ComponentWizardDefinition> getTopLevelComponentWizards() {
         return componentServiceDelegate.getTopLevelComponentWizards();
@@ -139,10 +154,33 @@ public class ComponentServiceSpring implements ComponentService {
     @ApiOperation(value = "Return the icon related to the wizard", notes = "return the png image related to the wizard parameter.")
     public void getWizardImageRest(@PathVariable(value = "name") @ApiParam(name = "name", value = "Name of wizard") String name,
             final HttpServletResponse response) {
+        InputStream wizardPngImageStream = getWizardPngImage(name);
+        sendStreamBack(response, wizardPngImageStream);
+    }
+
+    /**
+     * DOC sgandon Comment method "sendStreamBack".
+     * 
+     * @param response
+     * @param inputStream
+     * @throws IOException
+     */
+    private void sendStreamBack(final HttpServletResponse response, InputStream inputStream) {
         try {
-            IOUtils.copy(getWizardPngImage(name), response.getOutputStream());
+            if (inputStream != null) {
+                try {
+                    IOUtils.copy(inputStream, response.getOutputStream());
         } catch (IOException e) {
-            throw new ComponentException(e);
+                    throw new ComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
+                } finally {
+                    inputStream.close();
+                }
+            } else {// could not get icon so respond a resource_not_found : 404
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            }
+        } catch (IOException e) {// is sendError fails or inputstream fails when closing
+            LOGGER.error("sendError failed or inputstream failed when closing.", e); //$NON-NLS-1$
+            throw new ComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
         }
     }
 
@@ -157,10 +195,7 @@ public class ComponentServiceSpring implements ComponentService {
     public void getComponentsImageRest(
             @PathVariable(value = "name") @ApiParam(name = "name", value = "Name of Component") String name,
             final HttpServletResponse response) {
-        try {
-            IOUtils.copy(getComponentPngImage(name), response.getOutputStream());
-        } catch (IOException e) {
-            throw new ComponentException(e);
-        }
+        InputStream componentPngImageStream = getComponentPngImage(name);
+        sendStreamBack(response, componentPngImageStream);
     }
 }

@@ -12,28 +12,30 @@
 // ============================================================================
 package org.talend.components.api.exception;
 
+import org.talend.daikon.exception.TalendExceptionContext;
+import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.exception.error.ErrorCode;
+
 /**
  * created by sgandon on 9 sept. 2015 Detailled comment
  *
  */
-public class ComponentException extends RuntimeException {
+public class ComponentException extends TalendRuntimeException {
 
-    /**
-     * DOC sgandon ComponentException constructor comment.
-     * 
-     * @param string
-     */
-    public ComponentException(String string) {
-        super(string);
+    public ComponentException(ErrorCode code) {
+        super(code);
     }
 
-    /**
-     * DOC sgandon ComponentException constructor comment.
-     * 
-     * @param e
-     */
-    public ComponentException(Exception e) {
-        super(e);
+    public ComponentException(ErrorCode code, Throwable cause) {
+        super(code, cause);
+    }
+
+    public ComponentException(ErrorCode code, TalendExceptionContext context) {
+        super(code, context);
+    }
+
+    public ComponentException(ErrorCode code, Throwable cause, TalendExceptionContext context) {
+        super(code, cause, context);
     }
 
     /**

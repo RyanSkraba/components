@@ -22,11 +22,13 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.Constants;
 import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.components.api.exception.error.ComponentsErrorCode;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
+import org.talend.daikon.exception.TalendExceptionContext;
 
 /**
  * Main Component Service implementation that is not related to any framework (neither OSGI, nor Spring) it uses a
@@ -68,8 +70,9 @@ public class ComponentServiceImpl implements ComponentService {
         final String beanName = Constants.COMPONENT_BEAN_PREFIX + name;
         ComponentDefinition compDef = componentRegistry.getComponents().get(beanName);
         if (compDef == null) {
-            throw new ComponentException("Failed to find the component [" + beanName + "], it may not be registered."); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+            throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME,
+                    TalendExceptionContext.build().put("name", name)); //$NON-NLS-1$
+        } // else got the def so use it
         ComponentProperties properties = compDef.createProperties();
         return properties;
     }
@@ -79,7 +82,7 @@ public class ComponentServiceImpl implements ComponentService {
         final String beanName = Constants.COMPONENT_WIZARD_BEAN_PREFIX + name;
         ComponentWizardDefinition wizardDefinition = componentRegistry.getComponentWizards().get(beanName);
         if (wizardDefinition == null) {
-            throw new ComponentException("Failed to find the wizard [" + beanName + "], it may not be registered."); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new ComponentException(ComponentsErrorCode.WRONG_WIZARD_NAME, TalendExceptionContext.build().put("name", name)); //$NON-NLS-1$
         }
         ComponentWizard wizard = wizardDefinition.createWizard(location);
         return wizard;
@@ -105,24 +108,26 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     public InputStream getWizardPngImage(String wizardName) {
-        TopLevelDefinition wizardDefinition = componentRegistry.getComponentWizards().get(
-                Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);
+        TopLevelDefinition wizardDefinition = componentRegistry.getComponentWizards()
+                .get(Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);
         if (wizardDefinition != null) {
             return getImageStream(wizardDefinition);
         } else {
-            throw new ComponentException("The Wizard with name [" + wizardName + "] does not exists."); //$NON-NLS-1$//$NON-NLS-2$
+            throw new ComponentException(ComponentsErrorCode.WRONG_WIZARD_NAME,
+                    TalendExceptionContext.build().put("name", wizardName)); //$NON-NLS-1$
         }
 
     }
 
     @Override
     public InputStream getComponentPngImage(String componentName) {
-        TopLevelDefinition componentDefinition = componentRegistry.getComponents().get(
-                Constants.COMPONENT_BEAN_PREFIX + componentName);
+        TopLevelDefinition componentDefinition = componentRegistry.getComponents()
+                .get(Constants.COMPONENT_BEAN_PREFIX + componentName);
         if (componentDefinition != null) {
             return getImageStream(componentDefinition);
         } else {
-            throw new ComponentException("The Component with name [" + componentName + "] does not exists."); //$NON-NLS-1$//$NON-NLS-2$
+            throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME,
+                    TalendExceptionContext.build().put("name", componentName)); //$NON-NLS-1$
         }
     }
 
@@ -130,7 +135,7 @@ public class ComponentServiceImpl implements ComponentService {
      * get the image stream or null
      * 
      * @param definition, must not be null
-     * @return
+     * @return the stream or null if no image was defined for th component or the path is wrong
      */
     private InputStream getImageStream(TopLevelDefinition definition) {
         InputStream result = null;
