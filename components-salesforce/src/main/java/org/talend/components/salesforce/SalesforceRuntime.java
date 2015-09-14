@@ -14,7 +14,12 @@ package org.talend.components.salesforce;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -24,19 +29,32 @@ import org.talend.components.api.runtime.ComponentRuntimeContainer;
 import org.talend.components.api.schema.ComponentSchema;
 import org.talend.components.api.schema.ComponentSchemaElement;
 import org.talend.components.api.schema.ComponentSchemaFactory;
+import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnection;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.BulkConnection;
-import com.sforce.soap.partner.*;
+import com.sforce.soap.partner.DeleteResult;
+import com.sforce.soap.partner.DescribeGlobalResult;
+import com.sforce.soap.partner.DescribeGlobalSObjectResult;
+import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Error;
+import com.sforce.soap.partner.Field;
+import com.sforce.soap.partner.GetDeletedResult;
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.QueryResult;
+import com.sforce.soap.partner.SaveResult;
+import com.sforce.soap.partner.SessionHeader_element;
+import com.sforce.soap.partner.UpsertResult;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 import com.sforce.ws.SessionRenewer;
 
 public class SalesforceRuntime extends ComponentRuntime {
+
+    private static final String                 API_VERSION = "34.0";
 
     private PartnerConnection                   connection;
 
@@ -126,8 +144,7 @@ public class SalesforceRuntime extends ComponentRuntime {
          */
         String soapEndpoint = config.getServiceEndpoint();
         // FIXME - fix hardcoded version
-        String apiVersion = "34.0";
-        String restEndpoint = soapEndpoint.substring(0, soapEndpoint.indexOf("Soap/")) + "async/" + apiVersion;
+        String restEndpoint = soapEndpoint.substring(0, soapEndpoint.indexOf("Soap/")) + "async/" + API_VERSION;
         bulkConfig.setRestEndpoint(restEndpoint);
         // This should only be false when doing debugging.
         bulkConfig.setCompression(true);
@@ -137,6 +154,14 @@ public class SalesforceRuntime extends ComponentRuntime {
 
     protected void doConnection(SalesforceConnectionProperties properties, ConnectorConfig config) throws AsyncApiException,
             ConnectionException {
+        if (SalesforceConnectionProperties.LoginType.OAUTH == properties.loginType.getValue()) {
+            new SalesforceOAuthConnection.Builder(properties.url.getValue(), properties.oauth.clientId.getValue(),
+                    properties.oauth.clientSecret.getValue(), API_VERSION)
+                    .setCallback(properties.oauth.callbackHost.getValue(), properties.oauth.callbackPort.getValue())
+                    .setTokenFilePath(properties.oauth.tokenFile.getValue()).build().login(config);
+        } else {
+            config.setAuthEndpoint(properties.url.getValue());
+        }
         connection = new PartnerConnection(config);
         if (properties.bulkConnection.isValueTrue()) {
             connectBulk(properties, config);
@@ -148,7 +173,6 @@ public class SalesforceRuntime extends ComponentRuntime {
         ConnectorConfig config = new ConnectorConfig();
         config.setUsername(properties.userPassword.userId.getValue());
         config.setPassword(properties.userPassword.password.getValue());
-        config.setAuthEndpoint(properties.url.getValue());
 
         // Notes on how to test this
         // http://thysmichels.com/2014/02/15/salesforce-wsc-partner-connection-session-renew-when-session-timeout/
@@ -159,6 +183,8 @@ public class SalesforceRuntime extends ComponentRuntime {
             public SessionRenewalHeader renewSession(ConnectorConfig connectorConfig) throws ConnectionException {
                 SessionRenewalHeader header = new SessionRenewalHeader();
                 try {
+                    // FIXME - session id need to be null for trigger the login?
+                    // connectorConfig.setSessionId(null);
                     doConnection(properties, connectorConfig);
                 } catch (AsyncApiException e) {
                     // FIXME
@@ -278,8 +304,9 @@ public class SalesforceRuntime extends ComponentRuntime {
             ComponentSchema schema = getSchema(sprops.module.moduleName.getValue());
 
             for (ComponentSchemaElement se : schema.getRoot().getChildren()) {
-                if (fieldMap.containsKey(se.getName()))
+                if (fieldMap.containsKey(se.getName())) {
                     continue;
+                }
                 filteredDynamicFields.add(se);
             }
             dynamicFieldList = filteredDynamicFields;
@@ -298,8 +325,9 @@ public class SalesforceRuntime extends ComponentRuntime {
             sb.append("select ");
             int count = 0;
             for (ComponentSchemaElement se : inputFieldsToUse) {
-                if (count++ > 0)
+                if (count++ > 0) {
                     sb.append(", ");
+                }
                 sb.append(se.getName());
             }
             sb.append(" from ");
@@ -357,8 +385,9 @@ public class SalesforceRuntime extends ComponentRuntime {
                     Object value = row.get(key);
                     if (value != null) {
                         ComponentSchemaElement se = fieldMap.get(key);
-                        if (se != null)
+                        if (se != null) {
                             addSObjectField(so, se, value);
+                        }
                     }
                 }
 
@@ -384,8 +413,9 @@ public class SalesforceRuntime extends ComponentRuntime {
                 }
             } else { // DELETE
                 String id = getIdValue(row);
-                if (id != null)
+                if (id != null) {
                     delete(id);
+                }
             }
         }
     }
@@ -403,8 +433,9 @@ public class SalesforceRuntime extends ComponentRuntime {
             }
         }
         // FIXME - error?
-        if (dynamicField == null)
+        if (dynamicField == null) {
             return null;
+        }
 
         Object dynamic = row.get(dynamicField.getName());
         ComponentSchemaElement[] dynamicSes = container.getDynamicElements(dynamic);
@@ -449,8 +480,9 @@ public class SalesforceRuntime extends ComponentRuntime {
     }
 
     public DeleteResult[] delete(String id) throws Exception {
-        if (id == null)
+        if (id == null) {
             return null;
+        }
         deleteItems.add(id);
         return doDelete();
     }
@@ -537,10 +569,11 @@ public class SalesforceRuntime extends ComponentRuntime {
             String[] changedItemKeys = new String[upds.length];
             for (int ix = 0; ix < upds.length; ++ix) {
                 Object value = upds[ix].getField(upsertKeyColumn);
-                if (value == null)
+                if (value == null) {
                     changedItemKeys[ix] = "No value for " + upsertKeyColumn + " ";
-                else
+                } else {
                     changedItemKeys[ix] = upsertKeyColumn;
+                }
             }
             UpsertResult[] upsertResults = connection.upsert(upsertKeyColumn, upds);
             upsertItems.clear();
