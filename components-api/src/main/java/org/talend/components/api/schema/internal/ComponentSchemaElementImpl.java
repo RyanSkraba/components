@@ -1,7 +1,9 @@
 package org.talend.components.api.schema.internal;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.talend.components.api.schema.ComponentSchemaElement;
 
@@ -19,13 +21,23 @@ public class ComponentSchemaElementImpl implements ComponentSchemaElement {
         setName(name);
     }
 
-    public String                          name;
+    private String                         name;
 
-    public String                          description;
+    private String                         description;
 
-    public Type                            type;
+    private Type                           type;
 
-    public int                             size;
+    private int                            size;
+
+    // Number of decimal places - DI
+    private int                            precision;
+
+    // Used for date conversion - DI
+    private String                         pattern;
+
+    private String                         defaultValue;
+
+    private boolean                        nullable;
 
     protected List<ComponentSchemaElement> children;
 
@@ -67,6 +79,38 @@ public class ComponentSchemaElementImpl implements ComponentSchemaElement {
         return false;
     }
 
+    public int getPrecision() {
+        return precision;
+    }
+
+    public void setPrecision(int precision) {
+        this.precision = precision;
+    }
+
+    public String getPattern() {
+        return pattern;
+    }
+
+    public void setPattern(String pattern) {
+        this.pattern = pattern;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    public boolean isNullable() {
+        return nullable;
+    }
+
+    public void setNullable(boolean nullable) {
+        this.nullable = nullable;
+    }
+
     public List<ComponentSchemaElement> getChildren() {
         return children;
     }
@@ -79,6 +123,14 @@ public class ComponentSchemaElementImpl implements ComponentSchemaElement {
         if (children == null)
             children = new ArrayList<ComponentSchemaElement>();
         children.add(child);
+    }
+
+    public Map<String, ComponentSchemaElement> getChildMap() {
+        Map<String, ComponentSchemaElement> map = new HashMap();
+        for (ComponentSchemaElement se : getChildren()) {
+            map.put(se.getName(), se);
+        }
+        return map;
     }
 
 }

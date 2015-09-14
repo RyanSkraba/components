@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.test;
 
-import java.util.Set;
+import java.util.*;
 
 import junit.framework.TestCase;
 
@@ -32,14 +32,13 @@ import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.common.oauth.OauthProperties;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
-import org.talend.components.salesforce.SalesforceConnectionWizard;
-import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
-import org.talend.components.salesforce.SalesforceModuleProperties;
+import org.talend.components.salesforce.*;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectDefinition;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
+import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
+import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -121,8 +120,15 @@ public class SalesforceLocalComponentTest extends TestCase {
                     .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
         }
         System.out.println("URI:" + props.url.getValue());
-        props.userPassword.userId.setValue("fupton@talend.com");
-        props.userPassword.password.setValue("talendsal99QSCzLBQgrkEq9w9EXiOt1BSy");
+
+        boolean inChina = true;
+        if (inChina) {
+            props.userPassword.userId.setValue("bchen2@talend.com");
+            props.userPassword.password.setValue("talend123sfYYBBe4aZN0TcDVDV7Ylzb6Ku");
+        } else {
+            props.userPassword.userId.setValue("fupton@talend.com");
+            props.userPassword.password.setValue("talendsal99QSCzLBQgrkEq9w9EXiOt1BSy");
+        }
         return props;
     }
 
@@ -149,7 +155,7 @@ public class SalesforceLocalComponentTest extends TestCase {
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
 
-        assertEquals(1, props.getForms().size());
+        assertEquals(2, props.getForms().size());
         Form f = props.module.getForm(SalesforceModuleProperties.REFERENCE);
         assertTrue(f.getWidget("moduleName").isCallBefore());
         // The Form is bound to a Properties object that created it. The Forms might not always be associated with the
@@ -181,6 +187,60 @@ public class SalesforceLocalComponentTest extends TestCase {
         }
         assertEquals("Id", schema.getRoot().getChildren().get(0).getName());
         assertTrue(schema.getRoot().getChildren().size() > 50);
+    }
+
+    @Test
+    public void testInput() throws Throwable {
+        TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
+                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
+        setupProps(props.connection);
+
+        Form f = props.module.getForm(SalesforceModuleProperties.REFERENCE);
+        SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
+        moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
+        moduleProps.moduleName.setValue("Account");
+        moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
+        ComponentSchema schema = moduleProps.schema.schema.getValue();
+
+        SalesforceRuntime runtime = new SalesforceRuntime();
+        runtime.connect(props.connection);
+
+        Map<String, Object> row = new HashMap();
+        List<Map<String, Object>> rows = new ArrayList();
+
+        if (false)
+            runtime.input(props, null, rows);
+
+        System.out.println(rows);
+    }
+
+    @Test
+    public void testOutput() throws Throwable {
+        TSalesforceOutputProperties props = (TSalesforceOutputProperties) componentService
+                .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
+        setupProps(props.connection);
+
+        Form f = props.module.getForm(SalesforceModuleProperties.REFERENCE);
+        SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
+        moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
+        moduleProps.moduleName.setValue("Account");
+        moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
+        ComponentSchema schema = moduleProps.schema.schema.getValue();
+        props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
+
+        SalesforceRuntime runtime = new SalesforceRuntime();
+        runtime.connect(props.connection);
+
+        Map<String, Object> row = new HashMap();
+        row.put("Name", "TestName");
+        row.put("BillingStreet", "123 Main Street");
+        row.put("BillingState", "CA");
+        List<Map<String, Object>> rows = new ArrayList();
+        rows.add(row);
+
+        // Don't run for now, even though it works, until we can clean this stuff up
+        if (false)
+            runtime.output(props, null, rows);
     }
 
 }

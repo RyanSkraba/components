@@ -16,4 +16,5 @@ public class ComponentSchemaImpl implements ComponentSchema {
     public void setRoot(ComponentSchemaElement root) {
         this.root = root;
     }
+
 }

@@ -46,7 +46,7 @@ public class TSalesforceOutputProperties extends ComponentProperties {
 
     public Property<Boolean>              retrieveInsertId = new Property<>("retrieveInsertId", "Retrieve Insert Id");
 
-    public Property<String>               commitLevel      = new Property<>("commitLevel", "Commit Level");
+    public Property<Integer>               commitLevel      = new Property<>("commitLevel", "Commit Level");
 
     // FIXME - should be file
     public Property<String>               logFileName      = new Property<>("logFileName", "Log File Name");
@@ -60,8 +60,6 @@ public class TSalesforceOutputProperties extends ComponentProperties {
     public SalesforceConnectionProperties connection       = new SalesforceConnectionProperties();
 
     public SalesforceModuleProperties     module           = new SalesforceModuleProperties(connection);
-
-    public SchemaProperties               schema           = new SchemaProperties();
 
     public SchemaProperties               schemaFlow       = new SchemaProperties();
 
@@ -84,7 +82,6 @@ public class TSalesforceOutputProperties extends ComponentProperties {
         Form mainForm = Form.create(this, MAIN, "Salesforce Output");
         mainForm.addRow(connection.getForm(SalesforceConnectionProperties.MAIN));
         mainForm.addRow(module.getForm(SalesforceModuleProperties.REFERENCE));
-        mainForm.addRow(schema.getForm(SchemaProperties.REFERENCE));
         mainForm.addRow(outputAction);
         refreshLayout(mainForm);
 
@@ -105,8 +102,8 @@ public class TSalesforceOutputProperties extends ComponentProperties {
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
-        schemaFlow.schema.getValue().getRoot().setChildren(null);
-        if (!extendInsert.getValue() && retrieveInsertId.getValue() != null && outputAction.getValue() == OutputAction.INSERT) {
+        schemaFlow.schema.getValue().setRoot(null);
+        if (!extendInsert.isValueTrue() && retrieveInsertId.getValue() != null && outputAction.getValue() == OutputAction.INSERT) {
             schemaFlow.addRow(ComponentSchemaFactory.getComponentSchemaElement("salesforce_id"));
         }
 

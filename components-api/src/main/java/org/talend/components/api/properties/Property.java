@@ -45,6 +45,12 @@ public class Property<T> extends AbstractNamedThing {
         return this.required;
     }
 
+    public boolean isValueTrue() {
+        if (value instanceof Boolean && ((Boolean)value))
+            return true;
+        return false;
+    }
+
     public T getValue() {
         return this.value;
     }

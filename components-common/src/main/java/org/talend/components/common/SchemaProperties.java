@@ -38,6 +38,7 @@ public class SchemaProperties extends ComponentProperties {
 
     public SchemaProperties() {
         super();
+        schema.setValue(ComponentSchemaFactory.getComponentSchema());
         setupLayout();
     }
 
