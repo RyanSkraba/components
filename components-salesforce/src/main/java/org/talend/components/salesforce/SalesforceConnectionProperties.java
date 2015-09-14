@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.properties.presentation.Widget.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.PresentationItem;
@@ -101,7 +101,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
         connectionForm.addRow(widget(advanced).setWidgetType(WidgetType.BUTTON));
         connectionForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
-        
+
         refreshLayout(connectionForm);
 
         Form advancedForm = Form.create(this, ADVANCED, "Advanced Connection Settings");
@@ -132,10 +132,12 @@ public class SalesforceConnectionProperties extends ComponentProperties {
             switch (loginType.getValue()) {
             case OAUTH:
                 form.getWidget(oauth.setupFormName(OauthProperties.OAUTH)).setVisible(true);
+                url.setValue("https://login.salesforce.com/services/oauth2");
                 form.getWidget(userPassword.setupFormName(UserPasswordProperties.USERPASSWORD)).setVisible(false);
                 break;
             case BASIC:
                 form.getWidget(oauth.setupFormName(OauthProperties.OAUTH)).setVisible(false);
+                url.setValue("https://www.salesforce.com/services/Soap/u/34.0");
                 form.getWidget(userPassword.setupFormName(UserPasswordProperties.USERPASSWORD)).setVisible(true);
                 break;
             default:
