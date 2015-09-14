@@ -224,8 +224,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
         moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
         moduleProps.moduleName.setValue("Account");
-        moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
-        ComponentSchema schema = moduleProps.schema.schema.getValue();
+        checkAndAfter(f, "moduleName", moduleProps);
         props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
 
         SalesforceRuntime runtime = new SalesforceRuntime();
@@ -239,7 +238,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         rows.add(row);
 
         // Don't run for now, even though it works, until we can clean this stuff up
-        if (false)
+        if (!false)
             runtime.output(props, null, rows);
     }
 
