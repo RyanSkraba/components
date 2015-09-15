@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.api.exception;
 
-import org.talend.daikon.exception.TalendExceptionContext;
+import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.ErrorCode;
 
@@ -30,11 +30,11 @@ public class ComponentException extends TalendRuntimeException {
         super(code, cause);
     }
 
-    public ComponentException(ErrorCode code, TalendExceptionContext context) {
+    public ComponentException(ErrorCode code, ExceptionContext context) {
         super(code, context);
     }
 
-    public ComponentException(ErrorCode code, Throwable cause, TalendExceptionContext context) {
+    public ComponentException(ErrorCode code, Throwable cause, ExceptionContext context) {
         super(code, cause, context);
     }
 

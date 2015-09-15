@@ -28,7 +28,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
-import org.talend.daikon.exception.TalendExceptionContext;
+import org.talend.daikon.exception.ExceptionContext;
 
 /**
  * Main Component Service implementation that is not related to any framework (neither OSGI, nor Spring) it uses a
@@ -71,7 +71,7 @@ public class ComponentServiceImpl implements ComponentService {
         ComponentDefinition compDef = componentRegistry.getComponents().get(beanName);
         if (compDef == null) {
             throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME,
-                    TalendExceptionContext.build().put("name", name)); //$NON-NLS-1$
+                    ExceptionContext.build().put("name", name)); //$NON-NLS-1$
         } // else got the def so use it
         ComponentProperties properties = compDef.createProperties();
         return properties;
@@ -82,7 +82,7 @@ public class ComponentServiceImpl implements ComponentService {
         final String beanName = Constants.COMPONENT_WIZARD_BEAN_PREFIX + name;
         ComponentWizardDefinition wizardDefinition = componentRegistry.getComponentWizards().get(beanName);
         if (wizardDefinition == null) {
-            throw new ComponentException(ComponentsErrorCode.WRONG_WIZARD_NAME, TalendExceptionContext.build().put("name", name)); //$NON-NLS-1$
+            throw new ComponentException(ComponentsErrorCode.WRONG_WIZARD_NAME, ExceptionContext.build().put("name", name)); //$NON-NLS-1$
         }
         ComponentWizard wizard = wizardDefinition.createWizard(location);
         return wizard;
@@ -114,7 +114,7 @@ public class ComponentServiceImpl implements ComponentService {
             return getImageStream(wizardDefinition);
         } else {
             throw new ComponentException(ComponentsErrorCode.WRONG_WIZARD_NAME,
-                    TalendExceptionContext.build().put("name", wizardName)); //$NON-NLS-1$
+                    ExceptionContext.build().put("name", wizardName)); //$NON-NLS-1$
         }
 
     }
@@ -127,7 +127,7 @@ public class ComponentServiceImpl implements ComponentService {
             return getImageStream(componentDefinition);
         } else {
             throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME,
-                    TalendExceptionContext.build().put("name", componentName)); //$NON-NLS-1$
+                    ExceptionContext.build().put("name", componentName)); //$NON-NLS-1$
         }
     }
 
