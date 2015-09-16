@@ -80,6 +80,7 @@
                         <Import-Package>org.talend*</Import-Package>
                         <Service-Component>*</Service-Component>
                         <Embed-Dependency>!components*|com.fasterxml;scope=compile|runtime</Embed-Dependency>
+                        <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>                        
                     </instructions>
                 </configuration>
             </plugin>
