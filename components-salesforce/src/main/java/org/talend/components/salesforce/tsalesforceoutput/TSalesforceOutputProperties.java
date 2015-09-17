@@ -12,15 +12,15 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
-
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.schema.ComponentSchemaFactory;
+import org.talend.components.api.schema.Schema;
+import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceModuleProperties;
+
+import static org.talend.components.api.schema.SchemaFactory.newSchemaElement;
 
 public class TSalesforceOutputProperties extends ComponentProperties {
 
@@ -31,49 +31,48 @@ public class TSalesforceOutputProperties extends ComponentProperties {
         DELETE
     }
 
-    public Property<OutputAction>         outputAction     = new Property<>("outputAction", "Output Action");
+    public SchemaElement outputAction = newSchemaElement(SchemaElement.Type.ENUM, "outputAction", "Output Action");
 
-    public Property<String>               upsertKeyColumn  = new Property<String>("upsertKeyColumn", "Upsert Key Column");
+    public SchemaElement upsertKeyColumn = newSchemaElement("upsertKeyColumn", "Upsert Key Column");
 
     //
     // Advanced
     //
-    public Property<Boolean>              extendInsert     = new Property<>("extendInsert", "Extend Insert");
+    public SchemaElement extendInsert = newSchemaElement(SchemaElement.Type.BOOLEAN, "extendInsert", "Extend Insert");
 
-    public Property<Boolean>              ceaseForError    = new Property<>("ceaseForError", "Cease on Error");
+    public SchemaElement ceaseForError = newSchemaElement(SchemaElement.Type.BOOLEAN, "ceaseForError", "Cease on Error");
 
-    public Property<Boolean>              ignoreNull       = new Property<>("ignoreNull", "Ignore Null");
+    public SchemaElement ignoreNull = newSchemaElement(SchemaElement.Type.BOOLEAN, "ignoreNull", "Ignore Null");
 
-    public Property<Boolean>              retrieveInsertId = new Property<>("retrieveInsertId", "Retrieve Insert Id");
+    public SchemaElement retrieveInsertId = newSchemaElement("retrieveInsertId", "Retrieve Insert Id");
 
-    public Property<Integer>               commitLevel      = new Property<>("commitLevel", "Commit Level");
+    public SchemaElement commitLevel = newSchemaElement("commitLevel", "Commit Level");
 
     // FIXME - should be file
-    public Property<String>               logFileName      = new Property<>("logFileName", "Log File Name");
+    public SchemaElement logFileName = newSchemaElement("logFileName", "Log File Name");
 
     // FIXME - need upsertRelation property which is a table
-
 
     //
     // Collections
     //
-    public SalesforceConnectionProperties connection       = new SalesforceConnectionProperties();
+    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties();
 
-    public SalesforceModuleProperties     module           = new SalesforceModuleProperties(connection);
+    public SalesforceModuleProperties module = new SalesforceModuleProperties(connection);
 
-    public SchemaProperties               schemaFlow       = new SchemaProperties();
+    public SchemaProperties schemaFlow = new SchemaProperties();
 
-    public SchemaProperties               schemaReject     = new SchemaProperties();
+    public SchemaProperties schemaReject = new SchemaProperties();
 
     public TSalesforceOutputProperties() {
-        schemaReject.addRow(ComponentSchemaFactory.getComponentSchemaElement("errorCode"));
-        schemaReject.addRow(ComponentSchemaFactory.getComponentSchemaElement("errorFields"));
-        schemaReject.addRow(ComponentSchemaFactory.getComponentSchemaElement("errorMessage"));
+        schemaReject.addRow(newSchemaElement("errorCode"));
+        schemaReject.addRow(newSchemaElement("errorFields"));
+        schemaReject.addRow(newSchemaElement("errorMessage"));
 
         setupLayout();
     }
 
-    public static final String MAIN     = "Main";
+    public static final String MAIN = "Main";
 
     public static final String ADVANCED = "Advanced";
 
@@ -102,9 +101,10 @@ public class TSalesforceOutputProperties extends ComponentProperties {
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
-        schemaFlow.schema.getValue().setRoot(null);
-        if (!extendInsert.isValueTrue() && retrieveInsertId.getValue() != null && outputAction.getValue() == OutputAction.INSERT) {
-            schemaFlow.addRow(ComponentSchemaFactory.getComponentSchemaElement("salesforce_id"));
+        ((Schema) schemaFlow.getValue(schemaFlow.schema)).setRoot(null);
+        if (!getBooleanValue(extendInsert) && getStringValue(retrieveInsertId) != null
+                && getValue(outputAction) == OutputAction.INSERT) {
+            schemaFlow.addRow(newSchemaElement("salesforce_id"));
         }
 
     }

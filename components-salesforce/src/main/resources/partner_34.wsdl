@@ -936,7 +936,7 @@ All Rights Reserved
             <complexType name="DescribeDataCategoryGroupResult">
                 <sequence>
                     <element name="categoryCount" type="xsd:int"/>
-                    <element name="description" type="xsd:string"/>
+                    <element name="title" type="xsd:string"/>
                     <element name="label" type="xsd:string"/>
                     <element name="name" type="xsd:string"/>
                     <element name="sobject" type="xsd:string"/>
@@ -945,7 +945,7 @@ All Rights Reserved
 
             <complexType name="DescribeDataCategoryGroupStructureResult">
                 <sequence>
-                    <element name="description" type="xsd:string"/>
+                    <element name="title" type="xsd:string"/>
                     <element name="label" type="xsd:string"/>
                     <element name="name" type="xsd:string"/>
                     <element name="sobject" type="xsd:string"/>
@@ -1716,7 +1716,7 @@ All Rights Reserved
                 <complexContent>
                     <extension base="tns:Email">
                         <sequence>
-                            <element name="description" type="xsd:string" nillable="true"/>
+                            <element name="title" type="xsd:string" nillable="true"/>
                             <element name="targetObjectIds" minOccurs="0" maxOccurs="250" type="tns:ID"/>
                             <element name="templateId" type="tns:ID"/>
                             <element name="whatIds" minOccurs="0" maxOccurs="250" type="tns:ID"/>

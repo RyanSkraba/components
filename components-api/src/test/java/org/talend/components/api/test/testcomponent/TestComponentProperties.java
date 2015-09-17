@@ -12,17 +12,17 @@
 // ============================================================================
 package org.talend.components.api.test.testcomponent;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.schema.SchemaFactory.newSchemaElement;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.schema.SchemaElement;
 
 public class TestComponentProperties extends ComponentProperties {
 
-    public Property<String>    userId        = new Property<String>("userId", "User Id").setRequired(true);
+    public SchemaElement userId = newSchemaElement("userId", "User Id").setRequired(true);
 
-    public Property<String>    password      = new Property<String>("password", "Password").setRequired(true);
+    public SchemaElement password = newSchemaElement("password", "Password").setRequired(true);
 
     public static final String TESTCOMPONENT = "TestComponent";
 

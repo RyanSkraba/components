@@ -13,10 +13,12 @@
 package org.talend.components.salesforce.tsalesforceinput;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceModuleProperties;
+
+import static org.talend.components.api.schema.SchemaFactory.newSchemaElement;
 
 public class TSalesforceInputProperties extends ComponentProperties {
 
@@ -25,37 +27,38 @@ public class TSalesforceInputProperties extends ComponentProperties {
         BULK
     }
 
-    public Property<QueryMode>            queryMode           = new Property<QueryMode>("QueryMode", "Query Mode");
+    public SchemaElement queryMode = newSchemaElement(SchemaElement.Type.ENUM, "QueryMode", "Query Mode");
 
-    public Property<String>               condition           = new Property<String>("Condition", "Condition");
+    public SchemaElement condition = newSchemaElement("Condition", "Condition");
 
-    public Property<Boolean>              manualQuery         = new Property<Boolean>("ManualQuery", "Manual Query");
+    public SchemaElement manualQuery = newSchemaElement(SchemaElement.Type.BOOLEAN, "ManualQuery", "Manual Query");
 
-    public Property<String>               query               = new Property<String>("Query", "Full OSQL query string");
+    public SchemaElement query = newSchemaElement("Query", "Full OSQL query string");
 
-    public Property<Boolean>              includeDeleted      = new Property<Boolean>("IncludeDeleted", "Include deleted records");
+    public SchemaElement includeDeleted = newSchemaElement(SchemaElement.Type.BOOLEAN, "IncludeDeleted",
+            "Include deleted records");
 
     //
     // Advanced
     //
-    public Property<Integer>              batchSize           = new Property<>("BatchSize", "Batch Size");
+    public SchemaElement batchSize = newSchemaElement(SchemaElement.Type.INT, "BatchSize", "Batch Size");
 
-    public Property<String>               normalizeDelimiter  = new Property<>("NormalizeDelimiter", "Normalize Delimeter");
+    public SchemaElement normalizeDelimiter = newSchemaElement("NormalizeDelimiter", "Normalize Delimeter");
 
-    public Property<String>               columnNameDelimiter = new Property<>("ColumnNameDelimiter", "Column Name Delimiter");
+    public SchemaElement columnNameDelimiter = newSchemaElement("ColumnNameDelimiter", "Column Name Delimiter");
 
     //
     // Collections
     //
-    public SalesforceConnectionProperties connection          = new SalesforceConnectionProperties();
+    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties();
 
-    public SalesforceModuleProperties     module              = new SalesforceModuleProperties(connection);
+    public SalesforceModuleProperties module = new SalesforceModuleProperties(connection);
 
     public TSalesforceInputProperties() {
         setupLayout();
     }
 
-    public static final String MAIN     = "Main";
+    public static final String MAIN = "Main";
 
     public static final String ADVANCED = "Advanced";
 
@@ -89,10 +92,10 @@ public class TSalesforceInputProperties extends ComponentProperties {
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        form.getWidget(includeDeleted.getName()).setVisible(queryMode.getValue() == QueryMode.QUERY);
+        form.getWidget(includeDeleted.getName()).setVisible(getValue(queryMode) == QueryMode.QUERY);
 
-        form.getWidget(query.getName()).setVisible(manualQuery.isValueTrue());
-        form.getWidget(condition.getName()).setVisible(!manualQuery.isValueTrue());
+        form.getWidget(query.getName()).setVisible(getBooleanValue(manualQuery));
+        form.getWidget(condition.getName()).setVisible(!getBooleanValue(manualQuery));
     }
 
 }

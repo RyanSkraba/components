@@ -13,13 +13,14 @@
 package org.talend.components.salesforce;
 
 import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.schema.SchemaFactory.newSchemaElement;
 
 import java.util.List;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
+import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.common.SchemaProperties;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
@@ -32,15 +33,15 @@ public class SalesforceModuleProperties extends ComponentProperties {
     //
     // Properties
     //
-    public Property<String>                moduleName = new Property<String>("moduleName", "Module Name");
+    public SchemaElement moduleName = newSchemaElement("moduleName", "Module Name");
 
-    public SchemaProperties                schema     = new SchemaProperties();
+    public SchemaProperties schema = new SchemaProperties();
 
-    public static final String             MAIN       = "Main";
+    public static final String MAIN = "Main";
 
-    public static final String             REFERENCE  = "Reference";
+    public static final String REFERENCE = "Reference";
 
-    public static final String             ADVANCED   = "Advanced";
+    public static final String ADVANCED = "Advanced";
 
     // FIXME - OK what about if we are using a connection from a separate component
     // that defines the connection, how do we get that separate component?
@@ -76,7 +77,7 @@ public class SalesforceModuleProperties extends ComponentProperties {
     public void afterModuleName() throws Exception {
         SalesforceRuntime conn = new SalesforceRuntime();
         conn.connect(connection);
-        schema.schema.setValue(conn.getSchema(moduleName.getValue()));
+        schema.setValue(schema.schema, conn.getSchema(getStringValue(moduleName)));
     }
 
 }

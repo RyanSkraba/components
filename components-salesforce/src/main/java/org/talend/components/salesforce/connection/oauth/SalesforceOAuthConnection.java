@@ -12,59 +12,33 @@
 // ============================================================================
 package org.talend.components.salesforce.connection.oauth;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import com.sforce.ws.ConnectorConfig;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.talend.components.common.oauth.OauthClient;
+import org.talend.components.common.oauth.OauthProperties;
+
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Properties;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.talend.components.common.oauth.OauthClient;
-
-import com.sforce.ws.ConnectorConfig;
-
-/**
- * created by bchen on Jul 10, 2014 Detailled comment
- * 
- */
 public class SalesforceOAuthConnection {
 
     private static final String REFRESHTOKEN_KEY = "refreshtoken"; //$NON-NLS-1$
 
-    private final String        login_endpoint;
+    private OauthProperties oauth;
 
-    private final String        oauth_clientID;
+    private String url;
 
-    private final String        oauth_clientSecret;
+    private String apiVersion;
 
-    private String              tokenFilePath;
-
-    private final String        apiVersion;
-
-    private String              callbackHost;
-
-    private int                 callbackPort;
-
-    private SalesforceOAuthConnection() throws Exception {
-        throw new Exception("should use builder to init"); //$NON-NLS-1$
-    }
-
-    private SalesforceOAuthConnection(Builder builder) {
-        this.login_endpoint = builder.login_endpoint;
-        this.oauth_clientID = builder.oauth_clientID;
-        this.oauth_clientSecret = builder.oauth_clientSecret;
-        this.apiVersion = builder.apiVersion;
-        this.tokenFilePath = builder.tokenFilePath;
-        this.callbackHost = builder.callbackHost;
-        this.callbackPort = builder.callbackPort;
+    public SalesforceOAuthConnection(OauthProperties oauthProperties, String url, String apiVersion) {
+        this.oauth = oauthProperties;
+        this.url = url;
+        this.apiVersion = apiVersion;
     }
 
     public void login(ConnectorConfig connect) {
@@ -72,6 +46,7 @@ public class SalesforceOAuthConnection {
         String refreshToken = null;
         SalesforceOAuthAccessTokenResponse token = null;
         // 1. if tokenFile exist, try refresh token
+        String tokenFilePath = oauth.getStringValue(oauth.tokenFile);
         if (tokenFilePath != null) {
             Properties prop = new Properties();
             File tokenFile = new File(tokenFilePath);
@@ -92,8 +67,9 @@ public class SalesforceOAuthConnection {
                 if (storedRefreshToken != null) {
                     OauthClient oauthClient;
                     try {
-                        oauthClient = new OauthClient.RefreshTokenBuilder(new URL(login_endpoint + "/token"), oauth_clientID,
-                                oauth_clientSecret).setRefreshToken(storedRefreshToken).build();
+                        oauthClient = new OauthClient.RefreshTokenBuilder(new URL(url + "/token"),
+                                oauth.getStringValue(oauth.clientId), oauth.getStringValue(oauth.clientSecret)).setRefreshToken(
+                                storedRefreshToken).build();
                         token = oauthClient.getToken(SalesforceOAuthAccessTokenResponse.class);
                         session_id = token.getAccessToken();
                         refreshToken = token.getRefreshToken();
@@ -108,9 +84,12 @@ public class SalesforceOAuthConnection {
         if (session_id == null) {
             OauthClient oauthClient;
             try {
-                oauthClient = new OauthClient.AuthorizationCodeBuilder(new URL(login_endpoint + "/token"), //$NON-NLS-1$
-                        oauth_clientID, oauth_clientSecret).setAuthorizationLocation(new URL(login_endpoint + "/authorize")) //$NON-NLS-1$
-                        .setCallbackURL(new URL("https://" + callbackHost + ":" + callbackPort)).setResponseType("code").build();
+                oauthClient = new OauthClient.AuthorizationCodeBuilder(new URL(url + "/token"), //$NON-NLS-1$
+                        oauth.getStringValue(oauth.clientId), oauth.getStringValue(oauth.clientSecret))
+                        .setAuthorizationLocation(new URL(url + "/authorize")) //$NON-NLS-1$
+                        .setCallbackURL(
+                                new URL("https://" + oauth.getStringValue(oauth.callbackHost) + ":"
+                                        + oauth.getIntValue(oauth.callbackPort))).setResponseType("code").build();
                 token = oauthClient.getToken(SalesforceOAuthAccessTokenResponse.class);
                 session_id = token.getAccessToken();
                 refreshToken = token.getRefreshToken();
@@ -193,45 +172,6 @@ public class SalesforceOAuthConnection {
             }
         }
         return endpointURL;
-    }
-
-    public static class Builder {
-
-        private final String login_endpoint;
-
-        private final String oauth_clientID;
-
-        private final String oauth_clientSecret;
-
-        private final String apiVersion;
-
-        private String       tokenFilePath = null;
-
-        private String       callbackHost;
-
-        private int          callbackPort;
-
-        public Builder(String login_endpoint, String oauth_clientID, String oauth_clientSecret, String apiVersion) {
-            this.login_endpoint = login_endpoint;
-            this.oauth_clientID = oauth_clientID;
-            this.oauth_clientSecret = oauth_clientSecret;
-            this.apiVersion = apiVersion;
-        }
-
-        public Builder setCallback(String host, int port) {
-            this.callbackHost = host;
-            this.callbackPort = port;
-            return this;
-        }
-
-        public Builder setTokenFilePath(String tokenFilePath) {
-            this.tokenFilePath = tokenFilePath;
-            return this;
-        }
-
-        public SalesforceOAuthConnection build() {
-            return new SalesforceOAuthConnection(this);
-        }
     }
 
 }

@@ -12,92 +12,75 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.namespace.QName;
-
-import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.runtime.ComponentRuntime;
-import org.talend.components.api.runtime.ComponentRuntimeContainer;
-import org.talend.components.api.schema.ComponentSchema;
-import org.talend.components.api.schema.ComponentSchemaElement;
-import org.talend.components.api.schema.ComponentSchemaFactory;
-import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnection;
-import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
-import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
-
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.BulkConnection;
-import com.sforce.soap.partner.DeleteResult;
-import com.sforce.soap.partner.DescribeGlobalResult;
-import com.sforce.soap.partner.DescribeGlobalSObjectResult;
-import com.sforce.soap.partner.DescribeSObjectResult;
+import com.sforce.soap.partner.*;
 import com.sforce.soap.partner.Error;
-import com.sforce.soap.partner.Field;
-import com.sforce.soap.partner.GetDeletedResult;
-import com.sforce.soap.partner.PartnerConnection;
-import com.sforce.soap.partner.QueryResult;
-import com.sforce.soap.partner.SaveResult;
-import com.sforce.soap.partner.SessionHeader_element;
-import com.sforce.soap.partner.UpsertResult;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 import com.sforce.ws.SessionRenewer;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.runtime.ComponentRuntime;
+import org.talend.components.api.runtime.ComponentRuntimeContainer;
+import org.talend.components.api.schema.Schema;
+import org.talend.components.api.schema.SchemaElement;
+import org.talend.components.api.schema.SchemaFactory;
+import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnection;
+import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
+import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
+
+import javax.xml.namespace.QName;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.util.*;
 
 public class SalesforceRuntime extends ComponentRuntime {
 
-    private static final String                 API_VERSION = "34.0";
+    private static final String API_VERSION = "34.0";
 
-    private PartnerConnection                   connection;
+    private PartnerConnection connection;
 
-    private BulkConnection                      bulkConnection;
+    private BulkConnection bulkConnection;
 
-    private ComponentRuntimeContainer           container;
+    private ComponentRuntimeContainer container;
 
-    private boolean                             exceptionForErrors;
+    private boolean exceptionForErrors;
 
-    private java.io.BufferedWriter              logWriter;
+    private java.io.BufferedWriter logWriter;
 
-    private int                                 commitLevel;
+    private int commitLevel;
 
-    private List<String>                        deleteItems;
+    private List<String> deleteItems;
 
-    private List<SObject>                       insertItems;
+    private List<SObject> insertItems;
 
-    private List<SObject>                       upsertItems;
+    private List<SObject> upsertItems;
 
-    private List<SObject>                       updateItems;
+    private List<SObject> updateItems;
 
-    private String                              upsertKeyColumn;
+    private String upsertKeyColumn;
 
-    private Map<String, ComponentSchemaElement> fieldMap;
+    private Map<String, SchemaElement> fieldMap;
 
-    private List<ComponentSchemaElement>        fieldList;
+    private List<SchemaElement> fieldList;
 
     /*
      * Used on input only, this is read from the module schema, it contains all of the fields from the salesforce
      * definition of the module that are not already in the field list.
      */
-    private List<ComponentSchemaElement>        dynamicFieldList;
+    private List<SchemaElement> dynamicFieldList;
 
     /*
      * The actual fields we read on input which is a combination of the fields specified in the schema and the dynamic
      * fields.
      */
-    private List<ComponentSchemaElement>        inputFieldsToUse;
+    private List<SchemaElement> inputFieldsToUse;
 
     /*
      * The dynamic column that is specified on the input schema.
      */
-    private ComponentSchemaElement              dynamicField;
+    private SchemaElement dynamicField;
 
     public SalesforceRuntime() {
         commitLevel = 1;
@@ -154,16 +137,13 @@ public class SalesforceRuntime extends ComponentRuntime {
 
     protected void doConnection(SalesforceConnectionProperties properties, ConnectorConfig config) throws AsyncApiException,
             ConnectionException {
-        if (SalesforceConnectionProperties.LoginType.OAUTH == properties.loginType.getValue()) {
-            new SalesforceOAuthConnection.Builder(properties.url.getValue(), properties.oauth.clientId.getValue(),
-                    properties.oauth.clientSecret.getValue(), API_VERSION)
-                    .setCallback(properties.oauth.callbackHost.getValue(), properties.oauth.callbackPort.getValue())
-                    .setTokenFilePath(properties.oauth.tokenFile.getValue()).build().login(config);
+        if (SalesforceConnectionProperties.LoginType.OAUTH == properties.getValue(properties.loginType)) {
+            new SalesforceOAuthConnection(properties.oauth, properties.getStringValue(properties.url), API_VERSION);
         } else {
-            config.setAuthEndpoint(properties.url.getValue());
+            config.setAuthEndpoint(properties.getStringValue(properties.url));
         }
         connection = new PartnerConnection(config);
-        if (properties.bulkConnection.isValueTrue()) {
+        if (properties.getBooleanValue(properties.bulkConnection)) {
             connectBulk(properties, config);
         }
     }
@@ -171,8 +151,8 @@ public class SalesforceRuntime extends ComponentRuntime {
     public void connect(final SalesforceConnectionProperties properties) throws Exception {
 
         ConnectorConfig config = new ConnectorConfig();
-        config.setUsername(properties.userPassword.userId.getValue());
-        config.setPassword(properties.userPassword.password.getValue());
+        config.setUsername(properties.userPassword.getStringValue(properties.userPassword.userId));
+        config.setPassword(properties.userPassword.getStringValue(properties.userPassword.password));
 
         // Notes on how to test this
         // http://thysmichels.com/2014/02/15/salesforce-wsc-partner-connection-session-renew-when-session-timeout/
@@ -200,12 +180,10 @@ public class SalesforceRuntime extends ComponentRuntime {
             }
         });
 
-        if (properties.timeout.getValue() > 0) {
-            config.setConnectionTimeout(properties.timeout.getValue());
+        if (properties.getIntValue(properties.timeout) > 0) {
+            config.setConnectionTimeout(properties.getIntValue(properties.timeout));
         }
-        if (properties.needCompression.isValueTrue()) {
-            config.setCompression(properties.needCompression.getValue());
-        }
+        config.setCompression(properties.getBooleanValue(properties.needCompression));
 
         config.setTraceMessage(true);
 
@@ -226,26 +204,26 @@ public class SalesforceRuntime extends ComponentRuntime {
         return returnList;
     }
 
-    public void setupSchemaElement(Field field, ComponentSchemaElement element) {
+    public void setupSchemaElement(Field field, SchemaElement element) {
         String type = field.getType().toString();
         if (type.equals("boolean")) { //$NON-NLS-1$
-            element.setType(ComponentSchemaElement.Type.BOOLEAN);
+            element.setType(SchemaElement.Type.BOOLEAN);
         } else if (type.equals("int")) { //$NON-NLS-1$
-            element.setType(ComponentSchemaElement.Type.INT);
+            element.setType(SchemaElement.Type.INT);
         } else if (type.equals("date")) { //$NON-NLS-1$
-            element.setType(ComponentSchemaElement.Type.DATE);
+            element.setType(SchemaElement.Type.DATE);
             element.setPattern("\"yyyy-MM-dd\""); //$NON-NLS-1$
         } else if (type.equals("datetime")) { //$NON-NLS-1$
-            element.setType(ComponentSchemaElement.Type.DATETIME);
+            element.setType(SchemaElement.Type.DATETIME);
             element.setPattern("\"yyyy-MM-dd\'T\'HH:mm:ss\'.000Z\'\""); //$NON-NLS-1$
         } else if (type.equals("double")) { //$NON-NLS-1$
-            element.setType(ComponentSchemaElement.Type.DOUBLE);
+            element.setType(SchemaElement.Type.DOUBLE);
         } else if (type.equals("currency")) { //$NON-NLS-1$
-            element.setType(ComponentSchemaElement.Type.DECIMAL);
+            element.setType(SchemaElement.Type.DECIMAL);
         }
         element.setNullable(field.getNillable());
 
-        if (element.getType() == ComponentSchemaElement.Type.STRING) {
+        if (element.getType() == SchemaElement.Type.STRING) {
             element.setSize(field.getLength());
             element.setPrecision(field.getPrecision());
         } else {
@@ -255,15 +233,15 @@ public class SalesforceRuntime extends ComponentRuntime {
         element.setDefaultValue(field.getDefaultValueFormula());
     }
 
-    public ComponentSchema getSchema(String module) throws ConnectionException {
-        ComponentSchema schema = ComponentSchemaFactory.getComponentSchema();
-        ComponentSchemaElement root = ComponentSchemaFactory.getComponentSchemaElement("Root");
+    public Schema getSchema(String module) throws ConnectionException {
+        Schema schema = SchemaFactory.newSchema();
+        SchemaElement root = SchemaFactory.newSchemaElement("Root");
         schema.setRoot(root);
 
         DescribeSObjectResult[] describeSObjectResults = connection.describeSObjects(new String[] { module });
         Field fields[] = describeSObjectResults[0].getFields();
         for (Field field : fields) {
-            ComponentSchemaElement child = ComponentSchemaFactory.getComponentSchemaElement(field.getName());
+            SchemaElement child = SchemaFactory.newSchemaElement(field.getName());
             setupSchemaElement(field, child);
             root.addChild(child);
         }
@@ -285,11 +263,12 @@ public class SalesforceRuntime extends ComponentRuntime {
         TSalesforceInputProperties sprops = (TSalesforceInputProperties) props;
 
         // FIXME - refactor in common having InputOutput properties
-        fieldMap = sprops.module.schema.schema.getValue().getRoot().getChildMap();
-        fieldList = sprops.module.schema.schema.getValue().getRoot().getChildren();
+        Schema schema = (Schema) sprops.module.schema.getValue(sprops.module.schema.schema);
+        fieldMap = schema.getRoot().getChildMap();
+        fieldList = schema.getRoot().getChildren();
 
-        for (ComponentSchemaElement se : fieldList) {
-            if (se.getType() == ComponentSchemaElement.Type.DYNAMIC) {
+        for (SchemaElement se : fieldList) {
+            if (se.getType() == SchemaElement.Type.DYNAMIC) {
                 dynamicField = se;
                 break;
             }
@@ -300,17 +279,17 @@ public class SalesforceRuntime extends ComponentRuntime {
          * specified in the schema.
          */
         if (dynamicField != null) {
-            List<ComponentSchemaElement> filteredDynamicFields = new ArrayList();
-            ComponentSchema schema = getSchema(sprops.module.moduleName.getValue());
+            List<SchemaElement> filteredDynamicFields = new ArrayList();
+            Schema dynSchema = getSchema(sprops.module.getStringValue(sprops.module.moduleName));
 
-            for (ComponentSchemaElement se : schema.getRoot().getChildren()) {
+            for (SchemaElement se : dynSchema.getRoot().getChildren()) {
                 if (fieldMap.containsKey(se.getName())) {
                     continue;
                 }
                 filteredDynamicFields.add(se);
             }
             dynamicFieldList = filteredDynamicFields;
-            container.setDynamicElements(dynamicFieldList.toArray(new ComponentSchemaElement[] {}));
+            container.setDynamicElements(dynamicFieldList.toArray(new SchemaElement[] {}));
         }
 
         inputFieldsToUse = new ArrayList();
@@ -318,24 +297,24 @@ public class SalesforceRuntime extends ComponentRuntime {
         inputFieldsToUse.addAll(dynamicFieldList);
 
         String queryText;
-        if (sprops.manualQuery.isValueTrue()) {
-            queryText = sprops.query.getValue();
+        if (sprops.getBooleanValue(sprops.manualQuery)) {
+            queryText = sprops.getStringValue(sprops.query);
         } else {
             StringBuilder sb = new StringBuilder();
             sb.append("select ");
             int count = 0;
-            for (ComponentSchemaElement se : inputFieldsToUse) {
+            for (SchemaElement se : inputFieldsToUse) {
                 if (count++ > 0) {
                     sb.append(", ");
                 }
                 sb.append(se.getName());
             }
             sb.append(" from ");
-            sb.append(sprops.module.moduleName.getValue());
+            sb.append(sprops.module.getStringValue(sprops.module.moduleName));
             queryText = sb.toString();
         }
 
-        QueryResult result = query(queryText, sprops.batchSize.getValue());
+        QueryResult result = query(queryText, sprops.getIntValue(sprops.batchSize));
 
     }
 
@@ -353,12 +332,13 @@ public class SalesforceRuntime extends ComponentRuntime {
     public void outputBegin(ComponentProperties props, ComponentRuntimeContainer env) {
         TSalesforceOutputProperties sprops = (TSalesforceOutputProperties) props;
 
-        upsertKeyColumn = sprops.upsertKeyColumn.getValue();
-        fieldMap = sprops.module.schema.schema.getValue().getRoot().getChildMap();
-        fieldList = sprops.module.schema.schema.getValue().getRoot().getChildren();
+        upsertKeyColumn = sprops.getStringValue(sprops.upsertKeyColumn);
+        Schema schema = (Schema) sprops.module.schema.getValue(sprops.module.schema.schema);
+        fieldMap = schema.getRoot().getChildMap();
+        fieldList = schema.getRoot().getChildren();
 
-        for (ComponentSchemaElement se : fieldList) {
-            if (se.getType() == ComponentSchemaElement.Type.DYNAMIC) {
+        for (SchemaElement se : fieldList) {
+            if (se.getType() == SchemaElement.Type.DYNAMIC) {
                 dynamicField = se;
             }
         }
@@ -377,14 +357,14 @@ public class SalesforceRuntime extends ComponentRuntime {
             throws Exception {
         TSalesforceOutputProperties sprops = (TSalesforceOutputProperties) props;
         for (Map<String, Object> row : rows) {
-            if (sprops.outputAction.getValue() != TSalesforceOutputProperties.OutputAction.DELETE) {
+            if (sprops.getValue(sprops.outputAction) != TSalesforceOutputProperties.OutputAction.DELETE) {
                 SObject so = new SObject();
-                so.setType(sprops.module.moduleName.getValue());
+                so.setType(sprops.module.getStringValue(sprops.module.moduleName));
 
                 for (String key : row.keySet()) {
                     Object value = row.get(key);
                     if (value != null) {
-                        ComponentSchemaElement se = fieldMap.get(key);
+                        SchemaElement se = fieldMap.get(key);
                         if (se != null) {
                             addSObjectField(so, se, value);
                         }
@@ -393,14 +373,14 @@ public class SalesforceRuntime extends ComponentRuntime {
 
                 if (dynamicField != null) {
                     Object dynamic = row.get(dynamicField.getName());
-                    ComponentSchemaElement[] dynamicSes = container.getDynamicElements(dynamic);
-                    for (ComponentSchemaElement dynamicSe : dynamicSes) {
+                    SchemaElement[] dynamicSes = container.getDynamicElements(dynamic);
+                    for (SchemaElement dynamicSe : dynamicSes) {
                         Object value = container.getDynamicValue(dynamic, dynamicSe.getName());
                         addSObjectField(so, dynamicSe, value);
                     }
                 }
 
-                switch (sprops.outputAction.getValue()) {
+                switch ((TSalesforceOutputProperties.OutputAction) sprops.getValue(sprops.outputAction)) {
                 case INSERT:
                     insert(so);
                     break;
@@ -427,8 +407,8 @@ public class SalesforceRuntime extends ComponentRuntime {
     protected String getIdValue(Map<String, Object> row) {
         String ID = "Id";
         if (row.get(ID) != null) {
-            ComponentSchemaElement se = fieldMap.get(ID);
-            if (se.getType() != ComponentSchemaElement.Type.DYNAMIC) {
+            SchemaElement se = fieldMap.get(ID);
+            if (se.getType() != SchemaElement.Type.DYNAMIC) {
                 return (String) row.get(ID);
             }
         }
@@ -438,8 +418,8 @@ public class SalesforceRuntime extends ComponentRuntime {
         }
 
         Object dynamic = row.get(dynamicField.getName());
-        ComponentSchemaElement[] dynamicSes = container.getDynamicElements(dynamic);
-        for (ComponentSchemaElement dynamicSe : dynamicSes) {
+        SchemaElement[] dynamicSes = container.getDynamicElements(dynamic);
+        for (SchemaElement dynamicSe : dynamicSes) {
             if (dynamicSe.getName().equals(ID)) {
                 return (String) container.getDynamicValue(dynamic, ID);
             }
@@ -448,7 +428,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         return null;
     }
 
-    protected void addSObjectField(SObject sObject, ComponentSchemaElement se, Object value) {
+    protected void addSObjectField(SObject sObject, SchemaElement se, Object value) {
         Object valueToAdd;
         switch (se.getType()) {
         case BYTE_ARRAY:

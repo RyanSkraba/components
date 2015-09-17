@@ -12,25 +12,26 @@
 // ============================================================================
 package org.talend.components.common.oauth;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
-
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.schema.SchemaElement;
+
+import static org.talend.components.api.schema.SchemaFactory.newSchemaElement;
 
 public class OauthProperties extends ComponentProperties {
 
-    public Property<String>    clientId     = new Property<String>("clientId", "Client Id").setRequired(true);
+    public SchemaElement clientId = newSchemaElement("clientId", "Client Id").setRequired(true);
 
-    public Property<String>    clientSecret = new Property<String>("clientSecret", "Client Secret").setRequired(true);
+    public SchemaElement clientSecret = newSchemaElement("clientSecret", "Client Secret").setRequired(true);
 
-    public Property<String>    callbackHost = new Property<String>("callbackHost", "Callback Host").setRequired(true);
+    public SchemaElement callbackHost = newSchemaElement("callbackHost", "Callback Host").setRequired(true);
 
-    public Property<Integer>   callbackPort = new Property<Integer>("callbackPort", "Callback Port").setRequired(true);
+    public SchemaElement callbackPort = newSchemaElement(SchemaElement.Type.INT, "callbackPort", "Callback Port").setRequired(
+            true);
 
-    public Property<String>    tokenFile    = new Property<String>("tokenFile", "Token File").setRequired(true);
+    public SchemaElement tokenFile = newSchemaElement("tokenFile", "Token File").setRequired(true);
 
-    public static final String OAUTH        = "OAuth";
+    public static final String OAUTH = "OAuth";
 
     public OauthProperties() {
         setupLayout();
@@ -39,7 +40,7 @@ public class OauthProperties extends ComponentProperties {
     @Override
     protected void setupLayout() {
         super.setupLayout();
-        
+
         Form form = Form.create(this, OAUTH, "OAuth Parameters");
         form.addRow(clientId);
         form.addColumn(clientSecret);

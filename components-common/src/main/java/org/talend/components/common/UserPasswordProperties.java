@@ -12,21 +12,21 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.schema.SchemaFactory.newSchemaElement;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.schema.SchemaElement;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 
 @JsonRootName("userPasswordProperties")
 public class UserPasswordProperties extends ComponentProperties {
 
-    public Property<String>    userId       = new Property<String>("userId", "User Id").setRequired(true);
+    public SchemaElement userId = newSchemaElement("userId", "User Id").setRequired(true);
 
     // FIXME - this needs to be encrypted, need to think about how to handle that
-    public Property<String>    password     = new Property<String>("password", "Password").setRequired(true);
+    public SchemaElement password = newSchemaElement("password", "Password").setRequired(true);
 
     public static final String USERPASSWORD = "UserPassword";
 

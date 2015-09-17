@@ -1,15 +1,16 @@
 package org.talend.components.api.properties;
 
+import org.talend.components.api.ComponentDesigner;
+import org.talend.components.api.properties.internal.ComponentPropertiesInternal;
+import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.properties.presentation.Widget;
+import org.talend.components.api.schema.SchemaElement;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.talend.components.api.ComponentDesigner;
-import org.talend.components.api.properties.internal.ComponentPropertiesInternal;
-import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Widget;
 
 /**
  * The {@code ComponentProperties} class contains the definitions of the properties associated with a component. These
@@ -19,7 +20,7 @@ import org.talend.components.api.properties.presentation.Widget;
  * include those for desktop (Eclipse), web, and scripting. All of these will use the code defined here for their
  * construction and validation.
  * <p/>
- * All aspects of the properties are defined in a subclass of this class using the {@link Property}, {@Link
+ * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement}, {@Link
  * PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface decisions are
  * made in code, methods can be added to the subclass to influence the flow of the user interface and help with
  * validation.
@@ -47,11 +48,11 @@ import org.talend.components.api.properties.presentation.Widget;
 // @JsonSerialize(using = ComponentPropertiesSerializer.class)
 public abstract class ComponentProperties {
 
-    static final String                   METHOD_BEFORE   = "before";
+    static final String METHOD_BEFORE = "before";
 
-    static final String                   METHOD_AFTER    = "after";
+    static final String METHOD_AFTER = "after";
 
-    static final String                   METHOD_VALIDATE = "validate";
+    static final String METHOD_VALIDATE = "validate";
 
     // Not a component property
     protected ComponentPropertiesInternal internal;
@@ -89,18 +90,44 @@ public abstract class ComponentProperties {
         internal.setDesigner(designer);
     }
 
-    public Property[] getProperties() {
-        List<Property> properties = new ArrayList();
+    public List<SchemaElement>    getProperties() {
+        List<SchemaElement> properties = new ArrayList();
         Field[] fields = getClass().getFields();
         for (Field f : fields) {
-            if (Property.class.isAssignableFrom(f.getType()))
+            if (SchemaElement.class.isAssignableFrom(f.getType()))
                 try {
-                    properties.add((Property) f.get(this));
+                    properties.add((SchemaElement) f.get(this));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
         }
-        return (Property[]) properties.toArray(new Property[] {});
+        return properties;
+    }
+
+    public void setValue(SchemaElement property, Object value) {
+        internal.setValue(property, value);
+    }
+
+    public Object getValue(SchemaElement property) {
+        return internal.getValue(property);
+    }
+
+    public boolean getBooleanValue(SchemaElement property) {
+        Boolean value = (Boolean) getValue(property);
+        if (value == null || !value)
+            return false;
+        return true;
+    }
+
+    public String getStringValue(SchemaElement property) {
+        return (String) getValue(property);
+    }
+
+    public int getIntValue(SchemaElement property) {
+        Integer value = (Integer) getValue(property);
+        if (value == null)
+            return 0;
+        return (int) value;
     }
 
     /**

@@ -15,10 +15,6 @@ package org.talend.components.salesforce.connection.oauth;
 import org.apache.oltu.oauth2.client.response.OAuthJSONAccessTokenResponse;
 import org.apache.oltu.oauth2.common.OAuth;
 
-/**
- * created by bchen on Sep 11, 2015 Detailled comment
- *
- */
 public class SalesforceOAuthAccessTokenResponse extends OAuthJSONAccessTokenResponse {
 
     public String getInstanceURL() {

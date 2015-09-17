@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.api.properties.presentation;
 
-import org.talend.components.api.AbstractNamedThing;
+import org.talend.components.api.NamedThing;
 
 /**
  * The {@code Layout} class defines the presentation characteristics of the property within its {@link Form}.
@@ -106,21 +106,21 @@ public class Widget {
 
     private boolean              callAfter;
 
-    private AbstractNamedThing[] properties;
+    private NamedThing[] properties;
 
-    public static Widget widget(AbstractNamedThing... properties) {
+    public static Widget widget(NamedThing... properties) {
         return new Widget(properties);
     }
 
-    public Widget(AbstractNamedThing... properties) {
+    public Widget(NamedThing... properties) {
         setProperties(properties);
     }
 
-    public void setProperties(AbstractNamedThing... properties) {
+    public void setProperties(NamedThing... properties) {
         this.properties = properties;
     }
 
-    public AbstractNamedThing[] getProperties() {
+    public NamedThing[] getProperties() {
         return properties;
     }
 

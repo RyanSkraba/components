@@ -12,14 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import junit.framework.TestCase;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,27 +21,24 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.schema.ComponentSchema;
-import org.talend.components.api.schema.ComponentSchemaElement;
+import org.talend.components.api.schema.Schema;
+import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.common.oauth.OauthProperties;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.*;
 import org.talend.components.salesforce.SalesforceConnectionProperties.LoginType;
-import org.talend.components.salesforce.SalesforceConnectionWizard;
-import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
-import org.talend.components.salesforce.SalesforceModuleProperties;
-import org.talend.components.salesforce.SalesforceRuntime;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectDefinition;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
+
+import java.util.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -108,14 +98,14 @@ public class SalesforceLocalComponentTest extends TestCase {
 
         props = (SalesforceConnectionProperties) componentService
                 .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
-        assertEquals(SalesforceConnectionProperties.LoginType.BASIC, props.loginType.getValue());
+        assertEquals(SalesforceConnectionProperties.LoginType.BASIC, props.getValue(props.loginType));
         Form mainForm = props.getForm(TSalesforceConnectProperties.MAIN);
         String userPassFormName = props.userPassword.setupFormName(UserPasswordProperties.USERPASSWORD);
         assertTrue(mainForm.getWidget(userPassFormName).isVisible());
         String oauthFormName = props.oauth.setupFormName(OauthProperties.OAUTH);
         assertFalse(mainForm.getWidget(oauthFormName).isVisible());
 
-        props.loginType.setValue(SalesforceConnectionProperties.LoginType.OAUTH);
+        props.setValue(props.loginType, SalesforceConnectionProperties.LoginType.OAUTH);
         props = (SalesforceConnectionProperties) checkAndAfter(mainForm, "loginType", props);
         mainForm = props.getForm(TSalesforceConnectProperties.MAIN);
         assertTrue(mainForm.isRefreshUI());
@@ -129,15 +119,15 @@ public class SalesforceLocalComponentTest extends TestCase {
             props = (SalesforceConnectionProperties) componentService
                     .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
         }
-        System.out.println("URI:" + props.url.getValue());
+        System.out.println("URI:" + props.getStringValue(props.url));
 
         boolean inChina = true;
-        if (inChina) {
-            props.userPassword.userId.setValue("bchen2@talend.com");
-            props.userPassword.password.setValue("talend123sfYYBBe4aZN0TcDVDV7Ylzb6Ku");
+        if (!inChina) {
+            props.userPassword.setValue(props.userPassword.userId, "bchen2@talend.com");
+            props.userPassword.setValue(props.userPassword.password, "talend123sfYYBBe4aZN0TcDVDV7Ylzb6Ku");
         } else {
-            props.userPassword.userId.setValue("fupton@talend.com");
-            props.userPassword.password.setValue("talendsal99QSCzLBQgrkEq9w9EXiOt1BSy");
+            props.userPassword.setValue(props.userPassword.userId, "fupton@talend.com");
+            props.userPassword.setValue(props.userPassword.password, "talendsal99QSCzLBQgrkEq9w9EXiOt1BSy");
         }
         return props;
     }
@@ -153,7 +143,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     @Test
     public void testBulkLogin() throws Throwable {
         SalesforceConnectionProperties props = setupProps(null);
-        props.bulkConnection.setValue(true);
+        props.setValue(props.bulkConnection, true);
         Form f = props.getForm(TSalesforceConnectProperties.MAIN);
         props = (SalesforceConnectionProperties) checkAndValidate(f, "testConnection", props);
         System.out.println(props.getValidationResult());
@@ -164,14 +154,15 @@ public class SalesforceLocalComponentTest extends TestCase {
             props = (SalesforceConnectionProperties) componentService
                     .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
         }
-        props.loginType.setValue(LoginType.OAUTH);
+        props.setValue(props.loginType, LoginType.OAUTH);
         Form mainForm = props.getForm(TSalesforceConnectProperties.MAIN);
         props = (SalesforceConnectionProperties) checkAndAfter(mainForm, "loginType", props);
-        System.out.println("URI:" + props.url.getValue());
-        props.oauth.clientId.setValue("3MVG9Y6d_Btp4xp6ParHznfCCUh0d9fU3LYcvd_hCXz3G3Owp4KvaDhNuEOrXJTBd09JMoPdZeDtNYxXZM4X2");
-        props.oauth.clientSecret.setValue("3545101463828280342");
-        props.oauth.callbackHost.setValue("localhost");
-        props.oauth.callbackPort.setValue(8115);
+        System.out.println("URI:" + props.getStringValue(props.url));
+        props.oauth.setValue(props.oauth.clientId,
+                "3MVG9Y6d_Btp4xp6ParHznfCCUh0d9fU3LYcvd_hCXz3G3Owp4KvaDhNuEOrXJTBd09JMoPdZeDtNYxXZM4X2");
+        props.oauth.setValue(props.oauth.clientSecret, "3545101463828280342");
+        props.oauth.setValue(props.oauth.callbackHost, "localhost");
+        props.oauth.setValue(props.oauth.callbackPort, 8115);
         // props.oauth.tokenFile.setValue()
         return props;
     }
@@ -189,7 +180,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     @Test
     public void testOAuthBulkLogin() throws Throwable {
         SalesforceConnectionProperties props = setupOAuthProps(null);
-        props.bulkConnection.setValue(true);
+        props.setValue(props.bulkConnection, true);
         Form f = props.getForm(TSalesforceConnectProperties.MAIN);
         props = (SalesforceConnectionProperties) checkAndValidate(f, "testConnection", props);
         System.out.println(props.getValidationResult());
@@ -209,7 +200,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         // they came from.
         ComponentProperties moduleProps = f.getProperties();
         moduleProps = checkAndBefore(f, "moduleName", moduleProps);
-        Property prop = (Property) f.getChild("moduleName");
+        SchemaElement prop = (SchemaElement) f.getChild("moduleName");
         assertTrue(prop.getPossibleValues().size() > 100);
         System.out.println(prop.getPossibleValues());
         System.out.println(moduleProps.getValidationResult());
@@ -224,11 +215,11 @@ public class SalesforceLocalComponentTest extends TestCase {
         Form f = props.module.getForm(SalesforceModuleProperties.REFERENCE);
         SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
         moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
-        moduleProps.moduleName.setValue("Account");
+        moduleProps.setValue(moduleProps.moduleName, "Account");
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
-        ComponentSchema schema = moduleProps.schema.schema.getValue();
+        Schema schema = (Schema) moduleProps.schema.getValue(moduleProps.schema.schema);
         System.out.println(schema);
-        for (ComponentSchemaElement child : schema.getRoot().getChildren()) {
+        for (SchemaElement child : schema.getRoot().getChildren()) {
             System.out.println(child.getName());
         }
         assertEquals("Id", schema.getRoot().getChildren().get(0).getName());
@@ -244,9 +235,9 @@ public class SalesforceLocalComponentTest extends TestCase {
         Form f = props.module.getForm(SalesforceModuleProperties.REFERENCE);
         SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
         moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
-        moduleProps.moduleName.setValue("Account");
+        moduleProps.setValue(moduleProps.moduleName, "Account");
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
-        ComponentSchema schema = moduleProps.schema.schema.getValue();
+        Schema schema = (Schema) moduleProps.schema.getValue(moduleProps.schema.schema);
 
         SalesforceRuntime runtime = new SalesforceRuntime();
         runtime.connect(props.connection);
@@ -270,9 +261,9 @@ public class SalesforceLocalComponentTest extends TestCase {
         Form f = props.module.getForm(SalesforceModuleProperties.REFERENCE);
         SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
         moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
-        moduleProps.moduleName.setValue("Account");
+        moduleProps.setValue(moduleProps.moduleName, "Account");
         checkAndAfter(f, "moduleName", moduleProps);
-        props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
+        props.setValue(props.outputAction, TSalesforceOutputProperties.OutputAction.INSERT);
 
         SalesforceRuntime runtime = new SalesforceRuntime();
         runtime.connect(props.connection);

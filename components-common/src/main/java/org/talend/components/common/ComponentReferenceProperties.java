@@ -13,13 +13,12 @@
 package org.talend.components.common;
 
 import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.schema.SchemaFactory.newSchemaElement;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
-
-import com.fasterxml.jackson.annotation.JsonRootName;
+import org.talend.components.api.schema.SchemaElement;
 
 /**
  * A reference to another component. This could be in one of the following states: <li>Use this component (no reference)
@@ -37,13 +36,13 @@ public class ComponentReferenceProperties extends ComponentProperties {
     //
     // Properties
     //
-    public Property<ReferenceType> referenceType       = new Property<ReferenceType>("referenceType", "Reference Type");
+    public SchemaElement referenceType = newSchemaElement("referenceType", "Reference Type").setEnumClass(ReferenceType.class);
 
-    public Property<String>        componentType       = new Property<String>("componentType", "Component Type");
+    public SchemaElement componentType = newSchemaElement("componentType", "Component Type");
 
-    public Property<String>        componentInstanceId = new Property<String>("componentInstanceId", "Component Instance");
+    public SchemaElement componentInstanceId = newSchemaElement("componentInstanceId", "Component Instance");
 
-    public static final String     REFERENCE           = "Reference";
+    public static final String REFERENCE = "Reference";
 
     public ComponentReferenceProperties() {
         super();

@@ -12,10 +12,7 @@
 // ============================================================================
 package org.talend.components.api.test;
 
-import java.io.InputStream;
-
 import junit.framework.TestCase;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +21,17 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.testcomponent.TestComponentDefinition;
 import org.talend.components.api.test.testcomponent.TestComponentProperties;
 import org.talend.components.api.test.testcomponent.TestComponentWizard;
 import org.talend.components.api.test.testcomponent.TestComponentWizardDefinition;
 import org.talend.components.api.wizard.ComponentWizard;
+
+import java.io.InputStream;
+import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -46,9 +46,9 @@ public class LocalComponentTest extends TestCase {
     @Test
     public void testGetPropsList() {
         ComponentProperties props = componentService.getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
-        Property[] pList = props.getProperties();
-        assertTrue(pList[0] != null);
-        assertEquals(2, pList.length);
+        List<SchemaElement> pList = props.getProperties();
+        assertTrue(pList.get(0) != null);
+        assertEquals(2, pList.size());
     }
 
     @Test

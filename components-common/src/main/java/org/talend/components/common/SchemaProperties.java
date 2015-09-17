@@ -13,14 +13,14 @@
 package org.talend.components.common;
 
 import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.schema.SchemaFactory.newSchemaElement;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
-import org.talend.components.api.schema.ComponentSchema;
-import org.talend.components.api.schema.ComponentSchemaElement;
-import org.talend.components.api.schema.ComponentSchemaFactory;
+import org.talend.components.api.schema.Schema;
+import org.talend.components.api.schema.SchemaElement;
+import org.talend.components.api.schema.SchemaFactory;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 
@@ -30,15 +30,15 @@ public class SchemaProperties extends ComponentProperties {
     //
     // Properties
     //
-    public Property<ComponentSchema> schema    = new Property<ComponentSchema>("schema", "Schema");
+    public SchemaElement schema = newSchemaElement(SchemaElement.Type.SCHEMA, "schema", "Schema");
 
-    public static final String       MAIN      = "Main";
+    public static final String MAIN = "Main";
 
-    public static final String       REFERENCE = "Reference";
+    public static final String REFERENCE = "Reference";
 
     public SchemaProperties() {
         super();
-        schema.setValue(ComponentSchemaFactory.getComponentSchema());
+        setValue(schema, SchemaFactory.newSchema());
         setupLayout();
     }
 
@@ -55,13 +55,13 @@ public class SchemaProperties extends ComponentProperties {
         refreshLayout(schemaRefForm);
     }
 
-    public ComponentSchemaElement addRow(ComponentSchemaElement row) {
-        ComponentSchema s = schema.getValue();
+    public SchemaElement addRow(SchemaElement row) {
+        Schema s = (Schema) getValue(schema);
         if (s == null)
-            s = ComponentSchemaFactory.getComponentSchema();
-        ComponentSchemaElement root = s.getRoot();
+            s = SchemaFactory.newSchema();
+        SchemaElement root = s.getRoot();
         if (root == null) {
-            root = ComponentSchemaFactory.getComponentSchemaElement("Root");
+            root = SchemaFactory.newSchemaElement("Root");
             s.setRoot(root);
         }
         root.addChild(row);

@@ -12,9 +12,6 @@
 // ============================================================================
 package org.talend.components.api;
 
-import org.talend.components.api.properties.PresentationItem;
-import org.talend.components.api.properties.Property;
-
 /**
  * Something that is named.
  */

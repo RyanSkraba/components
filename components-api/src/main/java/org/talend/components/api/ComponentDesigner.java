@@ -1,7 +1,7 @@
 package org.talend.components.api;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.schema.ComponentSchemaElement;
+import org.talend.components.api.schema.SchemaElement;
 
 /**
  * The ComponentDesigner is optionally implemented by the design-time client of the component service.
@@ -40,6 +40,6 @@ public interface ComponentDesigner {
      * call.
      */
     public String addComponentProperties(ComponentProperties properties, String name, String userData,
-            ComponentSchemaElement schema);
+            SchemaElement schema);
 
 }

@@ -12,40 +12,40 @@
 // ============================================================================
 package org.talend.components.api.properties.presentation;
 
-import java.util.*;
-
 import org.talend.components.api.AbstractNamedThing;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Property;
+import org.talend.components.api.schema.SchemaElement;
+
+import java.util.*;
 
 /**
- * Represents a collection of components {@link Property} objects that are grouped into a form for display. This form
- * can be manifested for example as a tab in a view, a dialog, or a page in a wizard.
+ * Represents a collection of components {@link SchemaElement} objects that are grouped into a form for display. This
+ * form can be manifested for example as a tab in a view, a dialog, or a page in a wizard.
  */
 public class Form extends AbstractNamedThing {
 
-    protected ComponentProperties             properties;
+    protected ComponentProperties properties;
 
-    protected Map<String, AbstractNamedThing> children;
+    protected Map<String, NamedThing> children;
 
-    protected Map<String, Widget>             widgetMap;
+    protected Map<String, Widget> widgetMap;
 
-    protected List<Widget>                    widgets;
+    protected List<Widget> widgets;
 
-    private int                               currentRow;
+    private int currentRow;
 
-    private int                               currentColumn;
+    private int currentColumn;
 
     /**
      * Indicate that some {@link Widget} objects for this form have changed and the UI should be re-rendered to reflect
      * the changed widget.
      */
-    protected boolean                         refreshUI;
+    protected boolean refreshUI;
 
     public Form(ComponentProperties props, String name, String displayName, String title) {
         super(name, displayName, title);
-        children = new HashMap<String, AbstractNamedThing>();
+        children = new HashMap<String, NamedThing>();
         widgetMap = new HashMap<String, Widget>();
         widgets = new ArrayList<Widget>();
         props.addForm(this);
@@ -56,7 +56,7 @@ public class Form extends AbstractNamedThing {
         return new Form(props, props.setupFormName(name), name, title);
     }
 
-    public Collection<AbstractNamedThing> getChildren() {
+    public Collection<NamedThing> getChildren() {
         return children.values();
     }
 
@@ -73,12 +73,12 @@ public class Form extends AbstractNamedThing {
         return widgets;
     }
 
-    public Form addRow(AbstractNamedThing child) {
+    public Form addRow(NamedThing child) {
         addRow(Widget.widget(child));
         return this;
     }
 
-    public Form addColumn(AbstractNamedThing child) {
+    public Form addColumn(NamedThing child) {
         addColumn(Widget.widget(child));
         return this;
     }
@@ -109,7 +109,7 @@ public class Form extends AbstractNamedThing {
     }
 
     private void fill(Widget widget) {
-        for (AbstractNamedThing child : widget.getProperties()) {
+        for (NamedThing child : widget.getProperties()) {
             widgetMap.put(child.getName(), widget);
             children.put(child.getName(), child);
             properties.setLayoutMethods(child.getName(), widget);

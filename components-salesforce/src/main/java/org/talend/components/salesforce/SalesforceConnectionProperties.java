@@ -12,19 +12,19 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.presentation.Widget.*;
-
+import com.fasterxml.jackson.annotation.JsonRootName;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.PresentationItem;
-import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget.WidgetType;
+import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.common.oauth.OauthProperties;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
+import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.schema.SchemaFactory.newSchemaElement;
 
 @JsonRootName("salesforceConnectionProperties")
 public class SalesforceConnectionProperties extends ComponentProperties {
@@ -39,54 +39,52 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     //
 
     // public String apiVersion;
-    public Property<String> url = new Property<String>("url", "Salesforce URL").setRequired(true) //$NON-NLS-1$//$NON-NLS-2$
-                                        .setValue("https://www.salesforce.com/services/Soap/u/34.0"); //$NON-NLS-1$
+    public SchemaElement url = newSchemaElement("url", "Salesforce URL").setRequired(true); //$NON-NLS-1$//$NON-NLS-2$
 
     public enum LoginType {
         BASIC,
         OAUTH
     }
 
-    public Property<LoginType>       loginType        = new Property<LoginType>("loginType", "Connection type").setRequired(true)
-                                                              .setValue(LoginType.BASIC);
+    public SchemaElement loginType = newSchemaElement(SchemaElement.Type.ENUM, "loginType", "Connection type").setRequired(true);
 
-    public Property<Boolean>         bulkConnection   = new Property<Boolean>("bulkConnection", "Bulk Connection");
+    public SchemaElement bulkConnection = newSchemaElement(SchemaElement.Type.BOOLEAN, "bulkConnection", "Bulk Connection");
 
-    public Property<Boolean>         needCompression  = new Property<Boolean>("needCompression", "Need compression");
+    public SchemaElement needCompression = newSchemaElement(SchemaElement.Type.BOOLEAN, "needCompression", "Need compression");
 
-    public Property<Integer>         timeout          = new Property<Integer>("timeout", "Timeout").setValue(0);
+    public SchemaElement timeout = newSchemaElement(SchemaElement.Type.INT, "timeout", "Timeout");
 
-    public Property<Boolean>         httpTraceMessage = new Property<Boolean>("httpTraceMessage", "Trace HTTP message");
+    public SchemaElement httpTraceMessage = newSchemaElement("httpTraceMessage", "Trace HTTP message");
 
-    public Property<String>          clientId         = new Property<String>("clientId", "Client Id");
-
-    public Property<ProxyProperties> proxy            = new Property<ProxyProperties>("proxy", "Proxy")
-                                                              .setValue(new ProxyProperties());
+    public SchemaElement clientId = newSchemaElement("clientId", "Client Id");
 
     //
     // Presentation items
     //
-    public PresentationItem          connectionDesc   = new PresentationItem("connectionDesc",
-                                                              "Complete these fields in order to connect to your Salesforce account");
+    public PresentationItem connectionDesc = new PresentationItem("connectionDesc",
+            "Complete these fields in order to connect to your Salesforce account");
 
-    public PresentationItem          testConnection   = new PresentationItem("testConnection", "Test connection");
+    public PresentationItem testConnection = new PresentationItem("testConnection", "Test connection");
 
-    public PresentationItem          advanced         = new PresentationItem("advanced", "Advanced...");
+    public PresentationItem advanced = new PresentationItem("advanced", "Advanced...");
 
     //
     // Nested property collections
     //
-    public OauthProperties           oauth            = new OauthProperties();
+    public OauthProperties oauth = new OauthProperties();
 
-    public UserPasswordProperties    userPassword     = new UserPasswordProperties();
+    public UserPasswordProperties userPassword = new UserPasswordProperties();
 
-    public static final String       MAIN             = "Main";
+    public ProxyProperties proxy = new ProxyProperties();
 
-    public static final String       ADVANCED         = "Advanced";
+    public static final String MAIN = "Main";
 
-    @Override
-    protected void setupLayout() {
+    public static final String ADVANCED = "Advanced";
+
+    @Override protected void setupLayout() {
         super.setupLayout();
+
+        setValue(loginType, LoginType.BASIC);
 
         Form connectionForm = Form.create(this, MAIN, "Salesforce Connection Settings");
         connectionForm.addRow(connectionDesc);
@@ -110,7 +108,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         advancedForm.addRow(httpTraceMessage);
         advancedForm.addRow(clientId);
         advancedForm.addRow(timeout);
-        advancedForm.addColumn(proxy);
+        advancedForm.addRow(proxy.getForm(ProxyProperties.PROXY));
         refreshLayout(advancedForm);
     }
 
@@ -129,19 +127,19 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals(setupFormName(MAIN))) {
-            switch (loginType.getValue()) {
+            switch ((LoginType) getValue(loginType)) {
             case OAUTH:
                 form.getWidget(oauth.setupFormName(OauthProperties.OAUTH)).setVisible(true);
-                url.setValue("https://login.salesforce.com/services/oauth2");
+                setValue(url, "https://login.salesforce.com/services/oauth2");
                 form.getWidget(userPassword.setupFormName(UserPasswordProperties.USERPASSWORD)).setVisible(false);
                 break;
             case BASIC:
                 form.getWidget(oauth.setupFormName(OauthProperties.OAUTH)).setVisible(false);
-                url.setValue("https://www.salesforce.com/services/Soap/u/34.0");
+                setValue(url, "https://www.salesforce.com/services/Soap/u/34.0");
                 form.getWidget(userPassword.setupFormName(UserPasswordProperties.USERPASSWORD)).setVisible(true);
                 break;
             default:
-                throw new RuntimeException("Enum value should be handled :" + loginType.getValue());
+                throw new RuntimeException("Enum value should be handled :" + getValue(loginType));
             }
         }
     }
