@@ -12,7 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce.test;
 
+import java.util.*;
+
 import junit.framework.TestCase;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,8 +40,6 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinit
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
-
-import java.util.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
