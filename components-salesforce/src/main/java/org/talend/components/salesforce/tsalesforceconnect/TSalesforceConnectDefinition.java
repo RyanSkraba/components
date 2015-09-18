@@ -12,10 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceconnect;
 
-import org.talend.components.api.properties.ComponentConnector;
-import org.talend.components.api.properties.ComponentConnector.Type;
 import org.talend.components.api.Constants;
 import org.talend.components.api.properties.AbstractComponentDefinition;
+import org.talend.components.api.properties.ComponentConnector;
+import org.talend.components.api.properties.ComponentConnector.Type;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 
@@ -55,6 +55,11 @@ public class TSalesforceConnectDefinition extends AbstractComponentDefinition {
     @Override
     public String getDisplayName() {
         return "tSalesforceConnect";
+    }
+
+    @Override
+    protected String getI18NBaseName() {
+        return null;// no i18n yet
     }
 
 }

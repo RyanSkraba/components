@@ -12,8 +12,7 @@
 // ============================================================================
 package org.talend.components.api;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
 import java.io.InputStream;
@@ -27,7 +26,7 @@ import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerMethod;
+import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
@@ -38,7 +37,7 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinit
  * created by sgandon on 7 sept. 2015 Detailled comment
  */
 @RunWith(PaxExam.class)
-@ExamReactorStrategy(PerMethod.class)
+@ExamReactorStrategy(PerClass.class)
 public class TestComponentServiceWithComponents {
 
     @Inject
@@ -47,11 +46,11 @@ public class TestComponentServiceWithComponents {
     @Configuration
     public Option[] config() {
 
-        return options(
-                composite(PaxExamOptions.getOptions()),
+        return options(composite(PaxExamOptions.getOptions()),
                 provision(mavenBundle().groupId("org.talend.components").artifactId("components-common"),
-                        mavenBundle().groupId("org.talend.components").artifactId("components-common-oauth"), mavenBundle()
-                                .groupId("org.talend.components").artifactId("components-salesforce")), junitBundles()
+                        mavenBundle().groupId("org.talend.components").artifactId("components-common-oauth"),
+                        mavenBundle().groupId("org.talend.components").artifactId("components-salesforce")),
+                junitBundles()
         // these debug option do not work, I still don't know how to debug this :, cleanCaches(),
         // vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"),systemTimeout(0)
         );

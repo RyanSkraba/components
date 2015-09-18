@@ -12,7 +12,10 @@
 // ============================================================================
 package org.talend.components.api.test;
 
-import junit.framework.TestCase;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.internal.SpringApp;
+import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
@@ -30,8 +34,7 @@ import org.talend.components.api.test.testcomponent.TestComponentWizard;
 import org.talend.components.api.test.testcomponent.TestComponentWizardDefinition;
 import org.talend.components.api.wizard.ComponentWizard;
 
-import java.io.InputStream;
-import java.util.List;
+import junit.framework.TestCase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -80,7 +83,16 @@ public class LocalComponentTest extends TestCase {
 
     @Test(expected = ComponentException.class)
     public void testGetWizardNotFound() {
-        ComponentWizard wizard = componentService.getComponentWizard("not found",
-                "userdata");
+        ComponentWizard wizard = componentService.getComponentWizard("not found", "userdata");
     }
+
+    @Test
+    public void testi18N() {
+        Set<ComponentDefinition> allComponents = componentService.getAllComponents();
+        assertEquals(1, allComponents.size());
+        ComponentDefinition componentDefinition = allComponents.iterator().next();
+        TestComponentDefinition tcd = (TestComponentDefinition) componentDefinition;
+        assertEquals("Test Component", tcd.getName());
+    }
+
 }

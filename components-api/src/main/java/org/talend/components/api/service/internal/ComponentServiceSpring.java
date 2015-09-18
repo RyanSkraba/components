@@ -14,6 +14,7 @@ package org.talend.components.api.service.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.talend.components.api.context.GlobalContext;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
@@ -54,19 +56,28 @@ import com.wordnik.swagger.annotations.ApiParam;
 @Service
 public class ComponentServiceSpring implements ComponentService {
 
-    private static final Logger LOGGER    = LoggerFactory.getLogger(ComponentServiceSpring.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ComponentServiceSpring.class);
 
-    static final String      BASE_PATH = "/components"; //$NON-NLS-1$
+    static final String BASE_PATH = "/components"; //$NON-NLS-1$
 
     private ComponentService componentServiceDelegate;
 
     @Autowired
-    public ComponentServiceSpring(final ApplicationContext context) {
+    public ComponentServiceSpring(final ApplicationContext context, final GlobalContext gc) {
         this.componentServiceDelegate = new ComponentServiceImpl(new ComponentRegistry() {
 
             @Override
             public Map<String, ComponentDefinition> getComponents() {
-                return context.getBeansOfType(ComponentDefinition.class);
+                Map<String, ComponentDefinition> compDefs = context.getBeansOfType(ComponentDefinition.class);
+                initializeGlobalContexts(compDefs.values());
+                return compDefs;
+            }
+
+            private void initializeGlobalContexts(Collection<ComponentDefinition> values) {
+                for (ComponentDefinition compDef : values) {
+                    compDef.setGlobalContext(gc);
+                }
+
             }
 
             @Override
@@ -85,7 +96,8 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
-    @RequestMapping(value = BASE_PATH + "/wizard/{name}/{userData}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = BASE_PATH
+            + "/wizard/{name}/{userData}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ComponentWizard getComponentWizard(
             @PathVariable(value = "name") @ApiParam(name = "name", value = "Name of the component") String name,
             @PathVariable(value = "userData") @ApiParam(name = "userData", value = "User data string") String userData) {
@@ -98,7 +110,7 @@ public class ComponentServiceSpring implements ComponentService {
     public @ResponseBody ComponentProperties validateProperty(
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
             @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
-            throws Throwable {
+                    throws Throwable {
         componentServiceDelegate.validateProperty(propName, properties);
         return properties;
     }
@@ -109,7 +121,7 @@ public class ComponentServiceSpring implements ComponentService {
     public @ResponseBody ComponentProperties beforeProperty(
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
             @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
-            throws Throwable {
+                    throws Throwable {
         componentServiceDelegate.beforeProperty(propName, properties);
         return properties;
     }
@@ -120,7 +132,7 @@ public class ComponentServiceSpring implements ComponentService {
     public @ResponseBody ComponentProperties afterProperty(
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
             @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
-            throws Throwable {
+                    throws Throwable {
         componentServiceDelegate.afterProperty(propName, properties);
         return properties;
     }
@@ -170,7 +182,7 @@ public class ComponentServiceSpring implements ComponentService {
             if (inputStream != null) {
                 try {
                     IOUtils.copy(inputStream, response.getOutputStream());
-        } catch (IOException e) {
+                } catch (IOException e) {
                     throw new ComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
                 } finally {
                     inputStream.close();

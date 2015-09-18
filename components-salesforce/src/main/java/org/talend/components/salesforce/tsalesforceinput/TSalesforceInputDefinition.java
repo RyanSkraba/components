@@ -12,10 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceinput;
 
-import org.talend.components.api.properties.ComponentConnector;
-import org.talend.components.api.properties.ComponentConnector.Type;
 import org.talend.components.api.Constants;
 import org.talend.components.api.properties.AbstractComponentDefinition;
+import org.talend.components.api.properties.ComponentConnector;
+import org.talend.components.api.properties.ComponentConnector.Type;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 
@@ -57,7 +57,12 @@ public class TSalesforceInputDefinition extends AbstractComponentDefinition {
 
     @Override
     public String getDisplayName() {
-        return "tSalesforceInput";
+        return "tSalesforceInput"; //$NON-NLS-1$
+    }
+
+    @Override
+    protected String getI18NBaseName() {
+        return null;// no i18n yet
     }
 
 }

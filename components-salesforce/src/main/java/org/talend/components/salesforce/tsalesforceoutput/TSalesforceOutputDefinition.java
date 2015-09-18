@@ -12,10 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
-import org.talend.components.api.properties.ComponentConnector;
-import org.talend.components.api.properties.ComponentConnector.Type;
 import org.talend.components.api.Constants;
 import org.talend.components.api.properties.AbstractComponentDefinition;
+import org.talend.components.api.properties.ComponentConnector;
+import org.talend.components.api.properties.ComponentConnector.Type;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 
@@ -31,8 +31,9 @@ public class TSalesforceOutputDefinition extends AbstractComponentDefinition {
     public static final String COMPONENT_NAME = "tSalesforceOutput"; //$NON-NLS-1$
 
     public TSalesforceOutputDefinition() {
-        setConnectors(new ComponentConnector(Type.FLOW, 1, 0), new ComponentConnector(Type.MAIN, 0, 1), new ComponentConnector(
-                Type.REJECT, 0, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
+        setConnectors(new ComponentConnector(Type.FLOW, 1, 0), new ComponentConnector(Type.MAIN, 0, 1),
+                new ComponentConnector(Type.REJECT, 0, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
+                new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
 
     @Override
@@ -58,6 +59,11 @@ public class TSalesforceOutputDefinition extends AbstractComponentDefinition {
     @Override
     public String getDisplayName() {
         return "tSalesforceOutput";
+    }
+
+    @Override
+    protected String getI18NBaseName() {
+        return null;// no i18n yet
     }
 
 }
