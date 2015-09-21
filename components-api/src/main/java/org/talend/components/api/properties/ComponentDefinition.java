@@ -13,6 +13,7 @@
 package org.talend.components.api.properties;
 
 import org.talend.components.api.TopLevelDefinition;
+import org.talend.components.api.runtime.ComponentRuntime;
 
 /**
  * Component definition service.
@@ -45,10 +46,17 @@ public interface ComponentDefinition extends TopLevelDefinition {
 
     public ComponentProperties createProperties();
 
+    /**
+     * Create a {@link ComponentRuntime} object.
+     * @return a {@link ComponentRuntime} object.
+     */
+    public ComponentRuntime createRuntime();
+
     // public void setDesignerFamily(Family family);
 
     public String[] getSupportedFamilies();
 
     public ComponentConnector[] getConnectors();
+
 
 }

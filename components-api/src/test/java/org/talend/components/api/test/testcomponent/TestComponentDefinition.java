@@ -7,6 +7,7 @@ import org.talend.components.api.Constants;
 import org.talend.components.api.properties.AbstractComponentDefinition;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.runtime.ComponentRuntime;
 
 @Component(Constants.COMPONENT_BEAN_PREFIX + TestComponentDefinition.COMPONENT_NAME)
 public class TestComponentDefinition extends AbstractComponentDefinition implements ComponentDefinition {
@@ -23,6 +24,10 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     @Override
     public ComponentProperties createProperties() {
         return new TestComponentProperties();
+    }
+
+    public ComponentRuntime createRuntime() {
+        return null;
     }
 
     @Override

@@ -18,6 +18,8 @@ import org.talend.components.api.Constants;
 import org.talend.components.api.properties.AbstractComponentDefinition;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.runtime.ComponentRuntime;
+import org.talend.components.salesforce.SalesforceRuntime;
 
 /**
  * Component that can connect to a salesforce system and get some data out of it.
@@ -38,6 +40,10 @@ public class TSalesforceInputDefinition extends AbstractComponentDefinition {
     @Override
     public ComponentProperties createProperties() {
         return new TSalesforceInputProperties();
+    }
+
+    public ComponentRuntime createRuntime() {
+        return new SalesforceRuntime();
     }
 
     @Override
