@@ -1,6 +1,6 @@
 package org.talend.components.api.schema;
 
-import org.talend.components.api.schema.internal.SchemaElementImpl;
+import org.talend.components.api.properties.internal.Property;
 import org.talend.components.api.schema.internal.SchemaImpl;
 
 /**
@@ -12,15 +12,19 @@ public class SchemaFactory {
         return new SchemaImpl();
     }
 
-    public static SchemaElement newSchemaElement(String name) {
-        return new SchemaElementImpl(name);
+    public static SchemaElement newProperty(String name) {
+        return new Property(name);
     }
 
-    public static SchemaElement newSchemaElement(String name, String title) {
-        return new SchemaElementImpl(name, title);
+    public static SchemaElement newProperty(String name, String title) {
+        return new Property(name, title);
     }
 
-    public static SchemaElement newSchemaElement(SchemaElement.Type type, String name, String title) {
-        return new SchemaElementImpl(type, name, title);
+    public static SchemaElement newProperty(SchemaElement.Type type, String name, String title) {
+        return new Property(type, name, title);
+    }
+
+    public static SchemaElement newProperty(SchemaElement.Type type, String name) {
+        return new Property(type, name);
     }
 }

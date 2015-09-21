@@ -13,6 +13,7 @@
 package org.talend.components.api.properties;
 
 import org.talend.components.api.TopLevelDefinition;
+import org.talend.components.api.context.GlobalContext;
 import org.talend.components.api.runtime.ComponentRuntime;
 
 /**
@@ -31,6 +32,7 @@ public interface ComponentDefinition extends TopLevelDefinition {
      */
     // FIXME - this needs to be corrected
     public static final String FAMILY_BUSINESS = "Business/Salesforce";
+
     public static final String FAMILY_CLOUD = "Cloud/Salesforce";
 
     /*
@@ -48,6 +50,7 @@ public interface ComponentDefinition extends TopLevelDefinition {
 
     /**
      * Create a {@link ComponentRuntime} object.
+     * 
      * @return a {@link ComponentRuntime} object.
      */
     public ComponentRuntime createRuntime();
@@ -58,5 +61,13 @@ public interface ComponentDefinition extends TopLevelDefinition {
 
     public ComponentConnector[] getConnectors();
 
+    /**
+     * This shall get called by the framework once the Component is instanciated. Actually this is not true, it is set
+     * once the component is first required by the client through the ComponentService apis
+     * 
+     * @param globalContext
+     */
+    @Override
+    public void setGlobalContext(GlobalContext globalContext);
 
 }

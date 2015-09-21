@@ -23,6 +23,8 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.TopLevelDefinition;
+import org.talend.components.api.context.GlobalContext;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
@@ -31,6 +33,7 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 
 import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
+import aQute.bnd.annotation.component.Reference;
 
 /**
  * This is the OSGI specific service implementation that completely delegates the implementation to the Framework
@@ -40,6 +43,13 @@ import aQute.bnd.annotation.component.Component;
 public class ComponentServiceOsgi implements ComponentService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ComponentServiceOsgi.class);
+
+    GlobalContext gctx;
+
+    @Reference
+    public void osgiInjectGlobalContext(GlobalContext aGctx) {
+        this.gctx = aGctx;
+    }
 
     /**
      * created by sgandon on 7 sept. 2015 Detailled comment
@@ -53,17 +63,18 @@ public class ComponentServiceOsgi implements ComponentService {
 
         }
 
-        private Map<String, ComponentDefinition>       components;
+        private Map<String, ComponentDefinition> components;
 
         private Map<String, ComponentWizardDefinition> componentWizards;
 
-        protected <T> Map<String, T> populateMap(Class<T> cls) {
+        protected <T extends TopLevelDefinition> Map<String, T> populateMap(Class<T> cls) {
             Map<String, T> map = new HashMap<>();
             try {
                 String typeCanonicalName = cls.getCanonicalName();
                 Collection<ServiceReference<T>> serviceReferences = bc.getServiceReferences(cls, null);
                 for (ServiceReference<T> sr : serviceReferences) {
                     T service = bc.getService(sr);
+                    service.setGlobalContext(gctx);
                     Object nameProp = sr.getProperty("component.name"); //$NON-NLS-1$
                     if (nameProp instanceof String) {
                         map.put((String) nameProp, service);

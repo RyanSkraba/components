@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.api.properties.presentation;
 
-import org.talend.components.api.AbstractNamedThing;
 import org.talend.components.api.NamedThing;
+import org.talend.components.api.SimpleNamedThing;
 
 /**
  * The {@code Widget} class defines the presentation characteristics of the property within its {@link Form}.
@@ -22,47 +22,48 @@ import org.talend.components.api.NamedThing;
  * the name in the {@code Widget} is to allow a name different than the name of the property which is required in some
  * cases where the same properties might be used for different purposes in the same {@code Form}.
  */
-public class Widget extends AbstractNamedThing {
+public class Widget extends SimpleNamedThing {
 
     public enum WidgetType {
-        /**
-         * No special widget is requested, the default for the property's type is to be used.
-         */
+                            /**
+                             * No special widget is requested, the default for the property's type is to be used.
+                             */
         DEFAULT,
 
-        /**
-         * Presentation of a schema editor.
-         */
+                            /**
+                             * Presentation of a schema editor.
+                             */
         SCHEMA_EDITOR,
 
-        /**
-         * Presentation of a reference to a schema on one line. This shows the name of the schema and provides a button
-         * to open the schema editor/viewer in a dialog.
-         */
+                            /**
+                             * Presentation of a reference to a schema on one line. This shows the name of the schema
+                             * and provides a button to open the schema editor/viewer in a dialog.
+                             */
         SCHEMA_REFERENCE,
 
-        /**
-         * Provides a means of selecting a name or name/description from a set of names, possibly arranged in a
-         * hierarchy. This is to be used for a large number of names, as this has search capability.
-         */
+                            /**
+                             * Provides a means of selecting a name or name/description from a set of names, possibly
+                             * arranged in a hierarchy. This is to be used for a large number of names, as this has
+                             * search capability.
+                             */
         NAME_SELECTION_AREA,
 
-        /**
-         * A reference to a named selection. This just shows the selected name and a button to get a dialog that has the
-         * {@link #NAME_SELECTION_AREA}.
-         */
+                            /**
+                             * A reference to a named selection. This just shows the selected name and a button to get a
+                             * dialog that has the {@link #NAME_SELECTION_AREA}.
+                             */
         NAME_SELECTION_REFERENCE,
 
-        /**
-         * A reference to a component. This could be a reference to this component, another single component in the
-         * enclosing scope's type, or a specified component instance. This is rendered as a single line with the type of
-         * reference in a combo box.
-         */
+                            /**
+                             * A reference to a component. This could be a reference to this component, another single
+                             * component in the enclosing scope's type, or a specified component instance. This is
+                             * rendered as a single line with the type of reference in a combo box.
+                             */
         COMPONENT_REFERENCE,
 
-        /**
-         * A button
-         */
+                            /**
+                             * A button
+                             */
         BUTTON
     }
 
@@ -208,4 +209,20 @@ public class Widget extends AbstractNamedThing {
     public void setCallAfter(boolean callAfter) {
         this.callAfter = callAfter;
     }
+
+    public Widget setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public Widget setDisplayName(String name) {
+        this.displayName = name;
+        return this;
+    }
+
+    public Widget setTitle(String title) {
+        this.title = title;
+        return this;
+    }
+
 }

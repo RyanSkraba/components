@@ -1,10 +1,10 @@
 package org.talend.components.api.test.testcomponent;
 
 import org.springframework.stereotype.Component;
-import org.talend.components.api.properties.ComponentConnector;
-import org.talend.components.api.properties.ComponentConnector.Type;
 import org.talend.components.api.Constants;
 import org.talend.components.api.properties.AbstractComponentDefinition;
+import org.talend.components.api.properties.ComponentConnector;
+import org.talend.components.api.properties.ComponentConnector.Type;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
@@ -23,9 +23,10 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
 
     @Override
     public ComponentProperties createProperties() {
-        return new TestComponentProperties();
+        return new TestComponentProperties(globalContext.i18nMessageProvider);
     }
 
+    @Override
     public ComponentRuntime createRuntime() {
         return null;
     }
@@ -37,7 +38,7 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
 
     @Override
     public String getName() {
-        return COMPONENT_NAME;
+        return getI18nMessage("component.name");
     }
 
     @Override
@@ -48,6 +49,11 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     @Override
     public String getDisplayName() {
         return null;
+    }
+
+    @Override
+    protected String getI18NBaseName() {
+        return "org.talend.components.api.test.testcomponent.testMessage"; //$NON-NLS-1$
     }
 
 }

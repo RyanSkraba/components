@@ -39,7 +39,7 @@ public class TSalesforceOutputDefinition extends AbstractComponentDefinition {
 
     @Override
     public ComponentProperties createProperties() {
-        return new TSalesforceOutputProperties();
+        return new TSalesforceOutputProperties(globalContext.i18nMessageProvider);
     }
 
     public ComponentRuntime createRuntime() {
@@ -64,6 +64,12 @@ public class TSalesforceOutputDefinition extends AbstractComponentDefinition {
     @Override
     public String getDisplayName() {
         return "tSalesforceOutput";
+    }
+
+
+    @Override
+    protected String getI18NBaseName() {
+        return "org.talend.components.salesforce.message"; //$NON-NLS-1$
     }
 
 }

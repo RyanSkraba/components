@@ -14,11 +14,11 @@ package org.talend.components.api.test.testcomponent;
 
 import org.springframework.stereotype.Component;
 import org.talend.components.api.Constants;
+import org.talend.components.api.wizard.AbstractComponentWizardDefintion;
 import org.talend.components.api.wizard.ComponentWizard;
-import org.talend.components.api.wizard.ComponentWizardDefinition;
 
 @Component(Constants.COMPONENT_WIZARD_BEAN_PREFIX + TestComponentWizardDefinition.COMPONENT_WIZARD_NAME)
-public class TestComponentWizardDefinition implements ComponentWizardDefinition {
+public class TestComponentWizardDefinition extends AbstractComponentWizardDefintion {
 
     public static final String COMPONENT_WIZARD_NAME = "zewizard"; //$NON-NLS-1$
 
@@ -50,6 +50,11 @@ public class TestComponentWizardDefinition implements ComponentWizardDefinition 
     @Override
     public String getTitle() {
         return "The title";
+    }
+
+    @Override
+    protected String getI18NBaseName() {
+        return "org.talend.components.api.test.testcomponent.testMessage";
     }
 
 }

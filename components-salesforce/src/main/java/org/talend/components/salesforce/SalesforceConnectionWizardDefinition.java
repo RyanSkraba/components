@@ -1,6 +1,7 @@
 package org.talend.components.salesforce;
 
 import org.talend.components.api.Constants;
+import org.talend.components.api.wizard.AbstractComponentWizardDefintion;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 
@@ -8,7 +9,7 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
         + SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME)
 @aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_WIZARD_BEAN_PREFIX
         + SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, provide = ComponentWizardDefinition.class)
-public class SalesforceConnectionWizardDefinition implements ComponentWizardDefinition {
+public class SalesforceConnectionWizardDefinition extends AbstractComponentWizardDefintion {
 
     public static final String COMPONENT_WIZARD_NAME = "salesforce"; //$NON-NLS-1$
 
@@ -40,5 +41,10 @@ public class SalesforceConnectionWizardDefinition implements ComponentWizardDefi
     @Override
     public String getTitle() {
         return "Salesforce Connection";
+    }
+
+    @Override
+    protected String getI18NBaseName() {
+        return "org.talend.components.salesforce.message";
     }
 }

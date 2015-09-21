@@ -235,13 +235,13 @@ public class SalesforceRuntime extends ComponentRuntime {
 
     public Schema getSchema(String module) throws ConnectionException {
         Schema schema = SchemaFactory.newSchema();
-        SchemaElement root = SchemaFactory.newSchemaElement("Root");
+        SchemaElement root = SchemaFactory.newProperty("Root");
         schema.setRoot(root);
 
         DescribeSObjectResult[] describeSObjectResults = connection.describeSObjects(new String[] { module });
         Field fields[] = describeSObjectResults[0].getFields();
         for (Field field : fields) {
-            SchemaElement child = SchemaFactory.newSchemaElement(field.getName());
+            SchemaElement child = SchemaFactory.newProperty(field.getName());
             setupSchemaElement(field, child);
             root.addChild(child);
         }

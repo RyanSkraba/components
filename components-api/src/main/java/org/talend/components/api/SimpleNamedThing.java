@@ -12,44 +12,31 @@
 // ============================================================================
 package org.talend.components.api;
 
+import org.talend.components.api.i18n.TranslatableImpl;
+
 /**
  * Something that is named.
  */
-public class AbstractNamedThing implements NamedThing {
+public class SimpleNamedThing extends TranslatableImpl implements NamedThing {
 
-    private String name;
+    protected String name;
 
-    private String displayName;
+    protected String displayName;
 
-    private String title;
+    protected String title;
 
-    public AbstractNamedThing() {
+    public SimpleNamedThing() {
     }
 
-    public AbstractNamedThing(String name, String displayName) {
+    public SimpleNamedThing(String name, String displayName) {
         this();
         this.name = name;
         this.displayName = displayName;
     }
 
-    public AbstractNamedThing(String name, String displayName, String title) {
+    public SimpleNamedThing(String name, String displayName, String title) {
         this(name, displayName);
         this.title = title;
-    }
-
-    public AbstractNamedThing setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public AbstractNamedThing setDisplayName(String name) {
-        this.displayName = name;
-        return this;
-    }
-
-    public AbstractNamedThing setTitle(String title) {
-        this.title = title;
-        return this;
     }
 
     @Override
@@ -66,4 +53,10 @@ public class AbstractNamedThing implements NamedThing {
     public String getTitle() {
         return title;
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
+
 }

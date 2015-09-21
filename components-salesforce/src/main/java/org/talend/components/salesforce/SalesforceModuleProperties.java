@@ -12,11 +12,12 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
-import static org.talend.components.api.schema.SchemaFactory.newSchemaElement;
+import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
 import java.util.List;
 
+import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
@@ -33,22 +34,25 @@ public class SalesforceModuleProperties extends ComponentProperties {
     //
     // Properties
     //
-    public SchemaElement moduleName = newSchemaElement("moduleName", "Module Name");
+    public SchemaElement moduleName = newProperty("moduleName"); //$NON-NLS-1$
 
-    public SchemaProperties schema = new SchemaProperties();
+    public SchemaProperties schema;
 
-    public static final String MAIN = "Main";
+    public static final String MAIN = "Main"; //$NON-NLS-1$
 
-    public static final String REFERENCE = "Reference";
+    public static final String REFERENCE = "Reference"; //$NON-NLS-1$
 
-    public static final String ADVANCED = "Advanced";
+    public static final String ADVANCED = "Advanced"; //$NON-NLS-1$
 
     // FIXME - OK what about if we are using a connection from a separate component
     // that defines the connection, how do we get that separate component?
-    public SalesforceModuleProperties(SalesforceConnectionProperties connectionProperties) {
-        super();
+    public SalesforceModuleProperties(I18nMessageProvider i18nMessageProvider,
+            SalesforceConnectionProperties connectionProperties) {
+        super(i18nMessageProvider, "org.talend.components.salesforce.message"); //$NON-NLS-1$
+        schema = new SchemaProperties(i18nMessageProvider);
         connection = connectionProperties;
         setupLayout();
+        setupPropertiesWithI18n();
     }
 
     @Override

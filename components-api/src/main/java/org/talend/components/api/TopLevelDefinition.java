@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.api;
 
+import org.talend.components.api.context.GlobalContext;
+
 /**
  * This interface is used by top level element that need to be presented to a user with a name a displayname and an
  * image
@@ -35,5 +37,13 @@ public interface TopLevelDefinition extends NamedThing {
      */
 
     public abstract String getPngImagePath();
+
+    /**
+     * This shall get called by the framework once the Component is instanciated. Actually this is not true, it is set
+     * once the component is first required by the client through the ComponentService apis
+     * 
+     * @param globalContext
+     */
+    public void setGlobalContext(GlobalContext globalContext);
 
 }

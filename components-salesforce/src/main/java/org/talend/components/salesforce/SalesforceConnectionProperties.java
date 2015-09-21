@@ -12,7 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
+import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.components.api.schema.SchemaFactory.*;
+
+import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.PresentationItem;
 import org.talend.components.api.properties.ValidationResult;
@@ -23,40 +26,34 @@ import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.common.oauth.OauthProperties;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
-import static org.talend.components.api.schema.SchemaFactory.newSchemaElement;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
 @JsonRootName("salesforceConnectionProperties")
 public class SalesforceConnectionProperties extends ComponentProperties {
-
-    public SalesforceConnectionProperties() {
-        super();
-        setupLayout();
-    }
 
     //
     // Properties
     //
 
     // public String apiVersion;
-    public SchemaElement url = newSchemaElement("url", "Salesforce URL").setRequired(true); //$NON-NLS-1$//$NON-NLS-2$
+    public SchemaElement url = newProperty("url", "Salesforce URL").setRequired(true); //$NON-NLS-1$//$NON-NLS-2$
 
     public enum LoginType {
-        BASIC,
-        OAUTH
+                           BASIC,
+                           OAUTH
     }
 
-    public SchemaElement loginType = newSchemaElement(SchemaElement.Type.ENUM, "loginType", "Connection type").setRequired(true);
+    public SchemaElement loginType = newProperty(SchemaElement.Type.ENUM, "loginType").setRequired(true); //$NON-NLS-1$
 
-    public SchemaElement bulkConnection = newSchemaElement(SchemaElement.Type.BOOLEAN, "bulkConnection", "Bulk Connection");
+    public SchemaElement bulkConnection = newProperty(SchemaElement.Type.BOOLEAN, "bulkConnection"); //$NON-NLS-1$
 
-    public SchemaElement needCompression = newSchemaElement(SchemaElement.Type.BOOLEAN, "needCompression", "Need compression");
+    public SchemaElement needCompression = newProperty(SchemaElement.Type.BOOLEAN, "needCompression"); //$NON-NLS-1$
 
-    public SchemaElement timeout = newSchemaElement(SchemaElement.Type.INT, "timeout", "Timeout");
+    public SchemaElement timeout = newProperty(SchemaElement.Type.INT, "timeout"); //$NON-NLS-1$
 
-    public SchemaElement httpTraceMessage = newSchemaElement("httpTraceMessage", "Trace HTTP message");
+    public SchemaElement httpTraceMessage = newProperty("httpTraceMessage"); //$NON-NLS-1$
 
-    public SchemaElement clientId = newSchemaElement("clientId", "Client Id");
+    public SchemaElement clientId = newProperty("clientId"); //$NON-NLS-1$
 
     //
     // Presentation items
@@ -71,17 +68,27 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     //
     // Nested property collections
     //
-    public OauthProperties oauth = new OauthProperties();
+    public OauthProperties oauth;
 
-    public UserPasswordProperties userPassword = new UserPasswordProperties();
+    public UserPasswordProperties userPassword;
 
-    public ProxyProperties proxy = new ProxyProperties();
+    public ComponentProperties proxy;
 
     public static final String MAIN = "Main";
 
     public static final String ADVANCED = "Advanced";
 
-    @Override protected void setupLayout() {
+    public SalesforceConnectionProperties(I18nMessageProvider i18nMessageProvider) {
+        super(i18nMessageProvider, "org.talend.components.salesforce.message"); //$NON-NLS-1$
+        oauth = new OauthProperties(i18nMessageProvider);
+        userPassword = new UserPasswordProperties(i18nMessageProvider);
+        proxy = new ProxyProperties(i18nMessageProvider);
+        setupLayout();
+        setupPropertiesWithI18n();
+    }
+
+    @Override
+    protected void setupLayout() {
         super.setupLayout();
 
         setValue(loginType, LoginType.BASIC);

@@ -12,40 +12,42 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
-import static org.talend.components.api.schema.SchemaFactory.newSchemaElement;
+import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
+import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.schema.SchemaElement;
 
 /**
- * A reference to another component. This could be in one of the following states: <li>Use this component (no reference)
- * </li> <li>Reference a single instance of a given component type in the enclosing scope, e.g. Job</li> <li>Reference
- * to a particular instance of a component</li>
+ * A reference to another component. This could be in one of the following states:
+ * <li>Use this component (no reference)</li>
+ * <li>Reference a single instance of a given component type in the enclosing scope, e.g. Job</li>
+ * <li>Reference to a particular instance of a component</li>
  */
 public class ComponentReferenceProperties extends ComponentProperties {
 
     public enum ReferenceType {
-        THIS_COMPONENT,
-        COMPONENT_TYPE,
-        COMPONENT_INSTANCE
+                               THIS_COMPONENT,
+                               COMPONENT_TYPE,
+                               COMPONENT_INSTANCE
     }
 
     //
     // Properties
     //
-    public SchemaElement referenceType = newSchemaElement("referenceType", "Reference Type").setEnumClass(ReferenceType.class);
+    public SchemaElement referenceType = newProperty("referenceType").setEnumClass(ReferenceType.class); //$NON-NLS-1$
 
-    public SchemaElement componentType = newSchemaElement("componentType", "Component Type");
+    public SchemaElement componentType = newProperty("componentType"); //$NON-NLS-1$
 
-    public SchemaElement componentInstanceId = newSchemaElement("componentInstanceId", "Component Instance");
+    public SchemaElement componentInstanceId = newProperty("componentInstanceId"); //$NON-NLS-1$
 
-    public static final String REFERENCE = "Reference";
+    public static final String REFERENCE = "Reference"; //$NON-NLS-1$
 
-    public ComponentReferenceProperties() {
-        super();
+    public ComponentReferenceProperties(I18nMessageProvider i18nMessagesProvider) {
+        super(i18nMessagesProvider, "org.talend.components.common.messages"); //$NON-NLS-1$
         setupLayout();
     }
 
@@ -54,8 +56,8 @@ public class ComponentReferenceProperties extends ComponentProperties {
         super.setupLayout();
 
         Form reference = Form.create(this, REFERENCE, "Component");
-        reference.addRow(widget(referenceType, componentType, componentInstanceId).setWidgetType(
-                Widget.WidgetType.COMPONENT_REFERENCE));
+        reference.addRow(
+                widget(referenceType, componentType, componentInstanceId).setWidgetType(Widget.WidgetType.COMPONENT_REFERENCE));
         refreshLayout(reference);
     }
 

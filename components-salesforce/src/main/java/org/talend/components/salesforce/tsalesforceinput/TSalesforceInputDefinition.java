@@ -39,7 +39,7 @@ public class TSalesforceInputDefinition extends AbstractComponentDefinition {
 
     @Override
     public ComponentProperties createProperties() {
-        return new TSalesforceInputProperties();
+        return new TSalesforceInputProperties(globalContext.i18nMessageProvider);
     }
 
     public ComponentRuntime createRuntime() {
@@ -63,7 +63,12 @@ public class TSalesforceInputDefinition extends AbstractComponentDefinition {
 
     @Override
     public String getDisplayName() {
-        return "tSalesforceInput";
+        return "tSalesforceInput"; //$NON-NLS-1$
+    }
+
+    @Override
+    protected String getI18NBaseName() {
+        return "org.talend.components.salesforce.message"; //$NON-NLS-1$
     }
 
 }

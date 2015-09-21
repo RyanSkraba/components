@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.talend.components.api.AbstractNamedThing;
+import org.talend.components.api.SimpleNamedThing;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.schema.SchemaElement;
@@ -26,7 +26,7 @@ import org.talend.components.api.schema.SchemaElement;
  * Represents a collection of components {@link SchemaElement} objects that are grouped into a form for display. This
  * form can be manifested for example as a tab in a view, a dialog, or a page in a wizard.
  */
-public class Form extends AbstractNamedThing {
+public class Form extends SimpleNamedThing {
 
     protected ComponentProperties properties;
 
@@ -46,8 +46,6 @@ public class Form extends AbstractNamedThing {
      */
     protected boolean refreshUI;
 
-    public Form() {
-    }
 
     public Form(ComponentProperties props, String name, String displayName, String title) {
         super(name, displayName, title);

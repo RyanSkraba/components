@@ -12,8 +12,13 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceconnect;
 
+import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 
 public class TSalesforceConnectProperties extends SalesforceConnectionProperties {
+
+    public TSalesforceConnectProperties(I18nMessageProvider i18nMessageProvider) {
+        super(i18nMessageProvider);
+    }
 
 }

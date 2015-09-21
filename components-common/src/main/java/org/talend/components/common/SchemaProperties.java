@@ -12,9 +12,10 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
-import static org.talend.components.api.schema.SchemaFactory.newSchemaElement;
+import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
+import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
@@ -30,14 +31,14 @@ public class SchemaProperties extends ComponentProperties {
     //
     // Properties
     //
-    public SchemaElement schema = newSchemaElement(SchemaElement.Type.SCHEMA, "schema", "Schema");
+    public SchemaElement schema = newProperty(SchemaElement.Type.SCHEMA, "schema"); //$NON-NLS-1$
 
-    public static final String MAIN = "Main";
+    public static final String MAIN = "Main"; //$NON-NLS-1$
 
-    public static final String REFERENCE = "Reference";
+    public static final String REFERENCE = "Reference"; //$NON-NLS-1$
 
-    public SchemaProperties() {
-        super();
+    public SchemaProperties(I18nMessageProvider i18nMessagesProvider) {
+        super(i18nMessagesProvider, "org.talend.components.common.messages"); //$NON-NLS-1$
         setValue(schema, SchemaFactory.newSchema());
         setupLayout();
     }
@@ -46,22 +47,23 @@ public class SchemaProperties extends ComponentProperties {
     protected void setupLayout() {
         super.setupLayout();
 
-        Form schemaForm = Form.create(this, MAIN, "Schema");
+        Form schemaForm = Form.create(this, MAIN, "Schema"); //$NON-NLS-1$
         schemaForm.addRow(widget(schema).setWidgetType(Widget.WidgetType.SCHEMA_EDITOR));
         refreshLayout(schemaForm);
 
-        Form schemaRefForm = Form.create(this, REFERENCE, "Schema");
+        Form schemaRefForm = Form.create(this, REFERENCE, "Schema"); //$NON-NLS-1$
         schemaRefForm.addRow(widget(schema).setWidgetType(Widget.WidgetType.SCHEMA_REFERENCE));
         refreshLayout(schemaRefForm);
     }
 
-    public SchemaElement addRow(SchemaElement row) {
+    public SchemaElement addChild(SchemaElement row) {
         Schema s = (Schema) getValue(schema);
-        if (s == null)
+        if (s == null) {
             s = SchemaFactory.newSchema();
+        }
         SchemaElement root = s.getRoot();
         if (root == null) {
-            root = SchemaFactory.newSchemaElement("Root");
+            root = SchemaFactory.newProperty("Root"); //$NON-NLS-1$
             s.setRoot(root);
         }
         root.addChild(row);

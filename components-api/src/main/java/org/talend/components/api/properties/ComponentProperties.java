@@ -1,18 +1,24 @@
 package org.talend.components.api.properties;
 
-import com.cedarsoftware.util.io.JsonReader;
-import com.cedarsoftware.util.io.JsonWriter;
-import org.talend.components.api.ComponentDesigner;
-import org.talend.components.api.properties.internal.ComponentPropertiesInternal;
-import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Widget;
-import org.talend.components.api.schema.SchemaElement;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.talend.components.api.ComponentDesigner;
+import org.talend.components.api.exception.ComponentException;
+import org.talend.components.api.i18n.I18nMessageProvider;
+import org.talend.components.api.i18n.TranslatableImpl;
+import org.talend.components.api.properties.internal.ComponentPropertiesInternal;
+import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.properties.presentation.Widget;
+import org.talend.components.api.schema.SchemaElement;
+import org.talend.daikon.exception.error.CommonErrorCodes;
+import org.talend.daikon.i18n.I18nMessages;
+
+import com.cedarsoftware.util.io.JsonReader;
+import com.cedarsoftware.util.io.JsonWriter;
 
 /**
  * The {@code ComponentProperties} class contains the definitions of the properties associated with a component. These
@@ -22,10 +28,10 @@ import java.util.List;
  * include those for desktop (Eclipse), web, and scripting. All of these will use the code defined here for their
  * construction and validation.
  * <p/>
- * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement}, {@Link
- * PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface decisions are
- * made in code, methods can be added to the subclass to influence the flow of the user interface and help with
- * validation.
+ * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement},
+ * {@Link PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface
+ * decisions are made in code, methods can be added to the subclass to influence the flow of the user interface and help
+ * with validation.
  * <p/>
  * Each property can be a Java type, both simple types and collections are permitted. In addition,
  * {@code ComponentProperties} classes can be composed allowing hierarchies of properties and collections of properties
@@ -45,10 +51,14 @@ import java.util.List;
  * This will return a {@link ValidationResult} object with any error information.</li>
  * <li>{@code beforeForm&lt;FormName&gt;} - Called before the form is displayed.</li>
  * </ul>
+ * 
+ * WARNING : property shall be created as instance field before the constructor is called so that this abstract
+ * constructor can attach i18n translator to the properties. If you want to create the property later you'll have to
+ * call {@link SchemaElement#setI18nMessageFormater(I18nMessages)} manually.
  */
 
 // @JsonSerialize(using = ComponentPropertiesSerializer.class)
-public abstract class ComponentProperties {
+public abstract class ComponentProperties extends TranslatableImpl {
 
     static final String METHOD_BEFORE = "before";
 
@@ -63,25 +73,29 @@ public abstract class ComponentProperties {
      * Holder class for the results of a deserialization.
      */
     public static class Deserialized {
+
         public ComponentProperties properties;
+
         public MigrationInformation migration;
     }
 
     // FIXME - will be moved
     public static class MigrationInformationImpl implements MigrationInformation {
 
-        @Override public boolean isMigrated() {
+        @Override
+        public boolean isMigrated() {
             return false;
         }
 
-        @Override public String getVersion() {
+        @Override
+        public String getVersion() {
             return null;
         }
     }
 
-
     /**
      * Returns the ComponentProperties object previously serialized.
+     * 
      * @param serialized created by {@link #toSerialized()}.
      * @return a {@code ComponentProperties} object represented by the {@code serialized} value.
      */
@@ -92,13 +106,37 @@ public abstract class ComponentProperties {
         return d;
     }
 
-
-    public ComponentProperties() {
+    /**
+     * inheriting class must call i18nMessagesProvider at the end of the constructor and every time they create and new
+     * direct property
+     * 
+     * @param messageProvider, used to find the I18nMessage according to the current LocalProvider
+     * @param baseName, used to find the resource file for I18N
+     */
+    public ComponentProperties(I18nMessageProvider messageProvider, String baseName) {
         internal = new ComponentPropertiesInternal();
+        setI18nMessageFormater(messageProvider.getI18nMessages(this.getClass().getClassLoader(), baseName));
+    }
+
+    /**
+     * This will use the current I18nMessage to the property handles by this class, but only for direct properties and
+     * not nested ComponentProperties
+     */
+    protected void setupPropertiesWithI18n() {
+        List<SchemaElement> properties = getProperties();
+        for (SchemaElement prop : properties) {
+            if (!(prop instanceof ComponentProperties)) {
+                if (prop != null) {
+                    prop.setI18nMessageFormater(i18nMessages);
+                } // else the property has not been initialised yet, please make sure to call this after initilisation
+            } // else this is handle by the constructor of this class.
+        }
+
     }
 
     /**
      * Returns a serialized version of this for storage in a repository.
+     * 
      * @return the serialized {@code String}, use {@link #fromSerialized(String)} to materialize the object.
      */
     public String toSerialized() {
@@ -134,16 +172,20 @@ public abstract class ComponentProperties {
         internal.setDesigner(designer);
     }
 
-    public List<SchemaElement>    getProperties() {
+    public List<SchemaElement> getProperties() {
         List<SchemaElement> properties = new ArrayList();
         Field[] fields = getClass().getFields();
         for (Field f : fields) {
-            if (SchemaElement.class.isAssignableFrom(f.getType()))
+            if (SchemaElement.class.isAssignableFrom(f.getType())) {
                 try {
-                    properties.add((SchemaElement) f.get(this));
+                    SchemaElement se = (SchemaElement) f.get(this);
+                    if (se != null) {
+                        properties.add(se);
+                    } // else element not initialised (set to null)
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    throw new ComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
                 }
+            }
         }
         return properties;
     }
@@ -158,8 +200,9 @@ public abstract class ComponentProperties {
 
     public boolean getBooleanValue(SchemaElement property) {
         Boolean value = (Boolean) getValue(property);
-        if (value == null || !value)
+        if (value == null || !value) {
             return false;
+        }
         return true;
     }
 
@@ -169,9 +212,10 @@ public abstract class ComponentProperties {
 
     public int getIntValue(SchemaElement property) {
         Integer value = (Integer) getValue(property);
-        if (value == null)
+        if (value == null) {
             return 0;
-        return (int) value;
+        }
+        return value;
     }
 
     /**
@@ -200,14 +244,17 @@ public abstract class ComponentProperties {
     public void setLayoutMethods(String property, Widget layout) {
         Method m;
         m = findMethod(METHOD_BEFORE, property);
-        if (m != null)
+        if (m != null) {
             layout.setCallBefore(true);
+        }
         m = findMethod(METHOD_AFTER, property);
-        if (m != null)
+        if (m != null) {
             layout.setCallAfter(true);
+        }
         m = findMethod(METHOD_VALIDATE, property);
-        if (m != null)
+        if (m != null) {
             layout.setCallValidate(true);
+        }
     }
 
     Method findMethod(String type, String propName) {
@@ -236,8 +283,9 @@ public abstract class ComponentProperties {
 
     public void beforeProperty(String propName) throws Throwable {
         Method m = findMethod("before", propName);
-        if (m == null)
+        if (m == null) {
             throw new IllegalStateException("before method not found for: " + propName);
+        }
         try {
             m.invoke(this);
         } catch (InvocationTargetException e) {

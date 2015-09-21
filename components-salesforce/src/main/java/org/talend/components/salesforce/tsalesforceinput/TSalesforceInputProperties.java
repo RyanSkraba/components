@@ -12,55 +12,60 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceinput;
 
+import static org.talend.components.api.schema.SchemaFactory.*;
+
+import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceModuleProperties;
 
-import static org.talend.components.api.schema.SchemaFactory.newSchemaElement;
-
 public class TSalesforceInputProperties extends ComponentProperties {
 
     public enum QueryMode {
-        QUERY,
-        BULK
+                           QUERY,
+                           BULK
     }
 
-    public SchemaElement queryMode = newSchemaElement(SchemaElement.Type.ENUM, "QueryMode", "Query Mode");
+    public SchemaElement queryMode = newProperty(SchemaElement.Type.ENUM, "QueryMode"); //$NON-NLS-1$
 
-    public SchemaElement condition = newSchemaElement("Condition", "Condition");
+    public SchemaElement condition = newProperty("Condition"); //$NON-NLS-1$
 
-    public SchemaElement manualQuery = newSchemaElement(SchemaElement.Type.BOOLEAN, "ManualQuery", "Manual Query");
+    public SchemaElement manualQuery = newProperty(SchemaElement.Type.BOOLEAN, "ManualQuery"); //$NON-NLS-1$
 
-    public SchemaElement query = newSchemaElement("Query", "Full OSQL query string");
+    public SchemaElement query = newProperty("Query"); //$NON-NLS-1$
 
-    public SchemaElement includeDeleted = newSchemaElement(SchemaElement.Type.BOOLEAN, "IncludeDeleted",
-            "Include deleted records");
+    public SchemaElement includeDeleted = newProperty(SchemaElement.Type.BOOLEAN, "IncludeDeleted"); //$NON-NLS-1$
 
     //
     // Advanced
     //
-    public SchemaElement batchSize = newSchemaElement(SchemaElement.Type.INT, "BatchSize", "Batch Size");
+    public SchemaElement batchSize = newProperty(SchemaElement.Type.INT, "BatchSize"); //$NON-NLS-1$
 
-    public SchemaElement normalizeDelimiter = newSchemaElement("NormalizeDelimiter", "Normalize Delimeter");
+    public SchemaElement normalizeDelimiter = newProperty("NormalizeDelimiter"); //$NON-NLS-1$
 
-    public SchemaElement columnNameDelimiter = newSchemaElement("ColumnNameDelimiter", "Column Name Delimiter");
+    public SchemaElement columnNameDelimiter = newProperty("ColumnNameDelimiter"); //$NON-NLS-1$
 
     //
     // Collections
     //
-    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties();
+    public SalesforceConnectionProperties connection;
 
-    public SalesforceModuleProperties module = new SalesforceModuleProperties(connection);
+    public SalesforceModuleProperties module;
 
-    public TSalesforceInputProperties() {
+    public TSalesforceInputProperties(I18nMessageProvider i18nMessageProvider) {
+        super(i18nMessageProvider, "org.talend.components.salesforce.message"); //$NON-NLS-1$
+        connection = new SalesforceConnectionProperties(i18nMessageProvider);
+
+        module = new SalesforceModuleProperties(i18nMessageProvider, connection);
         setupLayout();
+        setupPropertiesWithI18n();
     }
 
-    public static final String MAIN = "Main";
+    public static final String MAIN = "Main"; //$NON-NLS-1$
 
-    public static final String ADVANCED = "Advanced";
+    public static final String ADVANCED = "Advanced"; //$NON-NLS-1$
 
     @Override
     public void setupLayout() {

@@ -12,11 +12,13 @@
 // ============================================================================
 package org.talend.components.api;
 
+import org.talend.components.api.i18n.Translatable;
+
 /**
  * Something that has a name.
  *
  */
-public interface NamedThing {
+public interface NamedThing extends Translatable {
 
     /**
      * This is a technical name that shall be unique to identify the thing

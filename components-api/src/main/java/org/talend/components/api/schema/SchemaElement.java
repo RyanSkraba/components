@@ -12,24 +12,26 @@ import org.talend.components.api.NamedThing;
 public interface SchemaElement extends NamedThing {
 
     public enum Type {
-        STRING,
-        BOOLEAN,
-        INT,
-        DATE,
-        DATETIME,
-        DECIMAL,
-        FLOAT,
-        DOUBLE,
-        BYTE_ARRAY,
-        ENUM,
-        DYNAMIC,
-        SCHEMA
+                      STRING,
+                      BOOLEAN,
+                      INT,
+                      DATE,
+                      DATETIME,
+                      DECIMAL,
+                      FLOAT,
+                      DOUBLE,
+                      BYTE_ARRAY,
+                      ENUM,
+                      DYNAMIC,
+                      SCHEMA
     }
 
+    @Override
     public String getName();
 
     public SchemaElement setName(String name);
 
+    @Override
     public String getTitle();
 
     public SchemaElement setTitle(String description);

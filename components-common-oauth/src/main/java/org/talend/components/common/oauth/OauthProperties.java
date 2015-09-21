@@ -12,29 +12,32 @@
 // ============================================================================
 package org.talend.components.common.oauth;
 
+import static org.talend.components.api.schema.SchemaFactory.*;
+
+import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 
-import static org.talend.components.api.schema.SchemaFactory.newSchemaElement;
-
 public class OauthProperties extends ComponentProperties {
 
-    public SchemaElement clientId = newSchemaElement("clientId", "Client Id").setRequired(true);
+    public SchemaElement clientId = newProperty("clientId").setRequired(true); //$NON-NLS-1$
 
-    public SchemaElement clientSecret = newSchemaElement("clientSecret", "Client Secret").setRequired(true);
+    public SchemaElement clientSecret = newProperty("clientSecret").setRequired(true); //$NON-NLS-1$
 
-    public SchemaElement callbackHost = newSchemaElement("callbackHost", "Callback Host").setRequired(true);
+    public SchemaElement callbackHost = newProperty("callbackHost").setRequired(true); //$NON-NLS-1$
 
-    public SchemaElement callbackPort = newSchemaElement(SchemaElement.Type.INT, "callbackPort", "Callback Port").setRequired(
-            true);
+    public SchemaElement callbackPort = newProperty(SchemaElement.Type.INT, "callbackPort").setRequired(true); //$NON-NLS-1$
 
-    public SchemaElement tokenFile = newSchemaElement("tokenFile", "Token File").setRequired(true);
+    public SchemaElement tokenFile = newProperty("tokenFile").setRequired(true); //$NON-NLS-1$
 
-    public static final String OAUTH = "OAuth";
+    public static final String OAUTH = "OAuth"; //$NON-NLS-1$
 
-    public OauthProperties() {
+    public OauthProperties(I18nMessageProvider i18nMessageProvider) {
+        super(i18nMessageProvider, "org.talend.components.common.oauth.messages"); //$NON-NLS-1$
         setupLayout();
+        setupPropertiesWithI18n();// this must once each property instance is created
+
     }
 
     @Override

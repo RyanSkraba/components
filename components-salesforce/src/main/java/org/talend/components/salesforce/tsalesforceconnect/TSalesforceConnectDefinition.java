@@ -34,7 +34,7 @@ public class TSalesforceConnectDefinition extends AbstractComponentDefinition {
 
     @Override
     public ComponentProperties createProperties() {
-        return new TSalesforceConnectProperties();
+        return new TSalesforceConnectProperties(globalContext.i18nMessageProvider);
     }
 
     public ComponentRuntime createRuntime() {
@@ -53,13 +53,18 @@ public class TSalesforceConnectDefinition extends AbstractComponentDefinition {
 
     @Override
     public String getPngImagePath() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String getDisplayName() {
         return "tSalesforceConnect";
+    }
+
+
+    @Override
+    protected String getI18NBaseName() {
+        return "org.talend.components.salesforce.message"; //$NON-NLS-1$
     }
 
 }
