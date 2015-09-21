@@ -1,5 +1,7 @@
 package org.talend.components.api.properties;
 
+import com.cedarsoftware.util.io.JsonReader;
+import com.cedarsoftware.util.io.JsonWriter;
 import org.talend.components.api.ComponentDesigner;
 import org.talend.components.api.properties.internal.ComponentPropertiesInternal;
 import org.talend.components.api.properties.presentation.Form;
@@ -65,6 +67,7 @@ public abstract class ComponentProperties {
         public MigrationInformation migration;
     }
 
+    // FIXME - will be moved
     public static class MigrationInformationImpl implements MigrationInformation {
 
         @Override public boolean isMigrated() {
@@ -85,7 +88,7 @@ public abstract class ComponentProperties {
     public static Deserialized fromSerialized(String serialized) {
         Deserialized d = new Deserialized();
         d.migration = new MigrationInformationImpl();
-
+        d.properties = (ComponentProperties) JsonReader.jsonToJava(serialized);
         return d;
     }
 
@@ -99,7 +102,7 @@ public abstract class ComponentProperties {
      * @return the serialized {@code String}, use {@link #fromSerialized(String)} to materialize the object.
      */
     public String toSerialized() {
-        return null;
+        return JsonWriter.objectToJson(this);
     }
 
     public List<Form> getForms() {

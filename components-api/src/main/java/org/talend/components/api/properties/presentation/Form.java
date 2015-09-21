@@ -43,6 +43,8 @@ public class Form extends AbstractNamedThing {
      */
     protected boolean refreshUI;
 
+    public Form() {}
+
     public Form(ComponentProperties props, String name, String displayName, String title) {
         super(name, displayName, title);
         children = new HashMap<String, NamedThing>();

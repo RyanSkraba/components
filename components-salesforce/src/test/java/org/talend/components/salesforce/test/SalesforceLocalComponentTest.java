@@ -28,6 +28,7 @@ import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.test.LocalComponentTest;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.common.UserPasswordProperties;
@@ -89,6 +90,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     public void testGetProps() {
         ComponentProperties props = componentService.getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
         Form f = props.getForm(TSalesforceConnectProperties.MAIN);
+        LocalComponentTest.checkSerialize(props);
         System.out.println(f);
         System.out.println(props);
     }
@@ -99,6 +101,7 @@ public class SalesforceLocalComponentTest extends TestCase {
 
         props = (SalesforceConnectionProperties) componentService
                 .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
+        LocalComponentTest.checkSerialize(props);
         assertEquals(SalesforceConnectionProperties.LoginType.BASIC, props.getValue(props.loginType));
         Form mainForm = props.getForm(TSalesforceConnectProperties.MAIN);
         String userPassFormName = props.userPassword.setupFormName(UserPasswordProperties.USERPASSWORD);
@@ -192,6 +195,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
+        LocalComponentTest.checkSerialize(props);
 
         assertEquals(2, props.getForms().size());
         Form f = props.module.getForm(SalesforceModuleProperties.REFERENCE);
@@ -240,6 +244,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
         Schema schema = (Schema) moduleProps.schema.getValue(moduleProps.schema.schema);
 
+        LocalComponentTest.checkSerialize(props);
         SalesforceRuntime runtime = new SalesforceRuntime();
         runtime.connect(props.connection);
 
@@ -265,6 +270,8 @@ public class SalesforceLocalComponentTest extends TestCase {
         moduleProps.setValue(moduleProps.moduleName, "Account");
         checkAndAfter(f, "moduleName", moduleProps);
         props.setValue(props.outputAction, TSalesforceOutputProperties.OutputAction.INSERT);
+
+        LocalComponentTest.checkSerialize(props);
 
         SalesforceRuntime runtime = new SalesforceRuntime();
         runtime.connect(props.connection);
