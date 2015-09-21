@@ -19,6 +19,9 @@ public abstract class ComponentWizard {
         this.userData = userData;
     }
 
+    public void addForm(Form form) {
+        forms.add(form);
+    }
     public List<Form> getForms() {
         return forms;
     }

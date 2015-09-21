@@ -12,12 +12,15 @@
 // ============================================================================
 package org.talend.components.api.properties.presentation;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.talend.components.api.AbstractNamedThing;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.schema.SchemaElement;
-
-import java.util.*;
 
 /**
  * Represents a collection of components {@link SchemaElement} objects that are grouped into a form for display. This
@@ -43,7 +46,8 @@ public class Form extends AbstractNamedThing {
      */
     protected boolean refreshUI;
 
-    public Form() {}
+    public Form() {
+    }
 
     public Form(ComponentProperties props, String name, String displayName, String title) {
         super(name, displayName, title);
@@ -58,8 +62,14 @@ public class Form extends AbstractNamedThing {
         return new Form(props, props.setupFormName(name), name, title);
     }
 
-    public Collection<NamedThing> getChildren() {
-        return children.values();
+    public List<NamedThing> getChildren() {
+        List<NamedThing> l = new ArrayList();
+        l.addAll(children.values());
+        return l;
+    }
+
+    public List<Widget> getWidgets() {
+        return widgets;
     }
 
     public NamedThing getChild(String name) {
@@ -68,11 +78,6 @@ public class Form extends AbstractNamedThing {
 
     public ComponentProperties getProperties() {
         return properties;
-    }
-
-    // FIXME - only here for JSON
-    public List<Widget> getWidgets() {
-        return widgets;
     }
 
     public Form addRow(NamedThing child) {

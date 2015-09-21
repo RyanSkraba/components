@@ -10,6 +10,10 @@ public class SalesforceConnectionWizard extends ComponentWizard {
     SalesforceConnectionWizard(String userData) {
         super(userData);
 
-        // FIXME - need to add the forms
+        SalesforceConnectionProperties cProps = new SalesforceConnectionProperties();
+        addForm(cProps.getForm(SalesforceConnectionProperties.MAIN));
+
+        SalesforceModuleProperties mProps = new SalesforceModuleProperties(cProps);
+        addForm(mProps.getForm(SalesforceModuleProperties.MAIN));
     }
 }

@@ -84,6 +84,9 @@ public class SalesforceLocalComponentTest extends TestCase {
         assertNotNull(wiz);
         assertEquals("userData", wiz.getUserData());
         assertTrue(wiz instanceof SalesforceConnectionWizard);
+        List<Form>forms = wiz.getForms();
+        assertEquals("SalesforceConnectionPropertiesMain", forms.get(0).getName());
+        assertEquals("SalesforceModulePropertiesMain", forms.get(1).getName());
     }
 
     @Test
