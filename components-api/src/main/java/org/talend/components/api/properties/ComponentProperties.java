@@ -57,8 +57,49 @@ public abstract class ComponentProperties {
     // Not a component property
     protected ComponentPropertiesInternal internal;
 
+    /**
+     * Holder class for the results of a deserialization.
+     */
+    public static class Deserialized {
+        public ComponentProperties properties;
+        public MigrationInformation migration;
+    }
+
+    public static class MigrationInformationImpl implements MigrationInformation {
+
+        @Override public boolean isMigrated() {
+            return false;
+        }
+
+        @Override public String getVersion() {
+            return null;
+        }
+    }
+
+
+    /**
+     * Returns the ComponentProperties object previously serialized.
+     * @param serialized created by {@link #toSerialized()}.
+     * @return a {@code ComponentProperties} object represented by the {@code serialized} value.
+     */
+    public static Deserialized fromSerialized(String serialized) {
+        Deserialized d = new Deserialized();
+        d.migration = new MigrationInformationImpl();
+
+        return d;
+    }
+
+
     public ComponentProperties() {
         internal = new ComponentPropertiesInternal();
+    }
+
+    /**
+     * Returns a serialized version of this for storage in a repository.
+     * @return the serialized {@code String}, use {@link #fromSerialized(String)} to materialize the object.
+     */
+    public String toSerialized() {
+        return null;
     }
 
     public List<Form> getForms() {
