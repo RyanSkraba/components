@@ -12,6 +12,9 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
+import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.schema.SchemaFactory.newSchemaElement;
+
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.Schema;
@@ -19,8 +22,6 @@ import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceModuleProperties;
-
-import static org.talend.components.api.schema.SchemaFactory.newSchemaElement;
 
 public class TSalesforceOutputProperties extends ComponentProperties {
 
@@ -91,9 +92,9 @@ public class TSalesforceOutputProperties extends ComponentProperties {
         mainForm.addRow(commitLevel);
         mainForm.addRow(logFileName);
         mainForm.addColumn(retrieveInsertId);
-        // FIXME - how is this labeled. Should we wrap this in a Property object?
-        mainForm.addRow(schemaFlow.getForm(SchemaProperties.REFERENCE));
-        mainForm.addRow(schemaReject.getForm(SchemaProperties.REFERENCE));
+        mainForm.addRow(widget(schemaFlow.getForm(SchemaProperties.REFERENCE)).setName("SchemaFlow").setTitle("Schema Flow"));
+        mainForm.addRow(widget(schemaReject.getForm(SchemaProperties.REFERENCE)).setName("SchemaReject")
+                .setTitle("Schema Reject"));
         refreshLayout(mainForm);
     }
 

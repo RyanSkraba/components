@@ -37,6 +37,21 @@ public class AbstractNamedThing implements NamedThing {
         this.title = title;
     }
 
+    public AbstractNamedThing setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public AbstractNamedThing setDisplayName(String name) {
+        this.displayName = name;
+        return this;
+    }
+
+    public AbstractNamedThing setTitle(String title) {
+        this.title = title;
+        return this;
+    }
+
     @Override
     public String getName() {
         return this.name;
