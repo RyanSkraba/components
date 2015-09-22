@@ -16,6 +16,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +37,6 @@ import org.talend.components.api.test.testcomponent.TestComponentProperties.Nest
 import org.talend.components.api.test.testcomponent.TestComponentWizard;
 import org.talend.components.api.test.testcomponent.TestComponentWizardDefinition;
 import org.talend.components.api.wizard.ComponentWizard;
-
-import junit.framework.TestCase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -87,12 +87,11 @@ public class LocalComponentTest extends TestCase {
         assertTrue(f.getWidget("userId").isVisible());
     }
 
-    // commented out during merge FIXME put it back on
-    // @Test
-    // public void testSerialize() {
-    // ComponentProperties props = componentService.getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
-    // checkSerialize(props);
-    // }
+    @Test
+    public void testSerialize() {
+        ComponentProperties props = componentService.getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
+        checkSerialize(props);
+    }
 
     @Test
     public void testGetWizardIconOk() {

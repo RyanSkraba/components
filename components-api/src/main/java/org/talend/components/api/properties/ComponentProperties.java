@@ -115,7 +115,8 @@ public abstract class ComponentProperties extends TranslatableImpl {
      */
     public ComponentProperties(I18nMessageProvider messageProvider, String baseName) {
         internal = new ComponentPropertiesInternal();
-        setI18nMessageFormater(messageProvider.getI18nMessages(this.getClass().getClassLoader(), baseName));
+        if (messageProvider != null)
+            setI18nMessageFormater(messageProvider.getI18nMessages(this.getClass().getClassLoader(), baseName));
     }
 
     /**
