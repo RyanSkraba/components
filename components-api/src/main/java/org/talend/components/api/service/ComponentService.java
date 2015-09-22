@@ -79,6 +79,22 @@ public interface ComponentService {
 
     ComponentProperties afterProperty(String propName, ComponentProperties properties) throws Throwable;
 
+    ComponentProperties beforeFormPresent(String formName, ComponentProperties properties) throws Throwable;
+
+    ComponentProperties afterFormPresent(String formName, ComponentProperties properties) throws Throwable;
+
+    ComponentProperties beforeFormNext(String formName, ComponentProperties properties) throws Throwable;
+
+    ComponentProperties afterFormNext(String formName, ComponentProperties properties) throws Throwable;
+
+    ComponentProperties beforeFormBack(String formName, ComponentProperties properties) throws Throwable;
+
+    ComponentProperties afterFormBack(String formName, ComponentProperties properties) throws Throwable;
+
+    ComponentProperties beforeFormFinish(String formName, ComponentProperties properties) throws Throwable;
+
+    ComponentProperties afterFormFinish(String formName, ComponentProperties properties) throws Throwable;
+
     /**
      * Return the png image related to the given wizard
      * 

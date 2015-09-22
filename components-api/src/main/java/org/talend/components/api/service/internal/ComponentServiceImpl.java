@@ -38,7 +38,7 @@ public class ComponentServiceImpl implements ComponentService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ComponentServiceImpl.class);
 
-    private ComponentRegistry   componentRegistry;
+    private ComponentRegistry componentRegistry;
 
     public ComponentServiceImpl(ComponentRegistry componentRegistry) {
         this.componentRegistry = componentRegistry;
@@ -70,8 +70,7 @@ public class ComponentServiceImpl implements ComponentService {
         final String beanName = Constants.COMPONENT_BEAN_PREFIX + name;
         ComponentDefinition compDef = componentRegistry.getComponents().get(beanName);
         if (compDef == null) {
-            throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME,
-                    ExceptionContext.build().put("name", name)); //$NON-NLS-1$
+            throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME, ExceptionContext.build().put("name", name)); //$NON-NLS-1$
         } // else got the def so use it
         ComponentProperties properties = compDef.createProperties();
         return properties;
@@ -107,14 +106,60 @@ public class ComponentServiceImpl implements ComponentService {
     }
 
     @Override
+    public ComponentProperties beforeFormPresent(String formName, ComponentProperties properties) throws Throwable {
+        properties.beforeFormPresent(formName);
+        return properties;
+    }
+
+    @Override
+    public ComponentProperties afterFormPresent(String formName, ComponentProperties properties) throws Throwable {
+        properties.afterFormPresent(formName);
+        return properties;
+    }
+
+    @Override
+    public ComponentProperties beforeFormNext(String formName, ComponentProperties properties) throws Throwable {
+        properties.beforeFormNext(formName);
+        return properties;
+    }
+
+    @Override
+    public ComponentProperties afterFormNext(String formName, ComponentProperties properties) throws Throwable {
+        properties.afterFormNext(formName);
+        return properties;
+    }
+
+    @Override
+    public ComponentProperties beforeFormBack(String formName, ComponentProperties properties) throws Throwable {
+        properties.beforeFormBack(formName);
+        return properties;
+    }
+
+    @Override
+    public ComponentProperties afterFormBack(String formName, ComponentProperties properties) throws Throwable {
+        properties.afterFormBack(formName);
+        return properties;
+    }
+
+    @Override
+    public ComponentProperties beforeFormFinish(String formName, ComponentProperties properties) throws Throwable {
+        properties.beforeFormFinish(formName);
+        return properties;
+    }
+
+    @Override
+    public ComponentProperties afterFormFinish(String formName, ComponentProperties properties) throws Throwable {
+        properties.afterFormFinish(formName);
+        return properties;
+    }
+
+    @Override
     public InputStream getWizardPngImage(String wizardName) {
-        TopLevelDefinition wizardDefinition = componentRegistry.getComponentWizards()
-                .get(Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);
+        TopLevelDefinition wizardDefinition = componentRegistry.getComponentWizards().get(Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);
         if (wizardDefinition != null) {
             return getImageStream(wizardDefinition);
         } else {
-            throw new ComponentException(ComponentsErrorCode.WRONG_WIZARD_NAME,
-                    ExceptionContext.build().put("name", wizardName)); //$NON-NLS-1$
+            throw new ComponentException(ComponentsErrorCode.WRONG_WIZARD_NAME, ExceptionContext.build().put("name", wizardName)); //$NON-NLS-1$
         }
 
     }
@@ -126,8 +171,8 @@ public class ComponentServiceImpl implements ComponentService {
         if (componentDefinition != null) {
             return getImageStream(componentDefinition);
         } else {
-            throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME,
-                    ExceptionContext.build().put("name", componentName)); //$NON-NLS-1$
+            throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME, ExceptionContext.build().put(
+                    "name", componentName)); //$NON-NLS-1$
         }
     }
 

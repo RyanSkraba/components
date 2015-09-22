@@ -28,10 +28,10 @@ import com.cedarsoftware.util.io.JsonWriter;
  * include those for desktop (Eclipse), web, and scripting. All of these will use the code defined here for their
  * construction and validation.
  * <p/>
- * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement},
- * {@Link PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface
- * decisions are made in code, methods can be added to the subclass to influence the flow of the user interface and help
- * with validation.
+ * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement}, {@Link
+ * PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface decisions are
+ * made in code, methods can be added to the subclass to influence the flow of the user interface and help with
+ * validation.
  * <p/>
  * Each property can be a Java type, both simple types and collections are permitted. In addition,
  * {@code ComponentProperties} classes can be composed allowing hierarchies of properties and collections of properties
@@ -244,21 +244,23 @@ public abstract class ComponentProperties extends TranslatableImpl {
     // Internal - not API
     public void setLayoutMethods(String property, Widget layout) {
         Method m;
-        m = findMethod(METHOD_BEFORE, property);
+        m = findMethod(METHOD_BEFORE, property, !REQUIRED);
         if (m != null) {
             layout.setCallBefore(true);
         }
-        m = findMethod(METHOD_AFTER, property);
+        m = findMethod(METHOD_AFTER, property, !REQUIRED);
         if (m != null) {
             layout.setCallAfter(true);
         }
-        m = findMethod(METHOD_VALIDATE, property);
+        m = findMethod(METHOD_VALIDATE, property, !REQUIRED);
         if (m != null) {
             layout.setCallValidate(true);
         }
     }
 
-    Method findMethod(String type, String propName) {
+    private boolean REQUIRED = true;
+
+    Method findMethod(String type, String propName, boolean required) {
         propName = propName.substring(0, 1).toUpperCase() + propName.substring(1);
         String methodName = type + propName;
         Method[] methods = getClass().getMethods();
@@ -267,26 +269,12 @@ public abstract class ComponentProperties extends TranslatableImpl {
                 return m;
             }
         }
+        if (required)
+            throw new IllegalStateException("Method: " + methodName + " not found");
         return null;
     }
 
-    public void validateProperty(String propName) throws Throwable {
-        Method m = findMethod("validate", propName);
-        if (m != null) {
-            try {
-                ValidationResult validationResult = (ValidationResult) m.invoke(this);
-                internal.setValidationResult(validationResult);
-            } catch (InvocationTargetException e) {
-                throw e.getTargetException();
-            }
-        }
-    }
-
-    public void beforeProperty(String propName) throws Throwable {
-        Method m = findMethod("before", propName);
-        if (m == null) {
-            throw new IllegalStateException("before method not found for: " + propName);
-        }
+    private void doInvoke(Method m) throws Throwable {
         try {
             m.invoke(this);
         } catch (InvocationTargetException e) {
@@ -294,15 +282,54 @@ public abstract class ComponentProperties extends TranslatableImpl {
         }
     }
 
-    public void afterProperty(String propName) throws Throwable {
-        Method m = findMethod("after", propName);
-        if (m != null) {
-            try {
-                m.invoke(this);
-            } catch (InvocationTargetException e) {
-                throw e.getTargetException();
-            }
+    public void validateProperty(String propName) throws Throwable {
+        Method m = findMethod("validate", propName, REQUIRED);
+        try {
+            ValidationResult validationResult = (ValidationResult) m.invoke(this);
+            internal.setValidationResult(validationResult);
+        } catch (InvocationTargetException e) {
+            throw e.getTargetException();
         }
+    }
+
+    public void beforeProperty(String propName) throws Throwable {
+        doInvoke(findMethod("before", propName, REQUIRED));
+    }
+
+    public void afterProperty(String propName) throws Throwable {
+        doInvoke(findMethod("after", propName, REQUIRED));
+    }
+
+    public void beforeFormPresent(String formName) throws Throwable {
+        doInvoke(findMethod("beforeFormPresent", formName, REQUIRED));
+    }
+
+    public void afterFormPresent(String formName) throws Throwable {
+        doInvoke(findMethod("afterFormPresent", formName, REQUIRED));
+    }
+
+    public void beforeFormNext(String formName) throws Throwable {
+        doInvoke(findMethod("beforeFormNext", formName, REQUIRED));
+    }
+
+    public void afterFormNext(String formName) throws Throwable {
+        doInvoke(findMethod("afterFormNext", formName, REQUIRED));
+    }
+
+    public void beforeFormBack(String formName) throws Throwable {
+        doInvoke(findMethod("beforeFormBack", formName, REQUIRED));
+    }
+
+    public void afterFormBack(String formName) throws Throwable {
+        doInvoke(findMethod("afterFormBack", formName, REQUIRED));
+    }
+
+    public void beforeFormFinish(String formName) throws Throwable {
+        doInvoke(findMethod("beforeFormFinish", formName, REQUIRED));
+    }
+
+    public void afterFormFinish(String formName) throws Throwable {
+        doInvoke(findMethod("afterFormFinish", formName, REQUIRED));
     }
 
 }

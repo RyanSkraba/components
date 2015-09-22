@@ -143,6 +143,46 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
+    public ComponentProperties beforeFormPresent(String formName, ComponentProperties properties) throws Throwable {
+        return componentServiceDelegate.beforeFormPresent(formName, properties);
+    }
+
+    @Override
+    public ComponentProperties afterFormPresent(String formName, ComponentProperties properties) throws Throwable {
+        return componentServiceDelegate.afterFormPresent(formName, properties);
+    }
+
+    @Override
+    public ComponentProperties beforeFormNext(String formName, ComponentProperties properties) throws Throwable {
+        return componentServiceDelegate.beforeFormNext(formName, properties);
+    }
+
+    @Override
+    public ComponentProperties afterFormNext(String formName, ComponentProperties properties) throws Throwable {
+        return componentServiceDelegate.afterFormNext(formName, properties);
+    }
+
+    @Override
+    public ComponentProperties beforeFormBack(String formName, ComponentProperties properties) throws Throwable {
+        return componentServiceDelegate.beforeFormBack(formName, properties);
+    }
+
+    @Override
+    public ComponentProperties afterFormBack(String formName, ComponentProperties properties) throws Throwable {
+        return componentServiceDelegate.afterFormBack(formName, properties);
+    }
+
+    @Override
+    public ComponentProperties beforeFormFinish(String formName, ComponentProperties properties) throws Throwable {
+        return componentServiceDelegate.beforeFormFinish(formName, properties);
+    }
+
+    @Override
+    public ComponentProperties afterFormFinish(String formName, ComponentProperties properties) throws Throwable {
+        return componentServiceDelegate.afterFormFinish(formName, properties);
+    }
+
+    @Override
     public Set<String> getAllComponentNames() {
         return componentServiceDelegate.getAllComponentNames();
     }

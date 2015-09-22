@@ -139,6 +139,94 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
+    @RequestMapping(value = BASE_PATH
+            + "/properties/beforeFormPresent/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody ComponentProperties beforeFormPresent(
+            @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
+            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
+            throws Throwable {
+        componentServiceDelegate.beforeFormPresent(formName, properties);
+        return properties;
+    }
+
+    @Override
+    @RequestMapping(value = BASE_PATH
+            + "/properties/afterFormPresent/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody ComponentProperties afterFormPresent(
+            @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
+            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
+            throws Throwable {
+        componentServiceDelegate.afterFormPresent(formName, properties);
+        return properties;
+    }
+
+    @Override
+    @RequestMapping(value = BASE_PATH
+            + "/properties/beforeFormNext/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody ComponentProperties beforeFormNext(
+            @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
+            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
+            throws Throwable {
+        componentServiceDelegate.beforeFormNext(formName, properties);
+        return properties;
+    }
+
+    @Override
+    @RequestMapping(value = BASE_PATH
+            + "/properties/afterFormNext/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody ComponentProperties afterFormNext(
+            @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
+            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
+            throws Throwable {
+        componentServiceDelegate.afterFormNext(formName, properties);
+        return properties;
+    }
+
+    @Override
+    @RequestMapping(value = BASE_PATH
+            + "/properties/beforeFormBack/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody ComponentProperties beforeFormBack(
+            @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
+            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
+            throws Throwable {
+        componentServiceDelegate.beforeFormBack(formName, properties);
+        return properties;
+    }
+
+    @Override
+    @RequestMapping(value = BASE_PATH
+            + "/properties/afterFormBack/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody ComponentProperties afterFormBack(
+            @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
+            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
+            throws Throwable {
+        componentServiceDelegate.afterFormBack(formName, properties);
+        return properties;
+    }
+
+    @Override
+    @RequestMapping(value = BASE_PATH
+            + "/properties/beforeFormFinish/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody ComponentProperties beforeFormFinish(
+            @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
+            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
+            throws Throwable {
+        componentServiceDelegate.beforeFormFinish(formName, properties);
+        return properties;
+    }
+
+    @Override
+    @RequestMapping(value = BASE_PATH
+            + "/properties/afterFormFinish/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody ComponentProperties afterFormFinish(
+            @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
+            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
+            throws Throwable {
+        componentServiceDelegate.afterFormFinish(formName, properties);
+        return properties;
+    }
+
+    @Override
     @RequestMapping(value = BASE_PATH + "/names", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody Set<String> getAllComponentNames() {
         return componentServiceDelegate.getAllComponentNames();
