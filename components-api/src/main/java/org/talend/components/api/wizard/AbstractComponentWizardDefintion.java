@@ -19,4 +19,18 @@ import org.talend.components.api.AbstractTopLevelDefinition;
  */
 public abstract class AbstractComponentWizardDefintion extends AbstractTopLevelDefinition implements ComponentWizardDefinition {
 
+    /**
+     * 
+     */
+    private static final String I18N_MENU_NAME_SUFFIX = ".menu.name"; //$NON-NLS-1$
+
+    @Override
+    protected String getI18nPrefix() {
+        return "wizard."; //$NON-NLS-1$
+    }
+
+    @Override
+    public String getMenuItemName() {
+        return getI18nMessage(getI18nPrefix() + getName() + I18N_MENU_NAME_SUFFIX);
+    }
 }

@@ -38,16 +38,11 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
 
     @Override
     public String getName() {
-        return getI18nMessage("component.name");
+        return COMPONENT_NAME;
     }
 
     @Override
     public String getPngImagePath() {
-        return null;
-    }
-
-    @Override
-    public String getDisplayName() {
         return null;
     }
 

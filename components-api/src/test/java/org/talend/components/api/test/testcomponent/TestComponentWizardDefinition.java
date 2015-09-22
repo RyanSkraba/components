@@ -28,28 +28,13 @@ public class TestComponentWizardDefinition extends AbstractComponentWizardDefint
     }
 
     @Override
-    public String getMenuItemName() {
-        return "menu item name";
-    }
-
-    @Override
     public String getPngImagePath() {
         return "connectionWizardIcon.png";
     }
 
     @Override
     public ComponentWizard createWizard(String location) {
-        return new TestComponentWizard(location);
-    }
-
-    @Override
-    public String getDisplayName() {
-        return " DisplayName";
-    }
-
-    @Override
-    public String getTitle() {
-        return "The title";
+        return new TestComponentWizard(location, globalContext.i18nMessageProvider);
     }
 
     @Override

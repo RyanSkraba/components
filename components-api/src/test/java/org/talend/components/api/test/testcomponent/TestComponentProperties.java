@@ -38,7 +38,7 @@ public class TestComponentProperties extends ComponentProperties {
 
     public SchemaElement userId = newProperty(USER_ID_PROP_NAME).setRequired(true);
 
-    public SchemaElement password = newProperty("password", "Password").setRequired(true);
+    public SchemaElement password = newProperty("password").setRequired(true);
 
     public NestedComponentProperties nestedProps;
 

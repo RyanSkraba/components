@@ -19,13 +19,8 @@ public class SalesforceConnectionWizardDefinition extends AbstractComponentWizar
     }
 
     @Override
-    public String getMenuItemName() {
-        return "Salesforce Connection";
-    }
-
-    @Override
     public ComponentWizard createWizard(String userData) {
-        return new SalesforceConnectionWizard(userData);
+        return new SalesforceConnectionWizard(userData, globalContext.i18nMessageProvider);
     }
 
     @Override
@@ -34,17 +29,7 @@ public class SalesforceConnectionWizardDefinition extends AbstractComponentWizar
     }
 
     @Override
-    public String getDisplayName() {
-        return "Salesforce";
-    }
-
-    @Override
-    public String getTitle() {
-        return "Salesforce Connection";
-    }
-
-    @Override
     protected String getI18NBaseName() {
-        return "org.talend.components.salesforce.message";
+        return "org.talend.components.salesforce.message"; //$NON-NLS-1$
     }
 }

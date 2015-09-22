@@ -36,7 +36,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     //
 
     // public String apiVersion;
-    public SchemaElement url = newProperty("url", "Salesforce URL").setRequired(true); //$NON-NLS-1$//$NON-NLS-2$
+    public SchemaElement url = newProperty("url").setRequired(true); //$NON-NLS-1$
 
     public enum LoginType {
                            BASIC,

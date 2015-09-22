@@ -16,8 +16,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +35,9 @@ import org.talend.components.api.test.testcomponent.TestComponentProperties.Nest
 import org.talend.components.api.test.testcomponent.TestComponentWizard;
 import org.talend.components.api.test.testcomponent.TestComponentWizardDefinition;
 import org.talend.components.api.wizard.ComponentWizard;
+import org.talend.components.api.wizard.ComponentWizardDefinition;
+
+import junit.framework.TestCase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -124,7 +125,19 @@ public class LocalComponentTest extends TestCase {
         assertEquals(1, allComponents.size());
         ComponentDefinition componentDefinition = allComponents.iterator().next();
         TestComponentDefinition tcd = (TestComponentDefinition) componentDefinition;
-        assertEquals("Test Component", tcd.getName());
+        assertEquals("Test Component", tcd.getDisplayName());
+        assertEquals("Ze Test Component Title", tcd.getTitle());
+    }
+
+    @Test
+    public void testi18NForWizardDefintion() {
+        Set<ComponentWizardDefinition> wizardDefs = componentService.getTopLevelComponentWizards();
+        assertEquals(1, wizardDefs.size());
+        ComponentWizardDefinition cwd = wizardDefs.iterator().next();
+        assertNotNull(cwd);
+        assertEquals("Test Wizard", cwd.getDisplayName());
+        assertEquals("Ze Test Wizard Title", cwd.getTitle());
+        assertEquals("Ze Test Wizard menu", cwd.getMenuItemName());
     }
 
     @Test

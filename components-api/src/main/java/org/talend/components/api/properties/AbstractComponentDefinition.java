@@ -17,15 +17,9 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
         return connectors;
     }
 
-    // FIXME - this should get it from the message file - temporary implementation
     @Override
-    public String getDisplayName() {
-        return getName();
+    protected String getI18nPrefix() {
+        return "component."; //$NON-NLS-1$
     }
 
-    // FIXME this should get it from the message file - temporary implementation
-    @Override
-    public String getTitle() {
-        return "Title: " + getName();
-    }
 }

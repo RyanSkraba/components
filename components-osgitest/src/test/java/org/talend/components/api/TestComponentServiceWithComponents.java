@@ -119,4 +119,30 @@ public class TestComponentServiceWithComponents {
         assertNotNull(scProps);
         assertEquals("Client Id", scProps.oauth.clientId.getDisplayName()); //$NON-NLS-1$
     }
+
+    @Test
+    public void testI18nWizardMenuForSalesforce() {
+        assertNotNull(componentService);
+        Set<ComponentWizardDefinition> wizardDefs = componentService.getTopLevelComponentWizards();
+        ComponentWizardDefinition salesforceWizDef = findWizardDefinition(wizardDefs, "salesforce");
+        assertNotNull(salesforceWizDef);
+        assertEquals("Salesforce Connection", salesforceWizDef.getMenuItemName()); //$NON-NLS-1$
+    }
+
+    /**
+     * DOC sgandon Comment method "findWizardDefinition".
+     * 
+     * @param wizardDefs
+     * @param wizardName
+     * @return
+     */
+    private ComponentWizardDefinition findWizardDefinition(Set<ComponentWizardDefinition> wizardDefs, String wizardName) {
+        for (ComponentWizardDefinition cwd : wizardDefs) {
+            if (wizardName.equals(cwd.getName())) {
+                return cwd;
+            } // else keep looking
+        }
+        return null;
+    }
+
 }

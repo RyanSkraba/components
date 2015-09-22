@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.talend.components.api.SimpleNamedThing;
-import org.talend.daikon.i18n.I18nMessages;
 
 /**
  * This implementation shall be used to represent meta data elements
@@ -15,9 +14,9 @@ import org.talend.daikon.i18n.I18nMessages;
 
 public abstract class AbstractSchemaElement extends SimpleNamedThing implements SchemaElement {
 
-    private String name;
+    private static final String I18N_DISPLAY_NAME_SUFFIX = ".displayName"; //$NON-NLS-1$
 
-    private String title;
+    private static final String I18N_PROPERTY_PREFIX = "property."; //$NON-NLS-1$
 
     private Type type;
 
@@ -43,10 +42,6 @@ public abstract class AbstractSchemaElement extends SimpleNamedThing implements 
 
     protected List<SchemaElement> children;
 
-    private I18nMessages formartedMessage;
-
-    private String displayName;
-
     @Override
     public String getName() {
         return name;
@@ -64,7 +59,7 @@ public abstract class AbstractSchemaElement extends SimpleNamedThing implements 
      */
     @Override
     public String getDisplayName() {
-        return displayName != null ? displayName : getI18nMessage("property." + name + ".displayName");
+        return displayName != null ? displayName : getI18nMessage(I18N_PROPERTY_PREFIX + name + I18N_DISPLAY_NAME_SUFFIX);
     }
 
     public SchemaElement setDisplayName(String displayName) {

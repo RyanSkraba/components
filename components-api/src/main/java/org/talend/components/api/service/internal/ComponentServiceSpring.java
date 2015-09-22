@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.context.GlobalContext;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentDefinition;
@@ -73,8 +74,8 @@ public class ComponentServiceSpring implements ComponentService {
                 return compDefs;
             }
 
-            private void initializeGlobalContexts(Collection<ComponentDefinition> values) {
-                for (ComponentDefinition compDef : values) {
+            private void initializeGlobalContexts(Collection<? extends TopLevelDefinition> values) {
+                for (TopLevelDefinition compDef : values) {
                     compDef.setGlobalContext(gc);
                 }
 
@@ -82,7 +83,9 @@ public class ComponentServiceSpring implements ComponentService {
 
             @Override
             public Map<String, ComponentWizardDefinition> getComponentWizards() {
-                return context.getBeansOfType(ComponentWizardDefinition.class);
+                Map<String, ComponentWizardDefinition> wizardDefs = context.getBeansOfType(ComponentWizardDefinition.class);
+                initializeGlobalContexts(wizardDefs.values());
+                return wizardDefs;
             }
 
         });
