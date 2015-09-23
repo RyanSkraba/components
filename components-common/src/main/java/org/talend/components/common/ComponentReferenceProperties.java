@@ -49,6 +49,7 @@ public class ComponentReferenceProperties extends ComponentProperties {
     public ComponentReferenceProperties(I18nMessageProvider i18nMessagesProvider) {
         super(i18nMessagesProvider, "org.talend.components.common.messages"); //$NON-NLS-1$
         setupLayout();
+        setupPropertiesWithI18n();
     }
 
     @Override

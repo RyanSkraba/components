@@ -34,12 +34,14 @@ public class UserPasswordProperties extends ComponentProperties {
     public UserPasswordProperties(I18nMessageProvider i18nMessagesProvider) {
         super(i18nMessagesProvider, "org.talend.components.common.messages"); //$NON-NLS-1$
         setupLayout();
+        setupPropertiesWithI18n();
     }
 
     @Override
     protected void setupLayout() {
         super.setupLayout();
         Form form = Form.create(this, USERPASSWORD, "User Password");
+        form.addRow(userId);
         form.addRow(password);
     }
 

@@ -36,6 +36,7 @@ public class ProxyProperties extends ComponentProperties {
         form.addRow(useProxy);
         form.addRow(host);
         form.addRow(userPassword.getForm(UserPasswordProperties.USERPASSWORD));
+        setupPropertiesWithI18n();
     }
 
 }

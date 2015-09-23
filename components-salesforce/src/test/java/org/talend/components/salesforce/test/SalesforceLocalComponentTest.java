@@ -24,6 +24,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.internal.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
@@ -85,11 +86,12 @@ public class SalesforceLocalComponentTest extends TestCase {
         assertEquals("userData", wiz.getUserData());
         assertTrue(wiz instanceof SalesforceConnectionWizard);
         List<Form> forms = wiz.getForms();
-        // Not Yet
-        if (false) {
-            assertEquals("SalesforceConnectionPropertiesMain", forms.get(0).getName());
-            assertEquals("SalesforceModulePropertiesMain", forms.get(1).getName());
-        }
+        assertEquals("SalesforceConnectionPropertiesMain", forms.get(0).getName());
+        assertEquals("SalesforceModulePropertiesMain", forms.get(1).getName());
+        Form connForm = forms.get(0);
+        Form userPassword = (Form) connForm.getChild("UserPasswordPropertiesUserPassword");
+        SchemaElement password = (SchemaElement) userPassword.getChild("password");
+        assertEquals("Password", password.getDisplayName());
     }
 
     @Test

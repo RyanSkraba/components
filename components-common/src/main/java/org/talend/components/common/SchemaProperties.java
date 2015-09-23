@@ -41,6 +41,7 @@ public class SchemaProperties extends ComponentProperties {
         super(i18nMessagesProvider, "org.talend.components.common.messages"); //$NON-NLS-1$
         setValue(schema, SchemaFactory.newSchema());
         setupLayout();
+        setupPropertiesWithI18n();
     }
 
     @Override
