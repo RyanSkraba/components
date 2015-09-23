@@ -39,7 +39,6 @@ public interface ComponentDesigner {
      * @return userData, a String containing the location of this object in the repository to be used for a subsequent
      * call.
      */
-    public String addComponentProperties(ComponentProperties properties, String name, String userData,
-            SchemaElement schema);
+    public String addComponentProperties(ComponentProperties properties, String name, String userData, SchemaElement schema);
 
 }

@@ -12,6 +12,10 @@ import org.talend.components.api.schema.SchemaElement;
 
 public class ComponentPropertiesInternal {
 
+    protected String name;
+
+    protected String title;
+
     protected ComponentDesigner designer;
 
     protected List<Form> forms;
@@ -35,6 +39,22 @@ public class ComponentPropertiesInternal {
                 return f;
         }
         return null;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public void setValue(SchemaElement property, Object value) {

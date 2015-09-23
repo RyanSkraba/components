@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
-import static org.talend.components.api.properties.presentation.Widget.*;
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.schema.SchemaFactory.newProperty;
 
 import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.api.properties.ComponentProperties;
@@ -27,10 +27,10 @@ import org.talend.components.salesforce.SalesforceModuleProperties;
 public class TSalesforceOutputProperties extends ComponentProperties {
 
     public enum OutputAction {
-                              INSERT,
-                              UPDATE,
-                              UPSERT,
-                              DELETE
+        INSERT,
+        UPDATE,
+        UPSERT,
+        DELETE
     }
 
     public SchemaElement outputAction = newProperty(SchemaElement.Type.ENUM, "outputAction"); //$NON-NLS-1$
@@ -101,9 +101,8 @@ public class TSalesforceOutputProperties extends ComponentProperties {
         mainForm.addRow(commitLevel);
         mainForm.addRow(logFileName);
         mainForm.addColumn(retrieveInsertId);
-        mainForm.addRow(widget(schemaFlow.getForm(SchemaProperties.REFERENCE)).setName("SchemaFlow").setTitle("Schema Flow"));
-        mainForm.addRow(
-                widget(schemaReject.getForm(SchemaProperties.REFERENCE)).setName("SchemaReject").setTitle("Schema Reject"));
+        mainForm.addRow(widget(schemaFlow.getForm(SchemaProperties.REFERENCE).setName("SchemaFlow").setTitle("Schema Flow")));
+        mainForm.addRow(widget(schemaReject.getForm(SchemaProperties.REFERENCE).setName("SchemaReject").setTitle("Schema Reject")));
         refreshLayout(mainForm);
     }
 

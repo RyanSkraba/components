@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.talend.components.api.SimpleNamedThing;
 import org.talend.components.api.NamedThing;
+import org.talend.components.api.SimpleNamedThing;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.schema.SchemaElement;
 
@@ -46,7 +46,8 @@ public class Form extends SimpleNamedThing {
      */
     protected boolean refreshUI;
 
-    public Form() {}
+    public Form() {
+    }
 
     public Form(ComponentProperties props, String name, String displayName, String title) {
         super(name, displayName, title);
@@ -77,6 +78,21 @@ public class Form extends SimpleNamedThing {
 
     public ComponentProperties getProperties() {
         return properties;
+    }
+
+    public Form setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public Form setDisplayName(String displayName) {
+        this.displayName = displayName;
+        return this;
+    }
+
+    public Form setTitle(String title) {
+        this.title = title;
+        return this;
     }
 
     public Form addRow(NamedThing child) {

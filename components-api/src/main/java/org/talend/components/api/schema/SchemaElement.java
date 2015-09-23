@@ -12,18 +12,19 @@ import org.talend.components.api.NamedThing;
 public interface SchemaElement extends NamedThing {
 
     public enum Type {
-                      STRING,
-                      BOOLEAN,
-                      INT,
-                      DATE,
-                      DATETIME,
-                      DECIMAL,
-                      FLOAT,
-                      DOUBLE,
-                      BYTE_ARRAY,
-                      ENUM,
-                      DYNAMIC,
-                      SCHEMA
+        STRING,
+        BOOLEAN,
+        INT,
+        DATE,
+        DATETIME,
+        DECIMAL,
+        FLOAT,
+        DOUBLE,
+        BYTE_ARRAY,
+        ENUM,
+        DYNAMIC,
+        GROUP,
+        SCHEMA
     }
 
     @Override
@@ -45,6 +46,8 @@ public interface SchemaElement extends NamedThing {
     public SchemaElement setSize(int size);
 
     public int getOccurMinTimes();
+
+    public boolean isSizeUnbounded();
 
     public SchemaElement setOccurMinTimes(int times);
 

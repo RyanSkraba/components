@@ -27,7 +27,7 @@ public class ValidationResult {
 
     public Result status = Result.OK;
 
-    public int    number;
+    public int number;
 
     public Result getStatus() {
         return status;

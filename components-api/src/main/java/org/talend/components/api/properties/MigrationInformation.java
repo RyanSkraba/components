@@ -12,7 +12,8 @@ public interface MigrationInformation {
      * Returns true if this object was created from a serialized form used by a previous version of the implementation.
      * 
      * This can be used by the caller to notify the user that the object has been migrated and also, if desired, it can
-     * be re-saved in its current serialized form (which would be different than the serialized form provided initially).
+     * be re-saved in its current serialized form (which would be different than the serialized form provided
+     * initially).
      * 
      * @return true if the object was migrated
      */

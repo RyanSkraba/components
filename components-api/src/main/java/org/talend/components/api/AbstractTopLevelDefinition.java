@@ -29,8 +29,8 @@ public abstract class AbstractTopLevelDefinition extends TranslatableImpl implem
     @Override
     public void setGlobalContext(GlobalContext globalContext) {
         this.globalContext = globalContext;
-        setI18nMessageFormater(
-                globalContext.i18nMessageProvider.getI18nMessages(this.getClass().getClassLoader(), getI18NBaseName()));
+        setI18nMessageFormater(globalContext.i18nMessageProvider.getI18nMessages(this.getClass().getClassLoader(),
+                getI18NBaseName()));
     }
 
     /**

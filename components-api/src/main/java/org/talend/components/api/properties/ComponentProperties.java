@@ -3,8 +3,7 @@ package org.talend.components.api.properties;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.talend.components.api.ComponentDesigner;
 import org.talend.components.api.exception.ComponentException;
@@ -58,7 +57,7 @@ import com.cedarsoftware.util.io.JsonWriter;
  */
 
 // @JsonSerialize(using = ComponentPropertiesSerializer.class)
-public abstract class ComponentProperties extends TranslatableImpl {
+public abstract class ComponentProperties extends TranslatableImpl implements SchemaElement {
 
     static final String METHOD_BEFORE = "before";
 
@@ -330,6 +329,180 @@ public abstract class ComponentProperties extends TranslatableImpl {
 
     public void afterFormFinish(String formName) throws Throwable {
         doInvoke(findMethod("afterFormFinish", formName, REQUIRED));
+    }
+
+    /*
+     * Implementation required because we are a SchemaElement
+     */
+
+    @Override
+    public String getName() {
+        return internal.getName();
+    }
+
+    @Override
+    public SchemaElement setName(String name) {
+        internal.setName(name);
+        return this;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return getName();
+    }
+
+    public SchemaElement setDisplayName(String displayName) {
+        // FIXME - need better exception for this
+        throw new RuntimeException("Cannot be used here");
+    }
+
+    @Override
+    public String getTitle() {
+        return internal.getTitle();
+    }
+
+    @Override
+    public SchemaElement setTitle(String title) {
+        internal.setTitle(title);
+        return this;
+    }
+
+    @Override
+    public Type getType() {
+        return Type.GROUP;
+    }
+
+    @Override
+    public SchemaElement setType(Type type) {
+        throw new RuntimeException("Cannot be used here");
+    }
+
+    @Override
+    public int getSize() {
+        return 0;
+    }
+
+    @Override
+    public SchemaElement setSize(int size) {
+        throw new RuntimeException("Cannot be used here");
+    }
+
+    public boolean isSizeUnbounded() {
+        return true;
+    }
+
+    @Override
+    public int getOccurMinTimes() {
+        return 1;
+    }
+
+    @Override
+    public SchemaElement setOccurMinTimes(int times) {
+        throw new RuntimeException("Cannot be used here");
+    }
+
+    @Override
+    public int getOccurMaxTimes() {
+        return 1;
+    }
+
+    @Override
+    public SchemaElement setOccurMaxTimes(int times) {
+        throw new RuntimeException("Cannot be used here");
+    }
+
+    @Override
+    public boolean isRequired() {
+        return false;
+    }
+
+    @Override
+    public SchemaElement setRequired(boolean required) {
+        throw new RuntimeException("Cannot be used here");
+    }
+
+    @Override
+    public int getPrecision() {
+        return 0;
+    }
+
+    @Override
+    public SchemaElement setPrecision(int precision) {
+        throw new RuntimeException("Cannot be used here");
+    }
+
+    @Override
+    public String getPattern() {
+        return null;
+    }
+
+    @Override
+    public SchemaElement setPattern(String pattern) {
+        throw new RuntimeException("Cannot be used here");
+    }
+
+    @Override
+    public String getDefaultValue() {
+        return null;
+    }
+
+    @Override
+    public SchemaElement setDefaultValue(String defaultValue) {
+        throw new RuntimeException("Cannot be used here");
+    }
+
+    @Override
+    public boolean isNullable() {
+        return false;
+    }
+
+    @Override
+    public SchemaElement setNullable(boolean nullable) {
+        throw new RuntimeException("Cannot be used here");
+    }
+
+    @Override
+    public Class getEnumClass() {
+        return null;
+    }
+
+    @Override
+    public SchemaElement setEnumClass(Class enumClass) {
+        throw new RuntimeException("Cannot be used here");
+    }
+
+    @Override
+    public Collection getPossibleValues() {
+        return null;
+    }
+
+    @Override
+    public SchemaElement setPossibleValues(Collection possibleValues) {
+        throw new RuntimeException("Cannot be used here");
+    }
+
+    @Override
+    public List<SchemaElement> getChildren() {
+        return getProperties();
+    }
+
+    @Override
+    public SchemaElement setChildren(List<SchemaElement> children) {
+        throw new RuntimeException("Cannot be used here");
+    }
+
+    @Override
+    public SchemaElement addChild(SchemaElement child) {
+        throw new RuntimeException("Cannot be used here");
+    }
+
+    @Override
+    public Map<String, SchemaElement> getChildMap() {
+        Map<String, SchemaElement> map = new HashMap();
+        for (SchemaElement se : getChildren()) {
+            map.put(se.getName(), se);
+        }
+        return map;
     }
 
 }

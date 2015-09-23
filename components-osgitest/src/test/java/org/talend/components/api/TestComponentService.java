@@ -12,7 +12,8 @@
 // ============================================================================
 package org.talend.components.api;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import javax.inject.Inject;
 

@@ -27,7 +27,8 @@ import aQute.bnd.annotation.component.Reference;
 @aQute.bnd.annotation.component.Component(provide = I18nMessageProvider.class)
 public class I18nMessageProvider {
 
-    @Inject // used by spring see below for osgi
+    @Inject
+    // used by spring see below for osgi
     LocaleProvider localeProvider;
 
     @Reference
@@ -39,8 +40,8 @@ public class I18nMessageProvider {
      * Return a I18nMessages with a resource bundle found at the path related to the classloader
      * 
      * @param classLoader, use to create the underlying resource bundle.
-     * @param baseName, used to create the underlying resource bundle, see {@link ResourceBundle#getBundle(String,
-     * java.util.Locale, ClassLoader, java.util.ResourceBundle.Control))}
+     * @param baseName, used to create the underlying resource bundle, see
+     * {@link ResourceBundle#getBundle(String, java.util.Locale, ClassLoader, java.util.ResourceBundle.Control))}
      * @return a I18nMessages instance to handle i18n using specific platform implementation, if none is provided, the
      * local vm Locale will be used.
      */

@@ -12,14 +12,12 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import com.sforce.async.AsyncApiException;
-import com.sforce.async.BulkConnection;
-import com.sforce.soap.partner.*;
-import com.sforce.soap.partner.Error;
-import com.sforce.soap.partner.sobject.SObject;
-import com.sforce.ws.ConnectionException;
-import com.sforce.ws.ConnectorConfig;
-import com.sforce.ws.SessionRenewer;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.util.*;
+
+import javax.xml.namespace.QName;
+
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.api.runtime.ComponentRuntimeContainer;
@@ -30,10 +28,14 @@ import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnecti
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 
-import javax.xml.namespace.QName;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.util.*;
+import com.sforce.async.AsyncApiException;
+import com.sforce.async.BulkConnection;
+import com.sforce.soap.partner.*;
+import com.sforce.soap.partner.Error;
+import com.sforce.soap.partner.sobject.SObject;
+import com.sforce.ws.ConnectionException;
+import com.sforce.ws.ConnectorConfig;
+import com.sforce.ws.SessionRenewer;
 
 public class SalesforceRuntime extends ComponentRuntime {
 

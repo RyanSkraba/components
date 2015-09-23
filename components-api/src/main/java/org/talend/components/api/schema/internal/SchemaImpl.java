@@ -7,11 +7,13 @@ public class SchemaImpl implements Schema {
 
     protected SchemaElement root;
 
-    @Override public SchemaElement getRoot() {
+    @Override
+    public SchemaElement getRoot() {
         return root;
     }
 
-    @Override public void setRoot(SchemaElement root) {
+    @Override
+    public void setRoot(SchemaElement root) {
         this.root = root;
     }
 

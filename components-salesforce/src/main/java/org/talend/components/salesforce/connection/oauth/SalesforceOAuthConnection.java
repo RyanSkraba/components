@@ -12,18 +12,19 @@
 // ============================================================================
 package org.talend.components.salesforce.connection.oauth;
 
-import com.sforce.ws.ConnectorConfig;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Properties;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.talend.components.common.oauth.OauthClient;
 import org.talend.components.common.oauth.OauthProperties;
 
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Properties;
+import com.sforce.ws.ConnectorConfig;
 
 public class SalesforceOAuthConnection {
 
