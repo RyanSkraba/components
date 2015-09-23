@@ -25,6 +25,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
@@ -227,6 +228,10 @@ public class SalesforceLocalComponentTest extends TestCase {
         SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
         moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
         moduleProps.setValue(moduleProps.moduleName, "Account");
+        Widget w = f.getWidget("moduleName");
+        assertEquals("moduleName", w.getName());
+        assertEquals("property.moduleName.displayName", w.getDisplayName());
+        assertEquals(null, w.getTitle());
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
         Schema schema = (Schema) moduleProps.schema.getValue(moduleProps.schema.schema);
         System.out.println(schema);

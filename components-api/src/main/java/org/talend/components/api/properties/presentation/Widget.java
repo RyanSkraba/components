@@ -225,4 +225,33 @@ public class Widget extends SimpleNamedThing {
         return this;
     }
 
+    @Override
+    public String getName() {
+        if (name == null) {
+            if (properties.length > 0)
+                return properties[0].getName();
+        }
+        return this.name;
+    }
+
+    @Override
+    public String getDisplayName() {
+        if (displayName == null) {
+            if (properties.length > 0)
+                return properties[0].getDisplayName();
+        }
+        return this.displayName;
+    }
+
+    @Override
+    public String getTitle() {
+        if (title == null) {
+            if (properties.length > 0)
+                return properties[0].getTitle();
+        }
+        return title;
+    }
+
+
+
 }
