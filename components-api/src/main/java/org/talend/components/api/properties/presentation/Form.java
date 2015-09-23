@@ -22,7 +22,7 @@ import org.talend.components.api.SimpleNamedThing;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.schema.SchemaElement;
 
-/**
+/**>
  * Represents a collection of components {@link SchemaElement} objects that are grouped into a form for display. This
  * form can be manifested for example as a tab in a view, a dialog, or a page in a wizard.
  */
@@ -148,5 +148,9 @@ public class Form extends SimpleNamedThing {
 
     public void setRefreshUI(boolean refreshUI) {
         this.refreshUI = refreshUI;
+    }
+
+    public String toString() {
+        return "Form: " + getName();
     }
 }

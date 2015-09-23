@@ -110,6 +110,9 @@ public class SalesforceLocalComponentTest extends TestCase {
         props = (SalesforceConnectionProperties) componentService
                 .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
         LocalComponentTest.checkSerialize(props);
+        System.out.println(props.loginType.getPossibleValues());
+        assertEquals("BASIC", props.loginType.getPossibleValues().get(0).toString());
+        assertEquals("OAUTH", props.loginType.getPossibleValues().get(1).toString());
         assertEquals(SalesforceConnectionProperties.LoginType.BASIC, props.getValue(props.loginType));
         Form mainForm = props.getForm(TSalesforceConnectProperties.MAIN);
         String userPassFormName = props.userPassword.setupFormName(UserPasswordProperties.USERPASSWORD);

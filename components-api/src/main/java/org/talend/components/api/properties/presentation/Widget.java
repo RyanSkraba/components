@@ -204,4 +204,9 @@ public class Widget {
         this.callAfter = callAfter;
     }
 
+    public String toString() {
+        return "Widget: (R/C)" + getRow() + "/" + getOrder() + " props: "
+                + (getProperties().length > 0 ? getProperties()[0] : "<none>");
+    }
+
 }

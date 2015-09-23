@@ -28,6 +28,10 @@ import org.talend.components.common.oauth.OauthProperties;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 @JsonRootName("salesforceConnectionProperties")
 public class SalesforceConnectionProperties extends ComponentProperties {
 
@@ -39,11 +43,13 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     public SchemaElement url = newProperty("url").setRequired(true); //$NON-NLS-1$
 
     public enum LoginType {
-                           BASIC,
-                           OAUTH
+        BASIC,
+        OAUTH
     }
 
-    public SchemaElement loginType = newProperty(SchemaElement.Type.ENUM, "loginType").setRequired(true); //$NON-NLS-1$
+
+
+    public SchemaElement loginType = newProperty(SchemaElement.Type.ENUM, "loginType").setRequired(true);
 
     public SchemaElement bulkConnection = newProperty(SchemaElement.Type.BOOLEAN, "bulkConnection"); //$NON-NLS-1$
 
@@ -80,6 +86,11 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
     public SalesforceConnectionProperties(I18nMessageProvider i18nMessageProvider) {
         super(i18nMessageProvider, "org.talend.components.salesforce.message"); //$NON-NLS-1$
+
+        List loginTypes = new ArrayList<>();
+        Collections.addAll(loginTypes, LoginType.values());
+        loginType.setPossibleValues(loginTypes);
+
         oauth = new OauthProperties(i18nMessageProvider);
         userPassword = new UserPasswordProperties(i18nMessageProvider);
         proxy = new ProxyProperties(i18nMessageProvider);
@@ -87,8 +98,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         setupPropertiesWithI18n();
     }
 
-    @Override
-    protected void setupLayout() {
+    @Override protected void setupLayout() {
         super.setupLayout();
 
         setValue(loginType, LoginType.BASIC);

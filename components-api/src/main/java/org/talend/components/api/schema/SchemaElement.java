@@ -79,9 +79,9 @@ public interface SchemaElement extends NamedThing {
 
     public SchemaElement setEnumClass(Class enumClass);
 
-    public Collection getPossibleValues();
+    public List<?> getPossibleValues();
 
-    public SchemaElement setPossibleValues(Collection possibleValues);
+    public SchemaElement setPossibleValues(List<?> possibleValues);
 
     public List<SchemaElement> getChildren();
 

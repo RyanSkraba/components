@@ -472,12 +472,12 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     }
 
     @Override
-    public Collection getPossibleValues() {
+    public List<?> getPossibleValues() {
         return null;
     }
 
     @Override
-    public SchemaElement setPossibleValues(Collection possibleValues) {
+    public SchemaElement setPossibleValues(List<?> possibleValues) {
         throw new RuntimeException("Cannot be used here");
     }
 

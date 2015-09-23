@@ -11,4 +11,8 @@ public class PresentationItem extends SimpleNamedThing {
         super(name, displayName);
     }
 
+    public String toString() {
+        return "Presentation Item: " + getName() + " - " + getTitle();
+    }
+
 }

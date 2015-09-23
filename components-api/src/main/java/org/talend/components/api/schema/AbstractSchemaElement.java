@@ -1,5 +1,7 @@
 package org.talend.components.api.schema;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 import org.talend.components.api.SimpleNamedThing;
@@ -34,7 +36,7 @@ public abstract class AbstractSchemaElement extends SimpleNamedThing implements 
 
     private Class<?> enumClass;
 
-    private Collection possibleValues;
+    private List<?> possibleValues;
 
     protected List<SchemaElement> children;
 
@@ -193,12 +195,12 @@ public abstract class AbstractSchemaElement extends SimpleNamedThing implements 
     }
 
     @Override
-    public Collection getPossibleValues() {
+    public List<?> getPossibleValues() {
         return possibleValues;
     }
 
     @Override
-    public SchemaElement setPossibleValues(Collection possibleValues) {
+    public SchemaElement setPossibleValues(List<?> possibleValues) {
         this.possibleValues = possibleValues;
         return this;
     }

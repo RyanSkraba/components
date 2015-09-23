@@ -38,4 +38,8 @@ public class Property extends AbstractSchemaElement {
         this(type, name, null);
     }
 
+    public String toString() {
+        return "Property: " + getName();
+    }
+
 }

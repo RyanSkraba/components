@@ -25,7 +25,7 @@ public class SalesforceConnectionWizardDefinition extends AbstractComponentWizar
 
     @Override
     public String getPngImagePath() {
-        return "connectionWizardIcon.png"; //$NON-NLS-1$
+        return "salesforce.png"; //$NON-NLS-1$
     }
 
     @Override
