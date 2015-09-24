@@ -50,7 +50,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
     public static final String LOGIN_OAUTH = "OAuth";
 
-    public SchemaElement loginType = newProperty("loginType").setRequired(true);
+    public SchemaElement loginType = newProperty(Type.ENUM, "loginType").setRequired(true);
 
     public SchemaElement bulkConnection = newProperty(SchemaElement.Type.BOOLEAN, "bulkConnection"); //$NON-NLS-1$
 
