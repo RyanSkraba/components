@@ -46,12 +46,11 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
     public SchemaElement url = newProperty("url").setRequired(true); //$NON-NLS-1$
 
-    public enum LoginType {
-        BASIC,
-        OAUTH
-    }
+    public static final String LOGIN_BASIC = "Basic";
 
-    public SchemaElement loginType = newProperty(SchemaElement.Type.ENUM, "loginType").setRequired(true);
+    public static final String LOGIN_OAUTH = "OAuth";
+
+    public SchemaElement loginType = newProperty("loginType").setRequired(true);
 
     public SchemaElement bulkConnection = newProperty(SchemaElement.Type.BOOLEAN, "bulkConnection"); //$NON-NLS-1$
 
@@ -99,7 +98,8 @@ public class SalesforceConnectionProperties extends ComponentProperties {
             name = null;
 
         List loginTypes = new ArrayList<>();
-        Collections.addAll(loginTypes, LoginType.values());
+        loginTypes.add(LOGIN_BASIC);
+        loginTypes.add(LOGIN_OAUTH);
         loginType.setPossibleValues(loginTypes);
 
         oauth = new OauthProperties(i18nMessageProvider);
@@ -109,11 +109,10 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         setupPropertiesWithI18n();
     }
 
-    @Override
-    protected void setupLayout() {
+    @Override protected void setupLayout() {
         super.setupLayout();
 
-        setValue(loginType, LoginType.BASIC);
+        setValue(loginType, LOGIN_BASIC);
 
         Form connectionForm = Form.create(this, MAIN, "Salesforce Connection Settings");
         connectionForm.addRow(connectionDesc);
@@ -156,18 +155,15 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals(MAIN)) {
-            switch ((LoginType) getValue(loginType)) {
-            case OAUTH:
+            if (LOGIN_OAUTH.equals(getValue(loginType))) {
                 form.getWidget(OauthProperties.OAUTH).setVisible(true);
                 setValue(url, "https://login.salesforce.com/services/oauth2");
                 form.getWidget(UserPasswordProperties.USERPASSWORD).setVisible(false);
-                break;
-            case BASIC:
+            } else if (LOGIN_BASIC.equals(getValue(loginType))) {
                 form.getWidget(OauthProperties.OAUTH).setVisible(false);
                 setValue(url, "https://www.salesforce.com/services/Soap/u/34.0");
                 form.getWidget(UserPasswordProperties.USERPASSWORD).setVisible(true);
-                break;
-            default:
+            } else {
                 throw new RuntimeException("Enum value should be handled :" + getValue(loginType));
             }
         }

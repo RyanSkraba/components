@@ -36,7 +36,6 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.*;
-import org.talend.components.salesforce.SalesforceConnectionProperties.LoginType;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectDefinition;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
@@ -203,16 +202,16 @@ public class SalesforceLocalComponentTest extends TestCase {
                 .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
         LocalComponentTest.checkSerialize(props);
         System.out.println(props.loginType.getPossibleValues());
-        assertEquals("BASIC", props.loginType.getPossibleValues().get(0).toString());
-        assertEquals("OAUTH", props.loginType.getPossibleValues().get(1).toString());
-        assertEquals(SalesforceConnectionProperties.LoginType.BASIC, props.getValue(props.loginType));
+        assertEquals("Basic", props.loginType.getPossibleValues().get(0).toString());
+        assertEquals("OAuth", props.loginType.getPossibleValues().get(1).toString());
+        assertEquals(SalesforceConnectionProperties.LOGIN_BASIC, props.getValue(props.loginType));
         Form mainForm = props.getForm(TSalesforceConnectProperties.MAIN);
         String userPassFormName = UserPasswordProperties.USERPASSWORD;
         assertTrue(mainForm.getWidget(userPassFormName).isVisible());
         String oauthFormName = OauthProperties.OAUTH;
         assertFalse(mainForm.getWidget(oauthFormName).isVisible());
 
-        props.setValue(props.loginType, SalesforceConnectionProperties.LoginType.OAUTH);
+        props.setValue(props.loginType, SalesforceConnectionProperties.LOGIN_OAUTH);
         props = (SalesforceConnectionProperties) checkAndAfter(mainForm, "loginType", props);
         mainForm = props.getForm(TSalesforceConnectProperties.MAIN);
         assertTrue(mainForm.isRefreshUI());
@@ -254,7 +253,7 @@ public class SalesforceLocalComponentTest extends TestCase {
             props = (SalesforceConnectionProperties) componentService
                     .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
         }
-        props.setValue(props.loginType, LoginType.OAUTH);
+        props.setValue(props.loginType, SalesforceConnectionProperties.LOGIN_OAUTH);
         Form mainForm = props.getForm(TSalesforceConnectProperties.MAIN);
         props = (SalesforceConnectionProperties) checkAndAfter(mainForm, "loginType", props);
         System.out.println("URI:" + props.getStringValue(props.url));
