@@ -4,6 +4,7 @@
 # Eclipse project files #
 .project
 .settings
+bin/
 # Intellij project files #
 .idea/
 *.ipr

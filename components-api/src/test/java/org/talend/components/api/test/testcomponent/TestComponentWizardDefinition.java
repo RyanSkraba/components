@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.talend.components.api.Constants;
 import org.talend.components.api.wizard.AbstractComponentWizardDefintion;
 import org.talend.components.api.wizard.ComponentWizard;
+import org.talend.components.api.wizard.WizardImageType;
 
 @Component(Constants.COMPONENT_WIZARD_BEAN_PREFIX + TestComponentWizardDefinition.COMPONENT_WIZARD_NAME)
 public class TestComponentWizardDefinition extends AbstractComponentWizardDefintion {
@@ -28,7 +29,7 @@ public class TestComponentWizardDefinition extends AbstractComponentWizardDefint
     }
 
     @Override
-    public String getPngImagePath() {
+    public String getPngImagePath(WizardImageType imageType) {
         return "connectionWizardIcon.png";
     }
 

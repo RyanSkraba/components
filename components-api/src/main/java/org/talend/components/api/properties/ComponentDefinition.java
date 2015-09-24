@@ -60,4 +60,22 @@ public interface ComponentDefinition extends TopLevelDefinition {
 
     public ComponentConnector[] getConnectors();
 
+    /**
+     * This shall be a path relative to the current Component definition, ideally is should just be the name of the png
+     * image if placed in the same resource folder that the current class. This icon will be computed with the following
+     * code
+     * 
+     * <pre>
+     * {@code
+     *    this.getClass().getResourceAsStream(getIconPngPath())
+     * }
+     * </pre>
+     * 
+     * @see {@link java.lang.Class#getResourceAsStream(String)}
+     * @param imageType the type of image requested
+     * @return the path to the png resource or null if the type is not handled.
+     */
+
+    public abstract String getPngImagePath(ComponentImageType imageType);
+
 }

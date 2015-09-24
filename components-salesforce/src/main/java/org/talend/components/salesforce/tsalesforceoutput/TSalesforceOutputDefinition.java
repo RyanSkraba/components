@@ -17,6 +17,7 @@ import org.talend.components.api.properties.AbstractComponentDefinition;
 import org.talend.components.api.properties.ComponentConnector;
 import org.talend.components.api.properties.ComponentConnector.Type;
 import org.talend.components.api.properties.ComponentDefinition;
+import org.talend.components.api.properties.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.salesforce.SalesforceRuntime;
@@ -33,8 +34,9 @@ public class TSalesforceOutputDefinition extends AbstractComponentDefinition {
     public static final String COMPONENT_NAME = "tSalesforceOutput"; //$NON-NLS-1$
 
     public TSalesforceOutputDefinition() {
-        setConnectors(new ComponentConnector(Type.FLOW, 1, 0), new ComponentConnector(Type.MAIN, 0, 1), new ComponentConnector(
-                Type.REJECT, 0, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
+        setConnectors(new ComponentConnector(Type.FLOW, 1, 0), new ComponentConnector(Type.MAIN, 0, 1),
+                new ComponentConnector(Type.REJECT, 0, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
+                new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
 
     @Override
@@ -42,6 +44,7 @@ public class TSalesforceOutputDefinition extends AbstractComponentDefinition {
         return new TSalesforceOutputProperties(globalContext.i18nMessageProvider);
     }
 
+    @Override
     public ComponentRuntime createRuntime() {
         return new SalesforceRuntime();
     }
@@ -57,7 +60,14 @@ public class TSalesforceOutputDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public String getPngImagePath() {
+    public String getPngImagePath(ComponentImageType imageType) {
+        switch (imageType) {
+        case PALLETE_ICON_32X32:
+            return "tSalesforceOutput_icon32.png"; //$NON-NLS-1$
+
+        default:
+            // will return null
+        }
         return null;
     }
 
@@ -65,7 +75,6 @@ public class TSalesforceOutputDefinition extends AbstractComponentDefinition {
     public String getDisplayName() {
         return "tSalesforceOutput";
     }
-
 
     @Override
     protected String getI18NBaseName() {

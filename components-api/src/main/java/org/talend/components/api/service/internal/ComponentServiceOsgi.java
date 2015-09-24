@@ -26,10 +26,12 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.context.GlobalContext;
 import org.talend.components.api.properties.ComponentDefinition;
+import org.talend.components.api.properties.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
+import org.talend.components.api.wizard.WizardImageType;
 
 import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
@@ -198,13 +200,13 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
-    public InputStream getWizardPngImage(String wizardName) {
-        return componentServiceDelegate.getWizardPngImage(wizardName);
+    public InputStream getWizardPngImage(String wizardName, WizardImageType imageType) {
+        return componentServiceDelegate.getWizardPngImage(wizardName, imageType);
     }
 
     @Override
-    public InputStream getComponentPngImage(String componentName) {
-        return componentServiceDelegate.getComponentPngImage(componentName);
+    public InputStream getComponentPngImage(String componentName, ComponentImageType imageType) {
+        return componentServiceDelegate.getComponentPngImage(componentName, imageType);
     }
 
 }

@@ -12,18 +12,24 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceconnect;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.Constants;
 import org.talend.components.api.properties.AbstractComponentDefinition;
 import org.talend.components.api.properties.ComponentConnector;
 import org.talend.components.api.properties.ComponentConnector.Type;
 import org.talend.components.api.properties.ComponentDefinition;
+import org.talend.components.api.properties.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.salesforce.SalesforceRuntime;
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceConnectDefinition.COMPONENT_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceConnectDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX
+        + TSalesforceConnectDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceConnectDefinition extends AbstractComponentDefinition {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TSalesforceConnectDefinition.class);
 
     public static final String COMPONENT_NAME = "tSalesforceConnect"; //$NON-NLS-1$
 
@@ -37,6 +43,7 @@ public class TSalesforceConnectDefinition extends AbstractComponentDefinition {
         return new TSalesforceConnectProperties(globalContext.i18nMessageProvider);
     }
 
+    @Override
     public ComponentRuntime createRuntime() {
         return new SalesforceRuntime();
     }
@@ -52,7 +59,14 @@ public class TSalesforceConnectDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public String getPngImagePath() {
+    public String getPngImagePath(ComponentImageType imageType) {
+        switch (imageType) {
+        case PALLETE_ICON_32X32:
+            return "tSalesforceConnect_icon32.png"; //$NON-NLS-1$
+
+        default:
+            // will return null
+        }
         return null;
     }
 
@@ -60,7 +74,6 @@ public class TSalesforceConnectDefinition extends AbstractComponentDefinition {
     public String getDisplayName() {
         return "tSalesforceConnect";
     }
-
 
     @Override
     protected String getI18NBaseName() {

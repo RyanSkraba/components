@@ -16,8 +16,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +36,9 @@ import org.talend.components.api.test.testcomponent.TestComponentWizard;
 import org.talend.components.api.test.testcomponent.TestComponentWizardDefinition;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
+import org.talend.components.api.wizard.WizardImageType;
+
+import junit.framework.TestCase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -96,13 +97,15 @@ public class LocalComponentTest extends TestCase {
 
     @Test
     public void testGetWizardIconOk() {
-        InputStream iconStream = componentService.getWizardPngImage(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME);
+        InputStream iconStream = componentService.getWizardPngImage(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME,
+                WizardImageType.TREE_ICON_16X16);
         assertNotNull(iconStream);
     }
 
     @Test(expected = ComponentException.class)
     public void testGetWizardIconWrongName() {
-        InputStream iconStream = componentService.getWizardPngImage("not an existing wizard name");
+        InputStream iconStream = componentService.getWizardPngImage("not an existing wizard name",
+                WizardImageType.TREE_ICON_16X16);
         assertNull(iconStream);
     }
 

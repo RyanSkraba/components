@@ -21,4 +21,22 @@ public interface ComponentWizardDefinition extends TopLevelDefinition {
      */
     ComponentWizard createWizard(String userData);
 
+    /**
+     * This shall be a path relative to the current Wizard definition, ideally is should just be the name of the png
+     * image if placed in the same resource folder that the current class. This icon will be computed with the following
+     * code
+     * 
+     * <pre>
+     * {@code
+     *    this.getClass().getResourceAsStream(getIconPngPath())
+     * }
+     * </pre>
+     * 
+     * @see {@link java.lang.Class#getResourceAsStream(String)}
+     * @param imageType the type of image requested
+     * @return the path to the png resource
+     */
+
+    public abstract String getPngImagePath(WizardImageType imageType);
+
 }

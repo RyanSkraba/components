@@ -28,8 +28,10 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerMethod;
 import org.talend.components.api.properties.ComponentDefinition;
+import org.talend.components.api.properties.ComponentImageType;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
+import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectDefinition;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectProperties;
@@ -91,14 +93,15 @@ public class TestComponentServiceWithComponents {
     public void testWizardIconForSalesForce() {
         assertNotNull(componentService);
         InputStream wizardPngIconStream = componentService
-                .getWizardPngImage(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME);
+                .getWizardPngImage(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, WizardImageType.TREE_ICON_16X16);
         assertNotNull(wizardPngIconStream);
     }
 
     @Test
     public void testComponentImageForSalesforce() {
         assertNotNull(componentService);
-        InputStream componentPngIconStream = componentService.getComponentPngImage(TSalesforceInputDefinition.COMPONENT_NAME);
+        InputStream componentPngIconStream = componentService.getComponentPngImage(TSalesforceInputDefinition.COMPONENT_NAME,
+                ComponentImageType.PALLETE_ICON_32X32);
         assertNotNull(componentPngIconStream);
     }
 

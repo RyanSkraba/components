@@ -4,6 +4,7 @@ import org.talend.components.api.Constants;
 import org.talend.components.api.wizard.AbstractComponentWizardDefintion;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
+import org.talend.components.api.wizard.WizardImageType;
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_WIZARD_BEAN_PREFIX
         + SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME)
@@ -24,8 +25,17 @@ public class SalesforceConnectionWizardDefinition extends AbstractComponentWizar
     }
 
     @Override
-    public String getPngImagePath() {
-        return "salesforce.png"; //$NON-NLS-1$
+    public String getPngImagePath(WizardImageType imageType) {
+        switch (imageType) {
+        case TREE_ICON_16X16:
+            return "connectionWizardIcon.png"; //$NON-NLS-1$
+        case WIZARD_BANNER_75X66:
+            return "salesforceWizardBanner.png"; //$NON-NLS-1$
+
+        default:
+            // will return null
+        }
+        return null;
     }
 
     @Override

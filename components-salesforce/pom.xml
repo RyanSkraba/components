@@ -79,7 +79,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Import-Package>!*internal,org.talend*</Import-Package>
+                        <Import-Package>!*internal,org.talend*,org.slf4j*</Import-Package>
                         <Service-Component>*</Service-Component>
                         <Embed-Dependency>!components*|com.fasterxml;scope=compile|runtime</Embed-Dependency>
                         <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>                        

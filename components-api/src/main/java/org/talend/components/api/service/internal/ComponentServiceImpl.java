@@ -24,10 +24,12 @@ import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.error.ComponentsErrorCode;
 import org.talend.components.api.properties.ComponentDefinition;
+import org.talend.components.api.properties.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
+import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.exception.ExceptionContext;
 
 /**
@@ -154,11 +156,11 @@ public class ComponentServiceImpl implements ComponentService {
     }
 
     @Override
-    public InputStream getWizardPngImage(String wizardName) {
-        TopLevelDefinition wizardDefinition = componentRegistry.getComponentWizards().get(
-                Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);
+    public InputStream getWizardPngImage(String wizardName, WizardImageType imageType) {
+        ComponentWizardDefinition wizardDefinition = componentRegistry.getComponentWizards()
+                .get(Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);
         if (wizardDefinition != null) {
-            return getImageStream(wizardDefinition);
+            return getImageStream(wizardDefinition, wizardDefinition.getPngImagePath(imageType));
         } else {
             throw new ComponentException(ComponentsErrorCode.WRONG_WIZARD_NAME, ExceptionContext.build().put("name", wizardName)); //$NON-NLS-1$
         }
@@ -166,14 +168,14 @@ public class ComponentServiceImpl implements ComponentService {
     }
 
     @Override
-    public InputStream getComponentPngImage(String componentName) {
-        TopLevelDefinition componentDefinition = componentRegistry.getComponents().get(
-                Constants.COMPONENT_BEAN_PREFIX + componentName);
+    public InputStream getComponentPngImage(String componentName, ComponentImageType imageType) {
+        ComponentDefinition componentDefinition = componentRegistry.getComponents()
+                .get(Constants.COMPONENT_BEAN_PREFIX + componentName);
         if (componentDefinition != null) {
-            return getImageStream(componentDefinition);
+            return getImageStream(componentDefinition, componentDefinition.getPngImagePath(imageType));
         } else {
-            throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME, ExceptionContext.build().put(
-                    "name", componentName)); //$NON-NLS-1$
+            throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME,
+                    ExceptionContext.build().put("name", componentName)); //$NON-NLS-1$
         }
     }
 
@@ -183,9 +185,8 @@ public class ComponentServiceImpl implements ComponentService {
      * @param definition, must not be null
      * @return the stream or null if no image was defined for th component or the path is wrong
      */
-    private InputStream getImageStream(TopLevelDefinition definition) {
+    private InputStream getImageStream(TopLevelDefinition definition, String pngIconPath) {
         InputStream result = null;
-        String pngIconPath = definition.getPngImagePath();
         if (pngIconPath != null && !"".equals(pngIconPath)) { //$NON-NLS-1$
             InputStream resourceAsStream = definition.getClass().getResourceAsStream(pngIconPath);
             if (resourceAsStream == null) {// no resource found so this is an component error, so log it and return

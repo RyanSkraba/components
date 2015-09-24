@@ -17,9 +17,11 @@ import java.util.Set;
 
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentDefinition;
+import org.talend.components.api.properties.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
+import org.talend.components.api.wizard.WizardImageType;
 
 /**
  * The Main service provided by this project to get access to all registered components and their properties.
@@ -99,18 +101,20 @@ public interface ComponentService {
      * Return the png image related to the given wizard
      * 
      * @param wizardName, name of the wizard to get the image for
+     * @param imageType, the type of image requested
      * @return the png image stream or null if none was provided or could not be found
      * @exception ComponentException thrown if the componentName is not registered in the service
      */
-    InputStream getWizardPngImage(String wizardName);
+    InputStream getWizardPngImage(String wizardName, WizardImageType imageType);
 
     /**
      * Return the png image related to the given component
      * 
      * @param componentName, name of the comonent to get the image for
+     * @param imageType, the type of image requested
      * @return the png image stream or null if none was provided or an error occurred
      * @exception ComponentException thrown if the componentName is not registered in the service
      */
-    InputStream getComponentPngImage(String componentName);
+    InputStream getComponentPngImage(String componentName, ComponentImageType imageType);
 
 }

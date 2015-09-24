@@ -6,6 +6,7 @@ import org.talend.components.api.properties.AbstractComponentDefinition;
 import org.talend.components.api.properties.ComponentConnector;
 import org.talend.components.api.properties.ComponentConnector.Type;
 import org.talend.components.api.properties.ComponentDefinition;
+import org.talend.components.api.properties.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
 
@@ -42,7 +43,7 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     }
 
     @Override
-    public String getPngImagePath() {
+    public String getPngImagePath(ComponentImageType imageType) {
         return null;
     }
 

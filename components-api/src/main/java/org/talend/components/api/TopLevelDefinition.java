@@ -22,23 +22,6 @@ import org.talend.components.api.context.GlobalContext;
 public interface TopLevelDefinition extends NamedThing {
 
     /**
-     * This shall be a path relative to the current Wizard definition, ideally is should just be the name of the png
-     * image if placed in the same resource folder that the current class. This icon will be computed with the following
-     * code
-     * 
-     * <pre>
-     * {@code
-     *    this.getClass().getResourceAsStream(getIconPngPath())
-     * }
-     * </pre>
-     * 
-     * @see {@link java.lang.Class#getResourceAsStream(String)}
-     * @return the path to the png resource
-     */
-
-    public abstract String getPngImagePath();
-
-    /**
      * This shall get called by the framework once the Component is instanciated. Actually this is not true, it is set
      * once the component is first required by the client through the ComponentService apis
      * 

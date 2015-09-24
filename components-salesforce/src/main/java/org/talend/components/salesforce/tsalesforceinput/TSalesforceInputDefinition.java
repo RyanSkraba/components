@@ -17,6 +17,7 @@ import org.talend.components.api.properties.AbstractComponentDefinition;
 import org.talend.components.api.properties.ComponentConnector;
 import org.talend.components.api.properties.ComponentConnector.Type;
 import org.talend.components.api.properties.ComponentDefinition;
+import org.talend.components.api.properties.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.salesforce.SalesforceRuntime;
@@ -42,6 +43,7 @@ public class TSalesforceInputDefinition extends AbstractComponentDefinition {
         return new TSalesforceInputProperties(globalContext.i18nMessageProvider);
     }
 
+    @Override
     public ComponentRuntime createRuntime() {
         return new SalesforceRuntime();
     }
@@ -57,8 +59,15 @@ public class TSalesforceInputDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public String getPngImagePath() {
-        return "tSalesforceInput_icon32.png"; //$NON-NLS-1$
+    public String getPngImagePath(ComponentImageType imageType) {
+        switch (imageType) {
+        case PALLETE_ICON_32X32:
+            return "tSalesforceInput_icon32.png"; //$NON-NLS-1$
+
+        default:
+            // will return null
+        }
+        return null;
     }
 
     @Override
