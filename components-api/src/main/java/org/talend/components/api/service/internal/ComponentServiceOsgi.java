@@ -28,6 +28,8 @@ import org.talend.components.api.context.GlobalContext;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Repository;
+import org.talend.components.api.schema.Schema;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
@@ -150,33 +152,13 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
-    public ComponentProperties afterFormPresent(String formName, ComponentProperties properties) throws Throwable {
-        return componentServiceDelegate.afterFormPresent(formName, properties);
-    }
-
-    @Override
-    public ComponentProperties beforeFormNext(String formName, ComponentProperties properties) throws Throwable {
-        return componentServiceDelegate.beforeFormNext(formName, properties);
-    }
-
-    @Override
     public ComponentProperties afterFormNext(String formName, ComponentProperties properties) throws Throwable {
         return componentServiceDelegate.afterFormNext(formName, properties);
     }
 
     @Override
-    public ComponentProperties beforeFormBack(String formName, ComponentProperties properties) throws Throwable {
-        return componentServiceDelegate.beforeFormBack(formName, properties);
-    }
-
-    @Override
     public ComponentProperties afterFormBack(String formName, ComponentProperties properties) throws Throwable {
         return componentServiceDelegate.afterFormBack(formName, properties);
-    }
-
-    @Override
-    public ComponentProperties beforeFormFinish(String formName, ComponentProperties properties) throws Throwable {
-        return componentServiceDelegate.beforeFormFinish(formName, properties);
     }
 
     @Override
@@ -208,5 +190,15 @@ public class ComponentServiceOsgi implements ComponentService {
     public InputStream getComponentPngImage(String componentName, ComponentImageType imageType) {
         return componentServiceDelegate.getComponentPngImage(componentName, imageType);
     }
+
+    public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation, Schema schema) {
+        return componentServiceDelegate.storeComponentProperties(properties, name, repositoryLocation, schema);
+    }
+
+    public void setRepository(Repository repository) {
+        componentServiceDelegate.setRepository(repository);
+    }
+
+
 
 }

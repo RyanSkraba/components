@@ -60,7 +60,8 @@ public class LocalComponentTest extends TestCase {
         int i = 0;
         for (NamedThing prop : props.getProperties()) {
             System.out.println(prop.getName());
-            assertEquals(prop.getName(), newProps.get(i++).getName());
+            assertEquals(prop.getName(), newProps.get(i).getName());
+            i++;
         }
         i = 0;
         for (Form form : props.getForms()) {
@@ -114,7 +115,7 @@ public class LocalComponentTest extends TestCase {
         ComponentWizard wizard = componentService.getComponentWizard(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME,
                 "userdata");
         assertTrue(wizard instanceof TestComponentWizard);
-        assertEquals("userdata", wizard.getUserData());
+        assertEquals("userdata", wizard.getRepositoryLocation());
     }
 
     @Test(expected = ComponentException.class)

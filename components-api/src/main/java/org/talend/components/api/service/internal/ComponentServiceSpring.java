@@ -40,6 +40,8 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Repository;
+import org.talend.components.api.schema.Schema;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
@@ -103,10 +105,10 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
-    @RequestMapping(value = BASE_PATH + "/wizard/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = BASE_PATH + "/wizard/{name}/{repositoryLocation}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ComponentWizard getComponentWizard(
             @PathVariable(value = "name") @ApiParam(name = "name", value = "Name of the component") String name,
-            @RequestParam(defaultValue = "", required = false) @ApiParam(name = "userData", value = "User data string") String userData) {
+            @PathVariable(value = "repositoryLocation") @ApiParam(name = "repositoryLocation", value = "User data string") String userData) {
         return componentServiceDelegate.getComponentWizard(name, userData);
     }
 
@@ -155,30 +157,7 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
-    @RequestMapping(value = BASE_PATH
-            + "/properties/afterFormPresent/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody ComponentProperties afterFormPresent(
-            @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
-                    throws Throwable {
-        componentServiceDelegate.afterFormPresent(formName, properties);
-        return properties;
-    }
-
-    @Override
-    @RequestMapping(value = BASE_PATH
-            + "/properties/beforeFormNext/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody ComponentProperties beforeFormNext(
-            @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
-                    throws Throwable {
-        componentServiceDelegate.beforeFormNext(formName, properties);
-        return properties;
-    }
-
-    @Override
-    @RequestMapping(value = BASE_PATH
-            + "/properties/afterFormNext/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = BASE_PATH + "/properties/afterFormNext/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ComponentProperties afterFormNext(
             @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
             @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
@@ -188,19 +167,7 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
-    @RequestMapping(value = BASE_PATH
-            + "/properties/beforeFormBack/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody ComponentProperties beforeFormBack(
-            @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
-                    throws Throwable {
-        componentServiceDelegate.beforeFormBack(formName, properties);
-        return properties;
-    }
-
-    @Override
-    @RequestMapping(value = BASE_PATH
-            + "/properties/afterFormBack/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = BASE_PATH + "/properties/afterFormBack/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ComponentProperties afterFormBack(
             @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
             @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
@@ -210,19 +177,7 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
-    @RequestMapping(value = BASE_PATH
-            + "/properties/beforeFormFinish/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody ComponentProperties beforeFormFinish(
-            @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
-                    throws Throwable {
-        componentServiceDelegate.beforeFormFinish(formName, properties);
-        return properties;
-    }
-
-    @Override
-    @RequestMapping(value = BASE_PATH
-            + "/properties/afterFormFinish/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = BASE_PATH + "/properties/afterFormFinish/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ComponentProperties afterFormFinish(
             @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
             @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
@@ -298,6 +253,10 @@ public class ComponentServiceSpring implements ComponentService {
         return componentServiceDelegate.getComponentPngImage(componentName, imageType);
     }
 
+    @Override public void setRepository(Repository repository) {
+        componentServiceDelegate.setRepository(repository);
+    }
+
     @RequestMapping(value = BASE_PATH + "/icon/{name}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     @ApiOperation(value = "Return the icon related to the Component", notes = "return the png image related to the Component name parameter.")
     public void getComponentsImageRest(
@@ -307,4 +266,12 @@ public class ComponentServiceSpring implements ComponentService {
         InputStream componentPngImageStream = getComponentPngImage(name, type);
         sendStreamBack(response, componentPngImageStream);
     }
+
+    // FIXME - make this work for web
+    @Override public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation,
+            Schema schema) {
+        return componentServiceDelegate.storeComponentProperties(properties, name, repositoryLocation, schema);
+    }
+
+
 }

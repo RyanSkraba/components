@@ -26,6 +26,8 @@ import org.talend.components.api.exception.error.ComponentsErrorCode;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Repository;
+import org.talend.components.api.schema.Schema;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
@@ -40,10 +42,16 @@ public class ComponentServiceImpl implements ComponentService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ComponentServiceImpl.class);
 
+    private Repository repository;
+
     private ComponentRegistry componentRegistry;
+
+    // FIXME - temporary to allow service to be found inside of ComponentProperties
+    public static ComponentService TEMP_INSTANCE;
 
     public ComponentServiceImpl(ComponentRegistry componentRegistry) {
         this.componentRegistry = componentRegistry;
+        TEMP_INSTANCE = this;
     }
 
     @Override
@@ -114,38 +122,14 @@ public class ComponentServiceImpl implements ComponentService {
     }
 
     @Override
-    public ComponentProperties afterFormPresent(String formName, ComponentProperties properties) throws Throwable {
-        properties.afterFormPresent(formName);
-        return properties;
-    }
-
-    @Override
-    public ComponentProperties beforeFormNext(String formName, ComponentProperties properties) throws Throwable {
-        properties.beforeFormNext(formName);
-        return properties;
-    }
-
-    @Override
     public ComponentProperties afterFormNext(String formName, ComponentProperties properties) throws Throwable {
         properties.afterFormNext(formName);
         return properties;
     }
 
     @Override
-    public ComponentProperties beforeFormBack(String formName, ComponentProperties properties) throws Throwable {
-        properties.beforeFormBack(formName);
-        return properties;
-    }
-
-    @Override
     public ComponentProperties afterFormBack(String formName, ComponentProperties properties) throws Throwable {
         properties.afterFormBack(formName);
-        return properties;
-    }
-
-    @Override
-    public ComponentProperties beforeFormFinish(String formName, ComponentProperties properties) throws Throwable {
-        properties.beforeFormFinish(formName);
         return properties;
     }
 
@@ -199,6 +183,16 @@ public class ComponentServiceImpl implements ComponentService {
             LOGGER.warn("The defintion of [" + definition.getName() + "] did not specify any icon"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return result;
+    }
+
+    public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation, Schema schema) {
+        if (repository != null)
+            return repository.storeComponentProperties(properties, name, repositoryLocation, schema);
+        return null;
+    }
+
+    public void setRepository(Repository repository) {
+        this.repository = repository;
     }
 
 }

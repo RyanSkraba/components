@@ -15,10 +15,12 @@ package org.talend.components.salesforce;
 import static org.talend.components.api.properties.presentation.Widget.widget;
 import static org.talend.components.api.schema.SchemaFactory.newProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.NameAndLabel;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.schema.SchemaElement;
@@ -46,8 +48,7 @@ public class SalesforceModuleProperties extends ComponentProperties {
 
     // FIXME - OK what about if we are using a connection from a separate component
     // that defines the connection, how do we get that separate component?
-    public SalesforceModuleProperties(I18nMessageProvider i18nMessageProvider,
-            SalesforceConnectionProperties connectionProperties) {
+    public SalesforceModuleProperties(I18nMessageProvider i18nMessageProvider, SalesforceConnectionProperties connectionProperties) {
         super(i18nMessageProvider, "org.talend.components.salesforce.message"); //$NON-NLS-1$
         schema = new SchemaProperties(i18nMessageProvider);
         connection = connectionProperties;
@@ -73,9 +74,13 @@ public class SalesforceModuleProperties extends ComponentProperties {
     public void beforeModuleName() throws Exception {
         SalesforceRuntime conn = new SalesforceRuntime();
         conn.connect(connection);
-        List<String> moduleNames = conn.getModuleNames();
+        List<NameAndLabel> moduleNames = conn.getModuleNames();
+        List<String> possibleValues = new ArrayList<>();
+        for (NameAndLabel nl : moduleNames)
+            possibleValues.add(nl.name);
         // FIXME - these are labels, need to have a corresponding actual values.
-        moduleName.setPossibleValues(moduleNames);
+        // SOmehow have to do this at the widget level
+        moduleName.setPossibleValues(possibleValues);
     }
 
     public void afterModuleName() throws Exception {

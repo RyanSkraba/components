@@ -24,7 +24,8 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.internal.Property;
+import org.talend.components.api.properties.NameAndLabel;
+import org.talend.components.api.properties.Repository;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
@@ -47,10 +48,24 @@ import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputPrope
 @SpringApplicationConfiguration(classes = SpringApp.class)
 public class SalesforceLocalComponentTest extends TestCase {
 
+    boolean inChina = true;
+
+    String userId;
+
+    String password;
+
     @Autowired
     protected ComponentService componentService;
 
     public SalesforceLocalComponentTest() {
+        if (!inChina) {
+            userId = "bchen2@talend.com";
+            password = "talend123sfYYBBe4aZN0TcDVDV7Ylzb6Ku";
+        } else {
+            userId = "fupton@talend.com";
+            password = "talendsal99QSCzLBQgrkEq9w9EXiOt1BSy";
+        }
+
     }
 
     protected ComponentProperties checkAndBefore(Form form, String propName, ComponentProperties props) throws Throwable {
@@ -68,8 +83,47 @@ public class SalesforceLocalComponentTest extends TestCase {
         return componentService.validateProperty(propName, props);
     }
 
+    static class RepoProps {
+
+        ComponentProperties props;
+
+        String name;
+
+        String repoLocation;
+
+        Schema schema;
+
+        RepoProps(ComponentProperties props, String name, String repoLocation, Schema schema) {
+            this.props = props;
+            this.name = name;
+            this.repoLocation = repoLocation;
+            this.schema = schema;
+        }
+
+        public String toString() {
+            return "RepoProps: " + repoLocation + "/" + name + " props: " + props;
+        }
+    }
+
     @Test
-    public void testWizard() {
+    public void testWizard() throws Throwable {
+        final List<RepoProps> repoProps = new ArrayList();
+
+        Repository repo = new Repository() {
+
+            private int locationNum;
+
+            @Override
+            public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation,
+                    Schema schema) {
+                RepoProps rp = new RepoProps(properties, name, repositoryLocation, schema);
+                repoProps.add(rp);
+                System.out.println(rp);
+                return repositoryLocation + ++locationNum;
+            }
+        };
+        componentService.setRepository(repo);
+
         Set<ComponentWizardDefinition> props = componentService.getTopLevelComponentWizards();
         int count = 0;
         ComponentWizardDefinition wizardDef = null;
@@ -81,17 +135,55 @@ public class SalesforceLocalComponentTest extends TestCase {
         }
         assertEquals(1, count);
         ComponentWizard wiz = componentService.getComponentWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
-                "userData");
+                "nodeSalesforce");
         assertNotNull(wiz);
-        assertEquals("userData", wiz.getUserData());
+        assertEquals("nodeSalesforce", wiz.getRepositoryLocation());
         assertTrue(wiz instanceof SalesforceConnectionWizard);
         List<Form> forms = wiz.getForms();
-        assertEquals("SalesforceConnectionPropertiesMain", forms.get(0).getName());
-        assertEquals("SalesforceModulePropertiesMain", forms.get(1).getName());
+        assertEquals("Main", forms.get(0).getName());
+        assertEquals("Main", forms.get(1).getName());
         Form connForm = forms.get(0);
-        Form userPassword = (Form) connForm.getChild("UserPasswordPropertiesUserPassword");
-        SchemaElement password = (SchemaElement) userPassword.getChild("password");
-        assertEquals("Password", password.getDisplayName());
+        SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connForm.getProperties();
+        connProps.setValue(connProps.name, "connName");
+        setupProps(connProps);
+        Form userPassword = (Form) connForm.getChild("UserPassword");
+        SchemaElement passwordSe = (SchemaElement) userPassword.getChild("password");
+        assertEquals("Password", passwordSe.getDisplayName());
+
+
+        Form modForm = forms.get(1);
+        SalesforceModuleListProperties mlProps = (SalesforceModuleListProperties) modForm.getProperties();
+        assertFalse(modForm.isCallAfterFormBack());
+        assertFalse(modForm.isCallAfterFormNext());
+        assertTrue(modForm.isCallAfterFormFinish());
+        assertTrue(modForm.isCallBeforeFormPresent());
+        mlProps = (SalesforceModuleListProperties) componentService.beforeFormPresent(modForm.getName(), mlProps);
+        System.out.println(mlProps.getValue(mlProps.moduleName));
+        List<NameAndLabel> all = (List<NameAndLabel>) mlProps.getValue(mlProps.moduleName);
+        List<NameAndLabel> selected = new ArrayList();
+        selected.add(all.get(0));
+        selected.add(all.get(2));
+        selected.add(all.get(3));
+
+        mlProps.setValue(mlProps.moduleName, selected);
+        componentService.afterFormFinish(modForm.getName(), mlProps);
+        System.out.println(repoProps);
+        assertEquals(4, repoProps.size());
+        int i = 0;
+        for (RepoProps rp : repoProps) {
+            if (i == 0) {
+                assertEquals("connName", rp.name);
+                SalesforceConnectionProperties storedConnProps = (SalesforceConnectionProperties) rp.props;
+                assertEquals(userId, storedConnProps.userPassword.getValue(storedConnProps.userPassword.userId));
+                assertEquals(password, storedConnProps.userPassword.getValue(storedConnProps.userPassword.password));
+            } else {
+                SalesforceModuleProperties storedModule = (SalesforceModuleProperties) rp.props;
+                assertEquals(selected.get(i - 1).name, storedModule.getValue(storedModule.moduleName));
+                assertTrue(rp.schema.getRoot().getChildren().size() > 10);
+                assertTrue(storedModule.schema.getValue(storedModule.schema.schema) == rp.schema);
+            }
+            i++;
+        }
     }
 
     @Test
@@ -115,9 +207,9 @@ public class SalesforceLocalComponentTest extends TestCase {
         assertEquals("OAUTH", props.loginType.getPossibleValues().get(1).toString());
         assertEquals(SalesforceConnectionProperties.LoginType.BASIC, props.getValue(props.loginType));
         Form mainForm = props.getForm(TSalesforceConnectProperties.MAIN);
-        String userPassFormName = props.userPassword.setupFormName(UserPasswordProperties.USERPASSWORD);
+        String userPassFormName = UserPasswordProperties.USERPASSWORD;
         assertTrue(mainForm.getWidget(userPassFormName).isVisible());
-        String oauthFormName = props.oauth.setupFormName(OauthProperties.OAUTH);
+        String oauthFormName = OauthProperties.OAUTH;
         assertFalse(mainForm.getWidget(oauthFormName).isVisible());
 
         props.setValue(props.loginType, SalesforceConnectionProperties.LoginType.OAUTH);
@@ -135,15 +227,8 @@ public class SalesforceLocalComponentTest extends TestCase {
                     .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
         }
         System.out.println("URI:" + props.getStringValue(props.url));
-
-        boolean inChina = true;
-        if (!inChina) {
-            props.userPassword.setValue(props.userPassword.userId, "bchen2@talend.com");
-            props.userPassword.setValue(props.userPassword.password, "talend123sfYYBBe4aZN0TcDVDV7Ylzb6Ku");
-        } else {
-            props.userPassword.setValue(props.userPassword.userId, "fupton@talend.com");
-            props.userPassword.setValue(props.userPassword.password, "talendsal99QSCzLBQgrkEq9w9EXiOt1BSy");
-        }
+        props.userPassword.setValue(props.userPassword.userId, userId);
+        props.userPassword.setValue(props.userPassword.password, password);
         return props;
     }
 

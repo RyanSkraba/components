@@ -22,8 +22,8 @@ import org.talend.components.api.SimpleNamedThing;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.schema.SchemaElement;
 
-/**>
- * Represents a collection of components {@link SchemaElement} objects that are grouped into a form for display. This
+/**
+ * > Represents a collection of components {@link SchemaElement} objects that are grouped into a form for display. This
  * form can be manifested for example as a tab in a view, a dialog, or a page in a wizard.
  */
 public class Form extends SimpleNamedThing {
@@ -39,6 +39,14 @@ public class Form extends SimpleNamedThing {
     private int currentRow;
 
     private int currentColumn;
+
+    private boolean callBeforeFormPresent;
+
+    private boolean callAfterFormBack;
+
+    private boolean callAfterFormNext;
+
+    private boolean callAfterFormFinish;
 
     /**
      * Indicate that some {@link Widget} objects for this form have changed and the UI should be re-rendered to reflect
@@ -56,10 +64,11 @@ public class Form extends SimpleNamedThing {
         widgets = new ArrayList<Widget>();
         props.addForm(this);
         properties = props;
+        props.setFormLayoutMethods(name, this);
     }
 
     public static Form create(ComponentProperties props, String name, String title) {
-        return new Form(props, props.setupFormName(name), name, title);
+        return new Form(props, name, name, title);
     }
 
     public List<NamedThing> getChildren() {
@@ -134,7 +143,7 @@ public class Form extends SimpleNamedThing {
         for (NamedThing child : widget.getProperties()) {
             widgetMap.put(child.getName(), widget);
             children.put(child.getName(), child);
-            properties.setLayoutMethods(child.getName(), widget);
+            properties.setWidgetLayoutMethods(child.getName(), widget);
         }
     }
 
@@ -148,6 +157,38 @@ public class Form extends SimpleNamedThing {
 
     public void setRefreshUI(boolean refreshUI) {
         this.refreshUI = refreshUI;
+    }
+
+    public boolean isCallBeforeFormPresent() {
+        return callBeforeFormPresent;
+    }
+
+    public void setCallBeforeFormPresent(boolean callBeforeFormPresent) {
+        this.callBeforeFormPresent = callBeforeFormPresent;
+    }
+
+    public boolean isCallAfterFormBack() {
+        return callAfterFormBack;
+    }
+
+    public void setCallAfterFormBack(boolean callAfterFormBack) {
+        this.callAfterFormBack = callAfterFormBack;
+    }
+
+    public boolean isCallAfterFormNext() {
+        return callAfterFormNext;
+    }
+
+    public void setCallAfterFormNext(boolean callAfterFormNext) {
+        this.callAfterFormNext = callAfterFormNext;
+    }
+
+    public boolean isCallAfterFormFinish() {
+        return callAfterFormFinish;
+    }
+
+    public void setCallAfterFormFinish(boolean callAfterFormFinish) {
+        this.callAfterFormFinish = callAfterFormFinish;
     }
 
     public String toString() {

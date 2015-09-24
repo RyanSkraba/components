@@ -19,6 +19,7 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Repository;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
@@ -26,7 +27,7 @@ import org.talend.components.api.wizard.WizardImageType;
 /**
  * The Main service provided by this project to get access to all registered components and their properties.
  */
-public interface ComponentService {
+public interface ComponentService extends Repository {
 
     /**
      * Get the list of all the component names that are registered
@@ -69,7 +70,7 @@ public interface ComponentService {
      * modules would be called "salesforce.modules" in order to make sure the name is unique.
      *
      * @param name the name of the wizard
-     * @param userData an arbitrary userData string to optionally be used in the wizard processing.
+     * @param userData an arbitrary repositoryLocation string to optionally be used in the wizard processing.
      * @return a {@code ComponentWizard} object.
      * @exception ComponentException thrown if the wizard is not registered in the service
      */
@@ -83,17 +84,9 @@ public interface ComponentService {
 
     ComponentProperties beforeFormPresent(String formName, ComponentProperties properties) throws Throwable;
 
-    ComponentProperties afterFormPresent(String formName, ComponentProperties properties) throws Throwable;
-
-    ComponentProperties beforeFormNext(String formName, ComponentProperties properties) throws Throwable;
-
     ComponentProperties afterFormNext(String formName, ComponentProperties properties) throws Throwable;
 
-    ComponentProperties beforeFormBack(String formName, ComponentProperties properties) throws Throwable;
-
     ComponentProperties afterFormBack(String formName, ComponentProperties properties) throws Throwable;
-
-    ComponentProperties beforeFormFinish(String formName, ComponentProperties properties) throws Throwable;
 
     ComponentProperties afterFormFinish(String formName, ComponentProperties properties) throws Throwable;
 
@@ -116,5 +109,12 @@ public interface ComponentService {
      * @exception ComponentException thrown if the componentName is not registered in the service
      */
     InputStream getComponentPngImage(String componentName, ComponentImageType imageType);
+
+    /**
+     * Allows for a local implementation to setup a repository store used to store {@link ComponentProperties}.
+     * 
+     * @param repository
+     */
+    void setRepository(Repository repository);
 
 }

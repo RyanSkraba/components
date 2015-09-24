@@ -19,6 +19,8 @@ import java.util.*;
 import javax.xml.namespace.QName;
 
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.NameAndLabel;
+import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.api.runtime.ComponentRuntimeContainer;
 import org.talend.components.api.schema.Schema;
@@ -150,8 +152,19 @@ public class SalesforceRuntime extends ComponentRuntime {
         }
     }
 
-    public void connect(final SalesforceConnectionProperties properties) throws Exception {
+    public ValidationResult connectWithResult(final SalesforceConnectionProperties properties) {
+        ValidationResult vr = new ValidationResult();
+        try {
+            connect(properties);
+        } catch (Exception ex) {
+            // FIXME - do a better job here
+            vr.setMessage(ex.getMessage());
+            return vr;
+        }
+        return vr;
+    }
 
+    public void connect(final SalesforceConnectionProperties properties) throws Exception {
         ConnectorConfig config = new ConnectorConfig();
         config.setUsername(properties.userPassword.getStringValue(properties.userPassword.userId));
         config.setPassword(properties.userPassword.getStringValue(properties.userPassword.password));
@@ -193,15 +206,16 @@ public class SalesforceRuntime extends ComponentRuntime {
 
         System.out.println("Connection: " + connection);
         System.out.println("Bulk Connection: " + bulkConnection);
+
     }
 
-    public List<String> getModuleNames() throws ConnectionException {
-        List<String> returnList = new ArrayList();
+    public List<NameAndLabel> getModuleNames() throws ConnectionException {
+        List<NameAndLabel> returnList = new ArrayList();
         DescribeGlobalResult result = connection.describeGlobal();
         DescribeGlobalSObjectResult[] objects = result.getSobjects();
         for (DescribeGlobalSObjectResult obj : objects) {
             System.out.println("module label: " + obj.getLabel() + " name: " + obj.getName());
-            returnList.add(obj.getName());
+            returnList.add(new NameAndLabel(obj.getName(), obj.getLabel()));
         }
         return returnList;
     }

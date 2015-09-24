@@ -3,7 +3,10 @@ package org.talend.components.api.properties;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.talend.components.api.ComponentDesigner;
 import org.talend.components.api.exception.ComponentException;
@@ -64,6 +67,14 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     static final String METHOD_AFTER = "after";
 
     static final String METHOD_VALIDATE = "validate";
+
+    static final String METHOD_BEFORE_FORM = "beforeFormPresent";
+
+    static final String METHOD_AFTER_FORM_BACK = "afterFormBack";
+
+    static final String METHOD_AFTER_FORM_NEXT = "afterFormNext";
+
+    static final String METHOD_AFTER_FORM_FINISH = "afterFormFinish";
 
     // Not a component property
     protected ComponentPropertiesInternal internal;
@@ -148,16 +159,11 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     }
 
     public Form getForm(String formName) {
-        return internal.getForm(setupFormName(formName));
+        return internal.getForm(formName);
     }
 
     public String getSimpleClassName() {
         return getClass().getSimpleName();
-    }
-
-    // Qualify the formName by this class for debugging/testing
-    public String setupFormName(String formName) {
-        return getSimpleClassName() + formName;
     }
 
     public void addForm(Form form) {
@@ -241,19 +247,40 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     }
 
     // Internal - not API
-    public void setLayoutMethods(String property, Widget layout) {
+    public void setWidgetLayoutMethods(String property, Widget widget) {
         Method m;
         m = findMethod(METHOD_BEFORE, property, !REQUIRED);
         if (m != null) {
-            layout.setCallBefore(true);
+            widget.setCallBefore(true);
         }
         m = findMethod(METHOD_AFTER, property, !REQUIRED);
         if (m != null) {
-            layout.setCallAfter(true);
+            widget.setCallAfter(true);
         }
         m = findMethod(METHOD_VALIDATE, property, !REQUIRED);
         if (m != null) {
-            layout.setCallValidate(true);
+            widget.setCallValidate(true);
+        }
+    }
+
+    // Internal - not API
+    public void setFormLayoutMethods(String property, Form form) {
+        Method m;
+        m = findMethod(METHOD_BEFORE_FORM, property, !REQUIRED);
+        if (m != null) {
+            form.setCallBeforeFormPresent(true);
+        }
+        m = findMethod(METHOD_AFTER_FORM_BACK, property, !REQUIRED);
+        if (m != null) {
+            form.setCallAfterFormBack(true);
+        }
+        m = findMethod(METHOD_AFTER_FORM_NEXT, property, !REQUIRED);
+        if (m != null) {
+            form.setCallAfterFormNext(true);
+        }
+        m = findMethod(METHOD_AFTER_FORM_FINISH, property, !REQUIRED);
+        if (m != null) {
+            form.setCallAfterFormFinish(true);
         }
     }
 
@@ -282,7 +309,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     }
 
     public void validateProperty(String propName) throws Throwable {
-        Method m = findMethod("validate", propName, REQUIRED);
+        Method m = findMethod(METHOD_VALIDATE, propName, REQUIRED);
         try {
             ValidationResult validationResult = (ValidationResult) m.invoke(this);
             internal.setValidationResult(validationResult);
@@ -292,43 +319,27 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     }
 
     public void beforeProperty(String propName) throws Throwable {
-        doInvoke(findMethod("before", propName, REQUIRED));
+        doInvoke(findMethod(METHOD_BEFORE, propName, REQUIRED));
     }
 
     public void afterProperty(String propName) throws Throwable {
-        doInvoke(findMethod("after", propName, REQUIRED));
+        doInvoke(findMethod(METHOD_AFTER, propName, REQUIRED));
     }
 
     public void beforeFormPresent(String formName) throws Throwable {
-        doInvoke(findMethod("beforeFormPresent", formName, REQUIRED));
-    }
-
-    public void afterFormPresent(String formName) throws Throwable {
-        doInvoke(findMethod("afterFormPresent", formName, REQUIRED));
-    }
-
-    public void beforeFormNext(String formName) throws Throwable {
-        doInvoke(findMethod("beforeFormNext", formName, REQUIRED));
+        doInvoke(findMethod(METHOD_BEFORE_FORM, formName, REQUIRED));
     }
 
     public void afterFormNext(String formName) throws Throwable {
-        doInvoke(findMethod("afterFormNext", formName, REQUIRED));
-    }
-
-    public void beforeFormBack(String formName) throws Throwable {
-        doInvoke(findMethod("beforeFormBack", formName, REQUIRED));
+        doInvoke(findMethod(METHOD_AFTER_FORM_NEXT, formName, REQUIRED));
     }
 
     public void afterFormBack(String formName) throws Throwable {
-        doInvoke(findMethod("afterFormBack", formName, REQUIRED));
-    }
-
-    public void beforeFormFinish(String formName) throws Throwable {
-        doInvoke(findMethod("beforeFormFinish", formName, REQUIRED));
+        doInvoke(findMethod(METHOD_AFTER_FORM_BACK, formName, REQUIRED));
     }
 
     public void afterFormFinish(String formName) throws Throwable {
-        doInvoke(findMethod("afterFormFinish", formName, REQUIRED));
+        doInvoke(findMethod(METHOD_AFTER_FORM_FINISH, formName, REQUIRED));
     }
 
     /*

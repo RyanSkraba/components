@@ -15,6 +15,10 @@ package org.talend.components.salesforce;
 import static org.talend.components.api.properties.presentation.Widget.widget;
 import static org.talend.components.api.schema.SchemaFactory.newProperty;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.PresentationItem;
@@ -28,10 +32,6 @@ import org.talend.components.common.oauth.OauthProperties;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 @JsonRootName("salesforceConnectionProperties")
 public class SalesforceConnectionProperties extends ComponentProperties {
 
@@ -40,14 +40,16 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     //
 
     // public String apiVersion;
+
+    // Only for the wizard use
+    public SchemaElement name = newProperty("name");
+
     public SchemaElement url = newProperty("url").setRequired(true); //$NON-NLS-1$
 
     public enum LoginType {
         BASIC,
         OAUTH
     }
-
-
 
     public SchemaElement loginType = newProperty(SchemaElement.Type.ENUM, "loginType").setRequired(true);
 
@@ -85,7 +87,16 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     public static final String ADVANCED = "Advanced";
 
     public SalesforceConnectionProperties(I18nMessageProvider i18nMessageProvider) {
+        this(i18nMessageProvider, !INCLUDE_NAME); //$NON-NLS-1$
+    }
+
+    public static final boolean INCLUDE_NAME = true;
+
+    public SalesforceConnectionProperties(I18nMessageProvider i18nMessageProvider, boolean includeName) {
         super(i18nMessageProvider, "org.talend.components.salesforce.message"); //$NON-NLS-1$
+
+        if (!includeName)
+            name = null;
 
         List loginTypes = new ArrayList<>();
         Collections.addAll(loginTypes, LoginType.values());
@@ -98,7 +109,8 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         setupPropertiesWithI18n();
     }
 
-    @Override protected void setupLayout() {
+    @Override
+    protected void setupLayout() {
         super.setupLayout();
 
         setValue(loginType, LoginType.BASIC);
@@ -106,13 +118,14 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         Form connectionForm = Form.create(this, MAIN, "Salesforce Connection Settings");
         connectionForm.addRow(connectionDesc);
 
+        if (name != null)
+            connectionForm.addRow(name);
+
         connectionForm.addRow(widget(loginType).setDeemphasize(true));
 
         // Only one of these is visible at a time
         connectionForm.addRow(oauth.getForm(OauthProperties.OAUTH));
         connectionForm.addRow(userPassword.getForm(UserPasswordProperties.USERPASSWORD));
-
-        connectionForm.addRow(url);
 
         connectionForm.addRow(widget(advanced).setWidgetType(WidgetType.BUTTON));
         connectionForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
@@ -125,6 +138,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         advancedForm.addRow(httpTraceMessage);
         advancedForm.addRow(clientId);
         advancedForm.addRow(timeout);
+        advancedForm.addRow(url);
         advancedForm.addRow(proxy.getForm(ProxyProperties.PROXY));
         refreshLayout(advancedForm);
     }
@@ -135,25 +149,23 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
     public ValidationResult validateTestConnection() throws Exception {
         SalesforceRuntime conn = new SalesforceRuntime();
-        conn.connect(this);
-        // FIXME - handle the error catching
-        return new ValidationResult();
+        return conn.connectWithResult(this);
     }
 
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        if (form.getName().equals(setupFormName(MAIN))) {
+        if (form.getName().equals(MAIN)) {
             switch ((LoginType) getValue(loginType)) {
             case OAUTH:
-                form.getWidget(oauth.setupFormName(OauthProperties.OAUTH)).setVisible(true);
+                form.getWidget(OauthProperties.OAUTH).setVisible(true);
                 setValue(url, "https://login.salesforce.com/services/oauth2");
-                form.getWidget(userPassword.setupFormName(UserPasswordProperties.USERPASSWORD)).setVisible(false);
+                form.getWidget(UserPasswordProperties.USERPASSWORD).setVisible(false);
                 break;
             case BASIC:
-                form.getWidget(oauth.setupFormName(OauthProperties.OAUTH)).setVisible(false);
+                form.getWidget(OauthProperties.OAUTH).setVisible(false);
                 setValue(url, "https://www.salesforce.com/services/Soap/u/34.0");
-                form.getWidget(userPassword.setupFormName(UserPasswordProperties.USERPASSWORD)).setVisible(true);
+                form.getWidget(UserPasswordProperties.USERPASSWORD).setVisible(true);
                 break;
             default:
                 throw new RuntimeException("Enum value should be handled :" + getValue(loginType));
