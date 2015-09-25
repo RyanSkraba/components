@@ -28,6 +28,8 @@ import org.talend.components.api.schema.SchemaElement;
  */
 public class Form extends SimpleNamedThing {
 
+    protected String subtitle;
+
     protected ComponentProperties properties;
 
     protected Map<String, NamedThing> children;
@@ -103,6 +105,16 @@ public class Form extends SimpleNamedThing {
         this.title = title;
         return this;
     }
+
+    public Form setSubtitle(String subtitle) {
+        this.subtitle = subtitle;
+        return this;
+    }
+
+    public String getSubtitle() {
+        return subtitle;
+    }
+
 
     public Form addRow(NamedThing child) {
         addRow(Widget.widget(child));

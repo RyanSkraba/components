@@ -220,6 +220,8 @@ public class SalesforceLocalComponentTest extends TestCase {
         assertEquals("OAuth", props.loginType.getPossibleValues().get(1).toString());
         assertEquals(SalesforceConnectionProperties.LOGIN_BASIC, props.getValue(props.loginType));
         Form mainForm = props.getForm(TSalesforceConnectProperties.MAIN);
+        assertEquals("Salesforce Connection Settings", mainForm.getTitle());
+        assertEquals("Complete these fields in order to connect to your Salesforce account.", mainForm.getSubtitle());
         String userPassFormName = UserPasswordProperties.USERPASSWORD;
         assertTrue(mainForm.getWidget(userPassFormName).isVisible());
         String oauthFormName = OauthProperties.OAUTH;

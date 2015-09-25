@@ -114,7 +114,8 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
         setValue(loginType, LOGIN_BASIC);
 
-        Form connectionForm = Form.create(this, MAIN, "Salesforce Connection Settings");
+        Form connectionForm = Form.create(this, MAIN, getI18nMessage("property.form.Main.title"));
+        connectionForm.setSubtitle(getI18nMessage("property.form.Main.subtitle"));
         connectionForm.addRow(connectionDesc);
 
         if (name != null)
@@ -131,7 +132,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
         refreshLayout(connectionForm);
 
-        Form advancedForm = Form.create(this, ADVANCED, "Advanced Connection Settings");
+        Form advancedForm = Form.create(this, ADVANCED, getI18nMessage("property.form.Advanced.title"));
         advancedForm.addRow(bulkConnection);
         advancedForm.addRow(needCompression);
         advancedForm.addRow(httpTraceMessage);

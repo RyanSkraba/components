@@ -34,7 +34,9 @@ public class TranslatableImpl implements Translatable {
         if (i18nMessages != null) {
             return i18nMessages.getMessage(key, arguments);
         } else {
-            throw new ComponentException(ComponentsErrorCode.MISSING_I18N_TRANSLATOR, ExceptionContext.build().put("key", key)); //$NON-NLS-1$
+            return "Missing translator: " + key;
+            // FIXME - removing this for now until I18N can support this on deserialization
+            // throw new ComponentException(ComponentsErrorCode.MISSING_I18N_TRANSLATOR, ExceptionContext.build().put("key", key)); //$NON-NLS-1$
         }
     }
 }
