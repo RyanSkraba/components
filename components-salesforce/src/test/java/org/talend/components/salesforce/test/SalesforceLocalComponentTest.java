@@ -12,9 +12,11 @@
 // ============================================================================
 package org.talend.components.salesforce.test;
 
-import java.util.*;
-
-import junit.framework.TestCase;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -22,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.talend.components.api.NamedThing;
 import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.NameAndLabel;
@@ -35,13 +38,20 @@ import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.common.oauth.OauthProperties;
-import org.talend.components.salesforce.*;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.SalesforceConnectionWizard;
+import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
+import org.talend.components.salesforce.SalesforceModuleListProperties;
+import org.talend.components.salesforce.SalesforceModuleProperties;
+import org.talend.components.salesforce.SalesforceRuntime;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectDefinition;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
+
+import junit.framework.TestCase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -99,6 +109,7 @@ public class SalesforceLocalComponentTest extends TestCase {
             this.schema = schema;
         }
 
+        @Override
         public String toString() {
             return "RepoProps: " + repoLocation + "/" + name + " props: " + props;
         }
@@ -141,6 +152,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         List<Form> forms = wiz.getForms();
         assertEquals("Main", forms.get(0).getName());
         assertEquals("Main", forms.get(1).getName());
+        // check password i18n
         Form connForm = forms.get(0);
         SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connForm.getProperties();
         connProps.setValue(connProps.name, "connName");
@@ -148,7 +160,9 @@ public class SalesforceLocalComponentTest extends TestCase {
         Form userPassword = (Form) connForm.getChild("UserPassword");
         SchemaElement passwordSe = (SchemaElement) userPassword.getChild("password");
         assertEquals("Password", passwordSe.getDisplayName());
-
+        // check name i18n
+        NamedThing nameProp = connForm.getChild("name"); //$NON-NLS-1$
+        assertEquals("Name", nameProp.getDisplayName());
 
         Form modForm = forms.get(1);
         SalesforceModuleListProperties mlProps = (SalesforceModuleListProperties) modForm.getProperties();
