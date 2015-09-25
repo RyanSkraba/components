@@ -1,6 +1,6 @@
 package org.talend.components.salesforce;
 
-import org.talend.components.api.i18n.I18nMessageProvider;
+import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.wizard.ComponentWizard;
 
 /**
@@ -13,11 +13,12 @@ public class SalesforceConnectionWizard extends ComponentWizard {
     SalesforceConnectionWizard(String repositoryLocation) {
         super(repositoryLocation);
 
-        SalesforceConnectionProperties cProps = new SalesforceConnectionProperties("SalesforceConnectionProperties");
-        addForm(cProps.getForm(SalesforceConnectionProperties.MAIN));
+        SalesforceConnectionProperties cProps = new SalesforceConnectionProperties("SalesforceConnectionProperties",
+                SalesforceConnectionProperties.INCLUDE_NAME);
+        addForm(cProps.getForm(Form.MAIN));
 
         mProps = new SalesforceModuleListProperties(null, cProps, getRepositoryLocation());
-        addForm(mProps.getForm(SalesforceModuleProperties.MAIN));
+        addForm(mProps.getForm(Form.MAIN));
     }
 
 }

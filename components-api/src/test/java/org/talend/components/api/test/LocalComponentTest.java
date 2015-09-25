@@ -16,6 +16,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,16 +31,10 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.test.testcomponent.NestedComponentProperties;
-import org.talend.components.api.test.testcomponent.TestComponentDefinition;
-import org.talend.components.api.test.testcomponent.TestComponentProperties;
-import org.talend.components.api.test.testcomponent.TestComponentWizard;
-import org.talend.components.api.test.testcomponent.TestComponentWizardDefinition;
+import org.talend.components.api.test.testcomponent.*;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
-
-import junit.framework.TestCase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -69,8 +65,15 @@ public class LocalComponentTest extends TestCase {
             Form newForm = newForms.get(i++);
             assertEquals(form.getName(), form.getName());
             for (NamedThing formChild : form.getChildren()) {
-                System.out.println("  prop: " + formChild.getName());
-                assertEquals(formChild.getName(), newForm.getChild(formChild.getName()).getName());
+                String name = formChild.getName();
+                if (formChild instanceof Form)
+                    name = ((Form) formChild).getProperties().getName();
+                System.out.println("  prop: " + formChild.getName() + " name to be used: " + name);
+                NamedThing newChild = newForm.getChild(name);
+                String newName = newChild.getName();
+                if (newChild instanceof Form)
+                    newName = ((Form) newChild).getProperties().getName();
+                assertEquals(name, newName);
             }
         }
     }

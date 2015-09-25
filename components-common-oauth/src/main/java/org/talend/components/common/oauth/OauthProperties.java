@@ -30,8 +30,6 @@ public class OauthProperties extends ComponentProperties {
 
     public SchemaElement tokenFile = newProperty("tokenFile").setRequired(true); //$NON-NLS-1$
 
-    public static final String OAUTH = "OAuth"; //$NON-NLS-1$
-
     public OauthProperties(String name) {
         super(name);
         setupLayout();
@@ -41,7 +39,7 @@ public class OauthProperties extends ComponentProperties {
     protected void setupLayout() {
         super.setupLayout();
 
-        Form form = Form.create(this, OAUTH, "OAuth Parameters");
+        Form form = Form.create(this, Form.MAIN, "OAuth Parameters");
         form.addRow(clientId);
         form.addColumn(clientSecret);
 

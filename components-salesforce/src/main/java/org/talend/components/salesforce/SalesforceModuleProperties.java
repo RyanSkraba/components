@@ -39,12 +39,6 @@ public class SalesforceModuleProperties extends ComponentProperties {
 
     public SchemaProperties schema = new SchemaProperties("shema"); //$NON-NLS-1$
 
-    public static final String MAIN = "Main"; //$NON-NLS-1$
-
-    public static final String REFERENCE = "Reference"; //$NON-NLS-1$
-
-    public static final String ADVANCED = "Advanced"; //$NON-NLS-1$
-
     // FIXME - OK what about if we are using a connection from a separate component
     // that defines the connection, how do we get that separate component?
     public SalesforceModuleProperties(String name, SalesforceConnectionProperties connectionProperties) {
@@ -58,14 +52,14 @@ public class SalesforceModuleProperties extends ComponentProperties {
     protected void setupLayout() {
         super.setupLayout();
 
-        Form moduleForm = Form.create(this, MAIN, "Salesforce Module");
+        Form moduleForm = Form.create(this, Form.MAIN, "Salesforce Module");
         moduleForm.addRow(widget(moduleName).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
         refreshLayout(moduleForm);
 
-        Form moduleRefForm = Form.create(this, REFERENCE, "Salesforce Module");
+        Form moduleRefForm = Form.create(this, Form.REFERENCE, "Salesforce Module");
         moduleRefForm.addRow(widget(moduleName).setWidgetType(Widget.WidgetType.NAME_SELECTION_REFERENCE));
 
-        moduleRefForm.addRow(schema.getForm(SchemaProperties.REFERENCE));
+        moduleRefForm.addRow(schema.getForm(Form.REFERENCE));
         refreshLayout(moduleRefForm);
     }
 

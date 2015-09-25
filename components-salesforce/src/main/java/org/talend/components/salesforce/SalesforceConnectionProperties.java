@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.presentation.Widget.*;
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.schema.SchemaFactory.newProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +36,6 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     //
     // Properties
     //
-
-    // public String apiVersion;
 
     // Only for the wizard use
     public SchemaElement name = newProperty("name").setRequired(true);
@@ -76,19 +74,20 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
     public ComponentProperties proxy = new ProxyProperties("proxy"); //$NON-NLS-1$
 
-    public static final String MAIN = "Main"; //$NON-NLS-1$
-
-    public static final String ADVANCED = "Advanced"; //$NON-NLS-1$
-
     public static final boolean INCLUDE_NAME = true;
 
     public SalesforceConnectionProperties(String name) {
+        this(name, !INCLUDE_NAME);
+    }
+
+    public SalesforceConnectionProperties(String name, boolean includeName) {
         super(name);
+        if (!includeName)
+            name = null;
         List<String> loginTypes = new ArrayList<>();
         loginTypes.add(LOGIN_BASIC);
         loginTypes.add(LOGIN_OAUTH);
         loginType.setPossibleValues(loginTypes);
-
         setupLayout();
     }
 
@@ -98,7 +97,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
         setValue(loginType, LOGIN_BASIC);
 
-        Form connectionForm = Form.create(this, MAIN, getI18nMessage("property.form.Main.title"));
+        Form connectionForm = Form.create(this, Form.MAIN, getI18nMessage("property.form.Main.title"));
         connectionForm.setSubtitle(getI18nMessage("property.form.Main.subtitle"));
 
         if (name != null) {
@@ -108,27 +107,27 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         connectionForm.addRow(widget(loginType).setDeemphasize(true));
 
         // Only one of these is visible at a time
-        connectionForm.addRow(oauth.getForm(OauthProperties.OAUTH));
-        connectionForm.addRow(userPassword.getForm(UserPasswordProperties.USERPASSWORD));
+        connectionForm.addRow(oauth.getForm(Form.MAIN));
+        connectionForm.addRow(userPassword.getForm(Form.MAIN));
 
         connectionForm.addRow(widget(advanced).setWidgetType(WidgetType.BUTTON));
         connectionForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
 
         refreshLayout(connectionForm);
 
-        Form advancedForm = Form.create(this, ADVANCED, getI18nMessage("property.form.Advanced.title"));
+        Form advancedForm = Form.create(this, Form.ADVANCED, getI18nMessage("property.form.Advanced.title"));
         advancedForm.addRow(bulkConnection);
         advancedForm.addRow(needCompression);
         advancedForm.addRow(httpTraceMessage);
         advancedForm.addRow(clientId);
         advancedForm.addRow(timeout);
         advancedForm.addRow(url);
-        advancedForm.addRow(proxy.getForm(ProxyProperties.PROXY));
+        advancedForm.addRow(proxy.getForm(Form.MAIN));
         refreshLayout(advancedForm);
     }
 
     public void afterLoginType() {
-        refreshLayout(getForm(MAIN));
+        refreshLayout(getForm(Form.MAIN));
     }
 
     public ValidationResult validateTestConnection() throws Exception {
@@ -139,15 +138,15 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        if (form.getName().equals(MAIN)) {
+        if (form.getName().equals(Form.MAIN)) {
             if (LOGIN_OAUTH.equals(getValue(loginType))) {
-                form.getWidget(OauthProperties.OAUTH).setVisible(true);
+                form.getWidget("oauth").setVisible(true);
                 setValue(url, "https://login.salesforce.com/services/oauth2");
-                form.getWidget(UserPasswordProperties.USERPASSWORD).setVisible(false);
+                form.getWidget("userPassword").setVisible(false);
             } else if (LOGIN_BASIC.equals(getValue(loginType))) {
-                form.getWidget(OauthProperties.OAUTH).setVisible(false);
+                form.getWidget("oauth").setVisible(false);
                 setValue(url, "https://www.salesforce.com/services/Soap/u/34.0");
-                form.getWidget(UserPasswordProperties.USERPASSWORD).setVisible(true);
+                form.getWidget("userPassword").setVisible(true);
             } else {
                 throw new RuntimeException("Enum value should be handled :" + getValue(loginType));
             }

@@ -32,10 +32,6 @@ public class SchemaProperties extends ComponentProperties {
     //
     public SchemaElement schema = newProperty(SchemaElement.Type.SCHEMA, "schema"); //$NON-NLS-1$
 
-    public static final String MAIN = "Main"; //$NON-NLS-1$
-
-    public static final String REFERENCE = "Reference"; //$NON-NLS-1$
-
     public SchemaProperties(String name) {
         super(name);
         setValue(schema, SchemaFactory.newSchema());
@@ -46,11 +42,11 @@ public class SchemaProperties extends ComponentProperties {
     protected void setupLayout() {
         super.setupLayout();
 
-        Form schemaForm = Form.create(this, MAIN, "Schema"); //$NON-NLS-1$
+        Form schemaForm = Form.create(this, Form.MAIN, "Schema"); //$NON-NLS-1$
         schemaForm.addRow(widget(schema).setWidgetType(Widget.WidgetType.SCHEMA_EDITOR));
         refreshLayout(schemaForm);
 
-        Form schemaRefForm = Form.create(this, REFERENCE, "Schema"); //$NON-NLS-1$
+        Form schemaRefForm = Form.create(this, Form.REFERENCE, "Schema"); //$NON-NLS-1$
         schemaRefForm.addRow(widget(schema).setWidgetType(Widget.WidgetType.SCHEMA_REFERENCE));
         refreshLayout(schemaRefForm);
     }

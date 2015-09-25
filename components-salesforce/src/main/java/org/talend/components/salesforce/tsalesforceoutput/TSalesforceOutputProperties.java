@@ -86,8 +86,8 @@ public class TSalesforceOutputProperties extends ComponentProperties {
     @Override
     public void setupLayout() {
         Form mainForm = Form.create(this, MAIN, "Salesforce Output");
-        mainForm.addRow(connection.getForm(SalesforceConnectionProperties.MAIN));
-        mainForm.addRow(module.getForm(SalesforceModuleProperties.REFERENCE));
+        mainForm.addRow(connection.getForm(Form.MAIN));
+        mainForm.addRow(module.getForm(Form.REFERENCE));
         mainForm.addRow(outputAction);
         refreshLayout(mainForm);
 
@@ -98,9 +98,10 @@ public class TSalesforceOutputProperties extends ComponentProperties {
         mainForm.addRow(commitLevel);
         mainForm.addRow(logFileName);
         mainForm.addColumn(retrieveInsertId);
-        mainForm.addRow(widget(schemaFlow.getForm(SchemaProperties.REFERENCE).setName("SchemaFlow").setTitle("Schema Flow")));
+        // FIXME - don't change name of FOrm
+        mainForm.addRow(widget(schemaFlow.getForm(Form.REFERENCE).setName("SchemaFlow").setTitle("Schema Flow")));
         mainForm.addRow(
-                widget(schemaReject.getForm(SchemaProperties.REFERENCE).setName("SchemaReject").setTitle("Schema Reject")));
+                widget(schemaReject.getForm(Form.REFERENCE).setName("SchemaReject").setTitle("Schema Reject")));
         refreshLayout(mainForm);
     }
 

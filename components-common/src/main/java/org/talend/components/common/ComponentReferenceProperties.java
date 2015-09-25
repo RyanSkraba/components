@@ -43,8 +43,6 @@ public class ComponentReferenceProperties extends ComponentProperties {
 
     public SchemaElement componentInstanceId = newProperty("componentInstanceId"); //$NON-NLS-1$
 
-    public static final String REFERENCE = "Reference"; //$NON-NLS-1$
-
     public ComponentReferenceProperties() {
         setupLayout();
     }
@@ -53,7 +51,7 @@ public class ComponentReferenceProperties extends ComponentProperties {
     protected void setupLayout() {
         super.setupLayout();
 
-        Form reference = Form.create(this, REFERENCE, "Component");
+        Form reference = Form.create(this, Form.REFERENCE, "Component");
         reference.addRow(
                 widget(referenceType, componentType, componentInstanceId).setWidgetType(Widget.WidgetType.COMPONENT_REFERENCE));
         refreshLayout(reference);

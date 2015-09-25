@@ -28,8 +28,6 @@ public class UserPasswordProperties extends ComponentProperties {
     // FIXME - this needs to be encrypted, need to think about how to handle that
     public SchemaElement password = newProperty("password").setRequired(true); //$NON-NLS-1$
 
-    public static final String USERPASSWORD = "UserPassword"; //$NON-NLS-1$
-
     public UserPasswordProperties(String name) {
         super(name);
         setupLayout();
@@ -38,7 +36,7 @@ public class UserPasswordProperties extends ComponentProperties {
     @Override
     protected void setupLayout() {
         super.setupLayout();
-        Form form = Form.create(this, USERPASSWORD, "User Password");
+        Form form = Form.create(this, Form.MAIN, "User Password");
         form.addRow(userId);
         form.addRow(password);
     }

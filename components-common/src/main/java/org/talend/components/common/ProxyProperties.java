@@ -26,14 +26,12 @@ public class ProxyProperties extends ComponentProperties {
 
     public UserPasswordProperties userPassword = new UserPasswordProperties("userPassword"); //$NON-NLS-1$
 
-    public static final String PROXY = "Proxy"; //$NON-NLS-1$
-
     public ProxyProperties(String name) {
         super(name);
-        Form form = Form.create(this, PROXY, "Proxy Parameters"); //$NON-NLS-1$
+        Form form = Form.create(this, Form.MAIN, "Proxy Parameters");
         form.addRow(useProxy);
         form.addRow(host);
-        form.addRow(userPassword.getForm(UserPasswordProperties.USERPASSWORD));
+        form.addRow(userPassword.getForm(Form.MAIN));
     }
 
 }

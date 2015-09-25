@@ -156,7 +156,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connForm.getProperties();
         connProps.setValue(connProps.name, "connName");
         setupProps(connProps);
-        Form userPassword = (Form) connForm.getChild("UserPassword");
+        Form userPassword = (Form) connForm.getChild("userPassword");
         SchemaElement passwordSe = (SchemaElement) userPassword.getChild("password");
         assertEquals("Password", passwordSe.getDisplayName());
         // check name i18n
@@ -201,7 +201,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     @Test
     public void testGetProps() {
         ComponentProperties props = componentService.getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
-        Form f = props.getForm(SalesforceConnectionProperties.MAIN);
+        Form f = props.getForm(Form.MAIN);
         LocalComponentTest.checkSerialize(props);
         System.out.println(f);
         System.out.println(props);
@@ -218,21 +218,19 @@ public class SalesforceLocalComponentTest extends TestCase {
         assertEquals("Basic", loginType.getPossibleValues().get(0).toString());
         assertEquals("OAuth", loginType.getPossibleValues().get(1).toString());
         assertEquals(SalesforceConnectionProperties.LOGIN_BASIC, props.getValue(loginType));
-        Form mainForm = props.getForm(SalesforceConnectionProperties.MAIN);
+        Form mainForm = props.getForm(Form.MAIN);
         assertEquals("Salesforce Connection Settings", mainForm.getTitle());
         assertEquals("Complete these fields in order to connect to your Salesforce account.", mainForm.getSubtitle());
-        String userPassFormName = UserPasswordProperties.USERPASSWORD;
-        assertTrue(mainForm.getWidget(userPassFormName).isVisible());
-        String oauthFormName = OauthProperties.OAUTH;
-        assertFalse(mainForm.getWidget(oauthFormName).isVisible());
+        assertTrue(mainForm.getWidget("userPassword").isVisible());
+        assertFalse(mainForm.getWidget("oauth").isVisible());
 
         props.setValue(loginType, SalesforceConnectionProperties.LOGIN_OAUTH);
         props = checkAndAfter(mainForm, "loginType", props);
-        mainForm = props.getForm(SalesforceConnectionProperties.MAIN);
+        mainForm = props.getForm(Form.MAIN);
         assertTrue(mainForm.isRefreshUI());
 
-        assertFalse(mainForm.getWidget(userPassFormName).isVisible());
-        assertTrue(mainForm.getWidget(oauthFormName).isVisible());
+        assertFalse(mainForm.getWidget("userPassword").isVisible());
+        assertTrue(mainForm.getWidget("oauth").isVisible());
     }
 
     private SalesforceConnectionProperties setupProps(SalesforceConnectionProperties props) {
@@ -250,7 +248,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     @Test
     public void testLogin() throws Throwable {
         SalesforceConnectionProperties props = setupProps(null);
-        Form f = props.getForm(SalesforceConnectionProperties.MAIN);
+        Form f = props.getForm(Form.MAIN);
         props = (SalesforceConnectionProperties) checkAndValidate(f, "testConnection", props);
         System.out.println(props.getValidationResult());
     }
@@ -259,7 +257,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     public void testBulkLogin() throws Throwable {
         SalesforceConnectionProperties props = setupProps(null);
         props.setValue(props.bulkConnection, true);
-        Form f = props.getForm(SalesforceConnectionProperties.MAIN);
+        Form f = props.getForm(Form.MAIN);
         props = (SalesforceConnectionProperties) checkAndValidate(f, "testConnection", props);
         System.out.println(props.getValidationResult());
     }
@@ -270,7 +268,7 @@ public class SalesforceLocalComponentTest extends TestCase {
                     .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
         }
         props.setValue(props.loginType, SalesforceConnectionProperties.LOGIN_OAUTH);
-        Form mainForm = props.getForm(SalesforceConnectionProperties.MAIN);
+        Form mainForm = props.getForm(Form.MAIN);
         props = (SalesforceConnectionProperties) checkAndAfter(mainForm, "loginType", props);
         System.out.println("URI:" + props.getStringValue(props.url));
         props.oauth.setValue(props.oauth.clientId,
@@ -286,7 +284,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     @Test
     public void testOAuthLogin() throws Throwable {
         SalesforceConnectionProperties props = setupOAuthProps(null);
-        Form f = props.getForm(SalesforceConnectionProperties.MAIN);
+        Form f = props.getForm(Form.MAIN);
         props = (SalesforceConnectionProperties) checkAndValidate(f, "testConnection", props);
         System.out.println(props.getValidationResult());
     }
@@ -296,7 +294,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     public void testOAuthBulkLogin() throws Throwable {
         SalesforceConnectionProperties props = setupOAuthProps(null);
         props.setValue(props.bulkConnection, true);
-        Form f = props.getForm(SalesforceConnectionProperties.MAIN);
+        Form f = props.getForm(Form.MAIN);
         props = (SalesforceConnectionProperties) checkAndValidate(f, "testConnection", props);
         System.out.println(props.getValidationResult());
     }
@@ -309,7 +307,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         LocalComponentTest.checkSerialize(props);
 
         assertEquals(2, props.getForms().size());
-        Form f = props.module.getForm(SalesforceModuleProperties.REFERENCE);
+        Form f = props.module.getForm(Form.REFERENCE);
         assertTrue(f.getWidget("moduleName").isCallBefore());
         // The Form is bound to a Properties object that created it. The Forms might not always be associated with the
         // properties object
@@ -328,7 +326,7 @@ public class SalesforceLocalComponentTest extends TestCase {
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
 
-        Form f = props.module.getForm(SalesforceModuleProperties.REFERENCE);
+        Form f = props.module.getForm(Form.REFERENCE);
         SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
         moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
         moduleProps.setValue(moduleProps.moduleName, "Account");
@@ -348,7 +346,7 @@ public class SalesforceLocalComponentTest extends TestCase {
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
 
-        Form f = props.module.getForm(SalesforceModuleProperties.REFERENCE);
+        Form f = props.module.getForm(Form.REFERENCE);
         SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
         moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
         moduleProps.setValue(moduleProps.moduleName, "Account");
@@ -375,7 +373,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         props = (TSalesforceOutputProperties) componentService.getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
 
-        Form f = props.module.getForm(SalesforceModuleProperties.REFERENCE);
+        Form f = props.module.getForm(Form.REFERENCE);
         SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
         moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
         moduleProps.setValue(moduleProps.moduleName, "Account");

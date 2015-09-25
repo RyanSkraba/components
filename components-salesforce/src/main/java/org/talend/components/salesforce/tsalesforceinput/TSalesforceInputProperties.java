@@ -65,8 +65,8 @@ public class TSalesforceInputProperties extends ComponentProperties {
     @Override
     public void setupLayout() {
         Form mainForm = Form.create(this, MAIN, "Salesforce Input");
-        mainForm.addRow(connection.getForm(SalesforceConnectionProperties.MAIN));
-        mainForm.addRow(module.getForm(SalesforceModuleProperties.REFERENCE));
+        mainForm.addRow(connection.getForm(Form.MAIN));
+        mainForm.addRow(module.getForm(Form.REFERENCE));
         mainForm.addRow(queryMode);
         mainForm.addRow(condition);
         mainForm.addRow(manualQuery);

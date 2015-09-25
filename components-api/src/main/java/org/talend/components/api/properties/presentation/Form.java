@@ -28,6 +28,28 @@ import org.talend.components.api.schema.SchemaElement;
  */
 public class Form extends SimpleNamedThing {
 
+    /**
+     * Standard form name for the main form associated with a component.
+     *
+     * This has no significance in the Component Framework, it's just a usage convention.
+     */
+    public static final String MAIN = "Main";
+
+    /**
+     * Standard form name for advanced properties associated with a component.
+     *
+     * This has no significance in the Component Framework, it's just a usage convention.
+     */
+    public static final String ADVANCED = "Advanced";
+
+    /**
+     * Standard form name for a form that references something (like a schema or other component), to be included in
+     * some other form.
+     *
+     * This has no significance in the Component Framework, it's just a usage convention.
+     */
+    public static final String REFERENCE = "Reference";
+
     protected String subtitle;
 
     protected ComponentProperties properties;
@@ -115,7 +137,6 @@ public class Form extends SimpleNamedThing {
         return subtitle;
     }
 
-
     public Form addRow(NamedThing child) {
         addRow(Widget.widget(child));
         return this;
@@ -153,9 +174,20 @@ public class Form extends SimpleNamedThing {
 
     private void fill(Widget widget) {
         for (NamedThing child : widget.getProperties()) {
-            widgetMap.put(child.getName(), widget);
-            children.put(child.getName(), child);
-            properties.setWidgetLayoutMethods(child.getName(), widget);
+            String name = child.getName();
+            /*
+             * We don't use the form name since that's not going to necessarily be unique within the form's list of
+             * properties. The ComponentProperties object associated with the form will have a unique name within the
+             * enclosing ComponentProperties (and therefore this Form).
+             */
+            if (child instanceof Form) {
+                name = ((Form) child).getProperties().getName();
+            }
+            if (name == null)
+                throw new NullPointerException();
+            widgetMap.put(name, widget);
+            children.put(name, child);
+            properties.setWidgetLayoutMethods(name, widget);
         }
     }
 
