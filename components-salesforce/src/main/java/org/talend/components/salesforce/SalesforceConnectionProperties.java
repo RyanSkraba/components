@@ -65,9 +65,6 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     //
     // Presentation items
     //
-    public PresentationItem connectionDesc = new PresentationItem("connectionDesc",
-            "Complete these fields in order to connect to your Salesforce account");
-
     public PresentationItem testConnection = new PresentationItem("testConnection", "Test connection");
 
     public PresentationItem advanced = new PresentationItem("advanced", "Advanced...");
@@ -116,7 +113,6 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
         Form connectionForm = Form.create(this, MAIN, getI18nMessage("property.form.Main.title"));
         connectionForm.setSubtitle(getI18nMessage("property.form.Main.subtitle"));
-        connectionForm.addRow(connectionDesc);
 
         if (name != null)
             connectionForm.addRow(name);
