@@ -12,11 +12,9 @@
 // ============================================================================
 package org.talend.components.salesforce.test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+import junit.framework.TestCase;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -36,21 +34,13 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.LocalComponentTest;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
-import org.talend.components.common.UserPasswordProperties;
-import org.talend.components.common.oauth.OauthProperties;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
-import org.talend.components.salesforce.SalesforceConnectionWizard;
-import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
-import org.talend.components.salesforce.SalesforceModuleListProperties;
-import org.talend.components.salesforce.SalesforceModuleProperties;
-import org.talend.components.salesforce.SalesforceRuntime;
+import org.talend.components.api.wizard.WizardImageType;
+import org.talend.components.salesforce.*;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
-
-import junit.framework.TestCase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -151,9 +141,18 @@ public class SalesforceLocalComponentTest extends TestCase {
         List<Form> forms = wiz.getForms();
         assertEquals("Main", forms.get(0).getName());
         assertEquals("Main", forms.get(1).getName());
+
+        Object image = componentService.getWizardPngImage(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
+                WizardImageType.TREE_ICON_16X16);
+        assertNotNull(image);
+        image = componentService.getWizardPngImage(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
+                WizardImageType.WIZARD_BANNER_75X66);
+        assertNotNull(image);
+
         // check password i18n
         Form connForm = forms.get(0);
         SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connForm.getProperties();
+        assertEquals("Name", connProps.getProperty("name").getDisplayName());
         connProps.setValue(connProps.name, "connName");
         setupProps(connProps);
         Form userPassword = (Form) connForm.getChild("userPassword");
@@ -421,11 +420,9 @@ public class SalesforceLocalComponentTest extends TestCase {
         List<SchemaElement> properties = outputDef.getProperties();
         for (SchemaElement prop : properties) {
             if (!(prop instanceof ComponentProperties)) {
-                assertFalse(
-                        "property [" + outputDef.getClass().getCanonicalName() + "/" + prop.getName()
-                                + "] should have a translated message key [property." + prop.getName()
-                                + ".displayName] in [ZE proper messages.property]",
-                        prop.getDisplayName().endsWith(".displayName"));
+                assertFalse("property [" + outputDef.getClass().getCanonicalName() + "/" + prop.getName()
+                        + "] should have a translated message key [property." + prop.getName()
+                        + ".displayName] in [ZE proper messages.property]", prop.getDisplayName().endsWith(".displayName"));
             } // else the nested ComponentProperties should be tested separatly
         }
     }
