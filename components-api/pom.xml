@@ -25,10 +25,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <!-- SWAGGER DEPENDENCIES -->
         <dependency>
-            <groupId>com.wordnik</groupId>
-            <artifactId>swagger-annotations</artifactId>
+            <groupId>com.mangofactory</groupId>
+            <artifactId>swagger-springmvc</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.cedarsoftware</groupId>
             <artifactId>json-io</artifactId>

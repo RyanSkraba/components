@@ -75,6 +75,13 @@
 				<artifactId>javax.inject</artifactId>
 				<version>1</version>
 			</dependency>
+			<!-- SWAGGER DEPENDENCIES -->
+            <dependency>
+                <groupId>com.mangofactory</groupId>
+                <artifactId>swagger-springmvc</artifactId>
+                <version>1.0.2</version>
+            </dependency>
+			
 		</dependencies>
 	</dependencyManagement>
 	<repositories>
