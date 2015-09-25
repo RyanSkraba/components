@@ -42,7 +42,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     // public String apiVersion;
 
     // Only for the wizard use
-    public SchemaElement name = newProperty("name");
+    public SchemaElement name = newProperty("name").setRequired(true);
 
     public SchemaElement url = newProperty("url").setRequired(true); //$NON-NLS-1$
 
