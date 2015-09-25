@@ -15,25 +15,17 @@ package org.talend.components.api.test.testcomponent;
 import static org.talend.components.api.schema.SchemaFactory.*;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 
-public class TestComponentProperties extends ComponentProperties {
+public class NestedComponentProperties extends ComponentProperties {
 
-    public static final String USER_ID_PROP_NAME = "userId"; //$NON-NLS-1$
+    public static final String A_GREAT_PROP_NAME = "aGreatProp"; //$NON-NLS-1$
 
-    public SchemaElement userId = newProperty(USER_ID_PROP_NAME).setRequired(true);
+    public SchemaElement aGreatProperty = newProperty(A_GREAT_PROP_NAME);
 
-    public SchemaElement password = newProperty("password").setRequired(true);
-
-    public NestedComponentProperties nestedProps;
-
-    public static final String TESTCOMPONENT = "TestComponent";
-
-    public TestComponentProperties() {
-        Form form = Form.create(this, TESTCOMPONENT, "Test Component");
-        form.addRow(userId);
-        form.addRow(password);
-        nestedProps = new NestedComponentProperties("thenestedproperty");
+    public NestedComponentProperties(String name) {
+        super(name);
+        // setupPropertiesWithI18n();// this must be called once each property instance is created
     }
+
 }

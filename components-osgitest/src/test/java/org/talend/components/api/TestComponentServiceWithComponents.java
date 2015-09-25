@@ -26,15 +26,16 @@ import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerMethod;
+import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentImageType;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectDefinition;
-import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
@@ -42,7 +43,7 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputPropert
  * created by sgandon on 7 sept. 2015 Detailled comment
  */
 @RunWith(PaxExam.class)
-@ExamReactorStrategy(PerMethod.class)
+@ExamReactorStrategy(PerClass.class)
 public class TestComponentServiceWithComponents {
 
     @Inject
@@ -111,16 +112,16 @@ public class TestComponentServiceWithComponents {
         TSalesforceInputProperties siProps = (TSalesforceInputProperties) componentService
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         assertNotNull(siProps);
-        assertEquals("Column Name Delimiter", siProps.columnNameDelimiter.getDisplayName()); //$NON-NLS-1$
+        assertEquals("Column Name Delimiter", siProps.getProperty("ColumnNameDelimiter").getDisplayName()); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Test
     public void testI18nNestedPropertyForSalesforce() {
         assertNotNull(componentService);
-        TSalesforceConnectProperties scProps = (TSalesforceConnectProperties) componentService
+        SalesforceConnectionProperties scProps = (SalesforceConnectionProperties) componentService
                 .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
         assertNotNull(scProps);
-        assertEquals("Client Id", scProps.oauth.clientId.getDisplayName()); //$NON-NLS-1$
+        assertEquals("Client Id", ((ComponentProperties) scProps.getProperty("oauth")).getProperty("clientId").getDisplayName()); //$NON-NLS-1$
     }
 
     @Test

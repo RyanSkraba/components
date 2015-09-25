@@ -8,9 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
+
 import org.talend.components.api.ComponentDesigner;
 import org.talend.components.api.exception.ComponentException;
-import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.api.i18n.TranslatableImpl;
 import org.talend.components.api.properties.internal.ComponentPropertiesInternal;
 import org.talend.components.api.properties.presentation.Form;
@@ -30,10 +31,10 @@ import com.cedarsoftware.util.io.JsonWriter;
  * include those for desktop (Eclipse), web, and scripting. All of these will use the code defined here for their
  * construction and validation.
  * <p/>
- * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement}, {@Link
- * PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface decisions are
- * made in code, methods can be added to the subclass to influence the flow of the user interface and help with
- * validation.
+ * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement},
+ * {@Link PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface
+ * decisions are made in code, methods can be added to the subclass to influence the flow of the user interface and help
+ * with validation.
  * <p/>
  * Each property can be a Java type, both simple types and collections are permitted. In addition,
  * {@code ComponentProperties} classes can be composed allowing hierarchies of properties and collections of properties
@@ -116,34 +117,30 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         return d;
     }
 
-    /**
-     * inheriting class must call i18nMessagesProvider at the end of the constructor and every time they create and new
-     * direct property
-     * 
-     * @param messageProvider, used to find the I18nMessage according to the current LocalProvider
-     * @param baseName, used to find the resource file for I18N
-     */
-    public ComponentProperties(I18nMessageProvider messageProvider, String baseName) {
+    public ComponentProperties() {
         internal = new ComponentPropertiesInternal();
-        if (messageProvider != null)
-            setI18nMessageFormater(messageProvider.getI18nMessages(this.getClass().getClassLoader(), baseName));
     }
 
-    /**
-     * This will use the current I18nMessage to the property handles by this class, but only for direct properties and
-     * not nested ComponentProperties
-     */
-    protected void setupPropertiesWithI18n() {
-        List<SchemaElement> properties = getProperties();
-        for (SchemaElement prop : properties) {
-            if (!(prop instanceof ComponentProperties)) {
-                if (prop != null) {
-                    prop.setI18nMessageFormater(i18nMessages);
-                } // else the property has not been initialised yet, please make sure to call this after initilisation
-            } // else this is handle by the constructor of this class.
-        }
-
+    public ComponentProperties(String name) {
+        internal = new ComponentPropertiesInternal();
+        setName(name);
     }
+
+    // /**
+    // * This will use the current I18nMessage to the property handles by this class, but only for direct properties and
+    // * not nested ComponentProperties
+    // */
+    // protected void setupPropertiesWithI18n() {
+    // List<SchemaElement> properties = getProperties();
+    // for (SchemaElement prop : properties) {
+    // if (!(prop instanceof ComponentProperties)) {
+    // if (prop != null) {
+    // prop.setI18nMessageFormater(i18nMessages);
+    // } // else the property has not been initialised yet, please make sure to call this after initilisation
+    // } // else this is handle by the constructor of this class.
+    // }
+    //
+    // }
 
     /**
      * Returns a serialized version of this for storage in a repository.
@@ -187,6 +184,9 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
                     SchemaElement se = (SchemaElement) f.get(this);
                     if (se != null) {
                         properties.add(se);
+                        if (!(se instanceof ComponentProperties)) {
+                            se.setI18nMessageFormater(getI18nMessageFormater());
+                        } // we do not set the i18N for nested ComponentProperties, they already handle their i18n
                     } // else element not initialised (set to null)
                 } catch (IllegalAccessException e) {
                     throw new ComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
@@ -194,6 +194,16 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
             }
         }
         return properties;
+    }
+
+    public SchemaElement getProperty(@NotNull String name) {
+        List<SchemaElement> properties = getProperties();
+        for (SchemaElement prop : properties) {
+            if (name.equals(prop.getName())) {
+                return prop;
+            }
+        }
+        return null;
     }
 
     public void setValue(SchemaElement property, Object value) {
@@ -295,8 +305,9 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
                 return m;
             }
         }
-        if (required)
+        if (required) {
             throw new IllegalStateException("Method: " + methodName + " not found");
+        }
         return null;
     }
 
@@ -359,7 +370,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
 
     @Override
     public String getDisplayName() {
-        return getName();
+        return getI18nMessage("properties" + (getName() == null ? getName() : "") + ".displayName");
     }
 
     public SchemaElement setDisplayName(String displayName) {
@@ -398,6 +409,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         throw new RuntimeException("Cannot be used here");
     }
 
+    @Override
     public boolean isSizeUnbounded() {
         return true;
     }

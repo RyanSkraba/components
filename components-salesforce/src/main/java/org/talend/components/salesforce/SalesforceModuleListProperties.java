@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
+import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
 import java.util.List;
 
@@ -46,14 +46,12 @@ public class SalesforceModuleListProperties extends ComponentProperties {
 
     public static final String MAIN = "Main"; //$NON-NLS-1$
 
-    public SalesforceModuleListProperties(I18nMessageProvider i18nMessageProvider,
-            SalesforceConnectionProperties connectionProperties, String repositoryLocation) {
-        super(i18nMessageProvider, "org.talend.components.salesforce.message"); //$NON-NLS-1$
+    public SalesforceModuleListProperties(String name, SalesforceConnectionProperties connectionProperties,
+            String repositoryLocation) {
+        super(name);
         this.repositoryLocation = repositoryLocation;
-        this.messageProvider = i18nMessageProvider;
         connectionProps = connectionProperties;
         setupLayout();
-        setupPropertiesWithI18n();
     }
 
     @Override
@@ -74,7 +72,7 @@ public class SalesforceModuleListProperties extends ComponentProperties {
     }
 
     public void afterFormFinishMain() throws Exception {
-        SchemaProperties schemaProps = new SchemaProperties(messageProvider);
+        SchemaProperties schemaProps = new SchemaProperties(null);
         SalesforceRuntime conn = new SalesforceRuntime();
         ValidationResult vr = conn.connectWithResult(connectionProps);
         if (vr.getStatus() != ValidationResult.Result.OK) {
@@ -89,7 +87,7 @@ public class SalesforceModuleListProperties extends ComponentProperties {
 
         List<NameAndLabel> selectedModuleNames = (List<NameAndLabel>) getValue(moduleName);
         for (NameAndLabel nl : selectedModuleNames) {
-            SalesforceModuleProperties modProps = new SalesforceModuleProperties(messageProvider, connectionProps);
+            SalesforceModuleProperties modProps = new SalesforceModuleProperties(null, connectionProps);
             Schema schema = conn.getSchema(nl.getName());
             modProps.setValue(modProps.moduleName, nl.getName());
             modProps.schema.setValue(modProps.schema.schema, schema);

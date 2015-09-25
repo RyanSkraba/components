@@ -29,9 +29,9 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.test.testcomponent.NestedComponentProperties;
 import org.talend.components.api.test.testcomponent.TestComponentDefinition;
 import org.talend.components.api.test.testcomponent.TestComponentProperties;
-import org.talend.components.api.test.testcomponent.TestComponentProperties.NestedComponentProperties;
 import org.talend.components.api.test.testcomponent.TestComponentWizard;
 import org.talend.components.api.test.testcomponent.TestComponentWizardDefinition;
 import org.talend.components.api.wizard.ComponentWizard;
@@ -151,7 +151,7 @@ public class LocalComponentTest extends TestCase {
         ComponentDefinition componentDefinition = allComponents.iterator().next();
         TestComponentDefinition tcd = (TestComponentDefinition) componentDefinition;
         TestComponentProperties componentProperties = (TestComponentProperties) tcd.createProperties();
-        SchemaElement userIdProp = componentProperties.userId;
+        SchemaElement userIdProp = componentProperties.getProperty("userId");
         assertNotNull(userIdProp);
         assertEquals("User Identifier", userIdProp.getDisplayName()); //$NON-NLS-1$
     }
@@ -163,9 +163,11 @@ public class LocalComponentTest extends TestCase {
         ComponentDefinition componentDefinition = allComponents.iterator().next();
         TestComponentDefinition tcd = (TestComponentDefinition) componentDefinition;
         TestComponentProperties componentProperties = (TestComponentProperties) tcd.createProperties();
-        NestedComponentProperties nestedProp = componentProperties.nestedProps;
+        ComponentProperties nestedProp = (ComponentProperties) componentProperties.getProperty("thenestedproperty"); //$NON-NLS-1$
         assertNotNull(nestedProp);
-        assertEquals("A Fanstastic Property", nestedProp.aGreatProperty.getDisplayName()); //$NON-NLS-1$
+        SchemaElement greatProperty = nestedProp.getProperty(NestedComponentProperties.A_GREAT_PROP_NAME);
+        assertNotNull(greatProperty);
+        assertEquals("A Fanstastic Property", greatProperty.getDisplayName()); //$NON-NLS-1$
     }
 
 }

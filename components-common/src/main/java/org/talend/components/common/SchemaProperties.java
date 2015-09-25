@@ -12,10 +12,9 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
+import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
-import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
@@ -37,11 +36,10 @@ public class SchemaProperties extends ComponentProperties {
 
     public static final String REFERENCE = "Reference"; //$NON-NLS-1$
 
-    public SchemaProperties(I18nMessageProvider i18nMessagesProvider) {
-        super(i18nMessagesProvider, "org.talend.components.common.messages"); //$NON-NLS-1$
+    public SchemaProperties(String name) {
+        super(name);
         setValue(schema, SchemaFactory.newSchema());
         setupLayout();
-        setupPropertiesWithI18n();
     }
 
     @Override
@@ -57,6 +55,7 @@ public class SchemaProperties extends ComponentProperties {
         refreshLayout(schemaRefForm);
     }
 
+    @Override
     public SchemaElement addChild(SchemaElement row) {
         Schema s = (Schema) getValue(schema);
         if (s == null) {

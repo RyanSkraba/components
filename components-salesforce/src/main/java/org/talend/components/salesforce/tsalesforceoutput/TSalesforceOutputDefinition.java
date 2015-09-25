@@ -41,7 +41,7 @@ public class TSalesforceOutputDefinition extends AbstractComponentDefinition {
 
     @Override
     public ComponentProperties createProperties() {
-        return new TSalesforceOutputProperties(globalContext.i18nMessageProvider);
+        return new TSalesforceOutputProperties(null);
     }
 
     @Override
@@ -74,11 +74,6 @@ public class TSalesforceOutputDefinition extends AbstractComponentDefinition {
     @Override
     public String getDisplayName() {
         return "tSalesforceOutput";
-    }
-
-    @Override
-    protected String getI18NBaseName() {
-        return "org.talend.components.salesforce.message"; //$NON-NLS-1$
     }
 
 }

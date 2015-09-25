@@ -21,7 +21,7 @@ public class SalesforceConnectionWizardDefinition extends AbstractComponentWizar
 
     @Override
     public ComponentWizard createWizard(String userData) {
-        return new SalesforceConnectionWizard(userData, globalContext.i18nMessageProvider);
+        return new SalesforceConnectionWizard(userData);
     }
 
     @Override
@@ -36,10 +36,5 @@ public class SalesforceConnectionWizardDefinition extends AbstractComponentWizar
             // will return null
         }
         return null;
-    }
-
-    @Override
-    protected String getI18NBaseName() {
-        return "org.talend.components.salesforce.message"; //$NON-NLS-1$
     }
 }

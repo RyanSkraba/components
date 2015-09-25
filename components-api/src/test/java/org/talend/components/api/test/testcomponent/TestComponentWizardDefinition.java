@@ -38,9 +38,4 @@ public class TestComponentWizardDefinition extends AbstractComponentWizardDefint
         return new TestComponentWizard(location, globalContext.i18nMessageProvider);
     }
 
-    @Override
-    protected String getI18NBaseName() {
-        return "org.talend.components.api.test.testcomponent.testMessage";
-    }
-
 }

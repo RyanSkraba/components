@@ -12,14 +12,12 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
+import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.PresentationItem;
 import org.talend.components.api.properties.ValidationResult;
@@ -72,41 +70,30 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     //
     // Nested property collections
     //
-    public OauthProperties oauth;
+    public OauthProperties oauth = new OauthProperties("oauth"); //$NON-NLS-1$
 
-    public UserPasswordProperties userPassword;
+    public UserPasswordProperties userPassword = new UserPasswordProperties("userPassword"); //$NON-NLS-1$
 
-    public ComponentProperties proxy;
+    public ComponentProperties proxy = new ProxyProperties("proxy"); //$NON-NLS-1$
 
-    public static final String MAIN = "Main";
+    public static final String MAIN = "Main"; //$NON-NLS-1$
 
-    public static final String ADVANCED = "Advanced";
-
-    public SalesforceConnectionProperties(I18nMessageProvider i18nMessageProvider) {
-        this(i18nMessageProvider, !INCLUDE_NAME); //$NON-NLS-1$
-    }
+    public static final String ADVANCED = "Advanced"; //$NON-NLS-1$
 
     public static final boolean INCLUDE_NAME = true;
 
-    public SalesforceConnectionProperties(I18nMessageProvider i18nMessageProvider, boolean includeName) {
-        super(i18nMessageProvider, "org.talend.components.salesforce.message"); //$NON-NLS-1$
-
-        if (!includeName)
-            name = null;
-
-        List loginTypes = new ArrayList<>();
+    public SalesforceConnectionProperties(String name) {
+        super(name);
+        List<String> loginTypes = new ArrayList<>();
         loginTypes.add(LOGIN_BASIC);
         loginTypes.add(LOGIN_OAUTH);
         loginType.setPossibleValues(loginTypes);
 
-        oauth = new OauthProperties(i18nMessageProvider);
-        userPassword = new UserPasswordProperties(i18nMessageProvider);
-        proxy = new ProxyProperties(i18nMessageProvider);
         setupLayout();
-        setupPropertiesWithI18n();
     }
 
-    @Override protected void setupLayout() {
+    @Override
+    protected void setupLayout() {
         super.setupLayout();
 
         setValue(loginType, LOGIN_BASIC);
@@ -114,8 +101,9 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         Form connectionForm = Form.create(this, MAIN, getI18nMessage("property.form.Main.title"));
         connectionForm.setSubtitle(getI18nMessage("property.form.Main.subtitle"));
 
-        if (name != null)
+        if (name != null) {
             connectionForm.addRow(name);
+        }
 
         connectionForm.addRow(widget(loginType).setDeemphasize(true));
 

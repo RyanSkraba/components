@@ -10,14 +10,13 @@ public class SalesforceConnectionWizard extends ComponentWizard {
 
     SalesforceModuleListProperties mProps;
 
-    SalesforceConnectionWizard(String repositoryLocation, I18nMessageProvider provider) {
-        super(repositoryLocation, provider, "org.talend.components.salesforce.message"); //$NON-NLS-1$
+    SalesforceConnectionWizard(String repositoryLocation) {
+        super(repositoryLocation);
 
-        SalesforceConnectionProperties cProps = new SalesforceConnectionProperties(i18nMessageProvider,
-                SalesforceConnectionProperties.INCLUDE_NAME);
+        SalesforceConnectionProperties cProps = new SalesforceConnectionProperties("SalesforceConnectionProperties");
         addForm(cProps.getForm(SalesforceConnectionProperties.MAIN));
 
-        mProps = new SalesforceModuleListProperties(i18nMessageProvider, cProps, getRepositoryLocation());
+        mProps = new SalesforceModuleListProperties(null, cProps, getRepositoryLocation());
         addForm(mProps.getForm(SalesforceModuleProperties.MAIN));
     }
 

@@ -14,7 +14,6 @@ package org.talend.components.api.service.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,10 +30,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.context.GlobalContext;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentDefinition;
@@ -75,21 +72,12 @@ public class ComponentServiceSpring implements ComponentService {
             @Override
             public Map<String, ComponentDefinition> getComponents() {
                 Map<String, ComponentDefinition> compDefs = context.getBeansOfType(ComponentDefinition.class);
-                initializeGlobalContexts(compDefs.values());
                 return compDefs;
-            }
-
-            private void initializeGlobalContexts(Collection<? extends TopLevelDefinition> values) {
-                for (TopLevelDefinition compDef : values) {
-                    compDef.setGlobalContext(gc);
-                }
-
             }
 
             @Override
             public Map<String, ComponentWizardDefinition> getComponentWizards() {
                 Map<String, ComponentWizardDefinition> wizardDefs = context.getBeansOfType(ComponentWizardDefinition.class);
-                initializeGlobalContexts(wizardDefs.values());
                 return wizardDefs;
             }
 
@@ -105,7 +93,8 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
-    @RequestMapping(value = BASE_PATH + "/wizard/{name}/{repositoryLocation}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = BASE_PATH
+            + "/wizard/{name}/{repositoryLocation}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ComponentWizard getComponentWizard(
             @PathVariable(value = "name") @ApiParam(name = "name", value = "Name of the component") String name,
             @PathVariable(value = "repositoryLocation") @ApiParam(name = "repositoryLocation", value = "User data string") String userData) {
@@ -157,7 +146,8 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
-    @RequestMapping(value = BASE_PATH + "/properties/afterFormNext/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = BASE_PATH
+            + "/properties/afterFormNext/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ComponentProperties afterFormNext(
             @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
             @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
@@ -167,7 +157,8 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
-    @RequestMapping(value = BASE_PATH + "/properties/afterFormBack/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = BASE_PATH
+            + "/properties/afterFormBack/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ComponentProperties afterFormBack(
             @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
             @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
@@ -177,7 +168,8 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
-    @RequestMapping(value = BASE_PATH + "/properties/afterFormFinish/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = BASE_PATH
+            + "/properties/afterFormFinish/{formName}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ComponentProperties afterFormFinish(
             @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
             @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
@@ -253,7 +245,8 @@ public class ComponentServiceSpring implements ComponentService {
         return componentServiceDelegate.getComponentPngImage(componentName, imageType);
     }
 
-    @Override public void setRepository(Repository repository) {
+    @Override
+    public void setRepository(Repository repository) {
         componentServiceDelegate.setRepository(repository);
     }
 
@@ -268,10 +261,10 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     // FIXME - make this work for web
-    @Override public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation,
+    @Override
+    public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation,
             Schema schema) {
         return componentServiceDelegate.storeComponentProperties(properties, name, repositoryLocation, schema);
     }
-
 
 }

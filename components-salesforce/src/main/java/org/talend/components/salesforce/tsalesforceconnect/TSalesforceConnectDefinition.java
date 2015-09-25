@@ -22,6 +22,7 @@ import org.talend.components.api.properties.ComponentDefinition;
 import org.talend.components.api.properties.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceRuntime;
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceConnectDefinition.COMPONENT_NAME)
@@ -40,7 +41,7 @@ public class TSalesforceConnectDefinition extends AbstractComponentDefinition {
 
     @Override
     public ComponentProperties createProperties() {
-        return new TSalesforceConnectProperties(globalContext.i18nMessageProvider);
+        return new SalesforceConnectionProperties(null);
     }
 
     @Override
@@ -73,11 +74,6 @@ public class TSalesforceConnectDefinition extends AbstractComponentDefinition {
     @Override
     public String getDisplayName() {
         return "tSalesforceConnect";
-    }
-
-    @Override
-    protected String getI18NBaseName() {
-        return "org.talend.components.salesforce.message"; //$NON-NLS-1$
     }
 
 }

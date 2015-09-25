@@ -12,10 +12,9 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
+import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
-import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.Schema;
@@ -27,10 +26,10 @@ import org.talend.components.salesforce.SalesforceModuleProperties;
 public class TSalesforceOutputProperties extends ComponentProperties {
 
     public enum OutputAction {
-        INSERT,
-        UPDATE,
-        UPSERT,
-        DELETE
+                              INSERT,
+                              UPDATE,
+                              UPSERT,
+                              DELETE
     }
 
     public SchemaElement outputAction = newProperty(SchemaElement.Type.ENUM, "outputAction"); //$NON-NLS-1$
@@ -62,23 +61,21 @@ public class TSalesforceOutputProperties extends ComponentProperties {
 
     public SalesforceModuleProperties module;
 
-    public SchemaProperties schemaFlow;
+    public SchemaProperties schemaFlow = new SchemaProperties("schemaFlow"); //$NON-NLS-1$
 
-    public SchemaProperties schemaReject;
+    public SchemaProperties schemaReject = new SchemaProperties("schemaReject"); //$NON-NLS-1$
 
-    public TSalesforceOutputProperties(I18nMessageProvider i18nMessageProvider) {
-        super(i18nMessageProvider, "org.talend.components.salesforce.message"); //$NON-NLS-1$
-        schemaFlow = new SchemaProperties(i18nMessageProvider);
-        schemaReject = new SchemaProperties(i18nMessageProvider);
+    public TSalesforceOutputProperties(String name) {
+        super(name);
+
         schemaReject.addChild(newProperty("errorCode")); //$NON-NLS-1$
         schemaReject.addChild(newProperty("errorFields")); //$NON-NLS-1$
         schemaReject.addChild(newProperty("errorMessage")); //$NON-NLS-1$
-        connection = new SalesforceConnectionProperties(i18nMessageProvider);
+        connection = new SalesforceConnectionProperties("connection"); //$NON-NLS-1$
 
-        module = new SalesforceModuleProperties(i18nMessageProvider, connection);
+        module = new SalesforceModuleProperties("module", connection); //$NON-NLS-1$
 
         setupLayout();
-        setupPropertiesWithI18n();
 
     }
 
@@ -102,7 +99,8 @@ public class TSalesforceOutputProperties extends ComponentProperties {
         mainForm.addRow(logFileName);
         mainForm.addColumn(retrieveInsertId);
         mainForm.addRow(widget(schemaFlow.getForm(SchemaProperties.REFERENCE).setName("SchemaFlow").setTitle("Schema Flow")));
-        mainForm.addRow(widget(schemaReject.getForm(SchemaProperties.REFERENCE).setName("SchemaReject").setTitle("Schema Reject")));
+        mainForm.addRow(
+                widget(schemaReject.getForm(SchemaProperties.REFERENCE).setName("SchemaReject").setTitle("Schema Reject")));
         refreshLayout(mainForm);
     }
 

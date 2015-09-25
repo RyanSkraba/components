@@ -24,7 +24,7 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
 
     @Override
     public ComponentProperties createProperties() {
-        return new TestComponentProperties(globalContext.i18nMessageProvider);
+        return new TestComponentProperties();
     }
 
     @Override
@@ -45,11 +45,6 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     @Override
     public String getPngImagePath(ComponentImageType imageType) {
         return null;
-    }
-
-    @Override
-    protected String getI18NBaseName() {
-        return "org.talend.components.api.test.testcomponent.testMessage"; //$NON-NLS-1$
     }
 
 }

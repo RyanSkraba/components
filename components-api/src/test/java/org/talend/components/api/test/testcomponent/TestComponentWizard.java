@@ -6,6 +6,6 @@ import org.talend.components.api.wizard.ComponentWizard;
 public class TestComponentWizard extends ComponentWizard {
 
     public TestComponentWizard(String userData, I18nMessageProvider messageProvider) {
-        super(userData, messageProvider, "org.talend.components.api.test.testcomponent.testMessage"); //$NON-NLS-1$
+        super(userData);
     }
 }

@@ -78,7 +78,6 @@ public class ComponentServiceOsgi implements ComponentService {
                 Collection<ServiceReference<T>> serviceReferences = bc.getServiceReferences(cls, null);
                 for (ServiceReference<T> sr : serviceReferences) {
                     T service = bc.getService(sr);
-                    service.setGlobalContext(gctx);
                     Object nameProp = sr.getProperty("component.name"); //$NON-NLS-1$
                     if (nameProp instanceof String) {
                         map.put((String) nameProp, service);
@@ -191,14 +190,15 @@ public class ComponentServiceOsgi implements ComponentService {
         return componentServiceDelegate.getComponentPngImage(componentName, imageType);
     }
 
-    public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation, Schema schema) {
+    @Override
+    public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation,
+            Schema schema) {
         return componentServiceDelegate.storeComponentProperties(properties, name, repositoryLocation, schema);
     }
 
+    @Override
     public void setRepository(Repository repository) {
         componentServiceDelegate.setRepository(repository);
     }
-
-
 
 }

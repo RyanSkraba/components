@@ -45,7 +45,6 @@ import org.talend.components.salesforce.SalesforceModuleListProperties;
 import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.SalesforceRuntime;
 import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectDefinition;
-import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
@@ -202,7 +201,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     @Test
     public void testGetProps() {
         ComponentProperties props = componentService.getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
-        Form f = props.getForm(TSalesforceConnectProperties.MAIN);
+        Form f = props.getForm(SalesforceConnectionProperties.MAIN);
         LocalComponentTest.checkSerialize(props);
         System.out.println(f);
         System.out.println(props);
@@ -210,16 +209,16 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     @Test
     public void testAfterLoginType() throws Throwable {
-        SalesforceConnectionProperties props;
+        ComponentProperties props;
 
-        props = (SalesforceConnectionProperties) componentService
-                .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
+        props = componentService.getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
         LocalComponentTest.checkSerialize(props);
-        System.out.println(props.loginType.getPossibleValues());
-        assertEquals("Basic", props.loginType.getPossibleValues().get(0).toString());
-        assertEquals("OAuth", props.loginType.getPossibleValues().get(1).toString());
-        assertEquals(SalesforceConnectionProperties.LOGIN_BASIC, props.getValue(props.loginType));
-        Form mainForm = props.getForm(TSalesforceConnectProperties.MAIN);
+        SchemaElement loginType = props.getProperty("loginType");
+        System.out.println(loginType.getPossibleValues());
+        assertEquals("Basic", loginType.getPossibleValues().get(0).toString());
+        assertEquals("OAuth", loginType.getPossibleValues().get(1).toString());
+        assertEquals(SalesforceConnectionProperties.LOGIN_BASIC, props.getValue(loginType));
+        Form mainForm = props.getForm(SalesforceConnectionProperties.MAIN);
         assertEquals("Salesforce Connection Settings", mainForm.getTitle());
         assertEquals("Complete these fields in order to connect to your Salesforce account.", mainForm.getSubtitle());
         String userPassFormName = UserPasswordProperties.USERPASSWORD;
@@ -227,9 +226,9 @@ public class SalesforceLocalComponentTest extends TestCase {
         String oauthFormName = OauthProperties.OAUTH;
         assertFalse(mainForm.getWidget(oauthFormName).isVisible());
 
-        props.setValue(props.loginType, SalesforceConnectionProperties.LOGIN_OAUTH);
-        props = (SalesforceConnectionProperties) checkAndAfter(mainForm, "loginType", props);
-        mainForm = props.getForm(TSalesforceConnectProperties.MAIN);
+        props.setValue(loginType, SalesforceConnectionProperties.LOGIN_OAUTH);
+        props = checkAndAfter(mainForm, "loginType", props);
+        mainForm = props.getForm(SalesforceConnectionProperties.MAIN);
         assertTrue(mainForm.isRefreshUI());
 
         assertFalse(mainForm.getWidget(userPassFormName).isVisible());
@@ -242,15 +241,16 @@ public class SalesforceLocalComponentTest extends TestCase {
                     .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
         }
         System.out.println("URI:" + props.getStringValue(props.url));
-        props.userPassword.setValue(props.userPassword.userId, userId);
-        props.userPassword.setValue(props.userPassword.password, password);
+        ComponentProperties userPassword = (ComponentProperties) props.getProperty("userPassword");
+        userPassword.setValue(userPassword.getProperty("userId"), userId);
+        userPassword.setValue(userPassword.getProperty("password"), password);
         return props;
     }
 
     @Test
     public void testLogin() throws Throwable {
         SalesforceConnectionProperties props = setupProps(null);
-        Form f = props.getForm(TSalesforceConnectProperties.MAIN);
+        Form f = props.getForm(SalesforceConnectionProperties.MAIN);
         props = (SalesforceConnectionProperties) checkAndValidate(f, "testConnection", props);
         System.out.println(props.getValidationResult());
     }
@@ -259,7 +259,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     public void testBulkLogin() throws Throwable {
         SalesforceConnectionProperties props = setupProps(null);
         props.setValue(props.bulkConnection, true);
-        Form f = props.getForm(TSalesforceConnectProperties.MAIN);
+        Form f = props.getForm(SalesforceConnectionProperties.MAIN);
         props = (SalesforceConnectionProperties) checkAndValidate(f, "testConnection", props);
         System.out.println(props.getValidationResult());
     }
@@ -270,7 +270,7 @@ public class SalesforceLocalComponentTest extends TestCase {
                     .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
         }
         props.setValue(props.loginType, SalesforceConnectionProperties.LOGIN_OAUTH);
-        Form mainForm = props.getForm(TSalesforceConnectProperties.MAIN);
+        Form mainForm = props.getForm(SalesforceConnectionProperties.MAIN);
         props = (SalesforceConnectionProperties) checkAndAfter(mainForm, "loginType", props);
         System.out.println("URI:" + props.getStringValue(props.url));
         props.oauth.setValue(props.oauth.clientId,
@@ -286,7 +286,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     @Test
     public void testOAuthLogin() throws Throwable {
         SalesforceConnectionProperties props = setupOAuthProps(null);
-        Form f = props.getForm(TSalesforceConnectProperties.MAIN);
+        Form f = props.getForm(SalesforceConnectionProperties.MAIN);
         props = (SalesforceConnectionProperties) checkAndValidate(f, "testConnection", props);
         System.out.println(props.getValidationResult());
     }
@@ -296,7 +296,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     public void testOAuthBulkLogin() throws Throwable {
         SalesforceConnectionProperties props = setupOAuthProps(null);
         props.setValue(props.bulkConnection, true);
-        Form f = props.getForm(TSalesforceConnectProperties.MAIN);
+        Form f = props.getForm(SalesforceConnectionProperties.MAIN);
         props = (SalesforceConnectionProperties) checkAndValidate(f, "testConnection", props);
         System.out.println(props.getValidationResult());
     }
@@ -397,6 +397,38 @@ public class SalesforceLocalComponentTest extends TestCase {
         // Don't run for now, even though it works, until we can clean this stuff up
         if (!false) {
             runtime.output(props, null, rows);
+        }
+    }
+
+    @Test
+    public void testAlli18n() {
+        ComponentProperties compProps = componentService.getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
+        checkAllI18NProperties(compProps);
+        compProps = componentService.getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
+        checkAllI18NProperties(compProps);
+        compProps = componentService.getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
+        checkAllI18NProperties(compProps);
+        compProps = new SalesforceModuleListProperties(null, null, null);
+        checkAllI18NProperties(compProps);
+        compProps = new SalesforceModuleProperties(null, null);
+        checkAllI18NProperties(compProps);
+    }
+
+    /**
+     * DOC sgandon Comment method "checkAllI18N".
+     * 
+     * @param outputDef
+     */
+    private void checkAllI18NProperties(ComponentProperties outputDef) {
+        List<SchemaElement> properties = outputDef.getProperties();
+        for (SchemaElement prop : properties) {
+            if (!(prop instanceof ComponentProperties)) {
+                assertFalse(
+                        "property [" + outputDef.getClass().getCanonicalName() + "/" + prop.getName()
+                                + "] should have a translated message key [property." + prop.getName()
+                                + ".displayName] in [ZE proper messages.property]",
+                        prop.getDisplayName().endsWith(".displayName"));
+            } // else the nested ComponentProperties should be tested separatly
         }
     }
 

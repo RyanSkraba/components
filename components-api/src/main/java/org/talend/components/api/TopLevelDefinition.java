@@ -12,8 +12,6 @@
 // ============================================================================
 package org.talend.components.api;
 
-import org.talend.components.api.context.GlobalContext;
-
 /**
  * This interface is used by top level element that need to be presented to a user with a name a displayname and an
  * image
@@ -27,6 +25,6 @@ public interface TopLevelDefinition extends NamedThing {
      * 
      * @param globalContext
      */
-    public void setGlobalContext(GlobalContext globalContext);
+    // public void setGlobalContext(GlobalContext globalContext);
 
 }

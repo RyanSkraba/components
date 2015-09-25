@@ -12,9 +12,8 @@
 // ============================================================================
 package org.talend.components.common.oauth;
 
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
-import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
@@ -33,11 +32,9 @@ public class OauthProperties extends ComponentProperties {
 
     public static final String OAUTH = "OAuth"; //$NON-NLS-1$
 
-    public OauthProperties(I18nMessageProvider i18nMessageProvider) {
-        super(i18nMessageProvider, "org.talend.components.common.oauth.messages"); //$NON-NLS-1$
+    public OauthProperties(String name) {
+        super(name);
         setupLayout();
-        setupPropertiesWithI18n();// this must once each property instance is created
-
     }
 
     @Override

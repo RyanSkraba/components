@@ -12,9 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceinput;
 
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
-import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
@@ -50,17 +49,13 @@ public class TSalesforceInputProperties extends ComponentProperties {
     //
     // Collections
     //
-    public SalesforceConnectionProperties connection;
+    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection"); //$NON-NLS-1$
 
-    public SalesforceModuleProperties module;
+    public SalesforceModuleProperties module = new SalesforceModuleProperties("module", connection); //$NON-NLS-1$
 
-    public TSalesforceInputProperties(I18nMessageProvider i18nMessageProvider) {
-        super(i18nMessageProvider, "org.talend.components.salesforce.message"); //$NON-NLS-1$
-        connection = new SalesforceConnectionProperties(i18nMessageProvider);
-
-        module = new SalesforceModuleProperties(i18nMessageProvider, connection);
+    public TSalesforceInputProperties(String name) {
+        super(name);
         setupLayout();
-        setupPropertiesWithI18n();
     }
 
     public static final String MAIN = "Main"; //$NON-NLS-1$
