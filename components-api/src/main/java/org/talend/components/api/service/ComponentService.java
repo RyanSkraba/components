@@ -15,9 +15,9 @@ package org.talend.components.api.service;
 import java.io.InputStream;
 import java.util.Set;
 
+import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.exception.ComponentException;
-import org.talend.components.api.properties.ComponentDefinition;
-import org.talend.components.api.properties.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Repository;
 import org.talend.components.api.wizard.ComponentWizard;

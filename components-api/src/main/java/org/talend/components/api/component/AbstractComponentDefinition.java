@@ -1,4 +1,4 @@
-package org.talend.components.api.properties;
+package org.talend.components.api.component;
 
 import org.talend.components.api.AbstractTopLevelDefinition;
 

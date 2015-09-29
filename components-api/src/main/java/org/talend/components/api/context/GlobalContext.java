@@ -12,8 +12,6 @@
 // ============================================================================
 package org.talend.components.api.context;
 
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -32,7 +30,6 @@ public class GlobalContext implements ApplicationContextAware {
 
     private static final Logger LOG = LoggerFactory.getLogger(GlobalContext.class);
 
-    @Inject
     public static I18nMessageProvider i18nMessageProvider;
 
     @Reference

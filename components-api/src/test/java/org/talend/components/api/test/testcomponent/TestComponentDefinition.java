@@ -2,11 +2,11 @@ package org.talend.components.api.test.testcomponent;
 
 import org.springframework.stereotype.Component;
 import org.talend.components.api.Constants;
-import org.talend.components.api.properties.AbstractComponentDefinition;
-import org.talend.components.api.properties.ComponentConnector;
-import org.talend.components.api.properties.ComponentConnector.Type;
-import org.talend.components.api.properties.ComponentDefinition;
-import org.talend.components.api.properties.ComponentImageType;
+import org.talend.components.api.component.AbstractComponentDefinition;
+import org.talend.components.api.component.ComponentConnector;
+import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.ComponentImageType;
+import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
 

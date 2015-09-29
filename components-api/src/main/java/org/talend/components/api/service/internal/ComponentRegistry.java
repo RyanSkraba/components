@@ -14,7 +14,7 @@ package org.talend.components.api.service.internal;
 
 import java.util.Map;
 
-import org.talend.components.api.properties.ComponentDefinition;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 
 /**
