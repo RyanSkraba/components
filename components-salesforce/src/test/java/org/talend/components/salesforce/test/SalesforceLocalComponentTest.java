@@ -26,6 +26,7 @@ import org.talend.components.api.NamedThing;
 import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.NameAndLabel;
+import org.talend.components.api.properties.PresentationItem;
 import org.talend.components.api.properties.Repository;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.Schema;
@@ -204,6 +205,9 @@ public class SalesforceLocalComponentTest extends TestCase {
         LocalComponentTest.checkSerialize(props);
         System.out.println(f);
         System.out.println(props);
+        assertEquals(Form.MAIN, f.getName());
+        Form af = props.getForm(Form.ADVANCED);
+        assertTrue(((PresentationItem)f.getChild("advanced")).getFormtoShow() == af);
     }
 
     @Test

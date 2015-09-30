@@ -112,7 +112,6 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
         connectionForm.addRow(widget(advanced).setWidgetType(WidgetType.BUTTON));
         connectionForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
-
         refreshLayout(connectionForm);
 
         Form advancedForm = Form.create(this, Form.ADVANCED, getI18nMessage("property.form.Advanced.title"));
@@ -123,7 +122,9 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         advancedForm.addRow(timeout);
         advancedForm.addRow(url);
         advancedForm.addRow(proxy.getForm(Form.MAIN));
+        advanced.setFormtoShow(advancedForm);
         refreshLayout(advancedForm);
+
     }
 
     public void afterLoginType() {
