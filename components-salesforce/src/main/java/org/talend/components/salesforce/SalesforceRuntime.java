@@ -34,6 +34,7 @@ import com.sforce.async.AsyncApiException;
 import com.sforce.async.BulkConnection;
 import com.sforce.soap.partner.*;
 import com.sforce.soap.partner.Error;
+import com.sforce.soap.partner.fault.LoginFault;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
@@ -156,15 +157,20 @@ public class SalesforceRuntime extends ComponentRuntime {
         ValidationResult vr = new ValidationResult();
         try {
             connect(properties);
+        } catch (LoginFault ex) {
+            vr.setMessage(ex.getExceptionMessage());
+            vr.setStatus(ValidationResult.Result.ERROR);
+            return vr;
         } catch (Exception ex) {
             // FIXME - do a better job here
             vr.setMessage(ex.getMessage());
+            vr.setStatus(ValidationResult.Result.ERROR);
             return vr;
         }
         return vr;
     }
 
-    public void connect(final SalesforceConnectionProperties properties) throws Exception {
+    public void connect(final SalesforceConnectionProperties properties) throws ConnectionException, AsyncApiException {
         ConnectorConfig config = new ConnectorConfig();
         config.setUsername(properties.userPassword.getStringValue(properties.userPassword.userId));
         config.setPassword(properties.userPassword.getStringValue(properties.userPassword.password));

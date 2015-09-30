@@ -55,4 +55,8 @@ public class ValidationResult {
 
     public String message;
 
+    public String toString() {
+        return getStatus() + " " + getMessage();
+    }
+
 }

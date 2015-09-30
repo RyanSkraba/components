@@ -24,10 +24,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.internal.SpringApp;
-import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.NameAndLabel;
-import org.talend.components.api.properties.PresentationItem;
-import org.talend.components.api.properties.Repository;
+import org.talend.components.api.properties.*;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
@@ -57,7 +54,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     protected ComponentService componentService;
 
     public SalesforceLocalComponentTest() {
-        if (!inChina) {
+        if (inChina) {
             userId = "bchen2@talend.com";
             password = "talend123sfYYBBe4aZN0TcDVDV7Ylzb6Ku";
         } else {
@@ -254,6 +251,17 @@ public class SalesforceLocalComponentTest extends TestCase {
         Form f = props.getForm(Form.MAIN);
         props = (SalesforceConnectionProperties) checkAndValidate(f, "testConnection", props);
         System.out.println(props.getValidationResult());
+        assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
+    }
+
+    @Test
+    public void testLoginFail() throws Throwable {
+        SalesforceConnectionProperties props = setupProps(null);
+        props.userPassword.setValue(props.userPassword.userId, "blah");
+        Form f = props.getForm(Form.MAIN);
+        props = (SalesforceConnectionProperties) checkAndValidate(f, "testConnection", props);
+        System.out.println(props.getValidationResult());
+        assertEquals(ValidationResult.Result.ERROR, props.getValidationResult().getStatus());
     }
 
     @Test
