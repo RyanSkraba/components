@@ -534,6 +534,11 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     }
 
     @Override
+    public SchemaElement getChild(String name) {
+        return null;
+    }
+
+    @Override
     public SchemaElement addChild(SchemaElement child) {
         throw new RuntimeException("Cannot be used here");
     }

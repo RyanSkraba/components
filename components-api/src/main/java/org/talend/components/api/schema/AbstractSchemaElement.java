@@ -1,8 +1,9 @@
 package org.talend.components.api.schema;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.talend.components.api.SimpleNamedThing;
 
@@ -223,6 +224,17 @@ public abstract class AbstractSchemaElement extends SimpleNamedThing implements 
         }
         children.add(child);
         return this;
+    }
+
+    @Override
+    public SchemaElement getChild(String name) {
+        if (children != null) {
+            for (SchemaElement child : children) {
+                if (child.getName().equals(name))
+                    return child;
+            }
+        }
+        return null;
     }
 
     @Override

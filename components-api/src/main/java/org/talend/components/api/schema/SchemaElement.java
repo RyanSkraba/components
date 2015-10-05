@@ -85,6 +85,8 @@ public interface SchemaElement extends NamedThing {
 
     public List<SchemaElement> getChildren();
 
+    public SchemaElement getChild(String name);
+
     public SchemaElement setChildren(List<SchemaElement> children);
 
     public SchemaElement addChild(SchemaElement child);

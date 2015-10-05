@@ -12,11 +12,15 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
-import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.components.api.properties.presentation.Widget.widget;
 import static org.talend.components.api.schema.SchemaFactory.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.common.SchemaProperties;
@@ -25,11 +29,19 @@ import org.talend.components.salesforce.SalesforceModuleProperties;
 
 public class TSalesforceOutputProperties extends ComponentProperties {
 
+    public static final String ACTION_INSERT = "INSERT";
+
+    public static final String ACTION_UPDATE = "UPDATE";
+
+    public static final String ACTION_UPSERT = "UPSERT";
+
+    public static final String ACTION_DELETE = "DELETE";
+
     public enum OutputAction {
-                              INSERT,
-                              UPDATE,
-                              UPSERT,
-                              DELETE
+        INSERT,
+        UPDATE,
+        UPSERT,
+        DELETE
     }
 
     public SchemaElement outputAction = newProperty(SchemaElement.Type.ENUM, "outputAction"); //$NON-NLS-1$
@@ -52,7 +64,7 @@ public class TSalesforceOutputProperties extends ComponentProperties {
     // FIXME - should be file
     public SchemaElement logFileName = newProperty("logFileName"); //$NON-NLS-1$
 
-    // FIXME - need upsertRelation property which is a table
+    public SchemaElement upsertRelation = newProperty("upsertRelation").setOccurMaxTimes(-1); //$NON-NLS-1$
 
     //
     // Collections
@@ -65,18 +77,52 @@ public class TSalesforceOutputProperties extends ComponentProperties {
 
     public SchemaProperties schemaReject = new SchemaProperties("schemaReject"); //$NON-NLS-1$
 
+    // Have to use an explicit class to get the override of afterModuleName(), an anonymous
+    // class cannot be public and thus cannot be called.
+    public class ModuleSubclass extends SalesforceModuleProperties {
+
+        public ModuleSubclass(String name, SalesforceConnectionProperties connectionProperties) {
+            super(name, connectionProperties);
+        }
+
+        @Override
+        public void afterModuleName() throws Exception {
+            super.afterModuleName();
+            Schema s = (Schema) schema.getValue(schema.schema);
+            // FIXME - we probably only want the names, not the SchemaElements
+            upsertKeyColumn.setPossibleValues(s.getRoot().getChildren());
+            upsertRelation.getChild("columnName").setPossibleValues(s.getRoot().getChildren());
+        }
+    }
+
     public TSalesforceOutputProperties(String name) {
         super(name);
+
+        List<String> outputActions = new ArrayList<>();
+        outputActions.add(ACTION_INSERT);
+        outputActions.add(ACTION_UPDATE);
+        outputActions.add(ACTION_UPSERT);
+        outputActions.add(ACTION_DELETE);
+        outputAction.setPossibleValues(outputActions);
+
+        returns = setReturnsProperty();
+        newReturnProperty(returns, SchemaElement.Type.INT, "NB_LINE"); //$NON-NLS-1$
+        newReturnProperty(returns, SchemaElement.Type.INT, "NB_SUCCESS"); //$NON-NLS-1$
+        newReturnProperty(returns, SchemaElement.Type.INT, "NB_REJECT"); //$NON-NLS-1$
 
         schemaReject.addChild(newProperty("errorCode")); //$NON-NLS-1$
         schemaReject.addChild(newProperty("errorFields")); //$NON-NLS-1$
         schemaReject.addChild(newProperty("errorMessage")); //$NON-NLS-1$
-        connection = new SalesforceConnectionProperties("connection"); //$NON-NLS-1$
 
-        module = new SalesforceModuleProperties("module", connection); //$NON-NLS-1$
+        upsertRelation.addChild(newProperty("columnName")); //$NON-NLS-1$
+        upsertRelation.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
+        upsertRelation.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
+        upsertRelation.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
+
+        connection = new SalesforceConnectionProperties("connection"); //$NON-NLS-1$
+        module = new ModuleSubclass("module", connection);
 
         setupLayout();
-
     }
 
     @Override
@@ -85,30 +131,49 @@ public class TSalesforceOutputProperties extends ComponentProperties {
         mainForm.addRow(connection.getForm(Form.MAIN));
         mainForm.addRow(module.getForm(Form.REFERENCE));
         mainForm.addRow(outputAction);
+        mainForm.addColumn(upsertKeyColumn);
+        mainForm.addRow(module.getForm(Form.REFERENCE));
         refreshLayout(mainForm);
 
         Form advancedForm = Form.create(this, Form.ADVANCED, "Advanced");
-        mainForm.addRow(extendInsert);
-        mainForm.addRow(ceaseForError);
-        mainForm.addRow(ignoreNull);
-        mainForm.addRow(commitLevel);
-        mainForm.addRow(logFileName);
-        mainForm.addColumn(retrieveInsertId);
-        // FIXME - don't change name of FOrm
-        mainForm.addRow(widget(schemaFlow.getForm(Form.REFERENCE).setName("SchemaFlow").setTitle("Schema Flow")));
-        mainForm.addRow(
-                widget(schemaReject.getForm(Form.REFERENCE).setName("SchemaReject").setTitle("Schema Reject")));
-        refreshLayout(mainForm);
+        advancedForm.addRow(extendInsert);
+        advancedForm.addRow(ceaseForError);
+        advancedForm.addRow(ignoreNull);
+        advancedForm.addRow(commitLevel);
+        advancedForm.addRow(logFileName);
+        advancedForm.addColumn(retrieveInsertId);
+        advancedForm.addRow(widget(upsertRelation).setWidgetType(Widget.WidgetType.TABLE));
+        advancedForm.addRow(widget(schemaFlow.getForm(Form.REFERENCE).setName("SchemaFlow").setTitle("Schema Flow")));
+        advancedForm.addRow(widget(schemaReject.getForm(Form.REFERENCE).setName("SchemaReject").setTitle("Schema Reject")));
+        refreshLayout(advancedForm);
+    }
+
+    public void afterOutputAction() {
+        refreshLayout(getForm(Form.MAIN));
     }
 
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
-        ((Schema) schemaFlow.getValue(schemaFlow.schema)).setRoot(null);
-        if (!getBooleanValue(extendInsert) && getStringValue(retrieveInsertId) != null
-                && getValue(outputAction) == OutputAction.INSERT) {
-            schemaFlow.addChild(newProperty("salesforce_id"));
+        if (form.getName().equals(Form.ADVANCED)) {
+            ((Schema) schemaFlow.getValue(schemaFlow.schema)).setRoot(null);
+            if (!getBooleanValue(extendInsert) && getStringValue(retrieveInsertId) != null
+                    && getValue(outputAction) == OutputAction.INSERT) {
+                schemaFlow.addChild(newProperty("salesforce_id"));
+            }
+        }
+        if (form.getName().equals(Form.MAIN)) {
+            Form advForm = getForm(Form.ADVANCED);
+            if (advForm != null) {
+                if (ACTION_UPSERT.equals(getValue(outputAction))) {
+                    form.getWidget("upsertKeyColumn").setVisible(true);
+                    advForm.getWidget("upsertRelation").setVisible(true);
+                } else {
+                    form.getWidget("upsertKeyColumn").setVisible(false);
+                    advForm.getWidget("upsertRelation").setVisible(false);
+                }
+            }
         }
 
     }

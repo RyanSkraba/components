@@ -124,7 +124,6 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         advancedForm.addRow(proxy.getForm(Form.MAIN));
         advanced.setFormtoShow(advancedForm);
         refreshLayout(advancedForm);
-
     }
 
     public void afterLoginType() {

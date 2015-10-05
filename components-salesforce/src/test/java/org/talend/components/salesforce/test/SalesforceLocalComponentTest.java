@@ -382,7 +382,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     }
 
     @Test
-    public void testOutput() throws Throwable {
+    public void testOutputInsert() throws Throwable {
         TSalesforceOutputProperties props;
         props = (TSalesforceOutputProperties) componentService.getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
@@ -408,6 +408,43 @@ public class SalesforceLocalComponentTest extends TestCase {
 
         // Don't run for now, even though it works, until we can clean this stuff up
         if (!false) {
+            runtime.output(props, null, rows);
+        }
+    }
+
+    @Test
+    public void testOutputUpsert() throws Throwable {
+        TSalesforceOutputProperties props;
+        props = (TSalesforceOutputProperties) componentService.getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
+        setupProps(props.connection);
+
+        Form f = props.module.getForm(Form.REFERENCE);
+        SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
+        moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
+        moduleProps.setValue(moduleProps.moduleName, "Account");
+        checkAndAfter(f, "moduleName", moduleProps);
+        props.setValue(props.outputAction, TSalesforceOutputProperties.OutputAction.UPSERT);
+        checkAndAfter(props.getForm(Form.MAIN), "outputAction", props);
+
+        SchemaElement se = props.getProperty("upsertKeyColumn");
+        System.out.println("--upsertKeyColumn - possible values");
+        System.out.println(se.getPossibleValues());
+        assertTrue(se.getPossibleValues().size() > 10);
+
+        LocalComponentTest.checkSerialize(props);
+
+        SalesforceRuntime runtime = new SalesforceRuntime();
+        runtime.connect(props.connection);
+
+        Map<String, Object> row = new HashMap();
+        row.put("Name", "TestName");
+        row.put("BillingStreet", "123 Main Street");
+        row.put("BillingState", "CA");
+        List<Map<String, Object>> rows = new ArrayList();
+        rows.add(row);
+
+        // Don't run for now, even though it works, until we can clean this stuff up
+        if (false) {
             runtime.output(props, null, rows);
         }
     }

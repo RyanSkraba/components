@@ -40,9 +40,9 @@ public class Widget {
          * Provides a means of selecting a name or name/description from a set of names, possibly arranged in a
          * hierarchy. This is to be used for a large number of names, as this has search capability.
          *
-         * The NAME_SELECTION_AREA will operate on a property whose occur max times is -1, and whose value is
-         * a {@code List<NameAndLabel>}. It will show everything on the list and then once complete will set
-         * the values of the list only to those that are selected.
+         * The NAME_SELECTION_AREA will operate on a property whose occur max times is -1, and whose value is a
+         * {@code List<NameAndLabel>}. It will show everything on the list and then once complete will set the values of
+         * the list only to those that are selected.
          */
         NAME_SELECTION_AREA,
 
@@ -62,7 +62,14 @@ public class Widget {
         /**
          * A button
          */
-        BUTTON
+        BUTTON,
+
+        /*
+         * A table, the children of this {@link SchemaElement} will be the columns for the table. The maximum occurrence
+         * value of this {@code SchemaElement} is the number of possible rows in the table.
+         */
+        TABLE
+
     }
 
     /**

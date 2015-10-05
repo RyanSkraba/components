@@ -30,6 +30,7 @@ public class SchemaProperties extends ComponentProperties {
     //
     // Properties
     //
+    // FIXME - change to Schema
     public SchemaElement schema = newProperty(SchemaElement.Type.SCHEMA, "schema"); //$NON-NLS-1$
 
     public SchemaProperties(String name) {
