@@ -34,7 +34,7 @@ import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.salesforce.*;
-import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectDefinition;
+import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
@@ -197,7 +197,7 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     @Test
     public void testGetProps() {
-        ComponentProperties props = componentService.getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
+        ComponentProperties props = componentService.getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
         Form f = props.getForm(Form.MAIN);
         LocalComponentTest.checkSerialize(props);
         System.out.println(f);
@@ -211,7 +211,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     public void testAfterLoginType() throws Throwable {
         ComponentProperties props;
 
-        props = componentService.getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
+        props = componentService.getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
         LocalComponentTest.checkSerialize(props);
         SchemaElement loginType = props.getProperty("loginType");
         System.out.println(loginType.getPossibleValues());
@@ -236,7 +236,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     private SalesforceConnectionProperties setupProps(SalesforceConnectionProperties props) {
         if (props == null) {
             props = (SalesforceConnectionProperties) componentService
-                    .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
+                    .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
         }
         System.out.println("URI:" + props.getStringValue(props.url));
         ComponentProperties userPassword = (ComponentProperties) props.getProperty("userPassword");
@@ -276,7 +276,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     private SalesforceConnectionProperties setupOAuthProps(SalesforceConnectionProperties props) throws Throwable {
         if (props == null) {
             props = (SalesforceConnectionProperties) componentService
-                    .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
+                    .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
         }
         props.setValue(props.loginType, SalesforceConnectionProperties.LOGIN_OAUTH);
         Form mainForm = props.getForm(Form.MAIN);
@@ -451,7 +451,7 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     @Test
     public void testAlli18n() {
-        ComponentProperties compProps = componentService.getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
+        ComponentProperties compProps = componentService.getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
         checkAllI18NProperties(compProps);
         compProps = componentService.getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         checkAllI18NProperties(compProps);

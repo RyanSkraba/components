@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.salesforce.tsalesforceconnect;
+package org.talend.components.salesforce.tsalesforceconnection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,45 +25,40 @@ import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceRuntime;
 
-@org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceConnectDefinition.COMPONENT_NAME)
+@org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceConnectionDefinition.COMPONENT_NAME)
 @aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TSalesforceConnectDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TSalesforceConnectDefinition extends AbstractComponentDefinition {
+        + TSalesforceConnectionDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+public class TSalesforceConnectionDefinition extends AbstractComponentDefinition {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TSalesforceConnectDefinition.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TSalesforceConnectionDefinition.class);
 
-    public static final String COMPONENT_NAME = "tSalesforceConnect"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tSalesforceConnection"; //$NON-NLS-1$
 
-    public TSalesforceConnectDefinition() {
+    public TSalesforceConnectionDefinition() {
         setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
                 new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
 
-    @Override
-    public ComponentProperties createProperties() {
+    @Override public ComponentProperties createProperties() {
         return new SalesforceConnectionProperties(null);
     }
 
-    @Override
-    public ComponentRuntime createRuntime() {
+    @Override public ComponentRuntime createRuntime() {
         return new SalesforceRuntime();
     }
 
-    @Override
-    public String[] getSupportedFamilies() {
+    @Override public String[] getSupportedFamilies() {
         return new String[] { ComponentDefinition.FAMILY_BUSINESS, ComponentDefinition.FAMILY_CLOUD };
     }
 
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return COMPONENT_NAME;
     }
 
-    @Override
-    public String getPngImagePath(ComponentImageType imageType) {
+    @Override public String getPngImagePath(ComponentImageType imageType) {
         switch (imageType) {
         case PALLETE_ICON_32X32:
-            return "tSalesforceConnect_icon32.png"; //$NON-NLS-1$
+            return "tSalesforceConnection_icon32.png"; //$NON-NLS-1$
 
         default:
             // will return null
@@ -71,9 +66,8 @@ public class TSalesforceConnectDefinition extends AbstractComponentDefinition {
         return null;
     }
 
-    @Override
-    public String getDisplayName() {
-        return "tSalesforceConnect";
+    @Override public String getDisplayName() {
+        return "tSalesforceConnection";
     }
 
 }

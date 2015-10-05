@@ -35,7 +35,7 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
-import org.talend.components.salesforce.tsalesforceconnect.TSalesforceConnectDefinition;
+import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
@@ -66,7 +66,7 @@ public class TestComponentServiceWithComponents {
     public void testTSalesforceConnectExists() {
         System.out.println("JUNIT test start.... *********************");
         assertNotNull(componentService);
-        assertNotNull(componentService.getComponentProperties("tSalesforceConnect")); //$NON-NLS-1$
+        assertNotNull(componentService.getComponentProperties("tSalesforceConnection")); //$NON-NLS-1$
     }
 
     @Test
@@ -119,7 +119,7 @@ public class TestComponentServiceWithComponents {
     public void testI18nNestedPropertyForSalesforce() {
         assertNotNull(componentService);
         SalesforceConnectionProperties scProps = (SalesforceConnectionProperties) componentService
-                .getComponentProperties(TSalesforceConnectDefinition.COMPONENT_NAME);
+                .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
         assertNotNull(scProps);
         assertEquals("Client Id", ((ComponentProperties) scProps.getProperty("oauth")).getProperty("clientId").getDisplayName()); //$NON-NLS-1$
     }
