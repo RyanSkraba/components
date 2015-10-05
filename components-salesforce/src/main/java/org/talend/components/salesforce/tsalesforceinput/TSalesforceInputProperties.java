@@ -55,16 +55,14 @@ public class TSalesforceInputProperties extends ComponentProperties {
 
     public TSalesforceInputProperties(String name) {
         super(name);
+        returns = setReturnsProperty();
+        newReturnProperty(returns, SchemaElement.Type.INT, "NB_LINE");
         setupLayout();
     }
 
-    public static final String MAIN = "Main"; //$NON-NLS-1$
-
-    public static final String ADVANCED = "Advanced"; //$NON-NLS-1$
-
     @Override
     public void setupLayout() {
-        Form mainForm = Form.create(this, MAIN, "Salesforce Input");
+        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Input");
         mainForm.addRow(connection.getForm(Form.MAIN));
         mainForm.addRow(module.getForm(Form.REFERENCE));
         mainForm.addRow(queryMode);
@@ -74,7 +72,7 @@ public class TSalesforceInputProperties extends ComponentProperties {
         mainForm.addRow(includeDeleted);
         refreshLayout(mainForm);
 
-        Form advancedForm = Form.create(this, ADVANCED, "Salesforce Advanced");
+        Form advancedForm = Form.create(this, Form.ADVANCED, "Salesforce Advanced");
         advancedForm.addRow(batchSize);
         advancedForm.addRow(normalizeDelimiter);
         advancedForm.addRow(columnNameDelimiter);
@@ -82,11 +80,11 @@ public class TSalesforceInputProperties extends ComponentProperties {
     }
 
     public void afterQueryMode() {
-        refreshLayout(getForm(MAIN));
+        refreshLayout(getForm(Form.MAIN));
     }
 
     public void afterManualQuery() {
-        refreshLayout(getForm(MAIN));
+        refreshLayout(getForm(Form.MAIN));
     }
 
     @Override

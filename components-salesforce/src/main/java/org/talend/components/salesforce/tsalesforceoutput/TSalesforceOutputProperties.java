@@ -79,19 +79,15 @@ public class TSalesforceOutputProperties extends ComponentProperties {
 
     }
 
-    public static final String MAIN = "Main"; //$NON-NLS-1$
-
-    public static final String ADVANCED = "Advanced"; //$NON-NLS-1$
-
     @Override
     public void setupLayout() {
-        Form mainForm = Form.create(this, MAIN, "Salesforce Output");
+        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Output");
         mainForm.addRow(connection.getForm(Form.MAIN));
         mainForm.addRow(module.getForm(Form.REFERENCE));
         mainForm.addRow(outputAction);
         refreshLayout(mainForm);
 
-        Form advancedForm = Form.create(this, ADVANCED, "Advanced");
+        Form advancedForm = Form.create(this, Form.ADVANCED, "Advanced");
         mainForm.addRow(extendInsert);
         mainForm.addRow(ceaseForError);
         mainForm.addRow(ignoreNull);

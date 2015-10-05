@@ -31,10 +31,10 @@ import com.cedarsoftware.util.io.JsonWriter;
  * include those for desktop (Eclipse), web, and scripting. All of these will use the code defined here for their
  * construction and validation.
  * <p/>
- * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement},
- * {@Link PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface
- * decisions are made in code, methods can be added to the subclass to influence the flow of the user interface and help
- * with validation.
+ * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement}, {@Link
+ * PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface decisions are
+ * made in code, methods can be added to the subclass to influence the flow of the user interface and help with
+ * validation.
  * <p/>
  * Each property can be a Java type, both simple types and collections are permitted. In addition,
  * {@code ComponentProperties} classes can be composed allowing hierarchies of properties and collections of properties
@@ -81,6 +81,17 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     protected ComponentPropertiesInternal internal;
 
     /**
+     * Name of the special Returns property.
+     */
+    public static final String RETURNS = "returns";
+
+    /**
+     * A special property for the values that a component returns. If this is used, this will be a {@link SchemaElement}
+     * that contains each of the values the component returns.
+     */
+    protected SchemaElement returns;
+
+    /**
      * Holder class for the results of a deserialization.
      */
     public static class Deserialized {
@@ -106,7 +117,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
 
     /**
      * Returns the ComponentProperties object previously serialized.
-     * 
+     *
      * @param serialized created by {@link #toSerialized()}.
      * @return a {@code ComponentProperties} object represented by the {@code serialized} value.
      */
@@ -144,7 +155,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
 
     /**
      * Returns a serialized version of this for storage in a repository.
-     * 
+     *
      * @return the serialized {@code String}, use {@link #fromSerialized(String)} to materialize the object.
      */
     public String toSerialized() {
@@ -175,6 +186,9 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         internal.setDesigner(designer);
     }
 
+    // FIXME - this does not consider properties in a superclass. Not sure if it should or not, however
+    // we need to document that we can't use subclasses to add additional properties from the parent
+    // class - we can only extent by composition, not inheritance.
     public List<SchemaElement> getProperties() {
         List<SchemaElement> properties = new ArrayList();
         Field[] fields = getClass().getFields();
@@ -184,14 +198,19 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
                     SchemaElement se = (SchemaElement) f.get(this);
                     if (se != null) {
                         properties.add(se);
+                        // Do not set the i18N for nested ComponentProperties, they already handle their i18n
                         if (!(se instanceof ComponentProperties)) {
                             se.setI18nMessageFormater(getI18nMessageFormater());
-                        } // we do not set the i18N for nested ComponentProperties, they already handle their i18n
+                        }
                     } // else element not initialised (set to null)
                 } catch (IllegalAccessException e) {
                     throw new ComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
                 }
             }
+        }
+        if (returns != null) {
+            returns.setI18nMessageFormater(getI18nMessageFormater());
+            properties.add(returns);
         }
         return properties;
     }

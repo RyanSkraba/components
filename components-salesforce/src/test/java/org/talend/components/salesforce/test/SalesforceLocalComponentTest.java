@@ -44,7 +44,7 @@ import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputPrope
 @SpringApplicationConfiguration(classes = SpringApp.class)
 public class SalesforceLocalComponentTest extends TestCase {
 
-    boolean inChina = true;
+    boolean inChina = !true;
 
     String userId;
 
@@ -356,6 +356,9 @@ public class SalesforceLocalComponentTest extends TestCase {
         TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
+
+        SchemaElement returns = props.getProperty(ComponentProperties.RETURNS);
+        assertEquals("NB_LINE", returns.getChildren().get(0).getName());
 
         Form f = props.module.getForm(Form.REFERENCE);
         SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
