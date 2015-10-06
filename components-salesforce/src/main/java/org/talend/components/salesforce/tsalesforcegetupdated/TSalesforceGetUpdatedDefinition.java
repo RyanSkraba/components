@@ -10,26 +10,23 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.salesforce.tsalesforceinput;
+package org.talend.components.salesforce.tsalesforcegetupdated;
 
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentConnector;
 import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 
-/**
- * Component that can connect to a salesforce system and get some data out of it.
- */
+@org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceGetUpdatedDefinition.COMPONENT_NAME)
+@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceGetUpdatedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+public class TSalesforceGetUpdatedDefinition extends SalesforceDefinition {
 
-@org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceInputDefinition.COMPONENT_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceInputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TSalesforceInputDefinition extends SalesforceDefinition {
+    public static final String COMPONENT_NAME = "tSalesforceGetUpdated"; //$NON-NLS-1$
 
-    public static final String COMPONENT_NAME = "tSalesforceInput"; //$NON-NLS-1$
-
-    public TSalesforceInputDefinition() {
+    public TSalesforceGetUpdatedDefinition() {
         super(COMPONENT_NAME);
         setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
                 new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
@@ -37,7 +34,7 @@ public class TSalesforceInputDefinition extends SalesforceDefinition {
 
     @Override
     public ComponentProperties createProperties() {
-        return new TSalesforceInputProperties(null);
+        return new TSalesforceGetUpdatedProperties(null);
     }
 
 }
