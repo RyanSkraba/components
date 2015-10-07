@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.test;
+package org.talend.components.api.service;
 
 public class RestComponentTest /* extends TestCase */{
     /*

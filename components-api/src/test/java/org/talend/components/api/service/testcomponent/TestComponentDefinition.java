@@ -1,4 +1,4 @@
-package org.talend.components.api.test.testcomponent;
+package org.talend.components.api.service.testcomponent;
 
 import org.springframework.stereotype.Component;
 import org.talend.components.api.Constants;

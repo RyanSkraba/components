@@ -1,4 +1,4 @@
-package org.talend.components.api.test.testcomponent;
+package org.talend.components.api.service.testcomponent;
 
 import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.api.wizard.ComponentWizard;

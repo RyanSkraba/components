@@ -44,7 +44,7 @@
                     <instructions>
                         <Import-Package>org.talend*</Import-Package>
                         <Service-Component>*</Service-Component>
-                        <Embed-Dependency>!components*|com.fasterxml;scope=compile|runtime</Embed-Dependency>
+                        <Embed-Dependency>!components*</Embed-Dependency>
                     </instructions>
                 </configuration>
             </plugin>

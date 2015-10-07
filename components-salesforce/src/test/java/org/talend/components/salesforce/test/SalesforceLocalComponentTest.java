@@ -29,7 +29,7 @@ import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.test.LocalComponentTest;
+import org.talend.components.api.service.LocalComponentTest;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
