@@ -13,6 +13,7 @@
 package org.talend.components.salesforce.test;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 import junit.framework.TestCase;
 
@@ -50,10 +51,16 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     String password;
 
+    // Used to make sure we have our own data
+    String random;
+
+    public static final String TEST_KEY = "Address2 456";
+
     @Autowired
     protected ComponentService componentService;
 
     public SalesforceLocalComponentTest() {
+        random = Integer.toString(ThreadLocalRandom.current().nextInt(1, 100000));
         if (inChina) {
             userId = "bchen2@talend.com";
             password = "talend123sfYYBBe4aZN0TcDVDV7Ylzb6Ku";
@@ -204,7 +211,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         System.out.println(props);
         assertEquals(Form.MAIN, f.getName());
         Form af = props.getForm(Form.ADVANCED);
-        assertTrue(((PresentationItem)f.getChild("advanced")).getFormtoShow() == af);
+        assertTrue(((PresentationItem) f.getChild("advanced")).getFormtoShow() == af);
     }
 
     @Test
@@ -372,13 +379,101 @@ public class SalesforceLocalComponentTest extends TestCase {
         runtime.connect(props.connection);
 
         Map<String, Object> row = new HashMap();
+
+        int count = 10;
+        List<Map<String, Object>> outputRows = makeRows(count);
+        writeRows(runtime, props, outputRows);
+
         List<Map<String, Object>> rows = new ArrayList();
+        runtime.input(props, null, rows);
+        checkRows(rows, count);
+        deleteRows(runtime, rows);
+    }
 
-        if (false) {
-            runtime.input(props, null, rows);
+    protected List<Map<String, Object>> makeRows(int count) {
+        List<Map<String, Object>> outputRows = new ArrayList();
+        for (int i = 0; i < count; i++) {
+            Map<String, Object> row = new HashMap();
+            row.put("Name", "TestName");
+            row.put("ShippingStreet", TEST_KEY);
+            row.put("ShippingPostalCode", Integer.toString(i));
+            row.put("BillingStreet", "123 Main Street");
+            row.put("BillingState", "CA");
+            row.put("BillingPostalCode", random);
+            System.out.println("out: " + row.get("Name") + " id: " + row.get("Id") + " post: " + row.get("BillingPostalCode")
+                    + " st: " + " street: " + row.get("BillingStreet"));
+            outputRows.add(row);
         }
+        return outputRows;
+    }
 
-        System.out.println(rows);
+    protected void checkRows(List<Map<String, Object>> rows, int count) {
+        int checkCount = 0;
+        for (Map<String, Object> row : rows) {
+            System.out.println("check: " + row.get("Name") + " id: " + row.get("Id") + " post: " + row.get("BillingPostalCode")
+                    + " st: " + " post: " + row.get("BillingStreet"));
+            String check = (String) row.get("ShippingStreet");
+            if (check == null || !check.equals(TEST_KEY))
+                continue;
+            check = (String) row.get("BillingPostalCode");
+            if (check == null || !check.equals(random))
+                continue;
+            checkCount++;
+            assertEquals("TestName", row.get("Name"));
+            assertEquals("123 Main Street", row.get("BillingStreet"));
+            assertEquals("CA", row.get("BillingState"));
+        }
+        assertEquals(count, checkCount);
+    }
+
+    protected List<String> getDeleteIds(List<Map<String, Object>> rows) {
+        List<String> ids = new ArrayList<>();
+        for (Map<String, Object> row : rows) {
+            System.out.println("del: " + row.get("Name") + " id: " + row.get("Id") + " post: " + row.get("BillingPostalCode")
+                    + " st: " + " post: " + row.get("BillingStreet"));
+            String check = (String) row.get("ShippingStreet");
+            if (check == null || !check.equals(TEST_KEY))
+                continue;
+            ids.add((String) row.get("Id"));
+        }
+        return ids;
+    }
+
+    protected List<Map<String, Object>> readAndCheckRows(SalesforceRuntime runtime, SalesforceInputOutputProperties props,
+            int count) throws Exception {
+        List<Map<String, Object>> inputRows = new ArrayList();
+        TSalesforceInputProperties inputProps = (TSalesforceInputProperties) componentService
+                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
+        inputProps.connection = props.connection;
+        inputProps.module = props.module;
+        inputProps.setValue(inputProps.batchSize, 200);
+        runtime.input(inputProps, null, inputRows);
+        checkRows(inputRows, count);
+        return inputRows;
+    }
+
+    protected void writeRows(SalesforceRuntime runtime, SalesforceInputOutputProperties props,
+            List<Map<String, Object>> outputRows) throws Exception {
+        TSalesforceOutputProperties outputProps;
+        outputProps = (TSalesforceOutputProperties) componentService
+                .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
+        outputProps.connection = props.connection;
+        outputProps.module = props.module;
+        outputProps.setValue(outputProps.outputAction, TSalesforceOutputProperties.OutputAction.INSERT);
+        runtime.output(outputProps, null, outputRows);
+    }
+
+    protected void deleteRows(SalesforceRuntime runtime, List<Map<String, Object>> inputRows) throws Exception {
+        List<String> ids = getDeleteIds(inputRows);
+        for (String id : ids) {
+            runtime.delete(id);
+        }
+    }
+
+    protected void checkAndDelete(SalesforceRuntime runtime, SalesforceInputOutputProperties props, int count) throws Exception {
+        List<Map<String, Object>> inputRows = readAndCheckRows(runtime, props, count);
+        deleteRows(runtime, inputRows);
+        readAndCheckRows(runtime, props, 0);
     }
 
     @Test
@@ -399,17 +494,10 @@ public class SalesforceLocalComponentTest extends TestCase {
         SalesforceRuntime runtime = new SalesforceRuntime();
         runtime.connect(props.connection);
 
-        Map<String, Object> row = new HashMap();
-        row.put("Name", "TestName");
-        row.put("BillingStreet", "123 Main Street");
-        row.put("BillingState", "CA");
-        List<Map<String, Object>> rows = new ArrayList();
-        rows.add(row);
-
-        // Don't run for now, even though it works, until we can clean this stuff up
-        if (!false) {
-            runtime.output(props, null, rows);
-        }
+        int count = 10;
+        List<Map<String, Object>> outputRows = makeRows(count);
+        runtime.output(props, null, outputRows);
+        checkAndDelete(runtime, props, count);
     }
 
     @Test
@@ -440,13 +528,9 @@ public class SalesforceLocalComponentTest extends TestCase {
         row.put("Name", "TestName");
         row.put("BillingStreet", "123 Main Street");
         row.put("BillingState", "CA");
-        List<Map<String, Object>> rows = new ArrayList();
-        rows.add(row);
+        List<Map<String, Object>> outputRows = new ArrayList();
+        outputRows.add(row);
 
-        // Don't run for now, even though it works, until we can clean this stuff up
-        if (false) {
-            runtime.output(props, null, rows);
-        }
     }
 
     @Test

@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcegetdeleted;
 
+import static org.talend.components.api.schema.SchemaFactory.newProperty;
+
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
@@ -20,6 +22,10 @@ import org.talend.components.salesforce.SalesforceModuleProperties;
 
 public class TSalesforceGetDeletedProperties extends ComponentProperties {
 
+    public SchemaElement startDate = newProperty(Type.DATE, "startDate");
+
+    public SchemaElement endDate = newProperty(Type.DATE, "startDate");
+
     //
     // Collections
     //
@@ -27,16 +33,13 @@ public class TSalesforceGetDeletedProperties extends ComponentProperties {
 
     public SalesforceModuleProperties module = new SalesforceModuleProperties("module", connection); //$NON-NLS-1$
 
-    public TSalesforceGetDeletedProperties(String name) {
-        super(name);
-        setupLayout();
-    }
-
-    @Override public void setupLayout() {
-        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Input");
+    @Override
+    public void setupLayout() {
+        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Get Deleted");
         mainForm.addRow(connection.getForm(Form.MAIN));
         mainForm.addRow(module.getForm(Form.REFERENCE));
-        refreshLayout(mainForm);
+        mainForm.addRow(startDate);
+        mainForm.addRow(endDate);
     }
 
 }

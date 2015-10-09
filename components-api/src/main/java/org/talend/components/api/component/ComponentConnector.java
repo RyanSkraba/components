@@ -14,6 +14,8 @@ package org.talend.components.api.component;
 
 public class ComponentConnector {
 
+    // FIXME - are the RUN_IF, COMPONENT_OK, COMPONENT_ERROR always present?
+
     public enum Type {
         FLOW,
         MAIN,

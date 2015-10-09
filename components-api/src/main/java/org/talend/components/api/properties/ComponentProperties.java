@@ -3,11 +3,9 @@ package org.talend.components.api.properties;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 import org.talend.components.api.ComponentDesigner;
@@ -128,13 +126,39 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         return d;
     }
 
+    /**
+     * Do not subclass this method for initialization, use {@link #initSubclass()} instead.
+     */
     public ComponentProperties() {
         internal = new ComponentPropertiesInternal();
     }
 
+    /**
+     * Do not subclass this method for initialization, use {@link #initSubclass()} instead.
+     */
     public ComponentProperties(String name) {
-        internal = new ComponentPropertiesInternal();
+        this();
         setName(name);
+    }
+
+    /**
+     * Initialize this object, all subclass initialization should override {@link #initSubclass()}, not this method, nor
+     * the constructor. This is done so that things are executed in the right order.
+     */
+    public ComponentProperties init() {
+        initSubclass();
+        setupLayout();
+        for (Form form : getForms()) {
+            refreshLayout(form);
+        }
+        return this;
+    }
+
+    /**
+     * Any subclass-specific initialization should override this method.
+     */
+    public void initSubclass() {
+        // Subclass me as required
     }
 
     // /**
@@ -160,6 +184,22 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
      */
     public String toSerialized() {
         return JsonWriter.objectToJson(this);
+    }
+
+    /**
+     * Declare the widget information for each of the properties
+     */
+    protected void setupLayout() {
+    }
+
+    /**
+     * This is called every time the presentation of the components properties needs to be updated.
+     *
+     * Note: This is automatically called at startup after all of the setupLayout() calls are done. It only needs to be
+     * called after that when the layout has been changed.
+     */
+    public void refreshLayout(Form form) {
+        form.setRefreshUI(true);
     }
 
     public List<Form> getForms() {
@@ -253,6 +293,10 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         return value;
     }
 
+    public Calendar getCalendarValue(SchemaElement property) {
+        return (Calendar) getValue(property);
+    }
+
     /**
      * Returns the {@link ValidationResult} for the property being validated if requested.
      *
@@ -260,19 +304,6 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
      */
     public ValidationResult getValidationResult() {
         return internal.getValidationResult();
-    }
-
-    /**
-     * Declare the widget information for each of the properties
-     */
-    protected void setupLayout() {
-    }
-
-    /**
-     * This is called every time the presentation of the components properties needs to be updated
-     */
-    public void refreshLayout(Form form) {
-        form.setRefreshUI(true);
     }
 
     // Internal - not API

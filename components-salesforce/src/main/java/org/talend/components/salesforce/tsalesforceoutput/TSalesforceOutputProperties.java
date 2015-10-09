@@ -25,9 +25,10 @@ import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.SalesforceInputOutputProperties;
 import org.talend.components.salesforce.SalesforceModuleProperties;
 
-public class TSalesforceOutputProperties extends ComponentProperties {
+public class TSalesforceOutputProperties extends SalesforceInputOutputProperties {
 
     public static final String ACTION_INSERT = "INSERT";
 
@@ -69,10 +70,6 @@ public class TSalesforceOutputProperties extends ComponentProperties {
     //
     // Collections
     //
-    public SalesforceConnectionProperties connection;
-
-    public SalesforceModuleProperties module;
-
     public SchemaProperties schemaFlow = new SchemaProperties("schemaFlow"); //$NON-NLS-1$
 
     public SchemaProperties schemaReject = new SchemaProperties("schemaReject"); //$NON-NLS-1$
@@ -95,9 +92,9 @@ public class TSalesforceOutputProperties extends ComponentProperties {
         }
     }
 
-    public TSalesforceOutputProperties(String name) {
-        super(name);
-
+    @Override
+    public void initSubclass() {
+        super.initSubclass();
         List<String> outputActions = new ArrayList<>();
         outputActions.add(ACTION_INSERT);
         outputActions.add(ACTION_UPDATE);
@@ -118,22 +115,18 @@ public class TSalesforceOutputProperties extends ComponentProperties {
         upsertRelation.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
         upsertRelation.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
         upsertRelation.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
+    }
 
-        connection = new SalesforceConnectionProperties("connection"); //$NON-NLS-1$
+    protected void createModuleProperties() {
         module = new ModuleSubclass("module", connection);
-
-        setupLayout();
     }
 
     @Override
     public void setupLayout() {
-        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Output");
-        mainForm.addRow(connection.getForm(Form.MAIN));
-        mainForm.addRow(module.getForm(Form.REFERENCE));
+        super.setupLayout();
+        Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(outputAction);
         mainForm.addColumn(upsertKeyColumn);
-        mainForm.addRow(module.getForm(Form.REFERENCE));
-        refreshLayout(mainForm);
 
         Form advancedForm = Form.create(this, Form.ADVANCED, "Advanced");
         advancedForm.addRow(extendInsert);
@@ -145,7 +138,6 @@ public class TSalesforceOutputProperties extends ComponentProperties {
         advancedForm.addRow(widget(upsertRelation).setWidgetType(Widget.WidgetType.TABLE));
         advancedForm.addRow(widget(schemaFlow.getForm(Form.REFERENCE).setName("SchemaFlow").setTitle("Schema Flow")));
         advancedForm.addRow(widget(schemaReject.getForm(Form.REFERENCE).setName("SchemaReject").setTitle("Schema Reject")));
-        refreshLayout(advancedForm);
     }
 
     public void afterOutputAction() {

@@ -26,16 +26,10 @@ public class TSalesforceOutputBulkExecProperties extends ComponentProperties {
 
     public SalesforceModuleProperties module = new SalesforceModuleProperties("module", connection); //$NON-NLS-1$
 
-    public TSalesforceOutputBulkExecProperties(String name) {
-        super(name);
-        setupLayout();
-    }
-
     @Override public void setupLayout() {
         Form mainForm = Form.create(this, Form.MAIN, "Salesforce Input");
         mainForm.addRow(connection.getForm(Form.MAIN));
         mainForm.addRow(module.getForm(Form.REFERENCE));
-        refreshLayout(mainForm);
     }
 
 }

@@ -39,6 +39,7 @@ import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 import com.sforce.ws.SessionRenewer;
+import com.sforce.ws.bind.XmlObject;
 
 public class SalesforceRuntime extends ComponentRuntime {
 
@@ -271,7 +272,18 @@ public class SalesforceRuntime extends ComponentRuntime {
     }
 
     public void commonBegin(ComponentProperties props, ComponentRuntimeContainer env) {
+        SalesforceInputOutputProperties sprops = (SalesforceInputOutputProperties) props;
 
+        Schema schema = sprops.getSchema();
+        fieldMap = schema.getRoot().getChildMap();
+        fieldList = schema.getRoot().getChildren();
+
+        for (SchemaElement se : fieldList) {
+            if (se.getType() == SchemaElement.Type.DYNAMIC) {
+                dynamicField = se;
+                break;
+            }
+        }
     }
 
     public void input(ComponentProperties props, ComponentRuntimeContainer container, List<Map<String, Object>> values)
@@ -283,18 +295,7 @@ public class SalesforceRuntime extends ComponentRuntime {
     public void inputBegin(ComponentProperties props, ComponentRuntimeContainer container, List<Map<String, Object>> values)
             throws Exception {
         TSalesforceInputProperties sprops = (TSalesforceInputProperties) props;
-
-        // FIXME - refactor in common having InputOutput properties
-        Schema schema = (Schema) sprops.module.schema.getValue(sprops.module.schema.schema);
-        fieldMap = schema.getRoot().getChildMap();
-        fieldList = schema.getRoot().getChildren();
-
-        for (SchemaElement se : fieldList) {
-            if (se.getType() == SchemaElement.Type.DYNAMIC) {
-                dynamicField = se;
-                break;
-            }
-        }
+        commonBegin(props, container);
 
         /*
          * Dynamic columns are requested, find them from Salesforce and only look at the ones that are not explicitly
@@ -316,7 +317,8 @@ public class SalesforceRuntime extends ComponentRuntime {
 
         inputFieldsToUse = new ArrayList();
         inputFieldsToUse.addAll(fieldList);
-        inputFieldsToUse.addAll(dynamicFieldList);
+        if (dynamicFieldList != null)
+            inputFieldsToUse.addAll(dynamicFieldList);
 
         String queryText;
         if (sprops.getBooleanValue(sprops.manualQuery)) {
@@ -337,7 +339,16 @@ public class SalesforceRuntime extends ComponentRuntime {
         }
 
         QueryResult result = query(queryText, sprops.getIntValue(sprops.batchSize));
-
+        SObject[] records = result.getRecords();
+        for (SObject record : records) {
+            Iterator it = record.getChildren();
+            Map<String, Object> columns = new HashMap();
+            while (it.hasNext()) {
+                XmlObject obj = (XmlObject) it.next();
+                columns.put(obj.getName().getLocalPart(), obj.getValue());
+            }
+            values.add(columns);
+        }
     }
 
     public void inputEnd(ComponentProperties props, ComponentRuntimeContainer container, List<Map<String, Object>> values)
@@ -352,18 +363,10 @@ public class SalesforceRuntime extends ComponentRuntime {
     }
 
     public void outputBegin(ComponentProperties props, ComponentRuntimeContainer env) {
+        commonBegin(props, container);
+
         TSalesforceOutputProperties sprops = (TSalesforceOutputProperties) props;
-
         upsertKeyColumn = sprops.getStringValue(sprops.upsertKeyColumn);
-        Schema schema = (Schema) sprops.module.schema.getValue(sprops.module.schema.schema);
-        fieldMap = schema.getRoot().getChildMap();
-        fieldList = schema.getRoot().getChildren();
-
-        for (SchemaElement se : fieldList) {
-            if (se.getType() == SchemaElement.Type.DYNAMIC) {
-                dynamicField = se;
-            }
-        }
     }
 
     /**

@@ -18,9 +18,10 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.SalesforceInputOutputProperties;
 import org.talend.components.salesforce.SalesforceModuleProperties;
 
-public class TSalesforceInputProperties extends ComponentProperties {
+public class TSalesforceInputProperties extends SalesforceInputOutputProperties {
 
     public enum QueryMode {
                            QUERY,
@@ -46,37 +47,29 @@ public class TSalesforceInputProperties extends ComponentProperties {
 
     public SchemaElement columnNameDelimiter = newProperty("ColumnNameDelimiter"); //$NON-NLS-1$
 
-    //
-    // Collections
-    //
-    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection"); //$NON-NLS-1$
-
-    public SalesforceModuleProperties module = new SalesforceModuleProperties("module", connection); //$NON-NLS-1$
-
-    public TSalesforceInputProperties(String name) {
-        super(name);
+    @Override
+    public void initSubclass() {
+        super.initSubclass();
         returns = setReturnsProperty();
         newReturnProperty(returns, SchemaElement.Type.INT, "NB_LINE");
-        setupLayout();
+        // FIXME - should use default value
+        setValue(batchSize, 100);
     }
 
     @Override
     public void setupLayout() {
-        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Input");
-        mainForm.addRow(connection.getForm(Form.MAIN));
-        mainForm.addRow(module.getForm(Form.REFERENCE));
+        super.setupLayout();
+        Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(queryMode);
         mainForm.addRow(condition);
         mainForm.addRow(manualQuery);
         mainForm.addRow(query);
         mainForm.addRow(includeDeleted);
-        refreshLayout(mainForm);
 
         Form advancedForm = Form.create(this, Form.ADVANCED, "Salesforce Advanced");
         advancedForm.addRow(batchSize);
         advancedForm.addRow(normalizeDelimiter);
         advancedForm.addRow(columnNameDelimiter);
-
     }
 
     public void afterQueryMode() {
@@ -90,10 +83,12 @@ public class TSalesforceInputProperties extends ComponentProperties {
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        form.getWidget(includeDeleted.getName()).setVisible(getValue(queryMode) == QueryMode.QUERY);
+        if (form.getName().equals(Form.MAIN)) {
+            form.getWidget(includeDeleted.getName()).setVisible(getValue(queryMode) == QueryMode.QUERY);
 
-        form.getWidget(query.getName()).setVisible(getBooleanValue(manualQuery));
-        form.getWidget(condition.getName()).setVisible(!getBooleanValue(manualQuery));
+            form.getWidget(query.getName()).setVisible(getBooleanValue(manualQuery));
+            form.getWidget(condition.getName()).setVisible(!getBooleanValue(manualQuery));
+        }
     }
 
 }

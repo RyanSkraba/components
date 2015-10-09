@@ -12,13 +12,18 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcegetupdated;
 
+import java.util.List;
+import java.util.Map;
+
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentConnector;
 import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.api.runtime.ComponentRuntime;
+import org.talend.components.api.runtime.ComponentRuntimeContainer;
 import org.talend.components.salesforce.SalesforceDefinition;
+import org.talend.components.salesforce.SalesforceRuntime;
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceGetUpdatedDefinition.COMPONENT_NAME)
 @aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceGetUpdatedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
@@ -28,13 +33,25 @@ public class TSalesforceGetUpdatedDefinition extends SalesforceDefinition {
 
     public TSalesforceGetUpdatedDefinition() {
         super(COMPONENT_NAME);
-        setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
+        propertiesClass = TSalesforceGetUpdatedProperties.class;
+        setConnectors(new ComponentConnector(Type.FLOW, 1,1),
                 new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
 
     @Override
-    public ComponentProperties createProperties() {
-        return new TSalesforceGetUpdatedProperties(null);
-    }
+    public ComponentRuntime createRuntime() {
+        return new SalesforceRuntime() {
 
+            public void inputBegin(ComponentProperties props, ComponentRuntimeContainer container,
+                    List<Map<String, Object>> values) throws Exception {
+
+            }
+
+            public void inputEnd(ComponentProperties props, ComponentRuntimeContainer container, List<Map<String, Object>> values)
+                    throws Exception {
+
+            }
+
+        };
+    }
 }

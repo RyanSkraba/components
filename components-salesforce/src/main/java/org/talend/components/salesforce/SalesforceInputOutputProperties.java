@@ -10,24 +10,41 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.salesforce.tsalesforceoutputbulk;
+package org.talend.components.salesforce;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
-import org.talend.components.salesforce.SalesforceModuleProperties;
+import org.talend.components.api.schema.Schema;
 
-public class TSalesforceOutputBulkProperties extends ComponentProperties {
+/**
+ * Properties common to input and output Salesforce components.
+ */
+public class SalesforceInputOutputProperties extends ComponentProperties {
 
-    //
     // Collections
     //
     public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection"); //$NON-NLS-1$
 
-    public SalesforceModuleProperties module = new SalesforceModuleProperties("module", connection); //$NON-NLS-1$
+    public SalesforceModuleProperties module;
 
-    @Override public void setupLayout() {
-        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Input");
+    @Override
+    public void initSubclass() {
+        super.initSubclass();
+        createModuleProperties();
+    }
+
+    protected void createModuleProperties() {
+        // Allow for subclassing
+        module = new SalesforceModuleProperties("module", connection);
+    }
+
+    public Schema getSchema() {
+        return (Schema) module.schema.getValue(module.schema.schema);
+    }
+
+    @Override
+    public void setupLayout() {
+        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Input/Output");
         mainForm.addRow(connection.getForm(Form.MAIN));
         mainForm.addRow(module.getForm(Form.REFERENCE));
     }
