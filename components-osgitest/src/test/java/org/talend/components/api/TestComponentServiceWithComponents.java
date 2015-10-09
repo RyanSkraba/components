@@ -20,6 +20,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -36,16 +37,17 @@ import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
+import org.talend.components.salesforce.test.SalesforceLocalComponentTest;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class TestComponentServiceWithComponents {
+public class TestComponentServiceWithComponents extends SalesforceLocalComponentTest {
 
     @Inject
-    private ComponentService componentService;
+    ComponentService osgiCompService;
 
     @Configuration
     public Option[] config() {
@@ -53,11 +55,17 @@ public class TestComponentServiceWithComponents {
         return options(composite(PaxExamOptions.getOptions()),
                 provision(mavenBundle().groupId("org.talend.components").artifactId("components-common"),
                         mavenBundle().groupId("org.talend.components").artifactId("components-common-oauth"),
-                        mavenBundle().groupId("org.talend.components").artifactId("components-salesforce")),
-                junitBundles()
+                        mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("bundle"),
+                        mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("tests")),
+                cleanCaches());
         // these debug option do not work, I still don't know how to debug this :, cleanCaches(),
-        // vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"),systemTimeout(0)
-        );
+        // vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
+        // , systemTimeout(0)
+    }
+
+    @Before
+    public void setypComponentService() {
+        componentService = osgiCompService;
     }
 
     @Test
@@ -137,6 +145,13 @@ public class TestComponentServiceWithComponents {
         assertNotNull(componentService);
         Set<String> deps = componentService.getMavenUriDependencies(TSalesforceConnectionDefinition.COMPONENT_NAME);
         assertEquals(101, deps.size());
+    }
+
+    @Test
+    public void testSalesforceLogin() throws Throwable {
+        SalesforceLocalComponentTest salesforceLocalComponentTest = new SalesforceLocalComponentTest();
+        salesforceLocalComponentTest.componentService = this.componentService;
+        salesforceLocalComponentTest.testLogin();
     }
 
     /**

@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.api.service;
 
-public class RestComponentTest /* extends TestCase */{
+public class RestComponentTest {
     /*
      * 
      * public static final String SERVER_URI = "http://localhost:8080/components/";

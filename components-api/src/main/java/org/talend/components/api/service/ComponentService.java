@@ -28,9 +28,6 @@ import org.talend.components.api.wizard.WizardImageType;
 /**
  * The Main service provided by this project to get access to all registered components and their properties.
  */
-/**
- * created by sgandon on 9 oct. 2015
- */
 public interface ComponentService extends Repository {
 
     /**

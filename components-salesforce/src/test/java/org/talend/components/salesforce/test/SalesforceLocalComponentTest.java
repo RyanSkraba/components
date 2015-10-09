@@ -12,21 +12,32 @@
 // ============================================================================
 package org.talend.components.salesforce.test;
 
-import java.util.*;
+import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-import junit.framework.TestCase;
+import javax.inject.Inject;
 
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.internal.SpringApp;
-import org.talend.components.api.properties.*;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.NameAndLabel;
+import org.talend.components.api.properties.PresentationItem;
+import org.talend.components.api.properties.Repository;
+import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.runtime.ComponentDynamicHolder;
 import org.talend.components.api.runtime.ComponentRuntimeContainer;
@@ -40,7 +51,14 @@ import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.common.oauth.OauthProperties;
-import org.talend.components.salesforce.*;
+import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.SalesforceConnectionWizard;
+import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
+import org.talend.components.salesforce.SalesforceModuleListProperties;
+import org.talend.components.salesforce.SalesforceModuleProperties;
+import org.talend.components.salesforce.SalesforceRuntime;
+import org.talend.components.salesforce.SalesforceUserPasswordProperties;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
@@ -53,7 +71,7 @@ import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputPrope
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
-public class SalesforceLocalComponentTest extends TestCase {
+public class SalesforceLocalComponentTest {
 
     boolean inChina = !true;
 
@@ -80,8 +98,8 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     public static final String TEST_KEY = "Address2 456";
 
-    @Autowired
-    protected ComponentService componentService;
+    @Inject
+    public ComponentService componentService;
 
     public SalesforceLocalComponentTest() {
         random = Integer.toString(ThreadLocalRandom.current().nextInt(1, 100000));
@@ -811,9 +829,11 @@ public class SalesforceLocalComponentTest extends TestCase {
         List<SchemaElement> properties = checkProps.getProperties();
         for (SchemaElement prop : properties) {
             if (!(prop instanceof ComponentProperties)) {
-                assertFalse("property [" + checkProps.getClass().getCanonicalName() + "/" + prop.getName()
-                        + "] should have a translated message key [property." + prop.getName()
-                        + ".displayName] in [ZE proper messages.property]", prop.getDisplayName().endsWith(".displayName"));
+                assertFalse(
+                        "property [" + checkProps.getClass().getCanonicalName() + "/" + prop.getName()
+                                + "] should have a translated message key [property." + prop.getName()
+                                + ".displayName] in [ZE proper messages.property]",
+                        prop.getDisplayName().endsWith(".displayName"));
             } else {
                 // FIXME - the inner class property thing is broken, remove this check to test it
                 if (prop.toString().contains("$")) {

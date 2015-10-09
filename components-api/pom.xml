@@ -160,24 +160,23 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
+				<!-- <configuration> <instructions> <bnd.version.policy>[$(version;==;$(@)),$(version;+;$(@)))</bnd.version.policy> 
+					<Service-Component>*</Service-Component> <Import-Package>org.osgi*</Import-Package> 
+					<Embed-Transitive>true</Embed-Transitive> <Embed-Dependency>!org.osgi.core;scope=compile|runtime</Embed-Dependency> 
+					</instructions> </configuration> -->
+				<executions>
+					<execution>
+						<id>default-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>bundle</goal>
+						</goals>
 				<configuration>
+							<classifier>bundle</classifier>
 					<instructions>
-						<bnd.version.policy>[$(version;==;$(@)),$(version;+;$(@)))</bnd.version.policy>
 						<Service-Component>*</Service-Component>
 						<Import-Package>org.osgi*,javax.net.ssl,javax.security.auth.x500</Import-Package>
 						<Embed-Transitive>true</Embed-Transitive>
@@ -185,6 +184,39 @@
 						<DynamicImport-Package>*</DynamicImport-Package>
 					</instructions>
 				</configuration>
+					</execution>
+					<execution>
+						<id>lib-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>bundle</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>test-bundle</id>
+						<phase>package</phase>
+						<goals>
+							<goal>bundle</goal>
+						</goals>
+						<configuration>
+							<classifier>tests</classifier>
+							<outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
+							<instructions>
+								<Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit</Import-Package>
+								<Bundle-SymbolicName>org.talend.components.api.test</Bundle-SymbolicName>
+								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
+								<Embed-Dependency></Embed-Dependency>
+                                <Export-Package>org.talend.components*</Export-Package>
+								<Include-Resource>=target/test-classes/
+								</Include-Resource>
+								<!-- <Bundle-ClassPath>{maven-dependencies},partner-${partner.version}.jar;mvn:org.talend.components.salesforce/partner/${partner.version}</Bundle-ClassPath> -->
+							</instructions>
+						</configuration>
+					</execution>
+				</executions>
+
+
+
 			</plugin>
 		</plugins>
 	</build>

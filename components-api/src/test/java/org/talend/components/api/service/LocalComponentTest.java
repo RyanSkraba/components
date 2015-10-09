@@ -1,3 +1,4 @@
+package org.talend.components.api.service;
 // ============================================================================
 //
 // Copyright (C) 2006-2015 Talend Inc. - www.talend.com
@@ -10,7 +11,8 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.service;
+
+import static org.junit.Assert.*;
 
 import java.io.InputStream;
 import java.util.List;
@@ -29,6 +31,7 @@ import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
+import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.testcomponent.ComponentPropertiesWithDefinedI18N;
 import org.talend.components.api.service.testcomponent.TestComponentDefinition;
 import org.talend.components.api.service.testcomponent.TestComponentProperties;
@@ -40,11 +43,9 @@ import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 
-import junit.framework.TestCase;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
-public class LocalComponentTest extends TestCase {
+public class LocalComponentTest {
 
     @Autowired
     protected ComponentService componentService;
