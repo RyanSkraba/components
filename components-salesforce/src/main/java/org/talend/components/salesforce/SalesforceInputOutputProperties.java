@@ -28,14 +28,10 @@ public class SalesforceInputOutputProperties extends ComponentProperties {
     public SalesforceModuleProperties module;
 
     @Override
-    public void initSubclass() {
-        super.initSubclass();
-        createModuleProperties();
-    }
-
-    protected void createModuleProperties() {
+    public ComponentProperties init() {
         // Allow for subclassing
         module = new SalesforceModuleProperties("module", connection);
+        return super.init();
     }
 
     public Schema getSchema() {

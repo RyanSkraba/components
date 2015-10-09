@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.properties.presentation.Widget.*;
 import static org.talend.components.api.schema.SchemaFactory.*;
 
 import java.util.ArrayList;
@@ -39,10 +39,10 @@ public class TSalesforceOutputProperties extends SalesforceInputOutputProperties
     public static final String ACTION_DELETE = "DELETE";
 
     public enum OutputAction {
-        INSERT,
-        UPDATE,
-        UPSERT,
-        DELETE
+                              INSERT,
+                              UPDATE,
+                              UPSERT,
+                              DELETE
     }
 
     public SchemaElement outputAction = newProperty(SchemaElement.Type.ENUM, "outputAction"); //$NON-NLS-1$
@@ -93,8 +93,7 @@ public class TSalesforceOutputProperties extends SalesforceInputOutputProperties
     }
 
     @Override
-    public void initSubclass() {
-        super.initSubclass();
+    public ComponentProperties init() {
         List<String> outputActions = new ArrayList<>();
         outputActions.add(ACTION_INSERT);
         outputActions.add(ACTION_UPDATE);
@@ -115,10 +114,10 @@ public class TSalesforceOutputProperties extends SalesforceInputOutputProperties
         upsertRelation.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
         upsertRelation.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
         upsertRelation.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
-    }
-
-    protected void createModuleProperties() {
+        super.init();
         module = new ModuleSubclass("module", connection);
+        module.init();
+        return this;
     }
 
     @Override

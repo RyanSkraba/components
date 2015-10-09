@@ -77,6 +77,6 @@ public interface ComponentDefinition extends TopLevelDefinition {
      * @return the path to the png resource or null if the type is not handled.
      */
 
-    public abstract String getPngImagePath(ComponentImageType imageType);
+    public String getPngImagePath(ComponentImageType imageType);
 
 }

@@ -4,9 +4,9 @@ import org.springframework.stereotype.Component;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentConnector;
+import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
-import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
 
@@ -23,7 +23,7 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     protected TestComponentProperties properties;
 
     @Override
-    public ComponentProperties createProperties() {
+    public ComponentProperties doCreateProperties() {
         return new TestComponentProperties();
     }
 
@@ -46,5 +46,14 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     public String getPngImagePath(ComponentImageType imageType) {
         return null;
     }
+
+    // @Override
+    // public URI getMavenGavUri() {
+    // try {
+    // return new URI("mvn:org.talend.components/components-api-test/0.1");
+    // } catch (URISyntaxException e) {
+    // throw new RuntimeException(e);// this should never happend if the url is properly formated.
+    // }
+    // }
 
 }

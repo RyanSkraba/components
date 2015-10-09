@@ -12,10 +12,12 @@
 // ============================================================================
 package org.talend.components.salesforce.test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-
-import junit.framework.TestCase;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -25,7 +27,11 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.internal.SpringApp;
-import org.talend.components.api.properties.*;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.NameAndLabel;
+import org.talend.components.api.properties.PresentationItem;
+import org.talend.components.api.properties.Repository;
+import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
@@ -34,12 +40,20 @@ import org.talend.components.api.service.LocalComponentTest;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
-import org.talend.components.salesforce.*;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.SalesforceConnectionWizard;
+import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
+import org.talend.components.salesforce.SalesforceInputOutputProperties;
+import org.talend.components.salesforce.SalesforceModuleListProperties;
+import org.talend.components.salesforce.SalesforceModuleProperties;
+import org.talend.components.salesforce.SalesforceRuntime;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
+
+import junit.framework.TestCase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -211,7 +225,8 @@ public class SalesforceLocalComponentTest extends TestCase {
         System.out.println(props);
         assertEquals(Form.MAIN, f.getName());
         Form af = props.getForm(Form.ADVANCED);
-        assertTrue(((PresentationItem) f.getChild("advanced")).getFormtoShow() == af);
+        assertTrue(((PresentationItem) f.getChild("advanced")).getFormtoShow() + " should be == to " + af,
+                ((PresentationItem) f.getChild("advanced")).getFormtoShow() == af);
     }
 
     @Test
@@ -411,11 +426,13 @@ public class SalesforceLocalComponentTest extends TestCase {
             System.out.println("check: " + row.get("Name") + " id: " + row.get("Id") + " post: " + row.get("BillingPostalCode")
                     + " st: " + " post: " + row.get("BillingStreet"));
             String check = (String) row.get("ShippingStreet");
-            if (check == null || !check.equals(TEST_KEY))
+            if (check == null || !check.equals(TEST_KEY)) {
                 continue;
+            }
             check = (String) row.get("BillingPostalCode");
-            if (check == null || !check.equals(random))
+            if (check == null || !check.equals(random)) {
                 continue;
+            }
             checkCount++;
             assertEquals("TestName", row.get("Name"));
             assertEquals("123 Main Street", row.get("BillingStreet"));
@@ -430,8 +447,9 @@ public class SalesforceLocalComponentTest extends TestCase {
             System.out.println("del: " + row.get("Name") + " id: " + row.get("Id") + " post: " + row.get("BillingPostalCode")
                     + " st: " + " post: " + row.get("BillingStreet"));
             String check = (String) row.get("ShippingStreet");
-            if (check == null || !check.equals(TEST_KEY))
+            if (check == null || !check.equals(TEST_KEY)) {
                 continue;
+            }
             ids.add((String) row.get("Id"));
         }
         return ids;
@@ -554,9 +572,11 @@ public class SalesforceLocalComponentTest extends TestCase {
         List<SchemaElement> properties = outputDef.getProperties();
         for (SchemaElement prop : properties) {
             if (!(prop instanceof ComponentProperties)) {
-                assertFalse("property [" + outputDef.getClass().getCanonicalName() + "/" + prop.getName()
-                        + "] should have a translated message key [property." + prop.getName()
-                        + ".displayName] in [ZE proper messages.property]", prop.getDisplayName().endsWith(".displayName"));
+                assertFalse(
+                        "property [" + outputDef.getClass().getCanonicalName() + "/" + prop.getName()
+                                + "] should have a translated message key [property." + prop.getName()
+                                + ".displayName] in [ZE proper messages.property]",
+                        prop.getDisplayName().endsWith(".displayName"));
             } // else the nested ComponentProperties should be tested separatly
         }
     }

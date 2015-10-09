@@ -7,8 +7,6 @@ import org.talend.components.api.properties.ComponentProperties;
  */
 public abstract class AbstractComponentDefinition extends AbstractTopLevelDefinition implements ComponentDefinition {
 
-    protected Class propertiesClass;
-
     private ComponentConnector[] connectors;
 
     public void setConnectors(ComponentConnector... conns) {
@@ -25,16 +23,19 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
         return "component."; //$NON-NLS-1$
     }
 
+    /**
+     * create the ComponentProperties instance and initialise it before returning it.
+     */
+    @Override
     public ComponentProperties createProperties() {
-        try {
-            return ((ComponentProperties)propertiesClass.newInstance()).init();
-        } catch (InstantiationException e) {
-            // FIXME - right exceptions
-            throw new RuntimeException(e.getCause());
-        } catch (IllegalAccessException e) {
-            // FIXME - right exceptions
-            throw new RuntimeException(e);
-        }
+        ComponentProperties compProp = doCreateProperties();
+        compProp.init();
+        return compProp;
     }
+
+    /**
+     * Shall be implemented to create the component properties
+     */
+    abstract protected ComponentProperties doCreateProperties();
 
 }

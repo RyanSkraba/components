@@ -3,9 +3,12 @@ package org.talend.components.api.properties;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 import org.talend.components.api.ComponentDesigner;
@@ -29,10 +32,10 @@ import com.cedarsoftware.util.io.JsonWriter;
  * include those for desktop (Eclipse), web, and scripting. All of these will use the code defined here for their
  * construction and validation.
  * <p/>
- * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement}, {@Link
- * PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface decisions are
- * made in code, methods can be added to the subclass to influence the flow of the user interface and help with
- * validation.
+ * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement},
+ * {@Link PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface
+ * decisions are made in code, methods can be added to the subclass to influence the flow of the user interface and help
+ * with validation.
  * <p/>
  * Each property can be a Java type, both simple types and collections are permitted. In addition,
  * {@code ComponentProperties} classes can be composed allowing hierarchies of properties and collections of properties
@@ -146,19 +149,19 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
      * the constructor. This is done so that things are executed in the right order.
      */
     public ComponentProperties init() {
-        initSubclass();
+        // init nested properties starting from the bottom ones
+        List<SchemaElement> properties = getProperties();
+        for (SchemaElement prop : properties) {
+            if (prop instanceof ComponentProperties) {
+                ((ComponentProperties) prop).init();
+            }
+        }
+        // initSubclass();
         setupLayout();
         for (Form form : getForms()) {
             refreshLayout(form);
         }
         return this;
-    }
-
-    /**
-     * Any subclass-specific initialization should override this method.
-     */
-    public void initSubclass() {
-        // Subclass me as required
     }
 
     // /**

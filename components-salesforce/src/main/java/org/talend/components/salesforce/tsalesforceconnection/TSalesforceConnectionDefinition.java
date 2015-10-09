@@ -21,7 +21,8 @@ import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceConnectionDefinition.COMPONENT_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceConnectionDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX
+        + TSalesforceConnectionDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceConnectionDefinition extends SalesforceDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceConnection"; //$NON-NLS-1$
@@ -33,7 +34,7 @@ public class TSalesforceConnectionDefinition extends SalesforceDefinition {
     }
 
     @Override
-    public ComponentProperties createProperties() {
+    public ComponentProperties doCreateProperties() {
         return new SalesforceConnectionProperties(null);
     }
 }

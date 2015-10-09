@@ -28,22 +28,28 @@ import org.talend.components.salesforce.SalesforceRuntime;
 import com.sforce.soap.partner.GetDeletedResult;
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceGetDeletedDefinition.COMPONENT_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceGetDeletedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX
+        + TSalesforceGetDeletedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceGetDeletedDefinition extends SalesforceDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceGetDeleted"; //$NON-NLS-1$
 
     public TSalesforceGetDeletedDefinition() {
         super(COMPONENT_NAME);
-        propertiesClass = TSalesforceGetDeletedProperties.class;
         setConnectors(new ComponentConnector(Type.FLOW, 1, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
                 new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
+    }
+
+    @Override
+    protected ComponentProperties doCreateProperties() {
+        return new TSalesforceGetDeletedProperties();
     }
 
     @Override
     public ComponentRuntime createRuntime() {
         return new SalesforceRuntime() {
 
+            @Override
             public void inputBegin(ComponentProperties props, ComponentRuntimeContainer container,
                     List<Map<String, Object>> values) throws Exception {
 
@@ -56,6 +62,7 @@ public class TSalesforceGetDeletedDefinition extends SalesforceDefinition {
                 // FIXME - finish this
             }
 
+            @Override
             public void inputEnd(ComponentProperties props, ComponentRuntimeContainer container, List<Map<String, Object>> values)
                     throws Exception {
 
