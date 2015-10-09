@@ -17,7 +17,6 @@ import org.talend.components.api.component.ComponentConnector;
 import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX
@@ -35,7 +34,7 @@ public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinitio
     }
 
     @Override
-    public ComponentProperties createProperties() {
+    public ComponentProperties doCreateProperties() {
         return new TSalesforceGetServerTimestampProperties(null);
     }
 

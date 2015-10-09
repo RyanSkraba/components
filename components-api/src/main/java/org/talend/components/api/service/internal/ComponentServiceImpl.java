@@ -185,12 +185,16 @@ public class ComponentServiceImpl implements ComponentService {
         return result;
     }
 
-    public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation, Schema schema) {
-        if (repository != null)
+    @Override
+    public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation,
+            Schema schema) {
+        if (repository != null) {
             return repository.storeComponentProperties(properties, name, repositoryLocation, schema);
+        }
         return null;
     }
 
+    @Override
     public void setRepository(Repository repository) {
         this.repository = repository;
     }

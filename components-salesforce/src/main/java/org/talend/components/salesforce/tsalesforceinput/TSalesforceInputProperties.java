@@ -17,9 +17,7 @@ import static org.talend.components.api.schema.SchemaFactory.*;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceInputOutputProperties;
-import org.talend.components.salesforce.SalesforceModuleProperties;
 
 public class TSalesforceInputProperties extends SalesforceInputOutputProperties {
 
@@ -48,12 +46,12 @@ public class TSalesforceInputProperties extends SalesforceInputOutputProperties 
     public SchemaElement columnNameDelimiter = newProperty("ColumnNameDelimiter"); //$NON-NLS-1$
 
     @Override
-    public void initSubclass() {
-        super.initSubclass();
+    public ComponentProperties init() {
         returns = setReturnsProperty();
         newReturnProperty(returns, SchemaElement.Type.INT, "NB_LINE");
         // FIXME - should use default value
         setValue(batchSize, 100);
+        return super.init();
     }
 
     @Override

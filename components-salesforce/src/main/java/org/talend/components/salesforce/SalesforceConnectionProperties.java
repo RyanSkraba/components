@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
+import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +34,8 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 public class SalesforceConnectionProperties extends ComponentProperties {
 
     public static final String URL = "https://www.salesforce.com/services/Soap/u/34.0";
-    public static final String OAUTH_URL =
-             "https://login.salesforce.com/services/oauth2";
 
+    public static final String OAUTH_URL = "https://login.salesforce.com/services/oauth2";
 
     //
     // Properties
@@ -85,13 +84,13 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
     public SalesforceConnectionProperties(String name, boolean includeName) {
         super(name);
-        if (!includeName)
+        if (!includeName) {
             name = null;
+        }
         List<String> loginTypes = new ArrayList<>();
         loginTypes.add(LOGIN_BASIC);
         loginTypes.add(LOGIN_OAUTH);
         loginType.setPossibleValues(loginTypes);
-        setupLayout();
     }
 
     @Override
