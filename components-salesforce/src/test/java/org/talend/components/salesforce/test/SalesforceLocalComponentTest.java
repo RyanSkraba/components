@@ -245,7 +245,6 @@ public class SalesforceLocalComponentTest extends TestCase {
             props = (SalesforceConnectionProperties) componentService
                     .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
         }
-        System.out.println("URI:" + props.getStringValue(props.url));
         ComponentProperties userPassword = (ComponentProperties) props.getProperty("userPassword");
         userPassword.setValue(userPassword.getProperty("userId"), userId);
         userPassword.setValue(userPassword.getProperty("password"), password);
@@ -288,7 +287,6 @@ public class SalesforceLocalComponentTest extends TestCase {
         props.setValue(props.loginType, SalesforceConnectionProperties.LOGIN_OAUTH);
         Form mainForm = props.getForm(Form.MAIN);
         props = (SalesforceConnectionProperties) checkAndAfter(mainForm, "loginType", props);
-        System.out.println("URI:" + props.getStringValue(props.url));
         props.oauth.setValue(props.oauth.clientId,
                 "3MVG9Y6d_Btp4xp6ParHznfCCUh0d9fU3LYcvd_hCXz3G3Owp4KvaDhNuEOrXJTBd09JMoPdZeDtNYxXZM4X2");
         props.oauth.setValue(props.oauth.clientSecret, "3545101463828280342");

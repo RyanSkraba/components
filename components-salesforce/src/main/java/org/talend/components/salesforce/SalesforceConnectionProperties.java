@@ -33,14 +33,17 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 @JsonRootName("salesforceConnectionProperties")
 public class SalesforceConnectionProperties extends ComponentProperties {
 
+    public static final String URL = "https://www.salesforce.com/services/Soap/u/34.0";
+    public static final String OAUTH_URL =
+             "https://login.salesforce.com/services/oauth2";
+
+
     //
     // Properties
     //
 
     // Only for the wizard use
     public SchemaElement name = newProperty("name").setRequired(true);
-
-    public SchemaElement url = newProperty("url").setRequired(true); //$NON-NLS-1$
 
     public static final String LOGIN_BASIC = "Basic";
 
@@ -120,7 +123,6 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         advancedForm.addRow(httpTraceMessage);
         advancedForm.addRow(clientId);
         advancedForm.addRow(timeout);
-        advancedForm.addRow(url);
         advancedForm.addRow(proxy.getForm(Form.MAIN));
         advanced.setFormtoShow(advancedForm);
         refreshLayout(advancedForm);
@@ -141,11 +143,9 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         if (form.getName().equals(Form.MAIN)) {
             if (LOGIN_OAUTH.equals(getValue(loginType))) {
                 form.getWidget("oauth").setVisible(true);
-                setValue(url, "https://login.salesforce.com/services/oauth2");
                 form.getWidget("userPassword").setVisible(false);
             } else if (LOGIN_BASIC.equals(getValue(loginType))) {
                 form.getWidget("oauth").setVisible(false);
-                setValue(url, "https://www.salesforce.com/services/Soap/u/34.0");
                 form.getWidget("userPassword").setVisible(true);
             } else {
                 throw new RuntimeException("Enum value should be handled :" + getValue(loginType));
