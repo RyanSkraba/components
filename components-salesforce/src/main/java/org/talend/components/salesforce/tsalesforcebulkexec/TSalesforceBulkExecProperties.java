@@ -35,11 +35,6 @@ public class TSalesforceBulkExecProperties extends TSalesforceOutputProperties {
 
     public SchemaElement waitTimeCheckBatchState = newProperty(Type.INT, "waitTimeCheckBatchState");
 
-    public TSalesforceBulkExecProperties(String name) {
-        super();
-        setupLayout();
-    }
-
     @Override
     public TSalesforceOutputProperties init() {
         List<String> l = new ArrayList<>();
@@ -51,12 +46,12 @@ public class TSalesforceBulkExecProperties extends TSalesforceOutputProperties {
 
     @Override
     public void setupLayout() {
+        super.setupLayout();
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(bulkFilePath);
         mainForm.addRow(concurrencyMode);
         mainForm.addRow(bytesToCommit);
         mainForm.addRow(waitTimeCheckBatchState);
-        refreshLayout(mainForm);
     }
 
 }

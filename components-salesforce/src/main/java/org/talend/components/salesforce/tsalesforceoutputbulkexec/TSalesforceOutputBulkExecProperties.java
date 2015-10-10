@@ -27,6 +27,7 @@ public class TSalesforceOutputBulkExecProperties extends ComponentProperties {
     public SalesforceModuleProperties module = new SalesforceModuleProperties("module", connection); //$NON-NLS-1$
 
     @Override public void setupLayout() {
+        super.setupLayout();
         Form mainForm = Form.create(this, Form.MAIN, "Salesforce Input");
         mainForm.addRow(connection.getForm(Form.MAIN));
         mainForm.addRow(module.getForm(Form.REFERENCE));

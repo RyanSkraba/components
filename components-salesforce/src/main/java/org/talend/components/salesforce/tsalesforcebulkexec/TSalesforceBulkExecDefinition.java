@@ -34,6 +34,6 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition {
 
     @Override
     public ComponentProperties doCreateProperties() {
-        return new TSalesforceBulkExecProperties(null);
+        return new TSalesforceBulkExecProperties();
     }
 }
