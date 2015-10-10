@@ -40,30 +40,24 @@ public class TSalesforceGetDeletedDefinition extends SalesforceDefinition {
                 new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
 
-    @Override
-    protected ComponentProperties doCreateProperties() {
+    @Override protected ComponentProperties doCreateProperties() {
         return new TSalesforceGetDeletedProperties();
     }
 
-    @Override
-    public ComponentRuntime createRuntime() {
+    @Override public ComponentRuntime createRuntime() {
         return new SalesforceRuntime() {
 
-            @Override
-            public void inputBegin(ComponentProperties props, ComponentRuntimeContainer container,
-                    List<Map<String, Object>> values) throws Exception {
+            @Override public void inputBegin(ComponentProperties props, ComponentRuntimeContainer container, List<Map<String, Object>> values) throws Exception {
 
                 TSalesforceGetDeletedProperties gdProps = (TSalesforceGetDeletedProperties) props;
                 String module = gdProps.module.getStringValue(gdProps.module.moduleName);
 
-                GetDeletedResult result = getDeleted(module, gdProps.getCalendarValue(gdProps.startDate),
-                        gdProps.getCalendarValue(gdProps.endDate));
+                GetDeletedResult result = getDeleted(module, gdProps.getCalendarValue(gdProps.startDate), gdProps.getCalendarValue(gdProps.endDate));
 
                 // FIXME - finish this
             }
 
-            @Override
-            public void inputEnd(ComponentProperties props, ComponentRuntimeContainer container, List<Map<String, Object>> values)
+            @Override public void inputEnd(ComponentProperties props, ComponentRuntimeContainer container, List<Map<String, Object>> values)
                     throws Exception {
 
             }

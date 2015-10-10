@@ -26,16 +26,11 @@ public class TSalesforceGetServerTimestampProperties extends ComponentProperties
 
     public SalesforceModuleProperties module = new SalesforceModuleProperties("module", connection); //$NON-NLS-1$
 
-    public TSalesforceGetServerTimestampProperties(String name) {
-        super(name);
-        setupLayout();
-    }
-
-    @Override public void setupLayout() {
-        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Input");
+    @Override
+    public void setupLayout() {
+        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Get Server Timestamp");
         mainForm.addRow(connection.getForm(Form.MAIN));
         mainForm.addRow(module.getForm(Form.REFERENCE));
-        refreshLayout(mainForm);
     }
 
 }

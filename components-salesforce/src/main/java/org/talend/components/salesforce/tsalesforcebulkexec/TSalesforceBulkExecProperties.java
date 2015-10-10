@@ -12,40 +12,50 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcebulkexec;
 
-import static org.talend.components.api.schema.SchemaFactory.newReturnProperty;
-import static org.talend.components.api.schema.SchemaFactory.setReturnsProperty;
+import static org.talend.components.api.schema.SchemaFactory.newProperty;
 
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
-import org.talend.components.salesforce.SalesforceModuleProperties;
+import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 
-public class TSalesforceBulkExecProperties extends ComponentProperties {
+import java.util.ArrayList;
+import java.util.List;
 
-    // FIXME - essentially identical to TSalesforceOutputProperties with a few more
+public class TSalesforceBulkExecProperties extends TSalesforceOutputProperties {
 
-    public SchemaElement bulkFilePath;
-    public SchemaElement concurrencyMode;
-    public SchemaElement bytesToCommit;
-    public SchemaElement waitTimeCheckBatchState;
+    public static final String CONCURRENCY_PARALLEL = "Parallel";
 
-    //
-    // Collections
-    //
-    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection"); //$NON-NLS-1$
+    public static final String CONCURRENCY_SERIAL = "Serial";
 
-    public SalesforceModuleProperties module = new SalesforceModuleProperties("module", connection); //$NON-NLS-1$
+    public SchemaElement bulkFilePath = newProperty("bulkFilePath");
+
+    public SchemaElement concurrencyMode = newProperty(Type.ENUM, "concurrencyMode");
+
+    public SchemaElement bytesToCommit = newProperty(Type.INT, "bytesToCommit");
+
+    public SchemaElement waitTimeCheckBatchState = newProperty(Type.INT, "waitTimeCheckBatchState");
 
     public TSalesforceBulkExecProperties(String name) {
-        super(name);
+        super();
         setupLayout();
     }
 
-    @Override public void setupLayout() {
-        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Input");
-        mainForm.addRow(connection.getForm(Form.MAIN));
-        mainForm.addRow(module.getForm(Form.REFERENCE));
+    @Override
+    public TSalesforceOutputProperties init() {
+        List<String> l = new ArrayList<>();
+        l.add(CONCURRENCY_PARALLEL);
+        l.add(CONCURRENCY_SERIAL);
+        concurrencyMode.setPossibleValues(l);
+        return this;
+    }
+
+    @Override
+    public void setupLayout() {
+        Form mainForm = getForm(Form.MAIN);
+        mainForm.addRow(bulkFilePath);
+        mainForm.addRow(concurrencyMode);
+        mainForm.addRow(bytesToCommit);
+        mainForm.addRow(waitTimeCheckBatchState);
         refreshLayout(mainForm);
     }
 
