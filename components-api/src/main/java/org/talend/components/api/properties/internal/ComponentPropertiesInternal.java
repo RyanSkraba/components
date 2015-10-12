@@ -26,7 +26,7 @@ public class ComponentPropertiesInternal {
 
     public ComponentPropertiesInternal() {
         forms = new ArrayList<Form>();
-        propertyValues = new HashMap();
+        propertyValues = new HashMap<>();
     }
 
     public List<Form> getForms() {

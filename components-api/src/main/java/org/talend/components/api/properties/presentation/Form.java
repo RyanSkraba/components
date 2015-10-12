@@ -96,7 +96,7 @@ public class Form extends SimpleNamedThing {
     }
 
     public List<NamedThing> getChildren() {
-        List<NamedThing> l = new ArrayList();
+        List<NamedThing> l = new ArrayList<>();
         l.addAll(children.values());
         return l;
     }

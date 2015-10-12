@@ -14,6 +14,7 @@ package org.talend.components.api.service.testcomponent;
 
 import org.springframework.stereotype.Component;
 import org.talend.components.api.Constants;
+import org.talend.components.api.context.GlobalContext;
 import org.talend.components.api.wizard.AbstractComponentWizardDefintion;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.WizardImageType;
@@ -35,7 +36,7 @@ public class TestComponentWizardDefinition extends AbstractComponentWizardDefint
 
     @Override
     public ComponentWizard createWizard(String location) {
-        return new TestComponentWizard(location, globalContext.i18nMessageProvider);
+        return new TestComponentWizard(location, GlobalContext.i18nMessageProvider);
     }
 
 }

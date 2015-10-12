@@ -217,7 +217,7 @@ public class SalesforceRuntime extends ComponentRuntime {
     }
 
     public List<NameAndLabel> getModuleNames() throws ConnectionException {
-        List<NameAndLabel> returnList = new ArrayList();
+        List<NameAndLabel> returnList = new ArrayList<>();
         DescribeGlobalResult result = connection.describeGlobal();
         DescribeGlobalSObjectResult[] objects = result.getSobjects();
         for (DescribeGlobalSObjectResult obj : objects) {
@@ -302,7 +302,7 @@ public class SalesforceRuntime extends ComponentRuntime {
          * specified in the schema.
          */
         if (dynamicField != null) {
-            List<SchemaElement> filteredDynamicFields = new ArrayList();
+            List<SchemaElement> filteredDynamicFields = new ArrayList<>();
             Schema dynSchema = getSchema(sprops.module.getStringValue(sprops.module.moduleName));
 
             for (SchemaElement se : dynSchema.getRoot().getChildren()) {
@@ -315,7 +315,7 @@ public class SalesforceRuntime extends ComponentRuntime {
             container.setDynamicElements(dynamicFieldList.toArray(new SchemaElement[] {}));
         }
 
-        inputFieldsToUse = new ArrayList();
+        inputFieldsToUse = new ArrayList<>();
         inputFieldsToUse.addAll(fieldList);
         if (dynamicFieldList != null)
             inputFieldsToUse.addAll(dynamicFieldList);
@@ -341,10 +341,10 @@ public class SalesforceRuntime extends ComponentRuntime {
         QueryResult result = query(queryText, sprops.getIntValue(sprops.batchSize));
         SObject[] records = result.getRecords();
         for (SObject record : records) {
-            Iterator it = record.getChildren();
-            Map<String, Object> columns = new HashMap();
+            Iterator<XmlObject> it = record.getChildren();
+            Map<String, Object> columns = new HashMap<>();
             while (it.hasNext()) {
-                XmlObject obj = (XmlObject) it.next();
+                XmlObject obj = it.next();
                 columns.put(obj.getName().getLocalPart(), obj.getValue());
             }
             values.add(columns);
@@ -415,6 +415,9 @@ public class SalesforceRuntime extends ComponentRuntime {
                 case UPSERT:
                     upsert(so);
                     break;
+                case DELETE:
+                    // See below
+                    throw new RuntimeException("Impossible");
                 }
             } else { // DELETE
                 String id = getIdValue(row);

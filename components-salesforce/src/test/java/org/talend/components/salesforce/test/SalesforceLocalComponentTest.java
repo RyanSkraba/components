@@ -113,7 +113,7 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     @Test
     public void testWizard() throws Throwable {
-        final List<RepoProps> repoProps = new ArrayList();
+        final List<RepoProps> repoProps = new ArrayList<>();
 
         Repository repo = new Repository() {
 
@@ -177,8 +177,9 @@ public class SalesforceLocalComponentTest extends TestCase {
         assertTrue(modForm.isCallBeforeFormPresent());
         mlProps = (SalesforceModuleListProperties) componentService.beforeFormPresent(modForm.getName(), mlProps);
         System.out.println(mlProps.getValue(mlProps.moduleName));
+        @SuppressWarnings("unchecked")
         List<NameAndLabel> all = (List<NameAndLabel>) mlProps.getValue(mlProps.moduleName);
-        List<NameAndLabel> selected = new ArrayList();
+        List<NameAndLabel> selected = new ArrayList<>();
         selected.add(all.get(0));
         selected.add(all.get(2));
         selected.add(all.get(3));
@@ -379,22 +380,22 @@ public class SalesforceLocalComponentTest extends TestCase {
         SalesforceRuntime runtime = new SalesforceRuntime();
         runtime.connect(props.connection);
 
-        Map<String, Object> row = new HashMap();
+        Map<String, Object> row = new HashMap<>();
 
         int count = 10;
         List<Map<String, Object>> outputRows = makeRows(count);
         writeRows(runtime, props, outputRows);
 
-        List<Map<String, Object>> rows = new ArrayList();
+        List<Map<String, Object>> rows = new ArrayList<>();
         runtime.input(props, null, rows);
         checkRows(rows, count);
         deleteRows(runtime, rows);
     }
 
     protected List<Map<String, Object>> makeRows(int count) {
-        List<Map<String, Object>> outputRows = new ArrayList();
+        List<Map<String, Object>> outputRows = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            Map<String, Object> row = new HashMap();
+            Map<String, Object> row = new HashMap<>();
             row.put("Name", "TestName");
             row.put("ShippingStreet", TEST_KEY);
             row.put("ShippingPostalCode", Integer.toString(i));
@@ -445,7 +446,7 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     protected List<Map<String, Object>> readAndCheckRows(SalesforceRuntime runtime, SalesforceInputOutputProperties props,
             int count) throws Exception {
-        List<Map<String, Object>> inputRows = new ArrayList();
+        List<Map<String, Object>> inputRows = new ArrayList<>();
         TSalesforceInputProperties inputProps = (TSalesforceInputProperties) componentService
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         inputProps.connection = props.connection;
@@ -555,11 +556,11 @@ public class SalesforceLocalComponentTest extends TestCase {
         SalesforceRuntime runtime = new SalesforceRuntime();
         runtime.connect(props.connection);
 
-        Map<String, Object> row = new HashMap();
+        Map<String, Object> row = new HashMap<>();
         row.put("Name", "TestName");
         row.put("BillingStreet", "123 Main Street");
         row.put("BillingState", "CA");
-        List<Map<String, Object>> outputRows = new ArrayList();
+        List<Map<String, Object>> outputRows = new ArrayList<>();
         outputRows.add(row);
 
     }

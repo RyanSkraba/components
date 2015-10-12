@@ -58,7 +58,7 @@ public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinitio
                 Schema column = (Schema) gdProps.module.schema.getValue(gdProps.module.schema.schema);
 
                 Calendar result = getServerTimestamp();
-                Map<String, Object> map = new HashMap();
+                Map<String, Object> map = new HashMap<>();
                 // FIXME - error checking - what if there are no columns
                 map.put(column.getRoot().getChildren().get(0).getName(), result);
             }

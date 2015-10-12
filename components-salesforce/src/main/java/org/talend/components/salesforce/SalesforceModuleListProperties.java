@@ -17,7 +17,6 @@ import static org.talend.components.api.schema.SchemaFactory.*;
 
 import java.util.List;
 
-import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.NameAndLabel;
 import org.talend.components.api.properties.ValidationResult;
@@ -27,15 +26,12 @@ import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
-import org.talend.components.common.SchemaProperties;
 
 public class SalesforceModuleListProperties extends ComponentProperties {
 
     private SalesforceConnectionProperties connectionProps;
 
     private String repositoryLocation;
-
-    private I18nMessageProvider messageProvider;
 
     private List<NameAndLabel> moduleNames;
 
@@ -72,7 +68,6 @@ public class SalesforceModuleListProperties extends ComponentProperties {
     }
 
     public void afterFormFinishMain() throws Exception {
-        SchemaProperties schemaProps = new SchemaProperties(null);
         SalesforceRuntime conn = new SalesforceRuntime();
         ValidationResult vr = conn.connectWithResult(connectionProps);
         if (vr.getStatus() != ValidationResult.Result.OK) {
@@ -85,6 +80,7 @@ public class SalesforceModuleListProperties extends ComponentProperties {
         String connRepLocation = service.storeComponentProperties(connectionProps,
                 (String) connectionProps.getValue(connectionProps.name), repositoryLocation, null);
 
+        @SuppressWarnings("unchecked")
         List<NameAndLabel> selectedModuleNames = (List<NameAndLabel>) getValue(moduleName);
         for (NameAndLabel nl : selectedModuleNames) {
             SalesforceModuleProperties modProps = new SalesforceModuleProperties(null, connectionProps);

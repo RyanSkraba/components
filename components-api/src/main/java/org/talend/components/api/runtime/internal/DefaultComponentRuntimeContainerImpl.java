@@ -12,7 +12,7 @@ import org.talend.components.api.schema.SchemaElement;
  */
 public class DefaultComponentRuntimeContainerImpl implements ComponentRuntimeContainer {
 
-    private Map<String, Object> globalMap = new HashMap();
+    private Map<String, Object> globalMap = new HashMap<>();
 
     public Map<String, Object> getGlobalMap() {
         return globalMap;

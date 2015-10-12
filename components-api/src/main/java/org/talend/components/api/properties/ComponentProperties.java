@@ -3,11 +3,7 @@ package org.talend.components.api.properties;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -233,7 +229,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     // we need to document that we can't use subclasses to add additional properties from the parent
     // class - we can only extent by composition, not inheritance.
     public List<SchemaElement> getProperties() {
-        List<SchemaElement> properties = new ArrayList();
+        List<SchemaElement> properties = new ArrayList<>();
         Field[] fields = getClass().getFields();
         for (Field f : fields) {
             if (SchemaElement.class.isAssignableFrom(f.getType())) {
@@ -278,10 +274,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
 
     public boolean getBooleanValue(SchemaElement property) {
         Boolean value = (Boolean) getValue(property);
-        if (value == null || !value) {
-            return false;
-        }
-        return true;
+        return !(value == null || !value);
     }
 
     public String getStringValue(SchemaElement property) {
@@ -538,12 +531,12 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     }
 
     @Override
-    public Class getEnumClass() {
+    public Class<?> getEnumClass() {
         return null;
     }
 
     @Override
-    public SchemaElement setEnumClass(Class enumClass) {
+    public SchemaElement setEnumClass(Class<?> enumClass) {
         throw new RuntimeException("Cannot be used here");
     }
 
@@ -579,7 +572,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
 
     @Override
     public Map<String, SchemaElement> getChildMap() {
-        Map<String, SchemaElement> map = new HashMap();
+        Map<String, SchemaElement> map = new HashMap<>();
         for (SchemaElement se : getChildren()) {
             map.put(se.getName(), se);
         }

@@ -1,6 +1,5 @@
 package org.talend.components.api.schema;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -75,9 +74,9 @@ public interface SchemaElement extends NamedThing {
 
     public SchemaElement setNullable(boolean nullable);
 
-    public Class getEnumClass();
+    public Class<?> getEnumClass();
 
-    public SchemaElement setEnumClass(Class enumClass);
+    public SchemaElement setEnumClass(Class<?> enumClass);
 
     public List<?> getPossibleValues();
 

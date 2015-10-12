@@ -1,7 +1,6 @@
 package org.talend.components.api.properties;
 
 import org.talend.components.api.schema.Schema;
-import org.talend.components.api.schema.SchemaElement;
 
 /**
  * A design-time interface to the repository to allow {@link ComponentProperties} to be stored.

@@ -185,12 +185,12 @@ public abstract class AbstractSchemaElement extends SimpleNamedThing implements 
     }
 
     @Override
-    public Class getEnumClass() {
+    public Class<?> getEnumClass() {
         return enumClass;
     }
 
     @Override
-    public SchemaElement setEnumClass(Class enumClass) {
+    public SchemaElement setEnumClass(Class<?> enumClass) {
         this.enumClass = enumClass;
         return this;
     }
@@ -239,7 +239,7 @@ public abstract class AbstractSchemaElement extends SimpleNamedThing implements 
 
     @Override
     public Map<String, SchemaElement> getChildMap() {
-        Map<String, SchemaElement> map = new HashMap();
+        Map<String, SchemaElement> map = new HashMap<>();
         for (SchemaElement se : getChildren()) {
             map.put(se.getName(), se);
         }

@@ -16,6 +16,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +30,10 @@ import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
-import org.talend.components.api.service.testcomponent.NestedComponentProperties;
-import org.talend.components.api.service.testcomponent.TestComponentDefinition;
-import org.talend.components.api.service.testcomponent.TestComponentProperties;
-import org.talend.components.api.service.testcomponent.TestComponentWizard;
-import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
+import org.talend.components.api.service.testcomponent.*;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
-
-import junit.framework.TestCase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -128,7 +124,7 @@ public class LocalComponentTest extends TestCase {
 
     @Test(expected = ComponentException.class)
     public void testGetWizardNotFound() {
-        ComponentWizard wizard = componentService.getComponentWizard("not found", "userdata");
+        componentService.getComponentWizard("not found", "userdata");
     }
 
     @Test
