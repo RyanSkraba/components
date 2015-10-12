@@ -16,10 +16,10 @@ public class SalesforceConnectionWizard extends ComponentWizard {
         SalesforceConnectionProperties cProps = new SalesforceConnectionProperties("SalesforceConnectionProperties",
                 SalesforceConnectionProperties.INCLUDE_NAME);
         cProps.init();
-        addForm(cProps.getForm(Form.MAIN));
+        addForm(cProps.getForm(SalesforceConnectionProperties.FORM_WIZARD));
 
         mProps = new SalesforceModuleListProperties(null, cProps, getRepositoryLocation());
-        cProps.init();
+        mProps.init();
         addForm(mProps.getForm(Form.MAIN));
     }
 

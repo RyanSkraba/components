@@ -27,7 +27,6 @@ import org.talend.components.common.SchemaProperties;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 
-@JsonRootName("salesforceModuleProperties")
 public class SalesforceModuleProperties extends ComponentProperties {
 
     private SalesforceConnectionProperties connection;
@@ -37,7 +36,7 @@ public class SalesforceModuleProperties extends ComponentProperties {
     //
     public SchemaElement moduleName = newProperty("moduleName"); //$NON-NLS-1$
 
-    public SchemaProperties schema = new SchemaProperties("shema"); //$NON-NLS-1$
+    public SchemaProperties schema = new SchemaProperties().init(); //$NON-NLS-1$
 
     // FIXME - OK what about if we are using a connection from a separate component
     // that defines the connection, how do we get that separate component?

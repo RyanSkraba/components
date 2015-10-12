@@ -53,6 +53,8 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     String password;
 
+    String securityKey;
+
     // Used to make sure we have our own data
     String random;
 
@@ -65,10 +67,12 @@ public class SalesforceLocalComponentTest extends TestCase {
         random = Integer.toString(ThreadLocalRandom.current().nextInt(1, 100000));
         if (inChina) {
             userId = "bchen2@talend.com";
-            password = "talend123sfYYBBe4aZN0TcDVDV7Ylzb6Ku";
+            password = "talend123sf";
+            securityKey = "YYBBe4aZN0TcDVDV7Ylzb6Ku";
         } else {
             userId = "fupton@talend.com";
-            password = "talendsal99QSCzLBQgrkEq9w9EXiOt1BSy";
+            password = "talendsal99";
+            securityKey = "QSCzLBQgrkEq9w9EXiOt1BSy";
         }
 
     }
@@ -130,10 +134,10 @@ public class SalesforceLocalComponentTest extends TestCase {
         };
         componentService.setRepository(repo);
 
-        Set<ComponentWizardDefinition> props = componentService.getTopLevelComponentWizards();
+        Set<ComponentWizardDefinition> wizards = componentService.getTopLevelComponentWizards();
         int count = 0;
         ComponentWizardDefinition wizardDef = null;
-        for (ComponentWizardDefinition wizardDefinition : props) {
+        for (ComponentWizardDefinition wizardDefinition : wizards) {
             if (wizardDefinition instanceof SalesforceConnectionWizardDefinition) {
                 wizardDef = wizardDefinition;
                 count++;
@@ -146,8 +150,18 @@ public class SalesforceLocalComponentTest extends TestCase {
         assertEquals("nodeSalesforce", wiz.getRepositoryLocation());
         assertTrue(wiz instanceof SalesforceConnectionWizard);
         List<Form> forms = wiz.getForms();
-        assertEquals("Main", forms.get(0).getName());
+        Form connFormWizard = forms.get(0);
+        assertEquals("Wizard", connFormWizard.getName());
+        // Main from SalesforceModuleListProperties
         assertEquals("Main", forms.get(1).getName());
+        assertEquals("Salesforce Connection Settings", connFormWizard.getTitle());
+        assertEquals("Complete these fields in order to connect to your Salesforce account.", connFormWizard.getSubtitle());
+
+        SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connFormWizard.getProperties();
+
+        Form af = connProps.getForm(Form.ADVANCED);
+        assertTrue(((PresentationItem) connFormWizard.getChild("advanced")).getFormtoShow() + " should be == to " + af,
+                ((PresentationItem) connFormWizard.getChild("advanced")).getFormtoShow() == af);
 
         Object image = componentService.getWizardPngImage(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
                 WizardImageType.TREE_ICON_16X16);
@@ -157,16 +171,14 @@ public class SalesforceLocalComponentTest extends TestCase {
         assertNotNull(image);
 
         // check password i18n
-        Form connForm = forms.get(0);
-        SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connForm.getProperties();
         assertEquals("Name", connProps.getProperty("name").getDisplayName());
         connProps.setValue(connProps.name, "connName");
         setupProps(connProps);
-        Form userPassword = (Form) connForm.getChild("userPassword");
+        Form userPassword = (Form) connFormWizard.getChild("userPassword");
         SchemaElement passwordSe = (SchemaElement) userPassword.getChild("password");
         assertEquals("Password", passwordSe.getDisplayName());
         // check name i18n
-        NamedThing nameProp = connForm.getChild("name"); //$NON-NLS-1$
+        NamedThing nameProp = connFormWizard.getChild("name"); //$NON-NLS-1$
         assertEquals("Name", nameProp.getDisplayName());
 
         Form modForm = forms.get(1);
@@ -213,9 +225,6 @@ public class SalesforceLocalComponentTest extends TestCase {
         System.out.println(f);
         System.out.println(props);
         assertEquals(Form.MAIN, f.getName());
-        Form af = props.getForm(Form.ADVANCED);
-        assertTrue(((PresentationItem) f.getChild("advanced")).getFormtoShow() + " should be == to " + af,
-                ((PresentationItem) f.getChild("advanced")).getFormtoShow() == af);
     }
 
     @Test
@@ -231,7 +240,6 @@ public class SalesforceLocalComponentTest extends TestCase {
         assertEquals(SalesforceConnectionProperties.LOGIN_BASIC, props.getValue(loginType));
         Form mainForm = props.getForm(Form.MAIN);
         assertEquals("Salesforce Connection Settings", mainForm.getTitle());
-        assertEquals("Complete these fields in order to connect to your Salesforce account.", mainForm.getSubtitle());
         assertTrue(mainForm.getWidget("userPassword").isVisible());
         assertFalse(mainForm.getWidget("oauth").isVisible());
 
@@ -252,6 +260,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         ComponentProperties userPassword = (ComponentProperties) props.getProperty("userPassword");
         userPassword.setValue(userPassword.getProperty("userId"), userId);
         userPassword.setValue(userPassword.getProperty("password"), password);
+        userPassword.setValue(userPassword.getProperty("securityKey"), securityKey);
         return props;
     }
 

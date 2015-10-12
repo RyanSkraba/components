@@ -24,10 +24,14 @@ public class ProxyProperties extends ComponentProperties {
 
     public SchemaElement host = newProperty("host").setRequired(true); //$NON-NLS-1$
 
-    public UserPasswordProperties userPassword = new UserPasswordProperties("userPassword"); //$NON-NLS-1$
+    public UserPasswordProperties userPassword = new UserPasswordProperties(); //$NON-NLS-1$
 
-    public ProxyProperties(String name) {
-        super(name);
+    public ProxyProperties() {
+        super("proxyProperties");
+    }
+
+    public void setupLayout() {
+        super.setupLayout();
         Form form = Form.create(this, Form.MAIN, "Proxy Parameters");
         form.addRow(useProxy);
         form.addRow(host);

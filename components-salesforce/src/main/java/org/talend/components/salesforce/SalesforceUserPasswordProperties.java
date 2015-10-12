@@ -10,34 +10,26 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.common;
+package org.talend.components.salesforce;
 
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.schema.SchemaFactory.newProperty;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
+import org.talend.components.common.UserPasswordProperties;
 
-@JsonRootName("userPasswordProperties")
-public class UserPasswordProperties extends ComponentProperties {
+public class SalesforceUserPasswordProperties extends UserPasswordProperties {
 
-    public SchemaElement userId = newProperty("userId").setRequired(true); //$NON-NLS-1$
-
-    // FIXME - this needs to be encrypted, need to think about how to handle that
-    public SchemaElement password = newProperty("password").setRequired(true); //$NON-NLS-1$
-
-    public UserPasswordProperties() {
-        super("userPassword");
-    }
+    public SchemaElement securityKey = newProperty("securityKey").setRequired(true); //$NON-NLS-1$
 
     @Override
     protected void setupLayout() {
         super.setupLayout();
-        Form form = Form.create(this, Form.MAIN, "User Password");
-        form.addRow(userId);
-        form.addRow(password);
+        Form form = getForm(Form.MAIN);
+        form.addColumn(securityKey);
     }
 
 }

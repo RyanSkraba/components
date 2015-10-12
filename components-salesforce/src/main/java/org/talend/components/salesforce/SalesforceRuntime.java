@@ -174,7 +174,8 @@ public class SalesforceRuntime extends ComponentRuntime {
     public void connect(final SalesforceConnectionProperties properties) throws ConnectionException, AsyncApiException {
         ConnectorConfig config = new ConnectorConfig();
         config.setUsername(properties.userPassword.getStringValue(properties.userPassword.userId));
-        config.setPassword(properties.userPassword.getStringValue(properties.userPassword.password));
+        config.setPassword(properties.userPassword.getStringValue(properties.userPassword.password)
+                + properties.userPassword.getStringValue(properties.userPassword.securityKey));
 
         // Notes on how to test this
         // http://thysmichels.com/2014/02/15/salesforce-wsc-partner-connection-session-renew-when-session-timeout/

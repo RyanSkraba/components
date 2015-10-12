@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.presentation.Widget.*;
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.schema.SchemaFactory.newProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,6 @@ import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget.WidgetType;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.common.ProxyProperties;
-import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.common.oauth.OauthProperties;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
@@ -36,6 +35,8 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     public static final String URL = "https://www.salesforce.com/services/Soap/u/34.0";
 
     public static final String OAUTH_URL = "https://login.salesforce.com/services/oauth2";
+
+    public static final String FORM_WIZARD = "Wizard";
 
     //
     // Properties
@@ -70,11 +71,11 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     //
     // Nested property collections
     //
-    public OauthProperties oauth = new OauthProperties("oauth"); //$NON-NLS-1$
+    public OauthProperties oauth = new OauthProperties();
 
-    public UserPasswordProperties userPassword = new UserPasswordProperties("userPassword"); //$NON-NLS-1$
+    public SalesforceUserPasswordProperties userPassword = new SalesforceUserPasswordProperties();
 
-    public ComponentProperties proxy = new ProxyProperties("proxy"); //$NON-NLS-1$
+    public ComponentProperties proxy = new ProxyProperties();
 
     public static final boolean INCLUDE_NAME = true;
 
@@ -93,28 +94,29 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         loginType.setPossibleValues(loginTypes);
     }
 
-    @Override
-    protected void setupLayout() {
+    @Override protected void setupLayout() {
         super.setupLayout();
 
         setValue(loginType, LOGIN_BASIC);
 
-        Form connectionForm = Form.create(this, Form.MAIN, getI18nMessage("property.form.Main.title"));
-        connectionForm.setSubtitle(getI18nMessage("property.form.Main.subtitle"));
-
-        if (name != null) {
-            connectionForm.addRow(name);
-        }
-
-        connectionForm.addRow(widget(loginType).setDeemphasize(true));
+        Form wizardForm = Form.create(this, FORM_WIZARD, getI18nMessage("property.form.Main.title"));
+        wizardForm.setSubtitle(getI18nMessage("property.form.Main.subtitle"));
+        wizardForm.addRow(name);
+        wizardForm.addRow(widget(loginType).setDeemphasize(true));
 
         // Only one of these is visible at a time
-        connectionForm.addRow(oauth.getForm(Form.MAIN));
-        connectionForm.addRow(userPassword.getForm(Form.MAIN));
+        wizardForm.addRow(oauth.getForm(Form.MAIN));
+        wizardForm.addRow(userPassword.getForm(Form.MAIN));
 
-        connectionForm.addRow(widget(advanced).setWidgetType(WidgetType.BUTTON));
-        connectionForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
-        refreshLayout(connectionForm);
+        wizardForm.addRow(widget(advanced).setWidgetType(WidgetType.BUTTON));
+        wizardForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
+
+        Form mainForm = Form.create(this, Form.MAIN, getI18nMessage("property.form.Main.title"));
+        mainForm.addRow(widget(loginType).setDeemphasize(true));
+        // Only one of these is visible at a time
+        mainForm.addRow(oauth.getForm(Form.MAIN));
+        mainForm.addRow(userPassword.getForm(Form.MAIN));
+        mainForm.addRow(widget(testConnection).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
 
         Form advancedForm = Form.create(this, Form.ADVANCED, getI18nMessage("property.form.Advanced.title"));
         advancedForm.addRow(bulkConnection);
@@ -124,11 +126,11 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         advancedForm.addRow(timeout);
         advancedForm.addRow(proxy.getForm(Form.MAIN));
         advanced.setFormtoShow(advancedForm);
-        refreshLayout(advancedForm);
     }
 
     public void afterLoginType() {
         refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(FORM_WIZARD));
     }
 
     public ValidationResult validateTestConnection() throws Exception {
@@ -136,10 +138,9 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         return conn.connectWithResult(this);
     }
 
-    @Override
-    public void refreshLayout(Form form) {
+    @Override public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        if (form.getName().equals(Form.MAIN)) {
+        if (form.getName().equals(Form.MAIN) || form.getName().equals(FORM_WIZARD)) {
             if (LOGIN_OAUTH.equals(getValue(loginType))) {
                 form.getWidget("oauth").setVisible(true);
                 form.getWidget("userPassword").setVisible(false);

@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.properties.presentation.Widget.*;
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.schema.SchemaFactory.newProperty;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
@@ -33,10 +33,19 @@ public class SchemaProperties extends ComponentProperties {
     // FIXME - change to Schema
     public SchemaElement schema = newProperty(SchemaElement.Type.SCHEMA, "schema"); //$NON-NLS-1$
 
+    public SchemaProperties() {
+        super("schema");
+    }
+
     public SchemaProperties(String name) {
         super(name);
+    }
+
+    @Override
+    public SchemaProperties init() {
+        super.init();
         setValue(schema, SchemaFactory.newSchema());
-        setupLayout();
+        return this;
     }
 
     @Override
@@ -45,11 +54,9 @@ public class SchemaProperties extends ComponentProperties {
 
         Form schemaForm = Form.create(this, Form.MAIN, "Schema"); //$NON-NLS-1$
         schemaForm.addRow(widget(schema).setWidgetType(Widget.WidgetType.SCHEMA_EDITOR));
-        refreshLayout(schemaForm);
 
         Form schemaRefForm = Form.create(this, Form.REFERENCE, "Schema"); //$NON-NLS-1$
         schemaRefForm.addRow(widget(schema).setWidgetType(Widget.WidgetType.SCHEMA_REFERENCE));
-        refreshLayout(schemaRefForm);
     }
 
     @Override
