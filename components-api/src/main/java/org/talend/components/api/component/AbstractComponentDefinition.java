@@ -38,4 +38,32 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
      */
     abstract protected ComponentProperties doCreateProperties();
 
+
+    //
+    // DI Flags - default definitions
+    //
+
+    public boolean isSchemaAutoPropagate() {
+        return false;
+    }
+
+    public boolean isDataAutoPropagate() {
+        return false;
+    }
+
+    public boolean isConditionalInputs() {
+        return false;
+    }
+
+    public boolean isStartable() {
+        return false;
+    }
+
+    public static final String AUTO = "Auto";
+    public static final String NONE = "None";
+
+    public String getPartitioning() {
+        return null;
+    }
+
 }

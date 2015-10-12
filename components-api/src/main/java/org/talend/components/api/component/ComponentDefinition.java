@@ -79,4 +79,19 @@ public interface ComponentDefinition extends TopLevelDefinition {
 
     public String getPngImagePath(ComponentImageType imageType);
 
+    //
+    // FIXME - DI flags - do we need all of these?
+    //
+
+    public boolean isSchemaAutoPropagate();
+
+    public boolean isDataAutoPropagate();
+
+    public boolean isConditionalInputs();
+
+    public boolean isStartable();
+
+    // FIXME - An ENUM perhaps?
+    public String getPartitioning();
+
 }

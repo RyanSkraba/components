@@ -71,5 +71,13 @@ public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinitio
         };
     }
 
+    public boolean isStartable() {
+        return true;
+    }
+
+    public String getPartitioning() {
+        return AUTO;
+    }
+
 
 }

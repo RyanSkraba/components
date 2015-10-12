@@ -24,21 +24,32 @@ import org.talend.components.salesforce.SalesforceDefinition;
  */
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceOutputDefinition.COMPONENT_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TSalesforceOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceOutputDefinition extends SalesforceDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceOutput"; //$NON-NLS-1$
 
     public TSalesforceOutputDefinition() {
         super(COMPONENT_NAME);
-        setConnectors(new ComponentConnector(Type.FLOW, 1, 0), new ComponentConnector(Type.MAIN, 0, 1),
-                new ComponentConnector(Type.REJECT, 0, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
-                new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
+        setConnectors(new ComponentConnector(Type.FLOW, 1, 0), new ComponentConnector(Type.MAIN, 0, 1), new ComponentConnector(
+                Type.REJECT, 0, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
 
     @Override
     public ComponentProperties doCreateProperties() {
         return new TSalesforceOutputProperties();
     }
+
+    public boolean isSchemaAutoPropagate() {
+        return true;
+    }
+
+    public boolean isConditionalInputs() {
+        return true;
+    }
+
+    public String getPartitioning() {
+        return AUTO;
+    }
+
 }

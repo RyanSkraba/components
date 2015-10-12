@@ -37,4 +37,17 @@ public class TSalesforceWaveOutputBulkExecDefinition extends SalesforceDefinitio
     public ComponentProperties doCreateProperties() {
         return new TSalesforceWaveOutputBulkExecProperties();
     }
+
+    public boolean isConditionalInputs() {
+        return true;
+    }
+
+    public boolean isStartable() {
+        return false;
+    }
+
+    public String getPartitioning() {
+        return NONE;
+    }
+
 }

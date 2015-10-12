@@ -61,4 +61,13 @@ public class TSalesforceGetUpdatedDefinition extends SalesforceDefinition {
 
         };
     }
+
+    public boolean isStartable() {
+        return true;
+    }
+
+    public String getPartitioning() {
+        return AUTO;
+    }
+
 }

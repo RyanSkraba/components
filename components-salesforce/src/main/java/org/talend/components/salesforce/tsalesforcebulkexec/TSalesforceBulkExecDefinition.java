@@ -36,4 +36,13 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition {
     public ComponentProperties doCreateProperties() {
         return new TSalesforceBulkExecProperties();
     }
+
+    public boolean isStartable() {
+        return true;
+    }
+
+    public boolean isConditionalInputs() {
+        return true;
+    }
+
 }

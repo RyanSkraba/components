@@ -36,4 +36,12 @@ public class TSalesforceOutputBulkDefinition extends SalesforceDefinition {
     public ComponentProperties doCreateProperties() {
         return new TSalesforceOutputBulkProperties();
     }
+
+
+    public String getPartitioning() {
+        return NONE;
+    }
+
+
+
 }

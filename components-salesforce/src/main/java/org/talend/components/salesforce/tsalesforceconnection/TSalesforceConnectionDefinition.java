@@ -37,4 +37,10 @@ public class TSalesforceConnectionDefinition extends SalesforceDefinition {
     public ComponentProperties doCreateProperties() {
         return new SalesforceConnectionProperties(null);
     }
+
+    public boolean isStartable() {
+        return true;
+    }
+
+
 }

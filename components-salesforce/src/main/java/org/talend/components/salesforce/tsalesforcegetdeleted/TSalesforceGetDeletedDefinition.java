@@ -64,4 +64,13 @@ public class TSalesforceGetDeletedDefinition extends SalesforceDefinition {
 
         };
     }
+
+    public boolean isStartable() {
+        return true;
+    }
+
+    public String getPartitioning() {
+        return AUTO;
+    }
+
 }

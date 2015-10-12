@@ -24,8 +24,7 @@ import org.talend.components.salesforce.SalesforceDefinition;
  */
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceInputDefinition.COMPONENT_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TSalesforceInputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceInputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceInputDefinition extends SalesforceDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceInput"; //$NON-NLS-1$
@@ -39,6 +38,10 @@ public class TSalesforceInputDefinition extends SalesforceDefinition {
     @Override
     public ComponentProperties doCreateProperties() {
         return new TSalesforceInputProperties();
+    }
+
+    public boolean isStartable() {
+        return true;
     }
 
 }

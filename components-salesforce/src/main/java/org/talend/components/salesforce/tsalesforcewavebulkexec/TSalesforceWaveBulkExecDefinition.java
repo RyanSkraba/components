@@ -36,4 +36,13 @@ public class TSalesforceWaveBulkExecDefinition extends SalesforceDefinition {
     public ComponentProperties doCreateProperties() {
         return new TSalesforceWaveBulkExecProperties();
     }
+
+    public boolean isStartable() {
+        return true;
+    }
+
+    public String getPartitioning() {
+        return NONE;
+    }
+
 }

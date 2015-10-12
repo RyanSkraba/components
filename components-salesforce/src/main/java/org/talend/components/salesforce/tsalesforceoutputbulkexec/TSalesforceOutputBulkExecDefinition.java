@@ -37,4 +37,12 @@ public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition {
         return new TSalesforceOutputBulkExecProperties();
     }
 
+    public boolean isConditionalInputs() {
+        return true;
+    }
+
+    public String getPartitioning() {
+        return NONE;
+    }
+
 }
