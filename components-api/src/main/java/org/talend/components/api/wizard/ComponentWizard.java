@@ -12,19 +12,15 @@ import org.talend.components.api.properties.presentation.Form;
  */
 public abstract class ComponentWizard extends TranslatableImpl {
 
+    private ComponentWizardDefinition definition;
+
     protected String repositoryLocation;
 
     protected List<Form> forms;
 
-    /**
-     * inheriting class must call i18nMessagesProvider at the end of the constructor and every time they create and new
-     * direct property
-     *
-     * @param messageProvider, used to find the I18nMessage according to the current LocalProvider
-     * @param baseName, used to find the resource file for I18N
-     */
-    public ComponentWizard(String repositoryLocation) {
+    public ComponentWizard(ComponentWizardDefinition definition, String repositoryLocation) {
         forms = new ArrayList<>();
+        this.definition = definition;
         this.repositoryLocation = repositoryLocation;
     }
 
@@ -42,5 +38,9 @@ public abstract class ComponentWizard extends TranslatableImpl {
 
     public void setRepositoryLocation(String repositoryLocation) {
         this.repositoryLocation = repositoryLocation;
+    }
+
+    public ComponentWizardDefinition getDefinition() {
+        return definition;
     }
 }

@@ -62,6 +62,11 @@ public class SalesforceModuleListProperties extends ComponentProperties {
         refreshLayout(moduleForm);
     }
 
+    // For the tests
+    public SalesforceConnectionProperties getConnectionProps() {
+        return connectionProps;
+    }
+
     public void beforeFormPresentMain() throws Exception {
         SalesforceRuntime conn = new SalesforceRuntime();
         conn.connect(connectionProps);

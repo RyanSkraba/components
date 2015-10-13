@@ -107,11 +107,10 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         wizardForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
 
         Form mainForm = Form.create(this, Form.MAIN, getI18nMessage("property.form.Main.title"));
-        mainForm.addRow(widget(loginType).setDeemphasize(true));
+        mainForm.addRow(loginType);
         // Only one of these is visible at a time
         mainForm.addRow(oauth.getForm(Form.MAIN));
         mainForm.addRow(userPassword.getForm(Form.MAIN));
-        mainForm.addRow(widget(testConnection).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
 
         Form advancedForm = Form.create(this, Form.ADVANCED, getI18nMessage("property.form.Advanced.title"));
         advancedForm.addRow(bulkConnection);

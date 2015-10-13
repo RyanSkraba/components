@@ -145,11 +145,12 @@ public class SalesforceLocalComponentTest extends TestCase {
             }
         }
         assertEquals(1, count);
+        assertEquals("Create Salesforce Connection", wizardDef.getMenuItemName());
         ComponentWizard wiz = componentService.getComponentWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
                 "nodeSalesforce");
         assertNotNull(wiz);
         assertEquals("nodeSalesforce", wiz.getRepositoryLocation());
-        assertTrue(wiz instanceof SalesforceConnectionWizard);
+        SalesforceConnectionWizard swiz = (SalesforceConnectionWizard) wiz;
         List<Form> forms = wiz.getForms();
         Form connFormWizard = forms.get(0);
         assertEquals("Wizard", connFormWizard.getName());
@@ -170,6 +171,8 @@ public class SalesforceLocalComponentTest extends TestCase {
         image = componentService.getWizardPngImage(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
                 WizardImageType.WIZARD_BANNER_75X66);
         assertNotNull(image);
+
+        // Check the non-top-level wizard
 
         // check password i18n
         assertEquals("Name", connProps.getProperty("name").getDisplayName());
@@ -216,6 +219,27 @@ public class SalesforceLocalComponentTest extends TestCase {
             }
             i++;
         }
+    }
+
+    @Test
+    public void testModuleWizard() throws Throwable {
+        ComponentWizard wiz = componentService.getComponentWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
+                "nodeSalesforce");
+        List<Form> forms = wiz.getForms();
+        Form connFormWizard = forms.get(0);
+        SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connFormWizard.getProperties();
+
+        List<ComponentWizard> subWizards = componentService.getComponentWizardsForProperties(connProps, "location");
+        assertEquals(3, subWizards.size());
+        assertTrue(connProps == subWizards.get(0).getForms().get(0).getProperties());
+        assertTrue(connProps == ((SalesforceModuleListProperties) subWizards.get(2).getForms().get(0).getProperties())
+                .getConnectionProps());
+        assertFalse(subWizards.get(0).getDefinition().isTopLevel());
+        assertEquals("Edit Salesforce Connection", subWizards.get(0).getDefinition().getMenuItemName());
+        assertTrue(subWizards.get(1).getDefinition().isTopLevel());
+        assertEquals("Create Salesforce Connection", subWizards.get(1).getDefinition().getMenuItemName());
+        assertFalse(subWizards.get(2).getDefinition().isTopLevel());
+        assertEquals("Add Salesforce Modules", subWizards.get(2).getDefinition().getMenuItemName());
     }
 
     @Test
@@ -268,7 +292,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     @Test
     public void testLogin() throws Throwable {
         SalesforceConnectionProperties props = setupProps(null);
-        Form f = props.getForm(Form.MAIN);
+        Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
         props = (SalesforceConnectionProperties) checkAndValidate(f, "testConnection", props);
         System.out.println(props.getValidationResult());
         assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
@@ -278,7 +302,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     public void testLoginFail() throws Throwable {
         SalesforceConnectionProperties props = setupProps(null);
         props.userPassword.setValue(props.userPassword.userId, "blah");
-        Form f = props.getForm(Form.MAIN);
+        Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
         props = (SalesforceConnectionProperties) checkAndValidate(f, "testConnection", props);
         System.out.println(props.getValidationResult());
         assertEquals(ValidationResult.Result.ERROR, props.getValidationResult().getStatus());
@@ -288,7 +312,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     public void testBulkLogin() throws Throwable {
         SalesforceConnectionProperties props = setupProps(null);
         props.setValue(props.bulkConnection, true);
-        Form f = props.getForm(Form.MAIN);
+        Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
         props = (SalesforceConnectionProperties) checkAndValidate(f, "testConnection", props);
         System.out.println(props.getValidationResult());
     }

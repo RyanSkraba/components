@@ -8,12 +8,12 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_WIZARD_BEAN_PREFIX
-        + SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME)
+        + SalesforceModuleWizardDefinition.COMPONENT_WIZARD_NAME)
 @aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_WIZARD_BEAN_PREFIX
-        + SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, provide = ComponentWizardDefinition.class)
-public class SalesforceConnectionWizardDefinition extends AbstractComponentWizardDefintion {
+        + SalesforceModuleWizardDefinition.COMPONENT_WIZARD_NAME, provide = ComponentWizardDefinition.class)
+public class SalesforceModuleWizardDefinition extends AbstractComponentWizardDefintion {
 
-    public static final String COMPONENT_WIZARD_NAME = "salesforce"; //$NON-NLS-1$
+    public static final String COMPONENT_WIZARD_NAME = "salesforce.module"; //$NON-NLS-1$
 
     @Override
     public String getName() {
@@ -22,7 +22,7 @@ public class SalesforceConnectionWizardDefinition extends AbstractComponentWizar
 
     @Override
     public ComponentWizard createWizard(String location) {
-        return new SalesforceConnectionWizard(this, location);
+        return new SalesforceModuleWizard(this, location);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class SalesforceConnectionWizardDefinition extends AbstractComponentWizar
 
     @Override
     public ComponentWizard createWizard(ComponentProperties properties, String location) {
-        SalesforceConnectionWizard wizard = (SalesforceConnectionWizard) createWizard(location);
+        SalesforceModuleWizard wizard = (SalesforceModuleWizard) createWizard(location);
         wizard.setupProperties((SalesforceConnectionProperties) properties);
         return wizard;
     }
@@ -52,11 +52,4 @@ public class SalesforceConnectionWizardDefinition extends AbstractComponentWizar
         }
         return null;
     }
-
-    @Override
-    public boolean isTopLevel() {
-        return true;
-    }
-
-
 }

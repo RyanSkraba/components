@@ -13,16 +13,17 @@
 package org.talend.components.api.wizard;
 
 import org.talend.components.api.AbstractTopLevelDefinition;
+import org.talend.components.api.properties.ComponentProperties;
 
-/**
- * Helper to create a ComponentWizardDefinition with I18N handling
- */
 public abstract class AbstractComponentWizardDefintion extends AbstractTopLevelDefinition implements ComponentWizardDefinition {
 
-    /**
-     * 
-     */
     private static final String I18N_MENU_NAME_SUFFIX = ".menu.name"; //$NON-NLS-1$
+
+    /**
+     * The class of the {@link ComponentProperties} object that this wizard will service. This is used to find the
+     * appropriate wizard given a set of stored properties.
+     */
+    protected Class<?> propertiesClass;
 
     @Override
     protected String getI18nPrefix() {
@@ -33,4 +34,9 @@ public abstract class AbstractComponentWizardDefintion extends AbstractTopLevelD
     public String getMenuItemName() {
         return getI18nMessage(getI18nPrefix() + getName() + I18N_MENU_NAME_SUFFIX);
     }
+
+    public boolean isTopLevel() {
+        return false;
+    }
+
 }

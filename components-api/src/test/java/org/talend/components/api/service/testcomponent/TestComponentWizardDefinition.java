@@ -15,6 +15,7 @@ package org.talend.components.api.service.testcomponent;
 import org.springframework.stereotype.Component;
 import org.talend.components.api.Constants;
 import org.talend.components.api.context.GlobalContext;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.wizard.AbstractComponentWizardDefintion;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.WizardImageType;
@@ -35,8 +36,27 @@ public class TestComponentWizardDefinition extends AbstractComponentWizardDefint
     }
 
     @Override
+    public boolean supportsProperties(ComponentProperties properties) {
+        if (properties instanceof TestComponentProperties)
+            return true;
+        return false;
+    }
+
+    @Override
     public ComponentWizard createWizard(String location) {
-        return new TestComponentWizard(location, GlobalContext.i18nMessageProvider);
+        return new TestComponentWizard(this, location, GlobalContext.i18nMessageProvider);
+    }
+
+    @Override
+    public ComponentWizard createWizard(ComponentProperties properties, String location) {
+        TestComponentWizard wizard = (TestComponentWizard) createWizard(location);
+        wizard.props = properties;
+        return wizard;
+    }
+
+    @Override
+    public boolean isTopLevel() {
+        return true;
     }
 
 }

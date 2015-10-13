@@ -79,6 +79,18 @@ public interface ComponentService extends Repository {
     ComponentWizard getComponentWizard(String name, String location);
 
     /**
+     * Creates {@link ComponentWizard}(s) that are populated by the given properties.
+     *
+     * This is used when you already have the {@link ComponentProperties} object from a previous execution of the wizard
+     * and you wish to show wizards applicable to the those properties.
+     * 
+     * @param properties a {@link ComponentProperties} object previously created
+     * @param location the repository location of where the {@link ComponentProperties} were stored.
+     * @return a {@link List} of {@code ComponentWizard} object(s)
+     */
+    List<ComponentWizard> getComponentWizardsForProperties(ComponentProperties properties, String location);
+
+    /**
      * Return the {@link ComponentDefinition} objects for any component(s) that can be constructed from the given
      * {@link ComponentProperties} object.
      * 

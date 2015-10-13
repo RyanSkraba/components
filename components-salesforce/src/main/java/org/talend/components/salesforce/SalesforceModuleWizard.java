@@ -6,20 +6,17 @@ import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 
 /**
- *
+ * A single-page wizard that just handles the selection of modules. This must always be created with the connection
+ * properties.
  */
-public class SalesforceConnectionWizard extends ComponentWizard {
+public class SalesforceModuleWizard extends ComponentWizard {
 
     SalesforceModuleListProperties mProps;
 
-    SalesforceConnectionWizard(ComponentWizardDefinition def, String repositoryLocation) {
+    SalesforceModuleWizard(ComponentWizardDefinition def, String repositoryLocation) {
         super(def, repositoryLocation);
 
-        SalesforceConnectionProperties cProps = new SalesforceConnectionProperties();
-        cProps.init();
-        addForm(cProps.getForm(SalesforceConnectionProperties.FORM_WIZARD));
-
-        mProps = new SalesforceModuleListProperties().setConnection(cProps).setRepositoryLocation(getRepositoryLocation());
+        mProps = new SalesforceModuleListProperties().setRepositoryLocation(getRepositoryLocation());
         mProps.init();
         addForm(mProps.getForm(Form.MAIN));
     }
@@ -31,8 +28,6 @@ public class SalesforceConnectionWizard extends ComponentWizard {
     }
 
     public void setupProperties(SalesforceConnectionProperties cProps) {
-        // Update the connection form properties
-        getForms().get(0).setProperties(cProps);
         mProps.setConnection(cProps);
     }
 

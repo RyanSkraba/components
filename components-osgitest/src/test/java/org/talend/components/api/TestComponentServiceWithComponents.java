@@ -129,7 +129,7 @@ public class TestComponentServiceWithComponents {
         Set<ComponentWizardDefinition> wizardDefs = componentService.getTopLevelComponentWizards();
         ComponentWizardDefinition salesforceWizDef = findWizardDefinition(wizardDefs, "salesforce");
         assertNotNull(salesforceWizDef);
-        assertEquals("Salesforce Connection", salesforceWizDef.getMenuItemName()); //$NON-NLS-1$
+        assertEquals("Create Salesforce Connection", salesforceWizDef.getMenuItemName()); //$NON-NLS-1$
     }
 
     /**

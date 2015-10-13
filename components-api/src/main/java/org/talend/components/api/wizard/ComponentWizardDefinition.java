@@ -3,6 +3,7 @@ package org.talend.components.api.wizard;
 import org.talend.components.api.ComponentDesigner;
 import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Repository;
 
 /**
  */
@@ -13,13 +14,27 @@ public interface ComponentWizardDefinition extends TopLevelDefinition {
     /**
      * Creates a {@link ComponentWizard} based on the this definition.
      *
-     * Optionally asks the wizard to remembers an arbitrary string to allow the wizard to notify the
+     * Optionally asks the wizard to remembers a repository location string to allow the wizard to notify the
      * {@link ComponentDesigner} when {@link ComponentProperties} objects are created.
      *
-     * @param userData optional user data to be used by the wizard
+     * @param location the repository location where the {@link ComponentProperties} associated with this wizard are to
+     * be stored. See {@link Repository}.
      * @return
      */
-    ComponentWizard createWizard(String userData);
+    ComponentWizard createWizard(String location);
+
+    /**
+     * Creates a {@link ComponentWizard} based on the this definition populated with the specified
+     * {@link ComponentProperties}
+     *
+     * Optionally asks the wizard to remembers a repository location string to allow the wizard to notify the
+     * {@link ComponentDesigner} when {@link ComponentProperties} objects are created.
+     *
+     * @param location the repository location where the {@link ComponentProperties} associated with this wizard are to
+     * be stored. See {@link Repository}.
+     * @return
+     */
+    ComponentWizard createWizard(ComponentProperties properties, String location);
 
     /**
      * This shall be a path relative to the current Wizard definition, ideally is should just be the name of the png
@@ -38,5 +53,9 @@ public interface ComponentWizardDefinition extends TopLevelDefinition {
      */
 
     public abstract String getPngImagePath(WizardImageType imageType);
+
+    public boolean supportsProperties(ComponentProperties properties);
+
+    public boolean isTopLevel();
 
 }

@@ -124,7 +124,7 @@ public class LocalComponentTest extends TestCase {
         assertNull(iconStream);
     }
 
-    @Test()
+    @Test
     public void testGetWizard() {
         ComponentWizard wizard = componentService.getComponentWizard(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME,
                 "userdata");
@@ -135,6 +135,16 @@ public class LocalComponentTest extends TestCase {
     @Test(expected = ComponentException.class)
     public void testGetWizardNotFound() {
         componentService.getComponentWizard("not found", "userdata");
+    }
+
+    @Test
+    public void testGetWizardWithProps() {
+        TestComponentWizard wizard = (TestComponentWizard) componentService.getComponentWizard(
+                TestComponentWizardDefinition.COMPONENT_WIZARD_NAME, "userdata");
+        wizard.props = new TestComponentProperties().init();
+        ComponentProperties props = wizard.props;
+        List<ComponentWizard> wizards = componentService.getComponentWizardsForProperties(props, "userdata");
+        assertTrue(props == ((TestComponentWizard)wizards.get(0)).props);
     }
 
     @Test

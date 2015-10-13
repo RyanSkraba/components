@@ -128,6 +128,11 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
+    public List<ComponentWizard> getComponentWizardsForProperties(ComponentProperties properties, String location) {
+        return componentServiceDelegate.getComponentWizardsForProperties(properties, location);
+    }
+
+    @Override
     public List<ComponentDefinition> getPossibleComponents(ComponentProperties properties) throws Throwable {
         return componentServiceDelegate.getPossibleComponents(properties);
     }

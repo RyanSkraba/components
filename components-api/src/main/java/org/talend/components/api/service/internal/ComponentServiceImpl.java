@@ -70,7 +70,12 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     public Set<ComponentWizardDefinition> getTopLevelComponentWizards() {
-        return new HashSet<>(componentRegistry.getComponentWizards().values());
+        Set<ComponentWizardDefinition> defs = new HashSet<>();
+        for (ComponentWizardDefinition def : componentRegistry.getComponentWizards().values()) {
+            if (def.isTopLevel())
+                defs.add(def);
+        }
+        return defs;
     }
 
     @Override
@@ -93,6 +98,18 @@ public class ComponentServiceImpl implements ComponentService {
         }
         ComponentWizard wizard = wizardDefinition.createWizard(location);
         return wizard;
+    }
+
+    @Override
+    public List<ComponentWizard> getComponentWizardsForProperties(ComponentProperties properties, String location) {
+        List<ComponentWizard> wizards = new ArrayList<>();
+        for (ComponentWizardDefinition wizardDefinition : componentRegistry.getComponentWizards().values()) {
+            if (wizardDefinition.supportsProperties(properties)) {
+                ComponentWizard wizard = wizardDefinition.createWizard(properties, location);
+                wizards.add(wizard);
+            }
+        }
+        return wizards;
     }
 
     @Override

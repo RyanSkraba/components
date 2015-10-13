@@ -91,8 +91,16 @@ public class ComponentServiceSpring implements ComponentService {
     @RequestMapping(value = BASE_PATH + "/wizard/{name}/{repositoryLocation}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ComponentWizard getComponentWizard(
             @PathVariable(value = "name") @ApiParam(name = "name", value = "Name of the component") String name,
-            @PathVariable(value = "repositoryLocation") @ApiParam(name = "repositoryLocation", value = "User data string") String userData) {
-        return componentServiceDelegate.getComponentWizard(name, userData);
+            @PathVariable(value = "repositoryLocation") @ApiParam(name = "repositoryLocation", value = "Repository location") String repositoryLocation) {
+        return componentServiceDelegate.getComponentWizard(name, repositoryLocation);
+    }
+
+    @Override
+    @RequestMapping(value = BASE_PATH + "/wizardForProperties/{repositoryLocation}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<ComponentWizard> getComponentWizardsForProperties(
+            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties,
+            @PathVariable(value = "repositoryLocation") @ApiParam(name = "repositoryLocation", value = "Repository location") String repositoryLocation) {
+        return componentServiceDelegate.getComponentWizardsForProperties(properties, repositoryLocation);
     }
 
     @Override

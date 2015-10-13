@@ -117,6 +117,10 @@ public class Form extends SimpleNamedThing {
         return properties;
     }
 
+    public void setProperties(ComponentProperties properties) {
+        this.properties = properties;
+    }
+
     public Form setName(String name) {
         this.name = name;
         return this;
