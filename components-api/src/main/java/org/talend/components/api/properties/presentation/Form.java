@@ -105,6 +105,10 @@ public class Form extends SimpleNamedThing {
         return widgets;
     }
 
+    public NamedThing getChild(Class<?> cls) {
+        return getChild(cls.getSimpleName());
+    }
+
     public NamedThing getChild(String name) {
         return children.get(name);
     }
@@ -193,6 +197,17 @@ public class Form extends SimpleNamedThing {
 
     public Widget getWidget(String child) {
         return widgetMap.get(child);
+    }
+
+    /**
+     * Uses the class name to get the {@link Widget}. This is used in the case of references to
+     * {@link ComponentProperties} which are by default named for their class.
+     * 
+     * @param childClass the Class of the desired {@link ComponentProperties} to get.
+     * @return the {@code Widget} belonging to those properties.
+     */
+    public Widget getWidget(Class<?> childClass) {
+        return widgetMap.get(childClass.getSimpleName());
     }
 
     public boolean isRefreshUI() {

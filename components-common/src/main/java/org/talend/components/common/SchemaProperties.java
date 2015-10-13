@@ -33,14 +33,6 @@ public class SchemaProperties extends ComponentProperties {
     // FIXME - change to Schema
     public SchemaElement schema = newProperty(SchemaElement.Type.SCHEMA, "schema"); //$NON-NLS-1$
 
-    public SchemaProperties() {
-        super("schema");
-    }
-
-    public SchemaProperties(String name) {
-        super(name);
-    }
-
     @Override
     public SchemaProperties init() {
         super.init();

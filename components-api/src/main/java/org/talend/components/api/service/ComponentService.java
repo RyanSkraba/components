@@ -13,6 +13,7 @@
 package org.talend.components.api.service;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Set;
 
 import org.talend.components.api.component.ComponentDefinition;
@@ -70,11 +71,21 @@ public interface ComponentService extends Repository {
      * modules would be called "salesforce.modules" in order to make sure the name is unique.
      *
      * @param name the name of the wizard
-     * @param userData an arbitrary repositoryLocation string to optionally be used in the wizard processing.
+     * @param location an arbitrary repositoryLocation string to optionally be used in the wizard processing. This is
+     * given to an implementation of the {@link Repository} object when the {@link ComponentProperties} are stored.
      * @return a {@code ComponentWizard} object.
      * @exception ComponentException thrown if the wizard is not registered in the service
      */
-    ComponentWizard getComponentWizard(String name, String userData);
+    ComponentWizard getComponentWizard(String name, String location);
+
+    /**
+     * Return the {@link ComponentDefinition} objects for any component(s) that can be constructed from the given
+     * {@link ComponentProperties} object.
+     * 
+     * @param properties the {@link ComponentProperties} object to look for.
+     * @return the list of compatbible {@link ComponentDefinition} objects.
+     */
+    List<ComponentDefinition> getPossibleComponents(ComponentProperties properties) throws Throwable;
 
     ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable;
 

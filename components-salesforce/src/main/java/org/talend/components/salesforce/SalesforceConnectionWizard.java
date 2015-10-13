@@ -13,12 +13,11 @@ public class SalesforceConnectionWizard extends ComponentWizard {
     SalesforceConnectionWizard(String repositoryLocation) {
         super(repositoryLocation);
 
-        SalesforceConnectionProperties cProps = new SalesforceConnectionProperties("SalesforceConnectionProperties",
-                SalesforceConnectionProperties.INCLUDE_NAME);
+        SalesforceConnectionProperties cProps = new SalesforceConnectionProperties();
         cProps.init();
         addForm(cProps.getForm(SalesforceConnectionProperties.FORM_WIZARD));
 
-        mProps = new SalesforceModuleListProperties(null, cProps, getRepositoryLocation());
+        mProps = new SalesforceModuleListProperties().setConnection(cProps).setRepositoryLocation(getRepositoryLocation());
         mProps.init();
         addForm(mProps.getForm(Form.MAIN));
     }

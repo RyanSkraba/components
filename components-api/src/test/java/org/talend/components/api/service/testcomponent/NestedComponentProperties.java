@@ -23,8 +23,8 @@ public class NestedComponentProperties extends ComponentProperties {
 
     public SchemaElement aGreatProperty = newProperty(A_GREAT_PROP_NAME);
 
-    public NestedComponentProperties(String name) {
-        super(name);
+    public NestedComponentProperties() {
+        super();
         // setupPropertiesWithI18n();// this must be called once each property instance is created
     }
 

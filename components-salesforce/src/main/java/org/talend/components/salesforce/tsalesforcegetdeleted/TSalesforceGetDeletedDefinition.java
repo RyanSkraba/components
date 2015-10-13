@@ -36,12 +36,9 @@ public class TSalesforceGetDeletedDefinition extends SalesforceDefinition {
 
     public TSalesforceGetDeletedDefinition() {
         super(COMPONENT_NAME);
+        propertiesClass = TSalesforceGetDeletedProperties.class;
         setConnectors(new ComponentConnector(Type.FLOW, 1, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
                 new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
-    }
-
-    @Override protected ComponentProperties doCreateProperties() {
-        return new TSalesforceGetDeletedProperties();
     }
 
     @Override public ComponentRuntime createRuntime() {

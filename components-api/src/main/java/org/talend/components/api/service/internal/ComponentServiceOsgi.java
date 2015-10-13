@@ -13,10 +13,7 @@
 package org.talend.components.api.service.internal;
 
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -131,6 +128,11 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
+    public List<ComponentDefinition> getPossibleComponents(ComponentProperties properties) throws Throwable {
+        return componentServiceDelegate.getPossibleComponents(properties);
+    }
+
+    @Override
     public ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable {
         return componentServiceDelegate.validateProperty(propName, properties);
     }
@@ -191,8 +193,7 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
-    public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation,
-            Schema schema) {
+    public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation, Schema schema) {
         return componentServiceDelegate.storeComponentProperties(properties, name, repositoryLocation, schema);
     }
 

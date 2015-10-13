@@ -101,6 +101,16 @@ public class LocalComponentTest extends TestCase {
     }
 
     @Test
+    public void testSupportsProps() throws Throwable {
+        ComponentProperties props = componentService.getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
+        List<ComponentDefinition> comps = componentService.getPossibleComponents(props);
+        assertEquals("TestComponent", comps.get(0).getName());
+        props = new NestedComponentProperties();
+        comps = componentService.getPossibleComponents(props);
+        assertEquals(0, comps.size());
+    }
+
+    @Test
     public void testGetWizardIconOk() {
         InputStream iconStream = componentService.getWizardPngImage(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME,
                 WizardImageType.TREE_ICON_16X16);
@@ -167,7 +177,7 @@ public class LocalComponentTest extends TestCase {
         ComponentDefinition componentDefinition = allComponents.iterator().next();
         TestComponentDefinition tcd = (TestComponentDefinition) componentDefinition;
         TestComponentProperties componentProperties = (TestComponentProperties) tcd.createProperties();
-        ComponentProperties nestedProp = (ComponentProperties) componentProperties.getProperty("thenestedproperty"); //$NON-NLS-1$
+        ComponentProperties nestedProp = (ComponentProperties) componentProperties.getProperty(NestedComponentProperties.class); //$NON-NLS-1$
         assertNotNull(nestedProp);
         SchemaElement greatProperty = nestedProp.getProperty(NestedComponentProperties.A_GREAT_PROP_NAME);
         assertNotNull(greatProperty);

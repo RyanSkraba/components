@@ -28,10 +28,10 @@ import com.cedarsoftware.util.io.JsonWriter;
  * include those for desktop (Eclipse), web, and scripting. All of these will use the code defined here for their
  * construction and validation.
  * <p/>
- * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement},
- * {@Link PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface
- * decisions are made in code, methods can be added to the subclass to influence the flow of the user interface and help
- * with validation.
+ * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement}, {@Link
+ * PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface decisions are
+ * made in code, methods can be added to the subclass to influence the flow of the user interface and help with
+ * validation.
  * <p/>
  * Each property can be a Java type, both simple types and collections are permitted. In addition,
  * {@code ComponentProperties} classes can be composed allowing hierarchies of properties and collections of properties
@@ -126,23 +126,19 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     }
 
     /**
-     * Do not subclass this method for initialization, use {@link #initSubclass()} instead.
+     * Do not subclass this method for initialization, use {@link #init()} instead.
      */
     public ComponentProperties() {
         internal = new ComponentPropertiesInternal();
+        /*
+         * Give it a default name, can be overridden in the case where the properties object needs a different name
+         * (when it's pointed to multiple times by some containing properties object.
+         */
+        setName(getClass().getSimpleName());
     }
 
     /**
-     * Do not subclass this method for initialization, use {@link #initSubclass()} instead.
-     */
-    public ComponentProperties(String name) {
-        this();
-        setName(name);
-    }
-
-    /**
-     * Initialize this object, all subclass initialization should override {@link #initSubclass()}, not this method, nor
-     * the constructor. This is done so that things are executed in the right order.
+     * Initialize this object, all subclass initialization should override this (and call the superclass).
      */
     public ComponentProperties init() {
         // init nested properties starting from the bottom ones
@@ -252,6 +248,10 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
             properties.add(returns);
         }
         return properties;
+    }
+
+    public SchemaElement getProperty(Class<?> cls) {
+        return getProperty(cls.getSimpleName());
     }
 
     public SchemaElement getProperty(@NotNull String name) {

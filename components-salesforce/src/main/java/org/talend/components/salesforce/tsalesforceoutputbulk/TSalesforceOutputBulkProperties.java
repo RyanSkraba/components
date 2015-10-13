@@ -22,11 +22,12 @@ public class TSalesforceOutputBulkProperties extends ComponentProperties {
     //
     // Collections
     //
-    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection"); //$NON-NLS-1$
+    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties(); //$NON-NLS-1$
 
-    public SalesforceModuleProperties module = new SalesforceModuleProperties("module", connection); //$NON-NLS-1$
+    public SalesforceModuleProperties module = new SalesforceModuleProperties().setConnection(connection); //$NON-NLS-1$
 
-    @Override public void setupLayout() {
+    @Override
+    public void setupLayout() {
         Form mainForm = Form.create(this, Form.MAIN, "Salesforce Input");
         mainForm.addRow(connection.getForm(Form.MAIN));
         mainForm.addRow(module.getForm(Form.REFERENCE));

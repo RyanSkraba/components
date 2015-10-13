@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
-import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.components.api.properties.presentation.Widget.widget;
 import static org.talend.components.api.schema.SchemaFactory.*;
 
 import java.util.ArrayList;
@@ -39,10 +39,10 @@ public class TSalesforceOutputProperties extends SalesforceInputOutputProperties
     public static final String ACTION_DELETE = "DELETE";
 
     public enum OutputAction {
-                              INSERT,
-                              UPDATE,
-                              UPSERT,
-                              DELETE
+        INSERT,
+        UPDATE,
+        UPSERT,
+        DELETE
     }
 
     public SchemaElement outputAction = newProperty(SchemaElement.Type.ENUM, "outputAction"); //$NON-NLS-1$
@@ -70,17 +70,13 @@ public class TSalesforceOutputProperties extends SalesforceInputOutputProperties
     //
     // Collections
     //
-    public SchemaProperties schemaFlow = new SchemaProperties("schemaFlow"); //$NON-NLS-1$
+    public SchemaProperties schemaFlow = (SchemaProperties) new SchemaProperties().setName("schemaFlow"); //$NON-NLS-1$
 
-    public SchemaProperties schemaReject = new SchemaProperties("schemaReject"); //$NON-NLS-1$
+    public SchemaProperties schemaReject = (SchemaProperties) new SchemaProperties().setName("schemaReject"); //$NON-NLS-1$
 
     // Have to use an explicit class to get the override of afterModuleName(), an anonymous
     // class cannot be public and thus cannot be called.
     public class ModuleSubclass extends SalesforceModuleProperties {
-
-        public ModuleSubclass(String name, SalesforceConnectionProperties connectionProperties) {
-            super(name, connectionProperties);
-        }
 
         @Override
         public void afterModuleName() throws Exception {
@@ -115,7 +111,7 @@ public class TSalesforceOutputProperties extends SalesforceInputOutputProperties
         upsertRelation.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
         upsertRelation.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
         super.init();
-        module = new ModuleSubclass("module", connection);
+        module = new ModuleSubclass().setConnection(connection);
         module.init();
         return this;
     }

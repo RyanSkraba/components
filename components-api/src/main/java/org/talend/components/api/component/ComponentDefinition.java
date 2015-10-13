@@ -62,6 +62,11 @@ public interface ComponentDefinition extends TopLevelDefinition {
     public ComponentConnector[] getConnectors();
 
     /**
+     * Returns true if this {@code ComponentDefinition} will work with the specified {@link ComponentProperties}.
+     */
+    public boolean supportsProperties(ComponentProperties properties);
+
+    /**
      * This shall be a path relative to the current Component definition, ideally is should just be the name of the png
      * image if placed in the same resource folder that the current class. This icon will be computed with the following
      * code

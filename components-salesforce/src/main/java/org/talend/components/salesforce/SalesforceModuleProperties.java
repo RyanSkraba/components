@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.presentation.Widget.*;
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.schema.SchemaFactory.newProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +24,6 @@ import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.common.SchemaProperties;
-
-import com.fasterxml.jackson.annotation.JsonRootName;
 
 public class SalesforceModuleProperties extends ComponentProperties {
 
@@ -40,15 +38,12 @@ public class SalesforceModuleProperties extends ComponentProperties {
 
     // FIXME - OK what about if we are using a connection from a separate component
     // that defines the connection, how do we get that separate component?
-    public SalesforceModuleProperties(String name, SalesforceConnectionProperties connectionProperties) {
-        super(name);
-
-        connection = connectionProperties;
-        setupLayout();
+    public SalesforceModuleProperties setConnection(SalesforceConnectionProperties conn) {
+        connection = conn;
+        return this;
     }
 
-    @Override
-    protected void setupLayout() {
+    @Override protected void setupLayout() {
         super.setupLayout();
 
         Form moduleForm = Form.create(this, Form.MAIN, "Salesforce Module");

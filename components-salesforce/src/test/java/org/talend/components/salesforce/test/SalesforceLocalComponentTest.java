@@ -34,6 +34,7 @@ import org.talend.components.api.service.LocalComponentTest;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
+import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.*;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
@@ -174,7 +175,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         assertEquals("Name", connProps.getProperty("name").getDisplayName());
         connProps.setValue(connProps.name, "connName");
         setupProps(connProps);
-        Form userPassword = (Form) connFormWizard.getChild("userPassword");
+        Form userPassword = (Form) connFormWizard.getChild(SalesforceUserPasswordProperties.class);
         SchemaElement passwordSe = (SchemaElement) userPassword.getChild("password");
         assertEquals("Password", passwordSe.getDisplayName());
         // check name i18n
@@ -240,16 +241,16 @@ public class SalesforceLocalComponentTest extends TestCase {
         assertEquals(SalesforceConnectionProperties.LOGIN_BASIC, props.getValue(loginType));
         Form mainForm = props.getForm(Form.MAIN);
         assertEquals("Salesforce Connection Settings", mainForm.getTitle());
-        assertTrue(mainForm.getWidget("userPassword").isVisible());
-        assertFalse(mainForm.getWidget("oauth").isVisible());
+        assertTrue(mainForm.getWidget(SalesforceUserPasswordProperties.class).isVisible());
+        assertFalse(mainForm.getWidget(OauthProperties.class).isVisible());
 
         props.setValue(loginType, SalesforceConnectionProperties.LOGIN_OAUTH);
         props = checkAndAfter(mainForm, "loginType", props);
         mainForm = props.getForm(Form.MAIN);
         assertTrue(mainForm.isRefreshUI());
 
-        assertFalse(mainForm.getWidget("userPassword").isVisible());
-        assertTrue(mainForm.getWidget("oauth").isVisible());
+        assertFalse(mainForm.getWidget(SalesforceUserPasswordProperties.class).isVisible());
+        assertTrue(mainForm.getWidget(OauthProperties.class).isVisible());
     }
 
     private SalesforceConnectionProperties setupProps(SalesforceConnectionProperties props) {
@@ -257,7 +258,7 @@ public class SalesforceLocalComponentTest extends TestCase {
             props = (SalesforceConnectionProperties) componentService
                     .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
         }
-        ComponentProperties userPassword = (ComponentProperties) props.getProperty("userPassword");
+        ComponentProperties userPassword = (ComponentProperties) props.getProperty(SalesforceUserPasswordProperties.class);
         userPassword.setValue(userPassword.getProperty("userId"), userId);
         userPassword.setValue(userPassword.getProperty("password"), password);
         userPassword.setValue(userPassword.getProperty("securityKey"), securityKey);
@@ -582,17 +583,12 @@ public class SalesforceLocalComponentTest extends TestCase {
         checkAllI18NProperties(compProps);
         compProps = componentService.getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
         checkAllI18NProperties(compProps);
-        compProps = new SalesforceModuleListProperties(null, null, null);
+        compProps = new SalesforceModuleListProperties();
         checkAllI18NProperties(compProps);
-        compProps = new SalesforceModuleProperties(null, null);
+        compProps = new SalesforceModuleProperties();
         checkAllI18NProperties(compProps);
     }
 
-    /**
-     * DOC sgandon Comment method "checkAllI18N".
-     * 
-     * @param outputDef
-     */
     private void checkAllI18NProperties(ComponentProperties outputDef) {
         List<SchemaElement> properties = outputDef.getProperties();
         for (SchemaElement prop : properties) {
@@ -600,7 +596,7 @@ public class SalesforceLocalComponentTest extends TestCase {
                 assertFalse("property [" + outputDef.getClass().getCanonicalName() + "/" + prop.getName()
                         + "] should have a translated message key [property." + prop.getName()
                         + ".displayName] in [ZE proper messages.property]", prop.getDisplayName().endsWith(".displayName"));
-            } // else the nested ComponentProperties should be tested separatly
+            } // else the nested ComponentProperties should be tested separately
         }
     }
 

@@ -28,15 +28,10 @@ public class TSalesforceOutputBulkDefinition extends SalesforceDefinition {
 
     public TSalesforceOutputBulkDefinition() {
         super(COMPONENT_NAME);
+        propertiesClass = TSalesforceOutputBulkProperties.class;
         setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
                 new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
-
-    @Override
-    public ComponentProperties doCreateProperties() {
-        return new TSalesforceOutputBulkProperties();
-    }
-
 
     public String getPartitioning() {
         return NONE;

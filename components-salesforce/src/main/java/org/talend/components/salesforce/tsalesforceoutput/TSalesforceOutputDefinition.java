@@ -31,13 +31,9 @@ public class TSalesforceOutputDefinition extends SalesforceDefinition {
 
     public TSalesforceOutputDefinition() {
         super(COMPONENT_NAME);
+        propertiesClass = TSalesforceOutputProperties.class;
         setConnectors(new ComponentConnector(Type.FLOW, 1, 0), new ComponentConnector(Type.MAIN, 0, 1), new ComponentConnector(
                 Type.REJECT, 0, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
-    }
-
-    @Override
-    public ComponentProperties doCreateProperties() {
-        return new TSalesforceOutputProperties();
     }
 
     public boolean isSchemaAutoPropagate() {

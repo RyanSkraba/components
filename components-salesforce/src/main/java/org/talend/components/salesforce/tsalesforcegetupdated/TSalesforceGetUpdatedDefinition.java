@@ -26,21 +26,16 @@ import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceRuntime;
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceGetUpdatedDefinition.COMPONENT_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TSalesforceGetUpdatedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceGetUpdatedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceGetUpdatedDefinition extends SalesforceDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceGetUpdated"; //$NON-NLS-1$
 
     public TSalesforceGetUpdatedDefinition() {
         super(COMPONENT_NAME);
+        propertiesClass = TSalesforceGetUpdatedProperties.class;
         setConnectors(new ComponentConnector(Type.FLOW, 1, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
                 new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
-    }
-
-    @Override
-    public ComponentProperties doCreateProperties() {
-        return new TSalesforceGetUpdatedProperties();
     }
 
     @Override

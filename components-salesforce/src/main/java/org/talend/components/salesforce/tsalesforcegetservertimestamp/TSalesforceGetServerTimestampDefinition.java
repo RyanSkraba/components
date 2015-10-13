@@ -40,13 +40,9 @@ public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinitio
 
     public TSalesforceGetServerTimestampDefinition() {
         super(COMPONENT_NAME);
+        propertiesClass = TSalesforceGetServerTimestampProperties.class;
         setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
                 new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
-    }
-
-    @Override
-    public ComponentProperties doCreateProperties() {
-        return new TSalesforceGetServerTimestampProperties();
     }
 
     @Override public ComponentRuntime createRuntime() {

@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.presentation.Widget.*;
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.schema.SchemaFactory.newProperty;
 
 import java.util.List;
 
@@ -42,12 +42,14 @@ public class SalesforceModuleListProperties extends ComponentProperties {
 
     public static final String MAIN = "Main"; //$NON-NLS-1$
 
-    public SalesforceModuleListProperties(String name, SalesforceConnectionProperties connectionProperties,
-            String repositoryLocation) {
-        super(name);
-        this.repositoryLocation = repositoryLocation;
-        connectionProps = connectionProperties;
-        setupLayout();
+    public SalesforceModuleListProperties setConnection(SalesforceConnectionProperties connection) {
+        connectionProps = connection;
+        return this;
+    }
+
+    public SalesforceModuleListProperties setRepositoryLocation(String location) {
+        repositoryLocation = location;
+        return this;
     }
 
     @Override
@@ -83,7 +85,7 @@ public class SalesforceModuleListProperties extends ComponentProperties {
         @SuppressWarnings("unchecked")
         List<NameAndLabel> selectedModuleNames = (List<NameAndLabel>) getValue(moduleName);
         for (NameAndLabel nl : selectedModuleNames) {
-            SalesforceModuleProperties modProps = new SalesforceModuleProperties(null, connectionProps);
+            SalesforceModuleProperties modProps = new SalesforceModuleProperties().setConnection(connectionProps);
             Schema schema = conn.getSchema(nl.getName());
             modProps.setValue(modProps.moduleName, nl.getName());
             modProps.schema.setValue(modProps.schema.schema, schema);

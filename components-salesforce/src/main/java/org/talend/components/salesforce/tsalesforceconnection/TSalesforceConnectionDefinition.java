@@ -16,31 +16,24 @@ import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentConnector;
 import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceConnectionDefinition.COMPONENT_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TSalesforceConnectionDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceConnectionDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceConnectionDefinition extends SalesforceDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceConnection"; //$NON-NLS-1$
 
     public TSalesforceConnectionDefinition() {
         super(COMPONENT_NAME);
+        propertiesClass = SalesforceConnectionProperties.class;
         setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
                 new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
-    }
-
-    @Override
-    public ComponentProperties doCreateProperties() {
-        return new SalesforceConnectionProperties(null);
     }
 
     public boolean isStartable() {
         return true;
     }
-
 
 }

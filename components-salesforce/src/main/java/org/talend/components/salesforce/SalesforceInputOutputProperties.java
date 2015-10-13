@@ -23,14 +23,14 @@ public class SalesforceInputOutputProperties extends ComponentProperties {
 
     // Collections
     //
-    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection"); //$NON-NLS-1$
+    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties(); //$NON-NLS-1$
 
     public SalesforceModuleProperties module;
 
     @Override
     public ComponentProperties init() {
         // Allow for subclassing
-        module = new SalesforceModuleProperties("module", connection);
+        module = new SalesforceModuleProperties().setConnection(connection);
         return super.init();
     }
 

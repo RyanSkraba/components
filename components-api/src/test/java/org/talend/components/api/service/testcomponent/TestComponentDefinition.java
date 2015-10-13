@@ -16,16 +16,12 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     public static final String COMPONENT_NAME = "TestComponent"; //$NON-NLS-1$
 
     public TestComponentDefinition() {
+        propertiesClass = TestComponentProperties.class;
         setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
                 new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
 
     protected TestComponentProperties properties;
-
-    @Override
-    public ComponentProperties doCreateProperties() {
-        return new TestComponentProperties();
-    }
 
     @Override
     public ComponentRuntime createRuntime() {

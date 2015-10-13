@@ -16,7 +16,6 @@ import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentConnector;
 import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX
@@ -29,13 +28,9 @@ public class TSalesforceWaveOutputBulkExecDefinition extends SalesforceDefinitio
 
     public TSalesforceWaveOutputBulkExecDefinition() {
         super(COMPONENT_NAME);
+        propertiesClass = TSalesforceWaveOutputBulkExecProperties.class;
         setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
                 new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
-    }
-
-    @Override
-    public ComponentProperties doCreateProperties() {
-        return new TSalesforceWaveOutputBulkExecProperties();
     }
 
     public boolean isConditionalInputs() {

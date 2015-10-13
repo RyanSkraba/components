@@ -34,6 +34,6 @@ public class TestComponentProperties extends ComponentProperties {
         Form form = Form.create(this, TESTCOMPONENT, "Test Component");
         form.addRow(userId);
         form.addRow(password);
-        nestedProps = new NestedComponentProperties("thenestedproperty");
+        nestedProps = (NestedComponentProperties) new NestedComponentProperties();
     }
 }

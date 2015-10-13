@@ -25,6 +25,7 @@ import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget.WidgetType;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.common.ProxyProperties;
+import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.common.oauth.OauthProperties;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
@@ -77,24 +78,18 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
     public ComponentProperties proxy = new ProxyProperties();
 
-    public static final boolean INCLUDE_NAME = true;
-
-    public SalesforceConnectionProperties(String name) {
-        this(name, !INCLUDE_NAME);
-    }
-
-    public SalesforceConnectionProperties(String name, boolean includeName) {
-        super(name);
-        if (!includeName) {
-            name = null;
-        }
+    @Override
+    public ComponentProperties init() {
+        super.init();
         List<String> loginTypes = new ArrayList<>();
         loginTypes.add(LOGIN_BASIC);
         loginTypes.add(LOGIN_OAUTH);
         loginType.setPossibleValues(loginTypes);
+        return this;
     }
 
-    @Override protected void setupLayout() {
+    @Override
+    protected void setupLayout() {
         super.setupLayout();
 
         setValue(loginType, LOGIN_BASIC);
@@ -138,15 +133,16 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         return conn.connectWithResult(this);
     }
 
-    @Override public void refreshLayout(Form form) {
+    @Override
+    public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN) || form.getName().equals(FORM_WIZARD)) {
             if (LOGIN_OAUTH.equals(getValue(loginType))) {
-                form.getWidget("oauth").setVisible(true);
-                form.getWidget("userPassword").setVisible(false);
+                form.getWidget(OauthProperties.class).setVisible(true);
+                form.getWidget(SalesforceUserPasswordProperties.class).setVisible(false);
             } else if (LOGIN_BASIC.equals(getValue(loginType))) {
-                form.getWidget("oauth").setVisible(false);
-                form.getWidget("userPassword").setVisible(true);
+                form.getWidget(OauthProperties.class).setVisible(false);
+                form.getWidget(SalesforceUserPasswordProperties.class).setVisible(true);
             } else {
                 throw new RuntimeException("Enum value should be handled :" + getValue(loginType));
             }

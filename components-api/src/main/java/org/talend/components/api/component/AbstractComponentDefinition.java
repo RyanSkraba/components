@@ -3,8 +3,6 @@ package org.talend.components.api.component;
 import org.talend.components.api.AbstractTopLevelDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 
-/**
- */
 public abstract class AbstractComponentDefinition extends AbstractTopLevelDefinition implements ComponentDefinition {
 
     private ComponentConnector[] connectors;
@@ -12,6 +10,8 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
     public void setConnectors(ComponentConnector... conns) {
         this.connectors = conns;
     }
+
+    protected Class<?> propertiesClass;
 
     @Override
     public ComponentConnector[] getConnectors() {
@@ -23,21 +23,23 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
         return "component."; //$NON-NLS-1$
     }
 
-    /**
-     * create the ComponentProperties instance and initialise it before returning it.
-     */
     @Override
     public ComponentProperties createProperties() {
-        ComponentProperties compProp = doCreateProperties();
+        ComponentProperties compProp = null;
+        try {
+            compProp = (ComponentProperties) propertiesClass.newInstance();
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
         compProp.init();
         return compProp;
     }
 
-    /**
-     * Shall be implemented to create the component properties
-     */
-    abstract protected ComponentProperties doCreateProperties();
-
+    public boolean supportsProperties(ComponentProperties properties) {
+        return propertiesClass.isAssignableFrom(properties.getClass());
+    }
 
     //
     // DI Flags - default definitions
@@ -60,6 +62,7 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
     }
 
     public static final String AUTO = "Auto";
+
     public static final String NONE = "None";
 
     public String getPartitioning() {

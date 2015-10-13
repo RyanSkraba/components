@@ -22,9 +22,9 @@ public class TSalesforceGetServerTimestampProperties extends ComponentProperties
     //
     // Collections
     //
-    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection"); //$NON-NLS-1$
+    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties();
 
-    public SalesforceModuleProperties module = new SalesforceModuleProperties("module", connection); //$NON-NLS-1$
+    public SalesforceModuleProperties module = new SalesforceModuleProperties().setConnection(connection);
 
     @Override
     public void setupLayout() {

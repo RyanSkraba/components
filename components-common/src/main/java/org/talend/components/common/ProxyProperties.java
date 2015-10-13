@@ -26,10 +26,6 @@ public class ProxyProperties extends ComponentProperties {
 
     public UserPasswordProperties userPassword = new UserPasswordProperties(); //$NON-NLS-1$
 
-    public ProxyProperties() {
-        super("proxyProperties");
-    }
-
     public void setupLayout() {
         super.setupLayout();
         Form form = Form.create(this, Form.MAIN, "Proxy Parameters");

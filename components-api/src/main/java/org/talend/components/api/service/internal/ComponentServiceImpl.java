@@ -13,9 +13,7 @@
 package org.talend.components.api.service.internal;
 
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,6 +96,16 @@ public class ComponentServiceImpl implements ComponentService {
     }
 
     @Override
+    public List<ComponentDefinition> getPossibleComponents(ComponentProperties properties) {
+        List<ComponentDefinition> returnList = new ArrayList<>();
+        for (ComponentDefinition cd : componentRegistry.getComponents().values()) {
+            if (cd.supportsProperties(properties))
+                returnList.add(cd);
+        }
+        return returnList;
+    }
+
+    @Override
     public ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable {
         properties.validateProperty(propName);
         return properties;
@@ -141,8 +149,8 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     public InputStream getWizardPngImage(String wizardName, WizardImageType imageType) {
-        ComponentWizardDefinition wizardDefinition = componentRegistry.getComponentWizards()
-                .get(Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);
+        ComponentWizardDefinition wizardDefinition = componentRegistry.getComponentWizards().get(
+                Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);
         if (wizardDefinition != null) {
             return getImageStream(wizardDefinition, wizardDefinition.getPngImagePath(imageType));
         } else {
@@ -153,13 +161,13 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     public InputStream getComponentPngImage(String componentName, ComponentImageType imageType) {
-        ComponentDefinition componentDefinition = componentRegistry.getComponents()
-                .get(Constants.COMPONENT_BEAN_PREFIX + componentName);
+        ComponentDefinition componentDefinition = componentRegistry.getComponents().get(
+                Constants.COMPONENT_BEAN_PREFIX + componentName);
         if (componentDefinition != null) {
             return getImageStream(componentDefinition, componentDefinition.getPngImagePath(imageType));
         } else {
-            throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME,
-                    ExceptionContext.build().put("name", componentName)); //$NON-NLS-1$
+            throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME, ExceptionContext.build().put(
+                    "name", componentName)); //$NON-NLS-1$
         }
     }
 
@@ -186,8 +194,7 @@ public class ComponentServiceImpl implements ComponentService {
     }
 
     @Override
-    public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation,
-            Schema schema) {
+    public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation, Schema schema) {
         if (repository != null) {
             return repository.storeComponentProperties(properties, name, repositoryLocation, schema);
         }
