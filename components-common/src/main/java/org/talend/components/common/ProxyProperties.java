@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.schema.SchemaFactory.newProperty;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
@@ -32,6 +32,24 @@ public class ProxyProperties extends ComponentProperties {
         form.addRow(useProxy);
         form.addRow(host);
         form.addRow(userPassword.getForm(Form.MAIN));
+    }
+
+    public void afterUseProxy() {
+        refreshLayout(getForm(Form.MAIN));
+    }
+
+    @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+        if (form.getName().equals(Form.MAIN)) {
+            if (getBooleanValue(useProxy)) {
+                form.getWidget("host").setVisible(true);
+                form.getWidget(UserPasswordProperties.class).setVisible(true);
+            } else {
+                form.getWidget("host").setVisible(false);
+                form.getWidget(UserPasswordProperties.class).setVisible(false);
+            }
+        }
     }
 
 }

@@ -114,6 +114,12 @@ public class Widget {
 
     private boolean callAfter;
 
+    /**
+     * Used for the {@link WidgetType#COMPONENT_REFERENCE} to give the name of the components to search for in the
+     * referenced environment, i.e. the job.
+     */
+    private String referencedComponentName;
+
     private NamedThing[] properties;
 
     public static Widget widget(NamedThing... properties) {
@@ -184,6 +190,14 @@ public class Widget {
     public Widget setDeemphasize(boolean deemphasize) {
         this.deemphasize = deemphasize;
         return this;
+    }
+
+    public String getReferencedComponentName() {
+        return referencedComponentName;
+    }
+
+    public void setReferencedComponentName(String referencedComponentName) {
+        this.referencedComponentName = referencedComponentName;
     }
 
     //
