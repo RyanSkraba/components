@@ -59,8 +59,7 @@ public abstract class SalesforceDefinition extends AbstractComponentDefinition {
 
     @Override
     public InputStream getMavenPom() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.getClass().getResourceAsStream("/org/talend/components/salesforce/pom.xml");
     }
 
 }

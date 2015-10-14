@@ -1,96 +1,119 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.talend.components</groupId>
-        <artifactId>components</artifactId>
-        <version>0.1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
-    <properties>
-       <partner.version>34.0.0</partner.version>
-    </properties>
+	<parent>
+		<groupId>org.talend.components</groupId>
+		<artifactId>components</artifactId>
+		<version>0.1-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+	<properties>
+		<partner.version>34.0.0</partner.version>
+	</properties>
 
-    <artifactId>components-salesforce</artifactId>
-    <name>Components - Salesforce</name>
-    <packaging>bundle</packaging>
-    <dependencies>
+	<artifactId>components-salesforce</artifactId>
+	<name>Components - Salesforce</name>
+	<packaging>bundle</packaging>
+	<dependencies>
 
-        <dependency>
-            <groupId>com.force.api</groupId>
-            <artifactId>force-wsc</artifactId>
-            <version>35.0.0</version>
-        </dependency>
-
-        <!-- Generated Jar files from the WSDL -->
-        <dependency>
-            <groupId>org.talend.components.salesforce</groupId>
-            <artifactId>partner</artifactId>
-            <version>${partner.version}</version>
-<!--             <scope>provided</scope> -->
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components.salesforce</groupId>
-            <artifactId>metadata</artifactId>
-            <version>34.0.0</version>
-        </dependency>
-        <dependency>
-		    <groupId>com.googlecode.json-simple</groupId>
-		    <artifactId>json-simple</artifactId>
-		    <version>1.1.1</version>
+		<dependency>
+			<groupId>com.force.api</groupId>
+			<artifactId>force-wsc</artifactId>
+			<version>35.0.0</version>
 		</dependency>
-		        
 
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api</artifactId>
-            <version>0.1-SNAPSHOT</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-common</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-common-oauth</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>biz.aQute</groupId>
-            <artifactId>bndlib</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-        </dependency>        
-    </dependencies>
+		<!-- Generated Jar files from the WSDL -->
+		<dependency>
+			<groupId>org.talend.components.salesforce</groupId>
+			<artifactId>partner</artifactId>
+			<version>${partner.version}</version>
+			<!-- <scope>provided</scope> -->
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components.salesforce</groupId>
+			<artifactId>metadata</artifactId>
+			<version>34.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+		</dependency>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.5.4</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Import-Package>!*internal,org.talend*,org.slf4j*</Import-Package>
-                        <Service-Component>*</Service-Component>
-                        <Embed-Dependency>!components*,*;scope=compile|runtime</Embed-Dependency>
-                        <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-<!--                         <Bundle-ClassPath>{maven-dependencies},partner-${partner.version}.jar;mvn:org.talend.components.salesforce/partner/${partner.version}</Bundle-ClassPath> -->                        
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api</artifactId>
+			<version>0.1-SNAPSHOT</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-common</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-common-oauth</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>biz.aQute</groupId>
+			<artifactId>bndlib</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+		<!-- The pom is a resource of the component this is why it is copied as such at the top level package -->
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.7</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/classes/org/talend/components/salesforce</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}</directory>
+									<include>pom.xml</include>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.5.4</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Import-Package>!*internal,org.talend*,org.slf4j*</Import-Package>
+						<Service-Component>*</Service-Component>
+						<Embed-Dependency>!components*,*;scope=compile|runtime</Embed-Dependency>
+						<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
+						<!-- <Bundle-ClassPath>{maven-dependencies},partner-${partner.version}.jar;mvn:org.talend.components.salesforce/partner/${partner.version}</Bundle-ClassPath> -->
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

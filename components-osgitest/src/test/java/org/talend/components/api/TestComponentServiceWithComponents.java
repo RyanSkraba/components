@@ -132,6 +132,13 @@ public class TestComponentServiceWithComponents {
         assertEquals("Create Salesforce Connection", salesforceWizDef.getMenuItemName()); //$NON-NLS-1$
     }
 
+    @Test
+    public void testDepenenciesForSalesforce() {
+        assertNotNull(componentService);
+        Set<String> deps = componentService.getMavenUriDependencies(TSalesforceConnectionDefinition.COMPONENT_NAME);
+        assertEquals(11, deps.size());
+    }
+
     /**
      * DOC sgandon Comment method "findWizardDefinition".
      * 
