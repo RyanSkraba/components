@@ -26,6 +26,7 @@ import org.talend.components.api.runtime.ComponentRuntimeContainer;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.schema.SchemaFactory;
+import org.talend.components.api.service.ComponentService;
 import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnection;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
@@ -88,6 +89,8 @@ public class SalesforceRuntime extends ComponentRuntime {
      */
     private SchemaElement dynamicField;
 
+    private ComponentService componentService;
+
     public SalesforceRuntime() {
         commitLevel = 1;
         int arraySize = commitLevel * 2;
@@ -118,6 +121,10 @@ public class SalesforceRuntime extends ComponentRuntime {
         if (errorLogFile != null && errorLogFile.trim().length() > 0) {
             logWriter = new java.io.BufferedWriter(new java.io.FileWriter(errorLogFile));
         }
+    }
+
+    public void setComponentService(ComponentService service) {
+        componentService = service;
     }
 
     protected void connectBulk(SalesforceConnectionProperties properties, ConnectorConfig config) throws AsyncApiException {
@@ -171,7 +178,12 @@ public class SalesforceRuntime extends ComponentRuntime {
         return vr;
     }
 
-    public void connect(final SalesforceConnectionProperties properties) throws ConnectionException, AsyncApiException {
+    public void connect(SalesforceConnectionProperties properties) throws ConnectionException, AsyncApiException {
+        String refedComponentId = properties.getStringValue(properties.referencedComponentId);
+        if (refedComponentId != null) {
+            properties = (SalesforceConnectionProperties) componentService.getPropertiesForComponent(refedComponentId);
+        }
+
         ConnectorConfig config = new ConnectorConfig();
         config.setUsername(properties.userPassword.getStringValue(properties.userPassword.userId));
         config.setPassword(properties.userPassword.getStringValue(properties.userPassword.password)
@@ -180,6 +192,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         // Notes on how to test this
         // http://thysmichels.com/2014/02/15/salesforce-wsc-partner-connection-session-renew-when-session-timeout/
 
+        final SalesforceConnectionProperties finalProps = properties;
         config.setSessionRenewer(new SessionRenewer() {
 
             @Override
@@ -188,7 +201,7 @@ public class SalesforceRuntime extends ComponentRuntime {
                 try {
                     // FIXME - session id need to be null for trigger the login?
                     // connectorConfig.setSessionId(null);
-                    doConnection(properties, connectorConfig);
+                    doConnection(finalProps, connectorConfig);
                 } catch (AsyncApiException e) {
                     // FIXME
                     e.printStackTrace();

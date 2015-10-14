@@ -25,7 +25,6 @@ import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget.WidgetType;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.common.ProxyProperties;
-import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.common.oauth.OauthProperties;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
@@ -45,6 +44,8 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
     // Only for the wizard use
     public SchemaElement name = newProperty("name").setRequired(true);
+
+    public SchemaElement referencedComponentId = newProperty("referencedComponentId");
 
     public static final String LOGIN_BASIC = "Basic";
 
@@ -98,17 +99,13 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         wizardForm.setSubtitle(getI18nMessage("property.form.Main.subtitle"));
         wizardForm.addRow(name);
         wizardForm.addRow(widget(loginType).setDeemphasize(true));
-
-        // Only one of these is visible at a time
         wizardForm.addRow(oauth.getForm(Form.MAIN));
         wizardForm.addRow(userPassword.getForm(Form.MAIN));
-
         wizardForm.addRow(widget(advanced).setWidgetType(WidgetType.BUTTON));
         wizardForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
 
         Form mainForm = Form.create(this, Form.MAIN, getI18nMessage("property.form.Main.title"));
         mainForm.addRow(loginType);
-        // Only one of these is visible at a time
         mainForm.addRow(oauth.getForm(Form.MAIN));
         mainForm.addRow(userPassword.getForm(Form.MAIN));
 
@@ -120,11 +117,20 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         advancedForm.addRow(timeout);
         advancedForm.addRow(proxy.getForm(Form.MAIN));
         advanced.setFormtoShow(advancedForm);
+
+        Form refForm = Form.create(this, Form.REFERENCE, "Connection Reference");
+        refForm.addRow(widget(referencedComponentId).setWidgetType(WidgetType.COMPONENT_REFERENCE));
+        refForm.addRow(mainForm);
     }
 
     public void afterLoginType() {
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(FORM_WIZARD));
+    }
+
+    public void afterReferencedComponentId() {
+        refreshLayout(getForm(Form.REFERENCE));
+        refreshLayout(getForm(Form.ADVANCED));
     }
 
     public ValidationResult validateTestConnection() throws Exception {
@@ -146,6 +152,10 @@ public class SalesforceConnectionProperties extends ComponentProperties {
                 throw new RuntimeException("Enum value should be handled :" + getValue(loginType));
             }
         }
+
+        boolean useOtherConnection = referencedComponentId != null;
+        getForm(Form.REFERENCE).getWidget(SalesforceConnectionProperties.class).setVisible(!useOtherConnection);
+        // FIXME - what about the advanced form?
     }
 
 }

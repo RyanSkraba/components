@@ -203,6 +203,11 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
+    public ComponentProperties getPropertiesForComponent(String componentId) {
+        return componentServiceDelegate.getPropertiesForComponent(componentId);
+    }
+
+    @Override
     public void setRepository(Repository repository) {
         componentServiceDelegate.setRepository(repository);
     }

@@ -116,23 +116,45 @@ public class SalesforceLocalComponentTest extends TestCase {
         }
     }
 
+    class TestRepository implements Repository {
+
+        private int locationNum;
+
+        public String componentIdToCheck;
+
+        public ComponentProperties properties;
+
+        public List<RepoProps> repoProps;
+
+        TestRepository(List<RepoProps> repoProps) {
+            this.repoProps = repoProps;
+        }
+
+        @Override
+        public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation,
+                Schema schema) {
+            RepoProps rp = new RepoProps(properties, name, repositoryLocation, schema);
+            repoProps.add(rp);
+            System.out.println(rp);
+            return repositoryLocation + ++locationNum;
+        }
+
+        @Override
+        public ComponentProperties getPropertiesForComponent(String componentId) {
+            if (componentId.equals(componentIdToCheck)) {
+                System.out.println("getProps: " + componentId + " found: " + properties);
+                return properties;
+            }
+            return null;
+        }
+
+    }
+
     @Test
     public void testWizard() throws Throwable {
         final List<RepoProps> repoProps = new ArrayList<>();
 
-        Repository repo = new Repository() {
-
-            private int locationNum;
-
-            @Override
-            public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation,
-                    Schema schema) {
-                RepoProps rp = new RepoProps(properties, name, repositoryLocation, schema);
-                repoProps.add(rp);
-                System.out.println(rp);
-                return repositoryLocation + ++locationNum;
-            }
-        };
+        Repository repo = new TestRepository(repoProps);
         componentService.setRepository(repo);
 
         Set<ComponentWizardDefinition> wizards = componentService.getTopLevelComponentWizards();
@@ -392,6 +414,43 @@ public class SalesforceLocalComponentTest extends TestCase {
         }
         assertEquals("Id", schema.getRoot().getChildren().get(0).getName());
         assertTrue(schema.getRoot().getChildren().size() > 50);
+    }
+
+    @Test
+    public void testInputConnectionRef() throws Throwable {
+        TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
+                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
+        setupProps(props.connection);
+        SalesforceRuntime runtime = new SalesforceRuntime();
+        runtime.setComponentService(componentService);
+        runtime.connect(props.connection);
+
+        // Referenced properties simulating salesforce connect component
+        SalesforceConnectionProperties cProps = (SalesforceConnectionProperties) componentService
+                .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
+        setupProps(cProps);
+        cProps.userPassword.setValue(cProps.userPassword.password, "xxx");
+
+        String compId = "comp1";
+
+        TestRepository repo = new TestRepository(null);
+        repo.properties = cProps;
+        repo.componentIdToCheck = compId;
+        componentService.setRepository(repo);
+
+        // Use the connection props of the salesforce connect component
+        props.connection.setValue(props.connection.referencedComponentId, compId);
+        checkAndAfter(props.connection.getForm(Form.REFERENCE), "referencedComponentId", props.connection);
+        try {
+            runtime.connect(props.connection);
+            fail("Expected exception");
+        } catch (Exception ex) {
+            System.out.println("Got expected: " + ex.getMessage());
+        }
+
+        // Back to using the connection props of the salesforce input component
+        props.connection.setValue(props.connection.referencedComponentId, null);
+        runtime.connect(props.connection);
     }
 
     @Test

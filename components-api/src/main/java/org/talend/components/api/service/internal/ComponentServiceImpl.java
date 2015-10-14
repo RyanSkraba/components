@@ -219,6 +219,14 @@ public class ComponentServiceImpl implements ComponentService {
     }
 
     @Override
+    public ComponentProperties getPropertiesForComponent(String componentId) {
+        if (repository != null) {
+            return repository.getPropertiesForComponent(componentId);
+        }
+        return null;
+    }
+
+    @Override
     public void setRepository(Repository repository) {
         this.repository = repository;
     }
