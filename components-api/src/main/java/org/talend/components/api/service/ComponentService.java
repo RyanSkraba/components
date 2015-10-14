@@ -28,6 +28,9 @@ import org.talend.components.api.wizard.WizardImageType;
 /**
  * The Main service provided by this project to get access to all registered components and their properties.
  */
+/**
+ * created by sgandon on 9 oct. 2015
+ */
 public interface ComponentService extends Repository {
 
     /**
@@ -139,5 +142,15 @@ public interface ComponentService extends Repository {
      * @param repository
      */
     void setRepository(Repository repository);
+
+    /**
+     * list all the depencencies required for this component to be executed at runtime
+     * 
+     * @param componentName name of the component to get the dependencies of.
+     * @return a set of maven uri following the pax-maven uri scheme @see
+     * <a href="https://ops4j1.jira.com/wiki/display/paxurl/Mvn+Protocol">https://ops4j1.jira.com/wiki/display/paxurl/
+     * Mvn+Protocol</a>
+     */
+    Set<String> getMavenUriDependencies(String componentName);
 
 }

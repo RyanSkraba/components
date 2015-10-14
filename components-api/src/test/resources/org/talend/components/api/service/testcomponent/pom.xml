@@ -5,8 +5,7 @@
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components</artifactId>
-		<version>0.1-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
+        <version>0.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>components-api</artifactId>
@@ -17,15 +16,7 @@
     <aetherVersion>1.0.0.v20140518</aetherVersion>
     <mavenVersion>3.1.0</mavenVersion>
   </properties>	
-	<dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-utils</artifactId>
-        <version>3.0.15</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -129,6 +120,7 @@
             <artifactId>maven-model</artifactId>
             <version>3.3.3</version>
         </dependency>
+        
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.plexus</artifactId>

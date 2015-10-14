@@ -1,11 +1,16 @@
 package org.talend.components.salesforce;
 
+import javax.inject.Inject;
+
 import org.talend.components.api.Constants;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.AbstractComponentWizardDefintion;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
+
+import aQute.bnd.annotation.component.Reference;
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_WIZARD_BEAN_PREFIX
         + SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME)
@@ -15,6 +20,14 @@ public class SalesforceConnectionWizardDefinition extends AbstractComponentWizar
 
     public static final String COMPONENT_WIZARD_NAME = "salesforce"; //$NON-NLS-1$
 
+    @Inject
+    ComponentService compService;
+
+    @Reference
+    public void setupComponentServiceFromOsgi(ComponentService compService) {
+        this.compService = compService;
+    }
+
     @Override
     public String getName() {
         return COMPONENT_WIZARD_NAME;
@@ -22,13 +35,14 @@ public class SalesforceConnectionWizardDefinition extends AbstractComponentWizar
 
     @Override
     public ComponentWizard createWizard(String location) {
-        return new SalesforceConnectionWizard(this, location);
+        return new SalesforceConnectionWizard(this, location, compService);
     }
 
     @Override
     public boolean supportsProperties(ComponentProperties properties) {
-        if (properties instanceof SalesforceConnectionProperties)
+        if (properties instanceof SalesforceConnectionProperties) {
             return true;
+        }
         return false;
     }
 
@@ -57,6 +71,5 @@ public class SalesforceConnectionWizardDefinition extends AbstractComponentWizar
     public boolean isTopLevel() {
         return true;
     }
-
 
 }

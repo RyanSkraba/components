@@ -88,6 +88,14 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
+    @RequestMapping(value = BASE_PATH
+            + "/dependencies/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Set<String> getMavenUriDependencies(
+            @PathVariable(value = "name") @ApiParam(name = "name", value = "Name of the component") String name) {
+        return componentServiceDelegate.getMavenUriDependencies(name);
+    }
+
+    @Override
     @RequestMapping(value = BASE_PATH + "/wizard/{name}/{repositoryLocation}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ComponentWizard getComponentWizard(
             @PathVariable(value = "name") @ApiParam(name = "name", value = "Name of the component") String name,

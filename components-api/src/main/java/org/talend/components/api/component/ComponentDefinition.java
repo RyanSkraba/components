@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.api.component;
 
+import java.io.InputStream;
+
 import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
@@ -98,5 +100,7 @@ public interface ComponentDefinition extends TopLevelDefinition {
 
     // FIXME - An ENUM perhaps?
     public String getPartitioning();
+
+    public InputStream getMavenPom();
 
 }

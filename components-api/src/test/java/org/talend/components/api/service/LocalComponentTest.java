@@ -194,4 +194,14 @@ public class LocalComponentTest extends TestCase {
         assertEquals("A Fanstastic Property", greatProperty.getDisplayName()); //$NON-NLS-1$
     }
 
+    @Test
+    public void testGetDepenencies() {
+        // check the comp def return the proper stream for the pom
+        TestComponentDefinition testComponentDefinition = new TestComponentDefinition();
+        assertNotNull(testComponentDefinition.getMavenPom());
+        Set<String> mavenUriDependencies = componentService.getMavenUriDependencies(TestComponentDefinition.COMPONENT_NAME);
+        System.out.println("deps:" + mavenUriDependencies);
+        assertEquals(24, mavenUriDependencies.size());
+    }
+
 }

@@ -2,6 +2,7 @@ package org.talend.components.salesforce;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 
@@ -12,21 +13,24 @@ public class SalesforceConnectionWizard extends ComponentWizard {
 
     SalesforceModuleListProperties mProps;
 
-    SalesforceConnectionWizard(ComponentWizardDefinition def, String repositoryLocation) {
+    SalesforceConnectionWizard(ComponentWizardDefinition def, String repositoryLocation, ComponentService compService) {
         super(def, repositoryLocation);
 
         SalesforceConnectionProperties cProps = new SalesforceConnectionProperties();
         cProps.init();
         addForm(cProps.getForm(SalesforceConnectionProperties.FORM_WIZARD));
 
-        mProps = new SalesforceModuleListProperties().setConnection(cProps).setRepositoryLocation(getRepositoryLocation());
+        mProps = new SalesforceModuleListProperties().setConnection(cProps).setRepositoryLocation(getRepositoryLocation())
+                .setComponentService(compService);
+        ;
         mProps.init();
         addForm(mProps.getForm(Form.MAIN));
     }
 
     public boolean supportsProperties(ComponentProperties properties) {
-        if (properties instanceof SalesforceConnectionProperties)
+        if (properties instanceof SalesforceConnectionProperties) {
             return true;
+        }
         return false;
     }
 

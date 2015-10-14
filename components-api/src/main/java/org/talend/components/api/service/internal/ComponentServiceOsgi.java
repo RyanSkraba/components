@@ -212,4 +212,9 @@ public class ComponentServiceOsgi implements ComponentService {
         componentServiceDelegate.setRepository(repository);
     }
 
+    @Override
+    public Set<String> getMavenUriDependencies(String componentName) {
+        return componentServiceDelegate.getMavenUriDependencies(componentName);
+    }
+
 }

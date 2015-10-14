@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
+import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
 import java.util.List;
 
@@ -25,7 +25,6 @@ import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.service.internal.ComponentServiceImpl;
 
 public class SalesforceModuleListProperties extends ComponentProperties {
 
@@ -34,6 +33,8 @@ public class SalesforceModuleListProperties extends ComponentProperties {
     private String repositoryLocation;
 
     private List<NameAndLabel> moduleNames;
+
+    private ComponentService compService;
 
     //
     // Properties
@@ -82,9 +83,7 @@ public class SalesforceModuleListProperties extends ComponentProperties {
             return;
         }
 
-        ComponentService service = ComponentServiceImpl.TEMP_INSTANCE;
-
-        String connRepLocation = service.storeComponentProperties(connectionProps,
+        String connRepLocation = compService.storeComponentProperties(connectionProps,
                 (String) connectionProps.getValue(connectionProps.name), repositoryLocation, null);
 
         @SuppressWarnings("unchecked")
@@ -94,9 +93,19 @@ public class SalesforceModuleListProperties extends ComponentProperties {
             Schema schema = conn.getSchema(nl.getName());
             modProps.setValue(modProps.moduleName, nl.getName());
             modProps.schema.setValue(modProps.schema.schema, schema);
-            service.storeComponentProperties(modProps, nl.getName(), connRepLocation, schema);
+            compService.storeComponentProperties(modProps, nl.getName(), connRepLocation, schema);
         }
 
     }
 
+    /**
+     * Sets the compService.
+     * 
+     * @param compService the compService to set
+     * @return
+     */
+    public SalesforceModuleListProperties setComponentService(ComponentService compService) {
+        this.compService = compService;
+        return this;
+    }
 }

@@ -1,5 +1,7 @@
 package org.talend.components.api.service.testcomponent;
 
+import java.io.InputStream;
+
 import org.springframework.stereotype.Component;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
@@ -43,13 +45,10 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
         return null;
     }
 
-    // @Override
-    // public URI getMavenGavUri() {
-    // try {
-    // return new URI("mvn:org.talend.components/components-api-test/0.1");
-    // } catch (URISyntaxException e) {
-    // throw new RuntimeException(e);// this should never happend if the url is properly formated.
-    // }
-    // }
+
+    @Override
+    public InputStream getMavenPom() {
+        return this.getClass().getResourceAsStream("pom.xml");
+    }
 
 }

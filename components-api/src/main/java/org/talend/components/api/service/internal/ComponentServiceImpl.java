@@ -12,9 +12,38 @@
 // ============================================================================
 package org.talend.components.api.service.internal;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
+import org.apache.maven.model.Model;
+import org.apache.maven.model.building.DefaultModelBuilderFactory;
+import org.apache.maven.model.building.DefaultModelBuildingRequest;
+import org.apache.maven.model.building.ModelBuilder;
+import org.apache.maven.model.building.ModelBuildingException;
+import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelBuildingResult;
+import org.apache.maven.model.building.ModelSource;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectModelResolver;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.collection.CollectResult;
+import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.internal.impl.DefaultRemoteRepositoryManager;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.Constants;
@@ -44,12 +73,10 @@ public class ComponentServiceImpl implements ComponentService {
 
     private ComponentRegistry componentRegistry;
 
-    // FIXME - temporary to allow service to be found inside of ComponentProperties
-    public static ComponentService TEMP_INSTANCE;
+    private ModelBuilder modelBuilder;
 
     public ComponentServiceImpl(ComponentRegistry componentRegistry) {
         this.componentRegistry = componentRegistry;
-        TEMP_INSTANCE = this;
     }
 
     @Override
@@ -72,19 +99,16 @@ public class ComponentServiceImpl implements ComponentService {
     public Set<ComponentWizardDefinition> getTopLevelComponentWizards() {
         Set<ComponentWizardDefinition> defs = new HashSet<>();
         for (ComponentWizardDefinition def : componentRegistry.getComponentWizards().values()) {
-            if (def.isTopLevel())
+            if (def.isTopLevel()) {
                 defs.add(def);
+            }
         }
         return defs;
     }
 
     @Override
     public ComponentProperties getComponentProperties(String name) {
-        final String beanName = Constants.COMPONENT_BEAN_PREFIX + name;
-        ComponentDefinition compDef = componentRegistry.getComponents().get(beanName);
-        if (compDef == null) {
-            throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME, ExceptionContext.build().put("name", name)); //$NON-NLS-1$
-        } // else got the def so use it
+        ComponentDefinition compDef = getComponentDefinition(name);
         ComponentProperties properties = compDef.createProperties();
         return properties;
     }
@@ -116,8 +140,9 @@ public class ComponentServiceImpl implements ComponentService {
     public List<ComponentDefinition> getPossibleComponents(ComponentProperties properties) {
         List<ComponentDefinition> returnList = new ArrayList<>();
         for (ComponentDefinition cd : componentRegistry.getComponents().values()) {
-            if (cd.supportsProperties(properties))
+            if (cd.supportsProperties(properties)) {
                 returnList.add(cd);
+            }
         }
         return returnList;
     }
@@ -166,8 +191,8 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     public InputStream getWizardPngImage(String wizardName, WizardImageType imageType) {
-        ComponentWizardDefinition wizardDefinition = componentRegistry.getComponentWizards().get(
-                Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);
+        ComponentWizardDefinition wizardDefinition = componentRegistry.getComponentWizards()
+                .get(Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);
         if (wizardDefinition != null) {
             return getImageStream(wizardDefinition, wizardDefinition.getPngImagePath(imageType));
         } else {
@@ -178,13 +203,13 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     public InputStream getComponentPngImage(String componentName, ComponentImageType imageType) {
-        ComponentDefinition componentDefinition = componentRegistry.getComponents().get(
-                Constants.COMPONENT_BEAN_PREFIX + componentName);
+        ComponentDefinition componentDefinition = componentRegistry.getComponents()
+                .get(Constants.COMPONENT_BEAN_PREFIX + componentName);
         if (componentDefinition != null) {
             return getImageStream(componentDefinition, componentDefinition.getPngImagePath(imageType));
         } else {
-            throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME, ExceptionContext.build().put(
-                    "name", componentName)); //$NON-NLS-1$
+            throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME,
+                    ExceptionContext.build().put("name", componentName)); //$NON-NLS-1$
         }
     }
 
@@ -211,7 +236,8 @@ public class ComponentServiceImpl implements ComponentService {
     }
 
     @Override
-    public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation, Schema schema) {
+    public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation,
+            Schema schema) {
         if (repository != null) {
             return repository.storeComponentProperties(properties, name, repositoryLocation, schema);
         }
@@ -229,6 +255,134 @@ public class ComponentServiceImpl implements ComponentService {
     @Override
     public void setRepository(Repository repository) {
         this.repository = repository;
+    }
+
+    @Override
+    public Set<String> getMavenUriDependencies(String componentName) {
+        ComponentDefinition componentDef = getComponentDefinition(componentName);
+        InputStream mavenPomStream = componentDef.getMavenPom();
+        try {
+            return computeDependenciesFromPom(mavenPomStream, componentDef);
+        } catch (IOException | XmlPullParserException | DependencyCollectionException
+                | org.eclipse.aether.resolution.DependencyResolutionException | ModelBuildingException e) {
+            throw new ComponentException(ComponentsErrorCode.COMPUTE_DEPENDENCIES_FAILED, e);
+        }
+    }
+
+    /**
+     * @param name the name of the component to be retreived
+     * @return a ComponentDefinition according to the name or throws an exception, never null
+     * @exception ComponentException is none is found with the given name
+     */
+    private ComponentDefinition getComponentDefinition(String name) {
+        final String beanName = Constants.COMPONENT_BEAN_PREFIX + name;
+        ComponentDefinition compDef = componentRegistry.getComponents().get(beanName);
+        if (compDef == null) {
+            throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME, ExceptionContext.build().put("name", name)); //$NON-NLS-1$
+        } // else got the def so use it
+        return compDef;
+    }
+
+    /**
+     * DOC sgandon Comment method "computeDependenciesFromPom".
+     * 
+     * @param mavenPomStream
+     * @param componentDef will only be used to for its name in case of errors.
+     * @return
+     * @throws org.eclipse.aether.resolution.DependencyResolutionException
+     * @throws DependencyCollectionException
+     * @throws XmlPullParserException
+     * @throws IOException
+     * @throws ModelBuildingException
+     * @throws Exception
+     */
+    private Set<String> computeDependenciesFromPom(InputStream mavenPomStream, ComponentDefinition componentDef)
+            throws DependencyCollectionException, org.eclipse.aether.resolution.DependencyResolutionException, IOException,
+            XmlPullParserException, ModelBuildingException {
+        MavenBooter booter = new MavenBooter();
+
+        Model pomModel = loadPom(mavenPomStream, booter, Collections.EMPTY_LIST);
+
+        List<org.apache.maven.model.Dependency> dependencies = pomModel.getDependencies();
+        Set<String> depsStrings = new HashSet<>(dependencies.size());
+        depsStrings.add("mvn:" + pomModel.getGroupId() + "/" + pomModel.getArtifactId() + "/" + pomModel.getVersion());
+        for (org.apache.maven.model.Dependency dep : dependencies) {
+            depsStrings
+                    .add("mvn:" + dep.getGroupId() + "/" + dep.getArtifactId() + "/" + dep.getVersion() + (dep.getType() == null
+                            ? "" : "/" + dep.getType() + (dep.getClassifier() == null ? "" : "/" + dep.getClassifier())));
+        }
+        return depsStrings;
+    }
+
+    public static List<Dependency> getArtifactsDependencies(MavenProject project, String scope, RepositorySystem repoSystem,
+            RepositorySystemSession repoSession)
+                    throws DependencyCollectionException, org.eclipse.aether.resolution.DependencyResolutionException {
+        DefaultArtifact pomArtifact = new DefaultArtifact(project.getId());
+
+        List<RemoteRepository> remoteRepos = project.getRemoteProjectRepositories();
+        List<Dependency> ret = new ArrayList<>();
+
+        Dependency dependency = new Dependency(pomArtifact, scope);
+        ret.add(dependency);
+
+        CollectRequest collectRequest = new CollectRequest();
+        collectRequest.setRoot(dependency);
+        collectRequest.setRepositories(remoteRepos);
+
+        CollectResult collectResult = repoSystem.collectDependencies(repoSession,
+                new CollectRequest(new Dependency(pomArtifact, "runtime"), null)); //$NON-NLS-1$
+        DependencyNode root = collectResult.getRoot();
+        List<DependencyNode> children = root.getChildren();
+        for (DependencyNode dn : children) {
+            ret.add(dn.getDependency());
+        }
+        return ret;
+    }
+
+    Model loadPom(final InputStream pomStream, MavenBooter booter, List<String> profilesList) throws ModelBuildingException {
+
+        RepositorySystem system = booter.newRepositorySystem();
+        RepositorySystemSession session = booter.newRepositorySystemSession(system);
+        ModelBuildingRequest modelRequest = new DefaultModelBuildingRequest();
+        modelRequest.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        modelRequest.setProcessPlugins(false);
+        modelRequest.setTwoPhaseBuilding(false);
+        modelRequest.setSystemProperties(toProperties(session.getUserProperties(), session.getSystemProperties()));
+        // modelRequest.setModelCache( DefaultModelCache.newInstance( session ) );
+        ProjectModelResolver projectModelResolver = new ProjectModelResolver(session, null, system,
+                new DefaultRemoteRepositoryManager(), booter.getRemoteRepositoriesWithAuthentification(system, session), null,
+                null);
+        modelRequest.setModelResolver(projectModelResolver);
+        modelRequest.setActiveProfileIds(profilesList);
+        modelRequest.setModelSource(new ModelSource() {
+
+            @Override
+            public InputStream getInputStream() throws IOException {
+                return pomStream;
+            }
+
+            @Override
+            public String getLocation() {
+                return "";// FIXME return the component name
+            }
+        });
+        if (modelBuilder == null) {
+            modelBuilder = new DefaultModelBuilderFactory().newInstance();
+        }
+        ModelBuildingResult builtModel = modelBuilder.build(modelRequest);
+        System.out.println("built problems:" + builtModel.getProblems());
+        return builtModel.getEffectiveModel();
+    }
+
+    private Properties toProperties(Map<String, String> dominant, Map<String, String> recessive) {
+        Properties props = new Properties();
+        if (recessive != null) {
+            props.putAll(recessive);
+        }
+        if (dominant != null) {
+            props.putAll(dominant);
+        }
+        return props;
     }
 
 }

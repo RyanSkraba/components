@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
+import java.io.InputStream;
+
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
@@ -53,6 +55,12 @@ public abstract class SalesforceDefinition extends AbstractComponentDefinition {
     public String getDisplayName() {
         // FIXME
         return getName();
+    }
+
+    @Override
+    public InputStream getMavenPom() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
