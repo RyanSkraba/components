@@ -34,7 +34,7 @@ public class SalesforceModuleListProperties extends ComponentProperties {
 
     private List<NameAndLabel> moduleNames;
 
-    private ComponentService compService;
+    transient private ComponentService compService;
 
     //
     // Properties
