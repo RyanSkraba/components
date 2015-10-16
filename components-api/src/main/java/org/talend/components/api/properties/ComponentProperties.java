@@ -268,6 +268,10 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         internal.setValue(property, value);
     }
 
+    public void setValue(String property, Object value) {
+        setValue(getProperty(property), value);
+    }
+
     public Object getValue(SchemaElement property) {
         return internal.getValue(property);
     }
