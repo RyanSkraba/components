@@ -15,6 +15,7 @@ package org.talend.components.api.service.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -34,16 +35,22 @@ import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectModelResolver;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.CollectResult;
 import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.internal.impl.DefaultRemoteRepositoryManager;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.util.graph.selector.AndDependencySelector;
+import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
+import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
+import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.Constants;
@@ -262,7 +269,7 @@ public class ComponentServiceImpl implements ComponentService {
         ComponentDefinition componentDef = getComponentDefinition(componentName);
         InputStream mavenPomStream = componentDef.getMavenPom();
         try {
-            return computeDependenciesFromPom(mavenPomStream, componentDef);
+            return computeDependenciesFromPom(mavenPomStream, "test", "provided"); //$NON-NLS-1$
         } catch (IOException | XmlPullParserException | DependencyCollectionException
                 | org.eclipse.aether.resolution.DependencyResolutionException | ModelBuildingException e) {
             throw new ComponentException(ComponentsErrorCode.COMPUTE_DEPENDENCIES_FAILED, e);
@@ -296,47 +303,65 @@ public class ComponentServiceImpl implements ComponentService {
      * @throws ModelBuildingException
      * @throws Exception
      */
-    private Set<String> computeDependenciesFromPom(InputStream mavenPomStream, ComponentDefinition componentDef)
+    Set<String> computeDependenciesFromPom(InputStream mavenPomStream, String... excludedScopes)
             throws DependencyCollectionException, org.eclipse.aether.resolution.DependencyResolutionException, IOException,
             XmlPullParserException, ModelBuildingException {
         MavenBooter booter = new MavenBooter();
-
+        // FIXME we may not have to load the model and resolve it
         Model pomModel = loadPom(mavenPomStream, booter, Collections.EMPTY_LIST);
 
-        List<org.apache.maven.model.Dependency> dependencies = pomModel.getDependencies();
+        // List<org.apache.maven.model.Dependency> dependencies = pomModel.getDependencies();
+        MavenProject mavenProject = new MavenProject(pomModel);
+        Set<Dependency> dependencies = getArtifactsDependencies(mavenProject, booter, excludedScopes);
         Set<String> depsStrings = new HashSet<>(dependencies.size());
-        depsStrings.add("mvn:" + pomModel.getGroupId() + "/" + pomModel.getArtifactId() + "/" + pomModel.getVersion());
-        for (org.apache.maven.model.Dependency dep : dependencies) {
-            depsStrings
-                    .add("mvn:" + dep.getGroupId() + "/" + dep.getArtifactId() + "/" + dep.getVersion() + (dep.getType() == null
-                            ? "" : "/" + dep.getType() + (dep.getClassifier() == null ? "" : "/" + dep.getClassifier())));
+        // depsStrings.add("mvn:" + pomModel.getGroupId() + "/" + pomModel.getArtifactId() + "/" +
+        // pomModel.getVersion());
+        for (Dependency dep : dependencies) {
+            depsStrings.add("mvn:" + dep.getArtifact().getGroupId() + "/" + dep.getArtifact().getArtifactId() + "/"
+                    + dep.getArtifact().getVersion()
+                    + (dep.getArtifact().getExtension().equals("") ? ""
+                            : "/" + dep.getArtifact().getExtension() + (dep.getArtifact().getClassifier().equals("") ? ""
+                                    : "/" + dep.getArtifact().getClassifier())));
         }
         return depsStrings;
     }
 
-    public static List<Dependency> getArtifactsDependencies(MavenProject project, String scope, RepositorySystem repoSystem,
-            RepositorySystemSession repoSession)
-                    throws DependencyCollectionException, org.eclipse.aether.resolution.DependencyResolutionException {
+    public static Set<Dependency> getArtifactsDependencies(MavenProject project, MavenBooter booter, String... excludedScopes)
+            throws DependencyCollectionException, org.eclipse.aether.resolution.DependencyResolutionException {
         DefaultArtifact pomArtifact = new DefaultArtifact(project.getId());
+        RepositorySystem repoSystem = booter.newRepositorySystem();
+        DefaultRepositorySystemSession repoSession = booter.newRepositorySystemSession(repoSystem);
+        DependencySelector depFilter = new AndDependencySelector(new ScopeDependencySelector(null, Arrays.asList(excludedScopes)),
+                new OptionalDependencySelector(), new ExclusionDependencySelector());
+        repoSession.setDependencySelector(depFilter);
 
-        List<RemoteRepository> remoteRepos = project.getRemoteProjectRepositories();
-        List<Dependency> ret = new ArrayList<>();
+        List<RemoteRepository> remoteRepos = booter.getRemoteRepositoriesWithAuthentification(repoSystem, repoSession);
 
-        Dependency dependency = new Dependency(pomArtifact, scope);
-        ret.add(dependency);
-
-        CollectRequest collectRequest = new CollectRequest();
-        collectRequest.setRoot(dependency);
-        collectRequest.setRepositories(remoteRepos);
-
-        CollectResult collectResult = repoSystem.collectDependencies(repoSession,
-                new CollectRequest(new Dependency(pomArtifact, "runtime"), null)); //$NON-NLS-1$
+        CollectRequest collectRequest = new CollectRequest(new Dependency(pomArtifact, "runtime"), remoteRepos);
+        // collectRequest.setRequestContext(scope);
+        CollectResult collectResult = repoSystem.collectDependencies(repoSession, collectRequest);
         DependencyNode root = collectResult.getRoot();
-        List<DependencyNode> children = root.getChildren();
-        for (DependencyNode dn : children) {
-            ret.add(dn.getDependency());
-        }
+        Set<Dependency> ret = new HashSet<>();
+        ret.add(root.getDependency());
+        flattenDeps(root, ret);
         return ret;
+    }
+
+    /**
+     * DOC sgandon Comment method "flattenDeps".
+     * 
+     * @param node
+     * @param ret
+     */
+    private static void flattenDeps(DependencyNode node, Set<Dependency> ret) {
+        List<DependencyNode> children = node.getChildren();
+        for (DependencyNode dn : children) {
+            Dependency dep = dn.getDependency();
+            ret.add(dep);
+            if (!dn.getChildren().isEmpty()) {
+                flattenDeps(dn, ret);
+            }
+        }
     }
 
     Model loadPom(final InputStream pomStream, MavenBooter booter, List<String> profilesList) throws ModelBuildingException {

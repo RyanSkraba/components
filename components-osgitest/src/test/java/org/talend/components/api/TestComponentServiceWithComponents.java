@@ -50,11 +50,11 @@ public class TestComponentServiceWithComponents {
     @Configuration
     public Option[] config() {
 
-        return options(
-                composite(PaxExamOptions.getOptions()),
+        return options(composite(PaxExamOptions.getOptions()),
                 provision(mavenBundle().groupId("org.talend.components").artifactId("components-common"),
-                        mavenBundle().groupId("org.talend.components").artifactId("components-common-oauth"), mavenBundle()
-                                .groupId("org.talend.components").artifactId("components-salesforce")), junitBundles()
+                        mavenBundle().groupId("org.talend.components").artifactId("components-common-oauth"),
+                        mavenBundle().groupId("org.talend.components").artifactId("components-salesforce")),
+                junitBundles()
         // these debug option do not work, I still don't know how to debug this :, cleanCaches(),
         // vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"),systemTimeout(0)
         );
@@ -91,8 +91,8 @@ public class TestComponentServiceWithComponents {
     @Test
     public void testWizardIconForSalesForce() {
         assertNotNull(componentService);
-        InputStream wizardPngIconStream = componentService.getWizardPngImage(
-                SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, WizardImageType.TREE_ICON_16X16);
+        InputStream wizardPngIconStream = componentService
+                .getWizardPngImage(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, WizardImageType.TREE_ICON_16X16);
         assertNotNull(wizardPngIconStream);
     }
 
@@ -119,8 +119,8 @@ public class TestComponentServiceWithComponents {
         SalesforceConnectionProperties scProps = (SalesforceConnectionProperties) componentService
                 .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
         assertNotNull(scProps);
-        assertEquals(
-                "Client Id", ((ComponentProperties) scProps.getProperty(OauthProperties.class)).getProperty("clientId").getDisplayName()); //$NON-NLS-1$
+        assertEquals("Client Id", //$NON-NLS-1$
+                ((ComponentProperties) scProps.getProperty(OauthProperties.class)).getProperty("clientId").getDisplayName());
     }
 
     @Test
@@ -136,7 +136,7 @@ public class TestComponentServiceWithComponents {
     public void testDepenenciesForSalesforce() {
         assertNotNull(componentService);
         Set<String> deps = componentService.getMavenUriDependencies(TSalesforceConnectionDefinition.COMPONENT_NAME);
-        assertEquals(11, deps.size());
+        assertEquals(101, deps.size());
     }
 
     /**

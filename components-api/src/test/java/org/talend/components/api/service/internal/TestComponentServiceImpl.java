@@ -16,17 +16,22 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingException;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.resolution.DependencyResolutionException;
+import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -35,10 +40,18 @@ import org.junit.Test;
  */
 public class TestComponentServiceImpl {
 
-    List<String> NO_PROFILE_DEPS = Arrays.asList("mvn:org.springframework/spring-webmvc/1.0/jar", //$NON-NLS-1$
-            "mvn:org.eclipse.aether/aether-api/1.0.0.v20140518/jar", "mvn:foo/bar/1.6.3/jar", "mvn:junit/junit/4.11/jar",
-            "mvn:org.talend.components.salesforce/partner/34.0.0/jar");
+    String DIRECT_DEPS = "mvn:org.springframework/spring-webmvc/1.0/jar,mvn:org.eclipse.aether/aether-api/1.0.0.v20140518/jar,"
+            + "mvn:foo/bar/1.6.3/jar,mvn:org.talend.components.salesforce/partner/34.0.0/jar";
 
+    String FULL_DEPS = DIRECT_DEPS + ",mvn:org.talend.components/org.talend.test.dependencies/0.1-SNAPSHOT/bundle";
+
+    String DEPS_PROF12 = DIRECT_DEPS
+            + ",mvn:org.eclipse.aether/aether-util/1.0.0.v20140518/jar,mvn:org.eclipse.aether/aether-bar/1.0.0.v20140518/jar";
+
+    String FULL_DEPS_TEST = FULL_DEPS
+            + ",mvn:junit/junit/4.11/jar,mvn:org.hamcrest/hamcrest-library/1.3/jar,mvn:org.hamcrest/hamcrest-core/1.3/jar";
+
+    // ,mvn:junit/junit/4.11/jar
     /**
      * Test method for
      * {@link org.talend.components.api.service.internal.ComponentServiceImpl#loadPom(java.io.InputStream, org.talend.components.api.service.internal.MavenBooter)}
@@ -59,7 +72,7 @@ public class TestComponentServiceImpl {
 
             }, Collections.EMPTY_LIST);
             List<Dependency> dependencies = pom.getDependencies();
-            checkDependencies(dependencies, NO_PROFILE_DEPS.toArray(new String[NO_PROFILE_DEPS.size()]));
+            checkDependencies(dependencies, "runtime", DIRECT_DEPS.split(",")); //$NON-NLS-1$//$NON-NLS-2$
         } finally {
             FileUtils.deleteDirectory(temporaryFolder);
         }
@@ -86,7 +99,7 @@ public class TestComponentServiceImpl {
 
                     }, Collections.EMPTY_LIST);
             List<Dependency> dependencies = pom.getDependencies();
-            checkDependencies(dependencies, NO_PROFILE_DEPS.toArray(new String[NO_PROFILE_DEPS.size()]));
+            checkDependencies(dependencies, "runtime", DIRECT_DEPS.split(","));
         } finally {
             FileUtils.deleteDirectory(temporaryFolder);
         }
@@ -98,29 +111,57 @@ public class TestComponentServiceImpl {
         Model pom = componentServiceImpl.loadPom(this.getClass().getResourceAsStream("pom.xml"), new MavenBooter(), //$NON-NLS-1$
                 Arrays.asList("prof1", "prof2"));
         List<Dependency> dependencies = pom.getDependencies();
-        List<String> expected = new ArrayList<>(NO_PROFILE_DEPS);
-        expected.addAll(Arrays.asList("mvn:org.eclipse.aether/aether-util/1.0.0.v20140518/jar",
-                "mvn:org.eclipse.aether/aether-bar/1.0.0.v20140518/jar"));
-        checkDependencies(dependencies, expected.toArray(new String[expected.size()]));
+        checkDependencies(dependencies, "runtime", DEPS_PROF12.split(","));
     }
 
     /**
      * DOC sgandon Comment method "checkDependencies".
      * 
      * @param dependencies
+     * @param scope
      * @param string
      */
-    private void checkDependencies(List<Dependency> dependencies, String... mvnStrings) {
+    private void checkDependencies(List<Dependency> dependencies, String scope, String... mvnStrings) {
         List<String> mvnStringList = Arrays.asList(mvnStrings);
         for (Dependency dep : dependencies) {
             String mvnStr = "mvn:" + dep.getGroupId() + "/" + dep.getArtifactId() + "/" + dep.getVersion()
                     + (dep.getType() == null ? ""
                             : "/" + dep.getType() + (dep.getClassifier() == null ? "" : "/" + dep.getClassifier()));
-            if (!mvnStringList.contains(mvnStr)) {
+            if (!mvnStringList.contains(mvnStr) && scope.equals(dep.getScope())) {
                 fail("dependency [" + dep + "] was not found in expected dependencies.");
             }
         }
 
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testGetRuntimeDependencies() throws ModelBuildingException, URISyntaxException, IOException,
+            DependencyCollectionException, DependencyResolutionException, XmlPullParserException {
+        ComponentServiceImpl componentServiceImpl = new ComponentServiceImpl(null);
+        URL pomUrl = this.getClass().getResource("pom.xml"); //$NON-NLS-1$
+        InputStream stream = pomUrl.openStream();
+        try {
+            Set<String> mavenUriDependencies = componentServiceImpl.computeDependenciesFromPom(stream, "test", "provided");
+            assertThat(mavenUriDependencies, Matchers.containsInAnyOrder(FULL_DEPS.split(","))); //$NON-NLS-1$
+        } finally {
+            stream.close();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testGetTestDependenciesIncludingTransitive() throws ModelBuildingException, URISyntaxException, IOException,
+            DependencyCollectionException, DependencyResolutionException, XmlPullParserException {
+        ComponentServiceImpl componentServiceImpl = new ComponentServiceImpl(null);
+        URL pomUrl = this.getClass().getResource("pom.xml"); //$NON-NLS-1$
+        InputStream stream = pomUrl.openStream();
+        try {
+            Set<String> mavenUriDependencies = componentServiceImpl.computeDependenciesFromPom(stream, "provided");
+            assertThat(mavenUriDependencies, Matchers.containsInAnyOrder(FULL_DEPS_TEST.split(","))); //$NON-NLS-1$
+        } finally {
+            stream.close();
+        }
     }
 
 }

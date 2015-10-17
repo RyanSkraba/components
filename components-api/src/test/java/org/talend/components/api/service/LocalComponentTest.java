@@ -16,8 +16,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +28,16 @@ import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
-import org.talend.components.api.service.testcomponent.*;
+import org.talend.components.api.service.testcomponent.NestedComponentProperties;
+import org.talend.components.api.service.testcomponent.TestComponentDefinition;
+import org.talend.components.api.service.testcomponent.TestComponentProperties;
+import org.talend.components.api.service.testcomponent.TestComponentWizard;
+import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
+
+import junit.framework.TestCase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -139,12 +143,12 @@ public class LocalComponentTest extends TestCase {
 
     @Test
     public void testGetWizardWithProps() {
-        TestComponentWizard wizard = (TestComponentWizard) componentService.getComponentWizard(
-                TestComponentWizardDefinition.COMPONENT_WIZARD_NAME, "userdata");
+        TestComponentWizard wizard = (TestComponentWizard) componentService
+                .getComponentWizard(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME, "userdata");
         wizard.props = new TestComponentProperties().init();
         ComponentProperties props = wizard.props;
         List<ComponentWizard> wizards = componentService.getComponentWizardsForProperties(props, "userdata");
-        assertTrue(props == ((TestComponentWizard)wizards.get(0)).props);
+        assertTrue(props == ((TestComponentWizard) wizards.get(0)).props);
     }
 
     @Test
@@ -187,7 +191,7 @@ public class LocalComponentTest extends TestCase {
         ComponentDefinition componentDefinition = allComponents.iterator().next();
         TestComponentDefinition tcd = (TestComponentDefinition) componentDefinition;
         TestComponentProperties componentProperties = (TestComponentProperties) tcd.createProperties();
-        ComponentProperties nestedProp = (ComponentProperties) componentProperties.getProperty(NestedComponentProperties.class); //$NON-NLS-1$
+        ComponentProperties nestedProp = (ComponentProperties) componentProperties.getProperty(NestedComponentProperties.class);
         assertNotNull(nestedProp);
         SchemaElement greatProperty = nestedProp.getProperty(NestedComponentProperties.A_GREAT_PROP_NAME);
         assertNotNull(greatProperty);
@@ -201,7 +205,7 @@ public class LocalComponentTest extends TestCase {
         assertNotNull(testComponentDefinition.getMavenPom());
         Set<String> mavenUriDependencies = componentService.getMavenUriDependencies(TestComponentDefinition.COMPONENT_NAME);
         System.out.println("deps:" + mavenUriDependencies);
-        assertEquals(24, mavenUriDependencies.size());
+        assertEquals(5, mavenUriDependencies.size());
     }
 
 }
