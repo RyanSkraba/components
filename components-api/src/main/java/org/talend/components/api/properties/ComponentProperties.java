@@ -282,7 +282,10 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     }
 
     public String getStringValue(SchemaElement property) {
-        return (String) getValue(property);
+        Object value = getValue(property);
+        if (value != null)
+            return value.toString();
+        return null;
     }
 
     public int getIntValue(SchemaElement property) {

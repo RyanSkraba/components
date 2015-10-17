@@ -20,7 +20,7 @@ import org.talend.daikon.i18n.I18nMessages;
  */
 public class TranslatableImpl implements Translatable {
 
-    private I18nMessages i18nMessages;
+    private transient I18nMessages i18nMessages;
 
     @Override
     public void setI18nMessageFormater(I18nMessages i18nMessages) {
