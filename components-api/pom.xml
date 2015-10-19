@@ -174,16 +174,16 @@
 						<goals>
 							<goal>bundle</goal>
 						</goals>
-				<configuration>
+						<configuration>
 							<classifier>bundle</classifier>
-					<instructions>
-						<Service-Component>*</Service-Component>
-						<Import-Package>org.osgi*,javax.net.ssl,javax.security.auth.x500</Import-Package>
-						<Embed-Transitive>true</Embed-Transitive>
-						<Embed-Dependency>!org.osgi.core;scope=compile|runtime</Embed-Dependency>
-						<DynamicImport-Package>*</DynamicImport-Package>
-					</instructions>
-				</configuration>
+							<instructions>
+								<Service-Component>*</Service-Component>
+								<Import-Package>org.osgi*,javax.net.ssl,javax.security.auth.x500</Import-Package>
+								<Embed-Transitive>true</Embed-Transitive>
+								<Embed-Dependency>!org.osgi.core;scope=compile|runtime</Embed-Dependency>
+								<DynamicImport-Package>*</DynamicImport-Package>
+							</instructions>
+						</configuration>
 					</execution>
 					<execution>
 						<id>lib-jar</id>
@@ -191,6 +191,11 @@
 						<goals>
 							<goal>bundle</goal>
 						</goals>
+						<configuration>
+							<instructions>
+								<Bundle-SymbolicName>org.talend.components.api.lib</Bundle-SymbolicName>
+							</instructions>
+						</configuration>
 					</execution>
 					<execution>
 						<id>test-bundle</id>
@@ -206,7 +211,7 @@
 								<Bundle-SymbolicName>org.talend.components.api.test</Bundle-SymbolicName>
 								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
 								<Embed-Dependency></Embed-Dependency>
-                                <Export-Package>org.talend.components*</Export-Package>
+								<Export-Package>org.talend.components*</Export-Package>
 								<Include-Resource>=target/test-classes/
 								</Include-Resource>
 								<!-- <Bundle-ClassPath>{maven-dependencies},partner-${partner.version}.jar;mvn:org.talend.components.salesforce/partner/${partner.version}</Bundle-ClassPath> -->
@@ -214,9 +219,6 @@
 						</configuration>
 					</execution>
 				</executions>
-
-
-
 			</plugin>
 		</plugins>
 	</build>

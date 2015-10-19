@@ -14,6 +14,8 @@ package org.talend.components.api.service;
 
 import static org.junit.Assert.*;
 
+import static org.junit.Assert.*;
+
 import java.io.InputStream;
 import java.util.List;
 import java.util.Set;

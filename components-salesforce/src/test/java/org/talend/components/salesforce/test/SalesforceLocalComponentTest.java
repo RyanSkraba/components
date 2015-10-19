@@ -15,7 +15,9 @@ package org.talend.components.salesforce.test;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -295,17 +297,25 @@ public class SalesforceLocalComponentTest {
         Form connFormWizard = forms.get(0);
         SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connFormWizard.getProperties();
 
-        List<ComponentWizard> subWizards = componentService.getComponentWizardsForProperties(connProps, "location");
-        assertEquals(3, subWizards.size());
-        assertTrue(connProps == subWizards.get(0).getForms().get(0).getProperties());
-        assertTrue(connProps == ((SalesforceModuleListProperties) subWizards.get(2).getForms().get(0).getProperties())
+        ComponentWizard[] subWizards = componentService.getComponentWizardsForProperties(connProps, "location")
+                .toArray(new ComponentWizard[3]);
+        Arrays.sort(subWizards, new Comparator<ComponentWizard>() {
+
+            @Override
+            public int compare(ComponentWizard o1, ComponentWizard o2) {
+                return o1.getDefinition().getName().compareTo(o2.getDefinition().getName());
+            }
+        });
+        assertEquals(3, subWizards.length);
+        assertTrue(connProps == subWizards[1].getForms().get(0).getProperties());
+        assertTrue(connProps == ((SalesforceModuleListProperties) subWizards[2].getForms().get(0).getProperties())
                 .getConnectionProps());
-        assertFalse(subWizards.get(0).getDefinition().isTopLevel());
-        assertEquals("Edit Salesforce Connection", subWizards.get(0).getDefinition().getMenuItemName());
-        assertTrue(subWizards.get(1).getDefinition().isTopLevel());
-        assertEquals("Create Salesforce Connection", subWizards.get(1).getDefinition().getMenuItemName());
-        assertFalse(subWizards.get(2).getDefinition().isTopLevel());
-        assertEquals("Add Salesforce Modules", subWizards.get(2).getDefinition().getMenuItemName());
+        assertFalse(subWizards[1].getDefinition().isTopLevel());
+        assertEquals("Edit Salesforce Connection", subWizards[1].getDefinition().getMenuItemName());
+        assertTrue(subWizards[0].getDefinition().isTopLevel());
+        assertEquals("Create Salesforce Connection", subWizards[0].getDefinition().getMenuItemName());
+        assertFalse(subWizards[2].getDefinition().isTopLevel());
+        assertEquals("Add Salesforce Modules", subWizards[2].getDefinition().getMenuItemName());
     }
 
     @Test

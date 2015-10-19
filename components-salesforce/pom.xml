@@ -76,7 +76,8 @@
 
 	<build>
 		<plugins>
-		<!-- The pom is a resource of the component this is why it is copied as such at the top level package -->
+			<!-- The pom is a resource of the component this is why it is copied as 
+				such at the top level package -->
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.7</version>
@@ -111,16 +112,16 @@
 						<goals>
 							<goal>bundle</goal>
 						</goals>
-				<configuration>
-                            <classifier>bundle</classifier>
-					<instructions>
+						<configuration>
+							<classifier>bundle</classifier>
+							<instructions>
 								<Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace</Import-Package>
-						<Service-Component>*</Service-Component>
-						<Embed-Dependency>!components*,*;scope=compile|runtime</Embed-Dependency>
-						<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-						<!-- <Bundle-ClassPath>{maven-dependencies},partner-${partner.version}.jar;mvn:org.talend.components.salesforce/partner/${partner.version}</Bundle-ClassPath> -->
-					</instructions>
-				</configuration>
+								<Service-Component>*</Service-Component>
+								<Embed-Dependency>!components*,*;scope=compile|runtime</Embed-Dependency>
+								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
+								<!-- <Bundle-ClassPath>{maven-dependencies},partner-${partner.version}.jar;mvn:org.talend.components.salesforce/partner/${partner.version}</Bundle-ClassPath> -->
+							</instructions>
+						</configuration>
 					</execution>
 					<execution>
 						<id>lib-jar</id>
@@ -128,6 +129,11 @@
 						<goals>
 							<goal>bundle</goal>
 						</goals>
+						<configuration>
+							<instructions>
+								<Bundle-SymbolicName>org.talend.components.salesforce.lib</Bundle-SymbolicName>
+							</instructions>
+						</configuration>
 					</execution>
 					<execution>
 						<id>test-bundle</id>
@@ -138,14 +144,14 @@
 						<configuration>
 							<classifier>tests</classifier>
 							<outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
-                            <instructions>
+							<instructions>
 								<Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit</Import-Package>
 								<Bundle-SymbolicName>org.talend.components.salesforce.test</Bundle-SymbolicName>
 								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
 								<Embed-Dependency></Embed-Dependency>
-                                <Export-Package>org.talend.components.salesforce*</Export-Package>
-                                <Include-Resource>=target/test-classes/
-                                </Include-Resource>
+								<Export-Package>org.talend.components.salesforce*</Export-Package>
+								<Include-Resource>=target/test-classes/
+								</Include-Resource>
 								<!-- <Bundle-ClassPath>{maven-dependencies},partner-${partner.version}.jar;mvn:org.talend.components.salesforce/partner/${partner.version}</Bundle-ClassPath> -->
 							</instructions>
 						</configuration>
