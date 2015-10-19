@@ -19,7 +19,13 @@ import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.salesforce.SalesforceInputOutputProperties;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TSalesforceInputProperties extends SalesforceInputOutputProperties {
+
+    public static final String QUERY_QUERY = "Query";
+    public static final String QUERY_BULK = "Bulk";
 
     public enum QueryMode {
                            QUERY,
@@ -51,6 +57,12 @@ public class TSalesforceInputProperties extends SalesforceInputOutputProperties 
         newReturnProperty(returns, SchemaElement.Type.INT, "NB_LINE");
         // FIXME - should use default value
         setValue(batchSize, 100);
+
+        List<String> queryModes = new ArrayList<>();
+        queryModes.add(QUERY_QUERY);
+        queryModes.add(QUERY_BULK);
+        queryMode.setPossibleValues(queryModes);
+
         return super.init();
     }
 

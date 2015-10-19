@@ -459,6 +459,8 @@ public class SalesforceLocalComponentTest extends TestCase {
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
 
+        assertEquals(2, props.queryMode.getPossibleValues().size());
+
         SchemaElement returns = props.getProperty(ComponentProperties.RETURNS);
         assertEquals("NB_LINE", returns.getChildren().get(0).getName());
 
