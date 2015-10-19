@@ -181,6 +181,7 @@
 						<Import-Package>org.osgi*,javax.net.ssl,javax.security.auth.x500</Import-Package>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-Dependency>!org.osgi.core;scope=compile|runtime</Embed-Dependency>
+						<DynamicImport-Package>*</DynamicImport-Package>
 					</instructions>
 				</configuration>
 			</plugin>
