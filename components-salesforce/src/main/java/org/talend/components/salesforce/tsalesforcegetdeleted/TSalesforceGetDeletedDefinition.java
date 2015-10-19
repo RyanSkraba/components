@@ -44,7 +44,7 @@ public class TSalesforceGetDeletedDefinition extends SalesforceDefinition {
     @Override public ComponentRuntime createRuntime() {
         return new SalesforceRuntime() {
 
-            @Override public void inputBegin(ComponentProperties props, ComponentRuntimeContainer container, List<Map<String, Object>> values) throws Exception {
+            @Override public void inputBegin(ComponentProperties props) throws Exception {
 
                 TSalesforceGetDeletedProperties gdProps = (TSalesforceGetDeletedProperties) props;
                 String module = gdProps.module.getStringValue(gdProps.module.moduleName);
@@ -52,11 +52,6 @@ public class TSalesforceGetDeletedDefinition extends SalesforceDefinition {
                 GetDeletedResult result = getDeleted(module, gdProps.getCalendarValue(gdProps.startDate), gdProps.getCalendarValue(gdProps.endDate));
 
                 // FIXME - finish this
-            }
-
-            @Override public void inputEnd(ComponentProperties props, ComponentRuntimeContainer container, List<Map<String, Object>> values)
-                    throws Exception {
-
             }
 
         };

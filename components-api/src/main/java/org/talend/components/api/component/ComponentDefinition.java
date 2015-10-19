@@ -17,6 +17,7 @@ import java.io.InputStream;
 import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
+import org.talend.components.api.runtime.ComponentRuntimeContainer;
 
 /**
  * Component definition service.

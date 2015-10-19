@@ -2,6 +2,7 @@ package org.talend.components.api.schema;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.internal.Property;
+import org.talend.components.api.schema.internal.DataSchemaElement;
 import org.talend.components.api.schema.internal.SchemaImpl;
 
 /**
@@ -53,5 +54,14 @@ public class SchemaFactory {
         returns.addChild(p);
         return p;
     }
+
+
+    public static SchemaElement newSchemaElement(SchemaElement.Type type, String name) {
+        SchemaElement se = new DataSchemaElement();
+        se.setName(name);
+        se.setType(type);
+        return se;
+    }
+
 
 }

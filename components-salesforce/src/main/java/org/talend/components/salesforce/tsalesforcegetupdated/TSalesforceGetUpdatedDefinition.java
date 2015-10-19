@@ -43,15 +43,7 @@ public class TSalesforceGetUpdatedDefinition extends SalesforceDefinition {
         return new SalesforceRuntime() {
 
             @Override
-            public void inputBegin(ComponentProperties props, ComponentRuntimeContainer container,
-                    List<Map<String, Object>> values) throws Exception {
-
-            }
-
-            @Override
-            public void inputEnd(ComponentProperties props, ComponentRuntimeContainer container, List<Map<String, Object>> values)
-                    throws Exception {
-
+            public void inputBegin(ComponentProperties props) throws Exception {
             }
 
         };

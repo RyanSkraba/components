@@ -482,7 +482,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         writeRows(runtime, props, outputRows);
 
         List<Map<String, Object>> rows = new ArrayList<>();
-        runtime.input(props, null, rows);
+        runtime.input(props, rows);
         checkRows(rows, count);
         deleteRows(runtime, rows);
     }
@@ -547,7 +547,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         inputProps.connection = props.connection;
         inputProps.module = props.module;
         inputProps.setValue(inputProps.batchSize, 200);
-        runtime.input(inputProps, null, inputRows);
+        runtime.input(inputProps, inputRows);
         checkRows(inputRows, count);
         return inputRows;
     }
@@ -560,7 +560,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         outputProps.connection = props.connection;
         outputProps.module = props.module;
         outputProps.setValue(outputProps.outputAction, TSalesforceOutputProperties.OutputAction.INSERT);
-        runtime.output(outputProps, null, outputRows);
+        runtime.output(outputProps, outputRows);
     }
 
     protected void deleteRows(SalesforceRuntime runtime, List<Map<String, Object>> inputRows) throws Exception {
@@ -598,7 +598,7 @@ public class SalesforceLocalComponentTest extends TestCase {
 
             int count = 10;
             List<Map<String, Object>> outputRows = makeRows(count);
-            runtime.output(props, null, outputRows);
+            runtime.output(props, outputRows);
             checkAndDelete(runtime, props, count);
         }
     }
@@ -623,7 +623,7 @@ public class SalesforceLocalComponentTest extends TestCase {
 
         int count = 10;
         List<Map<String, Object>> outputRows = makeRows(count);
-        runtime.output(props, null, outputRows);
+        runtime.output(props, outputRows);
         checkAndDelete(runtime, props, count);
     }
 

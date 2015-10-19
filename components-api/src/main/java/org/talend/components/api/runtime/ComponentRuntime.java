@@ -10,17 +10,26 @@ import org.talend.components.api.properties.ComponentProperties;
  */
 public abstract class ComponentRuntime {
 
-    public abstract void inputBegin(ComponentProperties props, ComponentRuntimeContainer container,
-            List<Map<String, Object>> values) throws Exception;
+    public abstract void setContainer(ComponentRuntimeContainer container);
 
-    public abstract void inputEnd(ComponentProperties props, ComponentRuntimeContainer container, List<Map<String, Object>> values)
-            throws Exception;
+    public abstract void inputBegin(ComponentProperties props) throws Exception;
 
-    public abstract void outputBegin(ComponentProperties props, ComponentRuntimeContainer env);
+    /**
+     * Returns a row from the input.
+     *
+     * {@link #inputBegin(ComponentProperties)} must be called first.
+     * 
+     * @return a {@link Map} of the row, null if there are no more rows
+     * @throws Exception
+     */
+    public abstract Map<String, Object> inputRow() throws Exception;
 
-    public abstract void outputMain(ComponentProperties props, ComponentRuntimeContainer env, List<Map<String, Object>> rows)
-            throws Exception;
+    public abstract void inputEnd() throws Exception;
 
-    public abstract void outputEnd(ComponentProperties props, ComponentRuntimeContainer env) throws Exception;
+    public abstract void outputBegin(ComponentProperties props);
+
+    public abstract void outputMain(Map<String, Object> row) throws Exception;
+
+    public abstract void outputEnd() throws Exception;
 
 }

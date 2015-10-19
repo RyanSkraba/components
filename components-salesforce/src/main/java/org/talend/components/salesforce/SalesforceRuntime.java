@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
+import java.io.BufferedWriter;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -46,15 +47,19 @@ public class SalesforceRuntime extends ComponentRuntime {
 
     private static final String API_VERSION = "34.0";
 
+    private ComponentService componentService;
+
+    private ComponentRuntimeContainer container;
+
+    private ComponentProperties properties;
+
     private PartnerConnection connection;
 
     private BulkConnection bulkConnection;
 
-    private ComponentRuntimeContainer container;
-
     private boolean exceptionForErrors;
 
-    private java.io.BufferedWriter logWriter;
+    private BufferedWriter logWriter;
 
     private int commitLevel;
 
@@ -65,6 +70,12 @@ public class SalesforceRuntime extends ComponentRuntime {
     private List<SObject> upsertItems;
 
     private List<SObject> updateItems;
+
+    private QueryResult inputResult;
+
+    private SObject[] inputRecords;
+
+    private int inputRecordsIndex;
 
     private String upsertKeyColumn;
 
@@ -89,8 +100,6 @@ public class SalesforceRuntime extends ComponentRuntime {
      */
     private SchemaElement dynamicField;
 
-    private ComponentService componentService;
-
     public SalesforceRuntime() {
         commitLevel = 1;
         int arraySize = commitLevel * 2;
@@ -101,9 +110,9 @@ public class SalesforceRuntime extends ComponentRuntime {
         upsertKeyColumn = "";
     }
 
-    public SalesforceRuntime(ComponentRuntimeContainer context) {
+    public SalesforceRuntime(ComponentRuntimeContainer container) {
         this();
-        this.container = context;
+        setContainer(container);
     }
 
     public SalesforceRuntime(ComponentRuntimeContainer context, int commitLevel, boolean exceptionForErrors, String errorLogFile)
@@ -121,6 +130,10 @@ public class SalesforceRuntime extends ComponentRuntime {
         if (errorLogFile != null && errorLogFile.trim().length() > 0) {
             logWriter = new java.io.BufferedWriter(new java.io.FileWriter(errorLogFile));
         }
+    }
+
+    public void setContainer(ComponentRuntimeContainer container) {
+        this.container = container;
     }
 
     public void setComponentService(ComponentService service) {
@@ -285,7 +298,8 @@ public class SalesforceRuntime extends ComponentRuntime {
         return schema;
     }
 
-    public void commonBegin(ComponentProperties props, ComponentRuntimeContainer env) {
+    public void commonBegin(ComponentProperties props) {
+        properties = props;
         SalesforceInputOutputProperties sprops = (SalesforceInputOutputProperties) props;
 
         Schema schema = sprops.getSchema();
@@ -300,16 +314,21 @@ public class SalesforceRuntime extends ComponentRuntime {
         }
     }
 
-    public void input(ComponentProperties props, ComponentRuntimeContainer container, List<Map<String, Object>> values)
-            throws Exception {
-        inputBegin(props, container, values);
-        inputEnd(props, container, values);
+    public void input(ComponentProperties props, List<Map<String, Object>> values) throws Exception {
+        inputBegin(props);
+        Map<String, Object> value;
+        do {
+            value = inputRow();
+            if (value != null)
+                values.add(value);
+        } while (value != null);
     }
 
-    public void inputBegin(ComponentProperties props, ComponentRuntimeContainer container, List<Map<String, Object>> values)
-            throws Exception {
+    public void inputBegin(ComponentProperties props) throws Exception {
         TSalesforceInputProperties sprops = (TSalesforceInputProperties) props;
-        commonBegin(props, container);
+        commonBegin(props);
+
+        connection.setQueryOptions(sprops.getIntValue(sprops.batchSize));
 
         /*
          * Dynamic columns are requested, find them from Salesforce and only look at the ones that are not explicitly
@@ -326,6 +345,7 @@ public class SalesforceRuntime extends ComponentRuntime {
                 filteredDynamicFields.add(se);
             }
             dynamicFieldList = filteredDynamicFields;
+            // FIXME - this is not complete
             container.setDynamicElements(dynamicFieldList.toArray(new SchemaElement[] {}));
         }
 
@@ -352,97 +372,96 @@ public class SalesforceRuntime extends ComponentRuntime {
             queryText = sb.toString();
         }
 
-        QueryResult result = query(queryText, sprops.getIntValue(sprops.batchSize));
-        SObject[] records = result.getRecords();
-        for (SObject record : records) {
-            Iterator<XmlObject> it = record.getChildren();
-            Map<String, Object> columns = new HashMap<>();
-            while (it.hasNext()) {
-                XmlObject obj = it.next();
-                columns.put(obj.getName().getLocalPart(), obj.getValue());
-            }
-            values.add(columns);
+        inputResult = connection.query(queryText);
+        inputRecords = inputResult.getRecords();
+        inputRecordsIndex = 0;
+
+    }
+
+    public Map<String, Object> inputRow() throws Exception {
+        if (inputRecordsIndex >= inputRecords.length) {
+            if (inputResult.isDone())
+                return null;
+            inputResult = connection.queryMore(inputResult.getQueryLocator());
+            inputRecordsIndex = 0;
         }
+
+        Iterator<XmlObject> it = inputRecords[inputRecordsIndex++].getChildren();
+        Map<String, Object> columns = new HashMap<>();
+        while (it.hasNext()) {
+            XmlObject obj = it.next();
+            columns.put(obj.getName().getLocalPart(), obj.getValue());
+        }
+        return columns;
     }
 
-    public void inputEnd(ComponentProperties props, ComponentRuntimeContainer container, List<Map<String, Object>> values)
-            throws Exception {
+    public void inputEnd() throws Exception {
+        logout();
     }
 
-    public void output(ComponentProperties props, ComponentRuntimeContainer container, List<Map<String, Object>> values)
-            throws Exception {
-        outputBegin(props, container);
-        outputMain(props, container, values);
-        outputEnd(props, container);
+    public void output(ComponentProperties props, List<Map<String, Object>> values) throws Exception {
+        outputBegin(props);
+        for (Map<String, Object> row : values) {
+            outputMain(row);
+        }
+        outputEnd();
     }
 
-    public void outputBegin(ComponentProperties props, ComponentRuntimeContainer env) {
-        commonBegin(props, container);
+    public void outputBegin(ComponentProperties props) {
+        commonBegin(props);
 
         TSalesforceOutputProperties sprops = (TSalesforceOutputProperties) props;
         upsertKeyColumn = sprops.getStringValue(sprops.upsertKeyColumn);
     }
 
-    /**
-     *
-     * Process one or more rows to be output to Salesforce.
-     * 
-     * @param props
-     * @param env
-     * @param rows a {@link List} of {@link Map} objects. Each object in the List is a row to be processed, in a DI
-     * container this would correspond to a connection.
-     */
-    public void outputMain(ComponentProperties props, ComponentRuntimeContainer env, List<Map<String, Object>> rows)
-            throws Exception {
-        TSalesforceOutputProperties sprops = (TSalesforceOutputProperties) props;
-        for (Map<String, Object> row : rows) {
-            if (sprops.getValue(sprops.outputAction) != TSalesforceOutputProperties.OutputAction.DELETE) {
-                SObject so = new SObject();
-                so.setType(sprops.module.getStringValue(sprops.module.moduleName));
+    public void outputMain(Map<String, Object> row) throws Exception {
+        TSalesforceOutputProperties sprops = (TSalesforceOutputProperties) properties;
+        if (sprops.getValue(sprops.outputAction) != TSalesforceOutputProperties.OutputAction.DELETE) {
+            SObject so = new SObject();
+            so.setType(sprops.module.getStringValue(sprops.module.moduleName));
 
-                for (String key : row.keySet()) {
-                    Object value = row.get(key);
-                    if (value != null) {
-                        SchemaElement se = fieldMap.get(key);
-                        if (se != null) {
-                            addSObjectField(so, se, value);
-                        }
+            for (String key : row.keySet()) {
+                Object value = row.get(key);
+                if (value != null) {
+                    SchemaElement se = fieldMap.get(key);
+                    if (se != null) {
+                        addSObjectField(so, se, value);
                     }
                 }
+            }
 
-                if (dynamicField != null) {
-                    Object dynamic = row.get(dynamicField.getName());
-                    SchemaElement[] dynamicSes = container.getDynamicElements(dynamic);
-                    for (SchemaElement dynamicSe : dynamicSes) {
-                        Object value = container.getDynamicValue(dynamic, dynamicSe.getName());
-                        addSObjectField(so, dynamicSe, value);
-                    }
+            if (dynamicField != null) {
+                Object dynamic = row.get(dynamicField.getName());
+                SchemaElement[] dynamicSes = container.getDynamicElements(dynamic);
+                for (SchemaElement dynamicSe : dynamicSes) {
+                    Object value = container.getDynamicValue(dynamic, dynamicSe.getName());
+                    addSObjectField(so, dynamicSe, value);
                 }
+            }
 
-                switch ((TSalesforceOutputProperties.OutputAction) sprops.getValue(sprops.outputAction)) {
-                case INSERT:
-                    insert(so);
-                    break;
-                case UPDATE:
-                    update(so);
-                    break;
-                case UPSERT:
-                    upsert(so);
-                    break;
-                case DELETE:
-                    // See below
-                    throw new RuntimeException("Impossible");
-                }
-            } else { // DELETE
-                String id = getIdValue(row);
-                if (id != null) {
-                    delete(id);
-                }
+            switch ((TSalesforceOutputProperties.OutputAction) sprops.getValue(sprops.outputAction)) {
+            case INSERT:
+                insert(so);
+                break;
+            case UPDATE:
+                update(so);
+                break;
+            case UPSERT:
+                upsert(so);
+                break;
+            case DELETE:
+                // See below
+                throw new RuntimeException("Impossible");
+            }
+        } else { // DELETE
+            String id = getIdValue(row);
+            if (id != null) {
+                delete(id);
             }
         }
     }
 
-    public void outputEnd(ComponentProperties props, ComponentRuntimeContainer env) throws Exception {
+    public void outputEnd() throws Exception {
         logout();
     }
 
@@ -760,21 +779,6 @@ public class SalesforceRuntime extends ComponentRuntime {
 
     public GetDeletedResult getDeleted(String objectType, Calendar startDate, Calendar endDate) throws Exception {
         return connection.getDeleted(objectType, startDate, endDate);
-    }
-
-    public QueryResult queryAll(String soql, int batchSize) throws Exception {
-        connection.setQueryOptions(batchSize);
-        return connection.queryAll(soql);
-    }
-
-    public QueryResult queryMore(String queryLocator, int batchSize) throws Exception {
-        connection.setQueryOptions(batchSize);
-        return connection.queryMore(queryLocator);
-    }
-
-    public QueryResult query(String soql, int batchSize) throws Exception {
-        connection.setQueryOptions(batchSize);
-        return connection.query(soql);
     }
 
     public Calendar getServerTimestamp() throws ConnectionException {
