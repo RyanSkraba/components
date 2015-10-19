@@ -250,6 +250,17 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         return properties;
     }
 
+    public List<String> getPropertyFieldNames() {
+        List<String> fieldNames = new ArrayList<>();
+        Field[] fields = getClass().getFields();
+        for (Field f : fields) {
+            if (!SchemaElement.class.isAssignableFrom(f.getType()))
+                continue;
+            fieldNames.add(f.getName());
+        }
+        return fieldNames;
+    }
+
     public SchemaElement getProperty(Class<?> cls) {
         return getProperty(cls.getSimpleName());
     }
@@ -262,6 +273,18 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
             }
         }
         return null;
+    }
+
+    public SchemaElement getPropertyByFieldName(@NotNull String fieldName) {
+        SchemaElement prop = null;
+        try {
+            prop = (SchemaElement) getClass().getField(fieldName).get(this);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchFieldException e) {
+            return null;
+        }
+        return prop;
     }
 
     public void setValue(SchemaElement property, Object value) {

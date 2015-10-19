@@ -16,6 +16,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +30,10 @@ import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
-import org.talend.components.api.service.testcomponent.NestedComponentProperties;
-import org.talend.components.api.service.testcomponent.TestComponentDefinition;
-import org.talend.components.api.service.testcomponent.TestComponentProperties;
-import org.talend.components.api.service.testcomponent.TestComponentWizard;
-import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
+import org.talend.components.api.service.testcomponent.*;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
-
-import junit.framework.TestCase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -99,6 +95,17 @@ public class LocalComponentTest extends TestCase {
     }
 
     @Test
+    public void testGetPropFields() {
+        ComponentProperties props = componentService.getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
+        TestComponentProperties tProps = (TestComponentProperties) props;
+        List<String> fieldNames = props.getPropertyFieldNames();
+        System.out.println(fieldNames);
+        assertEquals(3, fieldNames.size());
+        assertTrue(tProps.userId == props.getPropertyByFieldName("userId"));
+        assertTrue(tProps.nestedProps == props.getPropertyByFieldName("nestedProps"));
+    }
+
+    @Test
     public void testSerialize() {
         ComponentProperties props = componentService.getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
         checkSerialize(props);
@@ -143,8 +150,8 @@ public class LocalComponentTest extends TestCase {
 
     @Test
     public void testGetWizardWithProps() {
-        TestComponentWizard wizard = (TestComponentWizard) componentService
-                .getComponentWizard(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME, "userdata");
+        TestComponentWizard wizard = (TestComponentWizard) componentService.getComponentWizard(
+                TestComponentWizardDefinition.COMPONENT_WIZARD_NAME, "userdata");
         wizard.props = new TestComponentProperties().init();
         ComponentProperties props = wizard.props;
         List<ComponentWizard> wizards = componentService.getComponentWizardsForProperties(props, "userdata");
