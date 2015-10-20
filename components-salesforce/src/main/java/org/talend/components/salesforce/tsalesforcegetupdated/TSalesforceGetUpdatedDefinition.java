@@ -23,6 +23,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.api.runtime.ComponentRuntimeContainer;
 import org.talend.components.salesforce.SalesforceDefinition;
+import org.talend.components.salesforce.SalesforceGetDeletedUpdatedProperties;
 import org.talend.components.salesforce.SalesforceRuntime;
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceGetUpdatedDefinition.COMPONENT_NAME)
@@ -33,7 +34,7 @@ public class TSalesforceGetUpdatedDefinition extends SalesforceDefinition {
 
     public TSalesforceGetUpdatedDefinition() {
         super(COMPONENT_NAME);
-        propertiesClass = TSalesforceGetUpdatedProperties.class;
+        propertiesClass = SalesforceGetDeletedUpdatedProperties.class;
         setConnectors(new ComponentConnector(Type.FLOW, 1, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
                 new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }

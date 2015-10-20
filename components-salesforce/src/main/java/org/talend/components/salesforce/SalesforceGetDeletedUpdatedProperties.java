@@ -10,17 +10,15 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.salesforce.tsalesforcegetdeleted;
+package org.talend.components.salesforce;
 
 import static org.talend.components.api.schema.SchemaFactory.newProperty;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
-import org.talend.components.salesforce.SalesforceModuleProperties;
 
-public class TSalesforceGetDeletedProperties extends ComponentProperties {
+public class SalesforceGetDeletedUpdatedProperties extends ComponentProperties {
 
     public SchemaElement startDate = newProperty(Type.DATE, "startDate");
 

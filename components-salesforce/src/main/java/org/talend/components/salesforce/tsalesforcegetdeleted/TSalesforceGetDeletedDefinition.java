@@ -23,6 +23,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.api.runtime.ComponentRuntimeContainer;
 import org.talend.components.salesforce.SalesforceDefinition;
+import org.talend.components.salesforce.SalesforceGetDeletedUpdatedProperties;
 import org.talend.components.salesforce.SalesforceRuntime;
 
 import com.sforce.soap.partner.GetDeletedResult;
@@ -36,7 +37,7 @@ public class TSalesforceGetDeletedDefinition extends SalesforceDefinition {
 
     public TSalesforceGetDeletedDefinition() {
         super(COMPONENT_NAME);
-        propertiesClass = TSalesforceGetDeletedProperties.class;
+        propertiesClass = SalesforceGetDeletedUpdatedProperties.class;
         setConnectors(new ComponentConnector(Type.FLOW, 1, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
                 new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
@@ -46,7 +47,7 @@ public class TSalesforceGetDeletedDefinition extends SalesforceDefinition {
 
             @Override public void inputBegin(ComponentProperties props) throws Exception {
 
-                TSalesforceGetDeletedProperties gdProps = (TSalesforceGetDeletedProperties) props;
+                SalesforceGetDeletedUpdatedProperties gdProps = (SalesforceGetDeletedUpdatedProperties) props;
                 String module = gdProps.module.getStringValue(gdProps.module.moduleName);
 
                 GetDeletedResult result = getDeleted(module, gdProps.getCalendarValue(gdProps.startDate), gdProps.getCalendarValue(gdProps.endDate));

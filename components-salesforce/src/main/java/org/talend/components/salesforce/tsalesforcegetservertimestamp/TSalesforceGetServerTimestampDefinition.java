@@ -25,7 +25,6 @@ import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceRuntime;
-import org.talend.components.salesforce.tsalesforcegetdeleted.TSalesforceGetDeletedProperties;
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceGetServerTimestampDefinition.COMPONENT_NAME)
@@ -49,7 +48,7 @@ public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinitio
             @Override
             public void inputBegin(ComponentProperties props) throws Exception {
 
-                TSalesforceGetDeletedProperties gdProps = (TSalesforceGetDeletedProperties) props;
+                TSalesforceGetServerTimestampProperties gdProps = (TSalesforceGetServerTimestampProperties) props;
                 Schema column = (Schema) gdProps.module.schema.getValue(gdProps.module.schema.schema);
 
                 Calendar result = getServerTimestamp();

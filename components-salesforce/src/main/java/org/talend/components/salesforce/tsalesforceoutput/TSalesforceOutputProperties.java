@@ -24,7 +24,6 @@ import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.common.SchemaProperties;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceInputOutputProperties;
 import org.talend.components.salesforce.SalesforceModuleProperties;
 
@@ -88,6 +87,13 @@ public class TSalesforceOutputProperties extends SalesforceInputOutputProperties
         }
     }
 
+    public static void setupUpsertRelation(SchemaElement ur) {
+        ur.addChild(newProperty("columnName")); //$NON-NLS-1$
+        ur.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
+        ur.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
+        ur.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
+    }
+
     @Override
     public ComponentProperties init() {
         List<String> outputActions = new ArrayList<>();
@@ -106,10 +112,7 @@ public class TSalesforceOutputProperties extends SalesforceInputOutputProperties
         schemaReject.addChild(newProperty("errorFields")); //$NON-NLS-1$
         schemaReject.addChild(newProperty("errorMessage")); //$NON-NLS-1$
 
-        upsertRelation.addChild(newProperty("columnName")); //$NON-NLS-1$
-        upsertRelation.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
-        upsertRelation.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
-        upsertRelation.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
+        setupUpsertRelation(upsertRelation);
         super.init();
         module = new ModuleSubclass().setConnection(connection);
         module.init();
