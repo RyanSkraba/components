@@ -61,13 +61,7 @@ public class SalesforceModuleProperties extends ComponentProperties {
         SalesforceRuntime conn = new SalesforceRuntime();
         conn.connect(connection);
         List<NameAndLabel> moduleNames = conn.getModuleNames();
-        List<String> possibleValues = new ArrayList<>();
-        for (NameAndLabel nl : moduleNames) {
-            possibleValues.add(nl.name);
-        }
-        // FIXME - these are labels, need to have a corresponding actual values.
-        // SOmehow have to do this at the widget level
-        moduleName.setPossibleValues(possibleValues);
+        moduleName.setPossibleValues(moduleNames);
     }
 
     public void afterModuleName() throws Exception {
