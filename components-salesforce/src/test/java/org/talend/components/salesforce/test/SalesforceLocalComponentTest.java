@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.NamedThing;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.*;
 import org.talend.components.api.properties.presentation.Form;
@@ -662,26 +663,30 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     @Test
     public void testAlli18n() {
-        ComponentProperties compProps = componentService.getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
-        checkAllI18NProperties(compProps);
-        compProps = componentService.getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
-        checkAllI18NProperties(compProps);
-        compProps = componentService.getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
-        checkAllI18NProperties(compProps);
-        compProps = new SalesforceModuleListProperties();
-        checkAllI18NProperties(compProps);
-        compProps = new SalesforceModuleProperties();
-        checkAllI18NProperties(compProps);
+        Set<ComponentDefinition> allComponents = componentService.getAllComponents();
+        for (ComponentDefinition cd : allComponents) {
+            ComponentProperties props = cd.createProperties();
+            checkAllI18NProperties(props);
+            // Make sure this translates
+            System.out.println(cd.getTitle());
+            assertFalse(cd.getTitle().contains("component."));
+        }
     }
 
-    private void checkAllI18NProperties(ComponentProperties outputDef) {
-        List<SchemaElement> properties = outputDef.getProperties();
+    private void checkAllI18NProperties(ComponentProperties checkProps) {
+        System.out.println("Checking: " + checkProps);
+        List<SchemaElement> properties = checkProps.getProperties();
         for (SchemaElement prop : properties) {
             if (!(prop instanceof ComponentProperties)) {
-                assertFalse("property [" + outputDef.getClass().getCanonicalName() + "/" + prop.getName()
+                assertFalse("property [" + checkProps.getClass().getCanonicalName() + "/" + prop.getName()
                         + "] should have a translated message key [property." + prop.getName()
                         + ".displayName] in [ZE proper messages.property]", prop.getDisplayName().endsWith(".displayName"));
-            } // else the nested ComponentProperties should be tested separately
+            } else {
+                // FIXME - the inner class property thing is broken, remove this check to test it
+                if (prop.toString().contains("$"))
+                    continue;
+                checkAllI18NProperties((ComponentProperties) prop);
+            }
         }
     }
 

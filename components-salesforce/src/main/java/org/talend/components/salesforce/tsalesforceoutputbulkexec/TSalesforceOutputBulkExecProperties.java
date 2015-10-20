@@ -14,24 +14,27 @@ package org.talend.components.salesforce.tsalesforceoutputbulkexec;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.salesforce.SalesforceBulkProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceModuleProperties;
+import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 
-public class TSalesforceOutputBulkExecProperties extends ComponentProperties {
+import static org.talend.components.api.properties.presentation.Widget.widget;
 
-    //
-    // Collections
-    //
-    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties();
-
-    public SalesforceModuleProperties module = new SalesforceModuleProperties().setConnection(connection);
+public class TSalesforceOutputBulkExecProperties extends TSalesforceOutputProperties {
 
     @Override
-    public void setupLayout() {
-        super.setupLayout();
-        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Input");
-        mainForm.addRow(connection.getForm(Form.MAIN));
-        mainForm.addRow(module.getForm(Form.REFERENCE));
+    public ComponentProperties init() {
+        TSalesforceOutputProperties.setupUpsertRelation(upsertRelation, TSalesforceOutputProperties.POLY);
+        super.init();
+        return this;
     }
 
+    public SalesforceBulkProperties bulkProperties = new SalesforceBulkProperties();
+
+    @Override public void setupLayout() {
+        super.setupLayout();
+        Form mainForm = getForm(Form.MAIN);
+        mainForm.addRow(widget(bulkProperties.getForm(Form.MAIN).setName("bulkProperties")));
+    }
 }

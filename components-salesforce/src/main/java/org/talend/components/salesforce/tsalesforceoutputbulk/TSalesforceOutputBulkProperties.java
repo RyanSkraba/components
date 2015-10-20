@@ -40,7 +40,7 @@ public class TSalesforceOutputBulkProperties extends ComponentProperties {
 
     @Override
     public ComponentProperties init() {
-        TSalesforceOutputProperties.setupUpsertRelation(upsertRelation);
+        TSalesforceOutputProperties.setupUpsertRelation(upsertRelation, TSalesforceOutputProperties.POLY);
         super.init();
         return this;
     }

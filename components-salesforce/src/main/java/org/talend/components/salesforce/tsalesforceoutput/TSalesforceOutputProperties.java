@@ -87,10 +87,16 @@ public class TSalesforceOutputProperties extends SalesforceInputOutputProperties
         }
     }
 
-    public static void setupUpsertRelation(SchemaElement ur) {
+    public static final boolean POLY = true;
+
+    public static void setupUpsertRelation(SchemaElement ur, boolean poly) {
+        // They might have been set previously in some inheritance cases
+        ur.setChildren(null);
         ur.addChild(newProperty("columnName")); //$NON-NLS-1$
         ur.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
         ur.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
+        if (poly)
+            ur.addChild(newProperty(Type.BOOLEAN, "polymorphic")); //$NON-NLS-1$
         ur.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
     }
 
@@ -112,7 +118,8 @@ public class TSalesforceOutputProperties extends SalesforceInputOutputProperties
         schemaReject.addChild(newProperty("errorFields")); //$NON-NLS-1$
         schemaReject.addChild(newProperty("errorMessage")); //$NON-NLS-1$
 
-        setupUpsertRelation(upsertRelation);
+        setupUpsertRelation(upsertRelation, !POLY);
+
         super.init();
         module = new ModuleSubclass().setConnection(connection);
         module.init();

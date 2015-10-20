@@ -22,7 +22,7 @@ public class SalesforceGetDeletedUpdatedProperties extends ComponentProperties {
 
     public SchemaElement startDate = newProperty(Type.DATE, "startDate");
 
-    public SchemaElement endDate = newProperty(Type.DATE, "startDate");
+    public SchemaElement endDate = newProperty(Type.DATE, "endDate");
 
     //
     // Collections
@@ -34,8 +34,8 @@ public class SalesforceGetDeletedUpdatedProperties extends ComponentProperties {
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Get Deleted");
-        mainForm.addRow(connection.getForm(Form.MAIN));
+        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Get Updated/Deleted");
+        mainForm.addRow(connection.getForm(Form.REFERENCE));
         mainForm.addRow(module.getForm(Form.REFERENCE));
         mainForm.addRow(startDate);
         mainForm.addRow(endDate);

@@ -19,18 +19,6 @@ import org.talend.components.salesforce.SalesforceModuleProperties;
 
 public class TSalesforceWaveBulkExecProperties extends ComponentProperties {
 
-    //
-    // Collections
-    //
-    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties(); //$NON-NLS-1$
 
-    public SalesforceModuleProperties module = new SalesforceModuleProperties().setConnection(connection); //$NON-NLS-1$
-
-    @Override
-    public void setupLayout() {
-        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Input");
-        mainForm.addRow(connection.getForm(Form.MAIN));
-        mainForm.addRow(module.getForm(Form.REFERENCE));
-    }
 
 }
