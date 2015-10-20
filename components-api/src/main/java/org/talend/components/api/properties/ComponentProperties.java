@@ -373,6 +373,11 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     private boolean REQUIRED = true;
 
     Method findMethod(String type, String propName, boolean required) {
+        if (propName == null) {
+            throw new IllegalArgumentException(
+                    "The ComponentService was used to access a property with a null property name. Type: " + type
+                            + " Properties: " + this);
+        }
         propName = propName.substring(0, 1).toUpperCase() + propName.substring(1);
         String methodName = type + propName;
         Method[] methods = getClass().getMethods();
@@ -607,6 +612,10 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
             map.put(se.getName(), se);
         }
         return map;
+    }
+
+    public String toString() {
+        return "Name: " + getName() + " Title: " + getTitle() + " " + getClass().getName();
     }
 
 }

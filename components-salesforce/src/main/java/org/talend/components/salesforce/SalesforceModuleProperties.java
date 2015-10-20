@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.NameAndLabel;
+import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.schema.SchemaElement;
@@ -59,15 +60,19 @@ public class SalesforceModuleProperties extends ComponentProperties {
 
     public void beforeModuleName() throws Exception {
         SalesforceRuntime conn = new SalesforceRuntime();
-        conn.connect(connection);
-        List<NameAndLabel> moduleNames = conn.getModuleNames();
-        moduleName.setPossibleValues(moduleNames);
+        ValidationResult vr = conn.connectWithResult(connection);
+        if (vr.getStatus() == ValidationResult.Result.OK) {
+            List<NameAndLabel> moduleNames = conn.getModuleNames();
+            moduleName.setPossibleValues(moduleNames);
+        }
     }
 
     public void afterModuleName() throws Exception {
         SalesforceRuntime conn = new SalesforceRuntime();
-        conn.connect(connection);
-        schema.setValue(schema.schema, conn.getSchema(getStringValue(moduleName)));
+        ValidationResult vr = conn.connectWithResult(connection);
+        if (vr.getStatus() == ValidationResult.Result.OK) {
+            schema.setValue(schema.schema, conn.getSchema(getStringValue(moduleName)));
+        }
     }
 
 }
