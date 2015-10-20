@@ -43,7 +43,7 @@ public class TestComponentServiceImpl {
     String DIRECT_DEPS = "mvn:org.springframework/spring-webmvc/1.0/jar,mvn:org.eclipse.aether/aether-api/1.0.0.v20140518/jar,"
             + "mvn:foo/bar/1.6.3/jar,mvn:org.talend.components.salesforce/partner/34.0.0/jar";
 
-    String FULL_DEPS = DIRECT_DEPS + ",mvn:org.talend.components/org.talend.test.dependencies/0.1-SNAPSHOT/bundle";
+    String FULL_DEPS = DIRECT_DEPS + ",mvn:org.talend.components/org.talend.test.dependencies/0.1-SNAPSHOT//bundle";
 
     String DEPS_PROF12 = DIRECT_DEPS
             + ",mvn:org.eclipse.aether/aether-util/1.0.0.v20140518/jar,mvn:org.eclipse.aether/aether-bar/1.0.0.v20140518/jar";

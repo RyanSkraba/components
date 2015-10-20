@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +31,7 @@ import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingResult;
 import org.apache.maven.model.building.ModelSource;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectModelResolver;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -308,7 +308,11 @@ public class ComponentServiceImpl implements ComponentService {
             XmlPullParserException, ModelBuildingException {
         MavenBooter booter = new MavenBooter();
         // FIXME we may not have to load the model and resolve it
-        Model pomModel = loadPom(mavenPomStream, booter, Collections.EMPTY_LIST);
+        MavenXpp3Reader mavenXpp3Reader = new MavenXpp3Reader();
+        mavenXpp3Reader.setAddDefaultEntities(false);
+        Model pomModel = mavenXpp3Reader.read(mavenPomStream);
+
+        // Model pomModel = loadPom(mavenPomStream, booter, Collections.EMPTY_LIST);
 
         // List<org.apache.maven.model.Dependency> dependencies = pomModel.getDependencies();
         MavenProject mavenProject = new MavenProject(pomModel);
@@ -317,18 +321,18 @@ public class ComponentServiceImpl implements ComponentService {
         // depsStrings.add("mvn:" + pomModel.getGroupId() + "/" + pomModel.getArtifactId() + "/" +
         // pomModel.getVersion());
         for (Dependency dep : dependencies) {
-            depsStrings.add("mvn:" + dep.getArtifact().getGroupId() + "/" + dep.getArtifact().getArtifactId() + "/"
-                    + dep.getArtifact().getVersion()
-                    + (dep.getArtifact().getExtension().equals("") ? ""
-                            : "/" + dep.getArtifact().getExtension() + (dep.getArtifact().getClassifier().equals("") ? ""
-                                    : "/" + dep.getArtifact().getClassifier())));
+            depsStrings.add("mvn:" + dep.getArtifact().getGroupId() + "/" + dep.getArtifact().getArtifactId() + "/" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+                    + dep.getArtifact().getVersion() + "/"
+                    + (dep.getArtifact().getExtension().equals("") ? "" : dep.getArtifact().getExtension())
+                    + (dep.getArtifact().getClassifier().equals("") ? "" : ("/" + dep.getArtifact().getClassifier())));
         }
         return depsStrings;
     }
 
     public static Set<Dependency> getArtifactsDependencies(MavenProject project, MavenBooter booter, String... excludedScopes)
             throws DependencyCollectionException, org.eclipse.aether.resolution.DependencyResolutionException {
-        DefaultArtifact pomArtifact = new DefaultArtifact(project.getId());
+        DefaultArtifact pomArtifact = new DefaultArtifact(project.getGroupId(), project.getArtifactId(), project.getPackaging(),
+                null, project.getVersion());
         RepositorySystem repoSystem = booter.newRepositorySystem();
         DefaultRepositorySystemSession repoSession = booter.newRepositorySystemSession(repoSystem);
         DependencySelector depFilter = new AndDependencySelector(new ScopeDependencySelector(null, Arrays.asList(excludedScopes)),
