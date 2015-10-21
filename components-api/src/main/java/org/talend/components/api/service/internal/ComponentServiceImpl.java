@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.CollectResult;
@@ -75,6 +77,8 @@ import org.talend.daikon.exception.ExceptionContext;
 public class ComponentServiceImpl implements ComponentService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ComponentServiceImpl.class);
+
+    private Map<Artifact, Set<Dependency>> dependenciesCache = new HashMap<>();
 
     private Repository repository;
 
@@ -329,10 +333,14 @@ public class ComponentServiceImpl implements ComponentService {
         return depsStrings;
     }
 
-    public static Set<Dependency> getArtifactsDependencies(MavenProject project, MavenBooter booter, String... excludedScopes)
+    public Set<Dependency> getArtifactsDependencies(MavenProject project, MavenBooter booter, String... excludedScopes)
             throws DependencyCollectionException, org.eclipse.aether.resolution.DependencyResolutionException {
         DefaultArtifact pomArtifact = new DefaultArtifact(project.getGroupId(), project.getArtifactId(), project.getPackaging(),
                 null, project.getVersion());
+        // check the cache if we already have computed the dependencies for this pom.
+        if (dependenciesCache.containsKey(pomArtifact)) {
+            return dependenciesCache.get(pomArtifact);
+        }
         RepositorySystem repoSystem = booter.newRepositorySystem();
         DefaultRepositorySystemSession repoSession = booter.newRepositorySystemSession(repoSystem);
         DependencySelector depFilter = new AndDependencySelector(new ScopeDependencySelector(null, Arrays.asList(excludedScopes)),
@@ -348,6 +356,7 @@ public class ComponentServiceImpl implements ComponentService {
         Set<Dependency> ret = new HashSet<>();
         ret.add(root.getDependency());
         flattenDeps(root, ret);
+        dependenciesCache.put(pomArtifact, ret);
         return ret;
     }
 

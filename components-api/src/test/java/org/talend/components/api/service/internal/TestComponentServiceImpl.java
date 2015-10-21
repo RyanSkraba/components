@@ -164,4 +164,27 @@ public class TestComponentServiceImpl {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testGetTestDependenciesCache() throws ModelBuildingException, URISyntaxException, IOException,
+            DependencyCollectionException, DependencyResolutionException, XmlPullParserException {
+        ComponentServiceImpl componentServiceImpl = new ComponentServiceImpl(null);
+        URL pomUrl = this.getClass().getResource("pom.xml"); //$NON-NLS-1$
+        InputStream stream = pomUrl.openStream();
+        Set<String> mavenUriDependencies;
+        try {
+            mavenUriDependencies = componentServiceImpl.computeDependenciesFromPom(stream, "provided");
+            assertThat(mavenUriDependencies, Matchers.containsInAnyOrder(FULL_DEPS_TEST.split(","))); //$NON-NLS-1$
+        } finally {
+            stream.close();
+        }
+        stream = pomUrl.openStream();
+        try {
+            Set<String> mavenUriDependencies2 = componentServiceImpl.computeDependenciesFromPom(stream, "provided");
+            assertThat(mavenUriDependencies, Matchers.equalTo(mavenUriDependencies2));
+        } finally {
+            stream.close();
+        }
+    }
+
 }
