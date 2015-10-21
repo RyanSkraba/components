@@ -3,7 +3,11 @@ package org.talend.components.api.properties;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
@@ -28,10 +32,10 @@ import com.cedarsoftware.util.io.JsonWriter;
  * include those for desktop (Eclipse), web, and scripting. All of these will use the code defined here for their
  * construction and validation.
  * <p/>
- * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement}, {@Link
- * PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface decisions are
- * made in code, methods can be added to the subclass to influence the flow of the user interface and help with
- * validation.
+ * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement},
+ * {@Link PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface
+ * decisions are made in code, methods can be added to the subclass to influence the flow of the user interface and help
+ * with validation.
  * <p/>
  * Each property can be a Java type, both simple types and collections are permitted. In addition,
  * {@code ComponentProperties} classes can be composed allowing hierarchies of properties and collections of properties
@@ -254,8 +258,9 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         List<String> fieldNames = new ArrayList<>();
         Field[] fields = getClass().getFields();
         for (Field f : fields) {
-            if (!SchemaElement.class.isAssignableFrom(f.getType()))
+            if (!SchemaElement.class.isAssignableFrom(f.getType())) {
                 continue;
+            }
             fieldNames.add(f.getName());
         }
         return fieldNames;
@@ -306,8 +311,9 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
 
     public String getStringValue(SchemaElement property) {
         Object value = getValue(property);
-        if (value != null)
+        if (value != null) {
             return value.toString();
+        }
         return null;
     }
 
@@ -614,6 +620,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         return map;
     }
 
+    @Override
     public String toString() {
         return "Name: " + getName() + " Title: " + getTitle() + " " + getClass().getName();
     }

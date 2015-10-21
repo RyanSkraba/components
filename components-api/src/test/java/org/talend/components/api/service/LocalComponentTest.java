@@ -16,8 +16,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +29,18 @@ import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
-import org.talend.components.api.service.testcomponent.*;
+import org.talend.components.api.service.testcomponent.ComponentPropertiesWithDefinedI18N;
+import org.talend.components.api.service.testcomponent.TestComponentDefinition;
+import org.talend.components.api.service.testcomponent.TestComponentProperties;
+import org.talend.components.api.service.testcomponent.TestComponentWizard;
+import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
+import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
+import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
+
+import junit.framework.TestCase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -84,7 +91,7 @@ public class LocalComponentTest extends TestCase {
         ComponentProperties props = componentService.getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
         List<SchemaElement> pList = props.getProperties();
         assertTrue(pList.get(0) != null);
-        assertEquals(3, pList.size());
+        assertEquals(4, pList.size());
     }
 
     @Test
@@ -100,7 +107,7 @@ public class LocalComponentTest extends TestCase {
         TestComponentProperties tProps = (TestComponentProperties) props;
         List<String> fieldNames = props.getPropertyFieldNames();
         System.out.println(fieldNames);
-        assertEquals(3, fieldNames.size());
+        assertEquals(4, fieldNames.size());
         assertTrue(tProps.userId == props.getPropertyByFieldName("userId"));
         assertTrue(tProps.nestedProps == props.getPropertyByFieldName("nestedProps"));
     }
@@ -150,8 +157,8 @@ public class LocalComponentTest extends TestCase {
 
     @Test
     public void testGetWizardWithProps() {
-        TestComponentWizard wizard = (TestComponentWizard) componentService.getComponentWizard(
-                TestComponentWizardDefinition.COMPONENT_WIZARD_NAME, "userdata");
+        TestComponentWizard wizard = (TestComponentWizard) componentService
+                .getComponentWizard(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME, "userdata");
         wizard.props = new TestComponentProperties().init();
         ComponentProperties props = wizard.props;
         List<ComponentWizard> wizards = componentService.getComponentWizardsForProperties(props, "userdata");
@@ -193,12 +200,34 @@ public class LocalComponentTest extends TestCase {
 
     @Test
     public void testi18NForNestedProperty() {
-        Set<ComponentDefinition> allComponents = componentService.getAllComponents();
-        assertEquals(1, allComponents.size());
-        ComponentDefinition componentDefinition = allComponents.iterator().next();
-        TestComponentDefinition tcd = (TestComponentDefinition) componentDefinition;
-        TestComponentProperties componentProperties = (TestComponentProperties) tcd.createProperties();
+        TestComponentProperties componentProperties = (TestComponentProperties) componentService
+                .getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
         ComponentProperties nestedProp = (ComponentProperties) componentProperties.getProperty(NestedComponentProperties.class);
+        assertNotNull(nestedProp);
+        SchemaElement greatProperty = nestedProp.getProperty(NestedComponentProperties.A_GREAT_PROP_NAME);
+        assertNotNull(greatProperty);
+        assertEquals("A Fanstastic Property", greatProperty.getDisplayName()); //$NON-NLS-1$
+    }
+
+    @Test
+    public void testi18NForNestedPropertyWithDefinedI18N() {
+        TestComponentProperties componentProperties = (TestComponentProperties) componentService
+                .getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
+        ComponentProperties nestedProp = (ComponentProperties) componentProperties
+                .getProperty(ComponentPropertiesWithDefinedI18N.class);
+        assertNotNull(nestedProp);
+        SchemaElement greatProperty = nestedProp.getProperty(ComponentPropertiesWithDefinedI18N.A_GREAT_PROP_NAME2);
+        assertNotNull(greatProperty);
+        assertEquals("A second Fanstastic Property", greatProperty.getDisplayName()); //$NON-NLS-1$
+    }
+
+    @Test
+    @Ignore("this does not work yet")
+    public void testi18NForInheritedProperty() {
+        TestComponentProperties componentProperties = (TestComponentProperties) componentService
+                .getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
+        ComponentProperties nestedProp = (ComponentProperties) componentProperties
+                .getProperty(InheritedComponentProperties.class);
         assertNotNull(nestedProp);
         SchemaElement greatProperty = nestedProp.getProperty(NestedComponentProperties.A_GREAT_PROP_NAME);
         assertNotNull(greatProperty);

@@ -10,22 +10,17 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.service.testcomponent;
+package org.talend.components.api.service.testcomponent.nestedprop.inherited;
 
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.schema.SchemaElement;
+import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 
-public class NestedComponentProperties extends ComponentProperties {
+public class InheritedComponentProperties extends NestedComponentProperties {
 
-    public static final String A_GREAT_PROP_NAME = "aGreatProp"; //$NON-NLS-1$
+    public static final String A_GREAT_PROP_NAME3 = "aGreatProp3"; //$NON-NLS-1$
 
-    public SchemaElement aGreatProperty = newProperty(A_GREAT_PROP_NAME);
-
-    public NestedComponentProperties() {
-        super();
-        // setupPropertiesWithI18n();// this must be called once each property instance is created
-    }
+    public SchemaElement aGreatProperty3 = newProperty(A_GREAT_PROP_NAME3);
 
 }

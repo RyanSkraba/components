@@ -12,11 +12,12 @@
 // ============================================================================
 package org.talend.components.api.service.testcomponent;
 
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
+import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 
 public class TestComponentProperties extends ComponentProperties {
 
@@ -26,7 +27,11 @@ public class TestComponentProperties extends ComponentProperties {
 
     public SchemaElement password = newProperty("password").setRequired(true);
 
-    public NestedComponentProperties nestedProps;
+    public NestedComponentProperties nestedProps = new NestedComponentProperties();
+
+    public ComponentPropertiesWithDefinedI18N nestedProp2 = new ComponentPropertiesWithDefinedI18N();
+
+    // public InheritedComponentProperties nestedProp3 = new InheritedComponentProperties();
 
     public static final String TESTCOMPONENT = "TestComponent";
 
@@ -34,6 +39,6 @@ public class TestComponentProperties extends ComponentProperties {
         Form form = Form.create(this, TESTCOMPONENT, "Test Component");
         form.addRow(userId);
         form.addRow(password);
-        nestedProps = (NestedComponentProperties) new NestedComponentProperties();
+
     }
 }
