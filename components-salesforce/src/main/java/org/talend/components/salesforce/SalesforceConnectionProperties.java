@@ -12,11 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
-
-import java.util.ArrayList;
-import java.util.List;
+import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.PresentationItem;
@@ -43,25 +40,25 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     //
 
     // Only for the wizard use
-    public SchemaElement name = newProperty("name").setRequired(true);
+    public SchemaElement name = newString("name").setRequired();
 
-    public SchemaElement referencedComponentId = newProperty("referencedComponentId");
+    public SchemaElement referencedComponentId = newString("referencedComponentId");
 
     public static final String LOGIN_BASIC = "Basic";
 
     public static final String LOGIN_OAUTH = "OAuth";
 
-    public SchemaElement loginType = newProperty(Type.ENUM, "loginType").setRequired(true);
+    public SchemaElement loginType = newEnum("loginType", LOGIN_BASIC, LOGIN_OAUTH).setRequired();
 
-    public SchemaElement bulkConnection = newProperty(SchemaElement.Type.BOOLEAN, "bulkConnection"); //$NON-NLS-1$
+    public SchemaElement bulkConnection = newBoolean("bulkConnection"); //$NON-NLS-1$
 
-    public SchemaElement needCompression = newProperty(SchemaElement.Type.BOOLEAN, "needCompression"); //$NON-NLS-1$
+    public SchemaElement needCompression = newBoolean("needCompression"); //$NON-NLS-1$
 
-    public SchemaElement timeout = newProperty(SchemaElement.Type.INT, "timeout"); //$NON-NLS-1$
+    public SchemaElement timeout = newInteger("timeout"); //$NON-NLS-1$
 
-    public SchemaElement httpTraceMessage = newProperty("httpTraceMessage"); //$NON-NLS-1$
+    public SchemaElement httpTraceMessage = newString("httpTraceMessage"); //$NON-NLS-1$
 
-    public SchemaElement clientId = newProperty("clientId"); //$NON-NLS-1$
+    public SchemaElement clientId = newString("clientId"); //$NON-NLS-1$
 
     //
     // Presentation items
@@ -82,10 +79,6 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     @Override
     public ComponentProperties init() {
         super.init();
-        List<String> loginTypes = new ArrayList<>();
-        loginTypes.add(LOGIN_BASIC);
-        loginTypes.add(LOGIN_OAUTH);
-        loginType.setPossibleValues(loginTypes);
         return this;
     }
 

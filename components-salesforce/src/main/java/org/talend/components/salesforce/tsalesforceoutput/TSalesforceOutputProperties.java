@@ -12,11 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.properties.presentation.Widget.*;
 import static org.talend.components.api.schema.SchemaFactory.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
@@ -44,34 +41,34 @@ public class TSalesforceOutputProperties extends SalesforceInputOutputProperties
         DELETE
     }
 
-    public SchemaElement outputAction = newProperty(SchemaElement.Type.ENUM, "outputAction"); //$NON-NLS-1$
+    public SchemaElement outputAction = newEnum("outputAction", ACTION_INSERT, ACTION_UPDATE, ACTION_UPSERT, ACTION_DELETE); //$NON-NLS-1$
 
-    public SchemaElement upsertKeyColumn = newProperty("upsertKeyColumn"); //$NON-NLS-1$
+    public SchemaElement upsertKeyColumn = newString("upsertKeyColumn"); //$NON-NLS-1$
 
     //
     // Advanced
     //
-    public SchemaElement extendInsert = newProperty(SchemaElement.Type.BOOLEAN, "extendInsert"); //$NON-NLS-1$
+    public SchemaElement extendInsert = newBoolean("extendInsert"); //$NON-NLS-1$
 
-    public SchemaElement ceaseForError = newProperty(SchemaElement.Type.BOOLEAN, "ceaseForError"); //$NON-NLS-1$
+    public SchemaElement ceaseForError = newBoolean("ceaseForError"); //$NON-NLS-1$
 
-    public SchemaElement ignoreNull = newProperty(SchemaElement.Type.BOOLEAN, "ignoreNull"); //$NON-NLS-1$
+    public SchemaElement ignoreNull = newBoolean("ignoreNull"); //$NON-NLS-1$
 
-    public SchemaElement retrieveInsertId = newProperty("retrieveInsertId"); //$NON-NLS-1$
+    public SchemaElement retrieveInsertId = newString("retrieveInsertId"); //$NON-NLS-1$
 
-    public SchemaElement commitLevel = newProperty("commitLevel"); //$NON-NLS-1$
+    public SchemaElement commitLevel = newString("commitLevel"); //$NON-NLS-1$
 
     // FIXME - should be file
-    public SchemaElement logFileName = newProperty("logFileName"); //$NON-NLS-1$
+    public SchemaElement logFileName = newString("logFileName"); //$NON-NLS-1$
 
-    public SchemaElement upsertRelation = newProperty("upsertRelation").setOccurMaxTimes(-1); //$NON-NLS-1$
+    public SchemaElement upsertRelation = newProperty("upsertRelation").setOccurMaxTimes(INFINITE); //$NON-NLS-1$
 
     //
     // Collections
     //
-    public SchemaProperties schemaFlow = (SchemaProperties) new SchemaProperties().setName("schemaFlow"); //$NON-NLS-1$
+    public SchemaProperties schemaFlow = new SchemaProperties("schemaFlow"); //$NON-NLS-1$
 
-    public SchemaProperties schemaReject = (SchemaProperties) new SchemaProperties().setName("schemaReject"); //$NON-NLS-1$
+    public SchemaProperties schemaReject = new SchemaProperties("schemaReject"); //$NON-NLS-1$
 
     // Have to use an explicit class to get the override of afterModuleName(), an anonymous
     // class cannot be public and thus cannot be called.
@@ -95,20 +92,14 @@ public class TSalesforceOutputProperties extends SalesforceInputOutputProperties
         ur.addChild(newProperty("columnName")); //$NON-NLS-1$
         ur.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
         ur.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
-        if (poly)
+        if (poly) {
             ur.addChild(newProperty(Type.BOOLEAN, "polymorphic")); //$NON-NLS-1$
+        }
         ur.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
     }
 
     @Override
     public ComponentProperties init() {
-        List<String> outputActions = new ArrayList<>();
-        outputActions.add(ACTION_INSERT);
-        outputActions.add(ACTION_UPDATE);
-        outputActions.add(ACTION_UPSERT);
-        outputActions.add(ACTION_DELETE);
-        outputAction.setPossibleValues(outputActions);
-
         returns = setReturnsProperty();
         newReturnProperty(returns, SchemaElement.Type.INT, "NB_LINE"); //$NON-NLS-1$
         newReturnProperty(returns, SchemaElement.Type.INT, "NB_SUCCESS"); //$NON-NLS-1$

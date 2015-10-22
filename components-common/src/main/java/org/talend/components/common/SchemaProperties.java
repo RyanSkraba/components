@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
+import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
@@ -26,6 +26,15 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 
 @JsonRootName("schema")
 public class SchemaProperties extends ComponentProperties {
+
+    public SchemaProperties() {
+        super();
+    }
+
+    public SchemaProperties(String name) {
+        super();
+        setName(name);
+    }
 
     //
     // Properties

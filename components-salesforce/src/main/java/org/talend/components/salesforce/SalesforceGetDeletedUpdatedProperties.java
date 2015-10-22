@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
@@ -20,9 +20,9 @@ import org.talend.components.api.schema.SchemaElement;
 
 public class SalesforceGetDeletedUpdatedProperties extends ComponentProperties {
 
-    public SchemaElement startDate = newProperty(Type.DATE, "startDate");
+    public SchemaElement startDate = newDate("startDate");
 
-    public SchemaElement endDate = newProperty(Type.DATE, "endDate");
+    public SchemaElement endDate = newDate("endDate");
 
     //
     // Collections

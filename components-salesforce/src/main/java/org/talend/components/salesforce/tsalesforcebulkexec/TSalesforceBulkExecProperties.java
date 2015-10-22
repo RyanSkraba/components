@@ -12,11 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcebulkexec;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
-
-import java.util.ArrayList;
-import java.util.List;
+import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
@@ -29,7 +26,8 @@ public class TSalesforceBulkExecProperties extends TSalesforceOutputProperties {
 
     public SalesforceBulkProperties bulkProperties = new SalesforceBulkProperties();
 
-    @Override public void setupLayout() {
+    @Override
+    public void setupLayout() {
         super.setupLayout();
         Form mainForm = getForm(Form.MAIN);
 

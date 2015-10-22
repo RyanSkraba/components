@@ -39,7 +39,7 @@ public class SalesforceModuleListProperties extends ComponentProperties {
     //
     // Properties
     //
-    public SchemaElement moduleName = newProperty("moduleName").setOccurMaxTimes(-1); //$NON-NLS-1$
+    public SchemaElement moduleName = newString("moduleName").setOccurMaxTimes(INFINITE); //$NON-NLS-1$
 
     public static final String MAIN = "Main"; //$NON-NLS-1$
 
@@ -100,7 +100,7 @@ public class SalesforceModuleListProperties extends ComponentProperties {
 
     /**
      * Sets the compService.
-     * 
+     *
      * @param compService the compService to set
      * @return
      */

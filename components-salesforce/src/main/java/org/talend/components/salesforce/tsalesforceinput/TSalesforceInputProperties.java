@@ -14,9 +14,6 @@ package org.talend.components.salesforce.tsalesforceinput;
 
 import static org.talend.components.api.schema.SchemaFactory.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
@@ -54,10 +51,7 @@ public class TSalesforceInputProperties extends SalesforceInputOutputProperties 
         // FIXME - should use default value
         setValue(batchSize, 100);
 
-        List<String> queryModes = new ArrayList<>();
-        queryModes.add(QUERY_QUERY);
-        queryModes.add(QUERY_BULK);
-        queryMode.setPossibleValues(queryModes);
+        queryMode.setPossibleValues(QUERY_QUERY, QUERY_BULK);
 
         return super.init();
     }

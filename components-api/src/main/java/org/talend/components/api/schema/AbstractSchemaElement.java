@@ -1,6 +1,7 @@
 package org.talend.components.api.schema;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,6 +100,7 @@ public abstract class AbstractSchemaElement extends SimpleNamedThing implements 
         return this;
     }
 
+    @Override
     public boolean isSizeUnbounded() {
         if (size == -1) {
             return true;
@@ -131,6 +133,11 @@ public abstract class AbstractSchemaElement extends SimpleNamedThing implements 
     @Override
     public boolean isRequired() {
         return occurMinTimes > 0;
+    }
+
+    @Override
+    public SchemaElement setRequired() {
+        return setRequired(true);
     }
 
     @Override
@@ -207,6 +214,12 @@ public abstract class AbstractSchemaElement extends SimpleNamedThing implements 
     }
 
     @Override
+    public SchemaElement setPossibleValues(Object... values) {
+        this.possibleValues = Arrays.asList(values);
+        return this;
+    }
+
+    @Override
     public List<SchemaElement> getChildren() {
         return children;
     }
@@ -230,8 +243,9 @@ public abstract class AbstractSchemaElement extends SimpleNamedThing implements 
     public SchemaElement getChild(String name) {
         if (children != null) {
             for (SchemaElement child : children) {
-                if (child.getName().equals(name))
+                if (child.getName().equals(name)) {
                     return child;
+                }
             }
         }
         return null;

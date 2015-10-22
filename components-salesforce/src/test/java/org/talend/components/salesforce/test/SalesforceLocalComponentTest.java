@@ -12,7 +12,12 @@
 // ============================================================================
 package org.talend.components.salesforce.test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 import junit.framework.TestCase;
@@ -26,7 +31,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.internal.SpringApp;
-import org.talend.components.api.properties.*;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.NameAndLabel;
+import org.talend.components.api.properties.PresentationItem;
+import org.talend.components.api.properties.Repository;
+import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.runtime.ComponentDynamicHolder;
 import org.talend.components.api.runtime.ComponentRuntimeContainer;
@@ -40,7 +49,14 @@ import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.common.oauth.OauthProperties;
-import org.talend.components.salesforce.*;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.SalesforceConnectionWizard;
+import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
+import org.talend.components.salesforce.SalesforceInputOutputProperties;
+import org.talend.components.salesforce.SalesforceModuleListProperties;
+import org.talend.components.salesforce.SalesforceModuleProperties;
+import org.talend.components.salesforce.SalesforceRuntime;
+import org.talend.components.salesforce.SalesforceUserPasswordProperties;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
@@ -513,8 +529,9 @@ public class SalesforceLocalComponentTest extends TestCase {
         setupProps(props.connection);
 
         setupModule(props.module, "Account");
-        if (isDynamic)
+        if (isDynamic) {
             fixSchemaForDynamic();
+        }
 
         LocalComponentTest.checkSerialize(props);
         createRuntime();
@@ -533,10 +550,12 @@ public class SalesforceLocalComponentTest extends TestCase {
     }
 
     protected boolean setupDynamic() {
-        if (dynamic != null)
+        if (dynamic != null) {
             return true;
-        if (schema == null)
+        }
+        if (schema == null) {
             return false;
+        }
         for (SchemaElement se : schema.getRoot().getChildren()) {
             if (se.getType() == SchemaElement.Type.DYNAMIC) {
                 if (dynamic == null) {
@@ -715,8 +734,9 @@ public class SalesforceLocalComponentTest extends TestCase {
         setupProps(props.connection);
 
         setupModule(props.module, "Account");
-        if (isDynamic)
+        if (isDynamic) {
             fixSchemaForDynamic();
+        }
         props.setValue(props.outputAction, TSalesforceOutputProperties.OutputAction.INSERT);
 
         LocalComponentTest.checkSerialize(props);
@@ -781,8 +801,9 @@ public class SalesforceLocalComponentTest extends TestCase {
                         + ".displayName] in [ZE proper messages.property]", prop.getDisplayName().endsWith(".displayName"));
             } else {
                 // FIXME - the inner class property thing is broken, remove this check to test it
-                if (prop.toString().contains("$"))
+                if (prop.toString().contains("$")) {
                     continue;
+                }
                 checkAllI18NProperties((ComponentProperties) prop);
             }
         }

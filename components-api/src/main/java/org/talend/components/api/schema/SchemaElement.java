@@ -26,6 +26,8 @@ public interface SchemaElement extends NamedThing {
         SCHEMA
     }
 
+    public static int INFINITE = -1;
+
     @Override
     public String getName();
 
@@ -56,6 +58,8 @@ public interface SchemaElement extends NamedThing {
 
     public boolean isRequired();
 
+    public SchemaElement setRequired();
+
     public SchemaElement setRequired(boolean required);
 
     public int getPrecision();
@@ -81,6 +85,8 @@ public interface SchemaElement extends NamedThing {
     public List<?> getPossibleValues();
 
     public SchemaElement setPossibleValues(List<?> possibleValues);
+
+    public SchemaElement setPossibleValues(Object... values);
 
     public List<SchemaElement> getChildren();
 

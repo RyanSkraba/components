@@ -12,18 +12,15 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
-
-import com.fasterxml.jackson.annotation.JsonRootName;
 import org.talend.components.common.UserPasswordProperties;
 
 public class SalesforceUserPasswordProperties extends UserPasswordProperties {
 
-    public SchemaElement securityKey = newProperty("securityKey").setRequired(true); //$NON-NLS-1$
+    public SchemaElement securityKey = newString("securityKey").setRequired(); //$NON-NLS-1$
 
     @Override
     protected void setupLayout() {

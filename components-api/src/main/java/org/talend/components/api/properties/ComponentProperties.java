@@ -32,10 +32,10 @@ import com.cedarsoftware.util.io.JsonWriter;
  * include those for desktop (Eclipse), web, and scripting. All of these will use the code defined here for their
  * construction and validation.
  * <p/>
- * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement},
- * {@Link PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface
- * decisions are made in code, methods can be added to the subclass to influence the flow of the user interface and help
- * with validation.
+ * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement}, {@Link
+ * PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface decisions are
+ * made in code, methods can be added to the subclass to influence the flow of the user interface and help with
+ * validation.
  * <p/>
  * Each property can be a Java type, both simple types and collections are permitted. In addition,
  * {@code ComponentProperties} classes can be composed allowing hierarchies of properties and collections of properties
@@ -55,7 +55,7 @@ import com.cedarsoftware.util.io.JsonWriter;
  * This will return a {@link ValidationResult} object with any error information.</li>
  * <li>{@code beforeForm&lt;FormName&gt;} - Called before the form is displayed.</li>
  * </ul>
- * 
+ *
  * WARNING : property shall be created as instance field before the constructor is called so that this abstract
  * constructor can attach i18n translator to the properties. If you want to create the property later you'll have to
  * call {@link SchemaElement#setI18nMessageFormater(I18nMessages)} manually.
@@ -306,7 +306,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
 
     public boolean getBooleanValue(SchemaElement property) {
         Boolean value = (Boolean) getValue(property);
-        return !(value == null || !value);
+        return value != null && value;
     }
 
     public String getStringValue(SchemaElement property) {
@@ -527,6 +527,11 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     }
 
     @Override
+    public SchemaElement setRequired() {
+        return setRequired(true);
+    }
+
+    @Override
     public SchemaElement setRequired(boolean required) {
         throw new RuntimeException("Cannot be used here");
     }
@@ -588,6 +593,11 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
 
     @Override
     public SchemaElement setPossibleValues(List<?> possibleValues) {
+        throw new RuntimeException("Cannot be used here");
+    }
+
+    @Override
+    public SchemaElement setPossibleValues(Object... values) {
         throw new RuntimeException("Cannot be used here");
     }
 

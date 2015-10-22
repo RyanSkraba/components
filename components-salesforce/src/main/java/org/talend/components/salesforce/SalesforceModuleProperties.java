@@ -12,10 +12,9 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
+import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.components.api.schema.SchemaFactory.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.talend.components.api.properties.ComponentProperties;
@@ -33,9 +32,9 @@ public class SalesforceModuleProperties extends ComponentProperties {
     //
     // Properties
     //
-    public SchemaElement moduleName = newProperty("moduleName"); //$NON-NLS-1$
+    public SchemaElement moduleName = newString("moduleName"); //$NON-NLS-1$
 
-    public SchemaProperties schema = new SchemaProperties().init(); //$NON-NLS-1$
+    public SchemaProperties schema = new SchemaProperties().init();
 
     // FIXME - OK what about if we are using a connection from a separate component
     // that defines the connection, how do we get that separate component?
@@ -44,7 +43,8 @@ public class SalesforceModuleProperties extends ComponentProperties {
         return this;
     }
 
-    @Override protected void setupLayout() {
+    @Override
+    protected void setupLayout() {
         super.setupLayout();
 
         Form moduleForm = Form.create(this, Form.MAIN, "Salesforce Module");
