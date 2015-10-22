@@ -1,6 +1,7 @@
 package org.talend.components.api.runtime;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.talend.components.api.schema.SchemaElement;
@@ -16,18 +17,7 @@ public interface ComponentRuntimeContainer {
     public String formatDate(Date date, String pattern);
 
     /**
-     * Returns the dynamic columns associated with this column value.
+     * Creates a {@link ComponentDynamicHolder} object.
      */
-    public SchemaElement[] getDynamicElements(Object dynamic);
-
-    /**
-     * Sets the dynamic columns associated with this runtime instance.
-     */
-    public void setDynamicElements(SchemaElement[] elements);
-
-    /**
-     * Returns the value associated with the specified column name.
-     */
-    public Object getDynamicValue(Object dynamic, String fieldName);
-
+    public ComponentDynamicHolder createDynamicHolder();
 }

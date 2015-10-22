@@ -22,6 +22,7 @@ import javax.xml.namespace.QName;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.NameAndLabel;
 import org.talend.components.api.properties.ValidationResult;
+import org.talend.components.api.runtime.ComponentDynamicHolder;
 import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.api.runtime.ComponentRuntimeContainer;
 import org.talend.components.api.schema.Schema;
@@ -89,6 +90,8 @@ public class SalesforceRuntime extends ComponentRuntime {
      */
     private List<SchemaElement> dynamicFieldList;
 
+    private Map<String, SchemaElement> dynamicFieldMap;
+
     /*
      * The actual fields we read on input which is a combination of the fields specified in the schema and the dynamic
      * fields.
@@ -99,6 +102,11 @@ public class SalesforceRuntime extends ComponentRuntime {
      * The dynamic column that is specified on the input schema.
      */
     private SchemaElement dynamicField;
+
+    /*
+     * The dynamic object used by the container to pass dynamic data.
+     */
+    private ComponentDynamicHolder dynamicHolder;
 
     public SalesforceRuntime() {
         commitLevel = 1;
@@ -208,8 +216,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         final SalesforceConnectionProperties finalProps = properties;
         config.setSessionRenewer(new SessionRenewer() {
 
-            @Override
-            public SessionRenewalHeader renewSession(ConnectorConfig connectorConfig) throws ConnectionException {
+            @Override public SessionRenewalHeader renewSession(ConnectorConfig connectorConfig) throws ConnectionException {
                 SessionRenewalHeader header = new SessionRenewalHeader();
                 try {
                     // FIXME - session id need to be null for trigger the login?
@@ -233,8 +240,8 @@ public class SalesforceRuntime extends ComponentRuntime {
             config.setConnectionTimeout(properties.getIntValue(properties.timeout));
         }
         config.setCompression(properties.getBooleanValue(properties.needCompression));
-
-        config.setTraceMessage(true);
+        if (false)
+            config.setTraceMessage(true);
 
         doConnection(properties, config);
 
@@ -335,6 +342,7 @@ public class SalesforceRuntime extends ComponentRuntime {
          * specified in the schema.
          */
         if (dynamicField != null) {
+            dynamicFieldMap = new HashMap<>();
             List<SchemaElement> filteredDynamicFields = new ArrayList<>();
             Schema dynSchema = getSchema(sprops.module.getStringValue(sprops.module.moduleName));
 
@@ -343,14 +351,19 @@ public class SalesforceRuntime extends ComponentRuntime {
                     continue;
                 }
                 filteredDynamicFields.add(se);
+                dynamicFieldMap.put(se.getName(), se);
             }
             dynamicFieldList = filteredDynamicFields;
-            // FIXME - this is not complete
-            container.setDynamicElements(dynamicFieldList.toArray(new SchemaElement[] {}));
+            dynamicHolder = container.createDynamicHolder();
+            dynamicHolder.setSchemaElements(dynamicFieldList);
         }
 
         inputFieldsToUse = new ArrayList<>();
-        inputFieldsToUse.addAll(fieldList);
+        for (SchemaElement s : fieldList) {
+            if (s.getType() == SchemaElement.Type.DYNAMIC)
+                continue;
+            inputFieldsToUse.add(s);
+        }
         if (dynamicFieldList != null)
             inputFieldsToUse.addAll(dynamicFieldList);
 
@@ -375,7 +388,6 @@ public class SalesforceRuntime extends ComponentRuntime {
         inputResult = connection.query(queryText);
         inputRecords = inputResult.getRecords();
         inputRecordsIndex = 0;
-
     }
 
     public Map<String, Object> inputRow() throws Exception {
@@ -386,12 +398,20 @@ public class SalesforceRuntime extends ComponentRuntime {
             inputRecordsIndex = 0;
         }
 
+        if (dynamicHolder != null)
+            dynamicHolder.resetValues();
         Iterator<XmlObject> it = inputRecords[inputRecordsIndex++].getChildren();
         Map<String, Object> columns = new HashMap<>();
         while (it.hasNext()) {
             XmlObject obj = it.next();
-            columns.put(obj.getName().getLocalPart(), obj.getValue());
+            String localName = obj.getName().getLocalPart();
+            if (dynamicFieldMap != null && dynamicFieldMap.get(localName) != null)
+                dynamicHolder.addFieldValue(localName, obj.getValue());
+            else
+                columns.put(localName, obj.getValue());
         }
+        if (dynamicHolder != null)
+            columns.put(dynamicField.getName(), dynamicHolder);
         return columns;
     }
 
@@ -424,17 +444,17 @@ public class SalesforceRuntime extends ComponentRuntime {
                 Object value = row.get(key);
                 if (value != null) {
                     SchemaElement se = fieldMap.get(key);
-                    if (se != null) {
+                    if (se != null && se.getType() != SchemaElement.Type.DYNAMIC) {
                         addSObjectField(so, se, value);
                     }
                 }
             }
 
             if (dynamicField != null) {
-                Object dynamic = row.get(dynamicField.getName());
-                SchemaElement[] dynamicSes = container.getDynamicElements(dynamic);
+                ComponentDynamicHolder dynamic = (ComponentDynamicHolder) row.get(dynamicField.getName());
+                List<SchemaElement> dynamicSes = dynamic.getSchemaElements();
                 for (SchemaElement dynamicSe : dynamicSes) {
-                    Object value = container.getDynamicValue(dynamic, dynamicSe.getName());
+                    Object value = dynamic.getFieldValue(dynamicSe.getName());
                     addSObjectField(so, dynamicSe, value);
                 }
             }
@@ -473,20 +493,21 @@ public class SalesforceRuntime extends ComponentRuntime {
                 return (String) row.get(ID);
             }
         }
-        // FIXME - error?
+        // FIXME - need better exception
         if (dynamicField == null) {
-            return null;
+            throw new RuntimeException("Expected dynamic column to be available");
         }
 
-        Object dynamic = row.get(dynamicField.getName());
-        SchemaElement[] dynamicSes = container.getDynamicElements(dynamic);
+        ComponentDynamicHolder dynamic = (ComponentDynamicHolder) row.get(dynamicField.getName());
+        List<SchemaElement> dynamicSes = dynamic.getSchemaElements();
         for (SchemaElement dynamicSe : dynamicSes) {
             if (dynamicSe.getName().equals(ID)) {
-                return (String) container.getDynamicValue(dynamic, ID);
+                return (String) dynamic.getFieldValue(ID);
             }
         }
-        // FIXME - really an error
-        return null;
+
+        // FIXME - need better exception
+        throw new RuntimeException(ID + " not found in dynamic columns");
     }
 
     protected void addSObjectField(SObject sObject, SchemaElement se, Object value) {

@@ -28,8 +28,12 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.*;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.runtime.ComponentDynamicHolder;
+import org.talend.components.api.runtime.ComponentRuntimeContainer;
+import org.talend.components.api.runtime.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
+import org.talend.components.api.schema.SchemaFactory;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.LocalComponentTest;
 import org.talend.components.api.wizard.ComponentWizard;
@@ -57,6 +61,16 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     String securityKey;
 
+    // Test schema
+    Schema schema;
+
+    // Test runtime container
+    ComponentRuntimeContainer container;
+
+    ComponentDynamicHolder dynamic;
+
+    SalesforceRuntime runtime;
+
     // Used to make sure we have our own data
     String random;
 
@@ -76,7 +90,12 @@ public class SalesforceLocalComponentTest extends TestCase {
             password = "talendsal99";
             securityKey = "QSCzLBQgrkEq9w9EXiOt1BSy";
         }
+        container = new TestRuntimeContainer();
+    }
 
+    protected void createRuntime() {
+        runtime = new SalesforceRuntime();
+        runtime.setContainer(container);
     }
 
     protected ComponentProperties checkAndBefore(Form form, String propName, ComponentProperties props) throws Throwable {
@@ -148,7 +167,9 @@ public class SalesforceLocalComponentTest extends TestCase {
             }
             return null;
         }
+    }
 
+    class TestRuntimeContainer extends DefaultComponentRuntimeContainerImpl {
     }
 
     @Test
@@ -422,7 +443,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
-        SalesforceRuntime runtime = new SalesforceRuntime();
+        createRuntime();
         runtime.setComponentService(componentService);
         runtime.connect(props.connection);
 
@@ -455,7 +476,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     }
 
     @Test
-    public void testInput() throws Throwable {
+    public void testInputProps() throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
@@ -464,16 +485,39 @@ public class SalesforceLocalComponentTest extends TestCase {
 
         SchemaElement returns = props.getProperty(ComponentProperties.RETURNS);
         assertEquals("NB_LINE", returns.getChildren().get(0).getName());
+    }
 
-        Form f = props.module.getForm(Form.REFERENCE);
-        SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
+    protected void setupModule(SalesforceModuleProperties moduleProps, String module) throws Throwable {
+        Form f = moduleProps.getForm(Form.REFERENCE);
         moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
-        moduleProps.setValue(moduleProps.moduleName, "Account");
+        moduleProps.setValue(moduleProps.moduleName, module);
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
-        Schema schema = (Schema) moduleProps.schema.getValue(moduleProps.schema.schema);
+        schema = (Schema) moduleProps.schema.getValue(moduleProps.schema.schema);
+    }
+
+    @Test
+    public void testInput() throws Throwable {
+        runInputTest(!DYNAMIC);
+    }
+
+    @Test
+    public void testInputDynamic() throws Throwable {
+        runInputTest(DYNAMIC);
+    }
+
+    protected static final boolean DYNAMIC = true;
+
+    protected void runInputTest(boolean isDynamic) throws Throwable {
+        TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
+                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
+        setupProps(props.connection);
+
+        setupModule(props.module, "Account");
+        if (isDynamic)
+            fixSchemaForDynamic();
 
         LocalComponentTest.checkSerialize(props);
-        SalesforceRuntime runtime = new SalesforceRuntime();
+        createRuntime();
         runtime.connect(props.connection);
 
         Map<String, Object> row = new HashMap<>();
@@ -488,6 +532,46 @@ public class SalesforceLocalComponentTest extends TestCase {
         deleteRows(runtime, rows);
     }
 
+    protected boolean setupDynamic() {
+        if (dynamic != null)
+            return true;
+        if (schema == null)
+            return false;
+        for (SchemaElement se : schema.getRoot().getChildren()) {
+            if (se.getType() == SchemaElement.Type.DYNAMIC) {
+                if (dynamic == null) {
+                    dynamic = container.createDynamicHolder();
+                    Schema dynSchema = SchemaFactory.newSchema();
+                    dynSchema.setRoot(SchemaFactory.newSchemaElement(SchemaElement.Type.STRING, "Root"));
+                    dynSchema.getRoot().addChild(SchemaFactory.newSchemaElement(SchemaElement.Type.STRING, "ShippingState"));
+                    dynamic.setSchemaElements(dynSchema.getRoot().getChildren());
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected void addDynamicColumn(Map<String, Object> row) {
+        if (setupDynamic()) {
+            dynamic.addFieldValue("ShippingState", "CA");
+            row.put("dynamic", dynamic);
+        }
+    }
+
+    protected void fixSchemaForDynamic() {
+        SchemaElement dynElement = SchemaFactory.newSchemaElement(SchemaElement.Type.DYNAMIC, "dynamic");
+        schema.getRoot().addChild(dynElement);
+        Iterator<SchemaElement> it = schema.getRoot().getChildren().iterator();
+        while (it.hasNext()) {
+            SchemaElement se = it.next();
+            if (se.getName().equals("ShippingState")) {
+                it.remove();
+                break;
+            }
+        }
+    }
+
     protected List<Map<String, Object>> makeRows(int count) {
         List<Map<String, Object>> outputRows = new ArrayList<>();
         for (int i = 0; i < count; i++) {
@@ -498,6 +582,7 @@ public class SalesforceLocalComponentTest extends TestCase {
             row.put("BillingStreet", "123 Main Street");
             row.put("BillingState", "CA");
             row.put("BillingPostalCode", random);
+            addDynamicColumn(row);
             System.out.println("out: " + row.get("Name") + " id: " + row.get("Id") + " post: " + row.get("BillingPostalCode")
                     + " st: " + " street: " + row.get("BillingStreet"));
             outputRows.add(row);
@@ -507,6 +592,7 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     protected void checkRows(List<Map<String, Object>> rows, int count) {
         int checkCount = 0;
+        int checkDynamicCount = 0;
         for (Map<String, Object> row : rows) {
             System.out.println("check: " + row.get("Name") + " id: " + row.get("Id") + " post: " + row.get("BillingPostalCode")
                     + " st: " + " post: " + row.get("BillingStreet"));
@@ -519,11 +605,20 @@ public class SalesforceLocalComponentTest extends TestCase {
                 continue;
             }
             checkCount++;
+            if (dynamic != null) {
+                ComponentDynamicHolder d = (ComponentDynamicHolder) row.get("dynamic");
+                assertEquals("CA", d.getFieldValue("ShippingState"));
+                checkDynamicCount++;
+            }
             assertEquals("TestName", row.get("Name"));
             assertEquals("123 Main Street", row.get("BillingStreet"));
             assertEquals("CA", row.get("BillingState"));
         }
         assertEquals(count, checkCount);
+        if (dynamic != null) {
+            assertEquals(count, checkDynamicCount);
+            System.out.println("Check dynamic rows: " + checkDynamicCount);
+        }
     }
 
     protected List<String> getDeleteIds(List<Map<String, Object>> rows) {
@@ -594,7 +689,7 @@ public class SalesforceLocalComponentTest extends TestCase {
 
             LocalComponentTest.checkSerialize(props);
 
-            SalesforceRuntime runtime = new SalesforceRuntime();
+            createRuntime();
             runtime.connect(props.connection);
 
             int count = 10;
@@ -606,20 +701,27 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     @Test
     public void testOutputInsert() throws Throwable {
+        runOutputInsert(!DYNAMIC);
+    }
+
+    @Test
+    public void testOutputInsertDynamic() throws Throwable {
+        runOutputInsert(DYNAMIC);
+    }
+
+    protected void runOutputInsert(boolean isDynamic) throws Throwable {
         TSalesforceOutputProperties props;
         props = (TSalesforceOutputProperties) componentService.getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
 
-        Form f = props.module.getForm(Form.REFERENCE);
-        SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
-        moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
-        moduleProps.setValue(moduleProps.moduleName, "Account");
-        checkAndAfter(f, "moduleName", moduleProps);
+        setupModule(props.module, "Account");
+        if (isDynamic)
+            fixSchemaForDynamic();
         props.setValue(props.outputAction, TSalesforceOutputProperties.OutputAction.INSERT);
 
         LocalComponentTest.checkSerialize(props);
 
-        SalesforceRuntime runtime = new SalesforceRuntime();
+        createRuntime();
         runtime.connect(props.connection);
 
         int count = 10;
@@ -634,11 +736,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         props = (TSalesforceOutputProperties) componentService.getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
 
-        Form f = props.module.getForm(Form.REFERENCE);
-        SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
-        moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
-        moduleProps.setValue(moduleProps.moduleName, "Account");
-        checkAndAfter(f, "moduleName", moduleProps);
+        setupModule(props.module, "Account");
         props.setValue(props.outputAction, TSalesforceOutputProperties.OutputAction.UPSERT);
         checkAndAfter(props.getForm(Form.MAIN), "outputAction", props);
 
@@ -649,7 +747,7 @@ public class SalesforceLocalComponentTest extends TestCase {
 
         LocalComponentTest.checkSerialize(props);
 
-        SalesforceRuntime runtime = new SalesforceRuntime();
+        createRuntime();
         runtime.connect(props.connection);
 
         Map<String, Object> row = new HashMap<>();
@@ -658,7 +756,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         row.put("BillingState", "CA");
         List<Map<String, Object>> outputRows = new ArrayList<>();
         outputRows.add(row);
-
+        // FIXME - finish this test
     }
 
     @Test

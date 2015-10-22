@@ -14,23 +14,19 @@ package org.talend.components.salesforce.tsalesforceinput;
 
 import static org.talend.components.api.schema.SchemaFactory.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.salesforce.SalesforceInputOutputProperties;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class TSalesforceInputProperties extends SalesforceInputOutputProperties {
 
     public static final String QUERY_QUERY = "Query";
-    public static final String QUERY_BULK = "Bulk";
 
-    public enum QueryMode {
-                           QUERY,
-                           BULK
-    }
+    public static final String QUERY_BULK = "Bulk";
 
     public SchemaElement queryMode = newProperty(SchemaElement.Type.ENUM, "QueryMode"); //$NON-NLS-1$
 
@@ -94,7 +90,8 @@ public class TSalesforceInputProperties extends SalesforceInputOutputProperties 
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN)) {
-            form.getWidget(includeDeleted.getName()).setVisible(getValue(queryMode) == QueryMode.QUERY);
+            form.getWidget(includeDeleted.getName()).setVisible(
+                    getValue(queryMode) != null && getValue(queryMode).equals(QUERY_QUERY));
 
             form.getWidget(query.getName()).setVisible(getBooleanValue(manualQuery));
             form.getWidget(condition.getName()).setVisible(!getBooleanValue(manualQuery));
