@@ -7,7 +7,7 @@ In the top level folder:
 
 ```
 mvn clean install
-cd component-webtest
+cd components-webtest
 mvn spring-boot:run
 ```
 
