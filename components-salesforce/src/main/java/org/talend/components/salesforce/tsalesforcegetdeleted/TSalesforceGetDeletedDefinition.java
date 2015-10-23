@@ -12,16 +12,12 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcegetdeleted;
 
-import java.util.List;
-import java.util.Map;
-
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentConnector;
 import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
-import org.talend.components.api.runtime.ComponentRuntimeContainer;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceGetDeletedUpdatedProperties;
 import org.talend.components.salesforce.SalesforceRuntime;
@@ -29,8 +25,7 @@ import org.talend.components.salesforce.SalesforceRuntime;
 import com.sforce.soap.partner.GetDeletedResult;
 
 @org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceGetDeletedDefinition.COMPONENT_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TSalesforceGetDeletedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceGetDeletedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceGetDeletedDefinition extends SalesforceDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceGetDeleted"; //$NON-NLS-1$
@@ -42,15 +37,18 @@ public class TSalesforceGetDeletedDefinition extends SalesforceDefinition {
                 new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
 
-    @Override public ComponentRuntime createRuntime() {
+    @Override
+    public ComponentRuntime createRuntime() {
         return new SalesforceRuntime() {
 
-            @Override public void inputBegin(ComponentProperties props) throws Exception {
+            @Override
+            public void inputBegin(ComponentProperties props) throws Exception {
 
                 SalesforceGetDeletedUpdatedProperties gdProps = (SalesforceGetDeletedUpdatedProperties) props;
                 String module = gdProps.module.getStringValue(gdProps.module.moduleName);
 
-                GetDeletedResult result = getDeleted(module, gdProps.getCalendarValue(gdProps.startDate), gdProps.getCalendarValue(gdProps.endDate));
+                GetDeletedResult result = connection.getDeleted(module, gdProps.getCalendarValue(gdProps.startDate),
+                        gdProps.getCalendarValue(gdProps.endDate));
 
                 // FIXME - finish this
             }

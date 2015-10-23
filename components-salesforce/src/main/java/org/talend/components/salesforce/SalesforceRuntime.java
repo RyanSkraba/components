@@ -305,7 +305,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         return schema;
     }
 
-    public void commonBegin(ComponentProperties props) throws ConnectionException, AsyncApiException {
+    protected void commonBegin(ComponentProperties props) throws ConnectionException, AsyncApiException {
         properties = props;
         if (!(props instanceof SalesforceConnectionModuleProperties))
             return;
@@ -531,7 +531,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         sObject.setField(se.getName(), valueToAdd);
     }
 
-    public void logout() throws Exception {
+    protected void logout() throws Exception {
         try {
             // Finish anything uncommitted
             doInsert();
@@ -545,6 +545,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         }
     }
 
+    // FIXME - public for tests
     public DeleteResult[] delete(String id) throws Exception {
         if (id == null) {
             return null;
@@ -575,7 +576,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         return null;
     }
 
-    public SaveResult[] insert(SObject sObject) throws Exception {
+    protected SaveResult[] insert(SObject sObject) throws Exception {
         insertItems.add(sObject);
         return doInsert();
     }
@@ -597,7 +598,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         return null;
     }
 
-    public SaveResult[] update(SObject sObject) throws Exception {
+    protected SaveResult[] update(SObject sObject) throws Exception {
         updateItems.add(sObject);
         return doUpdate();
     }
@@ -624,7 +625,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         return null;
     }
 
-    public UpsertResult[] upsert(SObject sObject) throws Exception {
+    protected UpsertResult[] upsert(SObject sObject) throws Exception {
         upsertItems.add(sObject);
         return doUpsert();
     }
@@ -714,7 +715,8 @@ public class SalesforceRuntime extends ComponentRuntime {
         return errors;
     }
 
-    public Map<String, String> readResult(Object[] results) throws Exception {
+    // FIXME - not sure what this is used for
+    protected Map<String, String> readResult(Object[] results) throws Exception {
         Map<String, String> resultMessage = null;
         if (results instanceof SaveResult[]) {
             for (SaveResult result : (SaveResult[]) results) {
@@ -792,18 +794,6 @@ public class SalesforceRuntime extends ComponentRuntime {
             return resultMessage;
         }
         return null;
-    }
-
-    public String[] getUpdated(String objectType, Calendar startDate, Calendar endDate) throws Exception {
-        return connection.getUpdated(objectType, startDate, endDate).getIds();
-    }
-
-    public SObject[] retrieve(String[] ids, String objectType, String fieldsList) throws Exception {
-        return connection.retrieve(fieldsList, objectType, ids);
-    }
-
-    public GetDeletedResult getDeleted(String objectType, Calendar startDate, Calendar endDate) throws Exception {
-        return connection.getDeleted(objectType, startDate, endDate);
     }
 
 }
