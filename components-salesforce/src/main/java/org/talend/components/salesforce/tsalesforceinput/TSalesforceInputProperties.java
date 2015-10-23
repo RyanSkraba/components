@@ -17,9 +17,9 @@ import static org.talend.components.api.schema.SchemaFactory.*;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
-import org.talend.components.salesforce.SalesforceInputOutputProperties;
+import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 
-public class TSalesforceInputProperties extends SalesforceInputOutputProperties {
+public class TSalesforceInputProperties extends SalesforceConnectionModuleProperties {
 
     public static final String QUERY_QUERY = "Query";
 

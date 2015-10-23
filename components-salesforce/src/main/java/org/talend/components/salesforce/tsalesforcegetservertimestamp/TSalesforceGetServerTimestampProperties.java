@@ -14,8 +14,10 @@ package org.talend.components.salesforce.tsalesforcegetservertimestamp;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.schema.Schema;
+import org.talend.components.api.schema.SchemaFactory;
+import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
-import org.talend.components.salesforce.SalesforceModuleProperties;
 
 public class TSalesforceGetServerTimestampProperties extends ComponentProperties {
 
@@ -24,14 +26,22 @@ public class TSalesforceGetServerTimestampProperties extends ComponentProperties
     //
     public SalesforceConnectionProperties connection = new SalesforceConnectionProperties();
 
-    public SalesforceModuleProperties module = new SalesforceModuleProperties().setConnection(connection);
+    // Just holds the server timestamp
+    public SchemaProperties schema = new SchemaProperties().init();
 
-    @Override
-    public void setupLayout() {
+    @Override public ComponentProperties init() {
+        super.init();
+        Schema s = (Schema) schema.getValue(schema.schema);
+        s.setRoot(SchemaFactory.newSchemaElement(Type.GROUP, "Root"));
+        s.getRoot().addChild(SchemaFactory.newDate("ServerTimestamp"));
+        return this;
+    }
+
+    @Override public void setupLayout() {
         super.setupLayout();
         Form mainForm = Form.create(this, Form.MAIN, "Salesforce Get Server Timestamp");
         mainForm.addRow(connection.getForm(Form.REFERENCE));
-        mainForm.addRow(module.getForm(Form.REFERENCE));
+        mainForm.addRow(schema.getForm(Form.REFERENCE));
     }
 
 }

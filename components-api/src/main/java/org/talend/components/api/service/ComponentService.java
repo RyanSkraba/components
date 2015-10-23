@@ -67,6 +67,16 @@ public interface ComponentService extends Repository {
     ComponentProperties getComponentProperties(String name);
 
     /**
+     * Used to get a the {@link ComponentDefinition} object for the specified component.
+     *
+     *
+     * @param name the name of the component
+     * @return the {@code ComponentDefinition} object.
+     * @exception ComponentException thrown if the component is not registered in the service
+     */
+    ComponentDefinition getComponentDefinition(String name);
+
+    /**
      * Creates a new instance of a {@link ComponentWizard} for the specified wizard name.
      *
      * Wizard names are globally unique. Non-top-level wizards should be named using the name of the top-level wizard.

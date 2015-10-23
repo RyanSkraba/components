@@ -12,12 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import junit.framework.TestCase;
@@ -31,11 +26,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.internal.SpringApp;
-import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.NameAndLabel;
-import org.talend.components.api.properties.PresentationItem;
-import org.talend.components.api.properties.Repository;
-import org.talend.components.api.properties.ValidationResult;
+import org.talend.components.api.properties.*;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.runtime.ComponentDynamicHolder;
 import org.talend.components.api.runtime.ComponentRuntimeContainer;
@@ -49,17 +40,12 @@ import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.common.oauth.OauthProperties;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
-import org.talend.components.salesforce.SalesforceConnectionWizard;
-import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
-import org.talend.components.salesforce.SalesforceInputOutputProperties;
-import org.talend.components.salesforce.SalesforceModuleListProperties;
-import org.talend.components.salesforce.SalesforceModuleProperties;
-import org.talend.components.salesforce.SalesforceRuntime;
-import org.talend.components.salesforce.SalesforceUserPasswordProperties;
+import org.talend.components.salesforce.*;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
+import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampDefinition;
+import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
@@ -79,6 +65,8 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     // Test schema
     Schema schema;
+
+    ComponentDefinition definition;
 
     // Test runtime container
     ComponentRuntimeContainer container;
@@ -110,7 +98,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     }
 
     protected void createRuntime() {
-        runtime = new SalesforceRuntime();
+        runtime = (SalesforceRuntime) definition.createRuntime();
         runtime.setContainer(container);
     }
 
@@ -456,6 +444,7 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     @Test
     public void testInputConnectionRef() throws Throwable {
+        definition = componentService.getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
         TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
@@ -493,6 +482,7 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     @Test
     public void testInputProps() throws Throwable {
+        definition = componentService.getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
         TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
@@ -524,6 +514,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     protected static final boolean DYNAMIC = true;
 
     protected void runInputTest(boolean isDynamic) throws Throwable {
+        definition = componentService.getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
         TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
@@ -535,7 +526,6 @@ public class SalesforceLocalComponentTest extends TestCase {
 
         LocalComponentTest.checkSerialize(props);
         createRuntime();
-        runtime.connect(props.connection);
 
         Map<String, Object> row = new HashMap<>();
 
@@ -654,7 +644,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         return ids;
     }
 
-    protected List<Map<String, Object>> readAndCheckRows(SalesforceRuntime runtime, SalesforceInputOutputProperties props,
+    protected List<Map<String, Object>> readAndCheckRows(SalesforceRuntime runtime, SalesforceConnectionModuleProperties props,
             int count) throws Exception {
         List<Map<String, Object>> inputRows = new ArrayList<>();
         TSalesforceInputProperties inputProps = (TSalesforceInputProperties) componentService
@@ -667,7 +657,7 @@ public class SalesforceLocalComponentTest extends TestCase {
         return inputRows;
     }
 
-    protected void writeRows(SalesforceRuntime runtime, SalesforceInputOutputProperties props,
+    protected void writeRows(SalesforceRuntime runtime, SalesforceConnectionModuleProperties props,
             List<Map<String, Object>> outputRows) throws Exception {
         TSalesforceOutputProperties outputProps;
         outputProps = (TSalesforceOutputProperties) componentService
@@ -685,7 +675,8 @@ public class SalesforceLocalComponentTest extends TestCase {
         }
     }
 
-    protected void checkAndDelete(SalesforceRuntime runtime, SalesforceInputOutputProperties props, int count) throws Exception {
+    protected void checkAndDelete(SalesforceRuntime runtime, SalesforceConnectionModuleProperties props, int count)
+            throws Exception {
         List<Map<String, Object>> inputRows = readAndCheckRows(runtime, props, count);
         deleteRows(runtime, inputRows);
         readAndCheckRows(runtime, props, 0);
@@ -693,6 +684,7 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     @Test
     public void testBulkExec() throws Throwable {
+        definition = componentService.getComponentDefinition(TSalesforceBulkExecDefinition.COMPONENT_NAME);
         TSalesforceBulkExecProperties props;
         props = (TSalesforceBulkExecProperties) componentService
                 .getComponentProperties(TSalesforceBulkExecDefinition.COMPONENT_NAME);
@@ -709,7 +701,6 @@ public class SalesforceLocalComponentTest extends TestCase {
             LocalComponentTest.checkSerialize(props);
 
             createRuntime();
-            runtime.connect(props.connection);
 
             int count = 10;
             List<Map<String, Object>> outputRows = makeRows(count);
@@ -729,6 +720,7 @@ public class SalesforceLocalComponentTest extends TestCase {
     }
 
     protected void runOutputInsert(boolean isDynamic) throws Throwable {
+        definition = componentService.getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
         TSalesforceOutputProperties props;
         props = (TSalesforceOutputProperties) componentService.getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
@@ -742,7 +734,6 @@ public class SalesforceLocalComponentTest extends TestCase {
         LocalComponentTest.checkSerialize(props);
 
         createRuntime();
-        runtime.connect(props.connection);
 
         int count = 10;
         List<Map<String, Object>> outputRows = makeRows(count);
@@ -752,6 +743,7 @@ public class SalesforceLocalComponentTest extends TestCase {
 
     @Test
     public void testOutputUpsert() throws Throwable {
+        definition = componentService.getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
         TSalesforceOutputProperties props;
         props = (TSalesforceOutputProperties) componentService.getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
@@ -768,7 +760,6 @@ public class SalesforceLocalComponentTest extends TestCase {
         LocalComponentTest.checkSerialize(props);
 
         createRuntime();
-        runtime.connect(props.connection);
 
         Map<String, Object> row = new HashMap<>();
         row.put("Name", "TestName");
@@ -777,6 +768,30 @@ public class SalesforceLocalComponentTest extends TestCase {
         List<Map<String, Object>> outputRows = new ArrayList<>();
         outputRows.add(row);
         // FIXME - finish this test
+    }
+
+    @Test
+    public void testGetServerTimestamp() throws Throwable {
+        definition = componentService.getComponentDefinition(TSalesforceGetServerTimestampDefinition.COMPONENT_NAME);
+        TSalesforceGetServerTimestampProperties props;
+        props = (TSalesforceGetServerTimestampProperties) componentService
+                .getComponentProperties(TSalesforceGetServerTimestampDefinition.COMPONENT_NAME);
+        setupProps(props.connection);
+
+        createRuntime();
+        runtime.inputBegin(props);
+
+        Map<String, Object> row = new HashMap<>();
+        row = runtime.inputRow();
+        Calendar now = Calendar.getInstance();
+        Calendar date = (Calendar) row.get("ServerTimestamp");
+        long nowMillis = now.getTimeInMillis();
+        long dateMillis = date.getTimeInMillis();
+        System.out.println("now: " + nowMillis);
+        System.out.println(dateMillis);
+        long delta = nowMillis - dateMillis;
+        assertTrue(Math.abs(delta) < 10000);
+        assertNull(runtime.inputRow());
     }
 
     @Test

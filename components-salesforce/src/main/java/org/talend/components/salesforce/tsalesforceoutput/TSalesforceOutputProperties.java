@@ -21,10 +21,10 @@ import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.common.SchemaProperties;
-import org.talend.components.salesforce.SalesforceInputOutputProperties;
+import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceModuleProperties;
 
-public class TSalesforceOutputProperties extends SalesforceInputOutputProperties {
+public class TSalesforceOutputProperties extends SalesforceConnectionModuleProperties {
 
     public static final String ACTION_INSERT = "INSERT";
 
@@ -41,7 +41,8 @@ public class TSalesforceOutputProperties extends SalesforceInputOutputProperties
         DELETE
     }
 
-    public SchemaElement outputAction = newEnum("outputAction", ACTION_INSERT, ACTION_UPDATE, ACTION_UPSERT, ACTION_DELETE); //$NON-NLS-1$
+    public SchemaElement outputAction = newEnum("outputAction", ACTION_INSERT, ACTION_UPDATE, ACTION_UPSERT,
+            ACTION_DELETE); //$NON-NLS-1$
 
     public SchemaElement upsertKeyColumn = newString("upsertKeyColumn"); //$NON-NLS-1$
 
@@ -74,8 +75,7 @@ public class TSalesforceOutputProperties extends SalesforceInputOutputProperties
     // class cannot be public and thus cannot be called.
     public class ModuleSubclass extends SalesforceModuleProperties {
 
-        @Override
-        public void afterModuleName() throws Exception {
+        @Override public void afterModuleName() throws Exception {
             super.afterModuleName();
             Schema s = (Schema) schema.getValue(schema.schema);
             // FIXME - we probably only want the names, not the SchemaElements
@@ -98,8 +98,7 @@ public class TSalesforceOutputProperties extends SalesforceInputOutputProperties
         ur.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
     }
 
-    @Override
-    public ComponentProperties init() {
+    @Override public ComponentProperties init() {
         returns = setReturnsProperty();
         newReturnProperty(returns, SchemaElement.Type.INT, "NB_LINE"); //$NON-NLS-1$
         newReturnProperty(returns, SchemaElement.Type.INT, "NB_SUCCESS"); //$NON-NLS-1$
@@ -117,8 +116,7 @@ public class TSalesforceOutputProperties extends SalesforceInputOutputProperties
         return this;
     }
 
-    @Override
-    public void setupLayout() {
+    @Override public void setupLayout() {
         super.setupLayout();
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(outputAction);

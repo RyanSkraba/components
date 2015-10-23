@@ -26,7 +26,7 @@ public abstract class ComponentRuntime {
 
     public abstract void inputEnd() throws Exception;
 
-    public abstract void outputBegin(ComponentProperties props);
+    public abstract void outputBegin(ComponentProperties props) throws Exception;
 
     public abstract void outputMain(Map<String, Object> row) throws Exception;
 

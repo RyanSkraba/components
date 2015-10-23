@@ -125,6 +125,16 @@ public class ComponentServiceImpl implements ComponentService {
     }
 
     @Override
+    public ComponentDefinition getComponentDefinition(String name) {
+        final String beanName = Constants.COMPONENT_BEAN_PREFIX + name;
+        ComponentDefinition compDef = componentRegistry.getComponents().get(beanName);
+        if (compDef == null) {
+            throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME, ExceptionContext.build().put("name", name)); //$NON-NLS-1$
+        } // else got the def so use it
+        return compDef;
+    }
+
+    @Override
     public ComponentWizard getComponentWizard(String name, String location) {
         final String beanName = Constants.COMPONENT_WIZARD_BEAN_PREFIX + name;
         ComponentWizardDefinition wizardDefinition = componentRegistry.getComponentWizards().get(beanName);
@@ -278,20 +288,6 @@ public class ComponentServiceImpl implements ComponentService {
                 | org.eclipse.aether.resolution.DependencyResolutionException | ModelBuildingException e) {
             throw new ComponentException(ComponentsErrorCode.COMPUTE_DEPENDENCIES_FAILED, e);
         }
-    }
-
-    /**
-     * @param name the name of the component to be retreived
-     * @return a ComponentDefinition according to the name or throws an exception, never null
-     * @exception ComponentException is none is found with the given name
-     */
-    private ComponentDefinition getComponentDefinition(String name) {
-        final String beanName = Constants.COMPONENT_BEAN_PREFIX + name;
-        ComponentDefinition compDef = componentRegistry.getComponents().get(beanName);
-        if (compDef == null) {
-            throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME, ExceptionContext.build().put("name", name)); //$NON-NLS-1$
-        } // else got the def so use it
-        return compDef;
     }
 
     /**

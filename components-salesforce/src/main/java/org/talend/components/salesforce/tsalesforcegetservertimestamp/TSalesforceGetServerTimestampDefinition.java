@@ -23,6 +23,7 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.api.schema.Schema;
+import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceRuntime;
 
@@ -45,18 +46,29 @@ public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinitio
     public ComponentRuntime createRuntime() {
         return new SalesforceRuntime() {
 
+            Calendar result;
+
+            Schema schema;
+
             @Override
             public void inputBegin(ComponentProperties props) throws Exception {
-
                 TSalesforceGetServerTimestampProperties gdProps = (TSalesforceGetServerTimestampProperties) props;
-                Schema column = (Schema) gdProps.module.schema.getValue(gdProps.module.schema.schema);
-
-                Calendar result = getServerTimestamp();
-                Map<String, Object> map = new HashMap<>();
-                // FIXME - error checking - what if there are no columns
-                map.put(column.getRoot().getChildren().get(0).getName(), result);
+                connect(gdProps.connection);
+                schema = (Schema) gdProps.schema.getValue(gdProps.schema.schema);
+                result = connection.getServerTimestamp().getTimestamp();
             }
 
+            @Override
+            public Map<String, Object> inputRow() throws Exception {
+                if (result == null)
+                    return null;
+
+                Map<String, Object> map = new HashMap<>();
+                // FIXME - error checking - what if there are no columns
+                map.put(schema.getRoot().getChildren().get(0).getName(), result);
+                result = null;
+                return map;
+            }
         };
     }
 

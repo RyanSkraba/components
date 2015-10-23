@@ -87,6 +87,12 @@ public class ComponentServiceSpring implements ComponentService {
         return componentServiceDelegate.getComponentProperties(name);
     }
 
+    @RequestMapping(value = BASE_PATH + "/definition/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody ComponentDefinition getComponentDefinition(
+            @PathVariable(value = "name") @ApiParam(name = "name", value = "Name of the component") String name) {
+        return componentServiceDelegate.getComponentDefinition(name);
+    }
+
     @Override
     @RequestMapping(value = BASE_PATH
             + "/dependencies/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

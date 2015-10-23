@@ -19,7 +19,7 @@ import org.talend.components.api.schema.Schema;
 /**
  * Properties common to input and output Salesforce components.
  */
-public class SalesforceInputOutputProperties extends ComponentProperties {
+public class SalesforceConnectionModuleProperties extends ComponentProperties {
 
     // Collections
     //

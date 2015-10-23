@@ -123,6 +123,11 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
+    public ComponentDefinition getComponentDefinition(String name) {
+        return componentServiceDelegate.getComponentDefinition(name);
+    }
+
+    @Override
     public ComponentWizard getComponentWizard(String name, String userData) {
         return componentServiceDelegate.getComponentWizard(name, userData);
     }

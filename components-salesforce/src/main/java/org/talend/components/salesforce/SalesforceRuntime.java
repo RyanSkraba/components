@@ -46,67 +46,67 @@ import com.sforce.ws.bind.XmlObject;
 
 public class SalesforceRuntime extends ComponentRuntime {
 
-    private static final String API_VERSION = "34.0";
+    protected static final String API_VERSION = "34.0";
 
-    private ComponentService componentService;
+    protected ComponentService componentService;
 
-    private ComponentRuntimeContainer container;
+    protected ComponentRuntimeContainer container;
 
-    private ComponentProperties properties;
+    protected ComponentProperties properties;
 
-    private PartnerConnection connection;
+    protected PartnerConnection connection;
 
-    private BulkConnection bulkConnection;
+    protected BulkConnection bulkConnection;
 
-    private boolean exceptionForErrors;
+    protected boolean exceptionForErrors;
 
-    private BufferedWriter logWriter;
+    protected BufferedWriter logWriter;
 
-    private int commitLevel;
+    protected int commitLevel;
 
-    private List<String> deleteItems;
+    protected List<String> deleteItems;
 
-    private List<SObject> insertItems;
+    protected List<SObject> insertItems;
 
-    private List<SObject> upsertItems;
+    protected List<SObject> upsertItems;
 
-    private List<SObject> updateItems;
+    protected List<SObject> updateItems;
 
-    private QueryResult inputResult;
+    protected QueryResult inputResult;
 
-    private SObject[] inputRecords;
+    protected SObject[] inputRecords;
 
-    private int inputRecordsIndex;
+    protected int inputRecordsIndex;
 
-    private String upsertKeyColumn;
+    protected String upsertKeyColumn;
 
-    private Map<String, SchemaElement> fieldMap;
+    protected Map<String, SchemaElement> fieldMap;
 
-    private List<SchemaElement> fieldList;
+    protected List<SchemaElement> fieldList;
 
     /*
      * Used on input only, this is read from the module schema, it contains all of the fields from the salesforce
      * definition of the module that are not already in the field list.
      */
-    private List<SchemaElement> dynamicFieldList;
+    protected List<SchemaElement> dynamicFieldList;
 
-    private Map<String, SchemaElement> dynamicFieldMap;
+    protected Map<String, SchemaElement> dynamicFieldMap;
 
     /*
      * The actual fields we read on input which is a combination of the fields specified in the schema and the dynamic
      * fields.
      */
-    private List<SchemaElement> inputFieldsToUse;
+    protected List<SchemaElement> inputFieldsToUse;
 
     /*
      * The dynamic column that is specified on the input schema.
      */
-    private SchemaElement dynamicField;
+    protected SchemaElement dynamicField;
 
     /*
      * The dynamic object used by the container to pass dynamic data.
      */
-    private ComponentDynamicHolder dynamicHolder;
+    protected ComponentDynamicHolder dynamicHolder;
 
     public SalesforceRuntime() {
         commitLevel = 1;
@@ -305,9 +305,13 @@ public class SalesforceRuntime extends ComponentRuntime {
         return schema;
     }
 
-    public void commonBegin(ComponentProperties props) {
+    public void commonBegin(ComponentProperties props) throws ConnectionException, AsyncApiException {
         properties = props;
-        SalesforceInputOutputProperties sprops = (SalesforceInputOutputProperties) props;
+        if (!(props instanceof SalesforceConnectionModuleProperties))
+            return;
+
+        SalesforceConnectionModuleProperties sprops = (SalesforceConnectionModuleProperties) props;
+        connect(sprops.connection);
 
         Schema schema = sprops.getSchema();
         fieldMap = schema.getRoot().getChildMap();
@@ -427,7 +431,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         outputEnd();
     }
 
-    public void outputBegin(ComponentProperties props) {
+    public void outputBegin(ComponentProperties props) throws Exception {
         commonBegin(props);
 
         TSalesforceOutputProperties sprops = (TSalesforceOutputProperties) props;
@@ -549,7 +553,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         return doDelete();
     }
 
-    private DeleteResult[] doDelete() throws Exception {
+    protected DeleteResult[] doDelete() throws Exception {
         if (deleteItems.size() >= commitLevel) {
             String[] delIDs = deleteItems.toArray(new String[deleteItems.size()]);
             String[] changedItemKeys = new String[delIDs.length];
@@ -576,7 +580,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         return doInsert();
     }
 
-    private SaveResult[] doInsert() throws Exception {
+    protected SaveResult[] doInsert() throws Exception {
         if (insertItems.size() >= commitLevel) {
             SObject[] accs = insertItems.toArray(new SObject[insertItems.size()]);
             String[] changedItemKeys = new String[accs.length];
@@ -598,7 +602,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         return doUpdate();
     }
 
-    private SaveResult[] doUpdate() throws Exception {
+    protected SaveResult[] doUpdate() throws Exception {
         if (updateItems.size() >= commitLevel) {
             SObject[] upds = updateItems.toArray(new SObject[updateItems.size()]);
             String[] changedItemKeys = new String[upds.length];
@@ -625,7 +629,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         return doUpsert();
     }
 
-    private UpsertResult[] doUpsert() throws Exception {
+    protected UpsertResult[] doUpsert() throws Exception {
         if (upsertItems.size() >= commitLevel) {
             SObject[] upds = upsertItems.toArray(new SObject[upsertItems.size()]);
             String[] changedItemKeys = new String[upds.length];
@@ -653,7 +657,7 @@ public class SalesforceRuntime extends ComponentRuntime {
 
     }
 
-    private void handleResults(boolean success, Error[] resultErrors, String[] changedItemKeys, int batchIdx) throws Exception {
+    protected void handleResults(boolean success, Error[] resultErrors, String[] changedItemKeys, int batchIdx) throws Exception {
         StringBuilder errors = new StringBuilder("");
         if (success) {
             // TODO: send back the ID
@@ -669,7 +673,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         }
     }
 
-    private StringBuilder addLog(Error[] resultErrors, String row_key) throws Exception {
+    protected StringBuilder addLog(Error[] resultErrors, String row_key) throws Exception {
         StringBuilder errors = new StringBuilder("");
         if (resultErrors != null) {
             for (Error error : resultErrors) {
@@ -800,10 +804,6 @@ public class SalesforceRuntime extends ComponentRuntime {
 
     public GetDeletedResult getDeleted(String objectType, Calendar startDate, Calendar endDate) throws Exception {
         return connection.getDeleted(objectType, startDate, endDate);
-    }
-
-    public Calendar getServerTimestamp() throws ConnectionException {
-        return connection.getServerTimestamp().getTimestamp();
     }
 
 }
