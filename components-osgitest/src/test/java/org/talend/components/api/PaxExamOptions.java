@@ -13,15 +13,8 @@
 package org.talend.components.api;
 
 import static org.ops4j.pax.exam.CoreOptions.*;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 
-import java.io.File;
-
-import org.ops4j.pax.exam.CoreOptions;
-import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.karaf.options.KarafDistributionBaseConfigurationOption;
-import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 
 /**
  * created by sgandon on 8 sept. 2015 Detailled comment
@@ -33,28 +26,25 @@ public class PaxExamOptions {
     private static final String ORG_APACHE_KARAF_GID = "org.apache.karaf";
 
     public static Option[] getOptions() {
-        // return options(mavenBundle("org.apache.felix", "org.apache.felix.scr"), mavenBundle("org.slf4j", "slf4j-api",
-        // "1.7.12"),
-        // mavenBundle("org.slf4j", "slf4j-simple", "1.7.12").noStart(),
-        KarafDistributionBaseConfigurationOption newKarafDistributionConfiguration = newKarafDistributionConfiguration();
-        return options(newKarafDistributionConfiguration,
-                provision(//
-                        mavenBundle("org.apache.felix", "org.apache.felix.scr"), //
-                        mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("bundle"), //
-                        mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("tests")
-                                .noStart()), //
-                junitBundles(),
-                cleanCaches(),
-                KarafDistributionOption.keepRuntimeFolder());
+        return options(mavenBundle("org.apache.felix", "org.apache.felix.scr"), mavenBundle("org.slf4j", "slf4j-api", "1.7.12"),
+                // mavenBundle("org.slf4j", "slf4j-simple", "1.7.12").noStart(),
+                // KarafDistributionBaseConfigurationOption newKarafDistributionConfiguration =
+                // newKarafDistributionConfiguration();
+                // return options(newKarafDistributionConfiguration, KarafDistributionOption.keepRuntimeFolder(),
+                // provision(//
+                mavenBundle("org.apache.felix", "org.apache.felix.scr"), //
+                mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("bundle"), //
+                mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("tests").noStart(), // ),
+                                                                                                                           // //
+                junitBundles(), cleanCaches());
     }
 
-    static KarafDistributionBaseConfigurationOption newKarafDistributionConfiguration() {
-        return karafDistributionConfiguration()
-                .frameworkUrl(
-                        maven().groupId(ORG_APACHE_KARAF_GID).artifactId(APACHE_KARAF_AID).versionAsInProject().type("tar.gz"))
-                .karafVersion(MavenUtils.getArtifactVersion(ORG_APACHE_KARAF_GID, APACHE_KARAF_AID)).name("Apache Karaf")
-                .unpackDirectory(new File("target/paxexam/"))
-                .useDeployFolder(false);
-    }
+    // static KarafDistributionBaseConfigurationOption newKarafDistributionConfiguration() {
+    // return karafDistributionConfiguration()
+    // .frameworkUrl(
+    // maven().groupId(ORG_APACHE_KARAF_GID).artifactId(APACHE_KARAF_AID).versionAsInProject().type("tar.gz"))
+    // .karafVersion(MavenUtils.getArtifactVersion(ORG_APACHE_KARAF_GID, APACHE_KARAF_AID)).name("Apache Karaf")
+    // .unpackDirectory(new File("target/paxexam/")).useDeployFolder(false);
+    // }
 
 }

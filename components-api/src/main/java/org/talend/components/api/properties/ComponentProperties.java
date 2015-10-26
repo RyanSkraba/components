@@ -32,10 +32,10 @@ import com.cedarsoftware.util.io.JsonWriter;
  * include those for desktop (Eclipse), web, and scripting. All of these will use the code defined here for their
  * construction and validation.
  * <p/>
- * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement}, {@Link
- * PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface decisions are
- * made in code, methods can be added to the subclass to influence the flow of the user interface and help with
- * validation.
+ * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement},
+ * {@Link PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface
+ * decisions are made in code, methods can be added to the subclass to influence the flow of the user interface and help
+ * with validation.
  * <p/>
  * Each property can be a Java type, both simple types and collections are permitted. In addition,
  * {@code ComponentProperties} classes can be composed allowing hierarchies of properties and collections of properties
@@ -122,10 +122,17 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
      * @param serialized created by {@link #toSerialized()}.
      * @return a {@code ComponentProperties} object represented by the {@code serialized} value.
      */
-    public static Deserialized fromSerialized(String serialized) {
+    public static synchronized Deserialized fromSerialized(String serialized) {
         Deserialized d = new Deserialized();
         d.migration = new MigrationInformationImpl();
-        d.properties = (ComponentProperties) JsonReader.jsonToJava(serialized);
+        // this set the proper classloader for the JsonReader especially for OSGI
+        ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(ComponentProperties.class.getClassLoader());
+            d.properties = (ComponentProperties) JsonReader.jsonToJava(serialized);
+        } finally {
+            Thread.currentThread().setContextClassLoader(originalContextClassLoader);
+        }
         return d;
     }
 

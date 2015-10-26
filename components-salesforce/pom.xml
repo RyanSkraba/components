@@ -147,6 +147,8 @@
 							<instructions>
 								<Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit</Import-Package>
 								<Bundle-SymbolicName>org.talend.components.salesforce.test</Bundle-SymbolicName>
+								<Bundle-Name>Test Fragment for ${pom.name}</Bundle-Name>
+								<Fragment-Host>org.talend.components.salesforce</Fragment-Host>
 								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
 								<Embed-Dependency></Embed-Dependency>
 								<Export-Package>org.talend.components.salesforce*</Export-Package>
