@@ -12,11 +12,12 @@
 // ============================================================================
 package org.talend.components.common;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+
+import javax.inject.Inject;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.internal.SpringApp;
@@ -25,9 +26,9 @@ import org.talend.components.api.service.ComponentService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
-public class ProxyPropertiesTest extends TestCase {
+public class ProxyPropertiesTest {
 
-    @Autowired
+    @Inject
     protected ComponentService componentService;
 
     public ProxyPropertiesTest() {

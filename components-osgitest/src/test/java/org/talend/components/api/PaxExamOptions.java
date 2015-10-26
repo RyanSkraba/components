@@ -27,18 +27,33 @@ public class PaxExamOptions {
 
     public static Option[] getOptions() {
         return options(mavenBundle("org.apache.felix", "org.apache.felix.scr"), mavenBundle("org.slf4j", "slf4j-api", "1.7.12"),
-                // mavenBundle("org.slf4j", "slf4j-simple", "1.7.12").noStart(),
-                // KarafDistributionBaseConfigurationOption newKarafDistributionConfiguration =
-                // newKarafDistributionConfiguration();
-                // return options(newKarafDistributionConfiguration, KarafDistributionOption.keepRuntimeFolder(),
-                // provision(//
                 mavenBundle("org.apache.felix", "org.apache.felix.scr"), //
                 mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("bundle"), //
-                mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("tests").noStart(), // ),
-                                                                                                                           // //
+                mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("tests").noStart(),
+                mavenBundle().groupId("org.talend.components").artifactId("components-common").classifier("bundle"),
+                mavenBundle().groupId("org.talend.components").artifactId("components-common").classifier("tests").noStart(),
+                mavenBundle().groupId("org.talend.components").artifactId("components-common-oauth").classifier("bundle"),
+                mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("bundle"),
+                mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("tests").noStart(),
+                // //
                 junitBundles(), cleanCaches());
     }
 
+    // public static Option[] getOptions() {
+    // return options(newKarafDistributionConfiguration(), KarafDistributionOption.keepRuntimeFolder(),
+    // provision(//
+    // mavenBundle("org.apache.felix", "org.apache.felix.scr"), //
+    // mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("bundle"), //
+    // mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("tests").noStart(),
+    // mavenBundle().groupId("org.talend.components").artifactId("components-common").classifier("bundle"),
+    // mavenBundle().groupId("org.talend.components").artifactId("components-common").classifier("tests")
+    // .noStart(),
+    // mavenBundle().groupId("org.talend.components").artifactId("components-common-oauth").classifier("bundle"),
+    // mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("bundle"),
+    // mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("tests").noStart()),
+    // junitBundles(), cleanCaches());
+    // }
+    //
     // static KarafDistributionBaseConfigurationOption newKarafDistributionConfiguration() {
     // return karafDistributionConfiguration()
     // .frameworkUrl(

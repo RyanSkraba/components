@@ -12,8 +12,7 @@
 // ============================================================================
 package org.talend.components.api;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import javax.inject.Inject;
 
@@ -42,7 +41,6 @@ public class TestComponentService {
 
     @Configuration
     public Option[] config() {
-
         return PaxExamOptions.getOptions();
     }
 

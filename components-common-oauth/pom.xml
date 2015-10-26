@@ -41,12 +41,44 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>
-                    <instructions>
+                </configuration>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>default-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>bundle</classifier>
+                            <instructions>
                         <Import-Package>org.talend*</Import-Package>
                         <Service-Component>*</Service-Component>
                         <Embed-Dependency>!components*</Embed-Dependency>
-                    </instructions>
-                </configuration>
+                                <!-- <Bundle-ClassPath>{maven-dependencies},partner-${partner.version}.jar;mvn:org.talend.components.salesforce/partner/${partner.version}</Bundle-ClassPath> -->
+                            </instructions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>lib-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                        <configuration>
+                            <instructions>
+                                <Bundle-Name>${pom.name} lib</Bundle-Name>
+                            </instructions>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
