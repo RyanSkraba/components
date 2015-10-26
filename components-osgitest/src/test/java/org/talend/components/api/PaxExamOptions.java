@@ -17,9 +17,11 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 
 import java.io.File;
 
+import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionBaseConfigurationOption;
+import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 
 /**
  * created by sgandon on 8 sept. 2015 Detailled comment
@@ -41,7 +43,9 @@ public class PaxExamOptions {
                         mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("bundle"), //
                         mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("tests")
                                 .noStart()), //
-                junitBundles(), cleanCaches());
+                junitBundles(),
+                cleanCaches(),
+                KarafDistributionOption.keepRuntimeFolder());
     }
 
     static KarafDistributionBaseConfigurationOption newKarafDistributionConfiguration() {
@@ -49,7 +53,8 @@ public class PaxExamOptions {
                 .frameworkUrl(
                         maven().groupId(ORG_APACHE_KARAF_GID).artifactId(APACHE_KARAF_AID).versionAsInProject().type("tar.gz"))
                 .karafVersion(MavenUtils.getArtifactVersion(ORG_APACHE_KARAF_GID, APACHE_KARAF_AID)).name("Apache Karaf")
-                .unpackDirectory(new File("target/paxexam/"));
+                .unpackDirectory(new File("target/paxexam/"))
+                .useDeployFolder(false);
     }
 
 }
