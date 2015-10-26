@@ -30,12 +30,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.ops4j.pax.exam</groupId>
-			<artifactId>pax-exam-container-native</artifactId>
-			<version>${paxexamversion}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<dependency>
 			<groupId>org.ops4j.pax.exam</groupId>
@@ -58,12 +52,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.framework</artifactId>
-			<version>5.2.0</version>
-			<scope>test</scope>
-		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -88,19 +76,66 @@
 			<version>${project.version}</version>
 			<classifier>bundle</classifier>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.ops4j.pax.exam</groupId> -->
-<!-- 			<artifactId>pax-exam-container-karaf</artifactId> -->
-<!-- 			<version>4.6.0</version> -->
-<!-- 		</dependency> -->
 
-<!--         <dependency> -->
-<!--             <groupId>org.apache.karaf</groupId> -->
-<!--             <artifactId>apache-karaf</artifactId> -->
-<!--             <version>3.0.3</version> -->
-<!--             <type>tar.gz</type> -->
-<!--         </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.ops4j.pax.exam</groupId> -->
+		<!-- <artifactId>pax-exam-container-native</artifactId> -->
+		<!-- <version>${paxexamversion}</version> -->
+		<!-- <scope>test</scope> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.felix</groupId> -->
+		<!-- <artifactId>org.apache.felix.framework</artifactId> -->
+		<!-- <version>5.2.0</version> -->
+		<!-- <scope>test</scope> -->
+		<!-- </dependency> -->
+		<dependency>
+			<groupId>org.ops4j.pax.exam</groupId>
+			<artifactId>pax-exam-container-karaf</artifactId>
+			<version>4.6.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.karaf.features</groupId>
+			<artifactId>standard</artifactId>
+			<version>4.0.0</version>
+			<classifier>features</classifier>
+			<type>xml</type>
+			<scope>test</scope>
+		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.karaf</groupId> -->
+		<!-- <artifactId>apache-karaf</artifactId> -->
+		<!-- <version>4.0.0</version> -->
+		<!-- <type>tar.gz</type> -->
+		<!-- </dependency> -->
 		<!-- <dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-simple</artifactId> 
 			<version>1.5.10</version> <scope>test</scope> </dependency> -->
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.servicemix.tooling</groupId>
+				<artifactId>depends-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-depends-file</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>generate-depends-file</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<pax.exam.karaf.version>4.0.0</pax.exam.karaf.version>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>

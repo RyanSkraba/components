@@ -181,6 +181,7 @@
 								<Import-Package>org.osgi*,javax.net.ssl,javax.security.auth.x500</Import-Package>
 								<Embed-Transitive>true</Embed-Transitive>
 								<Embed-Dependency>!org.osgi.core;scope=compile|runtime</Embed-Dependency>
+								<_exportcontents>!*.internal,org.talend.*</_exportcontents>
 								<DynamicImport-Package>*</DynamicImport-Package>
 							</instructions>
 						</configuration>
@@ -209,6 +210,7 @@
 							<instructions>
 								<Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit</Import-Package>
 								<Bundle-SymbolicName>org.talend.components.api.test</Bundle-SymbolicName>
+                                <Fragment-Host>org.talend.components.api</Fragment-Host>
 								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
 								<Embed-Dependency></Embed-Dependency>
 								<Export-Package>org.talend.components*</Export-Package>
