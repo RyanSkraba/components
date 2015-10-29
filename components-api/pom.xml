@@ -194,7 +194,7 @@
 						</goals>
 						<configuration>
 							<instructions>
-								<Bundle-SymbolicName>org.talend.components.api.lib</Bundle-SymbolicName>
+								<Bundle-Name>org.talend.components.api lib</Bundle-Name>
 							</instructions>
 						</configuration>
 					</execution>
