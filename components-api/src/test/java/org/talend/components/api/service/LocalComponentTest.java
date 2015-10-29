@@ -55,7 +55,7 @@ public class LocalComponentTest {
     public LocalComponentTest() {
     }
 
-    public static void checkSerialize(ComponentProperties props) {
+    public static ComponentProperties checkSerialize(ComponentProperties props) {
         String s = props.toSerialized();
         ComponentProperties.Deserialized d = ComponentProperties.fromSerialized(s);
         ComponentProperties deserProps = d.properties;
@@ -87,6 +87,7 @@ public class LocalComponentTest {
                 assertEquals(name, newName);
             }
         }
+        return deserProps;
     }
 
     @Test
@@ -119,6 +120,18 @@ public class LocalComponentTest {
     public void testSerialize() {
         ComponentProperties props = componentService.getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
         checkSerialize(props);
+    }
+
+    @Test
+    public void testSerializeValues() {
+        TestComponentProperties props = (TestComponentProperties) componentService.getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
+        props.setValue(props.userId, "testUser");
+        NestedComponentProperties nestedProp = (NestedComponentProperties) props.getProperty(NestedComponentProperties.class);
+        nestedProp.setValue(nestedProp.aGreatProperty, "greatness");
+        assertNotNull(nestedProp);
+        props = (TestComponentProperties) checkSerialize(props);
+        assertEquals("testUser", props.getValue(props.userId));
+        assertEquals("greatness", props.nestedProps.getValue(props.nestedProps.aGreatProperty));
     }
 
     @Test
