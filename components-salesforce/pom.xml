@@ -5,15 +5,16 @@
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components</artifactId>
-		<version>0.1-SNAPSHOT</version>
+        <version>0.1.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<properties>
 		<partner.version>34.0.0</partner.version>
 	</properties>
 
+    <name>Components - Salesforce</name>
 	<artifactId>components-salesforce</artifactId>
-	<name>Components - Salesforce</name>
+    <version>0.1.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<dependencies>
 
@@ -45,24 +46,24 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>0.1-SNAPSHOT</version>
+            <version>0.1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>0.1-SNAPSHOT</version>
+            <version>0.1.0-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-common</artifactId>
-			<version>0.1-SNAPSHOT</version>
+            <version>0.1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-common-oauth</artifactId>
-			<version>0.1-SNAPSHOT</version>
+            <version>0.1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>biz.aQute</groupId>

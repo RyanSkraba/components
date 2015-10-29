@@ -4,13 +4,13 @@
     <parent>
         <artifactId>components</artifactId>
         <groupId>org.talend.components</groupId>
-        <version>0.1-SNAPSHOT</version>
+        <version>0.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>components-common-oauth</artifactId>
-    <packaging>bundle</packaging>
-
     <name>Components - OAuth</name>
+    <artifactId>components-common-oauth</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>
@@ -29,22 +29,13 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>0.1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                </configuration>
-            </plugin>
-
-
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -74,7 +65,7 @@
                         </goals>
                         <configuration>
                             <instructions>
-                                <Bundle-Name>${pom.name} lib</Bundle-Name>
+                                <Bundle-Name>${project.name} lib</Bundle-Name>
                             </instructions>
                         </configuration>
                     </execution>
