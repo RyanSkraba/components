@@ -103,11 +103,6 @@ public class SalesforceRuntime extends ComponentRuntime {
      */
     protected SchemaElement dynamicField;
 
-    /*
-     * The dynamic object used by the container to pass dynamic data.
-     */
-    protected ComponentDynamicHolder dynamicHolder;
-
     public SalesforceRuntime() {
         commitLevel = 1;
         int arraySize = commitLevel * 2;
@@ -358,8 +353,6 @@ public class SalesforceRuntime extends ComponentRuntime {
                 dynamicFieldMap.put(se.getName(), se);
             }
             dynamicFieldList = filteredDynamicFields;
-            dynamicHolder = container.createDynamicHolder();
-            dynamicHolder.setSchemaElements(dynamicFieldList);
         }
 
         inputFieldsToUse = new ArrayList<>();
@@ -402,8 +395,11 @@ public class SalesforceRuntime extends ComponentRuntime {
             inputRecordsIndex = 0;
         }
 
-        if (dynamicHolder != null)
-            dynamicHolder.resetValues();
+        ComponentDynamicHolder dynamicHolder = null;
+        if (dynamicField != null) {
+            dynamicHolder = container.createDynamicHolder();
+            dynamicHolder.setSchemaElements(dynamicFieldList);
+        }
         Iterator<XmlObject> it = inputRecords[inputRecordsIndex++].getChildren();
         Map<String, Object> columns = new HashMap<>();
         while (it.hasNext()) {
