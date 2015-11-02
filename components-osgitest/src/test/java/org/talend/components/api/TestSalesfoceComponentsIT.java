@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.api;
 
+import static org.ops4j.pax.exam.CoreOptions.*;
+
 import javax.inject.Inject;
 
 import org.junit.Before;
@@ -22,19 +24,20 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.salesforce.SalesforceLocalComponentTest;
+import org.talend.components.salesforce.SalesforceLocalComponentTestIT;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class TestSalesfoceComponentsIT extends SalesforceLocalComponentTest {
+public class TestSalesfoceComponentsIT extends SalesforceLocalComponentTestIT {
 
     @Inject
     ComponentService osgiCompService;
 
     @Configuration
     public Option[] config() {
+        return options(composite(PaxExamOptions.getOptions()),
+                propagateSystemProperties("salesforce.user", "salesforce.password", "salesforce.key"));
 
-        return PaxExamOptions.getOptions();
         // these debug option do not work, I still don't know how to debug this :, cleanCaches(),
         // vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
         // , systemTimeout(0)

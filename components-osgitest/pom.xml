@@ -16,20 +16,20 @@
 	<artifactId>components-osgitest</artifactId>
 	<name>Component API OSGI tests</name>
 	<dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>components-api</artifactId>
-            <version>${project.version}</version>
-            <classifier>bundle</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>components-api</artifactId>
-            <version>${project.version}</version>
-            <classifier>tests</classifier>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>components-api</artifactId>
+			<version>${project.version}</version>
+			<classifier>bundle</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>components-api</artifactId>
+			<version>${project.version}</version>
+			<classifier>tests</classifier>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>components-common</artifactId>
@@ -45,12 +45,12 @@
 			<scope>test</scope>
 		</dependency>
 
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>components-salesforce</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>components-salesforce</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -64,7 +64,7 @@
 			<artifactId>components-salesforce</artifactId>
 			<version>${project.version}</version>
 			<classifier>bundle</classifier>
-            <scope>test</scope>
+			<scope>test</scope>
 		</dependency>
 
 
@@ -108,33 +108,33 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-		<groupId>org.ops4j.pax.exam</groupId>
-		<artifactId>pax-exam-container-forked</artifactId>
-		<version>${paxexamversion}</version>
-		<scope>test</scope>
+			<groupId>org.ops4j.pax.exam</groupId>
+			<artifactId>pax-exam-container-forked</artifactId>
+			<version>${paxexamversion}</version>
+			<scope>test</scope>
 		</dependency>
 		<!-- These are the dependencies to run the test using Karaf, and thus inherit 
 			from debug and console managment. -->
 		<!-- We will use the forked version as it is faster for tests. -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.ops4j.pax.exam</groupId> -->
-<!-- 			<artifactId>pax-exam-container-karaf</artifactId> -->
-<!-- 			<version>${paxexamversion}</version> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.apache.karaf.features</groupId> -->
-<!-- 			<artifactId>standard</artifactId> -->
-<!-- 			<version>4.0.0</version> -->
-<!-- 			<classifier>features</classifier> -->
-<!-- 			<type>xml</type> -->
-<!-- 			<scope>test</scope> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.apache.karaf</groupId> -->
-<!-- 			<artifactId>apache-karaf</artifactId> -->
-<!-- 			<version>4.0.2</version> -->
-<!-- 			<type>tar.gz</type> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.ops4j.pax.exam</groupId> -->
+		<!-- <artifactId>pax-exam-container-karaf</artifactId> -->
+		<!-- <version>${paxexamversion}</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.karaf.features</groupId> -->
+		<!-- <artifactId>standard</artifactId> -->
+		<!-- <version>4.0.0</version> -->
+		<!-- <classifier>features</classifier> -->
+		<!-- <type>xml</type> -->
+		<!-- <scope>test</scope> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.karaf</groupId> -->
+		<!-- <artifactId>apache-karaf</artifactId> -->
+		<!-- <version>4.0.2</version> -->
+		<!-- <type>tar.gz</type> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
@@ -159,15 +159,18 @@
 					</execution>
 				</executions>
 			</plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
-                        <pax.exam.karaf.version>4.0.2</pax.exam.karaf.version>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-			
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<pax.exam.karaf.version>4.0.2</pax.exam.karaf.version>
+						<salesforce.user>${salesforce.user}</salesforce.user>
+						<salesforce.password>${salesforce.password}</salesforce.password>
+						<salesforce.key>${salesforce.key}</salesforce.key>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 

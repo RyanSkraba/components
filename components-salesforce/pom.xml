@@ -76,6 +76,21 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<salesforce.user>${salesforce.user}</salesforce.user>
+						<salesforce.password>${salesforce.password}</salesforce.password>
+						<salesforce.key>${salesforce.key}</salesforce.key>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
 			<!-- The pom is a resource of the component this is why it is copied as 
 				such at the top level package -->
 			<plugin>
@@ -131,7 +146,7 @@
 						</goals>
 						<configuration>
 							<instructions>
-                                <Bundle-Name>${pom.name} lib</Bundle-Name>
+								<Bundle-Name>${pom.name} lib</Bundle-Name>
 							</instructions>
 						</configuration>
 					</execution>
