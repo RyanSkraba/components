@@ -16,6 +16,20 @@
 	<artifactId>components-osgitest</artifactId>
 	<name>Component API OSGI tests</name>
 	<dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>components-api</artifactId>
+            <version>${project.version}</version>
+            <classifier>bundle</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>components-api</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>components-common</artifactId>

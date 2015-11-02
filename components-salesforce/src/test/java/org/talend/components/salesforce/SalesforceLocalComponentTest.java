@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.talend.components.ComponentTestUtils;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.internal.SpringApp;
@@ -48,19 +49,10 @@ import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.schema.SchemaFactory;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.service.LocalComponentTest;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.common.oauth.OauthProperties;
-import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
-import org.talend.components.salesforce.SalesforceConnectionWizard;
-import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
-import org.talend.components.salesforce.SalesforceModuleListProperties;
-import org.talend.components.salesforce.SalesforceModuleProperties;
-import org.talend.components.salesforce.SalesforceRuntime;
-import org.talend.components.salesforce.SalesforceUserPasswordProperties;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
@@ -86,7 +78,7 @@ public class SalesforceLocalComponentTest {
     // Test schema
     Schema schema;
 
-    ComponentDefinition definition;
+    // ComponentDefinition definition;
 
     // Test runtime container
     ComponentRuntimeContainer container;
@@ -117,7 +109,7 @@ public class SalesforceLocalComponentTest {
         container = new TestRuntimeContainer();
     }
 
-    protected void createRuntime() {
+    protected void createRuntime(ComponentDefinition definition) {
         runtime = (SalesforceRuntime) definition.createRuntime();
         runtime.setContainer(container);
     }
@@ -322,7 +314,7 @@ public class SalesforceLocalComponentTest {
     public void testGetProps() {
         ComponentProperties props = componentService.getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
         Form f = props.getForm(Form.MAIN);
-        LocalComponentTest.checkSerialize(props);
+        ComponentTestUtils.checkSerialize(props);
         System.out.println(f);
         System.out.println(props);
         assertEquals(Form.MAIN, f.getName());
@@ -333,7 +325,7 @@ public class SalesforceLocalComponentTest {
         ComponentProperties props;
 
         props = componentService.getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
-        LocalComponentTest.checkSerialize(props);
+        ComponentTestUtils.checkSerialize(props);
         SchemaElement loginType = props.getProperty("loginType");
         System.out.println(loginType.getPossibleValues());
         assertEquals("Basic", loginType.getPossibleValues().get(0).toString());
@@ -434,7 +426,7 @@ public class SalesforceLocalComponentTest {
         TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
-        LocalComponentTest.checkSerialize(props);
+        ComponentTestUtils.checkSerialize(props);
 
         assertEquals(2, props.getForms().size());
         Form f = props.module.getForm(Form.REFERENCE);
@@ -472,11 +464,11 @@ public class SalesforceLocalComponentTest {
 
     @Test
     public void testInputConnectionRef() throws Throwable {
-        definition = componentService.getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
+        ComponentDefinition definition = componentService.getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
         TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
-        createRuntime();
+        createRuntime(definition);
         runtime.setComponentService(componentService);
         runtime.connect(props.connection);
 
@@ -510,7 +502,7 @@ public class SalesforceLocalComponentTest {
 
     @Test
     public void testInputProps() throws Throwable {
-        definition = componentService.getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
+        ComponentDefinition definition = componentService.getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
         TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
@@ -542,7 +534,7 @@ public class SalesforceLocalComponentTest {
     protected static final boolean DYNAMIC = true;
 
     protected void runInputTest(boolean isDynamic) throws Throwable {
-        definition = componentService.getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
+        ComponentDefinition definition = componentService.getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
         TSalesforceInputProperties props = (TSalesforceInputProperties) componentService
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
@@ -552,8 +544,8 @@ public class SalesforceLocalComponentTest {
             fixSchemaForDynamic();
         }
 
-        LocalComponentTest.checkSerialize(props);
-        createRuntime();
+        ComponentTestUtils.checkSerialize(props);
+        createRuntime(definition);
 
         Map<String, Object> row = new HashMap<>();
 
@@ -712,7 +704,7 @@ public class SalesforceLocalComponentTest {
 
     @Test
     public void testBulkExec() throws Throwable {
-        definition = componentService.getComponentDefinition(TSalesforceBulkExecDefinition.COMPONENT_NAME);
+        ComponentDefinition definition = componentService.getComponentDefinition(TSalesforceBulkExecDefinition.COMPONENT_NAME);
         TSalesforceBulkExecProperties props;
         props = (TSalesforceBulkExecProperties) componentService
                 .getComponentProperties(TSalesforceBulkExecDefinition.COMPONENT_NAME);
@@ -726,9 +718,9 @@ public class SalesforceLocalComponentTest {
             checkAndAfter(f, "moduleName", moduleProps);
             props.setValue(props.outputAction, TSalesforceOutputProperties.OutputAction.INSERT);
 
-            LocalComponentTest.checkSerialize(props);
+            ComponentTestUtils.checkSerialize(props);
 
-            createRuntime();
+            createRuntime(definition);
 
             int count = 10;
             List<Map<String, Object>> outputRows = makeRows(count);
@@ -748,7 +740,7 @@ public class SalesforceLocalComponentTest {
     }
 
     protected void runOutputInsert(boolean isDynamic) throws Throwable {
-        definition = componentService.getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
+        ComponentDefinition definition = componentService.getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
         TSalesforceOutputProperties props;
         props = (TSalesforceOutputProperties) componentService.getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
@@ -759,9 +751,9 @@ public class SalesforceLocalComponentTest {
         }
         props.setValue(props.outputAction, TSalesforceOutputProperties.OutputAction.INSERT);
 
-        LocalComponentTest.checkSerialize(props);
+        ComponentTestUtils.checkSerialize(props);
 
-        createRuntime();
+        createRuntime(definition);
 
         int count = 10;
         List<Map<String, Object>> outputRows = makeRows(count);
@@ -771,7 +763,7 @@ public class SalesforceLocalComponentTest {
 
     @Test
     public void testOutputUpsert() throws Throwable {
-        definition = componentService.getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
+        ComponentDefinition definition = componentService.getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
         TSalesforceOutputProperties props;
         props = (TSalesforceOutputProperties) componentService.getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
         setupProps(props.connection);
@@ -785,9 +777,9 @@ public class SalesforceLocalComponentTest {
         System.out.println(se.getPossibleValues());
         assertTrue(se.getPossibleValues().size() > 10);
 
-        LocalComponentTest.checkSerialize(props);
+        ComponentTestUtils.checkSerialize(props);
 
-        createRuntime();
+        createRuntime(definition);
 
         Map<String, Object> row = new HashMap<>();
         row.put("Name", "TestName");
@@ -800,13 +792,14 @@ public class SalesforceLocalComponentTest {
 
     @Test
     public void testGetServerTimestamp() throws Throwable {
-        definition = componentService.getComponentDefinition(TSalesforceGetServerTimestampDefinition.COMPONENT_NAME);
+        ComponentDefinition definition = componentService
+                .getComponentDefinition(TSalesforceGetServerTimestampDefinition.COMPONENT_NAME);
         TSalesforceGetServerTimestampProperties props;
         props = (TSalesforceGetServerTimestampProperties) componentService
                 .getComponentProperties(TSalesforceGetServerTimestampDefinition.COMPONENT_NAME);
         setupProps(props.connection);
 
-        createRuntime();
+        createRuntime(definition);
         runtime.inputBegin(props);
 
         Map<String, Object> row = new HashMap<>();

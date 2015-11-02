@@ -26,7 +26,7 @@ import org.talend.components.salesforce.SalesforceLocalComponentTest;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class TestSalesfoceComponents extends SalesforceLocalComponentTest {
+public class TestSalesfoceComponentsIT extends SalesforceLocalComponentTest {
 
     @Inject
     ComponentService osgiCompService;

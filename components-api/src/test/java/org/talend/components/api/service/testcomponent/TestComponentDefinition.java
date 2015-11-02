@@ -9,7 +9,6 @@ import org.talend.components.api.component.ComponentConnector;
 import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
 
 @Component(Constants.COMPONENT_BEAN_PREFIX + TestComponentDefinition.COMPONENT_NAME)
@@ -44,7 +43,6 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     public String getPngImagePath(ComponentImageType imageType) {
         return null;
     }
-
 
     @Override
     public InputStream getMavenPom() {

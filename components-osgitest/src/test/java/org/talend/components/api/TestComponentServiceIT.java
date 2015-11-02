@@ -14,8 +14,12 @@ package org.talend.components.api;
 
 import static org.junit.Assert.*;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import javax.inject.Inject;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -26,22 +30,38 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.service.LocalComponentTestIT;
+import org.talend.components.api.service.testcomponent.TestComponentDefinition;
+import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
+import org.talend.components.api.wizard.ComponentWizardDefinition;
 
 /**
  * created by sgandon on 7 sept. 2015 Detailled comment
  */
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class TestComponentService {
+public class TestComponentServiceIT extends LocalComponentTestIT {
 
     @Inject
-    private ComponentService componentService;
+    private ComponentService osgiCompService;
 
     @Configuration
     public Option[] config() {
         return PaxExamOptions.getOptions();
+    }
+
+    @Before
+    public void setupComponentService() {
+        BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
+        final Dictionary<String, Object> props = new Hashtable<String, Object>();
+        props.put("component.name", Constants.COMPONENT_BEAN_PREFIX + TestComponentDefinition.COMPONENT_NAME);
+        bundleContext.registerService(ComponentDefinition.class, new TestComponentDefinition(), props);
+        props.put("component.name", Constants.COMPONENT_WIZARD_BEAN_PREFIX + TestComponentWizardDefinition.COMPONENT_WIZARD_NAME);
+        bundleContext.registerService(ComponentWizardDefinition.class, new TestComponentWizardDefinition(), props);
+        componentService = osgiCompService;
     }
 
     @Test

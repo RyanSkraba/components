@@ -160,6 +160,10 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
@@ -206,16 +210,18 @@
 						</goals>
 						<configuration>
 							<classifier>tests</classifier>
+							<!-- removes the main classes we only want test classes -->
 							<outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
 							<instructions>
-								<Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit</Import-Package>
+                                <Service-Component>*</Service-Component>
+								<Import-Package>!*internal,org.talend*,javax.xml.namespace,org.junit</Import-Package>
 								<Bundle-SymbolicName>org.talend.components.api.test</Bundle-SymbolicName>
-                                <Fragment-Host>org.talend.components.api</Fragment-Host>
+								<Fragment-Host>org.talend.components.api</Fragment-Host>
 								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
 								<Embed-Dependency></Embed-Dependency>
 								<Export-Package>org.talend.components*</Export-Package>
-								<Include-Resource>=target/test-classes/
-								</Include-Resource>
+								<!-- include test classes -->
+								<Include-Resource>=target/test-classes/</Include-Resource>
 								<!-- <Bundle-ClassPath>{maven-dependencies},partner-${partner.version}.jar;mvn:org.talend.components.salesforce/partner/${partner.version}</Bundle-ClassPath> -->
 							</instructions>
 						</configuration>
