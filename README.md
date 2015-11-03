@@ -6,7 +6,7 @@
 In the top level folder:
 
 ```
-mvn clean install
+mvn clean install (or 'package' if you do not want the integration tests to be executed)
 cd components-webtest
 mvn spring-boot:run
 ```
@@ -43,3 +43,8 @@ WARNING : make sure to launch `mvn clean install` and not (mvn test) because the
 
 ## IDE setup
 See the [tooling](/tooling/) folder.
+
+## Tests 
+there are 2 kinds of tests, Unit test and Integration test.
+The Unit test are executed during the maven build in the *test* phase that is before the packaging of the artifact, whereas the Integration tests are executed after the *packaging* phase.
+**Integration tests** can be use to connect to actual system and they all **must be prefixed with TestIT**. 

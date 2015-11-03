@@ -26,7 +26,7 @@ import org.talend.components.common.ProxyPropertiesTest;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class TestComponentCommonIT extends ProxyPropertiesTest {
+public class ComponentCommonTestIT extends ProxyPropertiesTest {
 
     @Inject
     ComponentService osgiCompService;

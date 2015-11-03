@@ -43,7 +43,7 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
  */
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class TestComponentServiceIT extends LocalComponentTestIT {
+public class ComponentServiceTestIT extends LocalComponentTestIT {
 
     @Inject
     private ComponentService osgiCompService;

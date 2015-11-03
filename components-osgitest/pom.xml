@@ -162,7 +162,16 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
 					<systemPropertyVariables>
 						<pax.exam.karaf.version>4.0.2</pax.exam.karaf.version>
@@ -172,7 +181,6 @@
 					</systemPropertyVariables>
 				</configuration>
 			</plugin>
-
 		</plugins>
 	</build>
 
