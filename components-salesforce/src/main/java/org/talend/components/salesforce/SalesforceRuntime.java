@@ -19,6 +19,8 @@ import java.util.*;
 
 import javax.xml.namespace.QName;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.NameAndLabel;
 import org.talend.components.api.properties.ValidationResult;
@@ -45,6 +47,8 @@ import com.sforce.ws.SessionRenewer;
 import com.sforce.ws.bind.XmlObject;
 
 public class SalesforceRuntime extends ComponentRuntime {
+
+    private static final   Logger LOG         = LoggerFactory.getLogger(SalesforceRuntime.class);
 
     protected static final String API_VERSION = "34.0";
 
@@ -240,8 +244,8 @@ public class SalesforceRuntime extends ComponentRuntime {
 
         doConnection(properties, config);
 
-        System.out.println("Connection: " + connection);
-        System.out.println("Bulk Connection: " + bulkConnection);
+        LOG.debug("Connection: " + connection);
+        LOG.debug("Bulk Connection: " + bulkConnection);
 
     }
 
@@ -250,7 +254,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         DescribeGlobalResult result = connection.describeGlobal();
         DescribeGlobalSObjectResult[] objects = result.getSobjects();
         for (DescribeGlobalSObjectResult obj : objects) {
-            System.out.println("module label: " + obj.getLabel() + " name: " + obj.getName());
+            LOG.debug("module label: " + obj.getLabel() + " name: " + obj.getName());
             returnList.add(new NameAndLabel(obj.getName(), obj.getLabel()));
         }
         return returnList;

@@ -404,7 +404,7 @@ public class ComponentServiceImpl implements ComponentService {
             modelBuilder = new DefaultModelBuilderFactory().newInstance();
         }
         ModelBuildingResult builtModel = modelBuilder.build(modelRequest);
-        System.out.println("built problems:" + builtModel.getProblems());
+        LOGGER.debug("built problems:" + builtModel.getProblems());
         return builtModel.getEffectiveModel();
     }
 
