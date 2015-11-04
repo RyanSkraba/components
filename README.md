@@ -6,7 +6,7 @@
 In the top level folder:
 
 ```
-mvn clean install (or 'package' if you do not want the integration tests to be executed)
+mvn clean install (or 'package' if you do not want the integration tests to be executed see Tests below)
 cd components-webtest
 mvn spring-boot:run
 ```
@@ -46,5 +46,22 @@ See the [tooling](/tooling/) folder.
 
 ## Tests 
 there are 2 kinds of tests, Unit test and Integration test.
-The Unit test are executed during the maven build in the *test* phase that is before the packaging of the artifact, whereas the Integration tests are executed after the *packaging* phase.
 **Integration tests** can be use to connect to actual system and they all **must be prefixed with TestIT**. 
+  - The Unit test are executed during the maven build in the *test* phase that is before the packaging of the artifact, whereas 
+  - The Integration tests are executed after the *packaging* phase. 
+The salesforce integration tests require some credentials to be set in the maven .m2/settings.xml, here is an example
+```
+  <profiles>
+    <profile>
+      <id>salesforce</id>
+      <properties>
+            <salesforce.user>the user name</salesforce.user>
+            <salesforce.password>the pazzword</salesforce.password>
+            <salesforce.key>the salesforcekey</salesforce.key>            
+      </properties>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>salesforce</activeProfile>
+  </activeProfiles>
+```
