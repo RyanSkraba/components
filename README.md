@@ -55,13 +55,17 @@ The salesforce integration tests require some credentials to be set in the maven
     <profile>
       <id>salesforce</id>
       <properties>
-            <salesforce.user>the user name</salesforce.user>
-            <salesforce.password>the pazzword</salesforce.password>
-            <salesforce.key>the salesforcekey</salesforce.key>            
+            <salesforce.user>the_user_name</salesforce.user>
+            <salesforce.password>the_pazzword</salesforce.password>
+            <salesforce.key>the_salesforcekey</salesforce.key>            
       </properties>
     </profile>
   </profiles>
   <activeProfiles>
     <activeProfile>salesforce</activeProfile>
   </activeProfiles>
+```
+Alternatively you can launch the mvn command followed with those system properties
+```
+-Dsalesforce.user=the_user_name -Dsalesforce.password=the_pazzword -Dsalesforce.key=the_salesforcekey
 ```
