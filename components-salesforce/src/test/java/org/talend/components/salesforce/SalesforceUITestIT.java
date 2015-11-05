@@ -18,13 +18,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.testcomponent.PropertiesTester;
+import org.talend.components.test.SpringApp;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
-public class SalesforceUITest {
+public class SalesforceUITestIT {
 
 
     public PropertiesTester propertiesTester;
@@ -34,7 +34,7 @@ public class SalesforceUITest {
 
 
 
-    public SalesforceUITest() {
+    public SalesforceUITestIT() {
     }
 
     @Test public void testBasicUi() {

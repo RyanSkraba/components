@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.talend.components.ComponentTestUtils;
+import org.talend.components.api.ComponentTestUtils;
 import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
 
 /**

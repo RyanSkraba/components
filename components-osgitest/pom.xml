@@ -3,10 +3,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>org.talend.components</groupId>
-		<artifactId>components</artifactId>
-		<version>0.1.0.BUILD-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
+        <groupId>org.talend.components</groupId>
+        <artifactId>components-parent</artifactId>
+        <version>0.1.0.BUILD-SNAPSHOT</version>
+        <relativePath>../components-parent/pom.xml</relativePath>
 	</parent>
 
 	<properties>
@@ -97,6 +97,12 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.12</version>
 		</dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.12</version>
+            <scope>test</scope>
+        </dependency>
 
 		<dependency>
 			<groupId>javax.inject</groupId>
@@ -137,12 +143,6 @@
 		<!-- <version>4.0.2</version> -->
 		<!-- <type>tar.gz</type> -->
 		<!-- </dependency> -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.5.10</version>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 	<build>

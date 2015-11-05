@@ -32,10 +32,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.talend.components.ComponentTestUtils;
+import org.talend.components.api.ComponentTestUtils;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.internal.SpringApp;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.NameAndLabel;
 import org.talend.components.api.properties.PresentationItem;
@@ -60,6 +59,7 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinit
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
+import org.talend.components.test.SpringApp;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -742,6 +742,7 @@ public class SalesforceLocalComponentTestIT {
 
         Map<String, Object> row = new HashMap<>();
         row = runtime.inputRow();
+        // TODO we need to make sure about the server and local time zone are the same.
         Calendar now = Calendar.getInstance();
         Calendar date = (Calendar) row.get("ServerTimestamp");
         long nowMillis = now.getTimeInMillis();
@@ -749,7 +750,7 @@ public class SalesforceLocalComponentTestIT {
         System.out.println("now: " + nowMillis);
         System.out.println(dateMillis);
         long delta = nowMillis - dateMillis;
-        assertTrue(Math.abs(delta) < 10000);
+        assertTrue(Math.abs(delta) < 30000);
         assertNull(runtime.inputRow());
     }
 

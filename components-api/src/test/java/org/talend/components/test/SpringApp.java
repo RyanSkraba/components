@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.internal;
+package org.talend.components.test;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.boot.SpringApplication;

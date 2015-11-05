@@ -4,9 +4,9 @@
 
 	<parent>
 		<groupId>org.talend.components</groupId>
-		<artifactId>components</artifactId>
+		<artifactId>components-parent</artifactId>
 		<version>0.1.0.BUILD-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
+		<relativePath>../components-parent/pom.xml</relativePath>
 	</parent>
 
 	<name>Component API</name>
@@ -20,26 +20,48 @@
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>1.1.0.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+			<scope>test</scope>
 		</dependency>
+		<!-- the following dependencies may be removed once we get rid off the spring implementation and create a specific project for that.-->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>4.2.0.RELEASE</version>
+		</dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>4.2.0.RELEASE</version>
+        </dependency>
+		<!-- SWAGGER DEPENDENCIES -->
 		<!-- SWAGGER DEPENDENCIES -->
 		<dependency>
 			<groupId>com.mangofactory</groupId>
 			<artifactId>swagger-springmvc</artifactId>
+			<version>1.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
+			<version>3.0.15</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.cedarsoftware</groupId>
 			<artifactId>json-io</artifactId>
+			<version>4.1.7</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -161,10 +183,6 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
@@ -183,9 +201,10 @@
 							<classifier>bundle</classifier>
 							<instructions>
 								<Service-Component>*</Service-Component>
-								<Import-Package>org.osgi*,javax.net.ssl,javax.security.auth.x500</Import-Package>
+								<Import-Package>org.osgi*,javax.net.ssl,javax.security.auth.x500,
+									org.slf4j*</Import-Package>
 								<Embed-Transitive>true</Embed-Transitive>
-								<Embed-Dependency>!org.osgi.core;scope=compile|runtime</Embed-Dependency>
+								<Embed-Dependency>!org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api</Embed-Dependency>
 								<_exportcontents>!*.internal,org.talend.*</_exportcontents>
 								<DynamicImport-Package>*</DynamicImport-Package>
 							</instructions>
@@ -214,7 +233,7 @@
 							<!-- removes the main classes we only want test classes -->
 							<outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
 							<instructions>
-                                <Service-Component>*</Service-Component>
+								<Service-Component>*</Service-Component>
 								<Import-Package>!*internal,org.talend*,javax.xml.namespace,org.junit</Import-Package>
 								<Bundle-SymbolicName>org.talend.components.api.test</Bundle-SymbolicName>
 								<Fragment-Host>org.talend.components.api</Fragment-Host>

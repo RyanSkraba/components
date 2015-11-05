@@ -20,7 +20,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.talend.components.ComponentTestUtils;
+import org.talend.components.api.ComponentTestUtils;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.testcomponent.ComponentPropertiesWithDefinedI18N;

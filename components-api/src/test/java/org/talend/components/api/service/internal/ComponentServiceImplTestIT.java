@@ -38,7 +38,7 @@ import org.junit.Test;
 /**
  * created by sgandon on 13 oct. 2015
  */
-public class TestComponentServiceImpl {
+public class ComponentServiceImplTestIT {
 
     String DIRECT_DEPS = "mvn:org.springframework/spring-webmvc/1.0/jar,mvn:org.eclipse.aether/aether-api/1.0.0.v20140518/jar,"
             + "mvn:foo/bar/1.6.3/jar,mvn:org.talend.components.salesforce/partner/34.0.0/jar";

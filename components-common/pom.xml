@@ -6,9 +6,9 @@
 
     <parent>
         <groupId>org.talend.components</groupId>
-        <artifactId>components</artifactId>
+        <artifactId>components-parent</artifactId>
         <version>0.1.0.BUILD-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>../components-parent/pom.xml</relativePath>
     </parent>
 
     <name>Components - Shared Component Parts</name>
@@ -32,7 +32,13 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
+            <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <scope>test</scope>
+        </dependency>        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
