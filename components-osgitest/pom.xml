@@ -173,6 +173,7 @@
 					</execution>
 				</executions>
 				<configuration>
+				<argLine>-Xms512m -Xmx1024m</argLine>
 					<systemPropertyVariables>
 						<pax.exam.karaf.version>4.0.2</pax.exam.karaf.version>
 						<salesforce.user>${salesforce.user}</salesforce.user>
