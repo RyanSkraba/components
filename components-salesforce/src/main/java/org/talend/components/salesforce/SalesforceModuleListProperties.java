@@ -72,7 +72,7 @@ public class SalesforceModuleListProperties extends ComponentProperties {
         SalesforceRuntime conn = new SalesforceRuntime();
         conn.connect(connectionProps);
         moduleNames = conn.getModuleNames();
-        setValue(moduleName, moduleNames);
+        moduleName.setPossibleValues(moduleNames);
     }
 
     public void afterFormFinishMain() throws Exception {

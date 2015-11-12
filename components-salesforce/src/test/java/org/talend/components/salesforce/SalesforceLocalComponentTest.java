@@ -28,7 +28,7 @@ import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnect
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
-public class SalesforceLocalComponentTest {
+public class SalesforceLocalComponentTest  {
 
     ComponentService componentService = new ComponentServiceImpl(null);
 
@@ -41,6 +41,7 @@ public class SalesforceLocalComponentTest {
     }
 
     public SalesforceLocalComponentTest() {
+        super();
     }
 
     protected ComponentProperties checkAndBefore(Form form, String propName, ComponentProperties props) throws Throwable {
