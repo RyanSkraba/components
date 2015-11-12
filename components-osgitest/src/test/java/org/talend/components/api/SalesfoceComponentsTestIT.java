@@ -35,12 +35,10 @@ public class SalesfoceComponentsTestIT extends SalesforceLocalComponentTestIT {
 
     @Configuration
     public Option[] config() {
-        return options(composite(PaxExamOptions.getOptions()),
+        // Change "-DX" to "-X" below to use the debugger on the test proces
+        return options(vmOptions("-Xmx1000m", "-DXrunjdwp:transport=dt_socket,server=y,suspend=y,address=5010"),
+                systemTimeout(1000000), composite(PaxExamOptions.getOptions()),
                 propagateSystemProperties("salesforce.user", "salesforce.password", "salesforce.key"));
-
-        // these debug option do not work, I still don't know how to debug this :, cleanCaches(),
-        // vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
-        // , systemTimeout(0)
     }
 
     @Before
