@@ -26,8 +26,8 @@ public class PaxExamOptions {
     private static final String ORG_APACHE_KARAF_GID = "org.apache.karaf";
 
     public static Option[] getOptions() {
-        return options(mavenBundle("org.apache.felix", "org.apache.felix.scr"), mavenBundle("org.slf4j", "slf4j-api", "1.7.12"),
-                mavenBundle("org.apache.felix", "org.apache.felix.scr"), //
+        return options(mavenBundle("org.apache.felix", "org.apache.felix.scr"), //
+                mavenBundle("org.slf4j", "slf4j-api", "1.7.12"),
                 mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("bundle"), //
                 mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("tests").noStart(),
                 mavenBundle().groupId("org.talend.components").artifactId("components-common").classifier("bundle"),
