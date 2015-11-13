@@ -9,6 +9,7 @@
 
 	<name>Talend Component Framework and Components Agregator</name>
 	<modules>
+        <module>components-parent</module>
 		<module>components-api</module>
 		<module>components-common</module>
 		<module>components-common-oauth</module>
