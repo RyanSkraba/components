@@ -14,12 +14,24 @@ package org.talend.components.salesforce;
 
 import static org.junit.Assert.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.inject.Inject;
 
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -27,7 +39,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.ComponentTestUtils;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.properties.*;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.NameAndLabel;
+import org.talend.components.api.properties.PresentationItem;
+import org.talend.components.api.properties.Repository;
+import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.runtime.ComponentDynamicHolder;
 import org.talend.components.api.runtime.DefaultComponentRuntimeContainerImpl;
@@ -51,7 +67,7 @@ import org.talend.components.test.SpringApp;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
-public class SalesforceLocalComponentTestIT  {
+public class SalesforceLocalComponentTestIT {
 
     String userId;
 
@@ -81,16 +97,19 @@ public class SalesforceLocalComponentTestIT  {
         securityKey = System.getProperty("salesforce.key");
     }
 
-    @Rule public TestName name = new TestName();
+    @Rule
+    public TestName name = new TestName();
 
     long startTime;
 
-    @Before public void before() throws Exception {
+    @Before
+    public void before() throws Exception {
         startTime = System.currentTimeMillis();
         System.out.println(">>>>> " + name.getMethodName());
     }
 
-    @After public void after() throws Exception {
+    @After
+    public void after() throws Exception {
         System.out.println("<<<<< " + name.getMethodName() + " time: " + (System.currentTimeMillis() - startTime));
     }
 
@@ -132,7 +151,8 @@ public class SalesforceLocalComponentTestIT  {
             this.schema = schema;
         }
 
-        @Override public String toString() {
+        @Override
+        public String toString() {
             return "RepoProps: " + repoLocation + "/" + name + " props: " + props;
         }
     }
@@ -151,7 +171,8 @@ public class SalesforceLocalComponentTestIT  {
             this.repoProps = repoProps;
         }
 
-        @Override public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation,
+        @Override
+        public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation,
                 Schema schema) {
             RepoProps rp = new RepoProps(properties, name, repositoryLocation, schema);
             repoProps.add(rp);
@@ -159,7 +180,8 @@ public class SalesforceLocalComponentTestIT  {
             return repositoryLocation + ++locationNum;
         }
 
-        @Override public ComponentProperties getPropertiesForComponent(String componentId) {
+        @Override
+        public ComponentProperties getPropertiesForComponent(String componentId) {
             if (componentId.equals(componentIdToCheck)) {
                 System.out.println("getProps: " + componentId + " found: " + properties);
                 return properties;
@@ -172,7 +194,8 @@ public class SalesforceLocalComponentTestIT  {
 
     }
 
-    @Test public void testWizard() throws Throwable {
+    @Test
+    public void testWizard() throws Throwable {
         final List<RepoProps> repoProps = new ArrayList<>();
 
         Repository repo = new TestRepository(repoProps);
@@ -276,8 +299,8 @@ public class SalesforceLocalComponentTestIT  {
         Form connFormWizard = forms.get(0);
         SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connFormWizard.getProperties();
 
-        ComponentWizard[] subWizards = componentService.getComponentWizardsForProperties(connProps, "location").toArray(
-                new ComponentWizard[3]);
+        ComponentWizard[] subWizards = componentService.getComponentWizardsForProperties(connProps, "location")
+                .toArray(new ComponentWizard[3]);
         Arrays.sort(subWizards, new Comparator<ComponentWizard>() {
 
             @Override
@@ -758,32 +781,7 @@ public class SalesforceLocalComponentTestIT  {
 
     @Test
     public void testAlli18n() {
-        Set<ComponentDefinition> allComponents = componentService.getAllComponents();
-        for (ComponentDefinition cd : allComponents) {
-            ComponentProperties props = cd.createProperties();
-            checkAllI18NProperties(props);
-            // Make sure this translates
-            System.out.println(cd.getTitle());
-            assertFalse(cd.getTitle().contains("component."));
-        }
-    }
-
-    private void checkAllI18NProperties(ComponentProperties checkProps) {
-        System.out.println("Checking: " + checkProps);
-        List<SchemaElement> properties = checkProps.getProperties();
-        for (SchemaElement prop : properties) {
-            if (!(prop instanceof ComponentProperties)) {
-                assertFalse("property [" + checkProps.getClass().getCanonicalName() + "/" + prop.getName()
-                        + "] should have a translated message key [property." + prop.getName()
-                        + ".displayName] in [ZE proper messages.property]", prop.getDisplayName().endsWith(".displayName"));
-            } else {
-                // FIXME - the inner class property thing is broken, remove this check to test it
-                if (prop.toString().contains("$")) {
-                    continue;
-                }
-                checkAllI18NProperties((ComponentProperties) prop);
-            }
-        }
+        ComponentTestUtils.testAlli18n(componentService);
     }
 
 }

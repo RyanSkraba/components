@@ -18,6 +18,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
+import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
 
 public class TestComponentProperties extends ComponentProperties {
 
@@ -31,7 +32,7 @@ public class TestComponentProperties extends ComponentProperties {
 
     public ComponentPropertiesWithDefinedI18N nestedProp2 = new ComponentPropertiesWithDefinedI18N();
 
-    // public InheritedComponentProperties nestedProp3 = new InheritedComponentProperties();
+    public InheritedComponentProperties nestedProp3 = new InheritedComponentProperties();
 
     public static final String TESTCOMPONENT = "TestComponent";
 

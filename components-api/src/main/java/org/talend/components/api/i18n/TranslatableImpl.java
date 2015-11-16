@@ -14,6 +14,7 @@ package org.talend.components.api.i18n;
 
 import org.talend.components.api.context.GlobalContext;
 import org.talend.daikon.i18n.I18nMessages;
+import org.talend.daikon.i18n.I18nMessages;
 
 /**
  * created by sgandon on 18 sept. 2015
@@ -35,15 +36,13 @@ public class TranslatableImpl implements Translatable {
     }
 
     /**
-     * this uses the globalContext static variable and the current Class location to find the resource bundle names
-     * messages
+     * this uses the globalContext static variable and the current Class pacakge to find the resource bundle named
+     * messages.properties (it also look into inherited class, if no key is found)
      * 
      * @return the already set I18nMessages or a newly created one base on the current Class package.
      */
     protected I18nMessages createI18nMessageFormater() {
-        String className = this.getClass().getCanonicalName();
-        String baseName = className.substring(0, className.lastIndexOf('.')) + ".messages";
-        return GlobalContext.i18nMessageProvider.getI18nMessages(this.getClass().getClassLoader(), baseName);
+        return GlobalContext.i18nMessageProvider.getI18nMessages(this.getClass());
     }
 
     @Override

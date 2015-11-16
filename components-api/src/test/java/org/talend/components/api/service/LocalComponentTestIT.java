@@ -23,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.talend.components.api.ComponentTestUtils;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
@@ -96,6 +97,11 @@ public class LocalComponentTestIT {
         assertNotNull(testComponentDefinition.getMavenPom());
         Set<String> mavenUriDependencies = componentService.getMavenUriDependencies(TestComponentDefinition.COMPONENT_NAME);
         assertEquals(5, mavenUriDependencies.size());
+    }
+
+    @Test
+    public void testAlli18n() {
+        ComponentTestUtils.testAlli18n(componentService);
     }
 
 }

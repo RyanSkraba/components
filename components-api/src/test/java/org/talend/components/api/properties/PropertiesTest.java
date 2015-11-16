@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.ComponentTestUtils;
 import org.talend.components.api.properties.presentation.Form;
@@ -99,7 +98,6 @@ public class PropertiesTest {
     }
 
     @Test
-    @Ignore("this does not work yet")
     public void testi18NForInheritedProperty() {
         TestComponentProperties componentProperties = new TestComponentProperties();
         ComponentProperties nestedProp = (ComponentProperties) componentProperties
@@ -115,7 +113,7 @@ public class PropertiesTest {
         TestComponentProperties componentProperties = new TestComponentProperties();
         List<SchemaElement> pList = componentProperties.getProperties();
         assertTrue(pList.get(0) != null);
-        assertEquals(4, pList.size());
+        assertEquals(5, pList.size());
     }
 
     @Test
@@ -130,7 +128,7 @@ public class PropertiesTest {
         TestComponentProperties tProps = new TestComponentProperties();
         List<String> fieldNames = tProps.getPropertyFieldNames();
         System.out.println(fieldNames);
-        assertEquals(4, fieldNames.size());
+        assertEquals(5, fieldNames.size());
         assertTrue(tProps.userId == tProps.getPropertyByFieldName("userId"));
         assertTrue(tProps.nestedProps == tProps.getPropertyByFieldName("nestedProps"));
     }
