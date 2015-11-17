@@ -14,20 +14,19 @@ package org.talend.components.api.i18n;
 
 import javax.inject.Inject;
 
-import org.springframework.stereotype.Component;
 import org.talend.daikon.i18n.ClassBasedI18nMessages;
 import org.talend.daikon.i18n.ClassLoaderBasedI18nMessages;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.i18n.LocaleProvider;
 
+import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Reference;
 
 /**
  * This class creates instances of
  */
-@Component
-@aQute.bnd.annotation.component.Component(provide = I18nMessageProvider.class)
+@Component(provide = I18nMessageProvider.class)
 public class I18nMessageProvider {
 
     @Inject
@@ -47,7 +46,7 @@ public class I18nMessageProvider {
      * java.util.Locale, ClassLoader, java.util.ResourceBundle.Control))}
      * @return a DynamicLocalFormatedI18n instance to handle i18n.
      */
-    public I18nMessages getI18nMessagesX(ClassLoader classLoader, String baseName) {
+    public I18nMessages getI18nMessages(ClassLoader classLoader, String baseName) {
         return new ClassLoaderBasedI18nMessages(localeProvider, classLoader, baseName);
     }
 

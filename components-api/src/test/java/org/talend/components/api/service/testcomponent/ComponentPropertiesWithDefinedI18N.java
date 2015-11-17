@@ -33,7 +33,7 @@ public class ComponentPropertiesWithDefinedI18N extends ComponentProperties {
      */
     @Override
     protected I18nMessages createI18nMessageFormater() {
-        return GlobalContext.i18nMessageProvider.getI18nMessagesX(this.getClass().getClassLoader(),
+        return GlobalContext.i18nMessageProvider.getI18nMessages(this.getClass().getClassLoader(),
                 "org/talend/components/api/service/specificmessages");
     }
 

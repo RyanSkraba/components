@@ -18,9 +18,9 @@ import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.salesforce.SalesforceDefinition;
 
-@org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX
-        + TSalesforceWaveOutputBulkExecDefinition.COMPONENT_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX
+import aQute.bnd.annotation.component.Component;
+
+@Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceWaveOutputBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceWaveOutputBulkExecDefinition extends SalesforceDefinition {
 
@@ -33,14 +33,17 @@ public class TSalesforceWaveOutputBulkExecDefinition extends SalesforceDefinitio
                 new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
 
+    @Override
     public boolean isConditionalInputs() {
         return true;
     }
 
+    @Override
     public boolean isStartable() {
         return false;
     }
 
+    @Override
     public String getPartitioning() {
         return NONE;
     }

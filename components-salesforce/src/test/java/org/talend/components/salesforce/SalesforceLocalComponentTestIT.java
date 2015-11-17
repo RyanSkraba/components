@@ -775,7 +775,7 @@ public class SalesforceLocalComponentTestIT {
         System.out.println("now: " + nowMillis);
         System.out.println(dateMillis);
         long delta = nowMillis - dateMillis;
-        assertTrue(Math.abs(delta) < 30000);
+        assertTrue(Math.abs(delta) < 50000);
         assertNull(runtime.inputRow());
     }
 

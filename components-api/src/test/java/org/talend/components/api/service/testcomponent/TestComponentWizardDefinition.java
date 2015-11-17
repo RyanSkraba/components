@@ -12,7 +12,6 @@
 // ============================================================================
 package org.talend.components.api.service.testcomponent;
 
-import org.springframework.stereotype.Component;
 import org.talend.components.api.Constants;
 import org.talend.components.api.context.GlobalContext;
 import org.talend.components.api.properties.ComponentProperties;
@@ -20,7 +19,9 @@ import org.talend.components.api.wizard.AbstractComponentWizardDefintion;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.WizardImageType;
 
-@Component(Constants.COMPONENT_WIZARD_BEAN_PREFIX + TestComponentWizardDefinition.COMPONENT_WIZARD_NAME)
+import aQute.bnd.annotation.component.Component;
+
+@Component(name = Constants.COMPONENT_WIZARD_BEAN_PREFIX + TestComponentWizardDefinition.COMPONENT_WIZARD_NAME)
 public class TestComponentWizardDefinition extends AbstractComponentWizardDefintion {
 
     public static final String COMPONENT_WIZARD_NAME = "zewizard"; //$NON-NLS-1$
@@ -37,8 +38,9 @@ public class TestComponentWizardDefinition extends AbstractComponentWizardDefint
 
     @Override
     public boolean supportsProperties(ComponentProperties properties) {
-        if (properties instanceof TestComponentProperties)
+        if (properties instanceof TestComponentProperties) {
             return true;
+        }
         return false;
     }
 

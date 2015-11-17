@@ -12,22 +12,20 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcegetupdated;
 
-import java.util.List;
-import java.util.Map;
-
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentConnector;
 import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
-import org.talend.components.api.runtime.ComponentRuntimeContainer;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceGetDeletedUpdatedProperties;
 import org.talend.components.salesforce.SalesforceRuntime;
 
-@org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceGetUpdatedDefinition.COMPONENT_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceGetUpdatedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+import aQute.bnd.annotation.component.Component;
+
+@Component(name = Constants.COMPONENT_BEAN_PREFIX
+        + TSalesforceGetUpdatedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceGetUpdatedDefinition extends SalesforceDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceGetUpdated"; //$NON-NLS-1$
@@ -50,10 +48,12 @@ public class TSalesforceGetUpdatedDefinition extends SalesforceDefinition {
         };
     }
 
+    @Override
     public boolean isStartable() {
         return true;
     }
 
+    @Override
     public String getPartitioning() {
         return AUTO;
     }

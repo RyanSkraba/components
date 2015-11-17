@@ -1,17 +1,11 @@
 package org.talend.components.api.service.testcomponent;
 
-import org.osgi.service.component.annotations.Component;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.context.annotation.ComponentScan;
+import javax.inject.Inject;
+
 import org.springframework.stereotype.Service;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.test.SpringApp;
-
-import javax.inject.Inject;
 
 /**
  * Component properties test class
@@ -28,8 +22,9 @@ public class PropertiesTester {
 
     public void processCommand(String argString) {
         String[] args = new String(argString).split(" ");
-        if (args.length == 0)
+        if (args.length == 0) {
             throw new IllegalArgumentException("Empty command");
+        }
         int index = 0;
         String command = args[index++];
         if (command.equalsIgnoreCase("createProps")) {
@@ -47,8 +42,6 @@ public class PropertiesTester {
             processCommand(line);
         }
     }
-
-
 
     public static void main(String[] args) {
         PropertiesTester pt = new PropertiesTester();

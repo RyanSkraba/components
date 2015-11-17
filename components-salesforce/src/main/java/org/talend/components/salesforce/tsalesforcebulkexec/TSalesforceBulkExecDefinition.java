@@ -18,8 +18,10 @@ import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.salesforce.SalesforceDefinition;
 
-@org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceBulkExecDefinition.COMPONENT_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+import aQute.bnd.annotation.component.Component;
+
+@Component(name = Constants.COMPONENT_BEAN_PREFIX
+        + TSalesforceBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceBulkExecDefinition extends SalesforceDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceBulkExec"; //$NON-NLS-1$
@@ -31,10 +33,12 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition {
                 new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
 
+    @Override
     public boolean isStartable() {
         return true;
     }
 
+    @Override
     public boolean isConditionalInputs() {
         return true;
     }

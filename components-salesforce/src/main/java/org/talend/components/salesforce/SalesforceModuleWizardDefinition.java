@@ -7,9 +7,9 @@ import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 
-@org.springframework.stereotype.Component(Constants.COMPONENT_WIZARD_BEAN_PREFIX
-        + SalesforceModuleWizardDefinition.COMPONENT_WIZARD_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_WIZARD_BEAN_PREFIX
+import aQute.bnd.annotation.component.Component;
+
+@Component(name = Constants.COMPONENT_WIZARD_BEAN_PREFIX
         + SalesforceModuleWizardDefinition.COMPONENT_WIZARD_NAME, provide = ComponentWizardDefinition.class)
 public class SalesforceModuleWizardDefinition extends AbstractComponentWizardDefintion {
 
@@ -27,8 +27,9 @@ public class SalesforceModuleWizardDefinition extends AbstractComponentWizardDef
 
     @Override
     public boolean supportsProperties(ComponentProperties properties) {
-        if (properties instanceof SalesforceConnectionProperties)
+        if (properties instanceof SalesforceConnectionProperties) {
             return true;
+        }
         return false;
     }
 

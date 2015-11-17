@@ -23,13 +23,12 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.api.schema.Schema;
-import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceRuntime;
 
-@org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX
-        + TSalesforceGetServerTimestampDefinition.COMPONENT_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX
+import aQute.bnd.annotation.component.Component;
+
+@Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceGetServerTimestampDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinition {
 
@@ -60,8 +59,9 @@ public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinitio
 
             @Override
             public Map<String, Object> inputRow() throws Exception {
-                if (result == null)
+                if (result == null) {
                     return null;
+                }
 
                 Map<String, Object> map = new HashMap<>();
                 // FIXME - error checking - what if there are no columns
@@ -72,10 +72,12 @@ public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinitio
         };
     }
 
+    @Override
     public boolean isStartable() {
         return true;
     }
 
+    @Override
     public String getPartitioning() {
         return AUTO;
     }

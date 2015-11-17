@@ -1,15 +1,11 @@
 package org.talend.components.salesforce;
 
 import org.talend.components.api.Constants;
-import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.wizard.AbstractComponentWizardDefintion;
-import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
-import org.talend.components.api.wizard.WizardImageType;
 
-@org.springframework.stereotype.Component(Constants.COMPONENT_WIZARD_BEAN_PREFIX
-        + SalesforceConnectionEditWizardDefinition.COMPONENT_WIZARD_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_WIZARD_BEAN_PREFIX
+import aQute.bnd.annotation.component.Component;
+
+@Component(name = Constants.COMPONENT_WIZARD_BEAN_PREFIX
         + SalesforceConnectionEditWizardDefinition.COMPONENT_WIZARD_NAME, provide = ComponentWizardDefinition.class)
 public class SalesforceConnectionEditWizardDefinition extends SalesforceConnectionWizardDefinition {
 
@@ -24,6 +20,5 @@ public class SalesforceConnectionEditWizardDefinition extends SalesforceConnecti
     public boolean isTopLevel() {
         return false;
     }
-
 
 }

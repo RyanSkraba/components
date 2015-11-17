@@ -16,15 +16,16 @@ import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentConnector;
 import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
+
+import aQute.bnd.annotation.component.Component;
 
 /**
  * Component that can connect to a salesforce system and put some data into it.
  */
 
-@org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceOutputDefinition.COMPONENT_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+@Component(name = Constants.COMPONENT_BEAN_PREFIX
+        + TSalesforceOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceOutputDefinition extends SalesforceDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceOutput"; //$NON-NLS-1$
@@ -32,18 +33,22 @@ public class TSalesforceOutputDefinition extends SalesforceDefinition {
     public TSalesforceOutputDefinition() {
         super(COMPONENT_NAME);
         propertiesClass = TSalesforceOutputProperties.class;
-        setConnectors(new ComponentConnector(Type.FLOW, 1, 0), new ComponentConnector(Type.MAIN, 0, 1), new ComponentConnector(
-                Type.REJECT, 0, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
+        setConnectors(new ComponentConnector(Type.FLOW, 1, 0), new ComponentConnector(Type.MAIN, 0, 1),
+                new ComponentConnector(Type.REJECT, 0, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
+                new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
 
+    @Override
     public boolean isSchemaAutoPropagate() {
         return true;
     }
 
+    @Override
     public boolean isConditionalInputs() {
         return true;
     }
 
+    @Override
     public String getPartitioning() {
         return AUTO;
     }

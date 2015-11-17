@@ -14,8 +14,9 @@ package org.talend.components.api.i18n.internal;
 
 import java.util.Locale;
 
-import org.springframework.stereotype.Component;
 import org.talend.daikon.i18n.LocaleProvider;
+
+import aQute.bnd.annotation.component.Component;
 
 /**
  * created by sgandon on 14 sept. 2015
@@ -23,11 +24,9 @@ import org.talend.daikon.i18n.LocaleProvider;
 @Component
 public class LocaleProviderSpring implements LocaleProvider {
 
-    Locale locale = Locale.FRANCE;// FIXE ME this is just for test
-
     @Override
     public Locale getLocale() {
-        return locale;
+        return Locale.getDefault();
     }
 
 }

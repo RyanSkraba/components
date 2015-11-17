@@ -24,8 +24,10 @@ import org.talend.components.salesforce.SalesforceRuntime;
 
 import com.sforce.soap.partner.GetDeletedResult;
 
-@org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceGetDeletedDefinition.COMPONENT_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceGetDeletedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+import aQute.bnd.annotation.component.Component;
+
+@Component(name = Constants.COMPONENT_BEAN_PREFIX
+        + TSalesforceGetDeletedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceGetDeletedDefinition extends SalesforceDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceGetDeleted"; //$NON-NLS-1$
@@ -56,10 +58,12 @@ public class TSalesforceGetDeletedDefinition extends SalesforceDefinition {
         };
     }
 
+    @Override
     public boolean isStartable() {
         return true;
     }
 
+    @Override
     public String getPartitioning() {
         return AUTO;
     }

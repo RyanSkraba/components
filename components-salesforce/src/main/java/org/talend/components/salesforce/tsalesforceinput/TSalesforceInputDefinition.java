@@ -18,12 +18,14 @@ import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.salesforce.SalesforceDefinition;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  * Component that can connect to a salesforce system and get some data out of it.
  */
 
-@org.springframework.stereotype.Component(Constants.COMPONENT_BEAN_PREFIX + TSalesforceInputDefinition.COMPONENT_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceInputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+@Component(name = Constants.COMPONENT_BEAN_PREFIX
+        + TSalesforceInputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceInputDefinition extends SalesforceDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceInput"; //$NON-NLS-1$
@@ -35,6 +37,7 @@ public class TSalesforceInputDefinition extends SalesforceDefinition {
                 new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
 
+    @Override
     public boolean isStartable() {
         return true;
     }

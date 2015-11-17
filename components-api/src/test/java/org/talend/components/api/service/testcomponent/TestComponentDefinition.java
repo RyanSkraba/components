@@ -2,7 +2,6 @@ package org.talend.components.api.service.testcomponent;
 
 import java.io.InputStream;
 
-import org.springframework.stereotype.Component;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentConnector;
@@ -11,7 +10,10 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.runtime.ComponentRuntime;
 
-@Component(Constants.COMPONENT_BEAN_PREFIX + TestComponentDefinition.COMPONENT_NAME)
+import aQute.bnd.annotation.component.Component;
+
+// @Component(Constants.COMPONENT_BEAN_PREFIX + TestComponentDefinition.COMPONENT_NAME)
+@Component(name = Constants.COMPONENT_BEAN_PREFIX + TestComponentDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TestComponentDefinition extends AbstractComponentDefinition implements ComponentDefinition {
 
     public static final String COMPONENT_NAME = "TestComponent"; //$NON-NLS-1$

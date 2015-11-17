@@ -52,7 +52,7 @@
                 <extensions>true</extensions>
                 <executions>
                     <execution>
-                        <id>default-jar</id>
+                        <id>bundle-jar</id>
                         <phase>package</phase>
                         <goals>
                             <goal>bundle</goal>

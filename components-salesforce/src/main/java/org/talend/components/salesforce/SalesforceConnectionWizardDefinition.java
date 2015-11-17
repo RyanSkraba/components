@@ -10,11 +10,10 @@ import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 
+import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Reference;
 
-@org.springframework.stereotype.Component(Constants.COMPONENT_WIZARD_BEAN_PREFIX
-        + SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME)
-@aQute.bnd.annotation.component.Component(name = Constants.COMPONENT_WIZARD_BEAN_PREFIX
+@Component(name = Constants.COMPONENT_WIZARD_BEAN_PREFIX
         + SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, provide = ComponentWizardDefinition.class)
 public class SalesforceConnectionWizardDefinition extends AbstractComponentWizardDefintion {
 
