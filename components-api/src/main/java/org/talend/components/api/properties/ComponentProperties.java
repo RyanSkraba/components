@@ -64,12 +64,15 @@ import com.cedarsoftware.util.io.JsonWriter;
 // @JsonSerialize(using = ComponentPropertiesSerializer.class)
 public abstract class ComponentProperties extends TranslatableImpl implements SchemaElement {
 
+    // consider spilitting to beforeRender and beforeActivate
     static final String METHOD_BEFORE = "before";
 
+    // change to afterActivate
     static final String METHOD_AFTER = "after";
 
     static final String METHOD_VALIDATE = "validate";
 
+    // consider removing this in favor of beforeRender at the property level
     static final String METHOD_BEFORE_FORM = "beforeFormPresent";
 
     static final String METHOD_AFTER_FORM_BACK = "afterFormBack";

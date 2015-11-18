@@ -58,6 +58,8 @@ public class SalesforceModuleProperties extends ComponentProperties {
         refreshLayout(moduleRefForm);
     }
 
+    // consider beforeActivate and beforeRender (change after to afterActivate)
+
     public void beforeModuleName() throws Exception {
         SalesforceRuntime conn = new SalesforceRuntime();
         ValidationResult vr = conn.connectWithResult(connection);
