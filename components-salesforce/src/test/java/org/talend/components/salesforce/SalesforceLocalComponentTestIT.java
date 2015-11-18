@@ -513,12 +513,12 @@ public class SalesforceLocalComponentTestIT {
 
         int count = 10;
         List<Map<String, Object>> outputRows = makeRows(count);
-        writeRows(runtime, props, outputRows);
+        outputRows = writeRows(runtime, props, outputRows);
 
         List<Map<String, Object>> rows = new ArrayList<>();
         runtime.input(props, rows);
         checkRows(rows, count);
-        deleteRows(runtime, rows);
+        deleteRows(runtime, outputRows);
     }
 
     protected boolean setupDynamic() {
@@ -582,7 +582,9 @@ public class SalesforceLocalComponentTestIT {
         return outputRows;
     }
 
-    protected void checkRows(List<Map<String, Object>> rows, int count) {
+    protected List<Map<String, Object>> checkRows(List<Map<String, Object>> rows, int count) {
+        List<Map<String, Object>> checkedRows = new ArrayList<>();
+
         int checkCount = 0;
         int checkDynamicCount = 0;
         for (Map<String, Object> row : rows) {
@@ -605,12 +607,14 @@ public class SalesforceLocalComponentTestIT {
             assertEquals("TestName", row.get("Name"));
             assertEquals("123 Main Street", row.get("BillingStreet"));
             assertEquals("CA", row.get("BillingState"));
+            checkedRows.add(row);
         }
         assertEquals(count, checkCount);
         if (dynamic != null) {
             assertEquals(count, checkDynamicCount);
             System.out.println("Check dynamic rows: " + checkDynamicCount);
         }
+        return checkedRows;
     }
 
     protected List<String> getDeleteIds(List<Map<String, Object>> rows) {
@@ -636,11 +640,11 @@ public class SalesforceLocalComponentTestIT {
         inputProps.module = props.module;
         inputProps.setValue(inputProps.batchSize, 200);
         runtime.input(inputProps, inputRows);
-        checkRows(inputRows, count);
-        return inputRows;
+        return checkRows(inputRows, count);
     }
 
-    protected void writeRows(SalesforceRuntime runtime, SalesforceConnectionModuleProperties props,
+    // Returns the rows written (having been re-read so they have their Ids)
+    protected List<Map<String, Object>> writeRows(SalesforceRuntime runtime, SalesforceConnectionModuleProperties props,
             List<Map<String, Object>> outputRows) throws Exception {
         TSalesforceOutputProperties outputProps;
         outputProps = (TSalesforceOutputProperties) componentService
@@ -649,6 +653,7 @@ public class SalesforceLocalComponentTestIT {
         outputProps.module = props.module;
         outputProps.setValue(outputProps.outputAction, TSalesforceOutputProperties.OutputAction.INSERT);
         runtime.output(outputProps, outputRows);
+        return readAndCheckRows(runtime, props, outputRows.size());
     }
 
     protected void deleteRows(SalesforceRuntime runtime, List<Map<String, Object>> inputRows) throws Exception {
