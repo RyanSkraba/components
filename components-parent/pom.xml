@@ -98,6 +98,10 @@
 			<id>spring-releases</id>
 			<url>https://repo.spring.io/libs-release</url>
 		</pluginRepository>
+        <pluginRepository>
+            <id>releases</id>
+            <url>http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceRelease/</url>
+        </pluginRepository>
 	</pluginRepositories>
 	<build>
 		<pluginManagement>
