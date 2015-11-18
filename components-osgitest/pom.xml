@@ -164,6 +164,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.20-PAXEXAM-PATCH</version>
 				<executions>
 					<execution>
 						<goals>
@@ -180,10 +181,6 @@
 						<salesforce.password>${salesforce.password}</salesforce.password>
 						<salesforce.key>${salesforce.key}</salesforce.key>
 					</systemPropertyVariables>
-					<!-- Dues to an issue when launching the OSGI test we remove this test temporarily -->
-					<excludes>
-                        <exclude>**/SalesfoceComponentsTestIT.java</exclude>
-                    </excludes>
 				</configuration>
 			</plugin>
 		</plugins>
