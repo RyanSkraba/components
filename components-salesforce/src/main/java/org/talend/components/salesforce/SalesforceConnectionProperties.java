@@ -24,9 +24,6 @@ import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.oauth.OauthProperties;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
-
-@JsonRootName("salesforceConnectionProperties")
 public class SalesforceConnectionProperties extends ComponentProperties {
 
     public static final String URL = "https://www.salesforce.com/services/Soap/u/34.0";

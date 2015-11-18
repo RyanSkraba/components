@@ -33,7 +33,7 @@ public interface ComponentDefinition extends TopLevelDefinition {
      * Component categorization - this is an issue that wants further study. - which designer (big data, di, etc) and
      * then which family.
      */
-    // FIXME - this needs to be corrected
+    // FIXME - this needs to be corrected TCOMP-26
     public static final String FAMILY_BUSINESS = "Business/Salesforce";
 
     public static final String FAMILY_CLOUD = "Cloud/Salesforce";

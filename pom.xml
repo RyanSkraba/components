@@ -11,7 +11,7 @@
         <connection>scm:git:https://github.com/Talend/components.git</connection>
     </scm>
 
-    <name>Talend Component Framework and Components Aggregator</name>
+    <name>Component Aggregator</name>
     <modules>
         <module>components-parent</module>
         <module>components-api</module>

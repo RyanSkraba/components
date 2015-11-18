@@ -41,10 +41,6 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
         return propertiesClass.isAssignableFrom(properties.getClass());
     }
 
-    //
-    // DI Flags - default definitions
-    //
-
     public boolean isSchemaAutoPropagate() {
         return false;
     }

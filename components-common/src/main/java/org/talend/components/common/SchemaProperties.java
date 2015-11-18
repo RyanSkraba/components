@@ -22,9 +22,6 @@ import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.schema.SchemaFactory;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
-
-@JsonRootName("schema")
 public class SchemaProperties extends ComponentProperties {
 
     public SchemaProperties() {

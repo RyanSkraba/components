@@ -12,9 +12,6 @@
 // ============================================================================
 package org.talend.components.api.component;
 
-/**
- * created by sgandon on 23 sept. 2015
- */
 public enum ComponentImageType {
                                 PALLETE_ICON_32X32;
 }

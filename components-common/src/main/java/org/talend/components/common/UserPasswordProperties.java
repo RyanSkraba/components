@@ -18,9 +18,6 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
-
-@JsonRootName("userPasswordProperties")
 public class UserPasswordProperties extends ComponentProperties {
 
     public SchemaElement userId = newProperty("userId").setRequired(true); //$NON-NLS-1$

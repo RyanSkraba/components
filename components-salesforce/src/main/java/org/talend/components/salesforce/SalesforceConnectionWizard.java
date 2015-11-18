@@ -7,7 +7,7 @@ import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 
 /**
- *
+ * Handles the creating a connection and creating the modules associated with the connection.
  */
 public class SalesforceConnectionWizard extends ComponentWizard {
 
@@ -22,7 +22,6 @@ public class SalesforceConnectionWizard extends ComponentWizard {
 
         mProps = new SalesforceModuleListProperties().setConnection(cProps).setRepositoryLocation(getRepositoryLocation())
                 .setComponentService(compService);
-        ;
         mProps.init();
         addForm(mProps.getForm(Form.MAIN));
     }

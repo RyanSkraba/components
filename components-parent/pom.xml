@@ -7,7 +7,7 @@
 	<packaging>pom</packaging>
 	<version>0.2.0.BUILD-SNAPSHOT</version>
 
-	<name>Talend Component Framework and Components parent pom</name>
+	<name>Component Parent POM</name>
 	<properties>
 		<java.version>1.7</java.version>
 		<maven.compiler.source>1.7</maven.compiler.source>
