@@ -25,9 +25,6 @@ import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
 
-/**
- * created by sgandon on 27 oct. 2015
- */
 public class ComponentTestUtils {
 
     public static ComponentProperties checkSerialize(ComponentProperties props) {
@@ -66,18 +63,12 @@ public class ComponentTestUtils {
 
     }
 
-    /**
-     * DOC sgandon Comment method "setupGlobalContext".
-     */
     public static void setupGlobalContext() {
         I18nMessageProvider i18nMessageProvider = new I18nMessageProvider();
         i18nMessageProvider.osgiInjectLocalProvider(null);
         GlobalContext.i18nMessageProvider = i18nMessageProvider;
     }
 
-    /**
-     * DOC sgandon Comment method "unsetGlobalContext".
-     */
     public static void unsetGlobalContext() {
         GlobalContext.i18nMessageProvider = null;
     }
@@ -104,10 +95,6 @@ public class ComponentTestUtils {
                                 + ".displayName] in [the proper messages.properties]",
                         prop.getDisplayName().endsWith(".displayName"));
             } else {
-                // FIXME - the inner class property thing is broken, remove this check to test it
-                // if (prop.toString().contains("$")) {
-                // continue;
-                // }
                 checkAllI18NProperties((ComponentProperties) prop);
             }
         }
