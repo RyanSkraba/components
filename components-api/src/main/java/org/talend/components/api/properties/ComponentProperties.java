@@ -3,15 +3,13 @@ package org.talend.components.api.properties;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.validation.constraints.NotNull;
 
 import org.talend.components.api.ComponentDesigner;
+import org.talend.components.api.ToStringIndent;
+import org.talend.components.api.ToStringIndentUtil;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.i18n.TranslatableImpl;
 import org.talend.components.api.properties.internal.ComponentPropertiesInternal;
@@ -72,7 +70,7 @@ import com.cedarsoftware.util.io.JsonWriter;
  * call {@link SchemaElement#setI18nMessageFormater(I18nMessages)} manually.
  */
 
-public abstract class ComponentProperties extends TranslatableImpl implements SchemaElement {
+public abstract class ComponentProperties extends TranslatableImpl implements SchemaElement, ToStringIndent {
 
     static final String METHOD_BEFORE = "before";
 
@@ -652,7 +650,22 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
 
     @Override
     public String toString() {
-        return "Name: " + getName() + " Title: " + getTitle() + " " + getClass().getName();
+        return toStringIndent(0);
+    }
+
+    public String toStringIndent(int indent) {
+        StringBuilder sb = new StringBuilder();
+        String is = ToStringIndentUtil.indentString(indent);
+        sb.append(is + "Name: " + getName() + " - " + getTitle() + " " + getClass().getName());
+        sb.append("\n" + is + " Properties:");
+        for (SchemaElement prop : getProperties()) {
+            sb.append("\n" + prop.toStringIndent(indent + 2));
+        }
+        sb.append("\n Forms:");
+        for (Form form : getForms()) {
+            sb.append("\n" + form.toStringIndent(indent + 2));
+        }
+        return sb.toString();
     }
 
 }

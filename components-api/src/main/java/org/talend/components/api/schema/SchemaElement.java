@@ -4,11 +4,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.talend.components.api.NamedThing;
+import org.talend.components.api.ToStringIndent;
 
 /**
  *
  */
-public interface SchemaElement extends NamedThing {
+public interface SchemaElement extends NamedThing, ToStringIndent {
 
     public enum Type {
         STRING,

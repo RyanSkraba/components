@@ -58,7 +58,7 @@ public class SalesforceModuleProperties extends ComponentProperties {
         refreshLayout(moduleRefForm);
     }
 
-    // consider beforeActivate and beforeRender (change after to afterActivate)
+    // consider beforeActivate and beforeRender (change after to afterActivate)l
 
     public void beforeModuleName() throws Exception {
         SalesforceRuntime conn = new SalesforceRuntime();

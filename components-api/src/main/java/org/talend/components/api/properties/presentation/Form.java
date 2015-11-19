@@ -19,6 +19,8 @@ import java.util.Map;
 
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.SimpleNamedThing;
+import org.talend.components.api.ToStringIndent;
+import org.talend.components.api.ToStringIndentUtil;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.schema.SchemaElement;
 
@@ -26,7 +28,7 @@ import org.talend.components.api.schema.SchemaElement;
  * Represents a collection of components {@link SchemaElement} objects that are grouped into a form for display. This
  * form can be manifested for example as a tab in a view, a dialog, or a page in a wizard.
  */
-public class Form extends SimpleNamedThing {
+public class Form extends SimpleNamedThing implements ToStringIndent {
 
     /**
      * Standard form name for the main form associated with a component.
@@ -255,6 +257,17 @@ public class Form extends SimpleNamedThing {
     }
 
     public String toString() {
-        return "Form: " + getName();
+        return toStringIndent(0);
     }
+
+    public String toStringIndent(int indent) {
+        StringBuilder sb = new StringBuilder();
+        String is = ToStringIndentUtil.indentString(indent);
+        sb.append(is + "Form: " + getName());
+        for (Widget w : getWidgets()) {
+            sb.append("\n" + w.toStringIndent(indent + 2));
+        }
+        return sb.toString();
+    }
+
 }

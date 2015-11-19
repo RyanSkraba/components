@@ -65,4 +65,9 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
         return null;
     }
 
+    public String toString() {
+        return getName() + " (" + getDisplayName() + ") - " + getTitle() //
+                + "\n props: " + propertiesClass;
+    }
+
 }

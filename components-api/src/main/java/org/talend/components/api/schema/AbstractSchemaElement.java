@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.talend.components.api.SimpleNamedThing;
+import org.talend.components.api.ToStringIndentUtil;
 
 /**
  * This implementation shall be used to represent meta data elements
@@ -259,5 +260,10 @@ public abstract class AbstractSchemaElement extends SimpleNamedThing implements 
         }
         return map;
     }
+
+    public String toStringIndent(int indent) {
+        return ToStringIndentUtil.indentString(indent) + getName();
+    }
+
 
 }
