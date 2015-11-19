@@ -83,6 +83,12 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.talend.daikon</groupId>
+            <artifactId>daikon-spring</artifactId>
+            <version>0.2.0.BUILD-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 
 	<build>
