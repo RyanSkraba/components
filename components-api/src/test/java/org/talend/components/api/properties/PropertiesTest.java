@@ -28,9 +28,6 @@ import org.talend.components.api.service.testcomponent.TestComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
 
-/**
- * created by sgandon on 27 oct. 2015
- */
 public class PropertiesTest {
 
     @BeforeClass
@@ -114,6 +111,15 @@ public class PropertiesTest {
         List<SchemaElement> pList = componentProperties.getProperties();
         assertTrue(pList.get(0) != null);
         assertEquals(5, pList.size());
+    }
+
+    @Test
+    public void testGetPropsListInherited() {
+        ComponentProperties componentProperties = new InheritedComponentProperties();
+        List<SchemaElement> pList = componentProperties.getProperties();
+        System.out.println(pList);
+        assertTrue(pList.get(0) != null);
+        assertEquals(2, pList.size());
     }
 
     @Test
