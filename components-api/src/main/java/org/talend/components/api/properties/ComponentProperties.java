@@ -41,8 +41,19 @@ import com.cedarsoftware.util.io.JsonWriter;
  * {@code ComponentProperties} classes can be composed allowing hierarchies of properties and collections of properties
  * to be reused.
  * <p/>
- * Properties are be grouped into {@link Form} objects which can be presented in various ways by the user interface (for
- * example, a wizard page, a tab in a property sheet, or a dialog). The same property can appear in multiple forms.
+ * A property is defined using a field in a subclass of this class. Each property field is initialized with one of the
+ * following:
+ * <ol>
+ * <li>For a single property, a {@link SchemaElement} object, usually using a static method from the
+ * {@link org.talend.components.api.schema.SchemaFactory}.</li>
+ * <li>For a reference to other properties, a subclass of {@code ComponentProperties}.</li>
+ * <li>For a presentation item that's not actually a property, but is necessary for the user interface, a
+ * {@link PresentationItem}.</li>
+ * </ol>
+ * <p/>
+ * For construction of user interfaces, properties are grouped into {@link Form} objects which can be presented in
+ * various ways by the user interface (for example, a wizard page, a tab in a property sheet, or a dialog). The same
+ * property can appear in multiple forms.
  * <p/>
  * Methods can be added in subclasses according to the conventions below to help direct the UI. These methods will be
  * automatically called by the UI code.
@@ -55,19 +66,16 @@ import com.cedarsoftware.util.io.JsonWriter;
  * This will return a {@link ValidationResult} object with any error information.</li>
  * <li>{@code beforeForm&lt;FormName&gt;} - Called before the form is displayed.</li>
  * </ul>
- *
- * WARNING : property shall be created as instance field before the constructor is called so that this abstract
+ * <p/>
+ * <b>WARNING</b> - A property shall be created as instance field before the constructor is called so that this abstract
  * constructor can attach i18n translator to the properties. If you want to create the property later you'll have to
  * call {@link SchemaElement#setI18nMessageFormater(I18nMessages)} manually.
  */
 
-// @JsonSerialize(using = ComponentPropertiesSerializer.class)
 public abstract class ComponentProperties extends TranslatableImpl implements SchemaElement {
 
-    // consider spilitting to beforeRender and beforeActivate
     static final String METHOD_BEFORE = "before";
 
-    // change to afterActivate
     static final String METHOD_AFTER = "after";
 
     static final String METHOD_VALIDATE = "validate";
@@ -235,9 +243,11 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         internal.setDesigner(designer);
     }
 
-    // FIXME - this does not consider properties in a superclass. Not sure if it should or not, however
-    // we need to document that we can't use subclasses to add additional properties from the parent
-    // class - we can only extent by composition, not inheritance.
+    /**
+     * Returns the list of properties associated with this object.
+     * 
+     * @return all properties associated with this object (including those defined in superclasses).
+     */
     public List<SchemaElement> getProperties() {
         List<SchemaElement> properties = new ArrayList<>();
         Field[] fields = getClass().getFields();
