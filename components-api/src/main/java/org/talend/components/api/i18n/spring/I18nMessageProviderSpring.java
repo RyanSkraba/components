@@ -10,25 +10,25 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.i18n.internal;
+package org.talend.components.api.i18n.spring;
 
-import java.util.Locale;
+import javax.inject.Inject;
 
+import org.springframework.stereotype.Component;
+import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.daikon.i18n.LocaleProvider;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
- * created by sgandon on 14 sept. 2015
+ * I18nMessageProvider implementation for Spring container
  */
 @Component
-public class LocaleProviderOsgi implements LocaleProvider {
-
-    Locale locale = Locale.ENGLISH;// FIXE ME this is just for test
+public class I18nMessageProviderSpring extends I18nMessageProvider {
 
     @Override
-    public Locale getLocale() {
-        return locale;
+    protected LocaleProvider getLocaleProvider() {
+        return localeProvider;
     }
 
+    @Inject
+    LocaleProvider localeProvider;
 }

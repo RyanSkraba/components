@@ -10,15 +10,23 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.context;
+package org.talend.components.api.i18n.spring;
 
-import org.talend.components.api.i18n.I18nMessageProvider;
+import java.util.Locale;
+
+import org.talend.daikon.i18n.LocaleProvider;
+
+import aQute.bnd.annotation.component.Component;
 
 /**
- * Global context that provide i18n service.
+ * LocaleProvider implementation for Spring container
  */
-public class GlobalContext {
+@Component
+public class LocaleProviderSpring implements LocaleProvider {
 
-    public static I18nMessageProvider i18nMessageProvider;
+    @Override
+    public Locale getLocale() {
+        return Locale.getDefault();
+    }
 
 }

@@ -10,23 +10,30 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.i18n.internal;
+package org.talend.components.api.i18n.osgi;
 
-import java.util.Locale;
-
+import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.daikon.i18n.LocaleProvider;
 
 import aQute.bnd.annotation.component.Component;
+import aQute.bnd.annotation.component.Reference;
 
 /**
- * created by sgandon on 14 sept. 2015
+ * I18nMessageProvider implementation for OSGI container
  */
-@Component
-public class LocaleProviderSpring implements LocaleProvider {
+@Component(provide = I18nMessageProvider.class)
+public class I18nMessageProviderOsgi extends I18nMessageProvider {
 
     @Override
-    public Locale getLocale() {
-        return Locale.getDefault();
+    protected LocaleProvider getLocaleProvider() {
+        return localeProvider;
+    }
+
+    LocaleProvider localeProvider;
+
+    @Reference
+    public void osgiInjectLocalProvider(LocaleProvider locProvder) {
+        this.localeProvider = locProvder;
     }
 
 }

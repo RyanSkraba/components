@@ -25,6 +25,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
+import org.talend.daikon.i18n.LocaleProvider;
 
 public class ComponentTestUtils {
 
@@ -65,8 +66,13 @@ public class ComponentTestUtils {
     }
 
     public static void setupGlobalContext() {
-        I18nMessageProvider i18nMessageProvider = new I18nMessageProvider();
-        i18nMessageProvider.osgiInjectLocalProvider(null);
+        I18nMessageProvider i18nMessageProvider = new I18nMessageProvider() {
+
+            @Override
+            protected LocaleProvider getLocaleProvider() {
+                return null;
+            }
+        };
         GlobalContext.i18nMessageProvider = i18nMessageProvider;
     }
 

@@ -23,18 +23,19 @@
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
 			<version>1.1.0.Final</version>
+            <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.springframework</groupId> -->
-<!-- 			<artifactId>spring-beans</artifactId> -->
-<!--             <version>4.2.0.RELEASE</version> -->
-<!-- 			<scope>test</scope> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.springframework</groupId> -->
+		<!-- <artifactId>spring-beans</artifactId> -->
+		<!-- <version>4.2.0.RELEASE</version> -->
+		<!-- <scope>test</scope> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -46,11 +47,13 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 			<version>4.2.0.RELEASE</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
 			<version>4.2.0.RELEASE</version>
+            <scope>provided</scope>
 		</dependency>
 		<!-- SWAGGER DEPENDENCIES -->
 		<!-- SWAGGER DEPENDENCIES -->
@@ -58,6 +61,7 @@
 			<groupId>com.mangofactory</groupId>
 			<artifactId>swagger-springmvc</artifactId>
 			<version>1.0.2</version>
+            <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
@@ -218,8 +222,10 @@
 									org.slf4j*</Import-Package>
 								<Embed-Transitive>true</Embed-Transitive>
 								<Embed-Dependency>!org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api</Embed-Dependency>
-								<_exportcontents>!*.internal,org.talend.*</_exportcontents>
+								<_exportcontents>!*.internal,!*.osgi,org.talend.*</_exportcontents>
 								<DynamicImport-Package>*</DynamicImport-Package>
+								<!-- used to remove the spring classes -->
+								<Private-Package>!org.talend.components.*.spring,org.talend.components.*</Private-Package>
 							</instructions>
 						</configuration>
 					</execution>
@@ -247,7 +253,7 @@
 							<outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
 							<instructions>
 								<Service-Component>*</Service-Component>
-                                <Import-Package>!*internal,org.talend*,javax.xml.namespace,org.junit</Import-Package>
+								<Import-Package>!*internal,org.talend*,javax.xml.namespace,org.junit</Import-Package>
 								<Bundle-SymbolicName>org.talend.components.api.test</Bundle-SymbolicName>
 								<Fragment-Host>org.talend.components.api</Fragment-Host>
 								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>

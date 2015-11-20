@@ -12,30 +12,17 @@
 // ============================================================================
 package org.talend.components.api.i18n;
 
-import javax.inject.Inject;
-
 import org.talend.daikon.i18n.ClassBasedI18nMessages;
 import org.talend.daikon.i18n.ClassLoaderBasedI18nMessages;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.i18n.LocaleProvider;
 
-import aQute.bnd.annotation.component.Component;
-import aQute.bnd.annotation.component.Reference;
-
 /**
- * This class creates instances of
+ * This class provide i18n service according to the local provider service
  */
-@Component(provide = I18nMessageProvider.class)
-public class I18nMessageProvider {
+public abstract class I18nMessageProvider {
 
-    @Inject
-    // used by spring see below for osgi
-    LocaleProvider localeProvider;
-
-    @Reference
-    public void osgiInjectLocalProvider(LocaleProvider locProvder) {
-        this.localeProvider = locProvder;
-    }
+    abstract protected LocaleProvider getLocaleProvider();
 
     /**
      * Return a I18nMessages with a resource bundle found at the path related to the classloader
@@ -46,7 +33,7 @@ public class I18nMessageProvider {
      * @return a DynamicLocalFormatedI18n instance to handle i18n.
      */
     public I18nMessages getI18nMessages(ClassLoader classLoader, String baseName) {
-        return new ClassLoaderBasedI18nMessages(localeProvider, classLoader, baseName);
+        return new ClassLoaderBasedI18nMessages(getLocaleProvider(), classLoader, baseName);
     }
 
     /**
@@ -57,7 +44,7 @@ public class I18nMessageProvider {
      * @return a DynamicLocalFormatedI18n instance to handle i18n.
      */
     public I18nMessages getI18nMessages(Class<?> clazz) {
-        return new ClassBasedI18nMessages(localeProvider, clazz);
+        return new ClassBasedI18nMessages(getLocaleProvider(), clazz);
     }
 
 }

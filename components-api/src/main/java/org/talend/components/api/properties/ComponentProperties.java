@@ -3,7 +3,11 @@ package org.talend.components.api.properties;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
@@ -637,6 +641,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         return toStringIndent(0);
     }
 
+    @Override
     public String toStringIndent(int indent) {
         StringBuilder sb = new StringBuilder();
         String is = ToStringIndentUtil.indentString(indent);

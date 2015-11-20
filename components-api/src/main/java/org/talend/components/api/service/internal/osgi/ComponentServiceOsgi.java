@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.service.internal;
+package org.talend.components.api.service.internal.osgi;
 
 import java.io.InputStream;
 import java.util.*;
@@ -28,6 +28,8 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Repository;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.service.internal.ComponentRegistry;
+import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
