@@ -43,6 +43,11 @@ public class ComponentReferenceProperties extends ComponentProperties {
 
     public SchemaElement componentInstanceId = newProperty("componentInstanceId"); //$NON-NLS-1$
 
+    public ComponentReferenceProperties(String name) {
+        super(name);
+    }
+
+
     @Override
     protected void setupLayout() {
         super.setupLayout();

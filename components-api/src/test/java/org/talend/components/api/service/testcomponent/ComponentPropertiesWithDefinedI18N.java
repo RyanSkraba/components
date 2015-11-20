@@ -25,6 +25,10 @@ public class ComponentPropertiesWithDefinedI18N extends ComponentProperties {
 
     public SchemaElement aGreatProperty2 = newProperty(A_GREAT_PROP_NAME2);
 
+    public ComponentPropertiesWithDefinedI18N(String name) {
+        super(name);
+    }
+
     /**
      * this uses the globalContext static variable and the current Class location to find the resource bundle names
      * messages

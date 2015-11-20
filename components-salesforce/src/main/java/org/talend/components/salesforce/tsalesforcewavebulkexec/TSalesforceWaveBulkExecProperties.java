@@ -19,6 +19,7 @@ import org.talend.components.salesforce.SalesforceModuleProperties;
 
 public class TSalesforceWaveBulkExecProperties extends ComponentProperties {
 
-
-
+    public TSalesforceWaveBulkExecProperties(String name) {
+        super(name);
+    }
 }

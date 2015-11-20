@@ -71,9 +71,17 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
 
     public SchemaProperties schemaReject = new SchemaProperties("schemaReject"); //$NON-NLS-1$
 
+    public TSalesforceOutputProperties(String name) {
+        super(name);
+    }
+
     // Have to use an explicit class to get the override of afterModuleName(), an anonymous
     // class cannot be public and thus cannot be called.
     public class ModuleSubclass extends SalesforceModuleProperties {
+
+        public ModuleSubclass(String name) {
+            super(name);
+        }
 
         @Override public void afterModuleName() throws Exception {
             super.afterModuleName();
@@ -111,7 +119,7 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
         setupUpsertRelation(upsertRelation, !POLY);
 
         super.init();
-        module = new ModuleSubclass().setConnection(connection);
+        module = new ModuleSubclass("module").setConnection(connection);
         module.init();
         return this;
     }

@@ -43,6 +43,10 @@ public class SalesforceModuleListProperties extends ComponentProperties {
 
     public static final String MAIN = "Main"; //$NON-NLS-1$
 
+    public SalesforceModuleListProperties(String name) {
+        super(name);
+    }
+
     public SalesforceModuleListProperties setConnection(SalesforceConnectionProperties connection) {
         connectionProps = connection;
         return this;
@@ -89,7 +93,7 @@ public class SalesforceModuleListProperties extends ComponentProperties {
         @SuppressWarnings("unchecked")
         List<NameAndLabel> selectedModuleNames = (List<NameAndLabel>) getValue(moduleName);
         for (NameAndLabel nl : selectedModuleNames) {
-            SalesforceModuleProperties modProps = new SalesforceModuleProperties().setConnection(connectionProps);
+            SalesforceModuleProperties modProps = new SalesforceModuleProperties(nl.getName()).setConnection(connectionProps);
             Schema schema = conn.getSchema(nl.getName());
             modProps.setValue(modProps.moduleName, nl.getName());
             modProps.schema.setValue(modProps.schema.schema, schema);

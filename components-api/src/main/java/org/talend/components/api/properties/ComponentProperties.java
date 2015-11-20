@@ -148,13 +148,9 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     /**
      * Do not subclass this method for initialization, use {@link #init()} instead.
      */
-    public ComponentProperties() {
+    public ComponentProperties(String name) {
         internal = new ComponentPropertiesInternal();
-        /*
-         * Give it a default name, can be overridden in the case where the properties object needs a different name
-         * (when it's pointed to multiple times by some containing properties object.
-         */
-        setName(getClass().getSimpleName());
+        setName(name);
     }
 
     /**
@@ -175,22 +171,6 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         }
         return this;
     }
-
-    // /**
-    // * This will use the current I18nMessage to the property handles by this class, but only for direct properties and
-    // * not nested ComponentProperties
-    // */
-    // protected void setupPropertiesWithI18n() {
-    // List<SchemaElement> properties = getProperties();
-    // for (SchemaElement prop : properties) {
-    // if (!(prop instanceof ComponentProperties)) {
-    // if (prop != null) {
-    // prop.setI18nMessageFormater(i18nMessages);
-    // } // else the property has not been initialised yet, please make sure to call this after initilisation
-    // } // else this is handle by the constructor of this class.
-    // }
-    //
-    // }
 
     /**
      * Returns a serialized version of this for storage in a repository.
@@ -656,14 +636,18 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     public String toStringIndent(int indent) {
         StringBuilder sb = new StringBuilder();
         String is = ToStringIndentUtil.indentString(indent);
-        sb.append(is + "Name: " + getName() + " - " + getTitle() + " " + getClass().getName());
-        sb.append("\n" + is + " Properties:");
+        sb.append(is + getName() + " - " + getTitle() + " " + getClass().getName());
+        sb.append("\n" + is + "   Properties:");
         for (SchemaElement prop : getProperties()) {
-            sb.append("\n" + prop.toStringIndent(indent + 2));
+            sb.append("\n" + prop.toStringIndent(indent + 6));
+            String value = getStringValue(prop);
+            if (value != null) {
+                sb.append(" [" + value + "]");
+            }
         }
-        sb.append("\n Forms:");
+        sb.append("\n " + is + "  Forms:");
         for (Form form : getForms()) {
-            sb.append("\n" + form.toStringIndent(indent + 2));
+            sb.append("\n" + form.toStringIndent(indent + 6));
         }
         return sb.toString();
     }

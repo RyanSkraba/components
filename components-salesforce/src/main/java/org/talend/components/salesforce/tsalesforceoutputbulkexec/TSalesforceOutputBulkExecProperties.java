@@ -23,6 +23,10 @@ import static org.talend.components.api.properties.presentation.Widget.widget;
 
 public class TSalesforceOutputBulkExecProperties extends TSalesforceOutputProperties {
 
+    public TSalesforceOutputBulkExecProperties(String name) {
+        super(name);
+    }
+
     @Override
     public ComponentProperties init() {
         TSalesforceOutputProperties.setupUpsertRelation(upsertRelation, TSalesforceOutputProperties.POLY);
@@ -30,7 +34,7 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceOutputProper
         return this;
     }
 
-    public SalesforceBulkProperties bulkProperties = new SalesforceBulkProperties();
+    public SalesforceBulkProperties bulkProperties = new SalesforceBulkProperties("bulkProperties");
 
     @Override public void setupLayout() {
         super.setupLayout();

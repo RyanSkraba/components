@@ -22,6 +22,10 @@ public class SalesforceUserPasswordProperties extends UserPasswordProperties {
 
     public SchemaElement securityKey = newString("securityKey").setRequired(); //$NON-NLS-1$
 
+    public SalesforceUserPasswordProperties(String name) {
+        super(name);
+    }
+
     @Override
     protected void setupLayout() {
         super.setupLayout();

@@ -16,7 +16,7 @@ public class SalesforceModuleWizard extends ComponentWizard {
     SalesforceModuleWizard(ComponentWizardDefinition def, String repositoryLocation) {
         super(def, repositoryLocation);
 
-        mProps = new SalesforceModuleListProperties().setRepositoryLocation(getRepositoryLocation());
+        mProps = new SalesforceModuleListProperties("mProps").setRepositoryLocation(getRepositoryLocation());
         mProps.init();
         addForm(mProps.getForm(Form.MAIN));
     }

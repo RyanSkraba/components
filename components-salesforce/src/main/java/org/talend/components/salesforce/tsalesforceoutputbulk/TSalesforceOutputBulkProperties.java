@@ -36,7 +36,11 @@ public class TSalesforceOutputBulkProperties extends ComponentProperties {
     // Collections
     //
 
-    public SchemaProperties schema = new SchemaProperties().init();
+    public SchemaProperties schema = new SchemaProperties("name").init();
+
+    public TSalesforceOutputBulkProperties(String name) {
+        super(name);
+    }
 
     @Override
     public ComponentProperties init() {

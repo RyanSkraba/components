@@ -48,7 +48,7 @@ public class LocalComponentTestIT {
         ComponentProperties props = componentService.getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
         List<ComponentDefinition> comps = componentService.getPossibleComponents(props);
         assertEquals("TestComponent", comps.get(0).getName());
-        props = new NestedComponentProperties();
+        props = new NestedComponentProperties("props");
         comps = componentService.getPossibleComponents(props);
         assertEquals(0, comps.size());
     }
@@ -84,7 +84,7 @@ public class LocalComponentTestIT {
     public void testGetWizardWithProps() {
         TestComponentWizard wizard = (TestComponentWizard) componentService
                 .getComponentWizard(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME, "userdata");
-        wizard.props = new TestComponentProperties().init();
+        wizard.props = new TestComponentProperties("props").init();
         ComponentProperties props = wizard.props;
         List<ComponentWizard> wizards = componentService.getComponentWizardsForProperties(props, "userdata");
         assertTrue(props == ((TestComponentWizard) wizards.get(0)).props);

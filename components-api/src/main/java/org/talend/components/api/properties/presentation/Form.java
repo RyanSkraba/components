@@ -206,14 +206,22 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
     }
 
     /**
-     * Uses the class name to get the {@link Widget}. This is used in the case of references to
-     * {@link ComponentProperties} which are by default named for their class.
-     * 
+     * Uses the class name to get the {@link Widget}.
+     *
      * @param childClass the Class of the desired {@link ComponentProperties} to get.
      * @return the {@code Widget} belonging to those properties.
      */
     public Widget getWidget(Class<?> childClass) {
-        return widgetMap.get(childClass.getSimpleName());
+        for (Widget w : widgets) {
+            for (NamedThing p : w.getProperties()) {
+                // See comment above in fill()
+                if (p instanceof Form)
+                    p = ((Form)p).getProperties();
+                if (p.getClass() == childClass)
+                    return w;
+            }
+        }
+        return null;
     }
 
     public boolean isRefreshUI() {
@@ -264,8 +272,18 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
         StringBuilder sb = new StringBuilder();
         String is = ToStringIndentUtil.indentString(indent);
         sb.append(is + "Form: " + getName());
+        if (isRefreshUI())
+            sb.append(" REFRESH_UI");
+        if (isCallBeforeFormPresent())
+            sb.append(" BEFORE_FORM_PRESENT");
+        if (isCallAfterFormBack())
+            sb.append(" AFTER_FORM_BACK");
+        if (isCallAfterFormNext())
+            sb.append(" AFTER_FORM_NEXT");
+        if (isCallAfterFormFinish())
+            sb.append(" AFTER_FORM_FINISH");
         for (Widget w : getWidgets()) {
-            sb.append("\n" + w.toStringIndent(indent + 2));
+            sb.append("\n" + w.toStringIndent(indent + 4));
         }
         return sb.toString();
     }

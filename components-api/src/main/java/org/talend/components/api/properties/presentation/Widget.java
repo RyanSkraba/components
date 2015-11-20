@@ -15,6 +15,9 @@ package org.talend.components.api.properties.presentation;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.ToStringIndent;
 import org.talend.components.api.ToStringIndentUtil;
+import org.talend.components.api.schema.SchemaElement;
+
+import java.util.Collection;
 
 /**
  * The {@code Widget} class defines the presentation characteristics of the property within its {@link Form}.
@@ -97,8 +100,6 @@ public class Widget implements ToStringIndent {
     /**
      * Is the validation associated with this expected to be long running (so that the UI should give a wait indication.
      * This is for things like doing a connection or loading data from a database.
-     * <p/>
-     * TODO - perhaps in the future we can have some notion of progress.
      */
     private boolean longRunning;
 
@@ -240,8 +241,29 @@ public class Widget implements ToStringIndent {
     public String toStringIndent(int indent) {
         StringBuilder sb = new StringBuilder();
         String is = ToStringIndentUtil.indentString(indent);
-        sb.append(is + "Widget: (R/C)" + getRow() + "/" + getOrder() + " props: "
-                + (getProperties().length > 0 ? getProperties()[0].getName() : "<none>"));
+        sb.append(is + "Widget: " + getWidgetType() + " " + getRow() + "/" + getOrder() + " ");
+        boolean firstTime = true;
+        for (NamedThing n : getProperties()) {
+            if (!firstTime)
+                sb.append(", ");
+            if (n instanceof Form)
+                sb.append("Form: ");
+            sb.append(n.getName());
+            if (n instanceof Form)
+                sb.append(" (" + ((Form) n).getProperties().getName() + ")");
+            if (n instanceof SchemaElement) {
+                Collection values = ((SchemaElement)n).getPossibleValues();
+                if (values != null)
+                    sb.append(" Values: " + values);
+            }
+            firstTime = false;
+        }
+        if (isCallBefore())
+            sb.append(" CALL_BEFORE");
+        if (isCallAfter())
+            sb.append(" CALL_AFTER");
+        if (isCallValidate())
+            sb.append(" CALL_VALIDATE");
         return sb.toString();
     }
 

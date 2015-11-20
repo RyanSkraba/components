@@ -1,13 +1,13 @@
 package org.talend.components.webtest;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.inject.Inject;
+
+import jline.console.ConsoleReader;
+import jline.console.completer.ArgumentCompleter;
+import jline.console.completer.StringsCompleter;
 
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.boot.SpringApplication;
@@ -87,22 +87,65 @@ public class PropertiesTester {
 
     }
 
-    ComponentProperties testProps;
+    private class Command {
 
-    ComponentDefinition testDef;
+        String[] names;
+
+        String help;
+
+        void run() {
+
+        }
+
+        void setupCompletor() {
+
+        }
+
+        boolean executeIfMatch() {
+            for (String name : names) {
+                if (currentCommand.equalsIgnoreCase(name)) {
+                    try {
+                        run();
+                    } catch (Exception ex) {
+                        System.out.println("Error: " + ex);
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        List<String> getNameList() {
+            List<String> l = new ArrayList();
+            for (String s : names)
+                l.add(s);
+            return l;
+        }
+
+        String helpCommand() {
+            StringBuilder sb = new StringBuilder();
+            sb.append(names[0]);
+            if (names.length == 2)
+                sb.append(" (" + names[1] + ")");
+            return sb.toString();
+        }
+
+        Command(String[] names, String help) {
+            this.names = names;
+            this.help = help;
+        }
+    }
 
     private static PropertiesTester instance;
 
     @Inject
     public ComponentService componentService;
 
-    private static final int CMD_CREATEPROPS = 1;
+    ComponentProperties testProps;
 
-    private static final int CMD_SHOWPROP = 2;
+    ComponentDefinition testDef;
 
-    private static final int CMD_SHOWCOMPS = 3;
-
-    private static final int CMD_SHOWCOMPNAMES = 4;
+    ConsoleReader console;
 
     private String arrayLines(Collection c) {
         StringBuilder sb = new StringBuilder();
@@ -116,79 +159,131 @@ public class PropertiesTester {
         return sb.toString();
     }
 
-    public PropertiesTester() {
+    public PropertiesTester() throws IOException {
         instance = this;
 
         commands = new Command[] { //
-                new Command(CMD_CREATEPROPS, new String[] { "cp", "createProps" }, "Create properties", //
-                        new Runnable() {
+                new Command(new String[] { "createProps", "cp" }, "Create properties, specify component name") {
 
-                            @Override
-                            public void run() {
-                                String comp = args[argIndex++];
-                                testDef = componentService.getComponentDefinition(comp);
-                                testProps = componentService.getComponentProperties(comp);
-
-                            }
-                        }), //
-                new Command(CMD_SHOWPROP, new String[] { "sp", "showProps" }, "Show previously created properties", //
-                        new Runnable() {
-
-                            @Override
-                            public void run() {
-                                System.out.println("Properties: " + testProps);
-                            }
-                        }), //
-                new Command(CMD_SHOWCOMPS, new String[] { "sc", "showComps" }, "Show all component definitions", //
-                        new Runnable() {
-
-                            @Override
-                            public void run() {
-                                System.out.println(arrayLines(componentService.getAllComponents()));
-                            }
-                        }), //
-                new Command(CMD_SHOWCOMPNAMES, new String[] { "scn", "showCompNames" }, "Show all component names", //
-                        new Runnable() {
-
-                            @Override
-                            public void run() {
-                                System.out.println(componentService.getAllComponentNames());
-                            }
-                        }), //
-        };
-
-    }
-
-    private class Command {
-
-        int number;
-
-        String[] names;
-
-        String help;
-
-        Runnable run;
-
-        boolean executeIfMatch() {
-            for (String name : names) {
-                if (currentCommand.equalsIgnoreCase(name)) {
-                    try {
-                        run.run();
-                    } catch (Exception ex) {
-                        System.out.println("Error: " + ex);
+                    void run() {
+                        if (argIndex >= args.length) {
+                            System.out.println("Specify the component name");
+                            return;
+                        }
+                        String comp = args[argIndex++];
+                        testDef = componentService.getComponentDefinition(comp);
+                        testProps = componentService.getComponentProperties(comp);
                     }
-                    return true;
-                }
-            }
-            return false;
-        }
 
-        Command(int number, String[] names, String help, Runnable run) {
-            this.number = number;
-            this.names = names;
-            this.help = help;
-            this.run = run;
-        }
+                    void setupCompletor() {
+                        StringsCompleter sc = new StringsCompleter(getNameList());
+                        console.addCompleter(
+                                new ArgumentCompleter(sc, new StringsCompleter(componentService.getAllComponentNames())));
+                    }
+                }, //
+                new Command(new String[] { "showProps", "sp" }, "Show previously created properties") {
+
+                    void run() {
+                        System.out.println(testProps);
+                    }
+                }, //
+                new Command(new String[] { "showComps", "sc" }, "Show all component definitions") {
+
+                    void run() {
+                        System.out.println(arrayLines(componentService.getAllComponents()));
+                    }
+                }, //
+                new Command(new String[] { "showCompNames", "scn" }, "Show all component names") {
+
+                    void run() {
+                        System.out.println(arrayLines(componentService.getAllComponentNames()));
+                    }
+                }, //
+                new Command(new String[] { "setValue", "sv" }, "Sets the value of the specified property") {
+
+                    void run() {
+                        if (argIndex >= args.length) {
+                            System.out.println("Specify the property name (which can be qualified)");
+                            return;
+                        }
+                        String prop = args[argIndex++];
+                        if (argIndex >= args.length) {
+                            System.out.println("Specify the value");
+                            return;
+                        }
+                        String value = args[argIndex++];
+
+                        testProps.setValue(testProps.getProperty(prop), value);
+                    }
+                }, //
+                new Command(new String[] { "beforePresent", "bp" },
+                        "Call the beforePresent service with the specified property") {
+
+                    void run() {
+                        if (argIndex >= args.length) {
+                            System.out.println("Specify the property name (which can be qualified)");
+                            return;
+                        }
+                        String prop = args[argIndex++];
+
+                        try {
+                            ComponentProperties props = componentService.beforeProperty(prop, testProps);
+                            testProps = props;
+                        } catch (Throwable throwable) {
+                            throwable.printStackTrace();
+                        }
+                    }
+                }, //
+                new Command(new String[] { "after", "a" }, "Call the afterProperty service with the specified property") {
+
+                    void run() {
+                        if (argIndex >= args.length) {
+                            System.out.println("Specify the property name (which can be qualified)");
+                            return;
+                        }
+                        String prop = args[argIndex++];
+
+                        try {
+                            ComponentProperties props = componentService.afterProperty(prop, testProps);
+                            testProps = props;
+                        } catch (Throwable throwable) {
+                            throwable.printStackTrace();
+                        }
+                    }
+                }, //
+                new Command(new String[] { "validate", "v" }, "Call the validateProperty service with the specified property") {
+
+                    void run() {
+                        if (argIndex >= args.length) {
+                            System.out.println("Specify the property name (which can be qualified)");
+                            return;
+                        }
+                        String prop = args[argIndex++];
+
+                        try {
+                            ComponentProperties props = componentService.validateProperty(prop, testProps);
+                            System.out.println(props.getValidationResult());
+                            testProps = props;
+                        } catch (Throwable throwable) {
+                            throwable.printStackTrace();
+                        }
+                    }
+                }, //
+                new Command(new String[] { "help", "h" }, "Show this help") {
+
+                    void run() {
+                        for (Command c : commands) {
+                            System.out.printf("%-20s %s\n", c.helpCommand(), c.help);
+                        }
+                    }
+                }, //
+                new Command(new String[] { "exit" }, "Exit") {
+
+                    void run() {
+                        System.exit(0);
+                    }
+                }, //
+        };
     }
 
     private Command[] commands;
@@ -218,14 +313,22 @@ public class PropertiesTester {
         System.out.println("Unknown command: " + currentCommand);
     }
 
-    public void processCommands(String lines) {
-        String[] lineArray = lines.split("\n");
-        for (String line : lineArray) {
-            try {
-                processCommand(line);
-            } catch (Exception ex) {
-                System.out.println("Error: " + ex.getMessage());
+    public void processCommands() {
+        try {
+            console = new ConsoleReader();
+            List commandNames = new ArrayList();
+            for (Command c : commands) {
+                c.setupCompletor();
+                commandNames.add(c.names[0]);
             }
+            console.addCompleter(new StringsCompleter(commandNames));
+            console.setPrompt("comptest> ");
+            String line;
+            while ((line = console.readLine()) != null) {
+                processCommand(line);
+            }
+        } catch (IOException io) {
+            io.printStackTrace();
         }
     }
 
@@ -235,20 +338,12 @@ public class PropertiesTester {
         app.setShowBanner(false);
         app.setHeadless(true);
         app.setLogStartupInfo(false);
-        app.run(args);
+        if (true)
+            app.run(PropertiesTester.class, args);
+        else
+            app.run(args);
         PropertiesTester pt = instance;
-
-        try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            String input;
-
-            while ((input = br.readLine()) != null) {
-                pt.processCommand(input);
-            }
-
-        } catch (IOException io) {
-            io.printStackTrace();
-        }
+        pt.processCommands();
     }
 
 }

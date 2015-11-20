@@ -34,7 +34,11 @@ public class SalesforceModuleProperties extends ComponentProperties {
     //
     public SchemaElement moduleName = newString("moduleName"); //$NON-NLS-1$
 
-    public SchemaProperties schema = new SchemaProperties().init();
+    public SchemaProperties schema = new SchemaProperties("schema").init();
+
+    public SalesforceModuleProperties(String name) {
+        super(name);
+    }
 
     // FIXME - OK what about if we are using a connection from a separate component
     // that defines the connection, how do we get that separate component?

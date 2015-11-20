@@ -24,13 +24,8 @@ import org.talend.components.api.schema.SchemaFactory;
 
 public class SchemaProperties extends ComponentProperties {
 
-    public SchemaProperties() {
-        super();
-    }
-
     public SchemaProperties(String name) {
-        super();
-        setName(name);
+        super(name);
     }
 
     //

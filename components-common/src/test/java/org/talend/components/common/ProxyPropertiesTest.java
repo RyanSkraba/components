@@ -36,15 +36,15 @@ public class ProxyPropertiesTest {
 
     @Test
     public void testProxyProperties() throws Throwable {
-        ProxyProperties props = (ProxyProperties) new ProxyProperties().init();
+        ProxyProperties props = (ProxyProperties) new ProxyProperties("proxy").init();
         Form mainForm = props.getForm(Form.MAIN);
         assertFalse(mainForm.getWidget("host").isVisible());
-        assertFalse(mainForm.getWidget(UserPasswordProperties.class).isVisible());
+        assertFalse(mainForm.getWidget("userPassword").isVisible());
 
         props.setValue(props.useProxy, true);
         assertTrue(mainForm.getWidget("useProxy").isCallAfter());
         componentService.afterProperty("useProxy", props);
         assertTrue(mainForm.getWidget("host").isVisible());
-        assertTrue(mainForm.getWidget(UserPasswordProperties.class).isVisible());
+        assertTrue(mainForm.getWidget("userPassword").isVisible());
     }
 }

@@ -23,4 +23,7 @@ public class NestedComponentProperties extends ComponentProperties {
 
     public SchemaElement aGreatProperty = newProperty(A_GREAT_PROP_NAME);
 
+    public NestedComponentProperties(String name) {
+        super(name);
+    }
 }

@@ -23,4 +23,7 @@ public class InheritedComponentProperties extends NestedComponentProperties {
 
     public SchemaElement aGreatProperty3 = newProperty(A_GREAT_PROP_NAME3);
 
+    public InheritedComponentProperties(String name) {
+        super(name);
+    }
 }

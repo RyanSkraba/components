@@ -25,24 +25,28 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
     public static final String QUERY_BULK = "Bulk";
 
-    public SchemaElement queryMode = newProperty(SchemaElement.Type.ENUM, "QueryMode"); //$NON-NLS-1$
+    public SchemaElement queryMode = newProperty(SchemaElement.Type.ENUM, "queryMode"); //$NON-NLS-1$
 
-    public SchemaElement condition = newProperty("Condition"); //$NON-NLS-1$
+    public SchemaElement condition = newProperty("condition"); //$NON-NLS-1$
 
-    public SchemaElement manualQuery = newProperty(SchemaElement.Type.BOOLEAN, "ManualQuery"); //$NON-NLS-1$
+    public SchemaElement manualQuery = newProperty(SchemaElement.Type.BOOLEAN, "manualQuery"); //$NON-NLS-1$
 
-    public SchemaElement query = newProperty("Query"); //$NON-NLS-1$
+    public SchemaElement query = newProperty("query"); //$NON-NLS-1$
 
-    public SchemaElement includeDeleted = newProperty(SchemaElement.Type.BOOLEAN, "IncludeDeleted"); //$NON-NLS-1$
+    public SchemaElement includeDeleted = newProperty(SchemaElement.Type.BOOLEAN, "includeDeleted"); //$NON-NLS-1$
 
     //
     // Advanced
     //
-    public SchemaElement batchSize = newProperty(SchemaElement.Type.INT, "BatchSize"); //$NON-NLS-1$
+    public SchemaElement batchSize = newProperty(SchemaElement.Type.INT, "batchSize"); //$NON-NLS-1$
 
-    public SchemaElement normalizeDelimiter = newProperty("NormalizeDelimiter"); //$NON-NLS-1$
+    public SchemaElement normalizeDelimiter = newProperty("normalizeDelimiter"); //$NON-NLS-1$
 
-    public SchemaElement columnNameDelimiter = newProperty("ColumnNameDelimiter"); //$NON-NLS-1$
+    public SchemaElement columnNameDelimiter = newProperty("columnNameDelimiter"); //$NON-NLS-1$
+
+    public TSalesforceInputProperties(String name) {
+        super(name);
+    }
 
     @Override
     public ComponentProperties init() {

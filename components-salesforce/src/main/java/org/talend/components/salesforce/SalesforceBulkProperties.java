@@ -32,6 +32,10 @@ public class SalesforceBulkProperties extends ComponentProperties {
 
     public SchemaElement waitTimeCheckBatchState = newInteger("waitTimeCheckBatchState");
 
+    public SalesforceBulkProperties(String name) {
+        super(name);
+    }
+
     @Override
     public SalesforceBulkProperties init() {
         super.init();

@@ -24,7 +24,11 @@ public class TSalesforceBulkExecProperties extends TSalesforceOutputProperties {
 
     public SchemaElement bulkFilePath = newProperty("bulkFilePath");
 
-    public SalesforceBulkProperties bulkProperties = new SalesforceBulkProperties();
+    public SalesforceBulkProperties bulkProperties = new SalesforceBulkProperties("bulkProperties");
+
+    public TSalesforceBulkExecProperties(String name) {
+        super(name);
+    }
 
     @Override
     public void setupLayout() {

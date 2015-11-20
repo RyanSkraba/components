@@ -30,6 +30,10 @@ public class OauthProperties extends ComponentProperties {
 
     public SchemaElement tokenFile = newProperty("tokenFile").setRequired(true); //$NON-NLS-1$
 
+    public OauthProperties(String name) {
+        super(name);
+    }
+
     @Override
     protected void setupLayout() {
         super.setupLayout();

@@ -22,9 +22,15 @@ public class ProxyProperties extends ComponentProperties {
 
     public SchemaElement useProxy = newProperty(SchemaElement.Type.BOOLEAN, "useProxy").setRequired(true); //$NON-NLS-1$
 
-    public SchemaElement host = newProperty("host").setRequired(true); //$NON-NLS-1$
+    private static final String HOST = "host";
+    public SchemaElement host = newProperty(HOST).setRequired(true);
 
-    public UserPasswordProperties userPassword = new UserPasswordProperties(); //$NON-NLS-1$
+    private static final String USERPASSWORD = "userPassword";
+    public UserPasswordProperties userPassword = new UserPasswordProperties(USERPASSWORD);
+
+    public ProxyProperties(String name) {
+        super(name);
+    }
 
     public void setupLayout() {
         super.setupLayout();
@@ -43,11 +49,11 @@ public class ProxyProperties extends ComponentProperties {
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN)) {
             if (getBooleanValue(useProxy)) {
-                form.getWidget("host").setVisible(true);
-                form.getWidget(UserPasswordProperties.class).setVisible(true);
+                form.getWidget(HOST).setVisible(true);
+                form.getWidget(USERPASSWORD).setVisible(true);
             } else {
-                form.getWidget("host").setVisible(false);
-                form.getWidget(UserPasswordProperties.class).setVisible(false);
+                form.getWidget(HOST).setVisible(false);
+                form.getWidget(USERPASSWORD).setVisible(false);
             }
         }
     }

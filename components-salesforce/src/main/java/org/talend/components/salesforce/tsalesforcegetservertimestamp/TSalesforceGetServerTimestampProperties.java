@@ -24,10 +24,14 @@ public class TSalesforceGetServerTimestampProperties extends ComponentProperties
     //
     // Collections
     //
-    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties();
+    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection");
 
     // Just holds the server timestamp
-    public SchemaProperties schema = new SchemaProperties().init();
+    public SchemaProperties schema = new SchemaProperties("schema").init();
+
+    public TSalesforceGetServerTimestampProperties(String name) {
+        super(name);
+    }
 
     @Override public ComponentProperties init() {
         super.init();

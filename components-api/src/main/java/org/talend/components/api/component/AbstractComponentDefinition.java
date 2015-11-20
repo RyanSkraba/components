@@ -1,5 +1,8 @@
 package org.talend.components.api.component;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import org.talend.components.api.AbstractTopLevelDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 
@@ -27,11 +30,16 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
     public ComponentProperties createProperties() {
         ComponentProperties compProp = null;
         try {
-            compProp = (ComponentProperties) propertiesClass.newInstance();
+            Constructor c = propertiesClass.getConstructor(String.class);
+            compProp = (ComponentProperties) c.newInstance(new Object[] { "root" });
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
         }
         compProp.init();
         return compProp;

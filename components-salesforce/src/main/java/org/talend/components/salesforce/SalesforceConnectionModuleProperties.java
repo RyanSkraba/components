@@ -23,14 +23,18 @@ public class SalesforceConnectionModuleProperties extends ComponentProperties {
 
     // Collections
     //
-    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties(); //$NON-NLS-1$
+    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection"); //$NON-NLS-1$
 
     public SalesforceModuleProperties module;
+
+    public SalesforceConnectionModuleProperties(String name) {
+        super(name);
+    }
 
     @Override
     public ComponentProperties init() {
         // Allow for subclassing
-        module = new SalesforceModuleProperties().setConnection(connection);
+        module = new SalesforceModuleProperties("module").setConnection(connection);
         return super.init();
     }
 

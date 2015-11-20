@@ -25,6 +25,10 @@ public class UserPasswordProperties extends ComponentProperties {
     // FIXME - this needs to be encrypted, need to think about how to handle that
     public SchemaElement password = newProperty("password").setRequired(true); //$NON-NLS-1$
 
+    public UserPasswordProperties(String name) {
+        super(name);
+    }
+
     @Override
     protected void setupLayout() {
         super.setupLayout();

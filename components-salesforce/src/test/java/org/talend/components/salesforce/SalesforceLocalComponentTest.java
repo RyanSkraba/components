@@ -28,15 +28,17 @@ import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnect
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
-public class SalesforceLocalComponentTest  {
+public class SalesforceLocalComponentTest {
 
     ComponentService componentService = new ComponentServiceImpl(null);
 
-    @BeforeClass public static void init() {
+    @BeforeClass
+    public static void init() {
         ComponentTestUtils.setupGlobalContext();
     }
 
-    @AfterClass public static void unset() {
+    @AfterClass
+    public static void unset() {
         ComponentTestUtils.unsetGlobalContext();
     }
 
@@ -59,7 +61,8 @@ public class SalesforceLocalComponentTest  {
         return componentService.validateProperty(propName, props);
     }
 
-    @Test public void testGetProps() {
+    @Test
+    public void testGetProps() {
         ComponentProperties props = new TSalesforceConnectionDefinition().createProperties();
         Form f = props.getForm(Form.MAIN);
         ComponentTestUtils.checkSerialize(props);
@@ -68,7 +71,8 @@ public class SalesforceLocalComponentTest  {
         assertEquals(Form.MAIN, f.getName());
     }
 
-    @Test public void testAfterLoginType() throws Throwable {
+    @Test
+    public void testAfterLoginType() throws Throwable {
         ComponentProperties props;
 
         props = new TSalesforceConnectionDefinition().createProperties();
@@ -92,11 +96,12 @@ public class SalesforceLocalComponentTest  {
         assertTrue(mainForm.getWidget(OauthProperties.class).isVisible());
     }
 
-    @Test public void testInputProps() throws Throwable {
+    @Test
+    public void testInputProps() throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputDefinition().createProperties();
         assertEquals(2, props.queryMode.getPossibleValues().size());
-
         SchemaElement returns = props.getProperty(ComponentProperties.RETURNS);
         assertEquals("NB_LINE", returns.getChildren().get(0).getName());
     }
+
 }

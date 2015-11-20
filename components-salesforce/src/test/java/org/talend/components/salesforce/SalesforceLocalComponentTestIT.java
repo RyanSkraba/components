@@ -244,7 +244,7 @@ public class SalesforceLocalComponentTestIT {
         assertEquals("Name", connProps.getProperty("name").getDisplayName());
         connProps.setValue(connProps.name, "connName");
         setupProps(connProps);
-        Form userPassword = (Form) connFormWizard.getChild(SalesforceUserPasswordProperties.class);
+        Form userPassword = (Form) connFormWizard.getChild("userPassword");
         SchemaElement passwordSe = (SchemaElement) userPassword.getChild("password");
         assertEquals("Password", passwordSe.getDisplayName());
         // check name i18n
@@ -325,7 +325,7 @@ public class SalesforceLocalComponentTestIT {
             props = (SalesforceConnectionProperties) componentService
                     .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
         }
-        ComponentProperties userPassword = (ComponentProperties) props.getProperty(SalesforceUserPasswordProperties.class);
+        ComponentProperties userPassword = (ComponentProperties) props.getProperty("userPassword");
         userPassword.setValue(userPassword.getProperty("userId"), userId);
         userPassword.setValue(userPassword.getProperty("password"), password);
         userPassword.setValue(userPassword.getProperty("securityKey"), securityKey);
