@@ -18,11 +18,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.talend.components.api.ComponentTestUtils;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.service.testcomponent.TestComponentWizard;
 import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
 
-/**
- * created by sgandon on 27 oct. 2015
- */
 public class WizardTest {
 
     @BeforeClass
@@ -39,9 +38,20 @@ public class WizardTest {
     public void testi18NForWizardDefintion() {
         ComponentWizardDefinition cwd = new TestComponentWizardDefinition();
         assertNotNull(cwd);
+        assertTrue(cwd.isTopLevel());
         assertEquals("Test Wizard", cwd.getDisplayName());
         assertEquals("Ze Test Wizard Title", cwd.getTitle());
         assertEquals("Ze Test Wizard menu", cwd.getMenuItemName());
+    }
+
+    @Test
+    public void testWizardProps() {
+        ComponentWizardDefinition cwd = new TestComponentWizardDefinition();
+        TestComponentWizard wiz = (TestComponentWizard) cwd.createWizard("testLoc");
+        assertEquals("testLoc", wiz.getRepositoryLocation());
+        assertTrue(cwd == wiz.getDefinition());
+        assertEquals(1, wiz.getForms().size());
+        assertTrue(wiz.props == wiz.getForms().get(0).getProperties());
     }
 
 }

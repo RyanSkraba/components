@@ -110,7 +110,7 @@ public class PropertiesTest {
         TestComponentProperties componentProperties = new TestComponentProperties("test");
         List<SchemaElement> pList = componentProperties.getProperties();
         assertTrue(pList.get(0) != null);
-        assertEquals(5, pList.size());
+        assertEquals(7, pList.size());
     }
 
     @Test
@@ -125,7 +125,7 @@ public class PropertiesTest {
     @Test
     public void testGetProps() {
         TestComponentProperties componentProperties = new TestComponentProperties("test");
-        Form f = componentProperties.getForm(TestComponentProperties.TESTCOMPONENT);
+        Form f = componentProperties.getForm(Form.MAIN);
         assertTrue(f.getWidget("userId").isVisible());
     }
 
@@ -134,7 +134,7 @@ public class PropertiesTest {
         TestComponentProperties tProps = new TestComponentProperties("test");
         List<String> fieldNames = tProps.getPropertyFieldNames();
         System.out.println(fieldNames);
-        assertEquals(5, fieldNames.size());
+        assertEquals(7, fieldNames.size());
         assertTrue(tProps.userId == tProps.getPropertyByFieldName("userId"));
         assertTrue(tProps.nestedProps == tProps.getPropertyByFieldName("nestedProps"));
     }

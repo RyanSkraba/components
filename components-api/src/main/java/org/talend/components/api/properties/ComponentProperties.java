@@ -414,7 +414,11 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         }
     }
 
-    public void beforeProperty(String propName) throws Throwable {
+    public void beforePropertyActivate(String propName) throws Throwable {
+        doInvoke(findMethod(METHOD_BEFORE, propName, REQUIRED));
+    }
+
+    public void beforePropertyPresent(String propName) throws Throwable {
         doInvoke(findMethod(METHOD_BEFORE, propName, REQUIRED));
     }
 

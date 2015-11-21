@@ -148,8 +148,13 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
-    public ComponentProperties beforeProperty(String propName, ComponentProperties properties) throws Throwable {
-        return componentServiceDelegate.beforeProperty(propName, properties);
+    public ComponentProperties beforePropertyActivate(String propName, ComponentProperties properties) throws Throwable {
+        return componentServiceDelegate.beforePropertyActivate(propName, properties);
+    }
+
+    @Override
+    public ComponentProperties beforePropertyPresent(String propName, ComponentProperties properties) throws Throwable {
+        return componentServiceDelegate.beforePropertyPresent(propName, properties);
     }
 
     @Override

@@ -74,6 +74,10 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
 
     private boolean callAfterFormFinish;
 
+    private boolean allowBack;
+    private boolean allowForward;
+    private boolean allowFinish;
+
     /**
      * Indicate that some {@link Widget} objects for this form have changed and the UI should be re-rendered to reflect
      * the changed widget.
@@ -262,6 +266,30 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
 
     public void setCallAfterFormFinish(boolean callAfterFormFinish) {
         this.callAfterFormFinish = callAfterFormFinish;
+    }
+
+    public boolean isAllowBack() {
+        return allowBack;
+    }
+
+    public void setAllowBack(boolean allowBack) {
+        this.allowBack = allowBack;
+    }
+
+    public boolean isAllowForward() {
+        return allowForward;
+    }
+
+    public void setAllowForward(boolean allowForward) {
+        this.allowForward = allowForward;
+    }
+
+    public boolean isAllowFinish() {
+        return allowFinish;
+    }
+
+    public void setAllowFinish(boolean allowFinish) {
+        this.allowFinish = allowFinish;
     }
 
     public String toString() {

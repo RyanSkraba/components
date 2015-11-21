@@ -12,10 +12,16 @@
 // ============================================================================
 package org.talend.components.api.service.testcomponent;
 
+import static org.talend.components.api.properties.presentation.Widget.widget;
 import static org.talend.components.api.schema.SchemaFactory.newProperty;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
@@ -27,6 +33,10 @@ public class TestComponentProperties extends ComponentProperties {
     public SchemaElement userId = newProperty(USER_ID_PROP_NAME).setRequired(true);
 
     public SchemaElement password = newProperty("password").setRequired(true);
+
+    public SchemaElement nameList = newProperty("nameList");
+
+    public SchemaElement nameListRef = newProperty("nameListRef");
 
     public NestedComponentProperties nestedProps = new NestedComponentProperties("nestedProps");
 
@@ -41,11 +51,25 @@ public class TestComponentProperties extends ComponentProperties {
         init();
     }
 
+    public void beforeNameList() {
+        List values = new ArrayList<>();
+        Collections.addAll(values, new String[] { "name1", "name2", "name3" });
+        nameList.setPossibleValues(values);
+    }
+
+    public void beforeNameListRef() {
+        List values = new ArrayList<>();
+        Collections.addAll(values, new String[] { "namer1", "namer2", "namer3" });
+        nameListRef.setPossibleValues(values);
+    }
+
     public ComponentProperties init() {
         super.init();
-        Form form = Form.create(this, TESTCOMPONENT, "Test Component");
+        Form form = Form.create(this, Form.MAIN, "Test Component");
         form.addRow(userId);
         form.addRow(password);
+        form.addRow(widget(nameList).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
+        form.addRow(widget(nameListRef).setWidgetType(Widget.WidgetType.NAME_SELECTION_REFERENCE));
         return this;
     }
 }

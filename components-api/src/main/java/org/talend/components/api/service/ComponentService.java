@@ -111,7 +111,9 @@ public interface ComponentService extends Repository {
 
     ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable;
 
-    ComponentProperties beforeProperty(String propName, ComponentProperties properties) throws Throwable;
+    ComponentProperties beforePropertyActivate(String propName, ComponentProperties properties) throws Throwable;
+
+    ComponentProperties beforePropertyPresent(String propName, ComponentProperties properties) throws Throwable;
 
     ComponentProperties afterProperty(String propName, ComponentProperties properties) throws Throwable;
 

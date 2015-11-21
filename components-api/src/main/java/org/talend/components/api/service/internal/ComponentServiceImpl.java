@@ -175,8 +175,14 @@ public class ComponentServiceImpl implements ComponentService {
     }
 
     @Override
-    public ComponentProperties beforeProperty(String propName, ComponentProperties properties) throws Throwable {
-        properties.beforeProperty(propName);
+    public ComponentProperties beforePropertyActivate(String propName, ComponentProperties properties) throws Throwable {
+        properties.beforePropertyActivate(propName);
+        return properties;
+    }
+
+    @Override
+    public ComponentProperties beforePropertyPresent(String propName, ComponentProperties properties) throws Throwable {
+        properties.beforePropertyPresent(propName);
         return properties;
     }
 

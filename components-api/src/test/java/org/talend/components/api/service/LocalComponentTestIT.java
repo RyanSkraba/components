@@ -27,6 +27,7 @@ import org.talend.components.api.ComponentTestUtils;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.service.testcomponent.TestComponentDefinition;
 import org.talend.components.api.service.testcomponent.TestComponentProperties;
 import org.talend.components.api.service.testcomponent.TestComponentWizard;
@@ -38,10 +39,7 @@ import org.talend.components.test.SpringApp;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
-public class LocalComponentTestIT {
-
-    @Autowired
-    protected ComponentService componentService;
+public class LocalComponentTestIT extends AbstractComponentTestIT {
 
     @Test
     public void testSupportsProps() throws Throwable {
@@ -51,6 +49,22 @@ public class LocalComponentTestIT {
         props = new NestedComponentProperties("props");
         comps = componentService.getPossibleComponents(props);
         assertEquals(0, comps.size());
+    }
+
+    @Test
+    public void testBefore() throws Throwable {
+        ComponentProperties props = componentService.getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
+
+        checkAndBeforePresent(props.getForm(Form.MAIN), "nameList", props);
+        assertEquals(3, props.getProperty("nameList").getPossibleValues().size());
+        assertEquals("name1", props.getProperty("nameList").getPossibleValues().get(0));
+
+        checkAndBeforeActivate(props.getForm(Form.MAIN), "nameListRef", props);
+        assertEquals(3, props.getProperty("nameListRef").getPossibleValues().size());
+        assertEquals("namer1", props.getProperty("nameListRef").getPossibleValues().get(0));
+
+        assertFalse(props.getForm(Form.MAIN).getWidget("nameList").isCallBeforeActivate());
+        assertFalse(props.getForm(Form.MAIN).getWidget("nameListRef").isCallBeforePresent());
     }
 
     @Test

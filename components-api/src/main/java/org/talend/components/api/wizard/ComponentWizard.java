@@ -21,7 +21,7 @@ public abstract class ComponentWizard extends TranslatableImpl {
     public ComponentWizard(ComponentWizardDefinition definition, String repositoryLocation) {
         forms = new ArrayList<>();
         this.definition = definition;
-        this.repositoryLocation = repositoryLocation;
+        setRepositoryLocation(repositoryLocation);
     }
 
     public void addForm(Form form) {

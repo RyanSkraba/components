@@ -227,7 +227,25 @@ public class PropertiesTester {
                         String prop = args[argIndex++];
 
                         try {
-                            ComponentProperties props = componentService.beforeProperty(prop, testProps);
+                            ComponentProperties props = componentService.beforePropertyPresent(prop, testProps);
+                            testProps = props;
+                        } catch (Throwable throwable) {
+                            throwable.printStackTrace();
+                        }
+                    }
+                }, //
+                new Command(new String[] { "beforeActivate", "ba" },
+                        "Call the beforeActivate service with the specified property") {
+
+                    void run() {
+                        if (argIndex >= args.length) {
+                            System.out.println("Specify the property name (which can be qualified)");
+                            return;
+                        }
+                        String prop = args[argIndex++];
+
+                        try {
+                            ComponentProperties props = componentService.beforePropertyActivate(prop, testProps);
                             testProps = props;
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();

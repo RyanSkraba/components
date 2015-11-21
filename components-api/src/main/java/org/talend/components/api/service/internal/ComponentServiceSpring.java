@@ -136,12 +136,22 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
-    @RequestMapping(value = BASE_PATH + "/properties/{propName}/before", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody ComponentProperties beforeProperty(
+    @RequestMapping(value = BASE_PATH + "/properties/{propName}/beforeActivate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody ComponentProperties beforePropertyActivate(
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
             @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
             throws Throwable {
-        componentServiceDelegate.beforeProperty(propName, properties);
+        componentServiceDelegate.beforePropertyActivate(propName, properties);
+        return properties;
+    }
+
+    @Override
+    @RequestMapping(value = BASE_PATH + "/properties/{propName}/beforeRender", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody ComponentProperties beforePropertyPresent(
+            @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
+            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
+            throws Throwable {
+        componentServiceDelegate.beforePropertyPresent(propName, properties);
         return properties;
     }
 

@@ -12,12 +12,12 @@
 // ============================================================================
 package org.talend.components.api.properties.presentation;
 
+import java.util.Collection;
+
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.ToStringIndent;
 import org.talend.components.api.ToStringIndentUtil;
 import org.talend.components.api.schema.SchemaElement;
-
-import java.util.Collection;
 
 /**
  * The {@code Widget} class defines the presentation characteristics of the property within its {@link Form}.
@@ -113,7 +113,9 @@ public class Widget implements ToStringIndent {
     // Internal properties set by the component framework
     //
 
-    private boolean callBefore;
+    private boolean callBeforeActivate;
+
+    private boolean callBeforePresent;
 
     private boolean callValidate;
 
@@ -210,12 +212,22 @@ public class Widget implements ToStringIndent {
     // are not to be specified by the user.
     //
 
-    public boolean isCallBefore() {
-        return callBefore;
+    public boolean isCallBeforeActivate() {
+        return callBeforeActivate;
     }
 
     public void setCallBefore(boolean callBefore) {
-        this.callBefore = callBefore;
+        if (widgetType == WidgetType.SCHEMA_REFERENCE || widgetType == WidgetType.NAME_SELECTION_REFERENCE) {
+            this.callBeforeActivate = callBefore;
+            this.callBeforePresent = !callBefore;
+        } else {
+            this.callBeforePresent = callBefore;
+            this.callBeforeActivate = !callBefore;
+        }
+    }
+
+    public boolean isCallBeforePresent() {
+        return callBeforePresent;
     }
 
     public boolean isCallValidate() {
@@ -252,14 +264,16 @@ public class Widget implements ToStringIndent {
             if (n instanceof Form)
                 sb.append(" (" + ((Form) n).getProperties().getName() + ")");
             if (n instanceof SchemaElement) {
-                Collection values = ((SchemaElement)n).getPossibleValues();
+                Collection values = ((SchemaElement) n).getPossibleValues();
                 if (values != null)
                     sb.append(" Values: " + values);
             }
             firstTime = false;
         }
-        if (isCallBefore())
-            sb.append(" CALL_BEFORE");
+        if (isCallBeforeActivate())
+            sb.append(" CALL_BEFORE_ACTIVATE");
+        if (isCallBeforePresent())
+            sb.append(" CALL_BEFORE_PRESENT");
         if (isCallAfter())
             sb.append(" CALL_AFTER");
         if (isCallValidate())

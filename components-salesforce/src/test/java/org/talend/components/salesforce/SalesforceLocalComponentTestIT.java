@@ -14,43 +14,25 @@ package org.talend.components.salesforce;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-import javax.inject.Inject;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.ComponentTestUtils;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.NameAndLabel;
-import org.talend.components.api.properties.PresentationItem;
-import org.talend.components.api.properties.Repository;
-import org.talend.components.api.properties.ValidationResult;
+import org.talend.components.api.properties.*;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.runtime.ComponentDynamicHolder;
 import org.talend.components.api.runtime.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.schema.SchemaFactory;
-import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.service.AbstractComponentTestIT;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
@@ -67,7 +49,7 @@ import org.talend.components.test.SpringApp;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
-public class SalesforceLocalComponentTestIT {
+public class SalesforceLocalComponentTestIT extends AbstractComponentTestIT {
 
     String userId;
 
@@ -87,9 +69,6 @@ public class SalesforceLocalComponentTestIT {
 
     public static final String TEST_KEY = "Address2 456";
 
-    @Inject
-    public ComponentService componentService;
-
     public SalesforceLocalComponentTestIT() {
         random = Integer.toString(ThreadLocalRandom.current().nextInt(1, 100000));
         userId = System.getProperty("salesforce.user");
@@ -97,41 +76,10 @@ public class SalesforceLocalComponentTestIT {
         securityKey = System.getProperty("salesforce.key");
     }
 
-    @Rule
-    public TestName name = new TestName();
-
-    long startTime;
-
-    @Before
-    public void before() throws Exception {
-        startTime = System.currentTimeMillis();
-        System.out.println(">>>>> " + name.getMethodName());
-    }
-
-    @After
-    public void after() throws Exception {
-        System.out.println("<<<<< " + name.getMethodName() + " time: " + (System.currentTimeMillis() - startTime));
-    }
-
     protected SalesforceRuntime createRuntime(ComponentDefinition definition) {
         SalesforceRuntime runtime = (SalesforceRuntime) definition.createRuntime();
         runtime.setContainer(new TestRuntimeContainer());
         return runtime;
-    }
-
-    protected ComponentProperties checkAndBefore(Form form, String propName, ComponentProperties props) throws Throwable {
-        assertTrue(form.getWidget(propName).isCallBefore());
-        return componentService.beforeProperty(propName, props);
-    }
-
-    protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props) throws Throwable {
-        assertTrue(form.getWidget(propName).isCallAfter());
-        return componentService.afterProperty(propName, props);
-    }
-
-    protected ComponentProperties checkAndValidate(Form form, String propName, ComponentProperties props) throws Throwable {
-        assertTrue(form.getWidget(propName).isCallValidate());
-        return componentService.validateProperty(propName, props);
     }
 
     static class RepoProps {
@@ -405,12 +353,12 @@ public class SalesforceLocalComponentTestIT {
 
         assertEquals(2, props.getForms().size());
         Form f = props.module.getForm(Form.REFERENCE);
-        assertTrue(f.getWidget("moduleName").isCallBefore());
+        assertTrue(f.getWidget("moduleName").isCallBeforeActivate());
         // The Form is bound to a Properties object that created it. The Forms might not always be associated with the
         // properties object
         // they came from.
         ComponentProperties moduleProps = f.getProperties();
-        moduleProps = checkAndBefore(f, "moduleName", moduleProps);
+        moduleProps = checkAndBeforeActivate(f, "moduleName", moduleProps);
         SchemaElement prop = (SchemaElement) f.getChild("moduleName");
         assertTrue(prop.getPossibleValues().size() > 100);
         System.out.println(prop.getPossibleValues());
@@ -425,7 +373,7 @@ public class SalesforceLocalComponentTestIT {
 
         Form f = props.module.getForm(Form.REFERENCE);
         SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
-        moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
+        moduleProps = (SalesforceModuleProperties) checkAndBeforeActivate(f, "moduleName", moduleProps);
         moduleProps.setValue(moduleProps.moduleName, "Account");
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
         Schema schema = (Schema) moduleProps.schema.getValue(moduleProps.schema.schema);
@@ -477,7 +425,7 @@ public class SalesforceLocalComponentTestIT {
 
     protected void setupModule(SalesforceModuleProperties moduleProps, String module) throws Throwable {
         Form f = moduleProps.getForm(Form.REFERENCE);
-        moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
+        moduleProps = (SalesforceModuleProperties) checkAndBeforeActivate(f, "moduleName", moduleProps);
         moduleProps.setValue(moduleProps.moduleName, module);
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
         schema = (Schema) moduleProps.schema.getValue(moduleProps.schema.schema);
@@ -681,7 +629,7 @@ public class SalesforceLocalComponentTestIT {
         if (false) {
             Form f = props.module.getForm(Form.REFERENCE);
             SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
-            moduleProps = (SalesforceModuleProperties) checkAndBefore(f, "moduleName", moduleProps);
+            moduleProps = (SalesforceModuleProperties) checkAndBeforePresent(f, "moduleName", moduleProps);
             moduleProps.setValue(moduleProps.moduleName, "Account");
             checkAndAfter(f, "moduleName", moduleProps);
             props.setValue(props.outputAction, TSalesforceOutputProperties.OutputAction.INSERT);

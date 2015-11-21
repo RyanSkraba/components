@@ -46,19 +46,9 @@ public class SalesforceLocalComponentTest {
         super();
     }
 
-    protected ComponentProperties checkAndBefore(Form form, String propName, ComponentProperties props) throws Throwable {
-        assertTrue(form.getWidget(propName).isCallBefore());
-        return componentService.beforeProperty(propName, props);
-    }
-
     protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props) throws Throwable {
         assertTrue(form.getWidget(propName).isCallAfter());
         return componentService.afterProperty(propName, props);
-    }
-
-    protected ComponentProperties checkAndValidate(Form form, String propName, ComponentProperties props) throws Throwable {
-        assertTrue(form.getWidget(propName).isCallValidate());
-        return componentService.validateProperty(propName, props);
     }
 
     @Test
