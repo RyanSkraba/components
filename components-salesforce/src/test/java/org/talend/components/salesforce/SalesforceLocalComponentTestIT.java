@@ -168,6 +168,9 @@ public class SalesforceLocalComponentTestIT extends AbstractComponentTestIT {
         List<Form> forms = wiz.getForms();
         Form connFormWizard = forms.get(0);
         assertEquals("Wizard", connFormWizard.getName());
+        assertFalse(connFormWizard.isAllowBack());
+        assertFalse(connFormWizard.isAllowForward());
+        assertFalse(connFormWizard.isAllowFinish());
         // Main from SalesforceModuleListProperties
         assertEquals("Main", forms.get(1).getName());
         assertEquals("Salesforce Connection Settings", connFormWizard.getTitle());
@@ -198,6 +201,8 @@ public class SalesforceLocalComponentTestIT extends AbstractComponentTestIT {
         // check name i18n
         NamedThing nameProp = connFormWizard.getChild("name"); //$NON-NLS-1$
         assertEquals("Name", nameProp.getDisplayName());
+        connProps = (SalesforceConnectionProperties) checkAndValidate(connFormWizard, "testConnection", connProps);
+        assertTrue(connFormWizard.isAllowForward());
 
         Form modForm = forms.get(1);
         SalesforceModuleListProperties mlProps = (SalesforceModuleListProperties) modForm.getProperties();
@@ -205,7 +210,13 @@ public class SalesforceLocalComponentTestIT extends AbstractComponentTestIT {
         assertFalse(modForm.isCallAfterFormNext());
         assertTrue(modForm.isCallAfterFormFinish());
         assertTrue(modForm.isCallBeforeFormPresent());
+        assertFalse(modForm.isAllowBack());
+        assertFalse(modForm.isAllowForward());
+        assertFalse(modForm.isAllowFinish());
         mlProps = (SalesforceModuleListProperties) componentService.beforeFormPresent(modForm.getName(), mlProps);
+        assertTrue(modForm.isAllowBack());
+        assertFalse(modForm.isAllowForward());
+        assertTrue(modForm.isAllowFinish());
         System.out.println(mlProps.getValue(mlProps.moduleName));
         @SuppressWarnings("unchecked")
         List<NameAndLabel> all = (List<NameAndLabel>) mlProps.getValue(mlProps.moduleName);

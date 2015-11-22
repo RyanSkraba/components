@@ -127,7 +127,13 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
     public ValidationResult validateTestConnection() throws Exception {
         SalesforceRuntime conn = new SalesforceRuntime();
-        return conn.connectWithResult(this);
+        ValidationResult vr = conn.connectWithResult(this);
+        if (vr.getStatus() == ValidationResult.Result.OK) {
+            getForm(FORM_WIZARD).setAllowForward(true);
+        } else {
+            getForm(FORM_WIZARD).setAllowForward(false);
+        }
+        return vr;
     }
 
     @Override

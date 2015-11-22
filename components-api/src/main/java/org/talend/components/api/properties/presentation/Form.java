@@ -236,6 +236,7 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
         this.refreshUI = refreshUI;
     }
 
+    // FIXME - consider removing the word "Form" from these
     public boolean isCallBeforeFormPresent() {
         return callBeforeFormPresent;
     }
@@ -310,6 +311,12 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
             sb.append(" AFTER_FORM_NEXT");
         if (isCallAfterFormFinish())
             sb.append(" AFTER_FORM_FINISH");
+        if (isAllowBack())
+            sb.append(" ALLOW_BACK");
+        if (isAllowForward())
+            sb.append(" ALLOW_FORWARD");
+        if (isAllowFinish())
+            sb.append(" ALLOW_FINISH");
         for (Widget w : getWidgets()) {
             sb.append("\n" + w.toStringIndent(indent + 4));
         }

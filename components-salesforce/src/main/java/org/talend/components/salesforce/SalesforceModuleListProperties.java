@@ -41,8 +41,6 @@ public class SalesforceModuleListProperties extends ComponentProperties {
     //
     public SchemaElement moduleName = newString("moduleName").setOccurMaxTimes(INFINITE); //$NON-NLS-1$
 
-    public static final String MAIN = "Main"; //$NON-NLS-1$
-
     public SalesforceModuleListProperties(String name) {
         super(name);
     }
@@ -61,7 +59,7 @@ public class SalesforceModuleListProperties extends ComponentProperties {
     protected void setupLayout() {
         super.setupLayout();
 
-        Form moduleForm = Form.create(this, MAIN, "Salesforce Modules");
+        Form moduleForm = Form.create(this, Form.MAIN, "Salesforce Modules");
         // Since this is a repeating property it has a list of values
         moduleForm.addRow(widget(moduleName).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
         refreshLayout(moduleForm);
@@ -77,6 +75,8 @@ public class SalesforceModuleListProperties extends ComponentProperties {
         conn.connect(connectionProps);
         moduleNames = conn.getModuleNames();
         moduleName.setPossibleValues(moduleNames);
+        getForm(Form.MAIN).setAllowBack(true);
+        getForm(Form.MAIN).setAllowFinish(true);
     }
 
     public void afterFormFinishMain() throws Exception {
