@@ -262,7 +262,7 @@ public class Widget implements ToStringIndent {
                 sb.append("Form: ");
             sb.append(n.getName());
             if (n instanceof Form)
-                sb.append(" (" + ((Form) n).getProperties().getName() + ")");
+                sb.append(" (" + ((Form) n).getComponentProperties().getName() + ")");
             if (n instanceof SchemaElement) {
                 Collection values = ((SchemaElement) n).getPossibleValues();
                 if (values != null)

@@ -54,7 +54,7 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
 
     protected String subtitle;
 
-    protected ComponentProperties properties;
+    protected ComponentProperties componentProperties;
 
     protected Map<String, NamedThing> children;
 
@@ -75,7 +75,9 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
     private boolean callAfterFormFinish;
 
     private boolean allowBack;
+
     private boolean allowForward;
+
     private boolean allowFinish;
 
     /**
@@ -93,7 +95,7 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
         widgetMap = new HashMap<String, Widget>();
         widgets = new ArrayList<Widget>();
         props.addForm(this);
-        properties = props;
+        componentProperties = props;
         props.setFormLayoutMethods(name, this);
     }
 
@@ -119,12 +121,12 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
         return children.get(name);
     }
 
-    public ComponentProperties getProperties() {
-        return properties;
+    public ComponentProperties getComponentProperties() {
+        return componentProperties;
     }
 
-    public void setProperties(ComponentProperties properties) {
-        this.properties = properties;
+    public void setComponentProperties(ComponentProperties properties) {
+        this.componentProperties = properties;
     }
 
     public Form setName(String name) {
@@ -195,13 +197,13 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
              * enclosing ComponentProperties (and therefore this Form).
              */
             if (child instanceof Form) {
-                name = ((Form) child).getProperties().getName();
+                name = ((Form) child).getComponentProperties().getName();
             }
             if (name == null)
                 throw new NullPointerException();
             widgetMap.put(name, widget);
             children.put(name, child);
-            properties.setWidgetLayoutMethods(name, widget);
+            componentProperties.setWidgetLayoutMethods(name, widget);
         }
     }
 
@@ -220,7 +222,7 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
             for (NamedThing p : w.getProperties()) {
                 // See comment above in fill()
                 if (p instanceof Form)
-                    p = ((Form)p).getProperties();
+                    p = ((Form) p).getComponentProperties();
                 if (p.getClass() == childClass)
                     return w;
             }

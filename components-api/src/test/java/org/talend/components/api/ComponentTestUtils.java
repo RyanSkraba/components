@@ -48,13 +48,13 @@ public class ComponentTestUtils {
             for (NamedThing formChild : form.getChildren()) {
                 String name = formChild.getName();
                 if (formChild instanceof Form) {
-                    name = ((Form) formChild).getProperties().getName();
+                    name = ((Form) formChild).getComponentProperties().getName();
                 }
                 System.out.println("  prop: " + formChild.getName() + " name to be used: " + name);
                 NamedThing newChild = newForm.getChild(name);
                 String newName = newChild.getName();
                 if (newChild instanceof Form) {
-                    newName = ((Form) newChild).getProperties().getName();
+                    newName = ((Form) newChild).getComponentProperties().getName();
                 }
                 assertEquals(name, newName);
             }

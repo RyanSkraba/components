@@ -176,7 +176,7 @@ public class SalesforceLocalComponentTestIT extends AbstractComponentTestIT {
         assertEquals("Salesforce Connection Settings", connFormWizard.getTitle());
         assertEquals("Complete these fields in order to connect to your Salesforce account.", connFormWizard.getSubtitle());
 
-        SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connFormWizard.getProperties();
+        SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connFormWizard.getComponentProperties();
 
         Form af = connProps.getForm(Form.ADVANCED);
         assertTrue(((PresentationItem) connFormWizard.getChild("advanced")).getFormtoShow() + " should be == to " + af,
@@ -205,7 +205,7 @@ public class SalesforceLocalComponentTestIT extends AbstractComponentTestIT {
         assertTrue(connFormWizard.isAllowForward());
 
         Form modForm = forms.get(1);
-        SalesforceModuleListProperties mlProps = (SalesforceModuleListProperties) modForm.getProperties();
+        SalesforceModuleListProperties mlProps = (SalesforceModuleListProperties) modForm.getComponentProperties();
         assertFalse(modForm.isCallAfterFormBack());
         assertFalse(modForm.isCallAfterFormNext());
         assertTrue(modForm.isCallAfterFormFinish());
@@ -256,7 +256,7 @@ public class SalesforceLocalComponentTestIT extends AbstractComponentTestIT {
                 "nodeSalesforce");
         List<Form> forms = wiz.getForms();
         Form connFormWizard = forms.get(0);
-        SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connFormWizard.getProperties();
+        SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connFormWizard.getComponentProperties();
 
         ComponentWizard[] subWizards = componentService.getComponentWizardsForProperties(connProps, "location")
                 .toArray(new ComponentWizard[3]);
@@ -268,8 +268,8 @@ public class SalesforceLocalComponentTestIT extends AbstractComponentTestIT {
             }
         });
         assertEquals(3, subWizards.length);
-        assertTrue(connProps == subWizards[1].getForms().get(0).getProperties());
-        assertTrue(connProps == ((SalesforceModuleListProperties) subWizards[2].getForms().get(0).getProperties())
+        assertTrue(connProps == subWizards[1].getForms().get(0).getComponentProperties());
+        assertTrue(connProps == ((SalesforceModuleListProperties) subWizards[2].getForms().get(0).getComponentProperties())
                 .getConnectionProps());
         assertFalse(subWizards[1].getDefinition().isTopLevel());
         assertEquals("Edit Salesforce Connection", subWizards[1].getDefinition().getMenuItemName());
@@ -368,7 +368,7 @@ public class SalesforceLocalComponentTestIT extends AbstractComponentTestIT {
         // The Form is bound to a Properties object that created it. The Forms might not always be associated with the
         // properties object
         // they came from.
-        ComponentProperties moduleProps = f.getProperties();
+        ComponentProperties moduleProps = f.getComponentProperties();
         moduleProps = checkAndBeforeActivate(f, "moduleName", moduleProps);
         SchemaElement prop = (SchemaElement) f.getChild("moduleName");
         assertTrue(prop.getPossibleValues().size() > 100);
@@ -383,7 +383,7 @@ public class SalesforceLocalComponentTestIT extends AbstractComponentTestIT {
         setupProps(props.connection);
 
         Form f = props.module.getForm(Form.REFERENCE);
-        SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
+        SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getComponentProperties();
         moduleProps = (SalesforceModuleProperties) checkAndBeforeActivate(f, "moduleName", moduleProps);
         moduleProps.setValue(moduleProps.moduleName, "Account");
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
@@ -639,7 +639,7 @@ public class SalesforceLocalComponentTestIT extends AbstractComponentTestIT {
 
         if (false) {
             Form f = props.module.getForm(Form.REFERENCE);
-            SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
+            SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getComponentProperties();
             moduleProps = (SalesforceModuleProperties) checkAndBeforePresent(f, "moduleName", moduleProps);
             moduleProps.setValue(moduleProps.moduleName, "Account");
             checkAndAfter(f, "moduleName", moduleProps);

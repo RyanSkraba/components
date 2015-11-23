@@ -35,7 +35,7 @@ public class SalesforceConnectionWizard extends ComponentWizard {
 
     public void setupProperties(SalesforceConnectionProperties cProps) {
         // Update the connection form properties
-        getForms().get(0).setProperties(cProps);
+        getForms().get(0).setComponentProperties(cProps);
         mProps.setConnection(cProps);
     }
 

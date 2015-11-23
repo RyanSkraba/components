@@ -18,7 +18,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.talend.components.api.ComponentTestUtils;
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.testcomponent.TestComponentWizard;
 import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
 
@@ -51,7 +50,7 @@ public class WizardTest {
         assertEquals("testLoc", wiz.getRepositoryLocation());
         assertTrue(cwd == wiz.getDefinition());
         assertEquals(1, wiz.getForms().size());
-        assertTrue(wiz.props == wiz.getForms().get(0).getProperties());
+        assertTrue(wiz.props == wiz.getForms().get(0).getComponentProperties());
     }
 
 }
