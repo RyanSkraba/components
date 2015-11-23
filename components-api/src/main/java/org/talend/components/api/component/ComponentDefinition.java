@@ -22,31 +22,14 @@ import org.talend.components.api.runtime.ComponentRuntime;
  * Component definition service.
  * <p/>
  * An instance of this class handles the setup of the properties associated with a components.
- *
- * @author Francis Upton
  */
 
 public interface ComponentDefinition extends TopLevelDefinition {
 
     /**
-     * Component categorization - this is an issue that wants further study. - which designer (big data, di, etc) and
-     * then which family.
+     * Returns an array of paths that represent the categories of the component.
      */
-    // FIXME - this needs to be corrected TCOMP-26
-    public static final String FAMILY_BUSINESS = "Business/Salesforce";
-
-    public static final String FAMILY_CLOUD = "Cloud/Salesforce";
-
-    /*
-     * Where do we specify a wizard is required? Maybe list of groups that comprise wizard.
-     */
-
-    /*
-     * Intercomponent property references - need examples for this. - shared clumps of properties, referring to
-     * properties in the same job, refers to properties upstream in the connection.
-     * 
-     * all properties should support context variables (non-text properties need this).
-     */
+    public String[] getFamilies();
 
     public ComponentProperties createProperties();
 
@@ -56,10 +39,6 @@ public interface ComponentDefinition extends TopLevelDefinition {
      * @return a {@link ComponentRuntime} object.
      */
     public ComponentRuntime createRuntime();
-
-    // public void setDesignerFamily(Family family);
-
-    public String[] getSupportedFamilies();
 
     public ComponentConnector[] getConnectors();
 

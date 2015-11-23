@@ -113,6 +113,12 @@ public class LocalComponentTestIT extends AbstractComponentTestIT {
     }
 
     @Test
+    public void testFamilies() {
+        TestComponentDefinition testComponentDefinition = new TestComponentDefinition();
+        assertEquals(2, testComponentDefinition.getFamilies().length);
+    }
+
+    @Test
     public void testAlli18n() {
         ComponentTestUtils.testAlli18n(componentService);
     }

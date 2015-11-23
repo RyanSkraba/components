@@ -32,8 +32,8 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     }
 
     @Override
-    public String[] getSupportedFamilies() {
-        return new String[] { ComponentDefinition.FAMILY_BUSINESS, ComponentDefinition.FAMILY_CLOUD };
+    public String[] getFamilies() {
+        return new String[] { "level1/level2", "newlevel1/newlevel2" };
     }
 
     @Override

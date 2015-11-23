@@ -16,6 +16,11 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
 
     protected Class<?> propertiesClass;
 
+    public String[] getFamilies() {
+        // Subclass me
+        return new String[] {};
+    }
+
     @Override
     public ComponentConnector[] getConnectors() {
         return connectors;

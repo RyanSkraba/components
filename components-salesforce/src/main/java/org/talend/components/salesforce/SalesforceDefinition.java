@@ -28,13 +28,13 @@ public abstract class SalesforceDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public ComponentRuntime createRuntime() {
-        return new SalesforceRuntime();
+    public String[] getFamilies() {
+        return new String[] { "Business/Salesforce", "Cloud/Salesforce" };
     }
 
     @Override
-    public String[] getSupportedFamilies() {
-        return new String[] { ComponentDefinition.FAMILY_BUSINESS, ComponentDefinition.FAMILY_CLOUD };
+    public ComponentRuntime createRuntime() {
+        return new SalesforceRuntime();
     }
 
     @Override

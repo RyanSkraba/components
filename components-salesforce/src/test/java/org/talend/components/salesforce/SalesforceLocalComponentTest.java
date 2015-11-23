@@ -18,11 +18,13 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.talend.components.api.ComponentTestUtils;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
+import org.talend.components.api.service.testcomponent.TestComponentDefinition;
 import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
@@ -32,13 +34,11 @@ public class SalesforceLocalComponentTest {
 
     ComponentService componentService = new ComponentServiceImpl(null);
 
-    @BeforeClass
-    public static void init() {
+    @BeforeClass public static void init() {
         ComponentTestUtils.setupGlobalContext();
     }
 
-    @AfterClass
-    public static void unset() {
+    @AfterClass public static void unset() {
         ComponentTestUtils.unsetGlobalContext();
     }
 
@@ -51,8 +51,7 @@ public class SalesforceLocalComponentTest {
         return componentService.afterProperty(propName, props);
     }
 
-    @Test
-    public void testGetProps() {
+    @Test public void testGetProps() {
         ComponentProperties props = new TSalesforceConnectionDefinition().createProperties();
         Form f = props.getForm(Form.MAIN);
         ComponentTestUtils.checkSerialize(props);
@@ -61,8 +60,7 @@ public class SalesforceLocalComponentTest {
         assertEquals(Form.MAIN, f.getName());
     }
 
-    @Test
-    public void testAfterLoginType() throws Throwable {
+    @Test public void testAfterLoginType() throws Throwable {
         ComponentProperties props;
 
         props = new TSalesforceConnectionDefinition().createProperties();
@@ -86,8 +84,7 @@ public class SalesforceLocalComponentTest {
         assertTrue(mainForm.getWidget(OauthProperties.class).isVisible());
     }
 
-    @Test
-    public void testInputProps() throws Throwable {
+    @Test public void testInputProps() throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputDefinition().createProperties();
         assertEquals(2, props.queryMode.getPossibleValues().size());
         SchemaElement returns = props.getProperty(ComponentProperties.RETURNS);
