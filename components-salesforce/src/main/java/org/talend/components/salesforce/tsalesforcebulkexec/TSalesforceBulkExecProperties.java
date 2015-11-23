@@ -12,9 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcebulkexec;
 
-import static org.talend.components.api.properties.presentation.Widget.*;
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.properties.PropertyFactory.newProperty;
+import static org.talend.components.api.properties.presentation.Widget.widget;
 
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.salesforce.SalesforceBulkProperties;
@@ -22,7 +23,7 @@ import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputPrope
 
 public class TSalesforceBulkExecProperties extends TSalesforceOutputProperties {
 
-    public SchemaElement bulkFilePath = newProperty("bulkFilePath");
+    public Property bulkFilePath = newProperty("bulkFilePath");
 
     public SalesforceBulkProperties bulkProperties = new SalesforceBulkProperties("bulkProperties");
 

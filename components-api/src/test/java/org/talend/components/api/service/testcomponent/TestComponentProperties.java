@@ -12,17 +12,17 @@
 // ============================================================================
 package org.talend.components.api.service.testcomponent;
 
+import static org.talend.components.api.properties.PropertyFactory.newProperty;
 import static org.talend.components.api.properties.presentation.Widget.widget;
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
-import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
 
@@ -30,13 +30,13 @@ public class TestComponentProperties extends ComponentProperties {
 
     public static final String USER_ID_PROP_NAME = "userId"; //$NON-NLS-1$
 
-    public SchemaElement userId = newProperty(USER_ID_PROP_NAME).setRequired(true);
+    public Property userId = (Property) newProperty(USER_ID_PROP_NAME).setRequired(true);
 
-    public SchemaElement password = newProperty("password").setRequired(true);
+    public Property password = (Property) newProperty("password").setRequired(true);
 
-    public SchemaElement nameList = newProperty("nameList");
+    public Property nameList = newProperty("nameList");
 
-    public SchemaElement nameListRef = newProperty("nameListRef");
+    public Property nameListRef = newProperty("nameListRef");
 
     public NestedComponentProperties nestedProps = new NestedComponentProperties("nestedProps");
 

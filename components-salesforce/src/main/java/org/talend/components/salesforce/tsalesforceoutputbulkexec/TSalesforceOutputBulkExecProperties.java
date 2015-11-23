@@ -12,14 +12,12 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutputbulkexec;
 
+import static org.talend.components.api.properties.presentation.Widget.widget;
+
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.salesforce.SalesforceBulkProperties;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
-import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
-
-import static org.talend.components.api.properties.presentation.Widget.widget;
 
 public class TSalesforceOutputBulkExecProperties extends TSalesforceOutputProperties {
 

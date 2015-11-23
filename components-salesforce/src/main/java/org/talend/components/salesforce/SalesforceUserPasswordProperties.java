@@ -12,15 +12,16 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.properties.PropertyFactory.newString;
 
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.common.UserPasswordProperties;
 
 public class SalesforceUserPasswordProperties extends UserPasswordProperties {
 
-    public SchemaElement securityKey = newString("securityKey").setRequired(); //$NON-NLS-1$
+    public Property securityKey = (Property) newString("securityKey").setRequired(); //$NON-NLS-1$
 
     public SalesforceUserPasswordProperties(String name) {
         super(name);

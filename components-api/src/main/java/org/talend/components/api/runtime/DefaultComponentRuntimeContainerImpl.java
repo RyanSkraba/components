@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.talend.components.api.runtime.ComponentDynamicHolder;
-import org.talend.components.api.runtime.ComponentRuntimeContainer;
 import org.talend.components.api.schema.SchemaElement;
 
 /**

@@ -12,20 +12,23 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
+import static org.talend.components.api.properties.PropertyFactory.newProperty;
 
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 
 public class ProxyProperties extends ComponentProperties {
 
-    public SchemaElement useProxy = newProperty(SchemaElement.Type.BOOLEAN, "useProxy").setRequired(true); //$NON-NLS-1$
+    public Property useProxy = (Property) newProperty(SchemaElement.Type.BOOLEAN, "useProxy").setRequired(true); //$NON-NLS-1$
 
     private static final String HOST = "host";
-    public SchemaElement host = newProperty(HOST).setRequired(true);
+
+    public Property host = (Property) newProperty(HOST).setRequired(true);
 
     private static final String USERPASSWORD = "userPassword";
+
     public UserPasswordProperties userPassword = new UserPasswordProperties(USERPASSWORD);
 
     public ProxyProperties(String name) {

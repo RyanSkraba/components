@@ -12,10 +12,12 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.properties.presentation.Widget.*;
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.properties.PropertyFactory.newProperty;
+import static org.talend.components.api.properties.presentation.Widget.widget;
 
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Property;
+import org.talend.components.api.properties.PropertyFactory;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.schema.Schema;
@@ -32,7 +34,7 @@ public class SchemaProperties extends ComponentProperties {
     // Properties
     //
     // FIXME - change to Schema
-    public SchemaElement schema = newProperty(SchemaElement.Type.SCHEMA, "schema"); //$NON-NLS-1$
+    public Property schema = newProperty(SchemaElement.Type.SCHEMA, "schema"); //$NON-NLS-1$
 
     @Override
     public SchemaProperties init() {
@@ -60,7 +62,7 @@ public class SchemaProperties extends ComponentProperties {
         }
         SchemaElement root = s.getRoot();
         if (root == null) {
-            root = SchemaFactory.newProperty("Root"); //$NON-NLS-1$
+            root = PropertyFactory.newProperty("Root"); //$NON-NLS-1$
             s.setRoot(root);
         }
         root.addChild(row);

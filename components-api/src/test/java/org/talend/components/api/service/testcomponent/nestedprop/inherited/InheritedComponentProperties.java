@@ -12,16 +12,16 @@
 // ============================================================================
 package org.talend.components.api.service.testcomponent.nestedprop.inherited;
 
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.properties.PropertyFactory.newProperty;
 
-import org.talend.components.api.schema.SchemaElement;
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 
 public class InheritedComponentProperties extends NestedComponentProperties {
 
     public static final String A_GREAT_PROP_NAME3 = "aGreatProp3"; //$NON-NLS-1$
 
-    public SchemaElement aGreatProperty3 = newProperty(A_GREAT_PROP_NAME3);
+    public Property aGreatProperty3 = newProperty(A_GREAT_PROP_NAME3);
 
     public InheritedComponentProperties(String name) {
         super(name);

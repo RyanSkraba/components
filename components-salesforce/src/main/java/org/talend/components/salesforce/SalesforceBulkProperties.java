@@ -12,9 +12,11 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.properties.PropertyFactory.newEnum;
+import static org.talend.components.api.properties.PropertyFactory.newInteger;
 
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 
@@ -24,13 +26,13 @@ public class SalesforceBulkProperties extends ComponentProperties {
 
     public static final String CONCURRENCY_SERIAL = "Serial";
 
-    public SchemaElement concurrencyMode = newEnum("concurrencyMode", CONCURRENCY_PARALLEL, CONCURRENCY_SERIAL);
+    public Property concurrencyMode = newEnum("concurrencyMode", CONCURRENCY_PARALLEL, CONCURRENCY_SERIAL);
 
-    public SchemaElement bytesToCommit = newInteger("bytesToCommit", "10485760");
+    public Property bytesToCommit = newInteger("bytesToCommit", "10485760");
 
-    public SchemaElement rowsToCommit = newInteger("rowsToCommit", "10000");
+    public Property rowsToCommit = newInteger("rowsToCommit", "10000");
 
-    public SchemaElement waitTimeCheckBatchState = newInteger("waitTimeCheckBatchState");
+    public Property waitTimeCheckBatchState = newInteger("waitTimeCheckBatchState");
 
     public SalesforceBulkProperties(String name) {
         super(name);

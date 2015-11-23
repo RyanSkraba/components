@@ -30,7 +30,7 @@ import com.cedarsoftware.util.io.JsonWriter;
  * include those for desktop (Eclipse), web, and scripting. All of these will use the code defined here for their
  * construction and validation.
  * <p/>
- * All aspects of the properties are defined in a subclass of this class using the {@link SchemaElement},
+ * All aspects of the properties are defined in a subclass of this class using the {@link Property},
  * {@Link PresentationItem}, {@link Widget}, and {@link Form} classes. In addition in cases where user interface
  * decisions are made in code, methods can be added to the subclass to influence the flow of the user interface and help
  * with validation.
@@ -42,8 +42,8 @@ import com.cedarsoftware.util.io.JsonWriter;
  * A property is defined using a field in a subclass of this class. Each property field is initialized with one of the
  * following:
  * <ol>
- * <li>For a single property, a {@link SchemaElement} object, usually using a static method from the
- * {@link org.talend.components.api.schema.SchemaFactory}.</li>
+ * <li>For a single property, a {@link Property} object, usually using a static method from the
+ * {@link PropertyFactory}.</li>
  * <li>For a reference to other properties, a subclass of {@code ComponentProperties}.</li>
  * <li>For a presentation item that's not actually a property, but is necessary for the user interface, a
  * {@link PresentationItem}.</li>
@@ -99,7 +99,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
      * A special property for the values that a component returns. If this is used, this will be a {@link SchemaElement}
      * that contains each of the values the component returns.
      */
-    protected SchemaElement returns;
+    protected Property returns;
 
     /**
      * Holder class for the results of a deserialization.

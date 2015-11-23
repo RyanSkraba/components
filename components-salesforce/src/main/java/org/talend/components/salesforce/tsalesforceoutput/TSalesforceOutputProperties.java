@@ -12,10 +12,11 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
-import static org.talend.components.api.properties.presentation.Widget.*;
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.properties.PropertyFactory.*;
+import static org.talend.components.api.properties.presentation.Widget.widget;
 
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.schema.Schema;
@@ -35,34 +36,33 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
     public static final String ACTION_DELETE = "DELETE";
 
     public enum OutputAction {
-        INSERT,
-        UPDATE,
-        UPSERT,
-        DELETE
+                              INSERT,
+                              UPDATE,
+                              UPSERT,
+                              DELETE
     }
 
-    public SchemaElement outputAction = newEnum("outputAction", ACTION_INSERT, ACTION_UPDATE, ACTION_UPSERT,
-            ACTION_DELETE); //$NON-NLS-1$
+    public Property outputAction = newEnum("outputAction", ACTION_INSERT, ACTION_UPDATE, ACTION_UPSERT, ACTION_DELETE); // $NON-NLS-1$
 
-    public SchemaElement upsertKeyColumn = newString("upsertKeyColumn"); //$NON-NLS-1$
+    public Property upsertKeyColumn = newString("upsertKeyColumn"); //$NON-NLS-1$
 
     //
     // Advanced
     //
-    public SchemaElement extendInsert = newBoolean("extendInsert"); //$NON-NLS-1$
+    public Property extendInsert = newBoolean("extendInsert"); //$NON-NLS-1$
 
-    public SchemaElement ceaseForError = newBoolean("ceaseForError"); //$NON-NLS-1$
+    public Property ceaseForError = newBoolean("ceaseForError"); //$NON-NLS-1$
 
-    public SchemaElement ignoreNull = newBoolean("ignoreNull"); //$NON-NLS-1$
+    public Property ignoreNull = newBoolean("ignoreNull"); //$NON-NLS-1$
 
-    public SchemaElement retrieveInsertId = newString("retrieveInsertId"); //$NON-NLS-1$
+    public Property retrieveInsertId = newString("retrieveInsertId"); //$NON-NLS-1$
 
-    public SchemaElement commitLevel = newString("commitLevel"); //$NON-NLS-1$
+    public Property commitLevel = newString("commitLevel"); //$NON-NLS-1$
 
     // FIXME - should be file
-    public SchemaElement logFileName = newString("logFileName"); //$NON-NLS-1$
+    public Property logFileName = newString("logFileName"); //$NON-NLS-1$
 
-    public SchemaElement upsertRelation = newProperty("upsertRelation").setOccurMaxTimes(INFINITE); //$NON-NLS-1$
+    public Property upsertRelation = (Property) newProperty("upsertRelation").setOccurMaxTimes(INFINITE); //$NON-NLS-1$
 
     //
     // Collections
@@ -83,7 +83,8 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
             super(name);
         }
 
-        @Override public void afterModuleName() throws Exception {
+        @Override
+        public void afterModuleName() throws Exception {
             super.afterModuleName();
             Schema s = (Schema) schema.getValue(schema.schema);
             // FIXME - we probably only want the names, not the SchemaElements
@@ -94,7 +95,7 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
 
     public static final boolean POLY = true;
 
-    public static void setupUpsertRelation(SchemaElement ur, boolean poly) {
+    public static void setupUpsertRelation(Property ur, boolean poly) {
         // They might have been set previously in some inheritance cases
         ur.setChildren(null);
         ur.addChild(newProperty("columnName")); //$NON-NLS-1$
@@ -106,7 +107,8 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
         ur.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
     }
 
-    @Override public ComponentProperties init() {
+    @Override
+    public ComponentProperties init() {
         returns = setReturnsProperty();
         newReturnProperty(returns, SchemaElement.Type.INT, "NB_LINE"); //$NON-NLS-1$
         newReturnProperty(returns, SchemaElement.Type.INT, "NB_SUCCESS"); //$NON-NLS-1$
@@ -124,7 +126,8 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
         return this;
     }
 
-    @Override public void setupLayout() {
+    @Override
+    public void setupLayout() {
         super.setupLayout();
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(outputAction);

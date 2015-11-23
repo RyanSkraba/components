@@ -12,10 +12,11 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutputbulk;
 
+import static org.talend.components.api.properties.PropertyFactory.newProperty;
 import static org.talend.components.api.properties.presentation.Widget.widget;
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
 
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.schema.SchemaElement;
@@ -24,13 +25,13 @@ import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputPrope
 
 public class TSalesforceOutputBulkProperties extends ComponentProperties {
 
-    public SchemaElement fileName = newProperty("fileName"); //$NON-NLS-1$
+    public Property fileName = newProperty("fileName"); //$NON-NLS-1$
 
-    public SchemaElement append = newProperty(SchemaElement.Type.BOOLEAN, "append"); //$NON-NLS-1$
+    public Property append = newProperty(SchemaElement.Type.BOOLEAN, "append"); //$NON-NLS-1$
 
-    public SchemaElement ignoreNull = newProperty(SchemaElement.Type.BOOLEAN, "ignoreNull"); //$NON-NLS-1$
+    public Property ignoreNull = newProperty(SchemaElement.Type.BOOLEAN, "ignoreNull"); //$NON-NLS-1$
 
-    public SchemaElement upsertRelation = newProperty("upsertRelation").setOccurMaxTimes(-1); //$NON-NLS-1$
+    public Property upsertRelation = (Property) newProperty("upsertRelation").setOccurMaxTimes(-1); //$NON-NLS-1$
 
     //
     // Collections

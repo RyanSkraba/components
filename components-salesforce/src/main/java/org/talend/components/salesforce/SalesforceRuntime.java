@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.NameAndLabel;
+import org.talend.components.api.properties.PropertyFactory;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.runtime.ComponentDynamicHolder;
 import org.talend.components.api.runtime.ComponentRuntime;
@@ -291,13 +292,13 @@ public class SalesforceRuntime extends ComponentRuntime {
 
     public Schema getSchema(String module) throws ConnectionException {
         Schema schema = SchemaFactory.newSchema();
-        SchemaElement root = SchemaFactory.newProperty("Root");
+        SchemaElement root = SchemaFactory.newSchemaElement("Root");
         schema.setRoot(root);
 
         DescribeSObjectResult[] describeSObjectResults = connection.describeSObjects(new String[] { module });
         Field fields[] = describeSObjectResults[0].getFields();
         for (Field field : fields) {
-            SchemaElement child = SchemaFactory.newProperty(field.getName());
+            SchemaElement child = PropertyFactory.newProperty(field.getName());
             setupSchemaElement(field, child);
             root.addChild(child);
         }

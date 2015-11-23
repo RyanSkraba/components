@@ -12,11 +12,12 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
+import static org.talend.components.api.properties.PropertyFactory.*;
 import static org.talend.components.api.properties.presentation.Widget.widget;
-import static org.talend.components.api.schema.SchemaFactory.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.PresentationItem;
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget.WidgetType;
@@ -37,25 +38,25 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     //
 
     // Only for the wizard use
-    public SchemaElement name = newString("name").setRequired();
+    public Property name = (Property) newString("name").setRequired();
 
-    public SchemaElement referencedComponentId = newString("referencedComponentId");
+    public Property referencedComponentId = newString("referencedComponentId");
 
     public static final String LOGIN_BASIC = "Basic";
 
     public static final String LOGIN_OAUTH = "OAuth";
 
-    public SchemaElement loginType = newEnum("loginType", LOGIN_BASIC, LOGIN_OAUTH).setRequired();
+    public Property loginType = (Property) newEnum("loginType", LOGIN_BASIC, LOGIN_OAUTH).setRequired();
 
-    public SchemaElement bulkConnection = newBoolean("bulkConnection"); //$NON-NLS-1$
+    public Property bulkConnection = newBoolean("bulkConnection"); //$NON-NLS-1$
 
-    public SchemaElement needCompression = newBoolean("needCompression"); //$NON-NLS-1$
+    public Property needCompression = newBoolean("needCompression"); //$NON-NLS-1$
 
-    public SchemaElement timeout = newInteger("timeout"); //$NON-NLS-1$
+    public Property timeout = newInteger("timeout"); //$NON-NLS-1$
 
-    public SchemaElement httpTraceMessage = newString("httpTraceMessage"); //$NON-NLS-1$
+    public Property httpTraceMessage = newString("httpTraceMessage"); //$NON-NLS-1$
 
-    public SchemaElement clientId = newString("clientId"); //$NON-NLS-1$
+    public Property clientId = newString("clientId"); //$NON-NLS-1$
 
     //
     // Presentation items

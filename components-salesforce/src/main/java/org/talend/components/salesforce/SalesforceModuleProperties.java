@@ -12,13 +12,14 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.presentation.Widget.*;
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.properties.PropertyFactory.newString;
+import static org.talend.components.api.properties.presentation.Widget.widget;
 
 import java.util.List;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.NameAndLabel;
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
@@ -32,7 +33,7 @@ public class SalesforceModuleProperties extends ComponentProperties {
     //
     // Properties
     //
-    public SchemaElement moduleName = newString("moduleName"); //$NON-NLS-1$
+    public Property moduleName = newString("moduleName"); //$NON-NLS-1$
 
     public SchemaProperties schema = new SchemaProperties("schema").init();
 

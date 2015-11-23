@@ -12,9 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceinput;
 
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.properties.PropertyFactory.*;
 
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
@@ -25,24 +26,24 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
     public static final String QUERY_BULK = "Bulk";
 
-    public SchemaElement queryMode = newProperty(SchemaElement.Type.ENUM, "queryMode"); //$NON-NLS-1$
+    public Property queryMode = newProperty(SchemaElement.Type.ENUM, "queryMode"); //$NON-NLS-1$
 
-    public SchemaElement condition = newProperty("condition"); //$NON-NLS-1$
+    public Property condition = newProperty("condition"); //$NON-NLS-1$
 
-    public SchemaElement manualQuery = newProperty(SchemaElement.Type.BOOLEAN, "manualQuery"); //$NON-NLS-1$
+    public Property manualQuery = newProperty(SchemaElement.Type.BOOLEAN, "manualQuery"); //$NON-NLS-1$
 
-    public SchemaElement query = newProperty("query"); //$NON-NLS-1$
+    public Property query = newProperty("query"); //$NON-NLS-1$
 
-    public SchemaElement includeDeleted = newProperty(SchemaElement.Type.BOOLEAN, "includeDeleted"); //$NON-NLS-1$
+    public Property includeDeleted = newProperty(SchemaElement.Type.BOOLEAN, "includeDeleted"); //$NON-NLS-1$
 
     //
     // Advanced
     //
-    public SchemaElement batchSize = newProperty(SchemaElement.Type.INT, "batchSize"); //$NON-NLS-1$
+    public Property batchSize = newProperty(SchemaElement.Type.INT, "batchSize"); //$NON-NLS-1$
 
-    public SchemaElement normalizeDelimiter = newProperty("normalizeDelimiter"); //$NON-NLS-1$
+    public Property normalizeDelimiter = newProperty("normalizeDelimiter"); //$NON-NLS-1$
 
-    public SchemaElement columnNameDelimiter = newProperty("columnNameDelimiter"); //$NON-NLS-1$
+    public Property columnNameDelimiter = newProperty("columnNameDelimiter"); //$NON-NLS-1$
 
     public TSalesforceInputProperties(String name) {
         super(name);

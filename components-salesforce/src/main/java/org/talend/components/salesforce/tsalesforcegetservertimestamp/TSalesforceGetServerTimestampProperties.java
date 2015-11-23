@@ -13,6 +13,7 @@
 package org.talend.components.salesforce.tsalesforcegetservertimestamp;
 
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.PropertyFactory;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaFactory;
@@ -37,7 +38,7 @@ public class TSalesforceGetServerTimestampProperties extends ComponentProperties
         super.init();
         Schema s = (Schema) schema.getValue(schema.schema);
         s.setRoot(SchemaFactory.newSchemaElement(Type.GROUP, "Root"));
-        s.getRoot().addChild(SchemaFactory.newDate("ServerTimestamp"));
+        s.getRoot().addChild(PropertyFactory.newDate("ServerTimestamp"));
         return this;
     }
 

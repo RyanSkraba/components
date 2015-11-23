@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.api.service.testcomponent;
 
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.properties.PropertyFactory.newProperty;
 
 import org.talend.components.api.context.GlobalContext;
 import org.talend.components.api.properties.ComponentProperties;

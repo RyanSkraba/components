@@ -12,8 +12,6 @@
 // ============================================================================
 package org.talend.components.api;
 
-import org.talend.components.api.i18n.Translatable;
-
 /**
  * Indentable toString method.
  *

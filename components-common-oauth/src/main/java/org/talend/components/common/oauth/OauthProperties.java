@@ -12,23 +12,23 @@
 // ============================================================================
 package org.talend.components.common.oauth;
 
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.properties.PropertyFactory.newProperty;
 
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.schema.SchemaElement;
 
 public class OauthProperties extends ComponentProperties {
 
-    public SchemaElement clientId = newProperty("clientId").setRequired(true); //$NON-NLS-1$
+    public Property clientId = (Property) newProperty("clientId").setRequired(true); //$NON-NLS-1$
 
-    public SchemaElement clientSecret = newProperty("clientSecret").setRequired(true); //$NON-NLS-1$
+    public Property clientSecret = (Property) newProperty("clientSecret").setRequired(true); //$NON-NLS-1$
 
-    public SchemaElement callbackHost = newProperty("callbackHost").setRequired(true); //$NON-NLS-1$
+    public Property callbackHost = (Property) newProperty("callbackHost").setRequired(true); //$NON-NLS-1$
 
-    public SchemaElement callbackPort = newProperty(SchemaElement.Type.INT, "callbackPort").setRequired(true); //$NON-NLS-1$
+    public Property callbackPort = (Property) newProperty(Type.INT, "callbackPort").setRequired(true); //$NON-NLS-1$
 
-    public SchemaElement tokenFile = newProperty("tokenFile").setRequired(true); //$NON-NLS-1$
+    public Property tokenFile = (Property) newProperty("tokenFile").setRequired(true); //$NON-NLS-1$
 
     public OauthProperties(String name) {
         super(name);

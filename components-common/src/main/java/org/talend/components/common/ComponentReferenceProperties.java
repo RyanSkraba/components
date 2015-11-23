@@ -12,13 +12,13 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.properties.presentation.Widget.*;
-import static org.talend.components.api.schema.SchemaFactory.*;
+import static org.talend.components.api.properties.PropertyFactory.newProperty;
+import static org.talend.components.api.properties.presentation.Widget.widget;
 
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
-import org.talend.components.api.schema.SchemaElement;
 
 /**
  * A reference to another component. This could be in one of the following states:
@@ -37,16 +37,15 @@ public class ComponentReferenceProperties extends ComponentProperties {
     //
     // Properties
     //
-    public SchemaElement referenceType = newProperty("referenceType").setEnumClass(ReferenceType.class); //$NON-NLS-1$
+    public Property referenceType = (Property) newProperty("referenceType").setEnumClass(ReferenceType.class); //$NON-NLS-1$
 
-    public SchemaElement componentType = newProperty("componentType"); //$NON-NLS-1$
+    public Property componentType = newProperty("componentType"); //$NON-NLS-1$
 
-    public SchemaElement componentInstanceId = newProperty("componentInstanceId"); //$NON-NLS-1$
+    public Property componentInstanceId = newProperty("componentInstanceId"); //$NON-NLS-1$
 
     public ComponentReferenceProperties(String name) {
         super(name);
     }
-
 
     @Override
     protected void setupLayout() {

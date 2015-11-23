@@ -12,16 +12,16 @@
 // ============================================================================
 package org.talend.components.api.service.testcomponent;
 
-import static org.talend.components.api.schema.SchemaFactory.newProperty;
+import static org.talend.components.api.properties.PropertyFactory.newProperty;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.schema.SchemaElement;
+import org.talend.components.api.properties.Property;
 
 public class NestedComponentProperties extends ComponentProperties {
 
     public static final String A_GREAT_PROP_NAME = "aGreatProp"; //$NON-NLS-1$
 
-    public SchemaElement aGreatProperty = newProperty(A_GREAT_PROP_NAME);
+    public Property aGreatProperty = newProperty(A_GREAT_PROP_NAME);
 
     public NestedComponentProperties(String name) {
         super(name);

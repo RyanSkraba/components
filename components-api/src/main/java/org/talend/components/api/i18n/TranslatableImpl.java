@@ -14,7 +14,6 @@ package org.talend.components.api.i18n;
 
 import org.talend.components.api.context.GlobalContext;
 import org.talend.daikon.i18n.I18nMessages;
-import org.talend.daikon.i18n.I18nMessages;
 
 /**
  * created by sgandon on 18 sept. 2015

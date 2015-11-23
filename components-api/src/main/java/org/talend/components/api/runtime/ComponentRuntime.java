@@ -1,6 +1,5 @@
 package org.talend.components.api.runtime;
 
-import java.util.List;
 import java.util.Map;
 
 import org.talend.components.api.properties.ComponentProperties;
