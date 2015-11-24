@@ -21,6 +21,7 @@ import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Repository;
+import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
@@ -108,6 +109,10 @@ public interface ComponentService extends Repository {
      * @return the list of compatbible {@link ComponentDefinition} objects.
      */
     List<ComponentDefinition> getPossibleComponents(ComponentProperties properties) throws Throwable;
+
+    ComponentProperties makeFormCancelable(ComponentProperties properties, String formName);
+
+    ComponentProperties commitFormValues(ComponentProperties properties, String formName);
 
     ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable;
 

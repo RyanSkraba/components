@@ -16,14 +16,28 @@ import static org.talend.components.api.properties.PropertyFactory.newProperty;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
+import org.talend.components.api.properties.presentation.Form;
 
 public class NestedComponentProperties extends ComponentProperties {
 
-    public static final String A_GREAT_PROP_NAME = "aGreatProp"; //$NON-NLS-1$
+    public static final String A_GREAT_PROP_NAME = "aGreatProperty"; //$NON-NLS-1$
 
     public Property aGreatProperty = newProperty(A_GREAT_PROP_NAME);
+
+    public Property anotherProp = newProperty("anotherProp");
 
     public NestedComponentProperties(String name) {
         super(name);
     }
+
+    public ComponentProperties init() {
+        super.init();
+        Form form = Form.create(this, Form.MAIN, "Nested Component");
+        form.addRow(aGreatProperty);
+        form.addRow(anotherProp);
+
+        return this;
+
+    }
+
 }

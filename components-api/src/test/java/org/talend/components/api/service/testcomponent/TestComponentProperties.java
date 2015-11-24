@@ -38,17 +38,26 @@ public class TestComponentProperties extends ComponentProperties {
 
     public Property nameListRef = newProperty("nameListRef");
 
-    public NestedComponentProperties nestedProps = new NestedComponentProperties("nestedProps");
+    public Property integer = newProperty(Type.INT, "integer");
 
-    public ComponentPropertiesWithDefinedI18N nestedProp2 = new ComponentPropertiesWithDefinedI18N("nestedProp2");
+    public Property decimal = newProperty(Type.INT, "decimal");
 
-    public InheritedComponentProperties nestedProp3 = new InheritedComponentProperties("nestedProp3");
+    public Property date = newProperty(Type.DATE, "date");
+
+    public Property dateTime = newProperty(Type.DATETIME, "dateTime");
+
+    public NestedComponentProperties nestedProps = (NestedComponentProperties) new NestedComponentProperties("nestedProps");
+
+    public ComponentPropertiesWithDefinedI18N nestedProp2 = (ComponentPropertiesWithDefinedI18N) new ComponentPropertiesWithDefinedI18N(
+            "nestedProp2");
+
+    public InheritedComponentProperties nestedProp3 = (InheritedComponentProperties) new InheritedComponentProperties(
+            "nestedProp3");
 
     public static final String TESTCOMPONENT = "TestComponent";
 
     public TestComponentProperties(String name) {
         super(name);
-        init();
     }
 
     public void beforeNameList() {
@@ -70,6 +79,16 @@ public class TestComponentProperties extends ComponentProperties {
         form.addRow(password);
         form.addRow(widget(nameList).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
         form.addRow(widget(nameListRef).setWidgetType(Widget.WidgetType.NAME_SELECTION_REFERENCE));
+
+        form = Form.create(this, "restoreTest", "Restore Test");
+        form.addRow(userId);
+        form.addRow(nameList);
+        form.addRow(integer);
+        form.addRow(decimal);
+        form.addRow(date);
+        form.addRow(dateTime);
+        form.addRow(nestedProps.getForm(Form.MAIN));
         return this;
+
     }
 }

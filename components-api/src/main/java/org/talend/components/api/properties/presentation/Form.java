@@ -22,6 +22,7 @@ import org.talend.components.api.SimpleNamedThing;
 import org.talend.components.api.ToStringIndent;
 import org.talend.components.api.ToStringIndentUtil;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.schema.SchemaElement;
 
 /**
@@ -65,6 +66,10 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
     private int currentRow;
 
     private int currentColumn;
+
+    private boolean cancelable;
+
+    private Map<String, Object> cancelableValues;
 
     private boolean callBeforeFormPresent;
 
@@ -228,6 +233,55 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
             }
         }
         return null;
+    }
+
+    /**
+     * Sets the value of the given property to the specified value.
+     *
+     * If the form is cancelable (see
+     * {@link org.talend.components.api.service.ComponentService#makeFormCancelable(ComponentProperties, String)}) the
+     * values are stored with the this object and not into the underlying properties until
+     * {@link org.talend.components.api.service.ComponentService#commitFormValues(ComponentProperties, String)} is
+     * called.
+     * <p/>
+     * FIXME - note we need to work out how this happens with the REST API.
+     *
+     * @param property
+     * @param value
+     */
+    public void setValue(String property, Object value) {
+        // FIXME handle cases of qualified property names
+        SchemaElement se = getComponentProperties().getProperty(property);
+        if (!(se instanceof Property)) {
+            throw new IllegalArgumentException("Attempted to set value on " + se + " which is not a Property");
+        }
+        Property p = (Property) se;
+        if (cancelable) {
+            if (cancelableValues == null) {
+                throw new IllegalStateException("Cannot setValue on " + property + " after commitValues() has been called");
+            }
+            cancelableValues.put(property, value);
+        } else {
+            getComponentProperties().setValue(p, value);
+        }
+    }
+
+    // Not API - to be called by ComponentService only
+    public void setCancelable(boolean cancelable) {
+        this.cancelable = cancelable;
+        cancelableValues = null;
+        if (cancelable)
+            cancelableValues = new HashMap<>();
+    }
+
+    // Not API - to be called by ComponentService only
+    public void commitValues() {
+        if (cancelableValues == null)
+            return;
+        for (String key : cancelableValues.keySet()) {
+            ((Property) getComponentProperties().getProperty(key)).setValue(cancelableValues.get(key));
+        }
+        cancelableValues = null;
     }
 
     public boolean isRefreshUI() {

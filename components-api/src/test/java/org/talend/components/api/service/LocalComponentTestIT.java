@@ -15,6 +15,8 @@ package org.talend.components.api.service;
 import static org.junit.Assert.*;
 
 import java.io.InputStream;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -64,6 +66,56 @@ public class LocalComponentTestIT extends AbstractComponentTestIT {
 
         assertFalse(props.getForm(Form.MAIN).getWidget("nameList").isCallBeforeActivate());
         assertFalse(props.getForm(Form.MAIN).getWidget("nameListRef").isCallBeforePresent());
+    }
+
+    @Test
+    // TCOMP-15 Handle OK/Cancel button on advanced properties dialog from Wizard
+    public void testFormOkCancel() throws Throwable {
+        TestComponentProperties props = (TestComponentProperties) componentService
+                .getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
+
+        ComponentProperties savedProps = props;
+        ComponentProperties savedNested = props.nestedProps;
+
+        Date dateNow = new Date();
+        dateNow.setTime(System.currentTimeMillis());
+        Date dateLater = new Date();
+        dateLater.setTime(dateLater.getTime() + 10000);
+
+        props.setValue(props.userId, "userId");
+        props.setValue(props.integer, 1);
+        props.setValue(props.decimal, 2);
+        props.setValue(props.date, dateNow);
+        props.setValue(props.dateTime, dateNow);
+        props.nestedProps.setValue(props.nestedProps.aGreatProperty, "propPrevious1");
+        props.nestedProps.setValue(props.nestedProps.anotherProp, "propPrevious2");
+
+        props = (TestComponentProperties) componentService.makeFormCancelable(props, "restoreTest");
+
+        Form form = props.getForm("restoreTest");
+
+        form.setValue("userId", "userIdnew");
+        form.setValue("nestedProps.aGreatProperty", "propPrevious1new");
+
+        Date dateTimeLater = new Date();
+
+        form.setValue("integer", 10);
+        form.setValue("decimal", 20);
+        form.setValue("date", dateLater);
+        form.setValue("dateTime", dateLater);
+
+        assertEquals("userId", props.getValue(props.userId));
+        assertEquals("propPrevious1", props.nestedProps.getValue(props.nestedProps.aGreatProperty));
+        assertEquals(1, props.getIntValue(props.integer));
+        // FIXME - finish this
+        //assertEquals(2, props.getDecimalValue(props.decimal));
+        //assertEquals(dateNow, props.getCalendarValue(props.date));
+        assertTrue(props == savedProps);
+        assertTrue(props.nestedProps == savedNested);
+
+        props = (TestComponentProperties) componentService.commitFormValues(props, "restoreTest");
+        assertEquals("userIdnew", props.getValue(props.userId));
+        assertEquals("propPrevious1new", props.nestedProps.getValue(props.nestedProps.aGreatProperty));
     }
 
     @Test

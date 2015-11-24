@@ -145,6 +145,16 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
+    public ComponentProperties makeFormCancelable(ComponentProperties properties, String formName) {
+        return componentServiceDelegate.makeFormCancelable(properties, formName);
+    }
+
+    @Override
+    public ComponentProperties commitFormValues(ComponentProperties properties, String formName) {
+        return componentServiceDelegate.commitFormValues(properties, formName);
+    }
+
+    @Override
     public ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable {
         return componentServiceDelegate.validateProperty(propName, properties);
     }

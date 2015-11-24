@@ -27,12 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.exception.ComponentException;
@@ -136,6 +131,25 @@ public class ComponentServiceSpring implements ComponentService {
                     throws Throwable {
         return componentServiceDelegate.getPossibleComponents(properties);
     }
+
+    @Override
+    @RequestMapping(value = BASE_PATH
+            + "/makeFormCancelable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ComponentProperties makeFormCancelable(
+            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties,
+            @ApiParam(name = "formName", value = "Name of the form") String formName) {
+        return componentServiceDelegate.makeFormCancelable(properties, formName);
+    }
+
+    @Override
+    @RequestMapping(value = BASE_PATH
+            + "/commitFormValues", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ComponentProperties commitFormValues(
+            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties,
+            @ApiParam(name = "formName", value = "Name of the form") String formName) {
+        return componentServiceDelegate.commitFormValues(properties, formName);
+    }
+
 
     @Override
     @RequestMapping(value = BASE_PATH

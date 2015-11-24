@@ -59,6 +59,14 @@ public class PropertiesTest {
     }
 
     @Test
+    public void testGetProperty() {
+        TestComponentProperties props = new TestComponentProperties("test");
+        assertEquals("userId", props.getProperty("userId").getName());
+        assertEquals("integer", props.getProperty("integer").getName());
+        assertEquals("aGreatProperty", props.getProperty("nestedProps.aGreatProperty").getName());
+    }
+
+    @Test
     public void testi18NForComponentDefintion() {
         TestComponentDefinition tcd = new TestComponentDefinition();
         assertEquals("Test Component", tcd.getDisplayName());
@@ -110,7 +118,7 @@ public class PropertiesTest {
         TestComponentProperties componentProperties = new TestComponentProperties("test");
         List<SchemaElement> pList = componentProperties.getProperties();
         assertTrue(pList.get(0) != null);
-        assertEquals(7, pList.size());
+        assertEquals(11, pList.size());
     }
 
     @Test
@@ -119,12 +127,12 @@ public class PropertiesTest {
         List<SchemaElement> pList = componentProperties.getProperties();
         System.out.println(pList);
         assertTrue(pList.get(0) != null);
-        assertEquals(2, pList.size());
+        assertEquals(3, pList.size());
     }
 
     @Test
     public void testGetProps() {
-        TestComponentProperties componentProperties = new TestComponentProperties("test");
+        TestComponentProperties componentProperties = (TestComponentProperties) new TestComponentProperties("test").init();
         Form f = componentProperties.getForm(Form.MAIN);
         assertTrue(f.getWidget("userId").isVisible());
     }
@@ -134,7 +142,7 @@ public class PropertiesTest {
         TestComponentProperties tProps = new TestComponentProperties("test");
         List<String> fieldNames = tProps.getPropertyFieldNames();
         System.out.println(fieldNames);
-        assertEquals(7, fieldNames.size());
+        assertEquals(11, fieldNames.size());
         assertTrue(tProps.userId == tProps.getPropertyByFieldName("userId"));
         assertTrue(tProps.nestedProps == tProps.getPropertyByFieldName("nestedProps"));
     }

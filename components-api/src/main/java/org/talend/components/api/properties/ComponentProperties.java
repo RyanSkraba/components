@@ -3,11 +3,7 @@ package org.talend.components.api.properties;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -46,8 +42,8 @@ import com.cedarsoftware.util.io.JsonWriter;
  * A property is defined using a field in a subclass of this class. Each property field is initialized with one of the
  * following:
  * <ol>
- * <li>For a single property, a {@link Property} object, usually using a static method from the
- * {@link PropertyFactory}.</li>
+ * <li>For a single property, a {@link Property} object, usually using a static method from the {@link PropertyFactory}.
+ * </li>
  * <li>For a reference to other properties, a subclass of {@code ComponentProperties}.</li>
  * <li>For a presentation item that's not actually a property, but is necessary for the user interface, a
  * {@link PresentationItem}.</li>
@@ -239,6 +235,9 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
                     SchemaElement se = (SchemaElement) f.get(this);
                     if (se != null) {
                         properties.add(se);
+                        if (se instanceof Property) {
+                            ((Property) se).setComponentProperties(this);
+                        }
                         // Do not set the i18N for nested ComponentProperties, they already handle their i18n
                         if (!(se instanceof ComponentProperties)) {
                             se.setI18nMessageFormater(getI18nMessageFormater());
@@ -273,6 +272,23 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     }
 
     public SchemaElement getProperty(@NotNull String name) {
+        String[] propComps = name.split("\\.");
+        ComponentProperties currentProps = this;
+        int i = 0;
+        for (String prop : propComps) {
+            if (i++ == propComps.length - 1) {
+                return currentProps.getLocalProperty(prop);
+            }
+            SchemaElement se = currentProps.getLocalProperty(prop);
+            if (!(se instanceof ComponentProperties)) {
+                throw new IllegalArgumentException(prop + " is not a nested ComponentProperties. Processing: " + name);
+            }
+            currentProps = (ComponentProperties) currentProps.getLocalProperty(prop);
+        }
+        return null;
+    }
+
+    protected SchemaElement getLocalProperty(@NotNull String name) {
         List<SchemaElement> properties = getProperties();
         for (SchemaElement prop : properties) {
             if (name.equals(prop.getName())) {

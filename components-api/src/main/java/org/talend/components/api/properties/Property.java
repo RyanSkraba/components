@@ -12,12 +12,16 @@
 // ============================================================================
 package org.talend.components.api.properties;
 
+import java.util.Calendar;
+
 import org.talend.components.api.schema.AbstractSchemaElement;
 
 /**
  * Implementation to define Component properties
  */
 public class Property extends AbstractSchemaElement {
+
+    protected ComponentProperties componentProperties;
 
     public Property(String name) {
         this(name, null);
@@ -38,8 +42,37 @@ public class Property extends AbstractSchemaElement {
         this(type, name, null);
     }
 
+    public void setValue(Object value) {
+        componentProperties.setValue(this, value);
+    }
+
+    public Object getValue() {
+        return componentProperties.getValue(this);
+    }
+
+    public boolean getBooleanValue() {
+        return componentProperties.getBooleanValue(this);
+    }
+
+    public String getStringValue() {
+        return componentProperties.getStringValue(this);
+    }
+
+    public int getIntValue() {
+        return componentProperties.getIntValue(this);
+    }
+
+    public Calendar getCalendarValue() {
+        return componentProperties.getCalendarValue(this);
+    }
+
     public String toString() {
         return "Property: " + getName();
+    }
+
+    // Not API
+    public void setComponentProperties(ComponentProperties props) {
+        componentProperties = props;
     }
 
 }

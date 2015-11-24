@@ -49,6 +49,7 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.error.ComponentsErrorCode;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Repository;
+import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
@@ -152,6 +153,24 @@ public class ComponentServiceImpl implements ComponentService {
             }
         }
         return returnList;
+    }
+
+    @Override
+    public ComponentProperties makeFormCancelable(ComponentProperties properties, String formName) {
+        Form form = properties.getForm(formName);
+        if (form == null)
+            throw new IllegalArgumentException("Form: " + formName + " not found");
+        form.setCancelable(true);
+        return properties;
+    }
+
+    @Override
+    public ComponentProperties commitFormValues(ComponentProperties properties, String formName) {
+        Form form = properties.getForm(formName);
+        if (form == null)
+            throw new IllegalArgumentException("Form: " + formName + " not found");
+        form.commitValues();
+        return properties;
     }
 
     @Override
