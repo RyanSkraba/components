@@ -38,7 +38,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <scope>test</scope>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -66,9 +66,9 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
-                        <Import-Package>org.talend*</Import-Package>
-                        <Service-Component>*</Service-Component>
-                        <Embed-Dependency>!components*</Embed-Dependency>
+                                <Import-Package>org.talend*</Import-Package>
+                                <Service-Component>*</Service-Component>
+                                <Embed-Dependency>!components*</Embed-Dependency>
                                 <!-- <Bundle-ClassPath>{maven-dependencies},partner-${partner.version}.jar;mvn:org.talend.components.salesforce/partner/${partner.version}</Bundle-ClassPath> -->
                             </instructions>
                         </configuration>

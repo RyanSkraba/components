@@ -1,49 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<parent>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
         <version>0.2.0.BUILD-SNAPSHOT</version>
         <relativePath>../components-parent/pom.xml</relativePath>
-	</parent>
+    </parent>
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<name>Component Web Test Service</name>
-	<artifactId>components-webtest</artifactId>
-	<version>0.2.0.BUILD-SNAPSHOT</version>
+    <name>Component Web Test Service</name>
+    <artifactId>components-webtest</artifactId>
+    <version>0.2.0.BUILD-SNAPSHOT</version>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-api</artifactId>
-			<version>0.2.0.BUILD-SNAPSHOT</version>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api</artifactId>
+            <version>0.2.0.BUILD-SNAPSHOT</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-salesforce</artifactId>
-			<version>0.2.0.BUILD-SNAPSHOT</version>
-		</dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-salesforce</artifactId>
+            <version>0.2.0.BUILD-SNAPSHOT</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jetty</artifactId>
-			<version>1.2.5.RELEASE</version>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jetty</artifactId>
+            <version>1.2.5.RELEASE</version>
+        </dependency>
         <dependency>
             <groupId>com.mangofactory</groupId>
             <artifactId>swagger-springmvc</artifactId>
@@ -54,6 +54,6 @@
             <artifactId>daikon-spring</artifactId>
             <version>0.2.0.BUILD-SNAPSHOT</version>
         </dependency>
-	</dependencies>
+    </dependencies>
 
 </project>

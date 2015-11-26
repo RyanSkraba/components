@@ -19,13 +19,13 @@
             <artifactId>org.apache.oltu.oauth2.client</artifactId>
             <version>1.0.0</version>
         </dependency>
-        
+
         <dependency>
-		    <groupId>org.eclipse.jetty</groupId>
-		    <artifactId>jetty-server</artifactId>
-		    <version>8.1.17.v20150415</version>
-		</dependency>
-		        
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>8.1.17.v20150415</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.talend.components</groupId>
@@ -51,9 +51,9 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
-                        <Import-Package>org.talend*</Import-Package>
-                        <Service-Component>*</Service-Component>
-                        <Embed-Dependency>!components*</Embed-Dependency>
+                                <Import-Package>org.talend*</Import-Package>
+                                <Service-Component>*</Service-Component>
+                                <Embed-Dependency>!components*</Embed-Dependency>
                                 <!-- <Bundle-ClassPath>{maven-dependencies},partner-${partner.version}.jar;mvn:org.talend.components.salesforce/partner/${partner.version}</Bundle-ClassPath> -->
                             </instructions>
                         </configuration>
