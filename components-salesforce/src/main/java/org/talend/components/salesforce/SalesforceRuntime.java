@@ -49,7 +49,7 @@ import com.sforce.ws.bind.XmlObject;
 
 public class SalesforceRuntime extends ComponentRuntime {
 
-    private static final   Logger LOG         = LoggerFactory.getLogger(SalesforceRuntime.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SalesforceRuntime.class);
 
     protected static final String API_VERSION = "34.0";
 
@@ -169,8 +169,8 @@ public class SalesforceRuntime extends ComponentRuntime {
         bulkConnection = new BulkConnection(bulkConfig);
     }
 
-    protected void doConnection(SalesforceConnectionProperties properties, ConnectorConfig config) throws AsyncApiException,
-            ConnectionException {
+    protected void doConnection(SalesforceConnectionProperties properties, ConnectorConfig config)
+            throws AsyncApiException, ConnectionException {
         if (SalesforceConnectionProperties.LOGIN_OAUTH.equals(properties.getValue(properties.loginType))) {
             new SalesforceOAuthConnection(properties.oauth, SalesforceConnectionProperties.OAUTH_URL, API_VERSION);
         } else {
@@ -182,7 +182,8 @@ public class SalesforceRuntime extends ComponentRuntime {
         }
     }
 
-    public ValidationResult connectWithResult(final SalesforceConnectionProperties properties) {
+    public ValidationResult connectWithResult(ComponentProperties p) {
+        SalesforceConnectionProperties properties = (SalesforceConnectionProperties) p;
         ValidationResult vr = new ValidationResult();
         try {
             connect(properties);
@@ -199,7 +200,8 @@ public class SalesforceRuntime extends ComponentRuntime {
         return vr;
     }
 
-    public void connect(SalesforceConnectionProperties properties) throws ConnectionException, AsyncApiException {
+    public void connect(ComponentProperties p) throws ConnectionException, AsyncApiException {
+        SalesforceConnectionProperties properties = (SalesforceConnectionProperties) p;
         String refedComponentId = properties.getStringValue(properties.referencedComponentId);
         if (refedComponentId != null) {
             properties = (SalesforceConnectionProperties) componentService.getPropertiesForComponent(refedComponentId);
@@ -216,7 +218,8 @@ public class SalesforceRuntime extends ComponentRuntime {
         final SalesforceConnectionProperties finalProps = properties;
         config.setSessionRenewer(new SessionRenewer() {
 
-            @Override public SessionRenewalHeader renewSession(ConnectorConfig connectorConfig) throws ConnectionException {
+            @Override
+            public SessionRenewalHeader renewSession(ConnectorConfig connectorConfig) throws ConnectionException {
                 SessionRenewalHeader header = new SessionRenewalHeader();
                 try {
                     // FIXME - session id need to be null for trigger the login?
@@ -250,7 +253,8 @@ public class SalesforceRuntime extends ComponentRuntime {
 
     }
 
-    public List<NameAndLabel> getModuleNames() throws ConnectionException {
+    @Override
+    public List<NameAndLabel> getSchemaNames() throws ConnectionException {
         List<NameAndLabel> returnList = new ArrayList<>();
         DescribeGlobalResult result = connection.describeGlobal();
         DescribeGlobalSObjectResult[] objects = result.getSobjects();
@@ -290,6 +294,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         element.setDefaultValue(field.getDefaultValueFormula());
     }
 
+    @Override
     public Schema getSchema(String module) throws ConnectionException {
         Schema schema = SchemaFactory.newSchema();
         SchemaElement root = SchemaFactory.newSchemaElement("Root");
@@ -323,16 +328,6 @@ public class SalesforceRuntime extends ComponentRuntime {
                 break;
             }
         }
-    }
-
-    public void input(ComponentProperties props, List<Map<String, Object>> values) throws Exception {
-        inputBegin(props);
-        Map<String, Object> value;
-        do {
-            value = inputRow();
-            if (value != null)
-                values.add(value);
-        } while (value != null);
     }
 
     public void inputBegin(ComponentProperties props) throws Exception {
@@ -422,14 +417,6 @@ public class SalesforceRuntime extends ComponentRuntime {
 
     public void inputEnd() throws Exception {
         logout();
-    }
-
-    public void output(ComponentProperties props, List<Map<String, Object>> values) throws Exception {
-        outputBegin(props);
-        for (Map<String, Object> row : values) {
-            outputMain(row);
-        }
-        outputEnd();
     }
 
     public void outputBegin(ComponentProperties props) throws Exception {
@@ -664,8 +651,8 @@ public class SalesforceRuntime extends ComponentRuntime {
         if (success) {
             // TODO: send back the ID
         } else {
-            errors = addLog(resultErrors, batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx]
-                    : "Batch index out of bounds");
+            errors = addLog(resultErrors,
+                    batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx] : "Batch index out of bounds");
         }
         if (exceptionForErrors && errors.toString().length() > 0) {
             if (logWriter != null) {

@@ -73,7 +73,7 @@ public class SalesforceModuleListProperties extends ComponentProperties {
     public void beforeFormPresentMain() throws Exception {
         SalesforceRuntime conn = new SalesforceRuntime();
         conn.connect(connectionProps);
-        moduleNames = conn.getModuleNames();
+        moduleNames = conn.getSchemaNames();
         moduleName.setPossibleValues(moduleNames);
         getForm(Form.MAIN).setAllowBack(true);
         getForm(Form.MAIN).setAllowFinish(true);

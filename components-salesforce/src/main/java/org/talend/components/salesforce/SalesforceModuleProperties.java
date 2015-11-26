@@ -23,7 +23,6 @@ import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
-import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.common.SchemaProperties;
 
 public class SalesforceModuleProperties extends ComponentProperties {
@@ -69,7 +68,7 @@ public class SalesforceModuleProperties extends ComponentProperties {
         SalesforceRuntime conn = new SalesforceRuntime();
         ValidationResult vr = conn.connectWithResult(connection);
         if (vr.getStatus() == ValidationResult.Result.OK) {
-            List<NameAndLabel> moduleNames = conn.getModuleNames();
+            List<NameAndLabel> moduleNames = conn.getSchemaNames();
             moduleName.setPossibleValues(moduleNames);
         }
     }
