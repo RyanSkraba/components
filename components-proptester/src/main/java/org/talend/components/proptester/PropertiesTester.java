@@ -1,4 +1,4 @@
-package org.talend.components.webtest;
+package org.talend.components.proptester;
 
 import java.io.IOException;
 import java.util.*;
@@ -340,7 +340,7 @@ public class PropertiesTester {
                 commandNames.add(c.names[0]);
             }
             console.addCompleter(new StringsCompleter(commandNames));
-            console.setPrompt("comptest> ");
+            console.setPrompt("proptester> ");
             String line;
             while ((line = console.readLine()) != null) {
                 processCommand(line);
@@ -356,7 +356,7 @@ public class PropertiesTester {
         app.setShowBanner(false);
         app.setHeadless(true);
         app.setLogStartupInfo(false);
-        if (true)
+        if (!true)
             app.run(PropertiesTester.class, args);
         else
             app.run(args);

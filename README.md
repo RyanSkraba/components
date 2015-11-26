@@ -1,7 +1,24 @@
 
 #![alt text](http://www.talend.com/sites/all/themes/talend_responsive/images/logo.png "Talend") Components
 
-## Instructions for testing
+## Using the Command Line Test Program
+
+A command line test program is provided to allow you to create sets of properties for 
+components and manipulate them to see how they change and evaluate the correct functioning
+of your component. This can also be used to quickly create tests for the component's properties
+and associated UI interactions.
+
+To run this, in the top level folder:
+
+```
+mvn clean install (or 'package' if you do not want the integration tests to be executed see Tests below)
+cd components-proptester
+mvn exec:java
+```
+
+Type "help" to get the list of commands.
+
+## Using the Test Web Service
 
 In the top level folder:
 
@@ -26,11 +43,13 @@ The group is: org.talend.components.
 
 | Folder                                         | Module                | Artifact              | Description                                      |
 |:----------------------------------------------:|:---------------------:|:---------------------:|:------------------------------------------------:|
-| root                                           | components-parent     | component             | *This whole thing*                               |
-| [components-base](components-base)             | components-base       | components-base       | *API used to define and access component*        |
+| root                                           | components-root     | components             | *This whole thing*                               |
+| [components-parent](components-parent)             | components-parent       | components-parent       | *Parent pom for everything*        |
+| [components-api](components-api)             | components-api       | components-api       | *API used to define and access component*        |
 | [components-common](components-common)         | components-common     | components-common     | *Code shared by multiple components*             |
 | [components-common-oauth](components-common-oauth) | components-common-oauth | components-common-oauth | *OAuth impolementation*             |
 | [components-salesforce](components-salesforce) | components-salesforce  | components-salesforce | *SFDC components*                                |
+| [components-proptester](components-proptester)       | components-proptester  | components-proptester | *Command line test program*               |
 | [components-webtest](components-webtest)       | components-webtest  | components-webtest | *Temporary code to start the web services for testing*                                |
 | [components-osgitest](components-osgitest)       | components-osgitest  | components-osgitest | *Integration tests for OSGI services*                                |
 | [tooling]                                      | tooling               |                       | *IDE specific config files + some other stuff*   |
@@ -41,14 +60,16 @@ The group is: org.talend.components.
 - Specific Maven settings are required. See instructions in [tooling](/tooling/).
 WARNING : make sure to launch `mvn clean install` and not (mvn test) because the OSGI tests are bases on the installed bundle and not the one in the current maven reactor.
 
-## IDE setup
+## IDE Setup
 See the [tooling](/tooling/) folder.
 
-## Tests 
-there are 2 kinds of tests, Unit test and Integration test.
-**Integration tests** can be use to connect to actual system and they all **must be prefixed with TestIT**. 
-  - The Unit test are executed during the maven build in the *test* phase that is before the packaging of the artifact, whereas 
+## Tests Associated with Maven Build 
+There are 2 kinds of tests, Unit tests and Integration tests.
+
+**Integration tests** can be used to connect to actual system and they all *are suffixed with TestIT**. 
+  - The Unit tests are executed during the maven build in the *test* phase that is before the packaging of the artifact, whereas 
   - The Integration tests are executed after the *packaging* phase. 
+
 The salesforce integration tests require some credentials to be set in the maven .m2/settings.xml, here is an example
 ```
   <profiles>
