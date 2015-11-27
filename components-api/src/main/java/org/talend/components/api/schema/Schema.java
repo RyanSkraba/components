@@ -7,6 +7,12 @@ public interface Schema {
 
     public SchemaElement getRoot();
 
-    public void setRoot(SchemaElement root);
+    public SchemaElement setRoot(SchemaElement root);
+
+    /**
+     * Returns a string that is the serialized form of this Schema. Use {@link SchemaFactory#fromSerialized(String)} to
+     * materialize the object from the string.
+     */
+    public String toSerialized();
 
 }

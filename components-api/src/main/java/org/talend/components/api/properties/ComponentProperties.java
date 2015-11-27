@@ -15,7 +15,9 @@ import org.talend.components.api.i18n.TranslatableImpl;
 import org.talend.components.api.properties.internal.ComponentPropertiesInternal;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
+import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
+import org.talend.components.api.schema.SchemaFactory;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.i18n.I18nMessages;
 
@@ -311,6 +313,9 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     }
 
     public void setValue(SchemaElement property, Object value) {
+        if (property.getType() == Type.SCHEMA && value instanceof String)
+            value = SchemaFactory.fromSerialized((String) value);
+
         internal.setValue(property, value);
     }
 
@@ -330,6 +335,9 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     public String getStringValue(SchemaElement property) {
         Object value = getValue(property);
         if (value != null) {
+            if (value instanceof Schema) {
+                return ((Schema)value).toSerialized();
+            }
             return value.toString();
         }
         return null;
