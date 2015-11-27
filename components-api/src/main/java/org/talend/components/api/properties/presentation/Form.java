@@ -262,7 +262,7 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
             }
             cancelableValues.put(property, value);
         } else {
-            getComponentProperties().setValue(p, value);
+            p.setValue(value);
         }
     }
 

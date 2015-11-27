@@ -39,7 +39,7 @@ public class SchemaProperties extends ComponentProperties {
     @Override
     public SchemaProperties init() {
         super.init();
-        setValue(schema, SchemaFactory.newSchema());
+        schema.setValue(SchemaFactory.newSchema());
         return this;
     }
 

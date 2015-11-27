@@ -42,7 +42,7 @@ public class ProxyPropertiesTest {
         assertFalse(mainForm.getWidget("host").isVisible());
         assertFalse(mainForm.getWidget("userPassword").isVisible());
 
-        props.setValue(props.useProxy, true);
+        props.useProxy.setValue(true);
         assertTrue(mainForm.getWidget("useProxy").isCallAfter());
         componentService.afterProperty("useProxy", props);
         assertTrue(mainForm.getWidget("host").isVisible());

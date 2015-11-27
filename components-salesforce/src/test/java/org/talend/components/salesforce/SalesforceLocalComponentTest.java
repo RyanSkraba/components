@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.talend.components.api.ComponentTestUtils;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
@@ -65,7 +66,7 @@ public class SalesforceLocalComponentTest {
 
         props = new TSalesforceConnectionDefinition().createProperties();
         ComponentTestUtils.checkSerialize(props);
-        SchemaElement loginType = props.getProperty("loginType");
+        Property loginType = (Property) props.getProperty("loginType");
         System.out.println(loginType.getPossibleValues());
         assertEquals("Basic", loginType.getPossibleValues().get(0).toString());
         assertEquals("OAuth", loginType.getPossibleValues().get(1).toString());
@@ -75,7 +76,7 @@ public class SalesforceLocalComponentTest {
         assertTrue(mainForm.getWidget(SalesforceUserPasswordProperties.class).isVisible());
         assertFalse(mainForm.getWidget(OauthProperties.class).isVisible());
 
-        props.setValue(loginType, SalesforceConnectionProperties.LOGIN_OAUTH);
+        loginType.setValue(SalesforceConnectionProperties.LOGIN_OAUTH);
         props = checkAndAfter(mainForm, "loginType", props);
         mainForm = props.getForm(Form.MAIN);
         assertTrue(mainForm.isRefreshUI());

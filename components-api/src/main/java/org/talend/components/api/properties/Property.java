@@ -17,7 +17,7 @@ import java.util.Calendar;
 import org.talend.components.api.schema.AbstractSchemaElement;
 
 /**
- * Implementation to define Component properties
+ * A property that is part of a {@link ComponentProperties}.
  */
 public class Property extends AbstractSchemaElement {
 

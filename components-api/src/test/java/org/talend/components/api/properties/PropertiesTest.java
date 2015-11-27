@@ -48,10 +48,10 @@ public class PropertiesTest {
 
     @Test
     public void testSerializeValues() {
-        TestComponentProperties props = new TestComponentProperties("test");
-        props.setValue(props.userId, "testUser");
+        TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test").init();
+        props.userId.setValue("testUser");
         NestedComponentProperties nestedProp = (NestedComponentProperties) props.getProperty("nestedProps");
-        nestedProp.setValue(nestedProp.aGreatProperty, "greatness");
+        nestedProp.aGreatProperty.setValue("greatness");
         assertNotNull(nestedProp);
         props = (TestComponentProperties) ComponentTestUtils.checkSerialize(props);
         assertEquals("testUser", props.getValue(props.userId));

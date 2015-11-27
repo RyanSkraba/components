@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Property;
+import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
 
 /**
@@ -159,6 +161,25 @@ public class PropertiesTester {
         return sb.toString();
     }
 
+    private Property resolveProperty() {
+        if (argIndex >= args.length) {
+            System.out.println("Please specify the property name (which can be qualified)");
+            throw new IllegalArgumentException();
+        }
+        String prop = args[argIndex++];
+        SchemaElement se = testProps.getProperty(prop);
+        if (se == null) {
+            System.out.println("Property: " + prop + " not found");
+            throw new IllegalArgumentException();
+        }
+        if (!(se instanceof Property)) {
+            System.out.println("Property: " + prop + " must be a leaf property");
+            throw new IllegalArgumentException();
+        }
+        Property p = (Property) se;
+        return p;
+    }
+
     public PropertiesTester() throws IOException {
         instance = this;
 
@@ -202,32 +223,22 @@ public class PropertiesTester {
                 new Command(new String[] { "setValue", "sv" }, "Sets the value of the specified property") {
 
                     void run() {
+                        Property p = resolveProperty();
                         if (argIndex >= args.length) {
-                            System.out.println("Specify the property name (which can be qualified)");
-                            return;
-                        }
-                        String prop = args[argIndex++];
-                        if (argIndex >= args.length) {
-                            System.out.println("Specify the value");
+                            System.out.println("Please specify the value as the second argument");
                             return;
                         }
                         String value = args[argIndex++];
-
-                        testProps.setValue(testProps.getProperty(prop), value);
+                        p.setValue(value);
                     }
                 }, //
                 new Command(new String[] { "beforePresent", "bp" },
                         "Call the beforePresent service with the specified property") {
 
                     void run() {
-                        if (argIndex >= args.length) {
-                            System.out.println("Specify the property name (which can be qualified)");
-                            return;
-                        }
-                        String prop = args[argIndex++];
-
+                        Property p = resolveProperty();
                         try {
-                            ComponentProperties props = componentService.beforePropertyPresent(prop, testProps);
+                            ComponentProperties props = componentService.beforePropertyPresent(p.getName(), testProps);
                             testProps = props;
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();
@@ -238,14 +249,9 @@ public class PropertiesTester {
                         "Call the beforeActivate service with the specified property") {
 
                     void run() {
-                        if (argIndex >= args.length) {
-                            System.out.println("Specify the property name (which can be qualified)");
-                            return;
-                        }
-                        String prop = args[argIndex++];
-
+                        Property p = resolveProperty();
                         try {
-                            ComponentProperties props = componentService.beforePropertyActivate(prop, testProps);
+                            ComponentProperties props = componentService.beforePropertyActivate(p.getName(), testProps);
                             testProps = props;
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();
@@ -255,14 +261,9 @@ public class PropertiesTester {
                 new Command(new String[] { "after", "a" }, "Call the afterProperty service with the specified property") {
 
                     void run() {
-                        if (argIndex >= args.length) {
-                            System.out.println("Specify the property name (which can be qualified)");
-                            return;
-                        }
-                        String prop = args[argIndex++];
-
+                        Property p = resolveProperty();
                         try {
-                            ComponentProperties props = componentService.afterProperty(prop, testProps);
+                            ComponentProperties props = componentService.afterProperty(p.getName(), testProps);
                             testProps = props;
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();
@@ -272,14 +273,9 @@ public class PropertiesTester {
                 new Command(new String[] { "validate", "v" }, "Call the validateProperty service with the specified property") {
 
                     void run() {
-                        if (argIndex >= args.length) {
-                            System.out.println("Specify the property name (which can be qualified)");
-                            return;
-                        }
-                        String prop = args[argIndex++];
-
+                        Property p = resolveProperty();
                         try {
-                            ComponentProperties props = componentService.validateProperty(prop, testProps);
+                            ComponentProperties props = componentService.validateProperty(p.getName(), testProps);
                             System.out.println(props.getValidationResult());
                             testProps = props;
                         } catch (Throwable throwable) {
