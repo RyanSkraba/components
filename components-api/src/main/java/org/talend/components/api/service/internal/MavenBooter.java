@@ -70,10 +70,6 @@ public class MavenBooter {
 
         LocalRepository localRepo = new LocalRepository(getDefaultLocalRepoDir());
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
-
-        // session.setTransferListener(new ConsoleTransferListener());
-        // session.setRepositoryListener(new ConsoleRepositoryListener());
-
         return session;
     }
 
@@ -197,20 +193,10 @@ public class MavenBooter {
         return repoList;
     }
 
-    /**
-     * DOC sgandon Comment method "newCentralRepository".
-     * 
-     * @return
-     */
     protected RemoteRepository newCentralRepository() {
         return new RemoteRepository.Builder("central", "default", "http://central.maven.org/maven2/").build();
     }
 
-    /**
-     * DOC sgandon Comment method "newCentralRepository".
-     * 
-     * @return
-     */
     protected List<RemoteRepository> newTalendRepositories() {
         List<RemoteRepository> talendRepos = new ArrayList<>();
         talendRepos.add(new RemoteRepository.Builder("talend-opensource-release", "default",
@@ -252,14 +238,14 @@ public class MavenBooter {
         locator.addService(TransporterFactory.class, FileTransporterFactory.class);
         locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
 
-        // locator.setErrorHandler(new DefaultServiceLocator.ErrorHandler() {
-        //
-        // @Override
-        // public void serviceCreationFailed(Class<?> type, Class<?> impl, Throwable exception) {
-        // exception.printStackTrace();
-        // }
-        // });
-
+        if (false) {
+            locator.setErrorHandler(new DefaultServiceLocator.ErrorHandler() {
+                @Override
+                public void serviceCreationFailed(Class<?> type, Class<?> impl, Throwable exception) {
+                    exception.printStackTrace();
+                }
+            });
+        }
         return locator.getService(RepositorySystem.class);
     }
 }

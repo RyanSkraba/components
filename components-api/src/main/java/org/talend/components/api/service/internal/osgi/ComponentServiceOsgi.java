@@ -54,9 +54,6 @@ public class ComponentServiceOsgi implements ComponentService {
         this.gctx = aGctx;
     }
 
-    /**
-     * created by sgandon on 7 sept. 2015 Detailled comment
-     */
     private final class ComponentRegistryOsgi implements ComponentRegistry {
 
         private BundleContext bc;

@@ -30,7 +30,7 @@ public class ComponentPropertiesWithDefinedI18N extends ComponentProperties {
     }
 
     /**
-     * this uses the globalContext static variable and the current Class location to find the resource bundle names
+     * This uses the globalContext static variable and the current Class location to find the resource bundle names
      * messages
      * 
      * @return the already set I18nMessages or a newly created one base on the current Class package.

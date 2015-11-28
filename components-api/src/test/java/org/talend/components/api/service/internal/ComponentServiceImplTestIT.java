@@ -36,9 +36,6 @@ import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
 
-/**
- * created by sgandon on 13 oct. 2015
- */
 public class ComponentServiceImplTestIT {
 
     String DIRECT_DEPS = "mvn:org.springframework/spring-webmvc/1.0/jar,mvn:org.eclipse.aether/aether-api/1.0.0.v20140518/jar,"

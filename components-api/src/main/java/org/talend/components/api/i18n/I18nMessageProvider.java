@@ -17,8 +17,10 @@ import org.talend.daikon.i18n.ClassLoaderBasedI18nMessages;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.i18n.LocaleProvider;
 
+import java.util.ResourceBundle;
+
 /**
- * This class provide i18n service according to the local provider service
+ * This class provides I18n service according to the local provider service
  */
 public abstract class I18nMessageProvider {
 

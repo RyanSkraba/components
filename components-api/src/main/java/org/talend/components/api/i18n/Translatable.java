@@ -15,9 +15,6 @@ package org.talend.components.api.i18n;
 import org.talend.components.api.exception.error.ComponentsErrorCode;
 import org.talend.daikon.i18n.I18nMessages;
 
-/**
- * created by sgandon on 18 sept. 2015
- */
 public interface Translatable {
 
     void setI18nMessageFormater(I18nMessages i18nMessages);

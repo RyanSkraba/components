@@ -16,10 +16,6 @@ import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.ErrorCode;
 
-/**
- * created by sgandon on 9 sept. 2015 Detailled comment
- *
- */
 public class ComponentException extends TalendRuntimeException {
 
     public ComponentException(ErrorCode code) {
@@ -38,9 +34,6 @@ public class ComponentException extends TalendRuntimeException {
         super(code, cause, context);
     }
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -84662653622272070L;
     // FIXME this should be similar to dataprep Exception, be will be gathered into a common back-end project
 }

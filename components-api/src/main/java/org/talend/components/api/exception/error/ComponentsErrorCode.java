@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.talend.daikon.exception.error.ErrorCode;
 
 /**
- * Code errors for the Component services
+ * Error codes for the Component service
  */
 public enum ComponentsErrorCode implements ErrorCode {
 
@@ -37,21 +37,11 @@ public enum ComponentsErrorCode implements ErrorCode {
     /** Expected entries to be in the context. */
     private List<String> expectedContextEntries;
 
-    /**
-     * default constructor.
-     * 
-     * @param httpStatus the http status to use.
-     */
     ComponentsErrorCode(int httpStatus) {
         this.httpStatus = httpStatus;
         this.expectedContextEntries = Collections.emptyList();
     }
 
-    /**
-     * default constructor.
-     *
-     * @param httpStatus the http status to use.
-     */
     ComponentsErrorCode(int httpStatus, String... contextEntries) {
         this.httpStatus = httpStatus;
         this.expectedContextEntries = Arrays.asList(contextEntries);

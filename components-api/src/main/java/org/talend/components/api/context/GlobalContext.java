@@ -15,7 +15,7 @@ package org.talend.components.api.context;
 import org.talend.components.api.i18n.I18nMessageProvider;
 
 /**
- * Global context that provide i18n service.
+ * Global context that provides I18n service.
  */
 public class GlobalContext {
 

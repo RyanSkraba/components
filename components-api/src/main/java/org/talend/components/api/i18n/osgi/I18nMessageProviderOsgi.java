@@ -24,12 +24,12 @@ import aQute.bnd.annotation.component.Reference;
 @Component(provide = I18nMessageProvider.class)
 public class I18nMessageProviderOsgi extends I18nMessageProvider {
 
+    LocaleProvider localeProvider;
+
     @Override
     protected LocaleProvider getLocaleProvider() {
         return localeProvider;
     }
-
-    LocaleProvider localeProvider;
 
     @Reference
     public void osgiInjectLocalProvider(LocaleProvider locProvder) {

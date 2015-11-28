@@ -28,9 +28,6 @@ public class GlobalContextSpring extends GlobalContext implements ApplicationCon
 
     private static final Logger LOG = LoggerFactory.getLogger(GlobalContextSpring.class);
 
-    /**
-     * @see ApplicationContextAware#setApplicationContext(ApplicationContext)
-     */
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
         i18nMessageProvider = applicationContext.getBean(I18nMessageProvider.class);

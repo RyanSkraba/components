@@ -13,11 +13,11 @@
 package org.talend.components.api.i18n;
 
 import org.talend.components.api.context.GlobalContext;
+import org.talend.components.api.exception.ComponentException;
+import org.talend.components.api.exception.error.ComponentsErrorCode;
+import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.i18n.I18nMessages;
 
-/**
- * created by sgandon on 18 sept. 2015
- */
 public class TranslatableImpl implements Translatable {
 
     private transient I18nMessages i18nMessages;
@@ -35,7 +35,7 @@ public class TranslatableImpl implements Translatable {
     }
 
     /**
-     * this uses the globalContext static variable and the current Class pacakge to find the resource bundle named
+     * This uses the globalContext static variable and the current Class package to find the resource bundle named
      * messages.properties (it also look into inherited class, if no key is found)
      * 
      * @return the already set I18nMessages or a newly created one base on the current Class package.
@@ -50,10 +50,9 @@ public class TranslatableImpl implements Translatable {
         if (i18nMessageFormater != null) {
             return i18nMessageFormater.getMessage(key, arguments);
         } else {
-            return "Missing translator: " + key;
+            // return "Missing translator: " + key;
             // FIXME - removing this for now until I18N can support this on deserialization
-            // throw new ComponentException(ComponentsErrorCode.MISSING_I18N_TRANSLATOR,
-            // ExceptionContext.build().put("key", key)); //$NON-NLS-1$
+            throw new ComponentException(ComponentsErrorCode.MISSING_I18N_TRANSLATOR, ExceptionContext.build().put("key", key)); //$NON-NLS-1$
         }
     }
 }

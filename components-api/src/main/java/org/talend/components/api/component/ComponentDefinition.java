@@ -35,11 +35,12 @@ public interface ComponentDefinition extends TopLevelDefinition {
 
     /**
      * Create a {@link ComponentRuntime} object.
-     * 
-     * @return a {@link ComponentRuntime} object.
      */
     public ComponentRuntime createRuntime();
 
+    /**
+     * Returns the types of {@link ComponentConnector} objects supported by this component.
+     */
     public ComponentConnector[] getConnectors();
 
     /**
@@ -62,7 +63,6 @@ public interface ComponentDefinition extends TopLevelDefinition {
      * @param imageType the type of image requested
      * @return the path to the png resource or null if the type is not handled.
      */
-
     public String getPngImagePath(ComponentImageType imageType);
 
     //
