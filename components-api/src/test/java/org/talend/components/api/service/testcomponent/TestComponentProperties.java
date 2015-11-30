@@ -30,6 +30,9 @@ public class TestComponentProperties extends ComponentProperties {
 
     public static final String USER_ID_PROP_NAME = "userId"; //$NON-NLS-1$
 
+    public static Form mainForm;
+    public static Form restoreForm;
+
     public Property userId = (Property) newProperty(USER_ID_PROP_NAME).setRequired(true);
 
     public Property password = (Property) newProperty("password").setRequired(true);
@@ -75,12 +78,14 @@ public class TestComponentProperties extends ComponentProperties {
     public ComponentProperties init() {
         super.init();
         Form form = Form.create(this, Form.MAIN, "Test Component");
+        mainForm = form;
         form.addRow(userId);
         form.addRow(password);
         form.addRow(widget(nameList).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
         form.addRow(widget(nameListRef).setWidgetType(Widget.WidgetType.NAME_SELECTION_REFERENCE));
 
         form = Form.create(this, "restoreTest", "Restore Test");
+        restoreForm = form;
         form.addRow(userId);
         form.addRow(nameList);
         form.addRow(integer);

@@ -70,8 +70,10 @@ public class PropertiesTest {
     public void testFindForm() {
         TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test").init();
         Form main = props.getForm(Form.MAIN);
+        assertTrue(main == TestComponentProperties.mainForm);
         assertEquals(Form.MAIN, main.getName());
         Form restoreTest = props.getForm("restoreTest");
+        assertTrue(restoreTest == TestComponentProperties.restoreForm);
         assertEquals("restoreTest", restoreTest.getName());
     }
 
