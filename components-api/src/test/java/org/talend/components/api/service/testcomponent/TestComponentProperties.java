@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.PresentationItem;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
@@ -32,6 +33,8 @@ public class TestComponentProperties extends ComponentProperties {
 
     public static Form mainForm;
     public static Form restoreForm;
+
+    public PresentationItem testPI = new PresentationItem("testPI", "testPI display name");
 
     public Property userId = (Property) newProperty(USER_ID_PROP_NAME).setRequired(true);
 
@@ -81,6 +84,7 @@ public class TestComponentProperties extends ComponentProperties {
         mainForm = form;
         form.addRow(userId);
         form.addRow(password);
+        form.addRow(testPI);
         form.addRow(widget(nameList).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
         form.addRow(widget(nameListRef).setWidgetType(Widget.WidgetType.NAME_SELECTION_REFERENCE));
 

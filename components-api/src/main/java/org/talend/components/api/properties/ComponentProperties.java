@@ -281,10 +281,14 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         return fieldNames;
     }
 
-    public SchemaElement getProperty(Class<?> cls) {
-        return getProperty(cls.getSimpleName());
-    }
-
+    /**
+     * Returns the property as specified by a qualifed property name string.
+     * <p/>
+     * The first component is the property name within this object. The optional subsequent components, separated by a
+     * "." are property names in the nested {@link ComponentProperties} objects.
+     *
+     * @param name a qualified property name
+     */
     public SchemaElement getProperty(@NotNull String name) {
         String[] propComps = name.split("\\.");
         ComponentProperties currentProps = this;
@@ -302,6 +306,11 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         return null;
     }
 
+    /**
+     * Returns the property in this object specified by a the simple (unqualified) property name.
+     * 
+     * @param name a simple property name.
+     */
     protected SchemaElement getLocalProperty(@NotNull String name) {
         List<SchemaElement> properties = getProperties();
         for (SchemaElement prop : properties) {
@@ -348,7 +357,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         Object value = getValue(property);
         if (value != null) {
             if (value instanceof Schema) {
-                return ((Schema)value).toSerialized();
+                return ((Schema) value).toSerialized();
             }
             return value.toString();
         }
@@ -374,6 +383,26 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
      */
     public ValidationResult getValidationResult() {
         return internal.getValidationResult();
+    }
+
+    /**
+     * Copy all of the values from the specified {@link ComponentProperties} object. This includes the values from any nested objects.
+     * @param props
+     */
+    public void copyValuesFrom(ComponentProperties props) {
+        List<SchemaElement> values = getProperties();
+        for (SchemaElement se : values) {
+            SchemaElement otherSe = props.getProperty(se.getName());
+            if (otherSe == null)
+                continue;
+            if (se instanceof ComponentProperties) {
+                ((ComponentProperties)se).copyValuesFrom((ComponentProperties) otherSe);
+            } else {
+                Object value = props.getValue(otherSe);
+                setValue(se, value);
+            }
+        }
+
     }
 
     // Internal - not API

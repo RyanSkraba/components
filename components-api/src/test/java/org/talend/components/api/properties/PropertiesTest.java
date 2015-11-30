@@ -78,6 +78,20 @@ public class PropertiesTest {
     }
 
     @Test
+    public void testCopyValues() {
+        TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test1").init();
+        props.integer.setValue(1);
+        props.userId.setValue("User1");
+        ((Property)props.getProperty("nestedProps.aGreatProperty")).setValue("great1");
+
+        TestComponentProperties props2 = (TestComponentProperties) new TestComponentProperties("test2").init();
+        props2.copyValuesFrom(props);
+        assertEquals(1, props2.getIntValue(props2.getProperty("integer")));
+        assertEquals("User1", props2.getStringValue(props2.getProperty("userId")));
+        assertEquals("great1", ((Property)props2.getProperty("nestedProps.aGreatProperty")).getStringValue());
+    }
+
+    @Test
     public void testi18NForComponentDefintion() {
         TestComponentDefinition tcd = new TestComponentDefinition();
         assertEquals("Test Component", tcd.getDisplayName());

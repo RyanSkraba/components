@@ -142,7 +142,8 @@ public class SalesforceLocalComponentTestIT extends AbstractComponentTestIT {
 
     }
 
-    @Test public void testFamily() {
+    @Test
+    public void testFamily() {
         ComponentDefinition cd = componentService.getComponentDefinition("tSalesforceConnection");
         assertEquals(2, cd.getFamilies().length);
         assertEquals("Business/Salesforce", cd.getFamilies()[0]);
@@ -275,7 +276,11 @@ public class SalesforceLocalComponentTestIT extends AbstractComponentTestIT {
             }
         });
         assertEquals(3, subWizards.length);
-        assertTrue(connProps == subWizards[1].getForms().get(0).getComponentProperties());
+        // Edit connection wizard - we copy the connection properties, as we present the UI, so we use the
+        // connection properties object created by the new wizard
+        assertFalse(connProps == subWizards[1].getForms().get(0).getComponentProperties());
+        // Add module wizard - we refer to the existing connection properties as we don't present the UI
+        // for them.
         assertTrue(connProps == ((SalesforceModuleListProperties) subWizards[2].getForms().get(0).getComponentProperties())
                 .getConnectionProps());
         assertFalse(subWizards[1].getDefinition().isTopLevel());

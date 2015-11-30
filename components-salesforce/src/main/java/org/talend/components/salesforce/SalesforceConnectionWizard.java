@@ -11,12 +11,13 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
  */
 public class SalesforceConnectionWizard extends ComponentWizard {
 
+    SalesforceConnectionProperties cProps;
     SalesforceModuleListProperties mProps;
 
     SalesforceConnectionWizard(ComponentWizardDefinition def, String repositoryLocation, ComponentService compService) {
         super(def, repositoryLocation);
 
-        SalesforceConnectionProperties cProps = new SalesforceConnectionProperties("connection");
+        cProps = new SalesforceConnectionProperties("connection");
         cProps.init();
         addForm(cProps.getForm(SalesforceConnectionProperties.FORM_WIZARD));
 
@@ -33,9 +34,8 @@ public class SalesforceConnectionWizard extends ComponentWizard {
         return false;
     }
 
-    public void setupProperties(SalesforceConnectionProperties cProps) {
-        // Update the connection form properties
-        getForms().get(0).setComponentProperties(cProps);
+    public void setupProperties(SalesforceConnectionProperties cPropsOther) {
+        cProps.copyValuesFrom(cPropsOther);
         mProps.setConnection(cProps);
     }
 
