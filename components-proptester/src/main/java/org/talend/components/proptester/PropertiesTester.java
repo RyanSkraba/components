@@ -96,11 +96,9 @@ public class PropertiesTester {
         String help;
 
         void run() {
-
         }
 
-        void setupCompletor() {
-
+        void setupCompleter() {
         }
 
         boolean executeIfMatch() {
@@ -196,7 +194,7 @@ public class PropertiesTester {
                         testProps = componentService.getComponentProperties(comp);
                     }
 
-                    void setupCompletor() {
+                    void setupCompleter() {
                         StringsCompleter sc = new StringsCompleter(getNameList());
                         console.addCompleter(
                                 new ArgumentCompleter(sc, new StringsCompleter(componentService.getAllComponentNames())));
@@ -327,12 +325,20 @@ public class PropertiesTester {
         System.out.println("Unknown command: " + currentCommand);
     }
 
-    public void processCommands() {
+    public void processCommandLines(String commandLines) {
+        String lines[] = commandLines.split("\n");
+        for (String line : lines) {
+            System.out.println(line);
+            processCommand(line);
+        }
+    }
+
+    public void readCommands() {
         try {
             console = new ConsoleReader();
             List commandNames = new ArrayList();
             for (Command c : commands) {
-                c.setupCompletor();
+                c.setupCompleter();
                 commandNames.add(c.names[0]);
             }
             console.addCompleter(new StringsCompleter(commandNames));
@@ -352,12 +358,9 @@ public class PropertiesTester {
         app.setShowBanner(false);
         app.setHeadless(true);
         app.setLogStartupInfo(false);
-        if (!true)
-            app.run(PropertiesTester.class, args);
-        else
-            app.run(args);
+        app.run(args);
         PropertiesTester pt = instance;
-        pt.processCommands();
+        pt.readCommands();
     }
 
 }
