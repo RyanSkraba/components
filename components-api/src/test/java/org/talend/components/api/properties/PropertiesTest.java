@@ -67,6 +67,15 @@ public class PropertiesTest {
     }
 
     @Test
+    public void testFindForm() {
+        TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test").init();
+        Form main = props.getForm(Form.MAIN);
+        assertEquals(Form.MAIN, main.getName());
+        Form restoreTest = props.getForm("restoreTest");
+        assertEquals("restoreTest", restoreTest.getName());
+    }
+
+    @Test
     public void testi18NForComponentDefintion() {
         TestComponentDefinition tcd = new TestComponentDefinition();
         assertEquals("Test Component", tcd.getDisplayName());
