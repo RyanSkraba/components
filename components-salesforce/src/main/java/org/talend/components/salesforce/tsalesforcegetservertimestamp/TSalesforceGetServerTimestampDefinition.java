@@ -32,7 +32,7 @@ import aQute.bnd.annotation.component.Component;
         + TSalesforceGetServerTimestampDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinition {
 
-    public static final String COMPONENT_NAME = "tSalesforceGetServerTimestamp"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tSalesforceGetServerTimestampNew"; //$NON-NLS-1$
 
     public TSalesforceGetServerTimestampDefinition() {
         super(COMPONENT_NAME);

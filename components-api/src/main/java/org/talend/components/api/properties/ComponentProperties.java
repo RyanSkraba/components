@@ -32,6 +32,7 @@ import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.schema.SchemaFactory;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.i18n.I18nMessages;
+import org.talend.daikon.security.CryptoHelper;
 
 import com.cedarsoftware.util.io.JsonReader;
 import com.cedarsoftware.util.io.JsonWriter;
@@ -153,6 +154,8 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         try {
             Thread.currentThread().setContextClassLoader(ComponentProperties.class.getClassLoader());
             d.properties = (ComponentProperties) JsonReader.jsonToJava(serialized);
+            if (false)
+                d.properties.handlePropEncryption(!ENCRYPT);
         } finally {
             Thread.currentThread().setContextClassLoader(originalContextClassLoader);
         }
@@ -192,7 +195,36 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
      * @return the serialized {@code String}, use {@link #fromSerialized(String)} to materialize the object.
      */
     public String toSerialized() {
-        return JsonWriter.objectToJson(this);
+        if (false)
+            handlePropEncryption(ENCRYPT);
+        String ser = JsonWriter.objectToJson(this);
+        // Fix them back
+        if (false)
+            handlePropEncryption(!ENCRYPT);
+        return ser;
+    }
+
+    protected static final boolean ENCRYPT = true;
+
+    protected void handlePropEncryption(boolean encrypt) {
+        List<SchemaElement> props = getProperties();
+        for (SchemaElement se : props) {
+            if (se instanceof ComponentProperties) {
+                ((ComponentProperties) se).handlePropEncryption(encrypt);
+                continue;
+            }
+            if (se instanceof Property) {
+                Property prop = (Property) se;
+//                if (prop.isFlag(Property.Flags.ENCRYPT)) {
+//                    String value = prop.getStringValue();
+//                    CryptoHelper ch = new CryptoHelper(CryptoHelper.PASSPHRASE);
+//                    if (encrypt)
+//                        prop.setValue(ch.encrypt(value));
+//                    else
+//                        prop.setValue(ch.decrypt(value));
+//                }
+            }
+        }
     }
 
     /**
@@ -386,7 +418,9 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     }
 
     /**
-     * Copy all of the values from the specified {@link ComponentProperties} object. This includes the values from any nested objects.
+     * Copy all of the values from the specified {@link ComponentProperties} object. This includes the values from any
+     * nested objects.
+     * 
      * @param props
      */
     public void copyValuesFrom(ComponentProperties props) {
@@ -396,7 +430,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
             if (otherSe == null)
                 continue;
             if (se instanceof ComponentProperties) {
-                ((ComponentProperties)se).copyValuesFrom((ComponentProperties) otherSe);
+                ((ComponentProperties) se).copyValuesFrom((ComponentProperties) otherSe);
             } else {
                 Object value = props.getValue(otherSe);
                 setValue(se, value);

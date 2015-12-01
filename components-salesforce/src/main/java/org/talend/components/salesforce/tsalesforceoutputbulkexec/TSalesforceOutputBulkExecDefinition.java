@@ -24,7 +24,7 @@ import aQute.bnd.annotation.component.Component;
         + TSalesforceOutputBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition {
 
-    public static final String COMPONENT_NAME = "tSalesforceOutputBulkExec"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tSalesforceOutputBulkExecNew"; //$NON-NLS-1$
 
     public TSalesforceOutputBulkExecDefinition() {
         super(COMPONENT_NAME);

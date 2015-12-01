@@ -28,7 +28,7 @@ import aQute.bnd.annotation.component.Component;
         + TSalesforceInputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceInputDefinition extends SalesforceDefinition {
 
-    public static final String COMPONENT_NAME = "tSalesforceInput"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tSalesforceInputNew"; //$NON-NLS-1$
 
     public TSalesforceInputDefinition() {
         super(COMPONENT_NAME);

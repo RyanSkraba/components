@@ -17,6 +17,7 @@ import static org.talend.components.api.properties.presentation.Widget.widget;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.talend.components.api.properties.ComponentProperties;
@@ -32,6 +33,7 @@ public class TestComponentProperties extends ComponentProperties {
     public static final String USER_ID_PROP_NAME = "userId"; //$NON-NLS-1$
 
     public static Form mainForm;
+
     public static Form restoreForm;
 
     public PresentationItem testPI = new PresentationItem("testPI", "testPI display name");
@@ -39,6 +41,7 @@ public class TestComponentProperties extends ComponentProperties {
     public Property userId = (Property) newProperty(USER_ID_PROP_NAME).setRequired(true);
 
     public Property password = (Property) newProperty("password").setRequired(true);
+            //.setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING, Property.Flags.UI_PASSWORD));
 
     public Property nameList = newProperty("nameList");
 
@@ -80,6 +83,7 @@ public class TestComponentProperties extends ComponentProperties {
 
     public ComponentProperties init() {
         super.init();
+
         Form form = Form.create(this, Form.MAIN, "Test Component");
         mainForm = form;
         form.addRow(userId);

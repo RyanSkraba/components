@@ -24,7 +24,7 @@ import aQute.bnd.annotation.component.Component;
         + TSalesforceWaveOutputBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceWaveOutputBulkExecDefinition extends SalesforceDefinition {
 
-    public static final String COMPONENT_NAME = "tSalesforceWaveOutputBulkExec"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tSalesforceWaveOutputBulkExecNew"; //$NON-NLS-1$
 
     public TSalesforceWaveOutputBulkExecDefinition() {
         super(COMPONENT_NAME);

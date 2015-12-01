@@ -13,6 +13,8 @@
 package org.talend.components.api.properties;
 
 import java.util.Calendar;
+import java.util.EnumSet;
+import java.util.Iterator;
 
 import org.talend.components.api.schema.AbstractSchemaElement;
 
@@ -22,6 +24,24 @@ import org.talend.components.api.schema.AbstractSchemaElement;
 public class Property extends AbstractSchemaElement {
 
     protected ComponentProperties componentProperties;
+
+
+    //protected EnumSet<Flags> flags;
+
+    public enum Flags {
+                       /**
+                        * Encrypt this when storing the {@link ComponentProperties} into a serializable form.
+                        */
+        ENCRYPT,
+                       /**
+                        * Show this in the UI as if it were a password.
+                        */
+        UI_PASSWORD,
+                       /**
+                        * Don't log this value in any logs.
+                        */
+        SUPPRESS_LOGGING;
+    };
 
     public Property(String name) {
         this(name, null);
@@ -41,6 +61,21 @@ public class Property extends AbstractSchemaElement {
     public Property(Type type, String name) {
         this(type, name, null);
     }
+
+//    public EnumSet<Flags> getFlags() {
+//        return flags;
+//    }
+//
+//    public Property setFlags(EnumSet<Flags> flags) {
+//        this.flags = flags;
+//        return this;
+//    }
+//
+//    public boolean isFlag(Flags flag) {
+//        if (flags == null)
+//            return false;
+//        return flags.contains(flag);
+//    }
 
     public void setValue(Object value) {
         componentProperties.setValue(this, value);

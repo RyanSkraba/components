@@ -72,7 +72,8 @@
         <dependency>
             <groupId>com.cedarsoftware</groupId>
             <artifactId>json-io</artifactId>
-            <version>4.1.7</version>
+            <!-- Temporary until Issue #55 gets resolved this version has been deployed to our Nexus repo -->
+            <version>4.1.10-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>

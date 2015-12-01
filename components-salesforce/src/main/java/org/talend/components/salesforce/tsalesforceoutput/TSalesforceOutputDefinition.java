@@ -28,7 +28,7 @@ import aQute.bnd.annotation.component.Component;
         + TSalesforceOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceOutputDefinition extends SalesforceDefinition {
 
-    public static final String COMPONENT_NAME = "tSalesforceOutput"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tSalesforceOutputNew"; //$NON-NLS-1$
 
     public TSalesforceOutputDefinition() {
         super(COMPONENT_NAME);

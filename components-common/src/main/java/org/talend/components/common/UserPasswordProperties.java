@@ -14,6 +14,8 @@ package org.talend.components.common;
 
 import static org.talend.components.api.properties.PropertyFactory.newProperty;
 
+import java.util.EnumSet;
+
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
@@ -22,8 +24,8 @@ public class UserPasswordProperties extends ComponentProperties {
 
     public Property userId = (Property) newProperty("userId").setRequired(true); //$NON-NLS-1$
 
-    // FIXME - this needs to be encrypted, need to think about how to handle that
-    public Property password = (Property) newProperty("password").setRequired(true); //$NON-NLS-1$
+    public Property password = (Property) newProperty("password").setRequired(true);
+            //.setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING, Property.Flags.UI_PASSWORD));
 
     public UserPasswordProperties(String name) {
         super(name);

@@ -30,7 +30,7 @@ import com.sforce.soap.partner.GetDeletedResult;
         + TSalesforceGetDeletedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceGetDeletedDefinition extends SalesforceDefinition {
 
-    public static final String COMPONENT_NAME = "tSalesforceGetDeleted"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tSalesforceGetDeletedNew"; //$NON-NLS-1$
 
     public TSalesforceGetDeletedDefinition() {
         super(COMPONENT_NAME);
