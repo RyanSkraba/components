@@ -104,6 +104,19 @@ public class PropertiesTest {
     }
 
     @Test
+    public void testSetValueQualified() {
+        TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test1").init();
+        props.setValue("nestedProps.aGreatProperty", "great1");
+        assertEquals("great1", ((Property)props.getProperty("nestedProps.aGreatProperty")).getStringValue());
+        try {
+            props.setValue("nestedProps", "bad");
+            fail("did not get expected exception");
+        } catch (IllegalArgumentException ex) {
+            // expected
+        }
+    }
+
+    @Test
     public void testi18NForComponentDefintion() {
         TestComponentDefinition tcd = new TestComponentDefinition();
         assertEquals("Test Component", tcd.getDisplayName());

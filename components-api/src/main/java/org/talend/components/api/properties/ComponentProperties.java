@@ -373,7 +373,10 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     }
 
     public void setValue(String property, Object value) {
-        setValue(getProperty(property), value);
+        SchemaElement p = getProperty(property);
+        if (!(p instanceof Property))
+            throw new IllegalArgumentException("setValue but property: " + property + " is not a Property");
+        ((Property)p).setValue(value);
     }
 
     public Object getValue(SchemaElement property) {
