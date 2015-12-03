@@ -26,7 +26,7 @@ public class Property extends AbstractSchemaElement {
     protected ComponentProperties componentProperties;
 
 
-    //protected EnumSet<Flags> flags;
+    protected EnumSet<Flags> flags;
 
     public enum Flags {
                        /**
@@ -62,20 +62,20 @@ public class Property extends AbstractSchemaElement {
         this(type, name, null);
     }
 
-//    public EnumSet<Flags> getFlags() {
-//        return flags;
-//    }
-//
-//    public Property setFlags(EnumSet<Flags> flags) {
-//        this.flags = flags;
-//        return this;
-//    }
-//
-//    public boolean isFlag(Flags flag) {
-//        if (flags == null)
-//            return false;
-//        return flags.contains(flag);
-//    }
+    public EnumSet<Flags> getFlags() {
+        return flags;
+    }
+
+    public Property setFlags(EnumSet<Flags> flags) {
+        this.flags = flags;
+        return this;
+    }
+
+    public boolean isFlag(Flags flag) {
+        if (flags == null)
+            return false;
+        return flags.contains(flag);
+    }
 
     public void setValue(Object value) {
         componentProperties.setValue(this, value);

@@ -40,8 +40,8 @@ public class TestComponentProperties extends ComponentProperties {
 
     public Property userId = (Property) newProperty(USER_ID_PROP_NAME).setRequired(true);
 
-    public Property password = (Property) newProperty("password").setRequired(true);
-            //.setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING, Property.Flags.UI_PASSWORD));
+    public Property password = ((Property) newProperty("password").setRequired(true))
+            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING, Property.Flags.UI_PASSWORD));
 
     public Property nameList = newProperty("nameList");
 

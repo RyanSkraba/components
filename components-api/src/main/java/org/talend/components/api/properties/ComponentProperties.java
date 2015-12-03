@@ -154,8 +154,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         try {
             Thread.currentThread().setContextClassLoader(ComponentProperties.class.getClassLoader());
             d.properties = (ComponentProperties) JsonReader.jsonToJava(serialized);
-            if (false)
-                d.properties.handlePropEncryption(!ENCRYPT);
+            d.properties.handlePropEncryption(!ENCRYPT);
         } finally {
             Thread.currentThread().setContextClassLoader(originalContextClassLoader);
         }
@@ -195,12 +194,9 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
      * @return the serialized {@code String}, use {@link #fromSerialized(String)} to materialize the object.
      */
     public String toSerialized() {
-        if (false)
-            handlePropEncryption(ENCRYPT);
+        handlePropEncryption(ENCRYPT);
         String ser = JsonWriter.objectToJson(this);
-        // Fix them back
-        if (false)
-            handlePropEncryption(!ENCRYPT);
+        handlePropEncryption(!ENCRYPT);
         return ser;
     }
 
@@ -215,14 +211,14 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
             }
             if (se instanceof Property) {
                 Property prop = (Property) se;
-//                if (prop.isFlag(Property.Flags.ENCRYPT)) {
-//                    String value = prop.getStringValue();
-//                    CryptoHelper ch = new CryptoHelper(CryptoHelper.PASSPHRASE);
-//                    if (encrypt)
-//                        prop.setValue(ch.encrypt(value));
-//                    else
-//                        prop.setValue(ch.decrypt(value));
-//                }
+                if (prop.isFlag(Property.Flags.ENCRYPT)) {
+                    String value = prop.getStringValue();
+                    CryptoHelper ch = new CryptoHelper(CryptoHelper.PASSPHRASE);
+                    if (encrypt)
+                        prop.setValue(ch.encrypt(value));
+                    else
+                        prop.setValue(ch.decrypt(value));
+                }
             }
         }
     }

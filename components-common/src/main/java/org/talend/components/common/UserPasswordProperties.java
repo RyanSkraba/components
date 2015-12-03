@@ -24,8 +24,8 @@ public class UserPasswordProperties extends ComponentProperties {
 
     public Property userId = (Property) newProperty("userId").setRequired(true); //$NON-NLS-1$
 
-    public Property password = (Property) newProperty("password").setRequired(true);
-            //.setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING, Property.Flags.UI_PASSWORD));
+    public Property password = ((Property) newProperty("password").setRequired(true))
+            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING, Property.Flags.UI_PASSWORD));
 
     public UserPasswordProperties(String name) {
         super(name);
