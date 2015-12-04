@@ -40,8 +40,17 @@ public interface ComponentDefinition extends TopLevelDefinition {
 
     /**
      * Returns the types of {@link ComponentConnector} objects supported by this component.
+     *
+     * A connector is a link between two components that transmit data.
      */
     public ComponentConnector[] getConnectors();
+
+    /**
+     * Returns the types of {@link ComponentTrigger} objects supported by this component.
+     *
+     * A trigger is a link between two components that schedule the different subjobs.
+     */
+    public ComponentTrigger[] getTriggers();
 
     /**
      * Returns true if this {@code ComponentDefinition} will work with the specified {@link ComponentProperties}.
@@ -52,13 +61,13 @@ public interface ComponentDefinition extends TopLevelDefinition {
      * This shall be a path relative to the current Component definition, ideally is should just be the name of the png
      * image if placed in the same resource folder that the current class. This icon will be computed with the following
      * code
-     * 
+     *
      * <pre>
      * {@code
      *    this.getClass().getResourceAsStream(getIconPngPath())
      * }
      * </pre>
-     * 
+     *
      * @see {@link java.lang.Class#getResourceAsStream(String)}
      * @param imageType the type of image requested
      * @return the path to the png resource or null if the type is not handled.
