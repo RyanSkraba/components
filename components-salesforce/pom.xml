@@ -138,7 +138,7 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
-                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace</Import-Package>
+                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*</Import-Package>
                                 <Service-Component>*</Service-Component>
                                 <Embed-Dependency>!components*,*;scope=compile|runtime</Embed-Dependency>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>

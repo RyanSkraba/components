@@ -27,7 +27,7 @@ public class PaxExamOptions {
 
     public static Option[] getOptions() {
         return options(mavenBundle("org.apache.felix", "org.apache.felix.scr"), //
-                mavenBundle("org.slf4j", "slf4j-api", "1.7.12"),
+                mavenBundle("org.slf4j", "slf4j-api", "1.7.12"), mavenBundle("commons-lang", "commons-lang", "2.4"),
                 mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("bundle"), //
                 mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("tests").noStart(),
                 mavenBundle().groupId("org.talend.components").artifactId("components-common").classifier("bundle"),

@@ -15,10 +15,16 @@ package org.talend.components.salesforce;
 import java.io.BufferedWriter;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.properties.ComponentProperties;
@@ -38,8 +44,17 @@ import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputPrope
 
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.BulkConnection;
-import com.sforce.soap.partner.*;
+import com.sforce.soap.partner.DeleteResult;
+import com.sforce.soap.partner.DescribeGlobalResult;
+import com.sforce.soap.partner.DescribeGlobalSObjectResult;
+import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Error;
+import com.sforce.soap.partner.Field;
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.QueryResult;
+import com.sforce.soap.partner.SaveResult;
+import com.sforce.soap.partner.SessionHeader_element;
+import com.sforce.soap.partner.UpsertResult;
 import com.sforce.soap.partner.fault.LoginFault;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
@@ -140,6 +155,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         }
     }
 
+    @Override
     public void setContainer(ComponentRuntimeContainer container) {
         this.container = container;
     }
@@ -182,6 +198,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         }
     }
 
+    @Override
     public ValidationResult connectWithResult(ComponentProperties p) {
         SalesforceConnectionProperties properties = (SalesforceConnectionProperties) p;
         ValidationResult vr = new ValidationResult();
@@ -200,6 +217,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         return vr;
     }
 
+    @Override
     public void connect(ComponentProperties p) throws ConnectionException, AsyncApiException {
         SalesforceConnectionProperties properties = (SalesforceConnectionProperties) p;
         String refedComponentId = properties.getStringValue(properties.referencedComponentId);
@@ -208,9 +226,9 @@ public class SalesforceRuntime extends ComponentRuntime {
         }
 
         ConnectorConfig config = new ConnectorConfig();
-        config.setUsername(properties.userPassword.getStringValue(properties.userPassword.userId));
-        config.setPassword(properties.userPassword.getStringValue(properties.userPassword.password)
-                + properties.userPassword.getStringValue(properties.userPassword.securityKey));
+        config.setUsername(StringUtils.strip(properties.userPassword.getStringValue(properties.userPassword.userId), "\""));
+        config.setPassword(StringUtils.strip(properties.userPassword.getStringValue(properties.userPassword.password), "\"")
+                + StringUtils.strip(properties.userPassword.getStringValue(properties.userPassword.securityKey), "\""));
 
         // Notes on how to test this
         // http://thysmichels.com/2014/02/15/salesforce-wsc-partner-connection-session-renew-when-session-timeout/
@@ -243,8 +261,9 @@ public class SalesforceRuntime extends ComponentRuntime {
             config.setConnectionTimeout(properties.getIntValue(properties.timeout));
         }
         config.setCompression(properties.getBooleanValue(properties.needCompression));
-        if (false)
+        if (false) {
             config.setTraceMessage(true);
+        }
 
         doConnection(properties, config);
 
@@ -312,8 +331,9 @@ public class SalesforceRuntime extends ComponentRuntime {
 
     protected void commonBegin(ComponentProperties props) throws ConnectionException, AsyncApiException {
         properties = props;
-        if (!(props instanceof SalesforceConnectionModuleProperties))
+        if (!(props instanceof SalesforceConnectionModuleProperties)) {
             return;
+        }
 
         SalesforceConnectionModuleProperties sprops = (SalesforceConnectionModuleProperties) props;
         connect(sprops.connection);
@@ -330,6 +350,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         }
     }
 
+    @Override
     public void inputBegin(ComponentProperties props) throws Exception {
         TSalesforceInputProperties sprops = (TSalesforceInputProperties) props;
         commonBegin(props);
@@ -357,12 +378,14 @@ public class SalesforceRuntime extends ComponentRuntime {
 
         inputFieldsToUse = new ArrayList<>();
         for (SchemaElement s : fieldList) {
-            if (s.getType() == SchemaElement.Type.DYNAMIC)
+            if (s.getType() == SchemaElement.Type.DYNAMIC) {
                 continue;
+            }
             inputFieldsToUse.add(s);
         }
-        if (dynamicFieldList != null)
+        if (dynamicFieldList != null) {
             inputFieldsToUse.addAll(dynamicFieldList);
+        }
 
         String queryText;
         if (sprops.getBooleanValue(sprops.manualQuery)) {
@@ -387,10 +410,12 @@ public class SalesforceRuntime extends ComponentRuntime {
         inputRecordsIndex = 0;
     }
 
+    @Override
     public Map<String, Object> inputRow() throws Exception {
         if (inputRecordsIndex >= inputRecords.length) {
-            if (inputResult.isDone())
+            if (inputResult.isDone()) {
                 return null;
+            }
             inputResult = connection.queryMore(inputResult.getQueryLocator());
             inputRecordsIndex = 0;
         }
@@ -405,20 +430,24 @@ public class SalesforceRuntime extends ComponentRuntime {
         while (it.hasNext()) {
             XmlObject obj = it.next();
             String localName = obj.getName().getLocalPart();
-            if (dynamicFieldMap != null && dynamicFieldMap.get(localName) != null)
+            if (dynamicFieldMap != null && dynamicFieldMap.get(localName) != null) {
                 dynamicHolder.addFieldValue(localName, obj.getValue());
-            else
+            } else {
                 columns.put(localName, obj.getValue());
+            }
         }
-        if (dynamicHolder != null)
+        if (dynamicHolder != null) {
             columns.put(dynamicField.getName(), dynamicHolder);
+        }
         return columns;
     }
 
+    @Override
     public void inputEnd() throws Exception {
         logout();
     }
 
+    @Override
     public void outputBegin(ComponentProperties props) throws Exception {
         commonBegin(props);
 
@@ -426,6 +455,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         upsertKeyColumn = sprops.getStringValue(sprops.upsertKeyColumn);
     }
 
+    @Override
     public void outputMain(Map<String, Object> row) throws Exception {
         TSalesforceOutputProperties sprops = (TSalesforceOutputProperties) properties;
         if (sprops.getValue(sprops.outputAction) != TSalesforceOutputProperties.OutputAction.DELETE) {
@@ -473,6 +503,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         }
     }
 
+    @Override
     public void outputEnd() throws Exception {
         logout();
     }
