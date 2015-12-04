@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.PropertyFactory.newString;
-import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.properties.PropertyFactory.*;
+import static org.talend.components.api.properties.presentation.Widget.*;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class SalesforceModuleProperties extends ComponentProperties {
     //
     // Properties
     //
-    public Property moduleName = newString("moduleName"); //$NON-NLS-1$
+    public Property moduleName = newEnum("moduleName"); //$NON-NLS-1$
 
     public SchemaProperties schema = new SchemaProperties("schema").init();
 
