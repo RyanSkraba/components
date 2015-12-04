@@ -46,7 +46,7 @@ public class TestComponentWizardDefinition extends AbstractComponentWizardDefint
 
     @Override
     public ComponentWizard createWizard(String location) {
-        return new TestComponentWizard(this, location, GlobalContext.i18nMessageProvider);
+        return new TestComponentWizard(this, location, GlobalContext.getI18nMessageProvider());
     }
 
     @Override

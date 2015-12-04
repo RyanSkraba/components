@@ -41,7 +41,7 @@ public class TranslatableImpl implements Translatable {
      * @return the already set I18nMessages or a newly created one base on the current Class package.
      */
     protected I18nMessages createI18nMessageFormater() {
-        return GlobalContext.i18nMessageProvider.getI18nMessages(this.getClass());
+        return GlobalContext.getI18nMessageProvider().getI18nMessages(this.getClass());
     }
 
     @Override

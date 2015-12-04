@@ -12,20 +12,16 @@
 // ============================================================================
 package org.talend.components.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 import java.util.List;
 import java.util.Set;
 
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.context.GlobalContext;
-import org.talend.components.api.i18n.I18nMessageProvider;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
-import org.talend.daikon.i18n.LocaleProvider;
 
 public class ComponentTestUtils {
 
@@ -63,21 +59,6 @@ public class ComponentTestUtils {
         }
         return deserProps;
 
-    }
-
-    public static void setupGlobalContext() {
-        I18nMessageProvider i18nMessageProvider = new I18nMessageProvider() {
-
-            @Override
-            protected LocaleProvider getLocaleProvider() {
-                return null;
-            }
-        };
-        GlobalContext.i18nMessageProvider = i18nMessageProvider;
-    }
-
-    public static void unsetGlobalContext() {
-        GlobalContext.i18nMessageProvider = null;
     }
 
     static public void testAlli18n(ComponentService componentService) {

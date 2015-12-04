@@ -16,8 +16,6 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.talend.components.api.ComponentTestUtils;
 import org.talend.components.api.properties.presentation.Form;
@@ -29,16 +27,6 @@ import org.talend.components.api.service.testcomponent.nestedprop.NestedComponen
 import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
 
 public class PropertiesTest {
-
-    @BeforeClass
-    public static void init() {
-        ComponentTestUtils.setupGlobalContext();
-    }
-
-    @AfterClass
-    public static void unset() {
-        ComponentTestUtils.unsetGlobalContext();
-    }
 
     @Test
     public void testSerializeProp() {
@@ -92,20 +80,20 @@ public class PropertiesTest {
         TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test1").init();
         props.integer.setValue(1);
         props.userId.setValue("User1");
-        ((Property)props.getProperty("nestedProps.aGreatProperty")).setValue("great1");
+        ((Property) props.getProperty("nestedProps.aGreatProperty")).setValue("great1");
 
         TestComponentProperties props2 = (TestComponentProperties) new TestComponentProperties("test2").init();
         props2.copyValuesFrom(props);
         assertEquals(1, props2.getIntValue(props2.getProperty("integer")));
         assertEquals("User1", props2.getStringValue(props2.getProperty("userId")));
-        assertEquals("great1", ((Property)props2.getProperty("nestedProps.aGreatProperty")).getStringValue());
+        assertEquals("great1", ((Property) props2.getProperty("nestedProps.aGreatProperty")).getStringValue());
     }
 
     @Test
     public void testSetValueQualified() {
         TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test1").init();
         props.setValue("nestedProps.aGreatProperty", "great1");
-        assertEquals("great1", ((Property)props.getProperty("nestedProps.aGreatProperty")).getStringValue());
+        assertEquals("great1", ((Property) props.getProperty("nestedProps.aGreatProperty")).getStringValue());
         try {
             props.setValue("nestedProps", "bad");
             fail("did not get expected exception");
@@ -142,8 +130,7 @@ public class PropertiesTest {
     @Test
     public void testi18NForNestedPropertyWithDefinedI18N() {
         TestComponentProperties componentProperties = new TestComponentProperties("test");
-        ComponentProperties nestedProp = (ComponentProperties) componentProperties
-                .getProperty("nestedProp2");
+        ComponentProperties nestedProp = (ComponentProperties) componentProperties.getProperty("nestedProp2");
         assertNotNull(nestedProp);
         SchemaElement greatProperty = nestedProp.getProperty(ComponentPropertiesWithDefinedI18N.A_GREAT_PROP_NAME2);
         assertNotNull(greatProperty);
@@ -153,8 +140,7 @@ public class PropertiesTest {
     @Test
     public void testi18NForInheritedProperty() {
         TestComponentProperties componentProperties = new TestComponentProperties("test");
-        ComponentProperties nestedProp = (ComponentProperties) componentProperties
-                .getProperty("nestedProp3");
+        ComponentProperties nestedProp = (ComponentProperties) componentProperties.getProperty("nestedProp3");
         assertNotNull(nestedProp);
         SchemaElement greatProperty = nestedProp.getProperty(NestedComponentProperties.A_GREAT_PROP_NAME);
         assertNotNull(greatProperty);

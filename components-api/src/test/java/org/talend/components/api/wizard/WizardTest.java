@@ -14,24 +14,11 @@ package org.talend.components.api.wizard;
 
 import static org.junit.Assert.*;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.talend.components.api.ComponentTestUtils;
 import org.talend.components.api.service.testcomponent.TestComponentWizard;
 import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
 
 public class WizardTest {
-
-    @BeforeClass
-    public static void init() {
-        ComponentTestUtils.setupGlobalContext();
-    }
-
-    @AfterClass
-    public static void unset() {
-        ComponentTestUtils.unsetGlobalContext();
-    }
 
     @Test
     public void testi18NForWizardDefintion() {

@@ -12,25 +12,11 @@
 // ============================================================================
 package org.talend.components.api.schema;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.talend.components.api.ComponentTestUtils;
 
 public class SchemaTest {
-
-    @BeforeClass
-    public static void init() {
-        ComponentTestUtils.setupGlobalContext();
-    }
-
-    @AfterClass
-    public static void unset() {
-        ComponentTestUtils.unsetGlobalContext();
-    }
 
     @Test
     public void testSerializeSchema() {

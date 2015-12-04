@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.api.service.testcomponent;
 
-import static org.talend.components.api.properties.PropertyFactory.newProperty;
+import static org.talend.components.api.properties.PropertyFactory.*;
 
 import org.talend.components.api.context.GlobalContext;
 import org.talend.components.api.properties.ComponentProperties;
@@ -37,7 +37,7 @@ public class ComponentPropertiesWithDefinedI18N extends ComponentProperties {
      */
     @Override
     protected I18nMessages createI18nMessageFormater() {
-        return GlobalContext.i18nMessageProvider.getI18nMessages(this.getClass().getClassLoader(),
+        return GlobalContext.getI18nMessageProvider().getI18nMessages(this.getClass().getClassLoader(),
                 "org/talend/components/api/service/specificmessages");
     }
 
