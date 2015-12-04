@@ -44,17 +44,55 @@ public class PropertyFactory {
     }
 
     public static Property newInteger(String name, String defaultValue) {
-        Property property = new Property(name);
+        Property property = newInteger(name);
         property.setDefaultValue(defaultValue);
         return property;
+    }
+
+    public static Property newInteger(String name, Integer defaultValue) {
+        return newInteger(name, defaultValue.toString());
+    }
+
+    public static Property newDouble(String name) {
+        return new Property(SchemaElement.Type.DOUBLE, name);
+    }
+
+    public static Property newDouble(String name, String defaultValue) {
+        Property property = newDouble(name);
+        property.setDefaultValue(defaultValue);
+        return property;
+    }
+
+    public static Property newDouble(String name, Double defaultValue) {
+        return newDouble(name, defaultValue.toString());
     }
 
     public static Property newFloat(String name) {
         return new Property(SchemaElement.Type.FLOAT, name);
     }
 
+    public static Property newFloat(String name, String defaultValue) {
+        Property property = newFloat(name);
+        property.setDefaultValue(defaultValue);
+        return property;
+    }
+
+    public static Property newFloat(String name, Float defaultValue) {
+        return newFloat(name, defaultValue.toString());
+    }
+
     public static Property newBoolean(String name) {
         return new Property(SchemaElement.Type.BOOLEAN, name);
+    }
+
+    public static Property newBoolean(String name, String defaultValue) {
+        Property property = newBoolean(name);
+        property.setDefaultValue(defaultValue);
+        return property;
+    }
+
+    public static Property newBoolean(String name, Boolean defaultValue) {
+        return newBoolean(name, defaultValue.toString());
     }
 
     public static Property newDate(String name) {
@@ -91,6 +129,7 @@ public class PropertyFactory {
      * @return a {@link Property}
      */
     public static Property newReturnProperty(Property returns, SchemaElement.Type type, String name) {
+        // TODO Check if the property's name is equals ComponentProperties.RETURNS
         Property p = new Property(type, name);
         returns.addChild(p);
         return p;
