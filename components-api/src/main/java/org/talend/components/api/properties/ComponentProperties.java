@@ -180,11 +180,13 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
                 ((ComponentProperties) prop).init();
             }
         }
-        // initSubclass();
-        setupLayout();
-        for (Form form : getForms()) {
-            refreshLayout(form);
+        if (!isRuntimeOnly()) {
+            setupLayout();
+            for (Form form : getForms()) {
+                refreshLayout(form);
+            }
         }
+
         return this;
     }
 
@@ -221,6 +223,15 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
                 }
             }
         }
+    }
+
+    public ComponentProperties setRuntimeOnly() {
+        internal.setRuntimeOnly();
+        return this;
+    }
+
+    public boolean isRuntimeOnly() {
+        return internal.isRuntimeOnly();
     }
 
     /**
@@ -372,7 +383,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         SchemaElement p = getProperty(property);
         if (!(p instanceof Property))
             throw new IllegalArgumentException("setValue but property: " + property + " is not a Property");
-        ((Property)p).setValue(value);
+        ((Property) p).setValue(value);
     }
 
     public Object getValue(SchemaElement property) {

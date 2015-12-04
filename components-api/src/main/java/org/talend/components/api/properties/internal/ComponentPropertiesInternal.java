@@ -30,6 +30,8 @@ public class ComponentPropertiesInternal {
 
     protected ComponentDesigner designer;
 
+    protected boolean runtimeOnly;
+
     protected List<Form> forms;
 
     protected ValidationResult validationResult;
@@ -39,6 +41,14 @@ public class ComponentPropertiesInternal {
     public ComponentPropertiesInternal() {
         forms = new ArrayList<Form>();
         propertyValues = new HashMap<>();
+    }
+
+    public void setRuntimeOnly() {
+        runtimeOnly = true;
+    }
+
+    public boolean isRuntimeOnly() {
+        return runtimeOnly;
     }
 
     public List<Form> getForms() {

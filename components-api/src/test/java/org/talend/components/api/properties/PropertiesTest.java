@@ -57,6 +57,15 @@ public class PropertiesTest {
     }
 
     @Test
+    public void testRuntimeOnly() {
+        TestComponentProperties props = new TestComponentProperties("test");
+        props.setRuntimeOnly();
+        props.init();
+        assertTrue(props.isRuntimeOnly());
+        assertNull(props.getForm(Form.MAIN));
+    }
+
+    @Test
     public void testGetProperty() {
         TestComponentProperties props = new TestComponentProperties("test");
         assertEquals("userId", props.getProperty("userId").getName());

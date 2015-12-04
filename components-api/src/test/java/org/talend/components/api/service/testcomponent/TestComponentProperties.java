@@ -83,7 +83,10 @@ public class TestComponentProperties extends ComponentProperties {
 
     public ComponentProperties init() {
         super.init();
+        return this;
+    }
 
+    protected void setupLayout() {
         Form form = Form.create(this, Form.MAIN, "Test Component");
         mainForm = form;
         form.addRow(userId);
@@ -101,7 +104,5 @@ public class TestComponentProperties extends ComponentProperties {
         form.addRow(date);
         form.addRow(dateTime);
         form.addRow(nestedProps.getForm(Form.MAIN));
-        return this;
-
     }
 }
