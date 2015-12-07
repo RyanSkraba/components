@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.api.service.testcomponent;
 
-import static org.talend.components.api.properties.PropertyFactory.newProperty;
-import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.properties.PropertyFactory.*;
+import static org.talend.components.api.properties.presentation.Widget.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +23,8 @@ import java.util.List;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.PresentationItem;
 import org.talend.components.api.properties.Property;
+import org.talend.components.api.properties.ValidationResult;
+import org.talend.components.api.properties.ValidationResult.Result;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
@@ -55,13 +57,11 @@ public class TestComponentProperties extends ComponentProperties {
 
     public Property dateTime = newProperty(Type.DATETIME, "dateTime");
 
-    public NestedComponentProperties nestedProps = (NestedComponentProperties) new NestedComponentProperties("nestedProps");
+    public NestedComponentProperties nestedProps = new NestedComponentProperties("nestedProps");
 
-    public ComponentPropertiesWithDefinedI18N nestedProp2 = (ComponentPropertiesWithDefinedI18N) new ComponentPropertiesWithDefinedI18N(
-            "nestedProp2");
+    public ComponentPropertiesWithDefinedI18N nestedProp2 = new ComponentPropertiesWithDefinedI18N("nestedProp2");
 
-    public InheritedComponentProperties nestedProp3 = (InheritedComponentProperties) new InheritedComponentProperties(
-            "nestedProp3");
+    public InheritedComponentProperties nestedProp3 = new InheritedComponentProperties("nestedProp3");
 
     public static final String TESTCOMPONENT = "TestComponent";
 
@@ -69,10 +69,11 @@ public class TestComponentProperties extends ComponentProperties {
         super(name);
     }
 
-    public void beforeNameList() {
+    public ValidationResult beforeNameList() {
         List values = new ArrayList<>();
         Collections.addAll(values, new String[] { "name1", "name2", "name3" });
         nameList.setPossibleValues(values);
+        return ValidationResult.OK;
     }
 
     public void beforeNameListRef() {
@@ -81,11 +82,21 @@ public class TestComponentProperties extends ComponentProperties {
         nameListRef.setPossibleValues(values);
     }
 
+    public ValidationResult afterFormFinishMain() {
+        return new ValidationResult().setStatus(Result.ERROR);
+    }
+
+    public ValidationResult afterInteger() {
+        return new ValidationResult().setStatus(Result.WARNING);
+    }
+
+    @Override
     public ComponentProperties init() {
         super.init();
         return this;
     }
 
+    @Override
     protected void setupLayout() {
         Form form = Form.create(this, Form.MAIN, "Test Component");
         mainForm = form;

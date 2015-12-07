@@ -13,10 +13,11 @@
 package org.talend.components.salesforce.tsalesforceoutput;
 
 import static org.talend.components.api.properties.PropertyFactory.*;
-import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.properties.presentation.Widget.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
+import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.schema.Schema;
@@ -84,12 +85,13 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
         }
 
         @Override
-        public void afterModuleName() throws Exception {
-            super.afterModuleName();
+        public ValidationResult afterModuleName() throws Exception {
+            ValidationResult validationResult = super.afterModuleName();
             Schema s = (Schema) schema.getValue(schema.schema);
             // FIXME - we probably only want the names, not the SchemaElements
             upsertKeyColumn.setPossibleValues(s.getRoot().getChildren());
             upsertRelation.getChild("columnName").setPossibleValues(s.getRoot().getChildren());
+            return validationResult;
         }
     }
 

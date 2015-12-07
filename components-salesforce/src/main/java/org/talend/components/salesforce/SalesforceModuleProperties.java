@@ -64,21 +64,23 @@ public class SalesforceModuleProperties extends ComponentProperties {
 
     // consider beforeActivate and beforeRender (change after to afterActivate)l
 
-    public void beforeModuleName() throws Exception {
+    public ValidationResult beforeModuleName() throws Exception {
         SalesforceRuntime conn = new SalesforceRuntime();
         ValidationResult vr = conn.connectWithResult(connection);
         if (vr.getStatus() == ValidationResult.Result.OK) {
             List<NameAndLabel> moduleNames = conn.getSchemaNames();
             moduleName.setPossibleValues(moduleNames);
         }
+        return vr;
     }
 
-    public void afterModuleName() throws Exception {
+    public ValidationResult afterModuleName() throws Exception {
         SalesforceRuntime conn = new SalesforceRuntime();
         ValidationResult vr = conn.connectWithResult(connection);
         if (vr.getStatus() == ValidationResult.Result.OK) {
             schema.setValue(schema.schema, conn.getSchema(getStringValue(moduleName)));
         }
+        return vr;
     }
 
 }

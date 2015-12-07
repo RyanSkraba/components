@@ -20,10 +20,12 @@ package org.talend.components.api.properties;
 public class ValidationResult {
 
     public enum Result {
-        OK,
-        WARNING,
-        ERROR
+                        OK,
+                        WARNING,
+                        ERROR
     }
+
+    public static ValidationResult OK = new ValidationResult().setStatus(Result.OK);
 
     public Result status = Result.OK;
 
@@ -33,8 +35,9 @@ public class ValidationResult {
         return status;
     }
 
-    public void setStatus(Result status) {
+    public ValidationResult setStatus(Result status) {
         this.status = status;
+        return this;
     }
 
     public int getNumber() {
@@ -55,6 +58,7 @@ public class ValidationResult {
 
     public String message;
 
+    @Override
     public String toString() {
         return getStatus() + " " + getMessage();
     }

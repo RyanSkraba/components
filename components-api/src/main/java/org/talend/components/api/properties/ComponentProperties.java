@@ -15,7 +15,11 @@ package org.talend.components.api.properties;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
@@ -216,10 +220,11 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
                 if (prop.isFlag(Property.Flags.ENCRYPT)) {
                     String value = prop.getStringValue();
                     CryptoHelper ch = new CryptoHelper(CryptoHelper.PASSPHRASE);
-                    if (encrypt)
+                    if (encrypt) {
                         prop.setValue(ch.encrypt(value));
-                    else
+                    } else {
                         prop.setValue(ch.decrypt(value));
+                    }
                 }
             }
         }
@@ -373,16 +378,18 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     }
 
     public void setValue(SchemaElement property, Object value) {
-        if (property.getType() == Type.SCHEMA && value instanceof String)
+        if (property.getType() == Type.SCHEMA && value instanceof String) {
             value = SchemaFactory.fromSerialized((String) value);
+        }
 
         internal.setValue(property, value);
     }
 
     public void setValue(String property, Object value) {
         SchemaElement p = getProperty(property);
-        if (!(p instanceof Property))
+        if (!(p instanceof Property)) {
             throw new IllegalArgumentException("setValue but property: " + property + " is not a Property");
+        }
         ((Property) p).setValue(value);
     }
 
@@ -437,8 +444,9 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         List<SchemaElement> values = getProperties();
         for (SchemaElement se : values) {
             SchemaElement otherSe = props.getProperty(se.getName());
-            if (otherSe == null)
+            if (otherSe == null) {
                 continue;
+            }
             if (se instanceof ComponentProperties) {
                 ((ComponentProperties) se).copyValuesFrom((ComponentProperties) otherSe);
             } else {
@@ -511,7 +519,12 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
 
     private void doInvoke(Method m) throws Throwable {
         try {
-            m.invoke(this);
+            Object result = m.invoke(this);
+            if (result instanceof ValidationResult && result != null) {
+                internal.setValidationResult((ValidationResult) result);
+            } else {
+                internal.setValidationResult(ValidationResult.OK);
+            }
         } catch (InvocationTargetException e) {
             throw e.getTargetException();
         }

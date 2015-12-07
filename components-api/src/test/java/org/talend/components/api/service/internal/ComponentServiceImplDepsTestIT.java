@@ -12,8 +12,7 @@
 // ============================================================================
 package org.talend.components.api.service.internal;
 
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,8 +34,10 @@ import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.talend.components.api.service.internal.ComponentServiceImpl;
+import org.talend.components.api.service.internal.MavenBooter;
 
-public class ComponentServiceImplTestIT {
+public class ComponentServiceImplDepsTestIT {
 
     String DIRECT_DEPS = "mvn:org.springframework/spring-webmvc/1.0/jar,mvn:org.eclipse.aether/aether-api/1.0.0.v20140518/jar,"
             + "mvn:foo/bar/1.6.3/jar,mvn:org.talend.components.salesforce/partner/34.0.0/jar";
@@ -49,7 +50,6 @@ public class ComponentServiceImplTestIT {
     String FULL_DEPS_TEST = FULL_DEPS
             + ",mvn:junit/junit/4.11/jar,mvn:org.hamcrest/hamcrest-library/1.3/jar,mvn:org.hamcrest/hamcrest-core/1.3/jar";
 
-    // ,mvn:junit/junit/4.11/jar
     /**
      * Test method for
      * {@link org.talend.components.api.service.internal.ComponentServiceImpl#loadPom(java.io.InputStream, org.talend.components.api.service.internal.MavenBooter)}

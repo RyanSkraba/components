@@ -12,8 +12,7 @@
 // ============================================================================
 package org.talend.components.api;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -32,9 +31,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.service.LocalComponentTestIT;
+import org.talend.components.api.service.ComponentServiceTest;
 import org.talend.components.api.service.testcomponent.TestComponentDefinition;
 import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
@@ -44,7 +42,7 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
  */
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class ComponentServiceTestIT extends LocalComponentTestIT {
+public class ComponentServiceTestIT extends ComponentServiceTest {
 
     @Inject
     private ComponentService osgiCompService;
@@ -62,7 +60,6 @@ public class ComponentServiceTestIT extends LocalComponentTestIT {
         bundleContext.registerService(ComponentDefinition.class, new TestComponentDefinition(), props);
         props.put("component.name", Constants.COMPONENT_WIZARD_BEAN_PREFIX + TestComponentWizardDefinition.COMPONENT_WIZARD_NAME);
         bundleContext.registerService(ComponentWizardDefinition.class, new TestComponentWizardDefinition(), props);
-        componentService = osgiCompService;
     }
 
     @Test
@@ -79,10 +76,9 @@ public class ComponentServiceTestIT extends LocalComponentTestIT {
         }
     }
 
-    @Test(expected = ComponentException.class)
-    public void getComponentService() {
-        assertNotNull(componentService);
-        componentService.getComponentProperties("foo");
+    @Override
+    public ComponentService getComponentService() {
+        return osgiCompService;
     }
 
 }

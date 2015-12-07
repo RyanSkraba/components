@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.PropertyFactory.newString;
-import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.properties.PropertyFactory.*;
+import static org.talend.components.api.properties.presentation.Widget.*;
 
 import java.util.List;
 
@@ -79,12 +79,11 @@ public class SalesforceModuleListProperties extends ComponentProperties {
         getForm(Form.MAIN).setAllowFinish(true);
     }
 
-    public void afterFormFinishMain() throws Exception {
+    public ValidationResult afterFormFinishMain() throws Exception {
         SalesforceRuntime conn = new SalesforceRuntime();
         ValidationResult vr = conn.connectWithResult(connectionProps);
         if (vr.getStatus() != ValidationResult.Result.OK) {
-            // FIXME - add error handling, finish can fail
-            return;
+            return vr;
         }
 
         String connRepLocation = compService.storeComponentProperties(connectionProps,
@@ -99,7 +98,7 @@ public class SalesforceModuleListProperties extends ComponentProperties {
             modProps.schema.setValue(modProps.schema.schema, schema);
             compService.storeComponentProperties(modProps, nl.getName(), connRepLocation, schema);
         }
-
+        return ValidationResult.OK;
     }
 
     /**

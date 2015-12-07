@@ -12,9 +12,7 @@
 // ============================================================================
 package org.talend.components.api.service;
 
-import static org.junit.Assert.assertTrue;
-
-import javax.inject.Inject;
+import static org.junit.Assert.*;
 
 import org.junit.After;
 import org.junit.Before;
@@ -22,14 +20,9 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.service.ComponentService;
 
-public abstract class AbstractComponentTestIT {
-
-    @Inject
-    public ComponentService componentService;
-
-    public AbstractComponentTestIT() {
-    }
+public abstract class AbstractComponentTest {
 
     @Rule
     public TestName name = new TestName();
@@ -49,22 +42,29 @@ public abstract class AbstractComponentTestIT {
 
     protected ComponentProperties checkAndBeforeActivate(Form form, String propName, ComponentProperties props) throws Throwable {
         assertTrue(form.getWidget(propName).isCallBeforeActivate());
-        return componentService.beforePropertyActivate(propName, props);
+        return getComponentService().beforePropertyActivate(propName, props);
     }
 
     protected ComponentProperties checkAndBeforePresent(Form form, String propName, ComponentProperties props) throws Throwable {
         assertTrue(form.getWidget(propName).isCallBeforePresent());
-        return componentService.beforePropertyPresent(propName, props);
+        return getComponentService().beforePropertyPresent(propName, props);
     }
 
     protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props) throws Throwable {
         assertTrue(form.getWidget(propName).isCallAfter());
-        return componentService.afterProperty(propName, props);
+        return getComponentService().afterProperty(propName, props);
     }
 
     protected ComponentProperties checkAndValidate(Form form, String propName, ComponentProperties props) throws Throwable {
         assertTrue(form.getWidget(propName).isCallValidate());
-        return componentService.validateProperty(propName, props);
+        return getComponentService().validateProperty(propName, props);
     }
+
+    /**
+     * Getter for componentService.
+     * 
+     * @return the componentService
+     */
+    abstract public ComponentService getComponentService();
 
 }
