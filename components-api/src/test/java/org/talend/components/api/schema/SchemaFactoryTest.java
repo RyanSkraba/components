@@ -38,4 +38,20 @@ public class SchemaFactoryTest {
         assertNull(element.getTitle());
         assertEquals(Type.DECIMAL, element.getType());
     }
+
+    @Test
+    // TUP-3898 Generic codegen for a Schema does not probably handle escaped quotes.
+    public void testQuoteDeserialize() {
+        SchemaElement element = SchemaFactory.newSchemaElement(Type.DATETIME, "dateTime");
+        element.setPattern("\"pattern\"");
+        Schema schema = SchemaFactory.newSchema();
+        schema.setRoot(element);
+        String ser = schema.toSerialized();
+        System.out.println(ser);
+
+        String quoted = "\"" + ser.replace("\\\"",	"\\\\\"").replace("\"", "\\\"") + "\"";
+        System.out.println(quoted);
+        assertTrue(quoted.contains("\\\\\\\"pattern"));
+
+    }
 }
