@@ -1,93 +1,33 @@
 package org.talend.components.proptester;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import javax.inject.Inject;
 
-import jline.console.ConsoleReader;
-import jline.console.completer.ArgumentCompleter;
-import jline.console.completer.StringsCompleter;
-
-import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.boot.SpringApplication;
-import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.core.annotation.AnnotationAttributes;
-import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
+import org.talend.daikon.spring.BndToSpringBeanNameGenerator;
+
+import jline.console.ConsoleReader;
+import jline.console.completer.ArgumentCompleter;
+import jline.console.completer.StringsCompleter;
 
 /**
  * Component properties test class
  */
-@ComponentScan(basePackages = "org.talend.components", nameGenerator = PropertiesTester.BndToSpringBeanNameGenerator.class, includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = aQute.bnd.annotation.component.Component.class) , excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = ".*Osgi") )
+@ComponentScan(basePackages = "org.talend.components", nameGenerator = BndToSpringBeanNameGenerator.class, includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = aQute.bnd.annotation.component.Component.class) , excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = ".*Osgi") )
 @Service
 public class PropertiesTester {
-
-    // FIXME - temp
-    static final public String BND_ANNOTATION = "aQute.bnd.annotation.component.Component";
-
-    static public class BndToSpringBeanNameGenerator extends AnnotationBeanNameGenerator {
-
-        /**
-         * Derive a bean name from one of the annotations on the class.
-         *
-         * @param annotatedDef the annotation-aware bean definition
-         * @return the bean name, or {@code null} if none is found
-         */
-        @Override
-        protected String determineBeanNameFromAnnotation(AnnotatedBeanDefinition annotatedDef) {
-            String beanName = super.determineBeanNameFromAnnotation(annotatedDef);
-            if (beanName != null) {
-                return beanName;
-            } // else check for BND annotation
-            AnnotationMetadata amd = annotatedDef.getMetadata();
-            Set<String> types = amd.getAnnotationTypes();
-            for (String type : types) {
-                AnnotationAttributes attributes = AnnotationAttributes.fromMap(amd.getAnnotationAttributes(type, false));
-                if (isStereotypeWithBndNameValue(type, amd.getMetaAnnotationTypes(type), attributes)) {
-                    Object value = attributes.get("name");
-                    if (value instanceof String) {
-                        String strVal = (String) value;
-                        if (StringUtils.hasLength(strVal)) {
-                            if (beanName != null && !strVal.equals(beanName)) {
-                                throw new IllegalStateException("Stereotype annotations suggest inconsistent "
-                                        + "component names: '" + beanName + "' versus '" + strVal + "'");
-                            }
-                            beanName = strVal;
-                        }
-                    }
-                }
-            }
-            return beanName;
-        }
-
-        /**
-         * Check whether the given annotation is a stereotype that is allowed to suggest a component name through its
-         * annotation {@code value()}.
-         *
-         * @param annotationType the name of the annotation class to check
-         * @param metaAnnotationTypes the names of meta-annotations on the given annotation
-         * @param attributes the map of attributes for the given annotation
-         * @return whether the annotation qualifies as a stereotype with component name
-         */
-        protected boolean isStereotypeWithBndNameValue(String annotationType, Set<String> metaAnnotationTypes,
-                Map<String, Object> attributes) {
-
-            boolean isStereotype = annotationType.equals(BND_ANNOTATION)
-                    || (metaAnnotationTypes != null && metaAnnotationTypes.contains(BND_ANNOTATION));
-
-            return (isStereotype && attributes != null && attributes.containsKey("name"));
-        }
-
-    }
 
     private class Command {
 
@@ -117,16 +57,18 @@ public class PropertiesTester {
 
         List<String> getNameList() {
             List<String> l = new ArrayList();
-            for (String s : names)
+            for (String s : names) {
                 l.add(s);
+            }
             return l;
         }
 
         String helpCommand() {
             StringBuilder sb = new StringBuilder();
             sb.append(names[0]);
-            if (names.length == 2)
+            if (names.length == 2) {
                 sb.append(" (" + names[1] + ")");
+            }
             return sb.toString();
         }
 
@@ -151,8 +93,9 @@ public class PropertiesTester {
         StringBuilder sb = new StringBuilder();
         boolean firstTime = true;
         for (Object item : c) {
-            if (!firstTime)
+            if (!firstTime) {
                 sb.append("\n");
+            }
             sb.append(item.toString());
             firstTime = false;
         }
@@ -184,6 +127,7 @@ public class PropertiesTester {
         commands = new Command[] { //
                 new Command(new String[] { "createProps", "cp" }, "Create properties, specify component name") {
 
+                    @Override
                     void run() {
                         if (argIndex >= args.length) {
                             System.out.println("Specify the component name");
@@ -194,6 +138,7 @@ public class PropertiesTester {
                         testProps = componentService.getComponentProperties(comp);
                     }
 
+                    @Override
                     void setupCompleter() {
                         StringsCompleter sc = new StringsCompleter(getNameList());
                         console.addCompleter(
@@ -202,24 +147,28 @@ public class PropertiesTester {
                 }, //
                 new Command(new String[] { "showProps", "sp" }, "Show previously created properties") {
 
+                    @Override
                     void run() {
                         System.out.println(testProps);
                     }
                 }, //
                 new Command(new String[] { "showComps", "sc" }, "Show all component definitions") {
 
+                    @Override
                     void run() {
                         System.out.println(arrayLines(componentService.getAllComponents()));
                     }
                 }, //
                 new Command(new String[] { "showCompNames", "scn" }, "Show all component names") {
 
+                    @Override
                     void run() {
                         System.out.println(arrayLines(componentService.getAllComponentNames()));
                     }
                 }, //
                 new Command(new String[] { "setValue", "sv" }, "Sets the value of the specified property") {
 
+                    @Override
                     void run() {
                         Property p = resolveProperty();
                         if (argIndex >= args.length) {
@@ -233,6 +182,7 @@ public class PropertiesTester {
                 new Command(new String[] { "beforePresent", "bp" },
                         "Call the beforePresent service with the specified property") {
 
+                    @Override
                     void run() {
                         Property p = resolveProperty();
                         try {
@@ -246,6 +196,7 @@ public class PropertiesTester {
                 new Command(new String[] { "beforeActivate", "ba" },
                         "Call the beforeActivate service with the specified property") {
 
+                    @Override
                     void run() {
                         Property p = resolveProperty();
                         try {
@@ -258,6 +209,7 @@ public class PropertiesTester {
                 }, //
                 new Command(new String[] { "after", "a" }, "Call the afterProperty service with the specified property") {
 
+                    @Override
                     void run() {
                         Property p = resolveProperty();
                         try {
@@ -270,6 +222,7 @@ public class PropertiesTester {
                 }, //
                 new Command(new String[] { "validate", "v" }, "Call the validateProperty service with the specified property") {
 
+                    @Override
                     void run() {
                         Property p = resolveProperty();
                         try {
@@ -283,6 +236,7 @@ public class PropertiesTester {
                 }, //
                 new Command(new String[] { "help", "h" }, "Show this help") {
 
+                    @Override
                     void run() {
                         for (Command c : commands) {
                             System.out.printf("%-20s %s\n", c.helpCommand(), c.help);
@@ -291,6 +245,7 @@ public class PropertiesTester {
                 }, //
                 new Command(new String[] { "exit" }, "Exit") {
 
+                    @Override
                     void run() {
                         System.exit(0);
                     }
@@ -307,10 +262,12 @@ public class PropertiesTester {
     private int argIndex;
 
     public void processCommand(String argString) {
-        if (argString.isEmpty())
+        if (argString.isEmpty()) {
             return;
-        if (argString.startsWith("#"))
+        }
+        if (argString.startsWith("#")) {
             return;
+        }
 
         args = new String(argString).split(" ");
         if (args.length == 0) {
@@ -319,8 +276,9 @@ public class PropertiesTester {
         argIndex = 0;
         currentCommand = args[argIndex++];
         for (Command cmd : commands) {
-            if (cmd.executeIfMatch())
+            if (cmd.executeIfMatch()) {
                 return;
+            }
         }
         System.out.println("Unknown command: " + currentCommand);
     }
