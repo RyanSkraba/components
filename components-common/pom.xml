@@ -7,25 +7,25 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.2.0.RELEASE</version>
+        <version>0.3.0.BUILD-SNAPSHOT</version>
         <relativePath>../components-parent/pom.xml</relativePath>
     </parent>
 
     <name>Components - Shared Component Parts</name>
     <artifactId>components-common</artifactId>
-    <version>0.2.0.RELEASE</version>
+    <version>0.3.0.BUILD-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.2.0.RELEASE</version>
+            <version>0.3.0.BUILD-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.2.0.RELEASE</version>
+            <version>0.3.0.BUILD-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

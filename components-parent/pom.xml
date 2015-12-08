@@ -5,7 +5,7 @@
 	<groupId>org.talend.components</groupId>
 	<artifactId>components-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>0.2.0.RELEASE</version>
+	<version>0.3.0.BUILD-SNAPSHOT</version>
 
 	<name>Component Parent POM</name>
 	<properties>
