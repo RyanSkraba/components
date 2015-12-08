@@ -65,6 +65,7 @@
                         </goals>
                         <configuration>
                             <instructions>
+                                <Bundle-SymbolicName>org.talend.components.common-oauth.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                             </instructions>
                         </configuration>

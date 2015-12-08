@@ -227,7 +227,8 @@
                         </goals>
                         <configuration>
                             <instructions>
-                                <Bundle-Name>org.talend.components.api lib</Bundle-Name>
+                                <Bundle-SymbolicName>org.talend.components.api.lib</Bundle-SymbolicName>
+                                <Bundle-Name>${project.name} lib</Bundle-Name>
                             </instructions>
                         </configuration>
                     </execution>
