@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2014 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2015 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -32,23 +32,23 @@ import org.talend.components.common.oauth.util.HttpsService;
  */
 public class OauthClient {
 
-    private static final String HTTPS = "https";      //$NON-NLS-1$
+    private static final String HTTPS = "https"; //$NON-NLS-1$
 
-    private final URL           tokenLocation;
+    private final URL tokenLocation;
 
-    private final String        clientID;
+    private final String clientID;
 
-    private final String        clientSecret;
+    private final String clientSecret;
 
-    private URL                 authorizationLocation;
+    private URL authorizationLocation;
 
-    private URL                 callbackURL;
+    private URL callbackURL;
 
-    private String              responseType;
+    private String responseType;
 
-    private String              refreshToken;
+    private String refreshToken;
 
-    private GrantType           grantType;
+    private GrantType grantType;
 
     private OauthClient(Builder builder) {
         this.tokenLocation = builder.tokenLocation;
@@ -126,7 +126,7 @@ public class OauthClient {
 
     protected abstract static class Builder {
 
-        protected final URL    tokenLocation;
+        protected final URL tokenLocation;
 
         protected final String clientID;
 
@@ -147,9 +147,9 @@ public class OauthClient {
 
     public static class AuthorizationCodeBuilder extends Builder {
 
-        private URL    authorizationLocation;
+        private URL authorizationLocation;
 
-        private URL    callbackURL;
+        private URL callbackURL;
 
         private String responseType;
 

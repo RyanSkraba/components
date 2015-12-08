@@ -1,4 +1,3 @@
-package org.talend.components.api.service;
 // ============================================================================
 //
 // Copyright (C) 2006-2015 Talend Inc. - www.talend.com
@@ -11,13 +10,13 @@ package org.talend.components.api.service;
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
+package org.talend.components.api.service;
 
 import javax.inject.Inject;
 
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.talend.components.api.service.ComponentService;
 import org.talend.components.test.SpringApp;
 
 @RunWith(SpringJUnit4ClassRunner.class)

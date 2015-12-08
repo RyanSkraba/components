@@ -1,13 +1,13 @@
 // ============================================================================
 //
-// copyright (c) 2006-2015 talend inc. - www.talend.com
+// Copyright (C) 2006-2015 Talend Inc. - www.talend.com
 //
-// this source code is available under agreement available at
-// %installdir%\features\org.talend.rcp.branding.%productname%\%productname%license.txt
+// This source code is available under agreement available at
+// %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
 //
-// you should have received a copy of the agreement
-// along with this program; if not, write to talend sa
-// 9 rue pages 92150 suresnes, france
+// You should have received a copy of the agreement
+// along with this program; if not, write to Talend SA
+// 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
 package org.talend.components.api.service.internal.spring;
@@ -27,7 +27,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.exception.ComponentException;
@@ -149,7 +154,6 @@ public class ComponentServiceSpring implements ComponentService {
             @ApiParam(name = "formName", value = "Name of the form") String formName) {
         return componentServiceDelegate.commitFormValues(properties, formName);
     }
-
 
     @Override
     @RequestMapping(value = BASE_PATH

@@ -1,10 +1,3 @@
-package org.talend.components.common.oauth.util;
-
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
-
 // ============================================================================
 //
 // Copyright (C) 2006-2015 Talend Inc. - www.talend.com
@@ -17,6 +10,12 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
+package org.talend.components.common.oauth.util;
+
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 /**
  * created by bchen on Aug 26, 2013 Detailled comment
