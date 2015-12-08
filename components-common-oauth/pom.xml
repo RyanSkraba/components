@@ -54,7 +54,6 @@
                                 <Import-Package>org.talend*</Import-Package>
                                 <Service-Component>*</Service-Component>
                                 <Embed-Dependency>!components*</Embed-Dependency>
-                                <!-- <Bundle-ClassPath>{maven-dependencies},partner-${partner.version}.jar;mvn:org.talend.components.salesforce/partner/${partner.version}</Bundle-ClassPath> -->
                             </instructions>
                         </configuration>
                     </execution>

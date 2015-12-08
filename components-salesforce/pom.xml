@@ -29,7 +29,6 @@
             <groupId>org.talend.components.salesforce</groupId>
             <artifactId>partner</artifactId>
             <version>${partner.version}</version>
-            <!-- <scope>provided</scope> -->
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
@@ -142,7 +141,6 @@
                                 <Service-Component>*</Service-Component>
                                 <Embed-Dependency>!components*,*;scope=compile|runtime</Embed-Dependency>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                                <!-- <Bundle-ClassPath>{maven-dependencies},partner-${partner.version}.jar;mvn:org.talend.components.salesforce/partner/${partner.version}</Bundle-ClassPath> -->
                             </instructions>
                         </configuration>
                     </execution>
@@ -177,7 +175,6 @@
                                 <Export-Package>*</Export-Package>
                                 <Include-Resource>=target/test-classes/
                                 </Include-Resource>
-                                <!-- <Bundle-ClassPath>{maven-dependencies},partner-${partner.version}.jar;mvn:org.talend.components.salesforce/partner/${partner.version}</Bundle-ClassPath> -->
                             </instructions>
                         </configuration>
                     </execution>

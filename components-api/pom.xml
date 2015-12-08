@@ -30,12 +30,6 @@
             <artifactId>spring-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- <dependency> -->
-        <!-- <groupId>org.springframework</groupId> -->
-        <!-- <artifactId>spring-beans</artifactId> -->
-        <!-- <version>4.2.0.RELEASE</version> -->
-        <!-- <scope>test</scope> -->
-        <!-- </dependency> -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -56,19 +50,12 @@
             <scope>provided</scope>
         </dependency>
         <!-- SWAGGER DEPENDENCIES -->
-        <!-- SWAGGER DEPENDENCIES -->
         <dependency>
             <groupId>com.mangofactory</groupId>
             <artifactId>swagger-springmvc</artifactId>
             <version>1.0.2</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-utils</artifactId>
-            <version>3.0.15</version>
-        </dependency>
-
         <dependency>
             <groupId>com.cedarsoftware</groupId>
             <artifactId>json-io</artifactId>
@@ -105,6 +92,11 @@
             <artifactId>javax.inject</artifactId>
         </dependency>
         <!-- pom depenencies resolution deps -->
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+            <version>3.0.15</version>
+        </dependency>
         <dependency>
             <groupId>org.eclipse.aether</groupId>
             <artifactId>aether-api</artifactId>
@@ -204,10 +196,6 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <version>3.0.0</version>
                 <extensions>true</extensions>
-                <!-- <configuration> <instructions> <bnd.version.policy>[$(version;==;$(@)),$(version;+;$(@)))</bnd.version.policy>
-                    <Service-Component>*</Service-Component> <Import-Package>org.osgi*</Import-Package>
-                    <Embed-Transitive>true</Embed-Transitive> <Embed-Dependency>!org.osgi.core;scope=compile|runtime</Embed-Dependency>
-                    </instructions> </configuration> -->
                 <executions>
                     <execution>
                         <id>default-jar</id>
@@ -265,7 +253,6 @@
                                 <Export-Package>org.talend.components*</Export-Package>
                                 <!-- include test classes -->
                                 <Include-Resource>=target/test-classes/</Include-Resource>
-                                <!-- <Bundle-ClassPath>{maven-dependencies},partner-${partner.version}.jar;mvn:org.talend.components.salesforce/partner/${partner.version}</Bundle-ClassPath> -->
                             </instructions>
                         </configuration>
                     </execution>
