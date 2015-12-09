@@ -15,7 +15,6 @@ package org.talend.components.salesforce;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.talend.components.api.ComponentTestUtils;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
@@ -26,6 +25,7 @@ import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
+import org.talend.components.test.ComponentTestUtils;
 
 public class SalesforceLocalComponentTest {
 

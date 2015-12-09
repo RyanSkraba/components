@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.talend.components.api.ComponentTestUtils;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.exception.ComponentException;
@@ -42,6 +41,7 @@ import org.talend.components.api.service.testcomponent.nestedprop.NestedComponen
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
+import org.talend.components.test.ComponentTestUtils;
 
 public class ComponentServiceTest extends AbstractComponentTest {
 

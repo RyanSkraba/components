@@ -32,7 +32,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.talend.components.api.ComponentTestUtils;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
@@ -60,6 +59,7 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinit
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
+import org.talend.components.test.ComponentTestUtils;
 import org.talend.components.test.SpringApp;
 
 @RunWith(SpringJUnit4ClassRunner.class)

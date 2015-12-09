@@ -17,7 +17,6 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.junit.Test;
-import org.talend.components.api.ComponentTestUtils;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.testcomponent.ComponentPropertiesWithDefinedI18N;
@@ -25,6 +24,7 @@ import org.talend.components.api.service.testcomponent.TestComponentDefinition;
 import org.talend.components.api.service.testcomponent.TestComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
+import org.talend.components.test.ComponentTestUtils;
 
 public class PropertiesTest {
 
