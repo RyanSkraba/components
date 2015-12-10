@@ -26,8 +26,9 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
         this.connectors = conns;
     }
 
-    protected Class<?> propertiesClass;
+    // protected Class<?> propertiesClass;
 
+    @Override
     public String[] getFamilies() {
         // Subclass me
         return new String[] {};
@@ -47,7 +48,11 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
     public ComponentProperties createProperties() {
         ComponentProperties compProp = null;
         try {
-            Constructor c = propertiesClass.getConstructor(String.class);
+            Class<?> propertyClass = getPropertyClass();
+            if (propertyClass == null) {
+                return null;
+            } // else keep going
+            Constructor c = propertyClass.getConstructor(String.class);
             compProp = (ComponentProperties) c.newInstance(new Object[] { "root" });
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
@@ -62,22 +67,27 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
         return compProp;
     }
 
+    @Override
     public boolean supportsProperties(ComponentProperties properties) {
-        return propertiesClass.isAssignableFrom(properties.getClass());
+        return getPropertyClass().isAssignableFrom(properties.getClass());
     }
 
+    @Override
     public boolean isSchemaAutoPropagate() {
         return false;
     }
 
+    @Override
     public boolean isDataAutoPropagate() {
         return false;
     }
 
+    @Override
     public boolean isConditionalInputs() {
         return false;
     }
 
+    @Override
     public boolean isStartable() {
         return false;
     }
@@ -86,13 +96,16 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
 
     public static final String NONE = "None";
 
+    @Override
     public String getPartitioning() {
         return null;
     }
 
+    @Override
     public String toString() {
         return getName() + " (" + getDisplayName() + ") - " + getTitle() //
-                + "\n props: " + propertiesClass;
+                + "\n props: " + getPropertyClass();
     }
 
+    abstract public Class<?> getPropertyClass();
 }

@@ -29,7 +29,6 @@ public class TSalesforceConnectionDefinition extends SalesforceDefinition {
 
     public TSalesforceConnectionDefinition() {
         super(COMPONENT_NAME);
-        propertiesClass = SalesforceConnectionProperties.class;
         setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
                 new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
@@ -37,6 +36,11 @@ public class TSalesforceConnectionDefinition extends SalesforceDefinition {
     @Override
     public boolean isStartable() {
         return true;
+    }
+
+    @Override
+    public Class<?> getPropertyClass() {
+        return SalesforceConnectionProperties.class;
     }
 
 }

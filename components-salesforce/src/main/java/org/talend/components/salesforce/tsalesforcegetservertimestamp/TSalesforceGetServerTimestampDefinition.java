@@ -36,7 +36,6 @@ public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinitio
 
     public TSalesforceGetServerTimestampDefinition() {
         super(COMPONENT_NAME);
-        propertiesClass = TSalesforceGetServerTimestampProperties.class;
         setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
                 new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
@@ -80,6 +79,11 @@ public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinitio
     @Override
     public String getPartitioning() {
         return AUTO;
+    }
+
+    @Override
+    public Class<?> getPropertyClass() {
+        return TSalesforceGetServerTimestampProperties.class;
     }
 
 }

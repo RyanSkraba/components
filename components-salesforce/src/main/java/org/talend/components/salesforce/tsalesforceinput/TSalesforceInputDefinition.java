@@ -32,7 +32,6 @@ public class TSalesforceInputDefinition extends SalesforceDefinition {
 
     public TSalesforceInputDefinition() {
         super(COMPONENT_NAME);
-        propertiesClass = TSalesforceInputProperties.class;
         setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
                 new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
@@ -40,6 +39,11 @@ public class TSalesforceInputDefinition extends SalesforceDefinition {
     @Override
     public boolean isStartable() {
         return true;
+    }
+
+    @Override
+    public Class<?> getPropertyClass() {
+        return TSalesforceInputProperties.class;
     }
 
 }

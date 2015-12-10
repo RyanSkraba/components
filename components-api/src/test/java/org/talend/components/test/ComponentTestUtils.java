@@ -74,17 +74,21 @@ public class ComponentTestUtils {
     }
 
     static private void checkAllI18NProperties(ComponentProperties checkProps) {
-        System.out.println("Checking: " + checkProps);
-        List<SchemaElement> properties = checkProps.getProperties();
-        for (SchemaElement prop : properties) {
-            if (!(prop instanceof ComponentProperties)) {
-                assertFalse(
-                        "property [" + checkProps.getClass().getCanonicalName() + "/" + prop.getName()
-                                + "] should have a translated message key [property." + prop.getName()
-                                + ".displayName] in [the proper messages.properties]",
-                        prop.getDisplayName().endsWith(".displayName"));
-            } else {
-                checkAllI18NProperties((ComponentProperties) prop);
+        if (checkProps == null) {
+            System.out.println("No properties to be checked.");
+        } else {
+            System.out.println("Checking: " + checkProps);
+            List<SchemaElement> properties = checkProps.getProperties();
+            for (SchemaElement prop : properties) {
+                if (!(prop instanceof ComponentProperties)) {
+                    assertFalse(
+                            "property [" + checkProps.getClass().getCanonicalName() + "/" + prop.getName()
+                                    + "] should have a translated message key [property." + prop.getName()
+                                    + ".displayName] in [the proper messages.properties]",
+                            prop.getDisplayName().endsWith(".displayName"));
+                } else {
+                    checkAllI18NProperties((ComponentProperties) prop);
+                }
             }
         }
     }

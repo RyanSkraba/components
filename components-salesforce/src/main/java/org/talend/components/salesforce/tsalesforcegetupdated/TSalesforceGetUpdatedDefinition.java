@@ -32,7 +32,6 @@ public class TSalesforceGetUpdatedDefinition extends SalesforceDefinition {
 
     public TSalesforceGetUpdatedDefinition() {
         super(COMPONENT_NAME);
-        propertiesClass = SalesforceGetDeletedUpdatedProperties.class;
         setConnectors(new ComponentConnector(Type.FLOW, 1, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
                 new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
@@ -56,6 +55,11 @@ public class TSalesforceGetUpdatedDefinition extends SalesforceDefinition {
     @Override
     public String getPartitioning() {
         return AUTO;
+    }
+
+    @Override
+    public Class<?> getPropertyClass() {
+        return SalesforceGetDeletedUpdatedProperties.class;
     }
 
 }

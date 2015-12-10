@@ -28,7 +28,7 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition {
 
     public TSalesforceBulkExecDefinition() {
         super(COMPONENT_NAME);
-        propertiesClass = TSalesforceBulkExecProperties.class;
+
         setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
                 new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
@@ -41,6 +41,11 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition {
     @Override
     public boolean isConditionalInputs() {
         return true;
+    }
+
+    @Override
+    public Class<?> getPropertyClass() {
+        return TSalesforceBulkExecProperties.class;
     }
 
 }

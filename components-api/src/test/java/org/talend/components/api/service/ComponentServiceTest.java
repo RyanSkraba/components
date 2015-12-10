@@ -16,22 +16,17 @@ import static org.junit.Assert.*;
 
 import java.io.InputStream;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.ValidationResult.Result;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.service.internal.ComponentRegistry;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.service.testcomponent.TestComponentDefinition;
 import org.talend.components.api.service.testcomponent.TestComponentProperties;
@@ -39,19 +34,17 @@ import org.talend.components.api.service.testcomponent.TestComponentWizard;
 import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.wizard.ComponentWizard;
-import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.test.ComponentTestUtils;
+import org.talend.components.test.SimpleComponentRegistry;
 
 public class ComponentServiceTest extends AbstractComponentTest {
-
-    // default implementation for pure java tests
-    ComponentRegistry testComponentRegistry;
 
     private ComponentServiceImpl componentService;
 
     @Before
     public void initializeComponentRegistryAnsService() {
+        // reset the component service
         componentService = null;
     }
 
@@ -59,24 +52,10 @@ public class ComponentServiceTest extends AbstractComponentTest {
     @Override
     public ComponentService getComponentService() {
         if (componentService == null) {
-            testComponentRegistry = new ComponentRegistry() {
-
-                @Override
-                public Map<String, ComponentDefinition> getComponents() {
-                    Map<String, ComponentDefinition> comps = new HashMap<>();
-                    comps.put(Constants.COMPONENT_BEAN_PREFIX + TestComponentDefinition.COMPONENT_NAME,
-                            new TestComponentDefinition());
-                    return comps;
-                }
-
-                @Override
-                public Map<String, ComponentWizardDefinition> getComponentWizards() {
-                    Map<String, ComponentWizardDefinition> wizs = new HashMap<>();
-                    wizs.put(Constants.COMPONENT_WIZARD_BEAN_PREFIX + TestComponentWizardDefinition.COMPONENT_WIZARD_NAME,
-                            new TestComponentWizardDefinition());
-                    return wizs;
-                }
-            };
+            SimpleComponentRegistry testComponentRegistry = new SimpleComponentRegistry();
+            testComponentRegistry.addComponent(TestComponentDefinition.COMPONENT_NAME, new TestComponentDefinition());
+            testComponentRegistry.addWizard(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME,
+                    new TestComponentWizardDefinition());
             componentService = new ComponentServiceImpl(testComponentRegistry);
         }
         return componentService;
