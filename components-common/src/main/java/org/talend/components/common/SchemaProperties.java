@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.properties.PropertyFactory.*;
-import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.components.api.properties.PropertyFactory.newProperty;
+import static org.talend.components.api.properties.presentation.Widget.widget;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
@@ -45,6 +45,7 @@ public class SchemaProperties extends ComponentProperties {
     @Override
     public void setupLayout() {
         super.setupLayout();
+
         Form schemaForm = Form.create(this, Form.MAIN, "Schema"); //$NON-NLS-1$
         schemaForm.addRow(widget(schema).setWidgetType(Widget.WidgetType.SCHEMA_EDITOR));
 
