@@ -14,11 +14,13 @@ package org.talend.components.test;
 
 import static org.junit.Assert.*;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
@@ -66,10 +68,13 @@ public class ComponentTestUtils {
         Set<ComponentDefinition> allComponents = componentService.getAllComponents();
         for (ComponentDefinition cd : allComponents) {
             ComponentProperties props = cd.createProperties();
-            checkAllI18NProperties(props);
+            if (props != null) {
+                checkAllI18NProperties(props);
+            } else {
+                System.out.println("No properties to check fo I18n for :" + cd.getName());
+            }
             // Make sure this translates
-            System.out.println(cd.getTitle());
-            assertFalse(cd.getTitle().contains("component."));
+            assertFalse("missing I18n property :" + cd.getTitle(), cd.getTitle().contains("component."));
         }
     }
 
@@ -89,6 +94,28 @@ public class ComponentTestUtils {
                 } else {
                     checkAllI18NProperties((ComponentProperties) prop);
                 }
+            }
+        }
+    }
+
+    /**
+     * DOC sgandon Comment method "testAllImages".
+     * 
+     * @param componentService
+     */
+    public static void testAllImages(ComponentService componentService) {
+        Set<ComponentDefinition> allComponents = componentService.getAllComponents();
+        for (ComponentDefinition cd : allComponents) {
+            for (ComponentImageType compIT : ComponentImageType.values()) {
+                String pngImagePath = cd.getPngImagePath(compIT);
+                assertNotNull("the component [" + cd.getName() + "] must return an image path for type [" + compIT + "]",
+                        pngImagePath);
+                InputStream resourceAsStream = cd.getClass().getResourceAsStream(pngImagePath);
+                assertNotNull(
+                        "Failed to find the image for path [" + pngImagePath + "] for the component:type [" + cd.getName() + ":"
+                                + compIT + "].\nIt should be located at ["
+                                + cd.getClass().getPackage().getName().replace('.', '/') + "/" + pngImagePath + "]",
+                        resourceAsStream);
             }
         }
     }

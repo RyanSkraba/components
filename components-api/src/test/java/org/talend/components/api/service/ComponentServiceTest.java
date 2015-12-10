@@ -228,4 +228,9 @@ public class ComponentServiceTest extends AbstractComponentTest {
         ComponentTestUtils.testAlli18n(getComponentService());
     }
 
+    @Test
+    public void testAllImages() {
+        ComponentTestUtils.testAllImages(getComponentService());
+    }
+
 }

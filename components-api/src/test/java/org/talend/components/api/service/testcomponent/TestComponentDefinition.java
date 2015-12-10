@@ -53,7 +53,7 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
 
     @Override
     public String getPngImagePath(ComponentImageType imageType) {
-        return null;
+        return "testCompIcon_32x32.png";
     }
 
     @Override
