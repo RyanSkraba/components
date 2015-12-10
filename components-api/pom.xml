@@ -196,7 +196,7 @@
                 <extensions>true</extensions>
                 <executions>
                     <execution>
-                        <id>default-jar</id>
+                        <id>bundle-jar</id>
                         <phase>package</phase>
                         <goals>
                             <goal>bundle</goal>
@@ -210,7 +210,7 @@
                                 </Import-Package>
                                 <Embed-Transitive>true</Embed-Transitive>
                                 <Embed-Dependency>
-                                    !org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api
+                                    !org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api|javax.servlet-api|javax.inject
                                 </Embed-Dependency>
                                 <_exportcontents>!*.internal,!*.osgi,org.talend.*</_exportcontents>
                                 <DynamicImport-Package>*</DynamicImport-Package>
