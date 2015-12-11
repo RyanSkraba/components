@@ -812,6 +812,11 @@ public class SalesforceLocalComponentTestIT extends AbstractComponentTest {
         ComponentTestUtils.testAllImages(getComponentService());
     }
 
+    @Test
+    public void testAllRuntime() {
+        ComponentTestUtils.testAllRuntimeAvaialble(getComponentService());
+    }
+
     @Override
     public ComponentService getComponentService() {
         return componentService;

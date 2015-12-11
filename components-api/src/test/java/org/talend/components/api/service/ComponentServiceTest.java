@@ -233,4 +233,9 @@ public class ComponentServiceTest extends AbstractComponentTest {
         ComponentTestUtils.testAllImages(getComponentService());
     }
 
+    @Test
+    public void testAllRuntime() {
+        ComponentTestUtils.testAllRuntimeAvaialble(getComponentService());
+    }
+
 }

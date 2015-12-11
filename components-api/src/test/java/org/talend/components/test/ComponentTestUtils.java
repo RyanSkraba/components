@@ -25,6 +25,8 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.wizard.ComponentWizardDefinition;
+import org.talend.components.api.wizard.WizardImageType;
 
 public class ComponentTestUtils {
 
@@ -69,7 +71,7 @@ public class ComponentTestUtils {
         for (ComponentDefinition cd : allComponents) {
             ComponentProperties props = cd.createProperties();
             if (props != null) {
-                checkAllI18NProperties(props);
+                checkAllI18N(props);
             } else {
                 System.out.println("No properties to check fo I18n for :" + cd.getName());
             }
@@ -78,7 +80,12 @@ public class ComponentTestUtils {
         }
     }
 
-    static private void checkAllI18NProperties(ComponentProperties checkProps) {
+    /**
+     * check that all Components have theirs internationnalisation properties setup correctly.
+     * 
+     * @param componentService service to get the components to be checked.
+     */
+    static public void checkAllI18N(ComponentProperties checkProps) {
         if (checkProps == null) {
             System.out.println("No properties to be checked.");
         } else {
@@ -92,31 +99,60 @@ public class ComponentTestUtils {
                                     + ".displayName] in [the proper messages.properties]",
                             prop.getDisplayName().endsWith(".displayName"));
                 } else {
-                    checkAllI18NProperties((ComponentProperties) prop);
+                    checkAllI18N((ComponentProperties) prop);
                 }
             }
         }
     }
 
     /**
-     * DOC sgandon Comment method "testAllImages".
+     * check that all Components and Wizards have theirs images properly set.
      * 
-     * @param componentService
+     * @param componentService service to get the components to be checked.
      */
     public static void testAllImages(ComponentService componentService) {
+        // check components
         Set<ComponentDefinition> allComponents = componentService.getAllComponents();
-        for (ComponentDefinition cd : allComponents) {
+        for (ComponentDefinition compDef : allComponents) {
             for (ComponentImageType compIT : ComponentImageType.values()) {
-                String pngImagePath = cd.getPngImagePath(compIT);
-                assertNotNull("the component [" + cd.getName() + "] must return an image path for type [" + compIT + "]",
+                String pngImagePath = compDef.getPngImagePath(compIT);
+                assertNotNull("the component [" + compDef.getName() + "] must return an image path for type [" + compIT + "]",
                         pngImagePath);
-                InputStream resourceAsStream = cd.getClass().getResourceAsStream(pngImagePath);
+                InputStream resourceAsStream = compDef.getClass().getResourceAsStream(pngImagePath);
                 assertNotNull(
-                        "Failed to find the image for path [" + pngImagePath + "] for the component:type [" + cd.getName() + ":"
-                                + compIT + "].\nIt should be located at ["
-                                + cd.getClass().getPackage().getName().replace('.', '/') + "/" + pngImagePath + "]",
+                        "Failed to find the image for path [" + pngImagePath + "] for the component:type [" + compDef.getName()
+                                + ":" + compIT + "].\nIt should be located at ["
+                                + compDef.getClass().getPackage().getName().replace('.', '/') + "/" + pngImagePath + "]",
                         resourceAsStream);
             }
+        }
+        // check wizards
+        Set<ComponentWizardDefinition> allWizards = componentService.getTopLevelComponentWizards();
+        for (ComponentWizardDefinition wizDef : allWizards) {
+            for (WizardImageType wizIT : WizardImageType.values()) {
+                String pngImagePath = wizDef.getPngImagePath(wizIT);
+                assertNotNull("the wizard [" + wizDef.getName() + "] must return an image path for type [" + wizIT + "]",
+                        pngImagePath);
+                InputStream resourceAsStream = wizDef.getClass().getResourceAsStream(pngImagePath);
+                assertNotNull(
+                        "Failed to find the image for path [" + pngImagePath + "] for the component:type [" + wizDef.getName()
+                                + ":" + wizIT + "].\nIt should be located at ["
+                                + wizDef.getClass().getPackage().getName().replace('.', '/') + "/" + pngImagePath + "]",
+                        resourceAsStream);
+            }
+        }
+    }
+
+    /**
+     * check that all Components have a runtime not null.
+     * 
+     * @param componentService service to get the components to be checked.
+     */
+    public static void testAllRuntimeAvaialble(ComponentService componentService) {
+        Set<ComponentDefinition> allComponents = componentService.getAllComponents();
+        for (ComponentDefinition cd : allComponents) {
+            assertNotNull("the Runtime associated with component [" + cd.getName() + "] should never be null.",
+                    cd.createRuntime());
         }
     }
 

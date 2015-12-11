@@ -13,6 +13,7 @@
 package org.talend.components.api.service.testcomponent;
 
 import java.io.InputStream;
+import java.util.Map;
 
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
@@ -20,6 +21,7 @@ import org.talend.components.api.component.ComponentConnector;
 import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
 
 import aQute.bnd.annotation.component.Component;
@@ -38,7 +40,44 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
 
     @Override
     public ComponentRuntime createRuntime() {
-        return null;
+        return new ComponentRuntime() {
+
+            @Override
+            public void outputMain(Map<String, Object> row) throws Exception {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void outputEnd() throws Exception {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void outputBegin(ComponentProperties props) throws Exception {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public Map<String, Object> inputRow() throws Exception {
+                // TODO Auto-generated method stub
+                return null;
+            }
+
+            @Override
+            public void inputEnd() throws Exception {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void inputBegin(ComponentProperties props) throws Exception {
+                // TODO Auto-generated method stub
+
+            }
+        };
     }
 
     @Override
