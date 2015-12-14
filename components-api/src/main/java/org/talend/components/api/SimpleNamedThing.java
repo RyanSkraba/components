@@ -19,6 +19,9 @@ import org.talend.components.api.i18n.TranslatableImpl;
  */
 public class SimpleNamedThing extends TranslatableImpl implements NamedThing {
 
+    /* suffix used for i18N to compute displayName key */
+    public static final String I18N_DISPLAY_NAME_SUFFIX = ".displayName"; //$NON-NLS-1$
+
     protected String name;
 
     protected String displayName;

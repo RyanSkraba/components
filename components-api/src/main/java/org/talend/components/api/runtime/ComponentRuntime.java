@@ -91,7 +91,8 @@ public abstract class ComponentRuntime {
     }
 
     /**
-     * Initializes the input process. Used with {@link #inputRow()} to read rows.
+     * Initializes the input process. Then {@link #inputRow()} is called to read rows, and eventually the
+     * {@link #inputEnd()} is called when the rows are all red.
      * 
      * @param props the {@link ComponentProperties} that are necessary to define the connection.
      * @throws Exception

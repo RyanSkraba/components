@@ -14,8 +14,8 @@ package org.talend.components.api.properties;
 
 import java.util.Calendar;
 import java.util.EnumSet;
-import java.util.Iterator;
 
+import org.talend.components.api.SimpleNamedThing;
 import org.talend.components.api.schema.AbstractSchemaElement;
 
 /**
@@ -23,8 +23,9 @@ import org.talend.components.api.schema.AbstractSchemaElement;
  */
 public class Property extends AbstractSchemaElement {
 
-    protected ComponentProperties componentProperties;
+    private static final String I18N_PROPERTY_PREFIX = "property."; //$NON-NLS-1$
 
+    protected ComponentProperties componentProperties;
 
     protected EnumSet<Flags> flags;
 
@@ -72,8 +73,9 @@ public class Property extends AbstractSchemaElement {
     }
 
     public boolean isFlag(Flags flag) {
-        if (flags == null)
+        if (flags == null) {
             return false;
+        }
         return flags.contains(flag);
     }
 
@@ -101,6 +103,7 @@ public class Property extends AbstractSchemaElement {
         return componentProperties.getCalendarValue(this);
     }
 
+    @Override
     public String toString() {
         return "Property: " + getName();
     }
@@ -108,6 +111,15 @@ public class Property extends AbstractSchemaElement {
     // Not API
     public void setComponentProperties(ComponentProperties props) {
         componentProperties = props;
+    }
+
+    /**
+     * If no displayName was specified then the i18n key : {@value Property#I18N_PROPERTY_PREFIX}.name_of_this_property.
+     * {@value SimpleNamedThing#I18N_DISPLAY_NAME_SUFFIX} to find the value from the i18n.
+     */
+    @Override
+    public String getDisplayName() {
+        return displayName != null ? displayName : getI18nMessage(I18N_PROPERTY_PREFIX + name + I18N_DISPLAY_NAME_SUFFIX);
     }
 
 }

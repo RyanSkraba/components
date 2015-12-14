@@ -12,7 +12,11 @@
 // ============================================================================
 package org.talend.components.api.schema;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.talend.components.api.SimpleNamedThing;
 import org.talend.components.api.ToStringIndentUtil;
@@ -21,10 +25,6 @@ import org.talend.components.api.ToStringIndentUtil;
  * This implementation shall be used to represent meta data elements
  */
 public abstract class AbstractSchemaElement extends SimpleNamedThing implements SchemaElement {
-
-    private static final String I18N_DISPLAY_NAME_SUFFIX = ".displayName"; //$NON-NLS-1$
-
-    private static final String I18N_PROPERTY_PREFIX = "property."; //$NON-NLS-1$
 
     private Type type;
 
@@ -59,15 +59,6 @@ public abstract class AbstractSchemaElement extends SimpleNamedThing implements 
     public SchemaElement setName(String name) {
         this.name = name;
         return this;
-    }
-
-    /**
-     * the displayName is returning the current name because for real data schema the display name never gets
-     * translated.
-     */
-    @Override
-    public String getDisplayName() {
-        return displayName != null ? displayName : getI18nMessage(I18N_PROPERTY_PREFIX + name + I18N_DISPLAY_NAME_SUFFIX);
     }
 
     public SchemaElement setDisplayName(String displayName) {
@@ -268,9 +259,9 @@ public abstract class AbstractSchemaElement extends SimpleNamedThing implements 
         return map;
     }
 
+    @Override
     public String toStringIndent(int indent) {
         return ToStringIndentUtil.indentString(indent) + getName();
     }
-
 
 }

@@ -166,7 +166,10 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     }
 
     /**
-     * Do not subclass this method for initialization, use {@link #setupProperties()} instead.
+     * named constructor to be used is these properties are nested in other properties. Do not subclass this method for
+     * initialization, use {@link #init()} instead.
+     * 
+     * @param name, uniquely identify the property among other properties when used as nested properties.
      */
     public ComponentProperties(String name) {
         internal = new ComponentPropertiesInternal();
