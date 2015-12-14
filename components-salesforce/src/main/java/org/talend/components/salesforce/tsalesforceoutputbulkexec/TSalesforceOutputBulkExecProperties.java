@@ -12,9 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutputbulkexec;
 
-import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.properties.presentation.Widget.*;
 
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.salesforce.SalesforceBulkProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
@@ -26,15 +25,15 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceOutputProper
     }
 
     @Override
-    public ComponentProperties init() {
+    public void setupProperties() {
+        super.setupProperties();
         TSalesforceOutputProperties.setupUpsertRelation(upsertRelation, TSalesforceOutputProperties.POLY);
-        super.init();
-        return this;
     }
 
     public SalesforceBulkProperties bulkProperties = new SalesforceBulkProperties("bulkProperties");
 
-    @Override public void setupLayout() {
+    @Override
+    public void setupLayout() {
         super.setupLayout();
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(widget(bulkProperties.getForm(Form.MAIN).setName("bulkProperties")));

@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutputbulk;
 
-import static org.talend.components.api.properties.PropertyFactory.newProperty;
-import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.properties.PropertyFactory.*;
+import static org.talend.components.api.properties.presentation.Widget.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
@@ -37,17 +37,16 @@ public class TSalesforceOutputBulkProperties extends ComponentProperties {
     // Collections
     //
 
-    public SchemaProperties schema = new SchemaProperties("name").init();
+    public SchemaProperties schema = new SchemaProperties("name");
 
     public TSalesforceOutputBulkProperties(String name) {
         super(name);
     }
 
     @Override
-    public ComponentProperties init() {
+    public void setupProperties() {
+        super.setupProperties();
         TSalesforceOutputProperties.setupUpsertRelation(upsertRelation, TSalesforceOutputProperties.POLY);
-        super.init();
-        return this;
     }
 
     @Override

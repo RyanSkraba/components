@@ -25,18 +25,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-import javax.inject.Inject;
-
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.NameAndLabel;
 import org.talend.components.api.properties.PresentationItem;
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.Repository;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
@@ -50,24 +47,68 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
+import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
+import org.talend.components.salesforce.tsalesforcegetdeleted.TSalesforceGetDeletedDefinition;
 import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampDefinition;
 import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
+import org.talend.components.salesforce.tsalesforcegetupdated.TSalesforceGetUpdatedDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
+import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
+import org.talend.components.salesforce.tsalesforcewavebulkexec.TSalesforceWaveBulkExecDefinition;
+import org.talend.components.salesforce.tsalesforcewaveoutputbulkexec.TSalesforceWaveOutputBulkExecDefinition;
 import org.talend.components.test.ComponentTestUtils;
-import org.talend.components.test.SpringApp;
+import org.talend.components.test.SimpleComponentRegistry;
+import org.talend.components.test.SimpleComponentService;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SpringApp.class)
-public class SalesforceLocalComponentTestIT extends AbstractComponentTest {
+public class SalesforceComponentTestIT extends AbstractComponentTest {
 
-    @Inject
-    ComponentService componentService;
+    private ComponentService componentService;
+
+    @Before
+    public void initializeComponentRegistryAnsService() {
+        // reset the component service
+        componentService = null;
+    }
+
+    // default implementation for pure java test. Shall be overriden of Spring or OSGI tests
+    @Override
+    public ComponentService getComponentService() {
+        if (componentService == null) {
+            SimpleComponentRegistry testComponentRegistry = new SimpleComponentRegistry();
+            testComponentRegistry.addComponent(TSalesforceConnectionDefinition.COMPONENT_NAME,
+                    new TSalesforceConnectionDefinition());
+            testComponentRegistry.addComponent(TSalesforceBulkExecDefinition.COMPONENT_NAME, new TSalesforceBulkExecDefinition());
+            testComponentRegistry.addComponent(TSalesforceGetServerTimestampDefinition.COMPONENT_NAME,
+                    new TSalesforceGetServerTimestampDefinition());
+            testComponentRegistry.addComponent(TSalesforceInputDefinition.COMPONENT_NAME, new TSalesforceInputDefinition());
+            testComponentRegistry.addComponent(TSalesforceOutputDefinition.COMPONENT_NAME, new TSalesforceOutputDefinition());
+            testComponentRegistry.addComponent(TSalesforceGetDeletedDefinition.COMPONENT_NAME,
+                    new TSalesforceGetDeletedDefinition());
+            testComponentRegistry.addComponent(TSalesforceGetUpdatedDefinition.COMPONENT_NAME,
+                    new TSalesforceGetUpdatedDefinition());
+            testComponentRegistry.addComponent(TSalesforceOutputBulkDefinition.COMPONENT_NAME,
+                    new TSalesforceOutputBulkDefinition());
+            testComponentRegistry.addComponent(TSalesforceWaveBulkExecDefinition.COMPONENT_NAME,
+                    new TSalesforceWaveBulkExecDefinition());
+            testComponentRegistry.addComponent(TSalesforceWaveOutputBulkExecDefinition.COMPONENT_NAME,
+                    new TSalesforceWaveOutputBulkExecDefinition());
+            SalesforceConnectionWizardDefinition scwd = new SalesforceConnectionWizardDefinition();
+            testComponentRegistry.addWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, scwd);
+            testComponentRegistry.addWizard(SalesforceModuleWizardDefinition.COMPONENT_WIZARD_NAME,
+                    new SalesforceModuleWizardDefinition());
+            testComponentRegistry.addWizard(SalesforceConnectionEditWizardDefinition.COMPONENT_WIZARD_NAME,
+                    new SalesforceConnectionEditWizardDefinition());
+            componentService = new SimpleComponentService(testComponentRegistry);
+            scwd.setupComponentService(componentService);
+        }
+        return componentService;
+    }
 
     static final boolean ADD_QUOTES = true;
 
@@ -91,11 +132,60 @@ public class SalesforceLocalComponentTestIT extends AbstractComponentTest {
 
     public static final String TEST_KEY = "Address2 456";
 
-    public SalesforceLocalComponentTestIT() {
+    public SalesforceComponentTestIT() {
         random = Integer.toString(ThreadLocalRandom.current().nextInt(1, 100000));
         userId = System.getProperty("salesforce.user");
         password = System.getProperty("salesforce.password");
         securityKey = System.getProperty("salesforce.key");
+    }
+
+    @Override
+    protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props) throws Throwable {
+        assertTrue(form.getWidget(propName).isCallAfter());
+        return getComponentService().afterProperty(propName, props);
+    }
+
+    @Test
+    public void testGetProps() {
+        ComponentProperties props = new TSalesforceConnectionDefinition().createProperties();
+        Form f = props.getForm(Form.MAIN);
+        ComponentTestUtils.checkSerialize(props);
+        System.out.println(f);
+        System.out.println(props);
+        assertEquals(Form.MAIN, f.getName());
+    }
+
+    @Test
+    public void testAfterLoginType() throws Throwable {
+        ComponentProperties props;
+
+        props = new TSalesforceConnectionDefinition().createProperties();
+        ComponentTestUtils.checkSerialize(props);
+        Property loginType = (Property) props.getProperty("loginType");
+        System.out.println(loginType.getPossibleValues());
+        assertEquals("Basic", loginType.getPossibleValues().get(0).toString());
+        assertEquals("OAuth", loginType.getPossibleValues().get(1).toString());
+        assertEquals(SalesforceConnectionProperties.LOGIN_BASIC, props.getValue(loginType));
+        Form mainForm = props.getForm(Form.MAIN);
+        assertEquals("Salesforce Connection Settings", mainForm.getTitle());
+        assertTrue(mainForm.getWidget(SalesforceUserPasswordProperties.class).isVisible());
+        assertFalse(mainForm.getWidget(OauthProperties.class).isVisible());
+
+        loginType.setValue(SalesforceConnectionProperties.LOGIN_OAUTH);
+        props = checkAndAfter(mainForm, "loginType", props);
+        mainForm = props.getForm(Form.MAIN);
+        assertTrue(mainForm.isRefreshUI());
+
+        assertFalse(mainForm.getWidget(SalesforceUserPasswordProperties.class).isVisible());
+        assertTrue(mainForm.getWidget(OauthProperties.class).isVisible());
+    }
+
+    @Test
+    public void testInputProps() throws Throwable {
+        TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputDefinition().createProperties();
+        assertEquals(2, props.queryMode.getPossibleValues().size());
+        SchemaElement returns = props.getProperty(ComponentProperties.RETURNS);
+        assertEquals("NB_LINE", returns.getChildren().get(0).getName());
     }
 
     protected SalesforceRuntime createRuntime(ComponentDefinition definition) {
@@ -815,11 +905,6 @@ public class SalesforceLocalComponentTestIT extends AbstractComponentTest {
     @Test
     public void testAllRuntime() {
         ComponentTestUtils.testAllRuntimeAvaialble(getComponentService());
-    }
-
-    @Override
-    public ComponentService getComponentService() {
-        return componentService;
     }
 
 }

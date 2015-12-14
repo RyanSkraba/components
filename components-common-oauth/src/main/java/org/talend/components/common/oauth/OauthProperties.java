@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.common.oauth;
 
-import static org.talend.components.api.properties.PropertyFactory.newProperty;
+import static org.talend.components.api.properties.PropertyFactory.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
@@ -35,9 +35,8 @@ public class OauthProperties extends ComponentProperties {
     }
 
     @Override
-    protected void setupLayout() {
+    public void setupLayout() {
         super.setupLayout();
-
         Form form = Form.create(this, Form.MAIN, "OAuth Parameters");
         form.addRow(clientId);
         form.addColumn(clientSecret);

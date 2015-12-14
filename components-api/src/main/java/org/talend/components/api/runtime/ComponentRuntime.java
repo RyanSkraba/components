@@ -83,9 +83,11 @@ public abstract class ComponentRuntime {
         Map<String, Object> value;
         do {
             value = inputRow();
-            if (value != null)
+            if (value != null) {
                 values.add(value);
+            }
         } while (value != null);
+        inputEnd();
     }
 
     /**
@@ -97,7 +99,7 @@ public abstract class ComponentRuntime {
     public abstract void inputBegin(ComponentProperties props) throws Exception;
 
     /**
-     * Returns a row from the input.
+     * Reads a row from the input and returns it.
      *
      * {@link #inputBegin(ComponentProperties)} must be called first.
      * 

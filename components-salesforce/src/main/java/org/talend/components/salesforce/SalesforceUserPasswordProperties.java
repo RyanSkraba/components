@@ -12,15 +12,13 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.PropertyFactory.newProperty;
-import static org.talend.components.api.properties.PropertyFactory.newString;
+import static org.talend.components.api.properties.PropertyFactory.*;
+
+import java.util.EnumSet;
 
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.common.UserPasswordProperties;
-
-import java.util.EnumSet;
 
 public class SalesforceUserPasswordProperties extends UserPasswordProperties {
 
@@ -32,7 +30,7 @@ public class SalesforceUserPasswordProperties extends UserPasswordProperties {
     }
 
     @Override
-    protected void setupLayout() {
+    public void setupLayout() {
         super.setupLayout();
         Form form = getForm(Form.MAIN);
         form.addColumn(securityKey);

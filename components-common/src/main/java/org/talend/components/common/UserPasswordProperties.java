@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.properties.PropertyFactory.newProperty;
+import static org.talend.components.api.properties.PropertyFactory.*;
 
 import java.util.EnumSet;
 
@@ -32,7 +32,7 @@ public class UserPasswordProperties extends ComponentProperties {
     }
 
     @Override
-    protected void setupLayout() {
+    public void setupLayout() {
         super.setupLayout();
         Form form = Form.create(this, Form.MAIN, "User Password");
         form.addRow(userId);

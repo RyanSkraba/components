@@ -23,11 +23,11 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.salesforce.SalesforceLocalComponentTestIT;
+import org.talend.components.salesforce.SalesforceComponentTestIT;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class SalesfoceComponentsTestIT extends SalesforceLocalComponentTestIT {
+public class SalesfoceComponentsTestIT extends SalesforceComponentTestIT {
 
     @Inject
     ComponentService osgiCompService;

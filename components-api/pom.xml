@@ -247,7 +247,6 @@
                                 <Import-Package>!*internal,org.talend*,javax.xml.namespace,org.junit</Import-Package>
                                 <Bundle-SymbolicName>org.talend.components.api.test</Bundle-SymbolicName>
                                 <Fragment-Host>org.talend.components.api</Fragment-Host>
-                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                                 <Embed-Dependency>daikon-spring</Embed-Dependency>
                                 <Export-Package>org.talend.components*</Export-Package>
                                 <!-- include test classes -->

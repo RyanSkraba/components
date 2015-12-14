@@ -12,12 +12,11 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.PropertyFactory.newDate;
+import static org.talend.components.api.properties.PropertyFactory.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.schema.SchemaElement;
 
 public class SalesforceGetDeletedUpdatedProperties extends ComponentProperties {
 

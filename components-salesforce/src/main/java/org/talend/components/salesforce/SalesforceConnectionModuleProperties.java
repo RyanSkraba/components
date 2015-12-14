@@ -32,10 +32,10 @@ public class SalesforceConnectionModuleProperties extends ComponentProperties {
     }
 
     @Override
-    public ComponentProperties init() {
+    public void setupProperties() {
+        super.setupProperties();
         // Allow for subclassing
         module = new SalesforceModuleProperties("module").setConnection(connection);
-        return super.init();
     }
 
     public Schema getSchema() {

@@ -34,8 +34,11 @@ public class SalesforceConnectionWizardDefinition extends AbstractComponentWizar
     @Inject
     ComponentService compService;
 
+    /**
+     * this will be used when in OSGI or may be used when not in a container at all.
+     */
     @Reference
-    public void setupComponentServiceFromOsgi(ComponentService compService) {
+    public void setupComponentService(ComponentService compService) {
         this.compService = compService;
     }
 

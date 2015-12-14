@@ -82,7 +82,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     }
 
     @Override
-    protected void setupLayout() {
+    public void setupLayout() {
         super.setupLayout();
 
         setValue(loginType, LOGIN_BASIC);

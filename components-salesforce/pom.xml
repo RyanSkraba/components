@@ -171,6 +171,7 @@
                                 <Bundle-Name>Test Fragment for ${project.name}</Bundle-Name>
                                 <Fragment-Host>org.talend.components.salesforce</Fragment-Host>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
+                                <DynamicImport-Package>*</DynamicImport-Package>
                                 <Embed-Dependency></Embed-Dependency>
                                 <Export-Package>*</Export-Package>
                                 <Include-Resource>=target/test-classes/

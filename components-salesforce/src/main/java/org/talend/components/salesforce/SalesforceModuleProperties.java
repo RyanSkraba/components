@@ -34,7 +34,7 @@ public class SalesforceModuleProperties extends ComponentProperties {
     //
     public Property moduleName = newEnum("moduleName"); //$NON-NLS-1$
 
-    public SchemaProperties schema = new SchemaProperties("schema").init();
+    public SchemaProperties schema = new SchemaProperties("schema");
 
     public SalesforceModuleProperties(String name) {
         super(name);
@@ -48,9 +48,8 @@ public class SalesforceModuleProperties extends ComponentProperties {
     }
 
     @Override
-    protected void setupLayout() {
+    public void setupLayout() {
         super.setupLayout();
-
         Form moduleForm = Form.create(this, Form.MAIN, "Salesforce Module");
         moduleForm.addRow(widget(moduleName).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
         refreshLayout(moduleForm);

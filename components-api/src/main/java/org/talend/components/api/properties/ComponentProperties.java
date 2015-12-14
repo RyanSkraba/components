@@ -166,7 +166,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     }
 
     /**
-     * Do not subclass this method for initialization, use {@link #init()} instead.
+     * Do not subclass this method for initialization, use {@link #setupProperties()} instead.
      */
     public ComponentProperties(String name) {
         internal = new ComponentPropertiesInternal();
@@ -174,14 +174,30 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     }
 
     /**
-     * Initialize this object, all subclass initialization should override this (and call the superclass).
+     * Must be called once the class is instanciated to setup the properties and the layout
      */
     public ComponentProperties init() {
         // init nested properties starting from the bottom ones
+        initProperties();
+        initLayout();
+        return this;
+    }
+
+    private void initProperties() {
         List<SchemaElement> properties = getProperties();
         for (SchemaElement prop : properties) {
             if (prop instanceof ComponentProperties) {
-                ((ComponentProperties) prop).init();
+                ((ComponentProperties) prop).initProperties();
+            }
+        }
+        setupProperties();
+    }
+
+    private void initLayout() {
+        List<SchemaElement> properties = getProperties();
+        for (SchemaElement prop : properties) {
+            if (prop instanceof ComponentProperties) {
+                ((ComponentProperties) prop).initLayout();
             }
         }
         if (!isRuntimeOnly()) {
@@ -190,8 +206,20 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
                 refreshLayout(form);
             }
         }
+    }
 
-        return this;
+    /**
+     * Initialize this object, all subclass initialization should override this, and call the super. <br>
+     * WARNING : make sure to call super() first otherwise you may endup with NPE because of not initialised properties
+     */
+    public void setupProperties() {
+    }
+
+    /**
+     * Declare the widget layout information for each of the properties.<br>
+     * WARNING : make sure to call super() first otherwise you may endup with NPE because of not initialised layout
+     */
+    public void setupLayout() {
     }
 
     /**
@@ -237,12 +265,6 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
 
     public boolean isRuntimeOnly() {
         return internal.isRuntimeOnly();
-    }
-
-    /**
-     * Declare the widget information for each of the properties
-     */
-    protected void setupLayout() {
     }
 
     /**

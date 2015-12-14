@@ -15,7 +15,6 @@ package org.talend.components.salesforce.tsalesforceoutput;
 import static org.talend.components.api.properties.PropertyFactory.*;
 import static org.talend.components.api.properties.presentation.Widget.*;
 
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
@@ -110,7 +109,8 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
     }
 
     @Override
-    public ComponentProperties init() {
+    public void setupProperties() {
+        super.setupProperties();
         returns = setReturnsProperty();
         newReturnProperty(returns, SchemaElement.Type.INT, "NB_LINE"); //$NON-NLS-1$
         newReturnProperty(returns, SchemaElement.Type.INT, "NB_SUCCESS"); //$NON-NLS-1$
@@ -122,10 +122,8 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
 
         setupUpsertRelation(upsertRelation, !POLY);
 
-        super.init();
         module = new ModuleSubclass("module").setConnection(connection);
-        module.init();
-        return this;
+        module.setupProperties();
     }
 
     @Override

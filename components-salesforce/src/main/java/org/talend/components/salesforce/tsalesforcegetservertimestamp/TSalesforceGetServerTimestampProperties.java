@@ -28,21 +28,22 @@ public class TSalesforceGetServerTimestampProperties extends ComponentProperties
     public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection");
 
     // Just holds the server timestamp
-    public SchemaProperties schema = new SchemaProperties("schema").init();
+    public SchemaProperties schema = new SchemaProperties("schema");
 
     public TSalesforceGetServerTimestampProperties(String name) {
         super(name);
     }
 
-    @Override public ComponentProperties init() {
-        super.init();
+    @Override
+    public void setupProperties() {
+        super.setupProperties();
         Schema s = (Schema) schema.getValue(schema.schema);
         s.setRoot(SchemaFactory.newSchemaElement(Type.GROUP, "Root"));
         s.getRoot().addChild(PropertyFactory.newDate("ServerTimestamp"));
-        return this;
     }
 
-    @Override public void setupLayout() {
+    @Override
+    public void setupLayout() {
         super.setupLayout();
         Form mainForm = Form.create(this, Form.MAIN, "Salesforce Get Server Timestamp");
         mainForm.addRow(connection.getForm(Form.REFERENCE));

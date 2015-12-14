@@ -14,7 +14,6 @@ package org.talend.components.salesforce.tsalesforceinput;
 
 import static org.talend.components.api.properties.PropertyFactory.*;
 
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
@@ -50,7 +49,8 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
     }
 
     @Override
-    public ComponentProperties init() {
+    public void setupProperties() {
+        super.setupProperties();
         returns = setReturnsProperty();
         newReturnProperty(returns, SchemaElement.Type.INT, "NB_LINE");
         // FIXME - should use default value
@@ -58,7 +58,6 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
         queryMode.setPossibleValues(QUERY_QUERY, QUERY_BULK);
 
-        return super.init();
     }
 
     @Override
@@ -89,8 +88,8 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN)) {
-            form.getWidget(includeDeleted.getName()).setVisible(
-                    getValue(queryMode) != null && getValue(queryMode).equals(QUERY_QUERY));
+            form.getWidget(includeDeleted.getName())
+                    .setVisible(getValue(queryMode) != null && getValue(queryMode).equals(QUERY_QUERY));
 
             form.getWidget(query.getName()).setVisible(getBooleanValue(manualQuery));
             form.getWidget(condition.getName()).setVisible(!getBooleanValue(manualQuery));

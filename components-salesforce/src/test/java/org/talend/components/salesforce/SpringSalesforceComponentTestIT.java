@@ -10,41 +10,26 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.common;
-
-import static org.junit.Assert.*;
+package org.talend.components.salesforce;
 
 import javax.inject.Inject;
 
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.test.SpringApp;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
-public class ProxyPropertiesTest {
+public class SpringSalesforceComponentTestIT extends SalesforceComponentTestIT {
 
     @Inject
-    protected ComponentService componentService;
+    ComponentService componentService;
 
-    public ProxyPropertiesTest() {
+    @Override
+    public ComponentService getComponentService() {
+        return componentService;
     }
 
-    @Test
-    public void testProxyProperties() throws Throwable {
-        ProxyProperties props = (ProxyProperties) new ProxyProperties("proxy").init();
-        Form mainForm = props.getForm(Form.MAIN);
-        assertFalse(mainForm.getWidget("host").isVisible());
-        assertFalse(mainForm.getWidget("userPassword").isVisible());
-
-        props.useProxy.setValue(true);
-        assertTrue(mainForm.getWidget("useProxy").isCallAfter());
-        componentService.afterProperty("useProxy", props);
-        assertTrue(mainForm.getWidget("host").isVisible());
-        assertTrue(mainForm.getWidget("userPassword").isVisible());
-    }
 }

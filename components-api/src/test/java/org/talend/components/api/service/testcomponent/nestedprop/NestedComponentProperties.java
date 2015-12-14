@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.api.service.testcomponent.nestedprop;
 
-import static org.talend.components.api.properties.PropertyFactory.newProperty;
+import static org.talend.components.api.properties.PropertyFactory.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
@@ -30,14 +30,12 @@ public class NestedComponentProperties extends ComponentProperties {
         super(name);
     }
 
-    public ComponentProperties init() {
-        super.init();
+    @Override
+    public void setupLayout() {
+        super.setupLayout();
         Form form = Form.create(this, Form.MAIN, "Nested Component");
         form.addRow(aGreatProperty);
         form.addRow(anotherProp);
-
-        return this;
-
     }
 
 }

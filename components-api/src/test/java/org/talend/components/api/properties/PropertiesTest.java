@@ -60,7 +60,7 @@ public class PropertiesTest {
     public void testRuntimeOnly() {
         TestComponentProperties props = new TestComponentProperties("test");
         props.setRuntimeOnly();
-        props.init();
+        props.setupProperties();
         assertTrue(props.isRuntimeOnly());
         assertNull(props.getForm(Form.MAIN));
     }

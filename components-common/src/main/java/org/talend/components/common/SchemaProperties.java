@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.properties.PropertyFactory.newProperty;
-import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.properties.PropertyFactory.*;
+import static org.talend.components.api.properties.presentation.Widget.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
@@ -37,16 +37,14 @@ public class SchemaProperties extends ComponentProperties {
     public Property schema = newProperty(SchemaElement.Type.SCHEMA, "schema"); //$NON-NLS-1$
 
     @Override
-    public SchemaProperties init() {
-        super.init();
+    public void setupProperties() {
+        super.setupProperties();
         schema.setValue(SchemaFactory.newSchema());
-        return this;
     }
 
     @Override
-    protected void setupLayout() {
+    public void setupLayout() {
         super.setupLayout();
-
         Form schemaForm = Form.create(this, Form.MAIN, "Schema"); //$NON-NLS-1$
         schemaForm.addRow(widget(schema).setWidgetType(Widget.WidgetType.SCHEMA_EDITOR));
 
@@ -57,9 +55,6 @@ public class SchemaProperties extends ComponentProperties {
     @Override
     public SchemaElement addChild(SchemaElement row) {
         Schema s = (Schema) getValue(schema);
-        if (s == null) {
-            s = SchemaFactory.newSchema();
-        }
         SchemaElement root = s.getRoot();
         if (root == null) {
             root = PropertyFactory.newProperty("Root"); //$NON-NLS-1$

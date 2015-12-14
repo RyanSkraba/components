@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.properties.PropertyFactory.newProperty;
-import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.properties.PropertyFactory.*;
+import static org.talend.components.api.properties.presentation.Widget.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
@@ -48,9 +48,8 @@ public class ComponentReferenceProperties extends ComponentProperties {
     }
 
     @Override
-    protected void setupLayout() {
+    public void setupLayout() {
         super.setupLayout();
-
         Form reference = Form.create(this, Form.REFERENCE, "Component");
         reference.addRow(
                 widget(referenceType, componentType, componentInstanceId).setWidgetType(Widget.WidgetType.COMPONENT_REFERENCE));

@@ -91,13 +91,13 @@ public class TestComponentProperties extends ComponentProperties {
     }
 
     @Override
-    public ComponentProperties init() {
-        super.init();
-        return this;
+    public void setupProperties() {
+        super.setupProperties();
     }
 
     @Override
-    protected void setupLayout() {
+    public void setupLayout() {
+        super.setupLayout();
         Form form = Form.create(this, Form.MAIN, "Test Component");
         mainForm = form;
         form.addRow(userId);

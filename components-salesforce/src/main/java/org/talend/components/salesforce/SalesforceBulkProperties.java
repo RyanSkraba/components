@@ -12,13 +12,11 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.components.api.properties.PropertyFactory.newEnum;
-import static org.talend.components.api.properties.PropertyFactory.newInteger;
+import static org.talend.components.api.properties.PropertyFactory.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.schema.SchemaElement;
 
 public class SalesforceBulkProperties extends ComponentProperties {
 
@@ -36,12 +34,6 @@ public class SalesforceBulkProperties extends ComponentProperties {
 
     public SalesforceBulkProperties(String name) {
         super(name);
-    }
-
-    @Override
-    public SalesforceBulkProperties init() {
-        super.init();
-        return this;
     }
 
     @Override
