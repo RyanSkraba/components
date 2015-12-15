@@ -734,6 +734,26 @@ public class SalesforceRuntime extends ComponentRuntime {
         return errors;
     }
 
+    protected void populateResultMessage(Map<String, String> resultMessage, Error[] errors) {
+        for (Error error : errors) {
+            if (error.getStatusCode() != null) {
+                resultMessage.put("StatusCode", error.getStatusCode().toString());
+            }
+            if (error.getFields() != null) {
+                StringBuffer fields = new StringBuffer();
+                for (String field : error.getFields()) {
+                    fields.append(field);
+                    fields.append(",");
+                }
+                if (fields.length() > 0) {
+                    fields.deleteCharAt(fields.length() - 1);
+                }
+                resultMessage.put("Fields", fields.toString());
+            }
+            resultMessage.put("Message", error.getMessage());
+        }
+    }
+
     // FIXME - not sure what this is used for
     protected Map<String, String> readResult(Object[] results) throws Exception {
         Map<String, String> resultMessage = null;
@@ -745,23 +765,7 @@ public class SalesforceRuntime extends ComponentRuntime {
                 }
                 resultMessage.put("success", String.valueOf(result.getSuccess()));
                 if (!result.getSuccess()) {
-                    for (Error error : result.getErrors()) {
-                        if (error.getStatusCode() != null) {
-                            resultMessage.put("StatusCode", error.getStatusCode().toString());
-                        }
-                        if (error.getFields() != null) {
-                            StringBuffer fields = new StringBuffer();
-                            for (String field : error.getFields()) {
-                                fields.append(field);
-                                fields.append(",");
-                            }
-                            if (fields.length() > 0) {
-                                fields.deleteCharAt(fields.length() - 1);
-                            }
-                            resultMessage.put("Fields", fields.toString());
-                        }
-                        resultMessage.put("Message", error.getMessage());
-                    }
+                    populateResultMessage(resultMessage, result.getErrors());
                 }
             }
             return resultMessage;
@@ -773,12 +777,7 @@ public class SalesforceRuntime extends ComponentRuntime {
                 }
                 resultMessage.put("success", String.valueOf(result.getSuccess()));
                 if (!result.getSuccess()) {
-                    for (Error error : result.getErrors()) {
-                        if (error.getStatusCode() != null) {
-                            resultMessage.put("StatusCode", error.getStatusCode().toString());
-                        }
-                        resultMessage.put("Message", error.getMessage());
-                    }
+                    populateResultMessage(resultMessage, result.getErrors());
                 }
             }
             return resultMessage;
@@ -791,23 +790,7 @@ public class SalesforceRuntime extends ComponentRuntime {
                 resultMessage.put("success", String.valueOf(result.getSuccess()));
                 resultMessage.put("created", String.valueOf(result.getCreated()));
                 if (!result.getSuccess()) {
-                    for (Error error : result.getErrors()) {
-                        if (error.getStatusCode() != null) {
-                            resultMessage.put("StatusCode", error.getStatusCode().toString());
-                        }
-                        if (error.getFields() != null) {
-                            StringBuffer fields = new StringBuffer();
-                            for (String field : error.getFields()) {
-                                fields.append(field);
-                                fields.append(",");
-                            }
-                            if (fields.length() > 0) {
-                                fields.deleteCharAt(fields.length() - 1);
-                            }
-                            resultMessage.put("Fields", fields.toString());
-                        }
-                        resultMessage.put("Message", error.getMessage());
-                    }
+                    populateResultMessage(resultMessage, result.getErrors());
                 }
             }
             return resultMessage;
