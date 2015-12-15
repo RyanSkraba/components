@@ -12,14 +12,19 @@
 // ============================================================================
 package org.talend.components.common.oauth;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
 import org.talend.components.test.ComponentTestUtils;
 
 public class AllPropertiesTest {
 
+    @Rule
+    public ErrorCollector errorCollector = new ErrorCollector();
+
     @Test
     public void testAlli18n() {
-        ComponentTestUtils.checkAllI18N(new OauthProperties(null));
+        ComponentTestUtils.checkAllI18N(new OauthProperties(null).init(), errorCollector);
         ;
     }
 

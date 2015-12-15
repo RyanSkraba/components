@@ -27,7 +27,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
@@ -67,6 +69,9 @@ import org.talend.components.test.SimpleComponentRegistry;
 import org.talend.components.test.SimpleComponentService;
 
 public class SalesforceComponentTestIT extends AbstractComponentTest {
+
+    @Rule
+    public ErrorCollector errorCollector = new ErrorCollector();
 
     private ComponentService componentService;
 
@@ -894,7 +899,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
 
     @Test
     public void testAlli18n() {
-        ComponentTestUtils.testAlli18n(getComponentService());
+        ComponentTestUtils.testAlli18n(getComponentService(), errorCollector);
     }
 
     @Test

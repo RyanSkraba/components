@@ -21,9 +21,11 @@ import org.talend.components.api.NamedThing;
 import org.talend.components.api.SimpleNamedThing;
 import org.talend.components.api.ToStringIndent;
 import org.talend.components.api.ToStringIndentUtil;
+import org.talend.components.api.context.GlobalContext;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.schema.SchemaElement;
+import org.talend.daikon.i18n.I18nMessages;
 
 /**
  * Represents a collection of components {@link SchemaElement} objects that are grouped into a form for display. This
@@ -32,18 +34,23 @@ import org.talend.components.api.schema.SchemaElement;
 public class Form extends SimpleNamedThing implements ToStringIndent {
 
     /**
+     * prefix used in the i18n properties file for translatable strings for form attributes
+     */
+    public static final String I18N_FORM_PREFIX = "form."; //$NON-NLS-1$
+
+    /**
      * Standard form name for the main form associated with a component.
      *
      * This has no significance in the Component Framework, it's just a usage convention.
      */
-    public static final String MAIN = "Main";
+    public static final String MAIN = "Main"; //$NON-NLS-1$
 
     /**
      * Standard form name for advanced properties associated with a component.
      *
      * This has no significance in the Component Framework, it's just a usage convention.
      */
-    public static final String ADVANCED = "Advanced";
+    public static final String ADVANCED = "Advanced"; //$NON-NLS-1$
 
     /**
      * Standard form name for a form that references something (like a schema or other component), to be included in
@@ -52,6 +59,11 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
      * This has no significance in the Component Framework, it's just a usage convention.
      */
     public static final String REFERENCE = "Reference";
+
+    /**
+     * suffix used in the i18n properties file for translatable strings for subtitle value
+     */
+    public static final String I18N_SUBTITLE_NAME_SUFFIX = ".subtitle"; //$NON-NLS-1$
 
     protected String subtitle;
 
@@ -104,8 +116,27 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
         props.setFormLayoutMethods(name, this);
     }
 
+    /**
+     * create a form that will get title from i18n properties file. The display name is set to the name cause display
+     * name are not yet used for forms.
+     * 
+     * @param props the related ComponentProperties, never null
+     * @param name, form technical name.
+     */
+    public Form(ComponentProperties props, String name) {
+        this(props, name, name, null);
+    }
+
     public static Form create(ComponentProperties props, String name, String title) {
-        return new Form(props, name, name, title);
+        return new Form(props, name, name, null);
+    }
+
+    /*
+     * uses the associated ComponentProperties class to find the message properties
+     */
+    @Override
+    protected I18nMessages createI18nMessageFormater() {
+        return GlobalContext.getI18nMessageProvider().getI18nMessages(componentProperties.getClass());
     }
 
     public List<NamedThing> getChildren() {
@@ -154,8 +185,12 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
         return this;
     }
 
+    /**
+     * If no title was specified then the i18n key : {@value Form#I18N_FORM_PREFIX}.{@link Form#getName()}.
+     * {@value SimpleNamedThing#I18N_TITLE_NAME_SUFFIX} to find the value from the i18n.
+     */
     public String getSubtitle() {
-        return subtitle;
+        return subtitle != null ? subtitle : getI18nMessage(I18N_FORM_PREFIX + name + I18N_SUBTITLE_NAME_SUFFIX);
     }
 
     public Form addRow(NamedThing child) {
@@ -204,8 +239,9 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
             if (child instanceof Form) {
                 name = ((Form) child).getComponentProperties().getName();
             }
-            if (name == null)
+            if (name == null) {
                 throw new NullPointerException();
+            }
             widgetMap.put(name, widget);
             children.put(name, child);
             componentProperties.setWidgetLayoutMethods(name, widget);
@@ -226,10 +262,12 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
         for (Widget w : widgets) {
             for (NamedThing p : w.getProperties()) {
                 // See comment above in fill()
-                if (p instanceof Form)
+                if (p instanceof Form) {
                     p = ((Form) p).getComponentProperties();
-                if (p.getClass() == childClass)
+                }
+                if (p.getClass() == childClass) {
                     return w;
+                }
             }
         }
         return null;
@@ -270,14 +308,16 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
     public void setCancelable(boolean cancelable) {
         this.cancelable = cancelable;
         cancelableValues = null;
-        if (cancelable)
+        if (cancelable) {
             cancelableValues = new HashMap<>();
+        }
     }
 
     // Not API - to be called by ComponentService only
     public void commitValues() {
-        if (cancelableValues == null)
+        if (cancelableValues == null) {
             return;
+        }
         for (String key : cancelableValues.keySet()) {
             ((Property) getComponentProperties().getProperty(key)).setValue(cancelableValues.get(key));
         }
@@ -349,30 +389,58 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
         this.allowFinish = allowFinish;
     }
 
+    /**
+     * If no title was specified then the i18n key : {@value Form#I18N_FORM_PREFIX}.{@link Form#getName()}.
+     * {@value SimpleNamedThing#I18N_TITLE_NAME_SUFFIX} to find the value from the i18n.
+     */
+    @Override
+    public String getTitle() {
+        return title != null ? title : getI18nMessage(I18N_FORM_PREFIX + name + I18N_TITLE_NAME_SUFFIX);
+    }
+
+    /**
+     * If no displayName was specified then the i18n key : {@value Form#I18N_FORM_PREFIX}.{@link Form#getName()}.
+     * {@value SimpleNamedThing#I18N_DISPLAY_NAME_SUFFIX} to find the value from the i18n.
+     */
+    @Override
+    public String getDisplayName() {
+        return displayName != null ? displayName : getI18nMessage(I18N_FORM_PREFIX + name + I18N_DISPLAY_NAME_SUFFIX);
+    }
+
+    @Override
     public String toString() {
         return toStringIndent(0);
     }
 
+    @Override
     public String toStringIndent(int indent) {
         StringBuilder sb = new StringBuilder();
         String is = ToStringIndentUtil.indentString(indent);
         sb.append(is + "Form: " + getName());
-        if (isRefreshUI())
+        if (isRefreshUI()) {
             sb.append(" REFRESH_UI");
-        if (isCallBeforeFormPresent())
+        }
+        if (isCallBeforeFormPresent()) {
             sb.append(" BEFORE_FORM_PRESENT");
-        if (isCallAfterFormBack())
+        }
+        if (isCallAfterFormBack()) {
             sb.append(" AFTER_FORM_BACK");
-        if (isCallAfterFormNext())
+        }
+        if (isCallAfterFormNext()) {
             sb.append(" AFTER_FORM_NEXT");
-        if (isCallAfterFormFinish())
+        }
+        if (isCallAfterFormFinish()) {
             sb.append(" AFTER_FORM_FINISH");
-        if (isAllowBack())
+        }
+        if (isAllowBack()) {
             sb.append(" ALLOW_BACK");
-        if (isAllowForward())
+        }
+        if (isAllowForward()) {
             sb.append(" ALLOW_FORWARD");
-        if (isAllowFinish())
+        }
+        if (isAllowFinish()) {
             sb.append(" ALLOW_FINISH");
+        }
         for (Widget w : getWidgets()) {
             sb.append("\n" + w.toStringIndent(indent + 4));
         }

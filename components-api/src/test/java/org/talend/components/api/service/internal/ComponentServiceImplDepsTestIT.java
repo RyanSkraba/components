@@ -34,8 +34,6 @@ import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.talend.components.api.service.internal.ComponentServiceImpl;
-import org.talend.components.api.service.internal.MavenBooter;
 
 public class ComponentServiceImplDepsTestIT {
 

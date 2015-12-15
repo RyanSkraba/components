@@ -20,7 +20,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
@@ -39,6 +41,9 @@ import org.talend.components.test.ComponentTestUtils;
 import org.talend.components.test.SimpleComponentRegistry;
 
 public class ComponentServiceTest extends AbstractComponentTest {
+
+    @Rule
+    public ErrorCollector errorCollector = new ErrorCollector();
 
     private ComponentServiceImpl componentService;
 
@@ -225,7 +230,7 @@ public class ComponentServiceTest extends AbstractComponentTest {
 
     @Test
     public void testAlli18n() {
-        ComponentTestUtils.testAlli18n(getComponentService());
+        ComponentTestUtils.testAlli18n(getComponentService(), errorCollector);
     }
 
     @Test

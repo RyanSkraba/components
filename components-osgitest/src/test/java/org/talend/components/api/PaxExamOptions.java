@@ -36,7 +36,7 @@ public class PaxExamOptions {
                 mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("bundle"),
                 mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("tests").noStart(),
                 // //
-                junitBundles(), cleanCaches());
+                junitBundles(), mavenBundle("org.ops4j.pax.tipi", "org.ops4j.pax.tipi.hamcrest.core", "1.3.0.1"), cleanCaches());
     }
 
     // public static Option[] getOptions() {

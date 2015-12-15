@@ -12,12 +12,16 @@
 // ============================================================================
 package org.talend.components.test;
 
+import static org.hamcrest.CoreMatchers.*;
+// import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Rule;
+import org.junit.rules.ErrorCollector;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
@@ -29,6 +33,9 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 
 public class ComponentTestUtils {
+
+    @Rule
+    public ErrorCollector collector = new ErrorCollector();
 
     public static ComponentProperties checkSerialize(ComponentProperties props) {
         String s = props.toSerialized();
@@ -66,42 +73,67 @@ public class ComponentTestUtils {
 
     }
 
-    static public void testAlli18n(ComponentService componentService) {
+    /**
+     * check all properties of a component for i18n, check form i18n, check ComponentProperties title is i18n
+     * 
+     * @param componentService where to get all the components
+     * @param errorCollector used to collect all errors at once. @see
+     * <a href="http://junit.org/apidocs/org/junit/rules/ErrorCollector.html">ErrorCollector</a>
+     */
+    static public void testAlli18n(ComponentService componentService, ErrorCollector errorCollector) {
         Set<ComponentDefinition> allComponents = componentService.getAllComponents();
         for (ComponentDefinition cd : allComponents) {
             ComponentProperties props = cd.createProperties();
+            // check all properties
             if (props != null) {
-                checkAllI18N(props);
+                checkAllI18N(props, errorCollector);
             } else {
                 System.out.println("No properties to check fo I18n for :" + cd.getName());
             }
-            // Make sure this translates
-            assertFalse("missing I18n property :" + cd.getTitle(), cd.getTitle().contains("component."));
+            // check component properties title
+            errorCollector.checkThat("missing I18n property :" + cd.getTitle(), cd.getTitle().contains("component."), is(false));
         }
     }
 
     /**
      * check that all Components have theirs internationnalisation properties setup correctly.
      * 
+     * @param errorCollector
+     * 
      * @param componentService service to get the components to be checked.
      */
-    static public void checkAllI18N(ComponentProperties checkProps) {
-        if (checkProps == null) {
+    static public void checkAllI18N(ComponentProperties checkedProps, ErrorCollector errorCollector) {
+        if (checkedProps == null) {
             System.out.println("No properties to be checked.");
         } else {
-            System.out.println("Checking: " + checkProps);
-            List<SchemaElement> properties = checkProps.getProperties();
+            // checking properties
+            System.out.println("Checking: " + checkedProps);
+            List<SchemaElement> properties = checkedProps.getProperties();
             for (SchemaElement prop : properties) {
                 if (!(prop instanceof ComponentProperties)) {
-                    assertFalse(
-                            "property [" + checkProps.getClass().getCanonicalName() + "/" + prop.getName()
+                    errorCollector.checkThat(
+                            "property [" + checkedProps.getClass().getCanonicalName() + "/" + prop.getName()
                                     + "] should have a translated message key [property." + prop.getName()
                                     + ".displayName] in [the proper messages.properties]",
-                            prop.getDisplayName().endsWith(".displayName"));
+                            prop.getDisplayName().endsWith(".displayName"), is(false));
                 } else {
-                    checkAllI18N((ComponentProperties) prop);
+                    checkAllI18N((ComponentProperties) prop, errorCollector);
                 }
             }
+            // check forms
+            List<Form> forms = checkedProps.getForms();
+            for (Form form : forms) {
+                errorCollector.checkThat(
+                        "Form [" + form.getComponentProperties().getClass().getCanonicalName() + "/" + form.getName()
+                                + "] should have a translated message key [form." + form.getName()
+                                + ".displayName] in [the proper messages.properties]",
+                        form.getDisplayName().endsWith(".displayName"), is(false));
+                errorCollector.checkThat("Form [" + form.getComponentProperties().getClass().getCanonicalName() + "/"
+                        + form.getName() + "] should have a translated message key [form." + form.getName()
+                        + ".title] in [the proper messages.properties]", form.getTitle().endsWith(".title"), is(false));
+
+            }
+
         }
     }
 

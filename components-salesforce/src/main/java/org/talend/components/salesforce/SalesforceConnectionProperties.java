@@ -87,8 +87,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
         setValue(loginType, LOGIN_BASIC);
 
-        Form wizardForm = Form.create(this, FORM_WIZARD, getI18nMessage("property.form.Main.title"));
-        wizardForm.setSubtitle(getI18nMessage("property.form.Main.subtitle"));
+        Form wizardForm = new Form(this, FORM_WIZARD);
         wizardForm.addRow(name);
         wizardForm.addRow(widget(loginType).setDeemphasize(true));
         wizardForm.addRow(oauth.getForm(Form.MAIN));
@@ -96,12 +95,12 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         wizardForm.addRow(widget(advanced).setWidgetType(WidgetType.BUTTON));
         wizardForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
 
-        Form mainForm = Form.create(this, Form.MAIN, getI18nMessage("property.form.Main.title"));
+        Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(loginType);
         mainForm.addRow(oauth.getForm(Form.MAIN));
         mainForm.addRow(userPassword.getForm(Form.MAIN));
 
-        Form advancedForm = Form.create(this, Form.ADVANCED, getI18nMessage("property.form.Advanced.title"));
+        Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(bulkConnection);
         advancedForm.addRow(needCompression);
         advancedForm.addRow(httpTraceMessage);
@@ -110,7 +109,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         advancedForm.addRow(proxy.getForm(Form.MAIN));
         advanced.setFormtoShow(advancedForm);
 
-        Form refForm = Form.create(this, Form.REFERENCE, "Connection Reference");
+        Form refForm = new Form(this, Form.REFERENCE);
         refForm.addRow(widget(referencedComponentId).setWidgetType(WidgetType.COMPONENT_REFERENCE));
         refForm.addRow(mainForm);
     }

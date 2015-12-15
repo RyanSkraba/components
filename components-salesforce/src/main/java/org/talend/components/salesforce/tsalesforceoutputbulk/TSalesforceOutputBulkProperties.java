@@ -52,13 +52,13 @@ public class TSalesforceOutputBulkProperties extends ComponentProperties {
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Output Bulk");
+        Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(schema.getForm(Form.REFERENCE));
         mainForm.addRow(fileName);
         mainForm.addRow(append);
         mainForm.addRow(ignoreNull);
 
-        Form advancedForm = Form.create(this, Form.ADVANCED, "Advanced");
+        Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(widget(upsertRelation).setWidgetType(Widget.WidgetType.TABLE));
 
     }

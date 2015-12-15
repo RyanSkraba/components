@@ -38,7 +38,7 @@ public class SalesforceGetDeletedUpdatedProperties extends ComponentProperties {
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Get Updated/Deleted");
+        Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(connection.getForm(Form.REFERENCE));
         mainForm.addRow(module.getForm(Form.REFERENCE));
         mainForm.addRow(startDate);

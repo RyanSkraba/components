@@ -12,17 +12,22 @@
 // ============================================================================
 package org.talend.components.common;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
 import org.talend.components.test.ComponentTestUtils;
 
 public class AllPropertiesTest {
 
+    @Rule
+    public ErrorCollector errorCollector = new ErrorCollector();
+
     @Test
     public void testAlli18n() {
-        ComponentTestUtils.checkAllI18N(new ComponentReferenceProperties(null));
-        ComponentTestUtils.checkAllI18N(new ProxyProperties(null));
-        ComponentTestUtils.checkAllI18N(new SchemaProperties(null));
-        ComponentTestUtils.checkAllI18N(new UserPasswordProperties(null));
+        ComponentTestUtils.checkAllI18N(new ComponentReferenceProperties(null).init(), errorCollector);
+        ComponentTestUtils.checkAllI18N(new ProxyProperties(null).init(), errorCollector);
+        ComponentTestUtils.checkAllI18N(new SchemaProperties(null).init(), errorCollector);
+        ComponentTestUtils.checkAllI18N(new UserPasswordProperties(null).init(), errorCollector);
     }
 
 }

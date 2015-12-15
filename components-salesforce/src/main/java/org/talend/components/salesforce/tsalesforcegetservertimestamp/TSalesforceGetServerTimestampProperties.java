@@ -45,7 +45,7 @@ public class TSalesforceGetServerTimestampProperties extends ComponentProperties
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Get Server Timestamp");
+        Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(connection.getForm(Form.REFERENCE));
         mainForm.addRow(schema.getForm(Form.REFERENCE));
     }

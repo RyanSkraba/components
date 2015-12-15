@@ -70,7 +70,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         mainForm.addRow(query);
         mainForm.addRow(includeDeleted);
 
-        Form advancedForm = Form.create(this, Form.ADVANCED, "Salesforce Advanced");
+        Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(batchSize);
         advancedForm.addRow(normalizeDelimiter);
         advancedForm.addRow(columnNameDelimiter);

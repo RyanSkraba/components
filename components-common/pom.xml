@@ -40,10 +40,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.talend.daikon</groupId>
             <artifactId>daikon-spring</artifactId>
             <scope>test</scope>

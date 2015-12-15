@@ -45,7 +45,7 @@ public class SalesforceConnectionModuleProperties extends ComponentProperties {
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Input/Output");
+        Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(connection.getForm(Form.REFERENCE));
         mainForm.addRow(module.getForm(Form.REFERENCE));
     }
