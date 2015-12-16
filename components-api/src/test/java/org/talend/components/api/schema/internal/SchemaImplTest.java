@@ -10,15 +10,27 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api;
+package org.talend.components.api.schema.internal;
 
-public class ToStringIndentUtil {
+import static org.junit.Assert.*;
 
-    public static String indentString(int indent) {
-        if (indent < 0) {
-            return "";
-        }
-        return "                                                                              ".substring(0, indent);
+import org.junit.Test;
+import org.talend.components.api.schema.SchemaElement;
+
+/**
+ * created by pbailly on 16 Dec 2015 Detailled comment
+ *
+ */
+public class SchemaImplTest {
+
+    @Test
+    public void test() {
+        SchemaImpl schema = new SchemaImpl();
+        assertNull(schema.getRoot());
+        SchemaElement element = new DataSchemaElement();
+        schema.setRoot(element);
+        assertEquals(element, schema.getRoot());
+
     }
 
 }

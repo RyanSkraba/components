@@ -27,15 +27,16 @@ public class DefaultComponentRuntimeContainerImpl implements ComponentRuntimeCon
 
     private Map<String, Object> globalMap = new HashMap<>();
 
+    @Override
     public Map<String, Object> getGlobalMap() {
         return globalMap;
     }
 
     class Dynamic implements ComponentDynamicHolder {
 
-        List<SchemaElement> schemaElements;
+        private List<SchemaElement> schemaElements;
 
-        Map<String, Object> values;
+        private Map<String, Object> values = new HashMap<>();
 
         @Override
         public List<SchemaElement> getSchemaElements() {
@@ -54,14 +55,12 @@ public class DefaultComponentRuntimeContainerImpl implements ComponentRuntimeCon
 
         @Override
         public void addFieldValue(String fieldName, Object value) {
-            if (values == null)
-                values = new HashMap<>();
             values.put(fieldName, value);
         }
 
         @Override
         public void resetValues() {
-            values = null;
+            values.clear();
         }
     }
 
