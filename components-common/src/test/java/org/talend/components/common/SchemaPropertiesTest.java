@@ -63,7 +63,7 @@ public class SchemaPropertiesTest {
         Schema schema = (Schema) schemaProperties.getValue(schemaProperties.schema);
         assertNull(schema.getRoot());
         SchemaElement element = PropertyFactory.newBoolean("testBoolean", false);
-        schemaProperties.addChild(element);
+        schemaProperties.addSchemaChild(element);
         assertNotNull(schema.getRoot());
         SchemaElement root = schema.getRoot();
         assertEquals(1, root.getChildMap().size());

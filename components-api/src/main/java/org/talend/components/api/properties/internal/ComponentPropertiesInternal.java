@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.talend.components.api.ComponentDesigner;
+import org.talend.components.api.NamedThing;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.SchemaElement;
@@ -57,8 +58,9 @@ public class ComponentPropertiesInternal {
 
     public Form getForm(String name) {
         for (Form f : forms) {
-            if (f.getName().equals(name))
+            if (f.getName().equals(name)) {
                 return f;
+            }
         }
         return null;
     }
@@ -83,7 +85,7 @@ public class ComponentPropertiesInternal {
         propertyValues.put(property, value);
     }
 
-    public Object getValue(SchemaElement property) {
+    public Object getValue(NamedThing property) {
         return propertyValues.get(property);
     }
 
