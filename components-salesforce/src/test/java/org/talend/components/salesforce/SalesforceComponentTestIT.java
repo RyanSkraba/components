@@ -189,7 +189,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
     public void testInputProps() throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputDefinition().createProperties();
         assertEquals(2, props.queryMode.getPossibleValues().size());
-        SchemaElement returns = props.getProperty(ComponentProperties.RETURNS);
+        Property returns = (Property) props.getProperty(ComponentProperties.RETURNS);
         assertEquals("NB_LINE", returns.getChildren().get(0).getName());
     }
 
@@ -414,9 +414,10 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
                     .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
         }
         ComponentProperties userPassword = (ComponentProperties) props.getProperty("userPassword");
-        userPassword.setValue(userPassword.getProperty("userId"), addQuotes ? "\"" + userId + "\"" : userId);
-        userPassword.setValue(userPassword.getProperty("password"), addQuotes ? "\"" + password + "\"" : password);
-        userPassword.setValue(userPassword.getProperty("securityKey"), addQuotes ? "\"" + securityKey + "\"" : securityKey);
+        userPassword.setValue((Property) userPassword.getProperty("userId"), addQuotes ? "\"" + userId + "\"" : userId);
+        userPassword.setValue((Property) userPassword.getProperty("password"), addQuotes ? "\"" + password + "\"" : password);
+        userPassword.setValue((Property) userPassword.getProperty("securityKey"),
+                addQuotes ? "\"" + securityKey + "\"" : securityKey);
         return props;
     }
 
@@ -853,7 +854,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         props.setValue(props.outputAction, TSalesforceOutputProperties.OutputAction.UPSERT);
         checkAndAfter(props.getForm(Form.MAIN), "outputAction", props);
 
-        SchemaElement se = props.getProperty("upsertKeyColumn");
+        SchemaElement se = (Property) props.getProperty("upsertKeyColumn");
         System.out.println("--upsertKeyColumn - possible values");
         System.out.println(se.getPossibleValues());
         assertTrue(se.getPossibleValues().size() > 10);

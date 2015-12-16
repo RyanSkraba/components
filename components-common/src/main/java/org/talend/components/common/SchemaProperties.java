@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.properties.PropertyFactory.newProperty;
-import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.properties.PropertyFactory.*;
+import static org.talend.components.api.properties.presentation.Widget.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
@@ -53,8 +53,11 @@ public class SchemaProperties extends ComponentProperties {
         schemaRefForm.addRow(widget(schema).setWidgetType(Widget.WidgetType.SCHEMA_REFERENCE));
     }
 
-    @Override
-    public SchemaElement addChild(SchemaElement row) {
+    /**
+     * helper method to add a child schema element to the {@link SchemaProperties#schema} property This creates a Root
+     * named schema is not root exists.
+     */
+    public SchemaElement addSchemaChild(SchemaElement row) {
         Schema s = (Schema) getValue(schema);
         SchemaElement root = s.getRoot();
         if (root == null) {

@@ -16,6 +16,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.PropertyFactory;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.Schema;
+import org.talend.components.api.schema.SchemaElement.Type;
 import org.talend.components.api.schema.SchemaFactory;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;

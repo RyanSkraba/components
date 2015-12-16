@@ -21,6 +21,7 @@ import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
+import org.talend.components.api.schema.SchemaElement.Type;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceModuleProperties;
@@ -62,7 +63,7 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
     // FIXME - should be file
     public Property logFileName = newString("logFileName"); //$NON-NLS-1$
 
-    public Property upsertRelation = (Property) newProperty("upsertRelation").setOccurMaxTimes(INFINITE); //$NON-NLS-1$
+    public Property upsertRelation = (Property) newProperty("upsertRelation").setOccurMaxTimes(SchemaElement.INFINITE); //$NON-NLS-1$
 
     //
     // Collections
@@ -116,9 +117,9 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
         newReturnProperty(returns, SchemaElement.Type.INT, "NB_SUCCESS"); //$NON-NLS-1$
         newReturnProperty(returns, SchemaElement.Type.INT, "NB_REJECT"); //$NON-NLS-1$
 
-        schemaReject.addChild(newProperty("errorCode")); //$NON-NLS-1$
-        schemaReject.addChild(newProperty("errorFields")); //$NON-NLS-1$
-        schemaReject.addChild(newProperty("errorMessage")); //$NON-NLS-1$
+        schemaReject.addSchemaChild(newProperty("errorCode")); //$NON-NLS-1$
+        schemaReject.addSchemaChild(newProperty("errorFields")); //$NON-NLS-1$
+        schemaReject.addSchemaChild(newProperty("errorMessage")); //$NON-NLS-1$
 
         setupUpsertRelation(upsertRelation, !POLY);
 
@@ -157,7 +158,7 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
             ((Schema) schemaFlow.getValue(schemaFlow.schema)).setRoot(null);
             if (!getBooleanValue(extendInsert) && getStringValue(retrieveInsertId) != null
                     && getValue(outputAction) == OutputAction.INSERT) {
-                schemaFlow.addChild(newProperty("salesforce_id"));
+                schemaFlow.addSchemaChild(newProperty("salesforce_id"));
             }
         }
         if (form.getName().equals(Form.MAIN)) {
