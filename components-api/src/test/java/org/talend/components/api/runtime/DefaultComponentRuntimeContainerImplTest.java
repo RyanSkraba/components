@@ -14,6 +14,8 @@ package org.talend.components.api.runtime;
 
 import static org.junit.Assert.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -39,9 +41,10 @@ public class DefaultComponentRuntimeContainerImplTest {
     }
 
     @Test
-    public void testFormatDate() {
+    public void testFormatDate() throws ParseException {
         DefaultComponentRuntimeContainerImpl runtimeContainer = new DefaultComponentRuntimeContainerImpl();
-        Date fixedDate = new Date(100000000l);
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        Date fixedDate = format.parse("02-01-1970 04:46:40");
         assertEquals("02-01-1970", runtimeContainer.formatDate(fixedDate, "dd-MM-yyyy"));
         assertEquals("02-01-1970 04:46:40", runtimeContainer.formatDate(fixedDate, "dd-MM-yyyy hh:mm:ss"));
     }
