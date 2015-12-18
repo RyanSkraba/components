@@ -17,7 +17,6 @@ import static org.talend.components.api.properties.PropertyFactory.*;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.schema.SchemaElement.Type;
 
 public class OauthProperties extends ComponentProperties {
 

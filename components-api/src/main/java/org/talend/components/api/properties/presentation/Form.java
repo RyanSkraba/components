@@ -289,7 +289,7 @@ public class Form extends SimpleNamedThing implements ToStringIndent {
      */
     public void setValue(String property, Object value) {
         // FIXME handle cases of qualified property names
-        NamedThing se = getComponentProperties().getProperty(property);
+        SchemaElement se = getComponentProperties().getProperty(property);
         if (!(se instanceof Property)) {
             throw new IllegalArgumentException("Attempted to set value on " + se + " which is not a Property");
         }

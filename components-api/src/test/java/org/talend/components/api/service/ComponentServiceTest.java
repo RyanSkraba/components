@@ -26,7 +26,6 @@ import org.junit.rules.ErrorCollector;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.ValidationResult.Result;
 import org.talend.components.api.properties.presentation.Form;
@@ -82,12 +81,12 @@ public class ComponentServiceTest extends AbstractComponentTest {
         ComponentProperties props = getComponentService().getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
 
         checkAndBeforePresent(props.getForm(Form.MAIN), "nameList", props);
-        assertEquals(3, ((Property) props.getProperty("nameList")).getPossibleValues().size());
-        assertEquals("name1", ((Property) props.getProperty("nameList")).getPossibleValues().get(0));
+        assertEquals(3, props.getProperty("nameList").getPossibleValues().size());
+        assertEquals("name1", props.getProperty("nameList").getPossibleValues().get(0));
 
         checkAndBeforeActivate(props.getForm(Form.MAIN), "nameListRef", props);
-        assertEquals(3, ((Property) props.getProperty("nameListRef")).getPossibleValues().size());
-        assertEquals("namer1", ((Property) props.getProperty("nameListRef")).getPossibleValues().get(0));
+        assertEquals(3, props.getProperty("nameListRef").getPossibleValues().size());
+        assertEquals("namer1", props.getProperty("nameListRef").getPossibleValues().get(0));
 
         assertFalse(props.getForm(Form.MAIN).getWidget("nameList").isCallBeforeActivate());
         assertFalse(props.getForm(Form.MAIN).getWidget("nameListRef").isCallBeforePresent());
