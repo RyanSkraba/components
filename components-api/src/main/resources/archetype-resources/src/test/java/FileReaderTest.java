@@ -10,6 +10,7 @@
         import java.util.Map;
         import java.util.ArrayList;
 
+        import static org.junit.Assert.*;
         import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,8 +46,8 @@ public class ${classNamePrefix}Test {
 
     @Test
     public void testComponent() throws Exception {
-        ${classNamePrefix}Definition def = (${classNamePrefix}Definition)componentService.getComponentDefinition("${classNamePrefix}");
-        ${classNamePrefix}Properties props = (${classNamePrefix}Properties)componentService.getComponentProperties("${classNamePrefix}");
+        ${classNamePrefix}Definition def = (${classNamePrefix}Definition)getComponentService().getComponentDefinition("${classNamePrefix}");
+        ${classNamePrefix}Properties props = (${classNamePrefix}Properties)getComponentService().getComponentProperties("${classNamePrefix}");
         File temp = File.createTempFile("${classNamePrefix}testFile", ".txt");
 
         PrintWriter writer = new PrintWriter(temp.getAbsolutePath(), "UTF-8");
@@ -59,6 +60,9 @@ public class ${classNamePrefix}Test {
         List<Map<String,Object>> rows = new ArrayList<>();
         runtime.input(props, rows);
         System.out.println(rows);
+        assertEquals(2, rows.size());
+        assertEquals("The first line", rows.get(0).get("line"));
+        assertEquals("The second line", rows.get(1).get("line"));
     }
 
 }
