@@ -16,6 +16,7 @@ import java.util.Calendar;
 import java.util.EnumSet;
 
 import org.talend.components.api.SimpleNamedThing;
+import org.talend.components.api.properties.internal.ComponentPropertiesInternal;
 import org.talend.components.api.schema.AbstractSchemaElement;
 
 /**
@@ -25,7 +26,7 @@ public class Property extends AbstractSchemaElement {
 
     private static final String I18N_PROPERTY_PREFIX = "property."; //$NON-NLS-1$
 
-    protected ComponentProperties componentProperties;
+    protected ComponentPropertiesInternal componentProperties;
 
     protected EnumSet<Flags> flags;
 
@@ -109,7 +110,7 @@ public class Property extends AbstractSchemaElement {
     }
 
     // Not API
-    public void setComponentProperties(ComponentProperties props) {
+    void setValueHolder(ComponentPropertiesInternal props) {
         componentProperties = props;
     }
 

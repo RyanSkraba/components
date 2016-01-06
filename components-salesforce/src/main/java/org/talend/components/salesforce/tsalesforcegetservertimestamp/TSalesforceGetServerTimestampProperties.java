@@ -16,6 +16,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.PropertyFactory;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.Schema;
+import org.talend.components.api.schema.SchemaElement.Type;
 import org.talend.components.api.schema.SchemaFactory;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
@@ -37,7 +38,7 @@ public class TSalesforceGetServerTimestampProperties extends ComponentProperties
     @Override
     public void setupProperties() {
         super.setupProperties();
-        Schema s = (Schema) schema.getValue(schema.schema);
+        Schema s = (Schema) schema.schema.getValue();
         s.setRoot(SchemaFactory.newSchemaElement(Type.GROUP, "Root"));
         s.getRoot().addChild(PropertyFactory.newDate("ServerTimestamp"));
     }

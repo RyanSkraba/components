@@ -27,6 +27,7 @@ import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.ValidationResult.Result;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
+import org.talend.components.api.schema.SchemaElement.Type;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
 

@@ -23,10 +23,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.stereotype.Service;
+import org.talend.components.api.NamedThing;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
-import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
 import org.talend.daikon.spring.BndToSpringBeanNameGenerator;
 
@@ -120,7 +120,7 @@ public class PropertiesTester {
             throw new IllegalArgumentException();
         }
         String prop = args[argIndex++];
-        SchemaElement se = testProps.getProperty(prop);
+        NamedThing se = testProps.getProperty(prop);
         if (se == null) {
             System.out.println("Property: " + prop + " not found");
             throw new IllegalArgumentException();

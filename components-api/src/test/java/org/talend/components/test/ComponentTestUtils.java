@@ -27,7 +27,6 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
@@ -42,7 +41,7 @@ public class ComponentTestUtils {
         ComponentProperties.Deserialized d = ComponentProperties.fromSerialized(s);
         ComponentProperties deserProps = d.properties;
         assertFalse(d.migration.isMigrated());
-        List<SchemaElement> newProps = deserProps.getProperties();
+        List<NamedThing> newProps = deserProps.getProperties();
         List<Form> newForms = deserProps.getForms();
         int i = 0;
         for (NamedThing prop : props.getProperties()) {
@@ -108,8 +107,8 @@ public class ComponentTestUtils {
         } else {
             // checking properties
             System.out.println("Checking: " + checkedProps);
-            List<SchemaElement> properties = checkedProps.getProperties();
-            for (SchemaElement prop : properties) {
+            List<NamedThing> properties = checkedProps.getProperties();
+            for (NamedThing prop : properties) {
                 if (!(prop instanceof ComponentProperties)) {
                     errorCollector.checkThat(
                             "property [" + checkedProps.getClass().getCanonicalName() + "/" + prop.getName()

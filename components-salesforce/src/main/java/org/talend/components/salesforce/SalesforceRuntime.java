@@ -187,13 +187,13 @@ public class SalesforceRuntime extends ComponentRuntime {
 
     protected void doConnection(SalesforceConnectionProperties properties, ConnectorConfig config)
             throws AsyncApiException, ConnectionException {
-        if (SalesforceConnectionProperties.LOGIN_OAUTH.equals(properties.getValue(properties.loginType))) {
+        if (SalesforceConnectionProperties.LOGIN_OAUTH.equals(properties.loginType.getValue())) {
             new SalesforceOAuthConnection(properties.oauth, SalesforceConnectionProperties.OAUTH_URL, API_VERSION);
         } else {
             config.setAuthEndpoint(SalesforceConnectionProperties.URL);
         }
         connection = new PartnerConnection(config);
-        if (properties.getBooleanValue(properties.bulkConnection)) {
+        if (properties.bulkConnection.getBooleanValue()) {
             connectBulk(properties, config);
         }
     }
@@ -220,15 +220,15 @@ public class SalesforceRuntime extends ComponentRuntime {
     @Override
     public void connect(ComponentProperties p) throws ConnectionException, AsyncApiException {
         SalesforceConnectionProperties properties = (SalesforceConnectionProperties) p;
-        String refedComponentId = properties.getStringValue(properties.referencedComponentId);
+        String refedComponentId = properties.referencedComponentId.getStringValue();
         if (refedComponentId != null) {
             properties = (SalesforceConnectionProperties) componentService.getPropertiesForComponent(refedComponentId);
         }
 
         ConnectorConfig config = new ConnectorConfig();
-        config.setUsername(StringUtils.strip(properties.userPassword.getStringValue(properties.userPassword.userId), "\""));
-        config.setPassword(StringUtils.strip(properties.userPassword.getStringValue(properties.userPassword.password), "\"")
-                + StringUtils.strip(properties.userPassword.getStringValue(properties.userPassword.securityKey), "\""));
+        config.setUsername(StringUtils.strip(properties.userPassword.userId.getStringValue(), "\""));
+        config.setPassword(StringUtils.strip(properties.userPassword.password.getStringValue(), "\"")
+                + StringUtils.strip(properties.userPassword.securityKey.getStringValue(), "\""));
 
         // Notes on how to test this
         // http://thysmichels.com/2014/02/15/salesforce-wsc-partner-connection-session-renew-when-session-timeout/
@@ -257,10 +257,10 @@ public class SalesforceRuntime extends ComponentRuntime {
             }
         });
 
-        if (properties.getIntValue(properties.timeout) > 0) {
-            config.setConnectionTimeout(properties.getIntValue(properties.timeout));
+        if (properties.timeout.getIntValue() > 0) {
+            config.setConnectionTimeout(properties.timeout.getIntValue());
         }
-        config.setCompression(properties.getBooleanValue(properties.needCompression));
+        config.setCompression(properties.needCompression.getBooleanValue());
         if (false) {
             config.setTraceMessage(true);
         }
@@ -355,7 +355,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         TSalesforceInputProperties sprops = (TSalesforceInputProperties) props;
         commonBegin(props);
 
-        connection.setQueryOptions(sprops.getIntValue(sprops.batchSize));
+        connection.setQueryOptions(sprops.batchSize.getIntValue());
 
         /*
          * Dynamic columns are requested, find them from Salesforce and only look at the ones that are not explicitly
@@ -364,7 +364,7 @@ public class SalesforceRuntime extends ComponentRuntime {
         if (dynamicField != null) {
             dynamicFieldMap = new HashMap<>();
             List<SchemaElement> filteredDynamicFields = new ArrayList<>();
-            Schema dynSchema = getSchema(sprops.module.getStringValue(sprops.module.moduleName));
+            Schema dynSchema = getSchema(sprops.module.moduleName.getStringValue());
 
             for (SchemaElement se : dynSchema.getRoot().getChildren()) {
                 if (fieldMap.containsKey(se.getName())) {
@@ -388,8 +388,8 @@ public class SalesforceRuntime extends ComponentRuntime {
         }
 
         String queryText;
-        if (sprops.getBooleanValue(sprops.manualQuery)) {
-            queryText = sprops.getStringValue(sprops.query);
+        if (sprops.manualQuery.getBooleanValue()) {
+            queryText = sprops.query.getStringValue();
         } else {
             StringBuilder sb = new StringBuilder();
             sb.append("select ");
@@ -401,7 +401,7 @@ public class SalesforceRuntime extends ComponentRuntime {
                 sb.append(se.getName());
             }
             sb.append(" from ");
-            sb.append(sprops.module.getStringValue(sprops.module.moduleName));
+            sb.append(sprops.module.moduleName.getStringValue());
             queryText = sb.toString();
         }
 
@@ -452,15 +452,15 @@ public class SalesforceRuntime extends ComponentRuntime {
         commonBegin(props);
 
         TSalesforceOutputProperties sprops = (TSalesforceOutputProperties) props;
-        upsertKeyColumn = sprops.getStringValue(sprops.upsertKeyColumn);
+        upsertKeyColumn = sprops.upsertKeyColumn.getStringValue();
     }
 
     @Override
     public void outputMain(Map<String, Object> row) throws Exception {
         TSalesforceOutputProperties sprops = (TSalesforceOutputProperties) properties;
-        if (sprops.getValue(sprops.outputAction) != TSalesforceOutputProperties.OutputAction.DELETE) {
+        if (sprops.outputAction.getValue() != TSalesforceOutputProperties.OutputAction.DELETE) {
             SObject so = new SObject();
-            so.setType(sprops.module.getStringValue(sprops.module.moduleName));
+            so.setType(sprops.module.moduleName.getStringValue());
 
             for (String key : row.keySet()) {
                 Object value = row.get(key);
@@ -481,7 +481,7 @@ public class SalesforceRuntime extends ComponentRuntime {
                 }
             }
 
-            switch ((TSalesforceOutputProperties.OutputAction) sprops.getValue(sprops.outputAction)) {
+            switch ((TSalesforceOutputProperties.OutputAction) sprops.outputAction.getValue()) {
             case INSERT:
                 insert(so);
                 break;
