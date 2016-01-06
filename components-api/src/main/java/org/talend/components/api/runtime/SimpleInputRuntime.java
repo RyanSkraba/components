@@ -12,17 +12,36 @@
 // ============================================================================
 package org.talend.components.api.runtime;
 
-public interface SimpleInputRuntime<FrameworkObject> extends FrameworkRuntime {
+import java.util.Map;
+
+import org.talend.components.api.facet.SimpleInputFacet;
+
+import com.google.cloud.dataflow.sdk.values.PCollection;
+
+public class SimpleInputRuntime<Entity> implements FrameworkRuntime {
+
+    SimpleInputFacet facet;
+
+    PCollection<Map<String, Object>> outputObject;
 
     /**
      * Retrieve or generate input data and put them into the main flow compatible with the current Framework
      */
-    public void genericExecute() throws Exception;
+    public void genericExecute() throws Exception {
+        // TODO extract the connection phase from the execution phase
+        facet.connection();
+        // facet.execute(output);
+        // outputObject = sc.parallelize(output.getMainOutput());
+        facet.tearDown();
+    }
 
     /**
      * Retrieve the main output for tor the current framework
      *
      * @return
      */
-    public FrameworkObject getMainOutput();
+    public PCollection<Map<String, Object>> getMainOutput() {
+        return outputObject;
+    }
+
 }

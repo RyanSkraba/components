@@ -29,7 +29,7 @@ import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 
-public class MongoDBInputRuntime implements SimpleInputFacet {
+public class MongoDBInputRuntime extends SimpleInputFacet {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBInputRuntime.class);
 

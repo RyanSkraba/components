@@ -12,18 +12,33 @@
 // ============================================================================
 package org.talend.components.api.runtime;
 
-public interface SimpleTransformationRuntime<FrameworkObject> extends FrameworkRuntime {
+import java.util.Map;
+
+import org.talend.components.api.facet.SimpleTransformationFacet;
+
+import com.google.cloud.dataflow.sdk.transforms.ParDo;
+import com.google.cloud.dataflow.sdk.values.PCollection;
+
+public class SimpleTransformationRuntime implements FrameworkRuntime {
+
+    SimpleTransformationFacet facet;
+
+    PCollection<Map<String, Object>> outputMainRDD;
 
     /**
      * Execute a transformation with only a main flow compatible with the current Framework
      */
-    public void genericEexcute(FrameworkObject inputs) throws Exception;
+    public void genericEexcute(PCollection<Map<String, Object>> input) throws Exception {
+        outputMainRDD = input.apply(ParDo.of(facet));
+    }
 
     /**
      * Retrieve the main output for tor the current framework
      *
      * @return
      */
-    public FrameworkObject getMainOutput();
+    public PCollection<Map<String, Object>> getMainOutput() {
+        return outputMainRDD;
+    }
 
 }

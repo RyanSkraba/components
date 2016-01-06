@@ -12,10 +12,45 @@
 // ============================================================================
 package org.talend.components.api.facet;
 
+import java.util.Map;
+
+import com.google.cloud.dataflow.sdk.transforms.DoFn;
+import com.google.cloud.dataflow.sdk.values.KV;
+
 /**
  * Code to execute the component's facet. This can be used at runtime or design time as required.
  */
-public interface RejectableTransformationFacet extends SimpleTransformationFacet {
-    // TODO is their any interest to keep this interface?
+public abstract class RejectableTransformationFacet extends DoFn<Map<String, Object>, KV<Boolean, Map<String, Object>>> implements
+        ComponentFacet {
+
+    DoFn<Map<String, Object>, KV<Boolean, Map<String, Object>>>.ProcessContext context;
+
+    @Override
+    public void processElement(DoFn<Map<String, Object>, KV<Boolean, Map<String, Object>>>.ProcessContext context)
+            throws Exception {
+        this.context = context;
+        Map<String, Object> input = context.element();
+        execute(input);
+    }
+
+    public void addToMainOutput(Map<String, Object> output) {
+        this.context.output(KV.of(true, output));
+    }
+
+    public void addToErrorOutput(Map<String, Object> output) {
+        this.context.output(KV.of(false, output));
+    }
+
+    /**
+     * Apply a transformation on the input value and put the result into the return object
+     *
+     * @param inputValue Input field that will be processed.
+     * @param returnObject Object that know how to correctly return the current object for any runtime
+     * @throws Exception
+     */
+    public abstract void execute(Map<String, Object> inputValue) throws Exception;
+
+    // a transformation may use a tear down
+    public abstract void tearDown();
 
 }

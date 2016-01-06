@@ -18,11 +18,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.facet.RejectableTransformationFacet;
-import org.talend.components.api.runtime.ReturnObject;
 
 import com.mongodb.DBObject;
 
-public class MongoDBExtractRuntime implements RejectableTransformationFacet {
+public class MongoDBExtractRuntime extends RejectableTransformationFacet {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBExtractRuntime.class);
 
@@ -58,7 +57,7 @@ public class MongoDBExtractRuntime implements RejectableTransformationFacet {
     }
 
     @Override
-    public void execute(Map<String, Object> inputValue, ReturnObject returnObject) throws Exception {
+    public void execute(Map<String, Object> inputValue) throws Exception {
         DBObject input = (DBObject) inputValue.get("DBObject");
         String name = getValue("test.hierarchical", "name", input).toString();
         String value = getValue("test.hierarchical", "value", input).toString();
@@ -71,9 +70,9 @@ public class MongoDBExtractRuntime implements RejectableTransformationFacet {
             Map<String, Object> error = new HashMap<String, Object>();
             error.put("errorMsg", "The input JSON is invalid");
             error.put("inputValue", input);
-            returnObject.setErrorOutput(error);
+            this.addToErrorOutput(error);
         } else {
-            returnObject.setMainOutput(output);
+            this.addToMainOutput(output);
         }
     }
 
