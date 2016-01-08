@@ -22,8 +22,13 @@
 			<artifactId>mongo-java-driver</artifactId>
 			<version>3.2.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.esotericsoftware.kryo</groupId>
+			<artifactId>kryo</artifactId>
+			<version>2.24.0</version>
+		</dependency>
 
-    <!--  TODO should we keep these dependencies? -->
+		<!-- TODO should we keep these dependencies? -->
 		<dependency>
 			<groupId>org.talend.daikon</groupId>
 			<artifactId>daikon-spring</artifactId>

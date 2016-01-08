@@ -12,27 +12,20 @@
 // ============================================================================
 package org.talend.components.api.runtime;
 
-import java.util.Map;
-
 import org.talend.components.api.facet.SimpleInputFacet;
 
+import com.google.cloud.dataflow.sdk.Pipeline;
+import com.google.cloud.dataflow.sdk.io.Read;
 import com.google.cloud.dataflow.sdk.values.PCollection;
 
-public class SimpleInputRuntime<Entity> implements FrameworkRuntime {
+public class SimpleInputRuntime<OutputObject> implements FrameworkRuntime {
 
-    SimpleInputFacet facet;
+    private Pipeline pipeline;
 
-    PCollection<Map<String, Object>> outputObject;
+    private SimpleInputFacet<OutputObject> facet;
 
-    /**
-     * Retrieve or generate input data and put them into the main flow compatible with the current Framework
-     */
-    public void genericExecute() throws Exception {
-        // TODO extract the connection phase from the execution phase
-        facet.connection();
-        // facet.execute(output);
-        // outputObject = sc.parallelize(output.getMainOutput());
-        facet.tearDown();
+    public SimpleInputRuntime(Pipeline pipeline, SimpleInputFacet<OutputObject> facet) {
+        this.facet = facet;
     }
 
     /**
@@ -40,8 +33,8 @@ public class SimpleInputRuntime<Entity> implements FrameworkRuntime {
      *
      * @return
      */
-    public PCollection<Map<String, Object>> getMainOutput() {
-        return outputObject;
+    public PCollection<OutputObject> execute() {
+        return pipeline.apply(Read.from(facet));
     }
 
 }

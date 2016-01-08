@@ -65,7 +65,7 @@ public class RejectableTransformationRuntime implements FrameworkRuntime {
      * @param inputs
      * @throws Exception
      */
-    public void genericExecute(PCollection<Map<String, Object>> input) throws Exception {
+    public void execute(PCollection<Map<String, Object>> input) throws Exception {
         PCollection<KV<Boolean, Map<String, Object>>> outputRDD = input.apply(ParDo.of(facet));
         outputMainRDD = outputRDD.apply(ParDo.of(new retrieveMain()));
         outputErrorRDD = outputRDD.apply(ParDo.of(new retrieveError()));
