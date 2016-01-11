@@ -39,6 +39,12 @@ public class PropertyFactory {
         return new Property(SchemaElement.Type.STRING, name);
     }
 
+    public static Property newString(String name, String defaultValue) {
+        Property property = newString(name);
+        property.setDefaultValue(defaultValue);
+        return property;
+    }
+
     public static Property newInteger(String name) {
         return new Property(SchemaElement.Type.INT, name);
     }
@@ -51,6 +57,12 @@ public class PropertyFactory {
 
     public static Property newInteger(String name, Integer defaultValue) {
         return newInteger(name, defaultValue.toString());
+    }
+
+    public static Property newLong(String name, Long defaultValue) {
+        Property property = new Property(SchemaElement.Type.LONG, name);
+        property.setDefaultValue(String.valueOf(defaultValue));
+        return property;
     }
 
     public static Property newDouble(String name) {
@@ -109,6 +121,16 @@ public class PropertyFactory {
         return property;
     }
 
+    public static Property newTable(String name, Property... properties) {
+        Property table = newProperty(name);
+        table.setOccurMaxTimes(SchemaElement.INFINITE);
+        table.setChildren(null);
+        for (Property property : properties) {
+            table.addChild(property);
+        }
+        return table;
+    }
+
     /**
      * Used if there are returns to set the "returns" property with a {@link Property} that contains the returns
      * properties.
@@ -124,8 +146,8 @@ public class PropertyFactory {
      * Adds a new return property.
      *
      * @param returns the {@link Property} returned by {@link #setReturnsProperty()}
-     * @param type the type of the returns property
-     * @param name the name of the returns property
+     * @param type    the type of the returns property
+     * @param name    the name of the returns property
      * @return a {@link Property}
      */
     public static Property newReturnProperty(Property returns, SchemaElement.Type type, String name) {

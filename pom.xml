@@ -21,7 +21,8 @@
         <module>components-webtest</module>
         <module>components-osgitest</module>
         <module>components-proptester</module>
-  </modules>
+        <module>components-cassandra</module>
+    </modules>
     <build>
         <!-- skip the deployment for this aggregator, not necessary -->
         <plugins>

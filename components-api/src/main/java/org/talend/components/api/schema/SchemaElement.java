@@ -12,11 +12,11 @@
 // ============================================================================
 package org.talend.components.api.schema;
 
-import java.util.List;
-import java.util.Map;
-
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.ToStringIndent;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -27,6 +27,7 @@ public interface SchemaElement extends NamedThing, ToStringIndent {
         STRING,
         BOOLEAN,
         INT,
+        LONG,
         DATE,
         DATETIME,
         DECIMAL,
@@ -36,7 +37,7 @@ public interface SchemaElement extends NamedThing, ToStringIndent {
         ENUM,
         DYNAMIC,
         GROUP,
-        SCHEMA
+        SCHEMA,
     }
 
     public static int INFINITE = -1;
