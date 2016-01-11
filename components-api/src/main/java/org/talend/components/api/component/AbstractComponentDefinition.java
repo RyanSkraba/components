@@ -46,11 +46,23 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
 
     @Override
     public ComponentProperties createProperties() {
+        ComponentProperties compProp = instanciateComponentProperties();
+        compProp.init();
+        return compProp;
+    }
+
+    /**
+     * DOC sgandon Comment method "instanciateComponentProperties".
+     * 
+     * @param compProp
+     * @return
+     */
+    public ComponentProperties instanciateComponentProperties() {
         ComponentProperties compProp = null;
         try {
             Class<?> propertyClass = getPropertyClass();
             if (propertyClass == null) {
-                return null;
+                return null;// TODO throw an exception
             } // else keep going
             Constructor c = propertyClass.getConstructor(String.class);
             compProp = (ComponentProperties) c.newInstance(new Object[] { "root" });
@@ -63,7 +75,13 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
         } catch (InvocationTargetException e) {
             throw new RuntimeException(e.getCause());
         }
-        compProp.init();
+        return compProp;
+    }
+
+    @Override
+    public ComponentProperties createRuntimeProperties() {
+        ComponentProperties compProp = instanciateComponentProperties();
+        compProp.initForRuntime();
         return compProp;
     }
 

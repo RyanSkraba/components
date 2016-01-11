@@ -17,7 +17,6 @@ import static org.junit.Assert.*;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -212,15 +211,6 @@ public class ComponentServiceTest extends AbstractComponentTest {
         ComponentProperties props = wizard.props;
         List<ComponentWizard> wizards = getComponentService().getComponentWizardsForProperties(props, "userdata");
         assertTrue(props == ((TestComponentWizard) wizards.get(0)).props);
-    }
-
-    @Test
-    public void testGetDependencies() {
-        // check the comp def return the proper stream for the pom
-        TestComponentDefinition testComponentDefinition = new TestComponentDefinition();
-        assertNotNull(testComponentDefinition.getMavenPom());
-        Set<String> mavenUriDependencies = getComponentService().getMavenUriDependencies(TestComponentDefinition.COMPONENT_NAME);
-        assertEquals(5, mavenUriDependencies.size());
     }
 
     @Test
