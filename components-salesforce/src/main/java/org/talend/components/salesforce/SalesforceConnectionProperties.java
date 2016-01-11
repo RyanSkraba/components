@@ -20,6 +20,7 @@ import org.talend.components.api.properties.PresentationItem;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.properties.presentation.Widget.WidgetType;
 import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.oauth.OauthProperties;
@@ -110,7 +111,9 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         advanced.setFormtoShow(advancedForm);
 
         Form refForm = new Form(this, Form.REFERENCE);
-        refForm.addRow(widget(referencedComponentId).setWidgetType(WidgetType.COMPONENT_REFERENCE));
+        Widget compListWidget = widget(referencedComponentId).setWidgetType(WidgetType.COMPONENT_REFERENCE);
+        compListWidget.setReferencedComponentName("tSalesforceConnectionNew");
+        refForm.addRow(compListWidget);
         refForm.addRow(mainForm);
     }
 
