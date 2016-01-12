@@ -28,7 +28,8 @@ public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition {
 
     public TSalesforceOutputBulkExecDefinition() {
         super(COMPONENT_NAME);
-        setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
+        setConnectors(new ComponentConnector(Type.FLOW, 1, 0), new ComponentConnector(Type.MAIN, 0, 1),
+                new ComponentConnector(Type.REJECT, 0, 1),new ComponentConnector(Type.ITERATE, 0, 0),
                 new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
 

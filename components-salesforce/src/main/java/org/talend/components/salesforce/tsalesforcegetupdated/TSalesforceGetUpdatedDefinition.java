@@ -32,7 +32,7 @@ public class TSalesforceGetUpdatedDefinition extends SalesforceDefinition {
 
     public TSalesforceGetUpdatedDefinition() {
         super(COMPONENT_NAME);
-        setConnectors(new ComponentConnector(Type.FLOW, 1, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
+        setConnectors(new ComponentConnector(Type.FLOW, 0, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
                 new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
 

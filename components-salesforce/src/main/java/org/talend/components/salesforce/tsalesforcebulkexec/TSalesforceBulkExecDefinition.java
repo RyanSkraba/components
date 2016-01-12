@@ -24,13 +24,14 @@ import aQute.bnd.annotation.component.Component;
         + TSalesforceBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceBulkExecDefinition extends SalesforceDefinition {
 
-    public static final String COMPONENT_NAME = "tSalesforceBulkExec"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tSalesforceBulkExecNew"; //$NON-NLS-1$
 
     public TSalesforceBulkExecDefinition() {
         super(COMPONENT_NAME);
 
-        setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
-                new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
+        setConnectors(new ComponentConnector(Type.FLOW, 0, 0),new ComponentConnector(Type.MAIN, 0, 1),
+                new ComponentConnector(Type.REJECT, 0, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0), 
+                new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
 
     @Override
