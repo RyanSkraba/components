@@ -24,6 +24,7 @@ import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.api.properties.presentation.Widget.WidgetType;
 import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.oauth.OauthProperties;
+import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 
 public class SalesforceConnectionProperties extends ComponentProperties {
 
@@ -112,7 +113,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
 
         Form refForm = new Form(this, Form.REFERENCE);
         Widget compListWidget = widget(referencedComponentId).setWidgetType(WidgetType.COMPONENT_REFERENCE);
-        compListWidget.setReferencedComponentName("tSalesforceConnectionNew");
+        compListWidget.setReferencedComponentName(TSalesforceConnectionDefinition.COMPONENT_NAME);
         refForm.addRow(compListWidget);
         refForm.addRow(mainForm);
     }
