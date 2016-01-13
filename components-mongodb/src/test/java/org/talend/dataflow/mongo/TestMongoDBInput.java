@@ -20,8 +20,22 @@ import com.mongodb.DBObject;
 
 public class TestMongoDBInput {
 
+    /**
+     * These tests are here only to prove that we can read from a MongoDB collection named "inputCollection" and write
+     * into a collection named "outputCollection".
+     *
+     * You must instantiate the database with the following commands:
+     *
+     * db.createCollection("inputCollection")
+     * db.inputCollection.save({"test":{"hierarchical":{"name":"toto","value":3}}})
+     *
+     * You can after read the output with:
+     *
+     * db.outputCollection.find({})
+     *
+     */
     @Test
-    public void testComplete() throws Exception {
+    public void testWithInsert() throws Exception {
         // TransformTranslator.addTransformEvaluator(CassandraIO.Read.Bound.class, new
         // CassandraInputTransformEvaluator());
         PipelineOptions options = PipelineOptionsFactory.create();
@@ -30,21 +44,33 @@ public class TestMongoDBInput {
         ExtractionRuntime<DBObject> extract = new ExtractionRuntime<DBObject>(new MongoDBExtractRuntime());
         SimpleOutputRuntime output = new SimpleOutputRuntime(new MongoDBOutputFacet());
 
-        PCollection<DBObject> inputResult = input.execute(p);
+        PCollection<DBObject> inputResult = input.generatePipeline(p);
 
-        extract.execute(inputResult);
+        extract.generatePipeline(inputResult);
         PCollection<Map<String, Object>> extractedResult = extract.getMainOutput();
 
         // not used here currently, but allow me to test empty results
         PCollection<Map<String, Object>> rejectedResult = extract.getErrorOutput();
 
-        output.excute(extractedResult);
+        output.generatePipeline(extractedResult);
 
         DirectPipelineRunner.createForTest().run(p);
     }
 
+    /**
+     * These tests are here only to prove that we can read from a MongoDB collection named "inputCollection" and write
+     * into a collection named "outputCollection".
+     *
+     * You must instantiate the database with the following commands:
+     *
+     * db.createCollection("inputCollection")
+     * db.inputCollection.save({"test":{"hierarchical":{"name":"toto","value":3}}})
+     *
+     * You can after read the output on the shell
+     *
+     */
     @Test
-    public void testLog() throws Exception {
+    public void testWithALog() throws Exception {
         // TransformTranslator.addTransformEvaluator(CassandraIO.Read.Bound.class, new
         // CassandraInputTransformEvaluator());
         PipelineOptions options = PipelineOptionsFactory.create();
@@ -53,12 +79,12 @@ public class TestMongoDBInput {
         ExtractionRuntime<DBObject> extract = new ExtractionRuntime<DBObject>(new MongoDBExtractRuntime());
         SimpleOutputRuntime output = new SimpleOutputRuntime(new LogRowFacet());
 
-        PCollection<DBObject> inputResult = input.execute(p);
+        PCollection<DBObject> inputResult = input.generatePipeline(p);
 
-        extract.execute(inputResult);
+        extract.generatePipeline(inputResult);
         PCollection<Map<String, Object>> extractedResult = extract.getMainOutput();
 
-        output.excute(extractedResult);
+        output.generatePipeline(extractedResult);
 
         DirectPipelineRunner.createForTest().run(p);
     }

@@ -32,7 +32,7 @@ public class SimpleTransformationRuntime implements FrameworkRuntime {
     /**
      * Execute a transformation with only a main flow compatible with the current Framework
      */
-    public void excute(PCollection<Map<String, Object>> input) throws Exception {
+    public void generatePipeline(PCollection<Map<String, Object>> input) throws Exception {
         outputMainRDD = input.apply(ParDo.of(facet));
     }
 

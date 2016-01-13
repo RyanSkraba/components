@@ -69,7 +69,7 @@ public class ExtractionRuntime<InputType> implements FrameworkRuntime {
      * @param inputs
      * @throws Exception
      */
-    public void execute(PCollection<InputType> input) throws Exception {
+    public void generatePipeline(PCollection<InputType> input) throws Exception {
         // TODO we cannot use the KryoCoder for a KVCoder.
         // Also we cannot use KryoCoder for the Key and for the Value, because the KryoCoder is going to kill the
         // inputStream.

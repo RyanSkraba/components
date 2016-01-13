@@ -42,12 +42,12 @@ public class MongoDBOutputFacet extends SimpleOutputFacetV2 {
         List<MongoCredential> mongoCredentialList = new ArrayList<MongoCredential>();
         ServerAddress serverAddress = new ServerAddress("127.0.0.1", 27017);
         mongo = new MongoClient(serverAddress, mongoCredentialList, clientOptions);
-        this.db = mongo.getDB("dbTest");
+        this.db = mongo.getDB("test");
     }
 
     @Override
     public void execute(Map<String, Object> inputValue) throws Exception {
-        com.mongodb.DBCollection collection = db.getCollection("testCollection");
+        com.mongodb.DBCollection collection = db.getCollection("outputCollection");
         // initialize objects
         MongoDBOutputUtil updateObjectUtil = new MongoDBOutputUtil();
         updateObjectUtil.setObject(new com.mongodb.BasicDBObject());

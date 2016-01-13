@@ -55,7 +55,7 @@ public class MongoDBInputReader extends SimpleInputReader<DBObject> {
         ServerAddress serverAddress = new ServerAddress("127.0.0.1", 27017);
         mongo = new MongoClient(serverAddress, mongoCredentialList, clientOptions);
         db = mongo.getDB("test");
-        DBCollection coll = db.getCollection("testCollection");
+        DBCollection coll = db.getCollection("inputCollection");
         com.mongodb.DBObject myQuery = (com.mongodb.DBObject) com.mongodb.util.JSON.parse("{}");
 
         com.mongodb.DBObject fields = new com.mongodb.BasicDBObject();

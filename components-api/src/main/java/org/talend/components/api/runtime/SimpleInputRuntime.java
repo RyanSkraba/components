@@ -31,7 +31,7 @@ public class SimpleInputRuntime<OutputObject> implements FrameworkRuntime {
      *
      * @return
      */
-    public PCollection<OutputObject> execute(Pipeline pipeline) {
+    public PCollection<OutputObject> generatePipeline(Pipeline pipeline) {
         return pipeline.apply(Read.from(this.facet));
     }
 
