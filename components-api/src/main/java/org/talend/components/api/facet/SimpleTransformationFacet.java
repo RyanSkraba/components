@@ -42,4 +42,8 @@ public abstract class SimpleTransformationFacet extends DoFn<Map<String, Object>
     // a transformation may use a tear down
     // TODO Wrap to stopBundle
     public abstract void tearDown();
+
+    public void addToMainOutput(Map<String, Object> output) {
+        this.context.output(output);
+    }
 }
