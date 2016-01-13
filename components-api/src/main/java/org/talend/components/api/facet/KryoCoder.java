@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -52,8 +51,6 @@ public class KryoCoder<T> extends StandardCoder<T> implements Serializable {
         Output output = new Output(outStream);
         Kryo kryo = new Kryo();
         kryo.writeClassAndObject(output, value);
-        System.out.println("write:" + value);
-        System.out.println("in:" + outStream);
         test = value.getClass().toString();
         output.flush();
 
@@ -61,31 +58,11 @@ public class KryoCoder<T> extends StandardCoder<T> implements Serializable {
 
     @Override
     public T decode(InputStream inStream, Context context) throws IOException {
-        System.out.println("read:" + inStream);
-        System.out.println("from:" + test);
 
         Input input = new Input(inStream);
         Kryo kryo = new Kryo();
-        if (test.equals("class java.lang.Boolean")) {
-            System.out.println("________________");
-            System.out.println("inside the matrix");
-            Boolean b = (Boolean) kryo.readClassAndObject(input);
-            System.out.println("Boolean:" + b);
-            input.close();
-            // Map h = (Map) kryo.readClassAndObject(input);
-            // System.out.println("hash:" + h);
-            return (T) b;
-        } else if (test.equals("class java.util.HashMap")) {
-            System.out.println("________________");
-            System.out.println("But episode 2 socks");
-            Map h = (Map) kryo.readClassAndObject(input);
-            System.out.println("hash:" + h);
-            return (T) h;
-        } else {
-            T current = (T) kryo.readClassAndObject(input);
-            System.out.println("current:" + current);
-            return current;
-        }
+        T current = (T) kryo.readClassAndObject(input);
+        return current;
     }
 
     @Override

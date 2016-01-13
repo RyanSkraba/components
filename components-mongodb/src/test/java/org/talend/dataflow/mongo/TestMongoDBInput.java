@@ -17,9 +17,6 @@ import com.google.cloud.dataflow.sdk.runners.DirectPipelineRunner;
 import com.google.cloud.dataflow.sdk.values.PCollection;
 import com.mongodb.DBObject;
 
-/**
- * Created by bchen on 16-1-9.
- */
 public class TestMongoDBInput {
 
     @Test
@@ -33,6 +30,7 @@ public class TestMongoDBInput {
         SimpleOutputRuntime output = new SimpleOutputRuntime(new MongoDBOutputFacet());
 
         PCollection<DBObject> inputResult = input.execute(p);
+
         extract.execute(inputResult);
         PCollection<Map<String, Object>> extractedResult = extract.getMainOutput();
 
