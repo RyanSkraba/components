@@ -17,11 +17,11 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.facet.RejectableTransformationFacet;
+import org.talend.components.api.facet.ExtractionFacet;
 
 import com.mongodb.DBObject;
 
-public class MongoDBExtractRuntime extends RejectableTransformationFacet {
+public class MongoDBExtractRuntime extends ExtractionFacet<DBObject> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBExtractRuntime.class);
 
@@ -57,8 +57,8 @@ public class MongoDBExtractRuntime extends RejectableTransformationFacet {
     }
 
     @Override
-    public void execute(Map<String, Object> inputValue) throws Exception {
-        DBObject input = (DBObject) inputValue.get("DBObject");
+    public void execute(DBObject input) throws Exception {
+        System.out.println("input:" + input);
         String name = getValue("test.hierarchical", "name", input).toString();
         String value = getValue("test.hierarchical", "value", input).toString();
         String wholeJSON = getValue("", "*", input).toString();

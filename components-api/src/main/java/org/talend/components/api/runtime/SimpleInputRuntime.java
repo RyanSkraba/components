@@ -20,11 +20,9 @@ import com.google.cloud.dataflow.sdk.values.PCollection;
 
 public class SimpleInputRuntime<OutputObject> implements FrameworkRuntime {
 
-    private Pipeline pipeline;
-
     private SimpleInputFacet<OutputObject> facet;
 
-    public SimpleInputRuntime(Pipeline pipeline, SimpleInputFacet<OutputObject> facet) {
+    public SimpleInputRuntime(SimpleInputFacet<OutputObject> facet) {
         this.facet = facet;
     }
 
@@ -33,8 +31,8 @@ public class SimpleInputRuntime<OutputObject> implements FrameworkRuntime {
      *
      * @return
      */
-    public PCollection<OutputObject> execute() {
-        return pipeline.apply(Read.from(facet));
+    public PCollection<OutputObject> execute(Pipeline pipeline) {
+        return pipeline.apply(Read.from(this.facet));
     }
 
 }

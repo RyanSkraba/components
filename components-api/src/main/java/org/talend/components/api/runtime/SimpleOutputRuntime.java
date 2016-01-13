@@ -14,18 +14,18 @@ package org.talend.components.api.runtime;
 
 import java.util.Map;
 
-import org.talend.components.api.facet.SimpleTransformationFacet;
+import org.talend.components.api.facet.SimpleOutputFacetV2;
 
 import com.google.cloud.dataflow.sdk.transforms.ParDo;
 import com.google.cloud.dataflow.sdk.values.PCollection;
 
-public class SimpleTransformationRuntime implements FrameworkRuntime {
+public class SimpleOutputRuntime implements FrameworkRuntime {
 
-    SimpleTransformationFacet facet;
+    SimpleOutputFacetV2 facet;
 
     PCollection<Map<String, Object>> outputMainRDD;
 
-    public SimpleTransformationRuntime(SimpleTransformationFacet facet) {
+    public SimpleOutputRuntime(SimpleOutputFacetV2 facet) {
         this.facet = facet;
     }
 
@@ -33,16 +33,7 @@ public class SimpleTransformationRuntime implements FrameworkRuntime {
      * Execute a transformation with only a main flow compatible with the current Framework
      */
     public void excute(PCollection<Map<String, Object>> input) throws Exception {
-        outputMainRDD = input.apply(ParDo.of(facet));
-    }
-
-    /**
-     * Retrieve the main output for tor the current framework
-     *
-     * @return
-     */
-    public PCollection<Map<String, Object>> getMainOutput() {
-        return outputMainRDD;
+        input.apply(ParDo.of(facet));
     }
 
 }

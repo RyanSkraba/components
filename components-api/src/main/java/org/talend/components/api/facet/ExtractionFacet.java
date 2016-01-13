@@ -15,19 +15,29 @@ package org.talend.components.api.facet;
 import java.util.Map;
 
 import com.google.cloud.dataflow.sdk.transforms.DoFn;
+import com.google.cloud.dataflow.sdk.values.KV;
 
 /**
  * Code to execute the component's facet. This can be used at runtime or design time as required.
  */
-public abstract class SimpleTransformationFacet extends DoFn<Map<String, Object>, Map<String, Object>> implements ComponentFacet {
+public abstract class ExtractionFacet<InputType> extends DoFn<InputType, KV<Boolean, Map<String, Object>>> implements
+        ComponentFacet {
 
-    DoFn<Map<String, Object>, Map<String, Object>>.ProcessContext context;
+    DoFn<InputType, KV<Boolean, Map<String, Object>>>.ProcessContext context;
 
     @Override
-    public void processElement(DoFn<Map<String, Object>, Map<String, Object>>.ProcessContext context) throws Exception {
+    public void processElement(DoFn<InputType, KV<Boolean, Map<String, Object>>>.ProcessContext context) throws Exception {
         this.context = context;
-        Map<String, Object> input = context.element();
+        InputType input = context.element();
         execute(input);
+    }
+
+    public void addToMainOutput(Map<String, Object> output) {
+        this.context.output(KV.of(true, output));
+    }
+
+    public void addToErrorOutput(Map<String, Object> output) {
+        this.context.output(KV.of(false, output));
     }
 
     /**
@@ -37,9 +47,10 @@ public abstract class SimpleTransformationFacet extends DoFn<Map<String, Object>
      * @param returnObject Object that know how to correctly return the current object for any runtime
      * @throws Exception
      */
-    public abstract void execute(Map<String, Object> inputValue) throws Exception;
+    public abstract void execute(InputType inputValue) throws Exception;
 
     // a transformation may use a tear down
     // TODO Wrap to stopBundle
     public abstract void tearDown();
+
 }
