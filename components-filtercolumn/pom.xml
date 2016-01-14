@@ -132,29 +132,29 @@
                             </instructions>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>test-bundle</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>tests</classifier>
-                            <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
-                            <instructions>
-                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*</Import-Package>
-                                <Bundle-SymbolicName>org.talend.components.filtercolumn.test</Bundle-SymbolicName>
-                                <Bundle-Name>Test Fragment for ${project.name}</Bundle-Name>
-                                <Fragment-Host>org.talend.components.filtercolumn</Fragment-Host>
-                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                                <DynamicImport-Package>*</DynamicImport-Package>
-                                <Embed-Dependency></Embed-Dependency>
-                                <Export-Package>*</Export-Package>
-                                <Include-Resource>=target/test-classes/
-                                </Include-Resource>
-                            </instructions>
-                        </configuration>
-                    </execution>
+<!--                     <execution> -->
+<!--                         <id>test-bundle</id> -->
+<!--                         <phase>package</phase> -->
+<!--                         <goals> -->
+<!--                             <goal>bundle</goal> -->
+<!--                         </goals> -->
+<!--                         <configuration> -->
+<!--                             <classifier>tests</classifier> -->
+<!--                             <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory> -->
+<!--                             <instructions> -->
+<!--                                 <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*</Import-Package> -->
+<!--                                 <Bundle-SymbolicName>org.talend.components.filtercolumn.test</Bundle-SymbolicName> -->
+<!--                                 <Bundle-Name>Test Fragment for ${project.name}</Bundle-Name> -->
+<!--                                 <Fragment-Host>org.talend.components.filtercolumn</Fragment-Host> -->
+<!--                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy> -->
+<!--                                 <DynamicImport-Package>*</DynamicImport-Package> -->
+<!--                                 <Embed-Dependency></Embed-Dependency> -->
+<!--                                 <Export-Package>*</Export-Package> -->
+<!--                                 <Include-Resource>=target/test-classes/ -->
+<!--                                 </Include-Resource> -->
+<!--                             </instructions> -->
+<!--                         </configuration> -->
+<!--                     </execution> -->
                 </executions>
             </plugin>
         </plugins>
