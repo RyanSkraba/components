@@ -12,47 +12,17 @@
 // ============================================================================
 package org.talend.components.api.facet;
 
-import java.util.Map;
-
-import com.google.cloud.dataflow.sdk.transforms.DoFn;
-
 /**
  * Code to execute the component's facet. This can be used at runtime or design time as required.
  */
-public abstract class SimpleOutputFacetV2 extends DoFn<Map<String, Object>, Void> implements ComponentFacet {
-
-    @Override
-    public void startBundle(DoFn<Map<String, Object>, Void>.Context context) throws Exception {
-        // TODO pass only the properties
-        setUp(context);
-    }
-
-    // TODO pass only the properties
-    public abstract void setUp(DoFn<Map<String, Object>, Void>.Context context);
-
-    @Override
-    public void processElement(
-            com.google.cloud.dataflow.sdk.transforms.DoFn<Map<String, Object>, Void>.ProcessContext processContext)
-            throws Exception {
-        Map<String, Object> input = processContext.element();
-        execute(input);
-    }
+public abstract class SimpleOutputFacetV2<InputObject> implements ComponentFacet {
 
     /**
-     * Apply a transformation on the input value and put the result into the return object
+     * ouput to a final system the data gotten has inputValue
      *
-     * @param inputValue Input field that will be processed.
-     * @param returnObject Object that know how to correctly return the current object for any runtime
+     * @param inputValue Input value that will be processed.
      * @throws Exception
      */
-    public abstract void execute(Map<String, Object> inputValue) throws Exception;
+    public abstract void execute(InputObject inputValue) throws Exception;
 
-    @Override
-    public void finishBundle(DoFn<Map<String, Object>, Void>.Context context) throws Exception {
-        // TODO pass only the properties
-        tearDown(context);
-    }
-
-    // TODO pass only the properties
-    public abstract void tearDown(DoFn<Map<String, Object>, Void>.Context context);
 }

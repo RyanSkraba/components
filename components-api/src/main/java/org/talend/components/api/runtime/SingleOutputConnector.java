@@ -10,13 +10,14 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.facet;
-
-import com.google.cloud.dataflow.sdk.io.Sink;
+package org.talend.components.api.runtime;
 
 /**
- * Code to execute the component's facet. This can be used at runtime or design time as required.
+ * created by sgandon on 14 janv. 2016
+ * 
+ * @param <OutputObject>
  */
-public abstract class SimpleOutputFacet<OutputObject> extends Sink<OutputObject> implements ComponentFacet {
+public interface SingleOutputConnector<OutputObject> {
 
+    public void outputData(OutputObject out);
 }

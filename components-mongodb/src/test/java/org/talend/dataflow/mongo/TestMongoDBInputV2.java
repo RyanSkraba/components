@@ -3,12 +3,11 @@ package org.talend.dataflow.mongo;
 import java.util.Map;
 
 import org.junit.Test;
+import org.talend.components.api.facet.gdf.SimpleInputFacetGDF;
+import org.talend.components.api.facet.gdf.SimpleOutputFacetGDF;
 import org.talend.components.api.runtime.ExtractionRuntime;
-import org.talend.components.api.runtime.SimpleInputRuntimeV2;
-import org.talend.components.api.runtime.SimpleOutputRuntime;
 import org.talend.components.mongodb.tmongodbextract.MongoDBExtractRuntime;
-import org.talend.components.mongodb.tmongodboutputv2.MongoDBOutputFacet;
-import org.talend.components.output.tlogrow.LogRowFacet;
+import org.talend.components.mongodb.tmongodboutput.MongoDBOutputFacet;
 
 import com.google.cloud.dataflow.sdk.Pipeline;
 import com.google.cloud.dataflow.sdk.options.PipelineOptions;
@@ -23,27 +22,30 @@ public class TestMongoDBInputV2 {
      * These tests are here only to prove that we can read from a MongoDB collection named "inputCollection" and write
      * into a collection named "outputCollection".
      *
+     * to launch a mongo db with docker, run this docker run -p 27017:27017 --name comp-mongo -d mongo to open the mongo
+     * shell on this db, please run this : docker run -it --link comp-mongo:mongo --rm mongo sh -c 'exec mongo
+     * "$MONGO_PORT_27017_TCP_ADDR:$MONGO_PORT_27017_TCP_PORT/test"'
+     *
+     *
      * You must instantiate the database with the following commands:
      *
      * db.createCollection("inputCollection")
      * db.inputCollection.save({"test":{"hierarchical":{"name":"toto","value":3}}})
      *
-     * You can after read the output with:
+     * You can run this command after the test is executed to check there is a new record in the DB:
      *
      * db.outputCollection.find({})
      *
      */
     @Test
     public void testWithInsert() throws Exception {
-        // TransformTranslator.addTransformEvaluator(CassandraIO.Read.Bound.class, new
-        // CassandraInputTransformEvaluator());
         PipelineOptions options = PipelineOptionsFactory.create();
         Pipeline p = Pipeline.create(options);
 
-        SimpleInputRuntimeV2 input = new SimpleInputRuntimeV2<DBObject>(
-                new org.talend.components.mongodb.tmongodbinputv2.MongoDBInputFacet());
+        SimpleInputFacetGDF<DBObject> input = new SimpleInputFacetGDF<>(
+                new org.talend.components.mongodb.tmongodbinput.MongoDBInputFacet());
         ExtractionRuntime<DBObject> extract = new ExtractionRuntime<DBObject>(new MongoDBExtractRuntime());
-        SimpleOutputRuntime output = new SimpleOutputRuntime(new MongoDBOutputFacet());
+        SimpleOutputFacetGDF<Map<String, Object>> output = new SimpleOutputFacetGDF<>(new MongoDBOutputFacet());
 
         PCollection<DBObject> inputResult = input.generatePipeline(p);
 
@@ -76,10 +78,10 @@ public class TestMongoDBInputV2 {
         // CassandraInputTransformEvaluator());
         PipelineOptions options = PipelineOptionsFactory.create();
         Pipeline p = Pipeline.create(options);
-        SimpleInputRuntimeV2 input = new SimpleInputRuntimeV2<DBObject>(
-                new org.talend.components.mongodb.tmongodbinputv2.MongoDBInputFacet());
+        SimpleInputFacetGDF<DBObject> input = new SimpleInputFacetGDF<>(
+                new org.talend.components.mongodb.tmongodbinput.MongoDBInputFacet());
         ExtractionRuntime<DBObject> extract = new ExtractionRuntime<DBObject>(new MongoDBExtractRuntime());
-        SimpleOutputRuntime output = new SimpleOutputRuntime(new LogRowFacet());
+        SimpleOutputFacetGDF<Map<String, Object>> output = new SimpleOutputFacetGDF<>(new MongoDBOutputFacet());
 
         PCollection<DBObject> inputResult = input.generatePipeline(p);
 

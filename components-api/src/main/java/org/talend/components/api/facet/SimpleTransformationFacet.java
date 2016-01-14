@@ -14,12 +14,14 @@ package org.talend.components.api.facet;
 
 import java.util.Map;
 
+import org.talend.components.api.properties.ComponentProperties;
+
 import com.google.cloud.dataflow.sdk.transforms.DoFn;
 
 /**
  * Code to execute the component's facet. This can be used at runtime or design time as required.
  */
-public abstract class SimpleTransformationFacet extends DoFn<Map<String, Object>, Map<String, Object>> implements ComponentFacet {
+public abstract class SimpleTransformationFacet extends DoFn<Map<String, Object>, Map<String, Object>>implements ComponentFacet {
 
     DoFn<Map<String, Object>, Map<String, Object>>.ProcessContext processContext;
 
@@ -39,11 +41,25 @@ public abstract class SimpleTransformationFacet extends DoFn<Map<String, Object>
      */
     public abstract void execute(Map<String, Object> inputValue) throws Exception;
 
-    // a transformation may use a tear down
-    // TODO Wrap to stopBundle
-    public abstract void tearDown();
-
     public void addToMainOutput(Map<String, Object> output) {
         this.processContext.output(output);
     }
+
+    /**
+     * do nothing by default
+     */
+    @Override
+    public void tearDown() {
+        // Nothing
+    }
+
+    /**
+     * do nothing by default
+     */
+    @Override
+    public void setUp(ComponentProperties context) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

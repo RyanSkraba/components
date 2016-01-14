@@ -17,16 +17,15 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.facet.SimpleOutputFacetV2;
-
-import com.google.cloud.dataflow.sdk.transforms.DoFn;
+import org.talend.components.api.properties.ComponentProperties;
 
 // TODO slice the component into a write component and an output compoenent
-public class LogRowFacet extends SimpleOutputFacetV2 {
+public class LogRowFacet extends SimpleOutputFacetV2<Map<String, Object>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(LogRowFacet.class);
 
     @Override
-    public void setUp(DoFn<Map<String, Object>, Void>.Context context) {
+    public void setUp(ComponentProperties comp) {
     }
 
     @Override
@@ -35,7 +34,9 @@ public class LogRowFacet extends SimpleOutputFacetV2 {
     }
 
     @Override
-    public void tearDown(DoFn<Map<String, Object>, Void>.Context context) {
+    public void tearDown() {
+        // TODO Auto-generated method stub
+
     }
 
 }

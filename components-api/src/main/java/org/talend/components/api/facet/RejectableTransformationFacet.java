@@ -17,6 +17,6 @@ import java.util.Map;
 /**
  * Code to execute the component's facet. This can be used at runtime or design time as required.
  */
-public abstract class RejectableTransformationFacet extends ExtractionFacet<Map<String, Object>> implements ComponentFacet {
+public abstract class RejectableTransformationFacet extends ExtractionFacet<Map<String, Object>>implements ComponentFacet {
 
 }

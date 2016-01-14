@@ -18,6 +18,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.facet.ExtractionFacet;
+import org.talend.components.api.properties.ComponentProperties;
 
 import com.mongodb.DBObject;
 
@@ -79,5 +80,11 @@ public class MongoDBExtractRuntime extends ExtractionFacet<DBObject> {
     @Override
     public void tearDown() {
         // Nothing
+    }
+
+    @Override
+    public void setUp(ComponentProperties context) {
+        // TODO Auto-generated method stub
+
     }
 }

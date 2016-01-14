@@ -21,6 +21,8 @@
         <module>components-webtest</module>
         <module>components-osgitest</module>
         <module>components-proptester</module>
+        <module>components-filtercolumn</module>
+        <module>components-mongodb</module>
     </modules>
     <build>
         <!-- skip the deployment for this aggregator, not necessary -->

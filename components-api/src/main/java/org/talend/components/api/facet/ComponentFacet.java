@@ -14,9 +14,22 @@ package org.talend.components.api.facet;
 
 import java.io.Serializable;
 
+import org.talend.components.api.properties.ComponentProperties;
+
 /**
  * Code to execute the component's facet. This can be used at runtime or design time as required.
  */
 public interface ComponentFacet extends Serializable {
-    // Currently empty
+
+    /**
+     * used to initialise this facet before the process is done.
+     * 
+     * @param context ComponentPropertie used to get parameters for the process
+     */
+    void setUp(ComponentProperties context);
+
+    /**
+     * Called after the process is over to release all resources opened.
+     */
+    void tearDown();
 }

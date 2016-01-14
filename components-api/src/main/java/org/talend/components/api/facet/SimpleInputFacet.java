@@ -12,40 +12,37 @@
 // ============================================================================
 package org.talend.components.api.facet;
 
-import java.util.List;
-
-import com.google.cloud.dataflow.sdk.coders.Coder;
-import com.google.cloud.dataflow.sdk.io.BoundedSource;
-import com.google.cloud.dataflow.sdk.options.PipelineOptions;
-import com.google.common.collect.ImmutableList;
+import org.talend.components.api.facet.gdf.SimpleInputFacetGDF;
+import org.talend.components.api.runtime.SingleOutputConnector;
 
 /**
  * Code to execute the component's facet. This can be used at runtime or design time as required.
  */
-public abstract class SimpleInputFacet<InputObject> extends BoundedSource<InputObject> implements ComponentFacet {
+public abstract class SimpleInputFacet<OutputObject> implements ComponentFacet {
 
-    // TODO set as abstract an be overrided by the component implementation
-    @Override
-    public long getEstimatedSizeBytes(PipelineOptions arg0) throws Exception {
-        return 0;
+    private static final long serialVersionUID = -5896541157429439623L;
+
+    private SingleOutputConnector<OutputObject> soc;
+
+    /**
+     * This must be set by the runtime engine facet implmentation (see {@link SimpleInputFacetGDF})
+     * 
+     * @param soc connector used to ouput the data for the Input facet.
+     */
+    public void setOutputConnector(SingleOutputConnector<OutputObject> soc) {
+        this.soc = soc;
     }
 
-    @Override
-    public boolean producesSortedKeys(PipelineOptions arg0) throws Exception {
-        return false;
-    }
+    /**
+     * called to create all the inputs values they should all be outputed using the
+     * {@link SimpleInputFacet#addToMainOutput(Object)}
+     *
+     * @throws Exception
+     */
+    public abstract void execute() throws Exception;
 
-    @Override
-    public Coder<InputObject> getDefaultOutputCoder() {
-        // TODO is this really working?
-        // TODO please someone, test that.
-        return KryoCoder.<InputObject> of();
-    }
-
-    // TODO set as abstract an be overrided by the component implementation
-    @Override
-    public List<? extends BoundedSource<InputObject>> splitIntoBundles(long arg0, PipelineOptions arg1) throws Exception {
-        return ImmutableList.of(this);
+    public void addToMainOutput(OutputObject output) {
+        soc.outputData(output);
     }
 
 }

@@ -32,10 +32,4 @@ public class FilterColumnRuntime extends SimpleTransformationFacet {
         }
         addToMainOutput(inputValue);
     }
-
-    @Override
-    public void tearDown() {
-        // Nothing
-    }
-
 }

@@ -12,34 +12,63 @@
 // ============================================================================
 package org.talend.components.mongodb.tmongodboutput;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.facet.SimpleOutputFacet;
+import org.talend.components.api.facet.SimpleOutputFacetV2;
+import org.talend.components.api.properties.ComponentProperties;
 
-import com.google.api.client.repackaged.com.google.common.base.Preconditions;
-import com.google.cloud.dataflow.sdk.options.PipelineOptions;
+import com.mongodb.DB;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
 
 // TODO slice the component into a write component and an output compoenent
-public class MongoDBOutputFacet extends SimpleOutputFacet<Map<String, Object>> {
+public class MongoDBOutputFacet extends SimpleOutputFacetV2<Map<String, Object>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBOutputFacet.class);
 
-    public MongoDBOutputFacet() {
-        // TODO get properties
+    private MongoClient mongo = null;
+
+    private DB db = null;
+
+    @Override
+    public void setUp(ComponentProperties props) {
+        MongoClientOptions clientOptions = new MongoClientOptions.Builder().build();
+        List<MongoCredential> mongoCredentialList = new ArrayList<MongoCredential>();
+        ServerAddress serverAddress = new ServerAddress("192.168.99.100", 27017);
+        mongo = new MongoClient(serverAddress, mongoCredentialList, clientOptions);
+        this.db = mongo.getDB("test");
     }
 
     @Override
-    public com.google.cloud.dataflow.sdk.io.Sink.WriteOperation<Map<String, Object>, String> createWriteOperation(
-            PipelineOptions options) {
-        return new MongoDBOutputWriteOperation(this);
+    public void execute(Map<String, Object> inputValue) throws Exception {
+        com.mongodb.DBCollection collection = db.getCollection("outputCollection");
+        // initialize objects
+        MongoDBOutputUtil updateObjectUtil = new MongoDBOutputUtil();
+        updateObjectUtil.setObject(new com.mongodb.BasicDBObject());
+
+        java.util.Map<String, String> pathMap = new java.util.HashMap<String, String>();
+
+        // add parent path
+        pathMap.put("defaultColumn", "simplepath");
+
+        // create BasicDBObject
+        updateObjectUtil.put(pathMap.get("defaultColumn"), "outputcolumn", "name");
+        com.mongodb.BasicDBObject updateObj = updateObjectUtil.getObject();
+
+        collection.insert(updateObj);
     }
 
     @Override
-    public void validate(PipelineOptions options) {
-        Preconditions.checkNotNull("Replace this string by a condition you want to test", "Error message.");
-
+    public void tearDown() {
+        if (mongo != null) {
+            mongo.close();
+        }
     }
 
 }

@@ -20,8 +20,8 @@ import com.google.cloud.dataflow.sdk.values.KV;
 /**
  * Code to execute the component's facet. This can be used at runtime or design time as required.
  */
-public abstract class ExtractionFacet<InputType> extends DoFn<InputType, KV<Boolean, Map<String, Object>>> implements
-        ComponentFacet {
+public abstract class ExtractionFacet<InputType> extends DoFn<InputType, KV<Boolean, Map<String, Object>>>
+        implements ComponentFacet {
 
     DoFn<InputType, KV<Boolean, Map<String, Object>>>.ProcessContext context;
 
@@ -48,9 +48,5 @@ public abstract class ExtractionFacet<InputType> extends DoFn<InputType, KV<Bool
      * @throws Exception
      */
     public abstract void execute(InputType inputValue) throws Exception;
-
-    // a transformation may use a tear down
-    // TODO Wrap to stopBundle
-    public abstract void tearDown();
 
 }
