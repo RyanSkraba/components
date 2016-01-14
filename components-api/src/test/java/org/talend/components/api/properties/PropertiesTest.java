@@ -17,8 +17,8 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.junit.Test;
+import org.talend.components.api.NamedThing;
 import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.service.testcomponent.ComponentPropertiesWithDefinedI18N;
 import org.talend.components.api.service.testcomponent.TestComponentDefinition;
 import org.talend.components.api.service.testcomponent.TestComponentProperties;
@@ -30,7 +30,7 @@ public class PropertiesTest {
 
     @Test
     public void testSerializeProp() {
-        ComponentProperties props = new TestComponentProperties("test");
+        ComponentProperties props = new TestComponentProperties("test").init();
         ComponentTestUtils.checkSerialize(props);
     }
 
@@ -52,22 +52,13 @@ public class PropertiesTest {
 
         assertEquals("testUser", props.userId.getStringValue());
         assertEquals("testPassword", props.password.getValue());
-        assertEquals("greatness", props.nestedProps.getValue(props.nestedProps.aGreatProperty));
+        assertEquals("greatness", props.nestedProps.aGreatProperty.getValue());
 
-    }
-
-    @Test
-    public void testRuntimeOnly() {
-        TestComponentProperties props = new TestComponentProperties("test");
-        props.setRuntimeOnly();
-        props.setupProperties();
-        assertTrue(props.isRuntimeOnly());
-        assertNull(props.getForm(Form.MAIN));
     }
 
     @Test
     public void testGetProperty() {
-        TestComponentProperties props = new TestComponentProperties("test");
+        TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test").init();
         assertEquals("userId", props.getProperty("userId").getName());
         assertEquals("integer", props.getProperty("integer").getName());
         assertEquals("aGreatProperty", props.getProperty("nestedProps.aGreatProperty").getName());
@@ -77,10 +68,10 @@ public class PropertiesTest {
     public void testFindForm() {
         TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test").init();
         Form main = props.getForm(Form.MAIN);
-        assertTrue(main == TestComponentProperties.mainForm);
+        assertTrue(main == props.mainForm);
         assertEquals(Form.MAIN, main.getName());
         Form restoreTest = props.getForm("restoreTest");
-        assertTrue(restoreTest == TestComponentProperties.restoreForm);
+        assertTrue(restoreTest == props.restoreForm);
         assertEquals("restoreTest", restoreTest.getName());
     }
 
@@ -93,9 +84,22 @@ public class PropertiesTest {
 
         TestComponentProperties props2 = (TestComponentProperties) new TestComponentProperties("test2").init();
         props2.copyValuesFrom(props);
-        assertEquals(1, props2.getIntValue(props2.getProperty("integer")));
-        assertEquals("User1", props2.getStringValue(props2.getProperty("userId")));
+        assertEquals(1, ((Property) props2.getProperty("integer")).getIntValue());
+        assertEquals("User1", ((Property) props2.getProperty("userId")).getStringValue());
         assertEquals("great1", ((Property) props2.getProperty("nestedProps.aGreatProperty")).getStringValue());
+    }
+
+    @Test
+    public void testWrongFieldAndPropertyName() {
+        TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test1").init();
+        props.setValue("nestedProps.aGreatProperty", "great1");
+        assertEquals("great1", ((Property) props.getProperty("nestedProps.aGreatProperty")).getStringValue());
+        try {
+            props.setValue("nestedProps", "bad");
+            fail("did not get expected exception");
+        } catch (IllegalArgumentException ex) {
+            // expected
+        }
     }
 
     @Test
@@ -120,54 +124,54 @@ public class PropertiesTest {
 
     @Test
     public void testi18NForDirectProperty() {
-        TestComponentProperties componentProperties = new TestComponentProperties("test");
-        SchemaElement userIdProp = componentProperties.getProperty("userId");
+        TestComponentProperties componentProperties = (TestComponentProperties) new TestComponentProperties("test").init();
+        NamedThing userIdProp = componentProperties.getProperty("userId");
         assertNotNull(userIdProp);
         assertEquals("User Identifier", userIdProp.getDisplayName()); //$NON-NLS-1$
     }
 
     @Test
     public void testi18NForNestedProperty() {
-        TestComponentProperties componentProperties = new TestComponentProperties("test");
+        TestComponentProperties componentProperties = (TestComponentProperties) new TestComponentProperties("test").init();
         ComponentProperties nestedProp = (ComponentProperties) componentProperties.getProperty("nestedProps");
         assertNotNull(nestedProp);
-        SchemaElement greatProperty = nestedProp.getProperty(NestedComponentProperties.A_GREAT_PROP_NAME);
+        NamedThing greatProperty = nestedProp.getProperty(NestedComponentProperties.A_GREAT_PROP_NAME);
         assertNotNull(greatProperty);
         assertEquals("A Fanstastic Property", greatProperty.getDisplayName()); //$NON-NLS-1$
     }
 
     @Test
     public void testi18NForNestedPropertyWithDefinedI18N() {
-        TestComponentProperties componentProperties = new TestComponentProperties("test");
+        TestComponentProperties componentProperties = (TestComponentProperties) new TestComponentProperties("test").init();
         ComponentProperties nestedProp = (ComponentProperties) componentProperties.getProperty("nestedProp2");
         assertNotNull(nestedProp);
-        SchemaElement greatProperty = nestedProp.getProperty(ComponentPropertiesWithDefinedI18N.A_GREAT_PROP_NAME2);
+        NamedThing greatProperty = nestedProp.getProperty(ComponentPropertiesWithDefinedI18N.A_GREAT_PROP_NAME2);
         assertNotNull(greatProperty);
         assertEquals("A second Fanstastic Property", greatProperty.getDisplayName()); //$NON-NLS-1$
     }
 
     @Test
     public void testi18NForInheritedProperty() {
-        TestComponentProperties componentProperties = new TestComponentProperties("test");
+        TestComponentProperties componentProperties = (TestComponentProperties) new TestComponentProperties("test").init();
         ComponentProperties nestedProp = (ComponentProperties) componentProperties.getProperty("nestedProp3");
         assertNotNull(nestedProp);
-        SchemaElement greatProperty = nestedProp.getProperty(NestedComponentProperties.A_GREAT_PROP_NAME);
+        NamedThing greatProperty = nestedProp.getProperty(NestedComponentProperties.A_GREAT_PROP_NAME);
         assertNotNull(greatProperty);
         assertEquals("A Fanstastic Property", greatProperty.getDisplayName()); //$NON-NLS-1$
     }
 
     @Test
     public void testGetPropsList() {
-        TestComponentProperties componentProperties = new TestComponentProperties("test");
-        List<SchemaElement> pList = componentProperties.getProperties();
+        TestComponentProperties componentProperties = (TestComponentProperties) new TestComponentProperties("test").init();
+        List<NamedThing> pList = componentProperties.getProperties();
         assertTrue(pList.get(0) != null);
-        assertEquals(11, pList.size());
+        assertEquals(13, pList.size());
     }
 
     @Test
     public void testGetPropsListInherited() {
         ComponentProperties componentProperties = new InheritedComponentProperties("test");
-        List<SchemaElement> pList = componentProperties.getProperties();
+        List<NamedThing> pList = componentProperties.getProperties();
         System.out.println(pList);
         assertTrue(pList.get(0) != null);
         assertEquals(3, pList.size());
@@ -180,20 +184,53 @@ public class PropertiesTest {
         assertTrue(f.getWidget("userId").isVisible());
     }
 
-    @Test
-    public void testGetPropFields() {
-        TestComponentProperties tProps = new TestComponentProperties("test");
-        List<String> fieldNames = tProps.getPropertyFieldNames();
-        System.out.println(fieldNames);
-        assertEquals(11, fieldNames.size());
-        assertTrue(tProps.userId == tProps.getPropertyByFieldName("userId"));
-        assertTrue(tProps.nestedProps == tProps.getPropertyByFieldName("nestedProps"));
+    // @Test
+    // public void testGetPropFields() {
+    // TestComponentProperties tProps = (TestComponentProperties) new TestComponentProperties("test").init();
+    // List<String> fieldNames = tProps.getPropertyFieldNames();
+    // System.out.println(fieldNames);
+    // assertEquals(11, fieldNames.size());
+    // assertTrue(tProps.userId == tProps.getPropertyByFieldName("userId"));
+    // assertTrue(tProps.nestedProps == tProps.getPropertyByFieldName("nestedProps"));
+    // }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetValuedProperties() {
+        TestComponentProperties tProps = (TestComponentProperties) new TestComponentProperties("test").init();
+        assertNotNull(tProps.getValuedProperty("date"));
+        assertNull(tProps.getValuedProperty("nestedProps"));
+        // expected to throw exception
+        tProps.getValuedProperty("foo.nestedProps");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetComponentProperties() {
+        TestComponentProperties tProps = (TestComponentProperties) new TestComponentProperties("test").init();
+        assertNotNull(tProps.getComponentProperties("nestedProps"));
+        assertNull(tProps.getComponentProperties("date"));
+        // expected to throw exception
+        tProps.getComponentProperties("foo.nestedProps");
     }
 
     @Test
     public void testSerialize() {
-        TestComponentProperties props = new TestComponentProperties("test");
+        TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test").init();
         ComponentTestUtils.checkSerialize(props);
+    }
+
+    @Test
+    public void testPropertyInitializedDuringSetup() {
+        TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test").init();
+        // check that getValue returns null, cause is not initialized it will throw an NPE.
+        assertNull(props.initLater.getValue());
+        assertNull(props.nestedInitLater.anotherProp.getValue());
+    }
+
+    @Test
+    public void testCreatePropertiesForRuntime() {
+        TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test").initForRuntime();
+        assertNull(props.initLater.getValue());
+        assertNull(props.mainForm);
     }
 
 }

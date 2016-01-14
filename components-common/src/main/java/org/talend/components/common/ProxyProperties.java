@@ -52,7 +52,7 @@ public class ProxyProperties extends ComponentProperties {
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN)) {
-            if (getBooleanValue(useProxy)) {
+            if (useProxy.getBooleanValue()) {
                 form.getWidget(HOST).setVisible(true);
                 form.getWidget(USERPASSWORD).setVisible(true);
             } else {

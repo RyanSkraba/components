@@ -77,7 +77,7 @@ public class SalesforceModuleProperties extends ComponentProperties {
         SalesforceRuntime conn = new SalesforceRuntime();
         ValidationResult vr = conn.connectWithResult(connection);
         if (vr.getStatus() == ValidationResult.Result.OK) {
-            schema.setValue(schema.schema, conn.getSchema(getStringValue(moduleName)));
+            schema.schema.setValue(conn.getSchema(moduleName.getStringValue()));
         }
         return vr;
     }

@@ -87,7 +87,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     public void setupLayout() {
         super.setupLayout();
 
-        setValue(loginType, LOGIN_BASIC);
+        loginType.setValue(LOGIN_BASIC);
 
         Form wizardForm = new Form(this, FORM_WIZARD);
         wizardForm.addRow(name);
@@ -143,14 +143,14 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN) || form.getName().equals(FORM_WIZARD)) {
-            if (LOGIN_OAUTH.equals(getValue(loginType))) {
+            if (LOGIN_OAUTH.equals(loginType.getValue())) {
                 form.getWidget(OAUTH).setVisible(true);
                 form.getWidget(USERPASSWORD).setVisible(false);
-            } else if (LOGIN_BASIC.equals(getValue(loginType))) {
+            } else if (LOGIN_BASIC.equals(loginType.getValue())) {
                 form.getWidget(OAUTH).setVisible(false);
                 form.getWidget(USERPASSWORD).setVisible(true);
             } else {
-                throw new RuntimeException("Enum value should be handled :" + getValue(loginType));
+                throw new RuntimeException("Enum value should be handled :" + loginType.getValue());
             }
         }
 

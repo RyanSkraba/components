@@ -52,7 +52,7 @@ public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinitio
             public void inputBegin(ComponentProperties props) throws Exception {
                 TSalesforceGetServerTimestampProperties gdProps = (TSalesforceGetServerTimestampProperties) props;
                 connect(gdProps.connection);
-                schema = (Schema) gdProps.schema.getValue(gdProps.schema.schema);
+                schema = (Schema) gdProps.schema.schema.getValue();
                 result = connection.getServerTimestamp().getTimestamp();
             }
 

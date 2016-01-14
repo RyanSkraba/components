@@ -17,6 +17,7 @@ import static org.talend.components.api.properties.PropertyFactory.*;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.schema.SchemaElement;
 
 public class OauthProperties extends ComponentProperties {
 
@@ -26,7 +27,7 @@ public class OauthProperties extends ComponentProperties {
 
     public Property callbackHost = (Property) newProperty("callbackHost").setRequired(true); //$NON-NLS-1$
 
-    public Property callbackPort = (Property) newProperty(Type.INT, "callbackPort").setRequired(true); //$NON-NLS-1$
+    public Property callbackPort = (Property) newProperty(SchemaElement.Type.INT, "callbackPort").setRequired(true); //$NON-NLS-1$
 
     public Property tokenFile = (Property) newProperty("tokenFile").setRequired(true); //$NON-NLS-1$
 

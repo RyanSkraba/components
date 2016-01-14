@@ -39,7 +39,7 @@ public class SalesforceConnectionModuleProperties extends ComponentProperties {
     }
 
     public Schema getSchema() {
-        return (Schema) module.schema.getValue(module.schema.schema);
+        return (Schema) module.schema.schema.getValue();
     }
 
     @Override

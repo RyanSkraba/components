@@ -31,7 +31,15 @@ public interface ComponentDefinition extends TopLevelDefinition {
      */
     public String[] getFamilies();
 
+    /**
+     * create the ComponentProperties and initialize it's properties and ui layout
+     */
     public ComponentProperties createProperties();
+
+    /**
+     * create the ComponentProperties and initialize it's properties only and not the UI Layout not usefull for runtime
+     */
+    public ComponentProperties createRuntimeProperties();
 
     /**
      * Create a {@link ComponentRuntime} object.

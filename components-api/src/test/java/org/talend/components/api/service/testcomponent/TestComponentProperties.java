@@ -27,6 +27,7 @@ import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.ValidationResult.Result;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
+import org.talend.components.api.schema.SchemaElement.Type;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
 
@@ -34,9 +35,9 @@ public class TestComponentProperties extends ComponentProperties {
 
     public static final String USER_ID_PROP_NAME = "userId"; //$NON-NLS-1$
 
-    public static Form mainForm;
+    public Form mainForm;
 
-    public static Form restoreForm;
+    public Form restoreForm;
 
     public PresentationItem testPI = new PresentationItem("testPI", "testPI display name");
 
@@ -56,6 +57,10 @@ public class TestComponentProperties extends ComponentProperties {
     public Property date = newProperty(Type.DATE, "date");
 
     public Property dateTime = newProperty(Type.DATETIME, "dateTime");
+
+    public Property initLater = null;
+
+    public NestedComponentProperties nestedInitLater = null;
 
     public NestedComponentProperties nestedProps = new NestedComponentProperties("nestedProps");
 
@@ -93,6 +98,8 @@ public class TestComponentProperties extends ComponentProperties {
     @Override
     public void setupProperties() {
         super.setupProperties();
+        initLater = newProperty("initLater");
+        nestedInitLater = new NestedComponentProperties("nestedInitLater");
     }
 
     @Override

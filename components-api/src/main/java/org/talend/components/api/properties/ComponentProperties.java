@@ -16,24 +16,22 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
 import org.talend.components.api.ComponentDesigner;
+import org.talend.components.api.NamedThing;
 import org.talend.components.api.ToStringIndent;
 import org.talend.components.api.ToStringIndentUtil;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.components.api.exception.error.ComponentsErrorCode;
 import org.talend.components.api.i18n.TranslatableImpl;
 import org.talend.components.api.properties.internal.ComponentPropertiesInternal;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
-import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
-import org.talend.components.api.schema.SchemaFactory;
+import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.security.CryptoHelper;
@@ -89,7 +87,7 @@ import com.cedarsoftware.util.io.JsonWriter;
  * call {@link SchemaElement#setI18nMessageFormater(I18nMessages)} manually.
  */
 
-public abstract class ComponentProperties extends TranslatableImpl implements SchemaElement, ToStringIndent {
+public abstract class ComponentProperties extends TranslatableImpl implements NamedThing, ToStringIndent {
 
     static final String METHOD_BEFORE = "before";
 
@@ -118,7 +116,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
      * A special property for the values that a component returns. If this is used, this will be a {@link SchemaElement}
      * that contains each of the values the component returns.
      */
-    protected Property returns;
+    public Property returns;
 
     /**
      * Holder class for the results of a deserialization.
@@ -178,6 +176,8 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
 
     /**
      * Must be called once the class is instanciated to setup the properties and the layout
+     * 
+     * @return this instance
      */
     public ComponentProperties init() {
         // init nested properties starting from the bottom ones
@@ -186,28 +186,85 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         return this;
     }
 
+    /**
+     * only initilize the properties but not the layout.
+     * 
+     * @return this instance
+     */
+    public ComponentProperties initForRuntime() {
+        initProperties();
+        return this;
+    }
+
     private void initProperties() {
-        List<SchemaElement> properties = getProperties();
-        for (SchemaElement prop : properties) {
-            if (prop instanceof ComponentProperties) {
-                ((ComponentProperties) prop).initProperties();
+        List<Field> uninitializedProperties = new ArrayList<>();
+        Field[] fields = getClass().getFields();
+        for (Field f : fields) {
+            try {
+                if (isAPropertyType(f.getType())) {
+                    NamedThing se = (NamedThing) f.get(this);
+                    if (se != null) {
+                        initializeField(f, se);
+                    } else {// not yet initialized to record it
+                        uninitializedProperties.add(f);
+                    }
+                } // else not a field that ought to be initialized
+            } catch (IllegalAccessException e) {
+                throw new ComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
             }
         }
         setupProperties();
+        // initialize all the properties that where found and not initialized
+        // they must be initalized after the setup.
+        for (Field f : uninitializedProperties) {
+            NamedThing se;
+            try {
+                se = (NamedThing) f.get(this);
+                if (se != null) {
+                    initializeField(f, se);
+                } else {// field not initilaized but is should be (except for returns field)
+                    if (!RETURNS.equals(f.getName())) {
+                        throw new ComponentException(ComponentsErrorCode.COMPONENT_HAS_UNITIALIZED_PROPS, ExceptionContext
+                                .withBuilder().put("name", this.getClass().getCanonicalName()).put("field", f.getName()).build());
+                    } // else a returns field that may not be initialized
+                }
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                throw new ComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
+            }
+        }
+    }
+
+    /**
+     * DOC sgandon Comment method "initializeField".
+     * 
+     * @param f
+     * @param value
+     */
+    public void initializeField(Field f, NamedThing value) {
+        // check that field name matches the NamedThing name
+        if (!f.getName().equals(value.getName())) {
+            throw new IllegalArgumentException("The java field [" + this.getClass().getCanonicalName() + "." + f.getName()
+                    + "] should be named identically to the instance name [" + value.getName() + "]");
+        }
+        if (value instanceof Property) {
+            ((Property) value).setValueHolder(internal);
+            // Do not set the i18N for nested ComponentProperties, they already handle their i18n
+            value.setI18nMessageFormater(getI18nMessageFormater());
+        } else {// a Component property so setit up
+            ((ComponentProperties) value).initProperties();
+        }
     }
 
     private void initLayout() {
-        List<SchemaElement> properties = getProperties();
-        for (SchemaElement prop : properties) {
+        List<NamedThing> properties = getProperties();
+        for (NamedThing prop : properties) {
             if (prop instanceof ComponentProperties) {
                 ((ComponentProperties) prop).initLayout();
             }
         }
-        if (!isRuntimeOnly()) {
-            setupLayout();
-            for (Form form : getForms()) {
-                refreshLayout(form);
-            }
+        setupLayout();
+        for (Form form : getForms()) {
+            refreshLayout(form);
         }
     }
 
@@ -240,8 +297,8 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
     protected static final boolean ENCRYPT = true;
 
     protected void handlePropEncryption(boolean encrypt) {
-        List<SchemaElement> props = getProperties();
-        for (SchemaElement se : props) {
+        List<NamedThing> props = getProperties();
+        for (NamedThing se : props) {
             if (se instanceof ComponentProperties) {
                 ((ComponentProperties) se).handlePropEncryption(encrypt);
                 continue;
@@ -259,15 +316,6 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
                 }
             }
         }
-    }
-
-    public ComponentProperties setRuntimeOnly() {
-        internal.setRuntimeOnly();
-        return this;
-    }
-
-    public boolean isRuntimeOnly() {
-        return internal.isRuntimeOnly();
     }
 
     /**
@@ -309,56 +357,53 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
      * 
      * @return all properties associated with this object (including those defined in superclasses).
      */
-    public List<SchemaElement> getProperties() {
-        List<SchemaElement> properties = new ArrayList<>();
+    public List<NamedThing> getProperties() {
+
+        List<NamedThing> properties = new ArrayList<>();
         Field[] fields = getClass().getFields();
         for (Field f : fields) {
-            if (SchemaElement.class.isAssignableFrom(f.getType())) {
-                try {
-                    SchemaElement se = (SchemaElement) f.get(this);
-                    if (se != null) {
+            try {
+                Object fValue = f.get(this);
+                if (isAPropertyType(f.getType())) {
+                    if (fValue != null) {
+                        NamedThing se = (NamedThing) fValue;
                         properties.add(se);
-                        if (se instanceof Property) {
-                            ((Property) se).setComponentProperties(this);
-                        }
-                        // Do not set the i18N for nested ComponentProperties, they already handle their i18n
-                        if (!(se instanceof ComponentProperties)) {
-                            se.setI18nMessageFormater(getI18nMessageFormater());
-                        }
-                    } // else element not initialised (set to null)
-                } catch (IllegalAccessException e) {
-                    throw new ComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
+                    } // else not initalized but this is already handled in the initProperties that must be called
+                      // before the getProperties
                 }
+            } catch (IllegalAccessException e) {
+                throw new ComponentException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
             }
-        }
-        if (returns != null) {
-            returns.setI18nMessageFormater(getI18nMessageFormater());
-            properties.add(returns);
         }
         return properties;
     }
 
-    public List<String> getPropertyFieldNames() {
-        List<String> fieldNames = new ArrayList<>();
-        Field[] fields = getClass().getFields();
-        for (Field f : fields) {
-            if (!SchemaElement.class.isAssignableFrom(f.getType())) {
-                continue;
-            }
-            fieldNames.add(f.getName());
-        }
-        return fieldNames;
+    /**
+     * is this object of type Property or ComponenetProperties, the properties type handle by this class.
+     * 
+     * @param clazz, the class to be tested
+     * @return true if the clazz inherites from Property or ComponenetProperties
+     */
+    protected boolean isAPropertyType(Class<?> clazz) {
+        return ComponentProperties.class.isAssignableFrom(clazz) || Property.class.isAssignableFrom(clazz);
     }
 
     /**
-     * Returns the property as specified by a qualifed property name string.
+     * Returns Property or a CompoentProperties as specified by a qualifed property name string representing the field
+     * name.
      * <p/>
      * The first component is the property name within this object. The optional subsequent components, separated by a
      * "." are property names in the nested {@link ComponentProperties} objects.
      *
      * @param name a qualified property name
+     * @return the Property or Componenent denoted with the name or null if the final field is not found
+     * @exception IllegalArgumentException is the path before the last does not point to a CompoenentProperties
      */
-    public SchemaElement getProperty(@NotNull String name) {
+    public NamedThing getProperty(@NotNull String name) {
+        // TODO make the same behaviour if the nested ComponentProperties name is not found or the last properties is
+        // not found
+        // cause right now if the ComponentProperties is not foudnt an execpetion is thrown and if the last property is
+        // not found null is returned.
         String[] propComps = name.split("\\.");
         ComponentProperties currentProps = this;
         int i = 0;
@@ -366,13 +411,30 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
             if (i++ == propComps.length - 1) {
                 return currentProps.getLocalProperty(prop);
             }
-            SchemaElement se = currentProps.getLocalProperty(prop);
+            NamedThing se = currentProps.getLocalProperty(prop);
             if (!(se instanceof ComponentProperties)) {
                 throw new IllegalArgumentException(prop + " is not a nested ComponentProperties. Processing: " + name);
-            }
-            currentProps = (ComponentProperties) currentProps.getLocalProperty(prop);
+            } // else se is a CompoenetProperties so use it
+            currentProps = (ComponentProperties) se;
         }
         return null;
+    }
+
+    /**
+     * same as {@link ComponentProperties#getProperties()} but returns null if the Property is not of type Property.
+     */
+    public Property getValuedProperty(String propPath) {
+        NamedThing prop = getProperty(propPath);
+        return (prop instanceof Property) ? (Property) prop : null;
+    }
+
+    /**
+     * same as {@link ComponentProperties#getProperties()} but returns null if the Property is not of type
+     * ComponentProperty.
+     */
+    public ComponentProperties getComponentProperties(String propPath) {
+        NamedThing prop = getProperty(propPath);
+        return (prop instanceof ComponentProperties) ? (ComponentProperties) prop : null;
     }
 
     /**
@@ -380,9 +442,9 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
      * 
      * @param name a simple property name.
      */
-    protected SchemaElement getLocalProperty(@NotNull String name) {
-        List<SchemaElement> properties = getProperties();
-        for (SchemaElement prop : properties) {
+    protected NamedThing getLocalProperty(@NotNull String name) {
+        List<NamedThing> properties = getProperties();
+        for (NamedThing prop : properties) {
             if (name.equals(prop.getName())) {
                 return prop;
             }
@@ -390,64 +452,12 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         return null;
     }
 
-    public SchemaElement getPropertyByFieldName(@NotNull String fieldName) {
-        SchemaElement prop = null;
-        try {
-            prop = (SchemaElement) getClass().getField(fieldName).get(this);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchFieldException e) {
-            return null;
-        }
-        return prop;
-    }
-
-    public void setValue(SchemaElement property, Object value) {
-        if (property.getType() == Type.SCHEMA && value instanceof String) {
-            value = SchemaFactory.fromSerialized((String) value);
-        }
-
-        internal.setValue(property, value);
-    }
-
     public void setValue(String property, Object value) {
-        SchemaElement p = getProperty(property);
+        NamedThing p = getProperty(property);
         if (!(p instanceof Property)) {
             throw new IllegalArgumentException("setValue but property: " + property + " is not a Property");
         }
         ((Property) p).setValue(value);
-    }
-
-    public Object getValue(SchemaElement property) {
-        return internal.getValue(property);
-    }
-
-    public boolean getBooleanValue(SchemaElement property) {
-        Boolean value = (Boolean) getValue(property);
-        return value != null && value;
-    }
-
-    public String getStringValue(SchemaElement property) {
-        Object value = getValue(property);
-        if (value != null) {
-            if (value instanceof Schema) {
-                return ((Schema) value).toSerialized();
-            }
-            return value.toString();
-        }
-        return null;
-    }
-
-    public int getIntValue(SchemaElement property) {
-        Integer value = (Integer) getValue(property);
-        if (value == null) {
-            return 0;
-        }
-        return value;
-    }
-
-    public Calendar getCalendarValue(SchemaElement property) {
-        return (Calendar) getValue(property);
     }
 
     /**
@@ -466,17 +476,17 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
      * @param props
      */
     public void copyValuesFrom(ComponentProperties props) {
-        List<SchemaElement> values = getProperties();
-        for (SchemaElement se : values) {
-            SchemaElement otherSe = props.getProperty(se.getName());
+        List<NamedThing> values = getProperties();
+        for (NamedThing se : values) {
+            NamedThing otherSe = props.getProperty(se.getName());
             if (otherSe == null) {
                 continue;
             }
             if (se instanceof ComponentProperties) {
                 ((ComponentProperties) se).copyValuesFrom((ComponentProperties) otherSe);
             } else {
-                Object value = props.getValue(otherSe);
-                setValue(se, value);
+                Object value = ((Property) otherSe).getValue();
+                ((Property) se).setValue(value);
             }
         }
 
@@ -602,8 +612,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         return internal.getName();
     }
 
-    @Override
-    public SchemaElement setName(String name) {
+    public ComponentProperties setName(String name) {
         internal.setName(name);
         return this;
     }
@@ -613,174 +622,9 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         return getI18nMessage("properties" + (getName() == null ? getName() : "") + ".displayName");
     }
 
-    public SchemaElement setDisplayName(String displayName) {
-        // FIXME - need better exception for this
-        throw new RuntimeException("Cannot be used here");
-    }
-
     @Override
     public String getTitle() {
         return internal.getTitle();
-    }
-
-    @Override
-    public SchemaElement setTitle(String title) {
-        internal.setTitle(title);
-        return this;
-    }
-
-    @Override
-    public Type getType() {
-        return Type.GROUP;
-    }
-
-    @Override
-    public SchemaElement setType(Type type) {
-        throw new RuntimeException("Cannot be used here");
-    }
-
-    @Override
-    public int getSize() {
-        return 0;
-    }
-
-    @Override
-    public SchemaElement setSize(int size) {
-        throw new RuntimeException("Cannot be used here");
-    }
-
-    @Override
-    public boolean isSizeUnbounded() {
-        return true;
-    }
-
-    @Override
-    public int getOccurMinTimes() {
-        return 1;
-    }
-
-    @Override
-    public SchemaElement setOccurMinTimes(int times) {
-        throw new RuntimeException("Cannot be used here");
-    }
-
-    @Override
-    public int getOccurMaxTimes() {
-        return 1;
-    }
-
-    @Override
-    public SchemaElement setOccurMaxTimes(int times) {
-        throw new RuntimeException("Cannot be used here");
-    }
-
-    @Override
-    public boolean isRequired() {
-        return false;
-    }
-
-    @Override
-    public SchemaElement setRequired() {
-        return setRequired(true);
-    }
-
-    @Override
-    public SchemaElement setRequired(boolean required) {
-        throw new RuntimeException("Cannot be used here");
-    }
-
-    @Override
-    public int getPrecision() {
-        return 0;
-    }
-
-    @Override
-    public SchemaElement setPrecision(int precision) {
-        throw new RuntimeException("Cannot be used here");
-    }
-
-    @Override
-    public String getPattern() {
-        return null;
-    }
-
-    @Override
-    public SchemaElement setPattern(String pattern) {
-        throw new RuntimeException("Cannot be used here");
-    }
-
-    @Override
-    public String getDefaultValue() {
-        return null;
-    }
-
-    @Override
-    public SchemaElement setDefaultValue(String defaultValue) {
-        throw new RuntimeException("Cannot be used here");
-    }
-
-    @Override
-    public boolean isNullable() {
-        return false;
-    }
-
-    @Override
-    public SchemaElement setNullable(boolean nullable) {
-        throw new RuntimeException("Cannot be used here");
-    }
-
-    @Override
-    public Class<?> getEnumClass() {
-        return null;
-    }
-
-    @Override
-    public SchemaElement setEnumClass(Class<?> enumClass) {
-        throw new RuntimeException("Cannot be used here");
-    }
-
-    @Override
-    public List<?> getPossibleValues() {
-        return null;
-    }
-
-    @Override
-    public SchemaElement setPossibleValues(List<?> possibleValues) {
-        throw new RuntimeException("Cannot be used here");
-    }
-
-    @Override
-    public SchemaElement setPossibleValues(Object... values) {
-        throw new RuntimeException("Cannot be used here");
-    }
-
-    @Override
-    public List<SchemaElement> getChildren() {
-        return getProperties();
-    }
-
-    @Override
-    public SchemaElement setChildren(List<SchemaElement> children) {
-        throw new RuntimeException("Cannot be used here");
-    }
-
-    @Override
-    public SchemaElement getChild(String name) {
-        return null;
-    }
-
-    @Override
-    public SchemaElement addChild(SchemaElement child) {
-        throw new RuntimeException("Cannot be used here");
-    }
-
-    @Override
-    public Map<String, SchemaElement> getChildMap() {
-        Map<String, SchemaElement> map = new HashMap<>();
-        for (SchemaElement se : getChildren()) {
-            map.put(se.getName(), se);
-        }
-        return map;
     }
 
     @Override
@@ -794,9 +638,13 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         String is = ToStringIndentUtil.indentString(indent);
         sb.append(is + getName() + " - " + getTitle() + " " + getClass().getName());
         sb.append("\n" + is + "   Properties:");
-        for (SchemaElement prop : getProperties()) {
-            sb.append("\n" + prop.toStringIndent(indent + 6));
-            String value = getStringValue(prop);
+        for (NamedThing prop : getProperties()) {
+            if (prop instanceof ToStringIndent) {
+                sb.append('\n' + ((ToStringIndent) prop).toStringIndent(indent + 6));
+            } else {
+                sb.append('\n' + prop.toString());
+            }
+            String value = prop instanceof Property ? ((Property) prop).getStringValue() : null;
             if (value != null) {
                 sb.append(" [" + value + "]");
             }

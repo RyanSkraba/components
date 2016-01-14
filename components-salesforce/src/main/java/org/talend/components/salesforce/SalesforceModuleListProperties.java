@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.NameAndLabel;
+import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
@@ -39,7 +40,7 @@ public class SalesforceModuleListProperties extends ComponentProperties {
     //
     // Properties
     //
-    public SchemaElement moduleName = newString("moduleName").setOccurMaxTimes(INFINITE); //$NON-NLS-1$
+    public Property moduleName = (Property) newString("moduleName").setOccurMaxTimes(SchemaElement.INFINITE); //$NON-NLS-1$
 
     public SalesforceModuleListProperties(String name) {
         super(name);
@@ -85,16 +86,17 @@ public class SalesforceModuleListProperties extends ComponentProperties {
             return vr;
         }
 
-        String connRepLocation = compService.storeComponentProperties(connectionProps,
-                (String) connectionProps.getValue(connectionProps.name), repositoryLocation, null);
+        String connRepLocation = compService.storeComponentProperties(connectionProps, (String) connectionProps.name.getValue(),
+                repositoryLocation, null);
 
         @SuppressWarnings("unchecked")
-        List<NameAndLabel> selectedModuleNames = (List<NameAndLabel>) getValue(moduleName);
+        List<NameAndLabel> selectedModuleNames = (List<NameAndLabel>) moduleName.getValue();
         for (NameAndLabel nl : selectedModuleNames) {
             SalesforceModuleProperties modProps = new SalesforceModuleProperties(nl.getName()).setConnection(connectionProps);
+            modProps.init();
             Schema schema = conn.getSchema(nl.getName());
-            modProps.setValue(modProps.moduleName, nl.getName());
-            modProps.schema.setValue(modProps.schema.schema, schema);
+            modProps.moduleName.setValue(nl.getName());
+            modProps.schema.schema.setValue(schema);
             compService.storeComponentProperties(modProps, nl.getName(), connRepLocation, schema);
         }
         return ValidationResult.OK;
