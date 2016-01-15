@@ -2,16 +2,12 @@ package org.talend.components.cassandra.type;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Row;
-import org.talend.schema.type.TInt;
+import org.talend.components.api.schema.column.type.TInt;
 
 /**
  * Created by bchen on 16-1-10.
  */
-public class INT extends BaseType<Integer, TInt> {
-    @Override
-    public Class<TInt> getDefaultTalendType() {
-        return TInt.class;
-    }
+public class INT extends CassandraBaseType<Integer, TInt> {
 
     @Override
     protected Integer getAppValue(Row app, String key) {

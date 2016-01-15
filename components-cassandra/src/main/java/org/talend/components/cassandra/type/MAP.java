@@ -2,18 +2,14 @@ package org.talend.components.cassandra.type;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Row;
-import org.talend.schema.type.TObject;
+import org.talend.components.api.schema.column.type.TObject;
 
 import java.util.Map;
 
 /**
  * Created by bchen on 16-1-10.
  */
-public class MAP extends BaseType<Map, TObject> {
-    @Override
-    public Class<TObject> getDefaultTalendType() {
-        return TObject.class;
-    }
+public class MAP extends CassandraBaseType<Map, TObject> {
 
     @Override
     protected Map getAppValue(Row app, String key) {

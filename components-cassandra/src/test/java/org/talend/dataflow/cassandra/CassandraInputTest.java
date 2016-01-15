@@ -6,19 +6,27 @@ import com.cloudera.dataflow.spark.SparkPipelineRunner;
 import com.cloudera.dataflow.spark.TransformTranslator;
 import com.google.cloud.dataflow.sdk.Pipeline;
 import com.google.cloud.dataflow.sdk.io.TextIO;
+import org.junit.Before;
 import org.junit.Test;
+import org.talend.components.api.schema.column.type.common.TypeMapping;
 import org.talend.components.cassandra.io.dataflow.inputType1.CassandraIO;
 import org.talend.components.cassandra.io.dataflow.inputType1.CassandraInputTransformEvaluator;
 import org.talend.components.cassandra.tCassandraInput.tCassandraInputDIProperties;
 import org.talend.components.cassandra.tCassandraInput.tCassandraInputSparkProperties;
+import org.talend.components.cassandra.type.CassandraTypesRegistry;
 
 /**
  * Created by bchen on 16-1-9.
  */
 public class CassandraInputTest {
+    @Before
+    public void prepare() {
+        TypeMapping.registryTypes(new CassandraTypesRegistry());
+    }
 
     @Test
     public void testType1() {
+
         TransformTranslator.addTransformEvaluator(CassandraIO.Read.Bound.class, new CassandraInputTransformEvaluator());
         SparkPipelineOptions options = SparkPipelineOptionsFactory.create();
         Pipeline p = Pipeline.create(options);

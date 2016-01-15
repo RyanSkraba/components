@@ -2,16 +2,12 @@ package org.talend.components.cassandra.type;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Row;
-import org.talend.schema.type.TString;
+import org.talend.components.api.schema.column.type.TString;
 
 /**
  * Created by bchen on 16-1-10.
  */
-public class ASCII extends BaseType<String, TString> {
-    @Override
-    public Class<TString> getDefaultTalendType() {
-        return TString.class;
-    }
+public class ASCII extends CassandraBaseType<String, TString> {
 
     @Override
     protected String getAppValue(Row app, String key) {
@@ -34,4 +30,5 @@ public class ASCII extends BaseType<String, TString> {
         v.setValue(value);
         return v;
     }
+
 }

@@ -2,16 +2,12 @@ package org.talend.components.cassandra.type;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Row;
-import org.talend.schema.type.TBoolean;
+import org.talend.components.api.schema.column.type.TBoolean;
 
 /**
  * Created by bchen on 16-1-10.
  */
-public class BOOLEAN extends BaseType<Boolean, TBoolean> {
-    @Override
-    public Class<TBoolean> getDefaultTalendType() {
-        return TBoolean.class;
-    }
+public class BOOLEAN extends CassandraBaseType<Boolean, TBoolean> {
 
     @Override
     protected Boolean getAppValue(Row app, String key) {

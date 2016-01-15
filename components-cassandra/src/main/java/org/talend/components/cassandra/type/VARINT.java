@@ -2,18 +2,14 @@ package org.talend.components.cassandra.type;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Row;
-import org.talend.schema.type.TObject;
+import org.talend.components.api.schema.column.type.TObject;
 
 import java.math.BigInteger;
 
 /**
  * Created by bchen on 16-1-10.
  */
-public class VARINT extends BaseType<BigInteger, TObject> {
-    @Override
-    public Class<TObject> getDefaultTalendType() {
-        return TObject.class;
-    }
+public class VARINT extends CassandraBaseType<BigInteger, TObject> {
 
     @Override
     protected BigInteger getAppValue(Row app, String key) {

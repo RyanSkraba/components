@@ -10,11 +10,11 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.schema;
+package org.talend.components.api.schema.column;
 
-import org.talend.components.cassandra.type.BaseType;
-import org.talend.schema.type.TBaseType;
-import org.talend.schema.type.TypeMapping;
+import org.talend.components.api.schema.column.type.common.ExternalBaseType;
+import org.talend.components.api.schema.column.type.common.TBaseType;
+import org.talend.components.api.schema.column.type.common.TypeMapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +28,13 @@ public class Column {
 
     private Class<? extends TBaseType> col_type;
 
-    private Class<? extends BaseType> app_col_type;
+    private Class<? extends ExternalBaseType> app_col_type;
+
+    private String appFamily;
 
     private boolean buildFromT;
 
-    public Column(boolean buildFromT, String name, Class type) {
+    public Column(boolean buildFromT, String name, Class type, String appFamily) {
         this.buildFromT = buildFromT;
         if (buildFromT) {
             this.col_name = name;
@@ -41,6 +43,7 @@ public class Column {
             this.app_col_name = name;
             this.app_col_type = type;
         }
+        this.appFamily = appFamily;
     }
 
     public List<Class<? extends TBaseType>> getOptionalTalendTypes() {
@@ -49,44 +52,33 @@ public class Column {
             types.add(col_type);
             return types;
         }
-        return TypeMapping.getTalendTypes(app_col_type);
+        return TypeMapping.getTalendTypes(appFamily, app_col_type);
     }
 
-    public List<Class<? extends BaseType>> getOptionalAppTypes() {
+    public List<Class<? extends ExternalBaseType>> getOptionalAppTypes(String appFamily) {
         if (!buildFromT) {
-            List<Class<? extends BaseType>> types = new ArrayList<Class<? extends BaseType>>();
+            List<Class<? extends ExternalBaseType>> types = new ArrayList<Class<? extends ExternalBaseType>>();
             types.add(app_col_type);
             return types;
         }
-        try {
-            return TypeMapping.getAppTypes(app_col_type.newInstance().familyName, col_type);
-        } catch (InstantiationException | IllegalAccessException e) {
-            // TODO try to avoid newInstance
-            throw new RuntimeException("Should not throw this exception");
-        }
+        return TypeMapping.getAppTypes(appFamily, col_type);
     }
 
     public void setTalendType(String col_name, Class<? extends TBaseType> col_type) {
         if (!buildFromT) {
             // check on config stage
-            if (!TypeMapping.getTalendTypes(app_col_type).contains(col_type)) {
-                throw new RuntimeException("unsupport set talend type:class " + col_type + " for " + app_col_type);
+            if (!TypeMapping.getTalendTypes(appFamily, app_col_type).contains(col_type)) {
+                throw new RuntimeException("unsupport set talend type " + col_type + " for " + appFamily + " type " + app_col_type);
             }
             this.col_name = col_name;
             this.col_type = col_type;
         }
     }
 
-    public void setAppType(String app_col_name, Class<? extends BaseType> app_col_type) {
+    public void setAppType(String appFamily, String app_col_name, Class<? extends ExternalBaseType> app_col_type) {
         if (buildFromT) {
-            try {
-                // check on config stage
-                if (!TypeMapping.getAppTypes(app_col_type.newInstance().familyName, col_type).contains(app_col_type)) {
-                    throw new RuntimeException("unsupport set app type:class " + app_col_type + " for " + col_type);
-                }
-            } catch (InstantiationException | IllegalAccessException e) {
-                // TODO try to avoid newInstance
-                e.printStackTrace();
+            if (!TypeMapping.getAppTypes(appFamily, col_type).contains(app_col_type)) {
+                throw new RuntimeException("unsupport set " + appFamily + " type " + app_col_type + " for talend type" + col_type);
             }
             this.app_col_name = app_col_name;
             this.app_col_type = app_col_type;
@@ -116,7 +108,7 @@ public class Column {
      *
      * @return the app_col_type
      */
-    public Class<? extends BaseType> getApp_col_type() {
+    public Class<? extends ExternalBaseType> getApp_col_type() {
         return this.app_col_type;
     }
 

@@ -2,16 +2,12 @@ package org.talend.components.cassandra.type;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Row;
-import org.talend.schema.type.TDouble;
+import org.talend.components.api.schema.column.type.TDouble;
 
 /**
  * Created by bchen on 16-1-10.
  */
-public class DOUBLE extends BaseType<Double, TDouble> {
-    @Override
-    public Class<TDouble> getDefaultTalendType() {
-        return TDouble.class;
-    }
+public class DOUBLE extends CassandraBaseType<Double, TDouble> {
 
     @Override
     protected Double getAppValue(Row app, String key) {

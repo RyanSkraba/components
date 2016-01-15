@@ -1,4 +1,4 @@
-package org.talend.components.api.component.io;
+package org.talend.components.api.component.runtime.io;
 
 /**
  * Created by bchen on 16-1-13.

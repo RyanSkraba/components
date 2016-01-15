@@ -2,16 +2,12 @@ package org.talend.components.cassandra.type;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Row;
-import org.talend.schema.type.TLong;
+import org.talend.components.api.schema.column.type.TLong;
 
 /**
  * Created by bchen on 16-1-10.
  */
-public class COUNTER extends BaseType<Long, TLong>{
-    @Override
-    public Class<TLong> getDefaultTalendType() {
-        return TLong.class;
-    }
+public class COUNTER extends CassandraBaseType<Long, TLong> {
 
     @Override
     protected Long getAppValue(Row app, String key) {
@@ -20,7 +16,7 @@ public class COUNTER extends BaseType<Long, TLong>{
 
     @Override
     protected void setAppValue(BoundStatement app, String key, Long value) {
-app.setLong(key, value);
+        app.setLong(key, value);
     }
 
     @Override

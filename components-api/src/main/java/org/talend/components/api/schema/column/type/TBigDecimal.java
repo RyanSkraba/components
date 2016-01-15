@@ -10,8 +10,12 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.schema.type;
+package org.talend.components.api.schema.column.type;
 
-public class TByteArray extends TBaseType<byte[]> {
+import org.talend.components.api.schema.column.type.common.TBaseType;
+
+import java.math.BigDecimal;
+
+public class TBigDecimal extends TBaseType<BigDecimal> {
 
 }

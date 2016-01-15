@@ -1,4 +1,4 @@
-package org.talend.components.api.component.io;
+package org.talend.components.api.component.runtime.io;
 
 import org.talend.components.api.properties.ComponentProperties;
 

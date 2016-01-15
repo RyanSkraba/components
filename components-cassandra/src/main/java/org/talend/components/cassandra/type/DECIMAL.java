@@ -2,18 +2,14 @@ package org.talend.components.cassandra.type;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Row;
-import org.talend.schema.type.TBigDecimal;
+import org.talend.components.api.schema.column.type.TBigDecimal;
 
 import java.math.BigDecimal;
 
 /**
  * Created by bchen on 16-1-10.
  */
-public class DECIMAL extends BaseType<BigDecimal, TBigDecimal> {
-    @Override
-    public Class<TBigDecimal> getDefaultTalendType() {
-        return TBigDecimal.class;
-    }
+public class DECIMAL extends CassandraBaseType<BigDecimal, TBigDecimal> {
 
     @Override
     protected BigDecimal getAppValue(Row app, String key) {

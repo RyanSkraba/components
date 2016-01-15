@@ -2,16 +2,12 @@ package org.talend.components.cassandra.type;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Row;
-import org.talend.schema.type.TFloat;
+import org.talend.components.api.schema.column.type.TFloat;
 
 /**
  * Created by bchen on 16-1-10.
  */
-public class FLOAT extends BaseType<Float, TFloat> {
-    @Override
-    public Class<TFloat> getDefaultTalendType() {
-        return TFloat.class;
-    }
+public class FLOAT extends CassandraBaseType<Float, TFloat> {
 
     @Override
     protected Float getAppValue(Row app, String key) {

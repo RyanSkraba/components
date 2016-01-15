@@ -2,18 +2,14 @@ package org.talend.components.cassandra.type;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Row;
-import org.talend.schema.type.TList;
+import org.talend.components.api.schema.column.type.TList;
 
 import java.util.List;
 
 /**
  * Created by bchen on 16-1-10.
  */
-public class LIST extends BaseType<List, TList> {
-    @Override
-    public Class<TList> getDefaultTalendType() {
-        return TList.class;
-    }
+public class LIST extends CassandraBaseType<List, TList> {
 
     @Override
     protected List getAppValue(Row app, String key) {

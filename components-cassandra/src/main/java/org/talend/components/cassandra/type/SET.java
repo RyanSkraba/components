@@ -2,7 +2,7 @@ package org.talend.components.cassandra.type;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Row;
-import org.talend.schema.type.TObject;
+import org.talend.components.api.schema.column.type.TObject;
 
 import java.util.Set;
 
@@ -10,11 +10,7 @@ import java.util.Set;
 /**
  * Created by bchen on 16-1-10.
  */
-public class SET extends BaseType<Set, TObject> {
-    @Override
-    public Class<TObject> getDefaultTalendType() {
-        return TObject.class;
-    }
+public class SET extends CassandraBaseType<Set, TObject> {
 
     @Override
     protected Set getAppValue(Row app, String key) {

@@ -3,17 +3,18 @@ package org.talend.components.cassandra.io.bd;
 import com.datastax.driver.core.Row;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.*;
-import org.talend.components.api.component.io.Reader;
-import org.talend.components.api.component.io.SingleSplit;
-import org.talend.components.api.component.io.Split;
+import org.talend.components.api.component.runtime.io.Reader;
+import org.talend.components.api.component.runtime.io.SingleSplit;
+import org.talend.components.api.component.runtime.io.Split;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.cassandra.io.CassandraSource;
+import org.talend.components.cassandra.type.CassandraBaseType;
 import org.talend.components.cassandra.type.TEXT;
 import org.talend.row.BaseRowStruct;
-import org.talend.schema.Column;
-import org.talend.schema.type.TBaseType;
-import org.talend.schema.type.TString;
-import org.talend.schema.type.TypeMapping;
+import org.talend.components.api.schema.column.Column;
+import org.talend.components.api.schema.column.type.common.TBaseType;
+import org.talend.components.api.schema.column.type.TString;
+import org.talend.components.api.schema.column.type.common.TypeMapping;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -79,13 +80,13 @@ public class CassandraInputFormat implements InputFormat<NullWritable, BaseRowSt
 
                 //TODO metadata should be the schmea and get it from properties
                 List<Column> metadata = new ArrayList<>();
-                Column col1 = new Column(false, "name", TEXT.class);
+                Column col1 = new Column(false, "name", TEXT.class, CassandraBaseType.FAMILY_NAME);
                 metadata.addAll(Arrays.asList(new Column[]{col1}));
                 metadata.get(0).setTalendType("name", TString.class);
-                //TODO to support (app,key); (app,position); (value), now only (app,key)
+
                 for (Column column : metadata) {
                     try {
-                        baseRowStruct.put(column.getCol_name(), TypeMapping.convert(column.getApp_col_type().newInstance().getDefaultTalendType(),
+                        baseRowStruct.put(column.getCol_name(), TypeMapping.convert(TypeMapping.getDefaultTalendType(CassandraBaseType.FAMILY_NAME, column.getApp_col_type()),
                                 column.getCol_type(), column.getApp_col_type().newInstance().retrieveTValue(row, column.getApp_col_name())));
                     } catch (InstantiationException e) {
                         e.printStackTrace();

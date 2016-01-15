@@ -10,10 +10,10 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.schema.type;
+package org.talend.components.api.schema.column.type;
 
-import java.math.BigDecimal;
+import org.talend.components.api.schema.column.type.common.TBaseType;
 
-public class TBigDecimal extends TBaseType<BigDecimal> {
+public class TObject extends TBaseType<Object> {
 
 }

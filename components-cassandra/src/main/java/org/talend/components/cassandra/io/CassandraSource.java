@@ -4,9 +4,10 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import org.talend.components.api.component.io.Reader;
-import org.talend.components.api.component.io.Source;
-import org.talend.components.api.component.io.Split;
+import org.talend.components.api.component.runtime.io.Reader;
+import org.talend.components.api.component.runtime.io.SingleSplit;
+import org.talend.components.api.component.runtime.io.Source;
+import org.talend.components.api.component.runtime.io.Split;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.cassandra.tCassandraInput.tCassandraInputDIProperties;
 
@@ -58,7 +59,9 @@ public class CassandraSource implements Source<Row> {
         Row row;
 
         CassandraReader(tCassandraInputDIProperties props, Session connection, Split split) {
-            rs = connection.execute(props.query.getStringValue());
+            if (split instanceof SingleSplit) {
+                rs = connection.execute(props.query.getStringValue());
+            }
         }
 
         @Override

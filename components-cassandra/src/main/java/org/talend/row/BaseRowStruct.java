@@ -1,6 +1,6 @@
 package org.talend.row;
 
-import org.talend.schema.type.TBaseType;
+import org.talend.components.api.schema.column.type.common.TBaseType;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -2,18 +2,14 @@ package org.talend.components.cassandra.type;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Row;
-import org.talend.schema.type.TByteArray;
+import org.talend.components.api.schema.column.type.TByteArray;
 
 import java.nio.ByteBuffer;
 
 /**
  * Created by bchen on 16-1-10.
  */
-public class BLOB extends BaseType<ByteBuffer, TByteArray> {
-    @Override
-    public Class<TByteArray> getDefaultTalendType() {
-        return TByteArray.class;
-    }
+public class BLOB extends CassandraBaseType<ByteBuffer, TByteArray> {
 
     @Override
     protected ByteBuffer getAppValue(Row app, String key) {

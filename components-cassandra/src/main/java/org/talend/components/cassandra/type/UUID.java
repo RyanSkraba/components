@@ -2,16 +2,12 @@ package org.talend.components.cassandra.type;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Row;
-import org.talend.schema.type.TString;
+import org.talend.components.api.schema.column.type.TString;
 
 /**
  * Created by bchen on 16-1-10.
  */
-public class UUID extends BaseType<java.util.UUID, TString> {
-    @Override
-    public Class<TString> getDefaultTalendType() {
-        return TString.class;
-    }
+public class UUID extends CassandraBaseType<java.util.UUID, TString> {
 
     @Override
     protected java.util.UUID getAppValue(Row app, String key) {

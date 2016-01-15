@@ -10,11 +10,10 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.schema.type;
+package org.talend.components.api.schema.column.type;
 
-public class TString extends TBaseType<String> {
+import org.talend.components.api.schema.column.type.common.TBaseType;
 
-    public TString() {
-        optionalTalendTypes.add(TObject.class);
-    }
+public class TInt extends TBaseType<Integer> {
+
 }

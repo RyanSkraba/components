@@ -2,18 +2,14 @@ package org.talend.components.cassandra.type;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Row;
-import org.talend.schema.type.TDate;
+import org.talend.components.api.schema.column.type.TDate;
 
 import java.util.Date;
 
 /**
  * Created by bchen on 16-1-10.
  */
-public class TIMESTAMP extends BaseType<Date, TDate> {
-    @Override
-    public Class<TDate> getDefaultTalendType() {
-        return TDate.class;
-    }
+public class TIMESTAMP extends CassandraBaseType<Date, TDate> {
 
     @Override
     protected Date getAppValue(Row app, String key) {

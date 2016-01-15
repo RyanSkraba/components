@@ -2,18 +2,14 @@ package org.talend.components.cassandra.type;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Row;
-import org.talend.schema.type.TObject;
+import org.talend.components.api.schema.column.type.TObject;
 
 import java.net.InetAddress;
 
 /**
  * Created by bchen on 16-1-10.
  */
-public class INET extends BaseType<InetAddress, TObject> {
-    @Override
-    public Class<TObject> getDefaultTalendType() {
-        return TObject.class;
-    }
+public class INET extends CassandraBaseType<InetAddress, TObject> {
 
     @Override
     protected InetAddress getAppValue(Row app, String key) {
