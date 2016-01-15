@@ -116,7 +116,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Na
      * A special property for the values that a component returns. If this is used, this will be a {@link SchemaElement}
      * that contains each of the values the component returns.
      */
-    protected Property returns;
+    public Property returns;
 
     /**
      * Holder class for the results of a deserialization.

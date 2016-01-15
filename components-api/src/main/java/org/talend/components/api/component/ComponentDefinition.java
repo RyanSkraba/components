@@ -48,8 +48,6 @@ public interface ComponentDefinition extends TopLevelDefinition {
 
     /**
      * Returns the types of {@link ComponentConnector} objects supported by this component.
-     *
-     * A connector is a link between two components that transmit data.
      */
     public ComponentConnector[] getConnectors();
 

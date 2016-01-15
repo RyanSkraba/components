@@ -28,13 +28,6 @@
 			<version>2.24.0</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-filtercolumn</artifactId>
-			<version>0.3.0.BUILD-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- TODO should we keep these dependencies? -->
 		<dependency>
 			<groupId>org.talend.daikon</groupId>

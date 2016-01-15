@@ -46,6 +46,12 @@
                     <tag>${project.artifactId}-${project.version}</tag>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <configuration>
+                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
