@@ -26,6 +26,8 @@ import org.talend.components.api.schema.SchemaElement;
 public class DefaultComponentRuntimeContainerImpl implements ComponentRuntimeContainer {
 
     private Map<String, Object> globalMap = new HashMap<>();
+    
+    private String currentComponentName;
 
     @Override
     public Map<String, Object> getGlobalMap() {
@@ -74,5 +76,10 @@ public class DefaultComponentRuntimeContainerImpl implements ComponentRuntimeCon
     public Dynamic createDynamicHolder() {
         return new Dynamic();
     }
+
+	@Override
+	public String getCurrentComponentName() {
+		return currentComponentName;
+	}
 
 }

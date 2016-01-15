@@ -41,6 +41,19 @@ public class DefaultComponentRuntimeContainerImplTest {
     }
 
     @Test
+    public void testGetCurrentComponentName() {
+        DefaultComponentRuntimeContainerImpl runtimeContainer = new DefaultComponentRuntimeContainerImpl();
+        assertNull(runtimeContainer.getCurrentComponentName());
+        runtimeContainer = new DefaultComponentRuntimeContainerImpl(){
+            @Override
+            public String getCurrentComponentName() {
+                return "tSalesforceConnectionNew_1";
+            }
+        };
+        assertEquals("tSalesforceConnectionNew_1", runtimeContainer.getCurrentComponentName());
+    }
+
+    @Test
     public void testFormatDate() throws ParseException {
         DefaultComponentRuntimeContainerImpl runtimeContainer = new DefaultComponentRuntimeContainerImpl();
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");

@@ -24,6 +24,8 @@ public interface ComponentRuntimeContainer {
 
     // DI global map
     public Map<String, Object> getGlobalMap();
+    
+    public String getCurrentComponentName();
 
     /**
      * Format the specified date according to the specified pattern.
