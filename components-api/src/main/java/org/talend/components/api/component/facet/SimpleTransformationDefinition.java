@@ -15,7 +15,6 @@ package org.talend.components.api.component.facet;
 import java.io.InputStream;
 
 import org.talend.components.api.component.ComponentConnector;
-import org.talend.components.api.component.ComponentConnector.ConnectorType;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ProcessorComponentDefinition;
 
@@ -34,7 +33,7 @@ public abstract class SimpleTransformationDefinition extends ProcessorComponentD
     public SimpleTransformationDefinition(String componentName, String pomPath) {
         this.componentName = componentName;
         this.pomPath = pomPath;
-        setConnectors(new ComponentConnector(ConnectorType.FLOW, 1, 1));
+        setConnectors(new ComponentConnector(ComponentConnector.Type.FLOW, 1, 1));
         // No Trigger
     }
 

@@ -87,7 +87,7 @@ import com.cedarsoftware.util.io.JsonWriter;
  * call {@link SchemaElement#setI18nMessageFormater(I18nMessages)} manually.
  */
 
-public abstract class ComponentProperties extends TranslatableImpl implements SchemaElement, ToStringIndent {
+public abstract class ComponentProperties extends TranslatableImpl implements NamedThing, ToStringIndent {
 
     static final String METHOD_BEFORE = "before";
 

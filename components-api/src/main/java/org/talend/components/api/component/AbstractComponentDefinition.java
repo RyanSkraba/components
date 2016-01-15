@@ -22,14 +22,8 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
 
     private ComponentConnector[] connectors;
 
-    private ComponentTrigger[] triggers;
-
     public void setConnectors(ComponentConnector... conns) {
         this.connectors = conns;
-    }
-
-    public void setTriggers(ComponentTrigger... conns) {
-        this.triggers = conns;
     }
 
     // protected Class<?> propertiesClass;
@@ -43,11 +37,6 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
     @Override
     public ComponentConnector[] getConnectors() {
         return connectors;
-    }
-
-    @Override
-    public ComponentTrigger[] getTriggers() {
-        return triggers;
     }
 
     @Override

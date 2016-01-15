@@ -18,12 +18,10 @@ import java.util.Map;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentConnector;
-import org.talend.components.api.component.ComponentConnector.ConnectorType;
+import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.component.ComponentTrigger;
-import org.talend.components.api.component.ComponentTrigger.TriggerType;
 import org.talend.components.api.runtime.ComponentRuntime;
 
 import aQute.bnd.annotation.component.Component;
@@ -34,9 +32,8 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     public static final String COMPONENT_NAME = "TestComponent"; //$NON-NLS-1$
 
     public TestComponentDefinition() {
-        setConnectors(new ComponentConnector(ConnectorType.FLOW, 0, 0));
-        setTriggers(new ComponentTrigger(TriggerType.ITERATE, 1, 0), new ComponentTrigger(TriggerType.SUBJOB_OK, 1, 0),
-                new ComponentTrigger(TriggerType.SUBJOB_ERROR, 1, 0));
+        setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
+                new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
 
     protected TestComponentProperties properties;
@@ -66,10 +63,10 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
             @Override
             public Map<String, Object> inputRow() throws Exception {
                 // TODO Auto-generated method stub
-        return null;
-    }
+                return null;
+            }
 
-    @Override
+            @Override
             public void inputEnd() throws Exception {
                 // TODO Auto-generated method stub
 

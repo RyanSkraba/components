@@ -15,7 +15,6 @@ package org.talend.components.api.component.facet;
 import java.io.InputStream;
 
 import org.talend.components.api.component.ComponentConnector;
-import org.talend.components.api.component.ComponentConnector.ConnectorType;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.EndpointComponentDefinition;
 
@@ -32,7 +31,7 @@ public abstract class SimpleOutputDefinition extends EndpointComponentDefinition
     public SimpleOutputDefinition(String componentName, String pomPath) {
         this.componentName = componentName;
         this.pomPath = pomPath;
-        setConnectors(new ComponentConnector(ConnectorType.FLOW, 1, 0));
+        setConnectors(new ComponentConnector(ComponentConnector.Type.FLOW, 1, 0));
         // No Trigger
     }
 

@@ -15,10 +15,7 @@ package org.talend.components.api.component.facet;
 import java.io.InputStream;
 
 import org.talend.components.api.component.ComponentConnector;
-import org.talend.components.api.component.ComponentConnector.ConnectorType;
 import org.talend.components.api.component.ComponentImageType;
-import org.talend.components.api.component.ComponentTrigger;
-import org.talend.components.api.component.ComponentTrigger.TriggerType;
 import org.talend.components.api.component.EndpointComponentDefinition;
 
 /**
@@ -34,9 +31,7 @@ public abstract class SimpleInputDefinition extends EndpointComponentDefinition 
     public SimpleInputDefinition(String componentName, String pomPath) {
         this.componentName = componentName;
         this.pomPath = pomPath;
-        setConnectors(new ComponentConnector(ConnectorType.FLOW, 0, 1));
-        setTriggers(new ComponentTrigger(TriggerType.ITERATE, 1, 1), new ComponentTrigger(TriggerType.SUBJOB_OK, 1, 1),
-                new ComponentTrigger(TriggerType.SUBJOB_ERROR, 1, 1));
+        setConnectors(new ComponentConnector(ComponentConnector.Type.FLOW, 0, 1));
     }
 
     @Override

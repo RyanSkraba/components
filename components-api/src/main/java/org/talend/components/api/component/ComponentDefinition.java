@@ -54,13 +54,6 @@ public interface ComponentDefinition extends TopLevelDefinition {
     public ComponentConnector[] getConnectors();
 
     /**
-     * Returns the types of {@link ComponentTrigger} objects supported by this component.
-     *
-     * A trigger is a link between two components that schedule the different subjobs.
-     */
-    public ComponentTrigger[] getTriggers();
-
-    /**
      * Returns true if this {@code ComponentDefinition} will work with the specified {@link ComponentProperties}.
      */
     public boolean supportsProperties(ComponentProperties properties);

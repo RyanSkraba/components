@@ -14,10 +14,8 @@ package org.talend.components.salesforce.tsalesforceoutput;
 
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentConnector;
-import org.talend.components.api.component.ComponentConnector.ConnectorType;
+import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.ComponentTrigger;
-import org.talend.components.api.component.ComponentTrigger.TriggerType;
 import org.talend.components.salesforce.SalesforceDefinition;
 
 import aQute.bnd.annotation.component.Component;
@@ -34,10 +32,9 @@ public class TSalesforceOutputDefinition extends SalesforceDefinition {
 
     public TSalesforceOutputDefinition() {
         super(COMPONENT_NAME);
-
-        setConnectors(new ComponentConnector(ConnectorType.FLOW, 1, 0), new ComponentConnector(ConnectorType.MAIN, 0, 1),
-                new ComponentConnector(ConnectorType.REJECT, 0, 1));
-        setTriggers(new ComponentTrigger(TriggerType.SUBJOB_OK, 1, 0), new ComponentTrigger(TriggerType.SUBJOB_ERROR, 1, 0));
+        setConnectors(new ComponentConnector(Type.FLOW, 1, 0), new ComponentConnector(Type.MAIN, 0, 1),
+                new ComponentConnector(Type.REJECT, 0, 1), new ComponentConnector(Type.SUBJOB_OK, 1, 0),
+                new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
 
     @Override
