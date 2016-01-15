@@ -11,7 +11,7 @@
 	<name>Component API</name>
 	<artifactId>components-api</artifactId>
 	<version>0.3.0.BUILD-SNAPSHOT</version>
-	<packaging>pom</packaging>
+	<packaging>bundle</packaging>
 
 	<properties>
 		<aetherVersion>1.0.0.v20140518</aetherVersion>
