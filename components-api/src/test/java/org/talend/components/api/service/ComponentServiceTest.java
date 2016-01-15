@@ -17,7 +17,6 @@ import static org.junit.Assert.*;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -26,10 +25,10 @@ import org.junit.rules.ErrorCollector;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.ValidationResult.Result;
 import org.talend.components.api.properties.presentation.Form;
+import org.talend.components.api.schema.AbstractSchemaElement;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.service.testcomponent.TestComponentDefinition;
 import org.talend.components.api.service.testcomponent.TestComponentProperties;
@@ -82,12 +81,12 @@ public class ComponentServiceTest extends AbstractComponentTest {
         ComponentProperties props = getComponentService().getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
 
         checkAndBeforePresent(props.getForm(Form.MAIN), "nameList", props);
-        assertEquals(3, ((Property) props.getProperty("nameList")).getPossibleValues().size());
-        assertEquals("name1", ((Property) props.getProperty("nameList")).getPossibleValues().get(0));
+        assertEquals(3, ((AbstractSchemaElement) props.getProperty("nameList")).getPossibleValues().size());
+        assertEquals("name1", ((AbstractSchemaElement) props.getProperty("nameList")).getPossibleValues().get(0));
 
         checkAndBeforeActivate(props.getForm(Form.MAIN), "nameListRef", props);
-        assertEquals(3, ((Property) props.getProperty("nameListRef")).getPossibleValues().size());
-        assertEquals("namer1", ((Property) props.getProperty("nameListRef")).getPossibleValues().get(0));
+        assertEquals(3, ((AbstractSchemaElement) props.getProperty("nameListRef")).getPossibleValues().size());
+        assertEquals("namer1", ((AbstractSchemaElement) props.getProperty("nameListRef")).getPossibleValues().get(0));
 
         assertFalse(props.getForm(Form.MAIN).getWidget("nameList").isCallBeforeActivate());
         assertFalse(props.getForm(Form.MAIN).getWidget("nameListRef").isCallBeforePresent());
@@ -131,13 +130,13 @@ public class ComponentServiceTest extends AbstractComponentTest {
         Date dateLater = new Date();
         dateLater.setTime(dateLater.getTime() + 10000);
 
-        props.setValue(props.userId, "userId");
-        props.setValue(props.integer, 1);
-        props.setValue(props.decimal, 2);
-        props.setValue(props.date, dateNow);
-        props.setValue(props.dateTime, dateNow);
-        props.nestedProps.setValue(props.nestedProps.aGreatProperty, "propPrevious1");
-        props.nestedProps.setValue(props.nestedProps.anotherProp, "propPrevious2");
+        props.userId.setValue("userId");
+        props.integer.setValue(1);
+        props.decimal.setValue(2);
+        props.date.setValue(dateNow);
+        props.dateTime.setValue(dateNow);
+        props.nestedProps.aGreatProperty.setValue("propPrevious1");
+        props.nestedProps.anotherProp.setValue("propPrevious2");
 
         props = (TestComponentProperties) getComponentService().makeFormCancelable(props, "restoreTest");
 
@@ -153,9 +152,9 @@ public class ComponentServiceTest extends AbstractComponentTest {
         form.setValue("date", dateLater);
         form.setValue("dateTime", dateLater);
 
-        assertEquals("userId", props.getValue(props.userId));
-        assertEquals("propPrevious1", props.nestedProps.getValue(props.nestedProps.aGreatProperty));
-        assertEquals(1, props.getIntValue(props.integer));
+        assertEquals("userId", props.userId.getValue());
+        assertEquals("propPrevious1", props.nestedProps.aGreatProperty.getValue());
+        assertEquals(1, props.integer.getIntValue());
         // FIXME - finish this
         // assertEquals(2, props.getDecimalValue(props.decimal));
         // assertEquals(dateNow, props.getCalendarValue(props.date));
@@ -163,8 +162,8 @@ public class ComponentServiceTest extends AbstractComponentTest {
         assertTrue(props.nestedProps == savedNested);
 
         props = (TestComponentProperties) getComponentService().commitFormValues(props, "restoreTest");
-        assertEquals("userIdnew", props.getValue(props.userId));
-        assertEquals("propPrevious1new", props.nestedProps.getValue(props.nestedProps.aGreatProperty));
+        assertEquals("userIdnew", props.userId.getValue());
+        assertEquals("propPrevious1new", props.nestedProps.aGreatProperty.getValue());
     }
 
     @Test
@@ -212,15 +211,6 @@ public class ComponentServiceTest extends AbstractComponentTest {
         ComponentProperties props = wizard.props;
         List<ComponentWizard> wizards = getComponentService().getComponentWizardsForProperties(props, "userdata");
         assertTrue(props == ((TestComponentWizard) wizards.get(0)).props);
-    }
-
-    @Test
-    public void testGetDependencies() {
-        // check the comp def return the proper stream for the pom
-        TestComponentDefinition testComponentDefinition = new TestComponentDefinition();
-        assertNotNull(testComponentDefinition.getMavenPom());
-        Set<String> mavenUriDependencies = getComponentService().getMavenUriDependencies(TestComponentDefinition.COMPONENT_NAME);
-        assertEquals(5, mavenUriDependencies.size());
     }
 
     @Test

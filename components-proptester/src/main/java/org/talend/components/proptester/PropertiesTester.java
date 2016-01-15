@@ -198,8 +198,7 @@ public class PropertiesTester {
                     void run() {
                         Property p = resolveProperty();
                         try {
-                            ComponentProperties props = componentService.beforePropertyPresent(p.getName(), testProps);
-                            testProps = props;
+                            testProps = componentService.beforePropertyPresent(p.getName(), testProps);
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();
                         }
@@ -212,8 +211,7 @@ public class PropertiesTester {
                     void run() {
                         Property p = resolveProperty();
                         try {
-                            ComponentProperties props = componentService.beforePropertyActivate(p.getName(), testProps);
-                            testProps = props;
+                            testProps = componentService.beforePropertyActivate(p.getName(), testProps);
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();
                         }
@@ -225,8 +223,7 @@ public class PropertiesTester {
                     void run() {
                         Property p = resolveProperty();
                         try {
-                            ComponentProperties props = componentService.afterProperty(p.getName(), testProps);
-                            testProps = props;
+                            testProps = componentService.afterProperty(p.getName(), testProps);
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();
                         }
@@ -238,9 +235,8 @@ public class PropertiesTester {
                     void run() {
                         Property p = resolveProperty();
                         try {
-                            ComponentProperties props = componentService.validateProperty(p.getName(), testProps);
-                            System.out.println(props.getValidationResult());
-                            testProps = props;
+                            testProps = componentService.validateProperty(p.getName(), testProps);
+                            System.out.println(testProps.getValidationResult());
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();
                         }

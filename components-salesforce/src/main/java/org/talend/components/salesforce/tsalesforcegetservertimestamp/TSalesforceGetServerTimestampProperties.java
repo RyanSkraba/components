@@ -38,7 +38,7 @@ public class TSalesforceGetServerTimestampProperties extends ComponentProperties
     @Override
     public void setupProperties() {
         super.setupProperties();
-        Schema s = (Schema) schema.getValue(schema.schema);
+        Schema s = (Schema) schema.schema.getValue();
         s.setRoot(SchemaFactory.newSchemaElement(Type.GROUP, "Root"));
         s.getRoot().addChild(PropertyFactory.newDate("ServerTimestamp"));
     }

@@ -12,7 +12,13 @@
 // ============================================================================
 package org.talend.components.salesforce.connection.oauth;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -47,7 +53,7 @@ public class SalesforceOAuthConnection {
         String refreshToken = null;
         SalesforceOAuthAccessTokenResponse token = null;
         // 1. if tokenFile exist, try refresh token
-        String tokenFilePath = oauth.getStringValue(oauth.tokenFile);
+        String tokenFilePath = oauth.tokenFile.getStringValue();
         if (tokenFilePath != null) {
             Properties prop = new Properties();
             File tokenFile = new File(tokenFilePath);
@@ -69,8 +75,8 @@ public class SalesforceOAuthConnection {
                     OauthClient oauthClient;
                     try {
                         oauthClient = new OauthClient.RefreshTokenBuilder(new URL(url + "/token"),
-                                oauth.getStringValue(oauth.clientId), oauth.getStringValue(oauth.clientSecret)).setRefreshToken(
-                                storedRefreshToken).build();
+                                oauth.clientId.getStringValue(), oauth.clientSecret.getStringValue())
+                                        .setRefreshToken(storedRefreshToken).build();
                         token = oauthClient.getToken(SalesforceOAuthAccessTokenResponse.class);
                         session_id = token.getAccessToken();
                         refreshToken = token.getRefreshToken();
@@ -86,11 +92,11 @@ public class SalesforceOAuthConnection {
             OauthClient oauthClient;
             try {
                 oauthClient = new OauthClient.AuthorizationCodeBuilder(new URL(url + "/token"), //$NON-NLS-1$
-                        oauth.getStringValue(oauth.clientId), oauth.getStringValue(oauth.clientSecret))
-                        .setAuthorizationLocation(new URL(url + "/authorize")) //$NON-NLS-1$
-                        .setCallbackURL(
-                                new URL("https://" + oauth.getStringValue(oauth.callbackHost) + ":"
-                                        + oauth.getIntValue(oauth.callbackPort))).setResponseType("code").build();
+                        oauth.clientId.getStringValue(), oauth.clientSecret.getStringValue())
+                                .setAuthorizationLocation(new URL(url + "/authorize")) //$NON-NLS-1$
+                                .setCallbackURL(new URL("https://" + oauth.callbackHost.getStringValue() + ":"
+                                        + oauth.callbackPort.getIntValue()))
+                                .setResponseType("code").build();
                 token = oauthClient.getToken(SalesforceOAuthAccessTokenResponse.class);
                 session_id = token.getAccessToken();
                 refreshToken = token.getRefreshToken();
@@ -138,11 +144,11 @@ public class SalesforceOAuthConnection {
         // } else if (SalesforceConnectionType.BULK == connType) {
         // return genBulkEndpoint(token, version);
         // }
-        //        throw new RuntimeException("Unspport connection type"); //$NON-NLS-1$
+        // throw new RuntimeException("Unspport connection type"); //$NON-NLS-1$
     }
 
     // private String genBulkEndpoint(SalesforceOAuthAccessTokenResponse token, String version) {
-    //        return token.getInstanceURL() + "/services/async/" + version; //$NON-NLS-1$
+    // return token.getInstanceURL() + "/services/async/" + version; //$NON-NLS-1$
     // }
 
     // it's not necessary for bulk, there is another easy way, looking at genBulkEndpoint

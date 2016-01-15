@@ -87,7 +87,7 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
         @Override
         public ValidationResult afterModuleName() throws Exception {
             ValidationResult validationResult = super.afterModuleName();
-            Schema s = (Schema) schema.getValue(schema.schema);
+            Schema s = (Schema) schema.schema.getValue();
             // FIXME - we probably only want the names, not the SchemaElements
             upsertKeyColumn.setPossibleValues(s.getRoot().getChildren());
             upsertRelation.getChild("columnName").setPossibleValues(s.getRoot().getChildren());
@@ -155,16 +155,16 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
         super.refreshLayout(form);
 
         if (form.getName().equals(Form.ADVANCED)) {
-            ((Schema) schemaFlow.getValue(schemaFlow.schema)).setRoot(null);
-            if (!getBooleanValue(extendInsert) && getStringValue(retrieveInsertId) != null
-                    && getValue(outputAction) == OutputAction.INSERT) {
+            ((Schema) schemaFlow.schema.getValue()).setRoot(null);
+            if (!extendInsert.getBooleanValue() && retrieveInsertId.getStringValue() != null
+                    && outputAction.getValue() == OutputAction.INSERT) {
                 schemaFlow.addSchemaChild(newProperty("salesforce_id"));
             }
         }
         if (form.getName().equals(Form.MAIN)) {
             Form advForm = getForm(Form.ADVANCED);
             if (advForm != null) {
-                if (ACTION_UPSERT.equals(getValue(outputAction))) {
+                if (ACTION_UPSERT.equals(outputAction.getValue())) {
                     form.getWidget("upsertKeyColumn").setVisible(true);
                     advForm.getWidget("upsertRelation").setVisible(true);
                 } else {

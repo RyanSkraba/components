@@ -48,10 +48,10 @@ public class TSalesforceGetDeletedDefinition extends SalesforceDefinition {
             public void inputBegin(ComponentProperties props) throws Exception {
 
                 SalesforceGetDeletedUpdatedProperties gdProps = (SalesforceGetDeletedUpdatedProperties) props;
-                String module = gdProps.module.getStringValue(gdProps.module.moduleName);
+                String module = gdProps.module.moduleName.getStringValue();
 
-                GetDeletedResult result = connection.getDeleted(module, gdProps.getCalendarValue(gdProps.startDate),
-                        gdProps.getCalendarValue(gdProps.endDate));
+                GetDeletedResult result = connection.getDeleted(module, gdProps.startDate.getCalendarValue(),
+                        gdProps.endDate.getCalendarValue());
 
                 // FIXME - finish this
             }

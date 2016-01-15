@@ -58,7 +58,7 @@ public class SchemaProperties extends ComponentProperties {
      * named schema is not root exists.
      */
     public SchemaElement addSchemaChild(SchemaElement row) {
-        Schema s = (Schema) getValue(schema);
+        Schema s = (Schema) schema.getValue();
         SchemaElement root = s.getRoot();
         if (root == null) {
             root = PropertyFactory.newProperty("Root"); //$NON-NLS-1$

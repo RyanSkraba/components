@@ -10,27 +10,26 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.service;
+package org.talend.components.api.components;
 
 import static org.junit.Assert.*;
 
-import java.util.Set;
-
 import org.junit.Test;
 import org.talend.components.api.service.testcomponent.TestComponentDefinition;
+import org.talend.components.api.service.testcomponent.TestComponentProperties;
 
 /**
- * Base class for integration tests
+ * created by sgandon on 11 janv. 2016
  */
-public class ComponentServiceAbstractForIT extends ComponentServiceTest {
+public class ComponentDefinitionTest {
 
     @Test
-    public void testGetDependencies() {
-        // check the comp def return the proper stream for the pom
-        TestComponentDefinition testComponentDefinition = new TestComponentDefinition();
-        assertNotNull(testComponentDefinition.getMavenPom());
-        Set<String> mavenUriDependencies = getComponentService().getMavenUriDependencies(TestComponentDefinition.COMPONENT_NAME);
-        assertEquals(5, mavenUriDependencies.size());
+    public void test() {
+        TestComponentDefinition cd = new TestComponentDefinition();
+
+        TestComponentProperties prop = (TestComponentProperties) cd.createRuntimeProperties();
+        assertNotNull(prop.initLater);
+        assertNull(prop.mainForm);
     }
 
 }

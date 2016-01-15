@@ -60,7 +60,7 @@ public class SchemaPropertiesTest {
                 schemaProperties.getForm(Form.REFERENCE).getWidget(schemaProperties.schema.getName()).getWidgetType());
 
         // add element
-        Schema schema = (Schema) schemaProperties.getValue(schemaProperties.schema);
+        Schema schema = (Schema) schemaProperties.schema.getValue();
         assertNull(schema.getRoot());
         SchemaElement element = PropertyFactory.newBoolean("testBoolean", false);
         schemaProperties.addSchemaChild(element);
