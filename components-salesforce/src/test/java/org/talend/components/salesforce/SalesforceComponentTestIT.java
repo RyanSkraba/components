@@ -40,7 +40,7 @@ import org.talend.components.api.properties.Repository;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.runtime.ComponentDynamicHolder;
-import org.talend.components.api.runtime.DefaultComponentRuntimeContainerImpl;
+import org.talend.components.api.engine.DefaultComponentEngineImpl;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.schema.SchemaFactory;
@@ -195,7 +195,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
 
     protected SalesforceRuntime createRuntime(ComponentDefinition definition) {
         SalesforceRuntime runtime = (SalesforceRuntime) definition.createRuntime();
-        runtime.setContainer(new TestRuntimeContainer());
+        runtime.setContainer(new TestEngine());
         return runtime;
     }
 
@@ -255,7 +255,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         }
     }
 
-    class TestRuntimeContainer extends DefaultComponentRuntimeContainerImpl {
+    class TestEngine extends DefaultComponentEngineImpl {
 
     }
 
@@ -640,7 +640,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         for (SchemaElement se : schema.getRoot().getChildren()) {
             if (se.getType() == SchemaElement.Type.DYNAMIC) {
                 if (dynamic == null) {
-                    TestRuntimeContainer container = new TestRuntimeContainer();
+                    TestEngine container = new TestEngine();
                     dynamic = container.createDynamicHolder();
                     Schema dynSchema = SchemaFactory.newSchema();
                     dynSchema.setRoot(SchemaFactory.newSchemaElement(SchemaElement.Type.STRING, "Root"));

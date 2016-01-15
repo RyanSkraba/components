@@ -10,31 +10,34 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.component.facet;
+package org.talend.components.api.component;
 
 import java.io.InputStream;
 
 import org.talend.components.api.component.ComponentConnector;
 import org.talend.components.api.component.ComponentImageType;
-import org.talend.components.api.component.ProcessorComponentDefinition;
+import org.talend.components.api.component.EndpointComponentDefinition;
 
 /**
- * Simple transformation component. This component support one input and one output.
- *
- * It contains the main schema, defined by the user.
+ * Simple input component. This component support no input and one output. It contains one schema by default
  *
  */
-public abstract class SimpleTransformationDefinition extends ProcessorComponentDefinition {
+public abstract class SimpleOutputDefinition extends EndpointComponentDefinition {
 
     private String componentName;
 
     private String pomPath;
 
-    public SimpleTransformationDefinition(String componentName, String pomPath) {
+    public SimpleOutputDefinition(String componentName, String pomPath) {
         this.componentName = componentName;
         this.pomPath = pomPath;
-        setConnectors(new ComponentConnector(ComponentConnector.Type.FLOW, 1, 1));
+        setConnectors(new ComponentConnector(ComponentConnector.Type.FLOW, 1, 0));
         // No Trigger
+    }
+
+    @Override
+    public boolean isStartable() {
+        return false;
     }
 
     @Override

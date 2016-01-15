@@ -10,12 +10,11 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.facet.gdf;
+package org.talend.components.engine.gdf;
 
 import java.io.Serializable;
 
-import org.talend.components.api.facet.KryoCoder;
-import org.talend.components.api.facet.SimpleInputFacet;
+import org.talend.components.api.runtime.SimpleInputRuntime;
 import org.talend.components.api.runtime.SingleOutputConnector;
 
 import com.google.cloud.dataflow.sdk.Pipeline;
@@ -28,7 +27,7 @@ import com.google.cloud.dataflow.sdk.values.PCollection;
 /**
  * Code to execute the component's facet. This can be used at runtime or design time as required.
  */
-public class SimpleInputFacetGDF<OutputObject> extends DoFn<Void, OutputObject> {
+public class SimpleInputGDF<OutputObject> extends DoFn<Void, OutputObject> {
 
     /**
      * created by sgandon on 14 janv. 2016
@@ -46,30 +45,30 @@ public class SimpleInputFacetGDF<OutputObject> extends DoFn<Void, OutputObject> 
 
     private static final long serialVersionUID = -6363022558571467775L;
 
-    com.google.cloud.dataflow.sdk.transforms.DoFn<Void, OutputObject>.ProcessContext processContext;
+    ProcessContext processContext;
 
-    private SimpleInputFacet<OutputObject> compFacet;
+    private SimpleInputRuntime<OutputObject> compFacet;
 
-    public SimpleInputFacetGDF(SimpleInputFacet<OutputObject> compFacet) {
+    public SimpleInputGDF(SimpleInputRuntime<OutputObject> compFacet) {
         this.compFacet = compFacet;
         compFacet.setOutputConnector(new SingleOutputConnectorImpl());
     }
 
     @Override
-    public void startBundle(DoFn<Void, OutputObject>.Context context) throws Exception {
+    public void startBundle(Context context) throws Exception {
         // TODO get the ComponentProperties from the context
         compFacet.setUp(null);
     }
 
     @Override
-    public void processElement(com.google.cloud.dataflow.sdk.transforms.DoFn<Void, OutputObject>.ProcessContext processContext)
+    public void processElement(ProcessContext processContext)
             throws Exception {
         this.processContext = processContext;
         compFacet.execute();
     }
 
     @Override
-    public void finishBundle(DoFn<Void, OutputObject>.Context context) throws Exception {
+    public void finishBundle(Context context) throws Exception {
         compFacet.tearDown();
     }
 

@@ -14,7 +14,7 @@ package org.talend.components.mongodb.tmongodbinput;
 
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.facet.SimpleInputDefinition;
+import org.talend.components.api.component.SimpleInputDefinition;
 import org.talend.components.api.runtime.ComponentRuntime;
 
 import aQute.bnd.annotation.component.Component;

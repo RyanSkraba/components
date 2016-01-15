@@ -10,27 +10,30 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.mongodb.tmongodboutput;
+package org.talend.components.mongodb.tmongodbinput;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.facet.SimpleOutputFacetV2;
+import org.talend.components.api.runtime.SimpleInputRuntime;
 import org.talend.components.api.properties.ComponentProperties;
 
 import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 
-// TODO slice the component into a write component and an output compoenent
-public class MongoDBOutputFacet extends SimpleOutputFacetV2<Map<String, Object>> {
+public class MongoDBInputRuntime extends SimpleInputRuntime<DBObject> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MongoDBOutputFacet.class);
+    private static final long serialVersionUID = 8345765264712176890L;
+
+    private static final Logger LOG = LoggerFactory.getLogger(MongoDBInputRuntime.class);
 
     private MongoClient mongo = null;
 
@@ -46,22 +49,14 @@ public class MongoDBOutputFacet extends SimpleOutputFacetV2<Map<String, Object>>
     }
 
     @Override
-    public void execute(Map<String, Object> inputValue) throws Exception {
-        com.mongodb.DBCollection collection = db.getCollection("outputCollection");
-        // initialize objects
-        MongoDBOutputUtil updateObjectUtil = new MongoDBOutputUtil();
-        updateObjectUtil.setObject(new com.mongodb.BasicDBObject());
-
-        java.util.Map<String, String> pathMap = new java.util.HashMap<String, String>();
-
-        // add parent path
-        pathMap.put("defaultColumn", "simplepath");
-
-        // create BasicDBObject
-        updateObjectUtil.put(pathMap.get("defaultColumn"), "outputcolumn", "name");
-        com.mongodb.BasicDBObject updateObj = updateObjectUtil.getObject();
-
-        collection.insert(updateObj);
+    public void execute() throws Exception {
+        DBCollection coll = db.getCollection("inputCollection");
+        com.mongodb.DBObject myQuery = (com.mongodb.DBObject) com.mongodb.util.JSON.parse("{}");
+        com.mongodb.DBObject fields = new com.mongodb.BasicDBObject();
+        DBCursor cursor = coll.find(myQuery, fields);
+        while (cursor.hasNext()) {
+            this.addToMainOutput(cursor.next());
+        }
     }
 
     @Override
@@ -70,5 +65,4 @@ public class MongoDBOutputFacet extends SimpleOutputFacetV2<Map<String, Object>>
             mongo.close();
         }
     }
-
 }

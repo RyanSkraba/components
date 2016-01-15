@@ -14,7 +14,7 @@ package org.talend.components.output.tlogrow;
 
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.facet.SimpleOutputDefinition;
+import org.talend.components.api.component.SimpleOutputDefinition;
 import org.talend.components.api.runtime.ComponentRuntime;
 
 import aQute.bnd.annotation.component.Component;

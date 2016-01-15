@@ -12,26 +12,17 @@
 // ============================================================================
 package org.talend.components.api.runtime;
 
-import java.util.Date;
-import java.util.Map;
-
 /**
- * The container that's running the component provides this implementation.
- *
- * This handles various functionality in the runtime environment required by components.
+ * Code to execute the component's facet. This can be used at runtime or design time as required.
  */
-public interface ComponentRuntimeContainer {
-
-    // DI global map
-    public Map<String, Object> getGlobalMap();
+public abstract class SimpleOutputRuntime<InputObject> implements BaseRuntime {
 
     /**
-     * Format the specified date according to the specified pattern.
+     * ouput to a final system the data gotten has inputValue
+     *
+     * @param inputValue Input value that will be processed.
+     * @throws Exception
      */
-    public String formatDate(Date date, String pattern);
+    public abstract void execute(InputObject inputValue) throws Exception;
 
-    /**
-     * Creates a {@link ComponentDynamicHolder} object.
-     */
-    public ComponentDynamicHolder createDynamicHolder();
 }

@@ -12,92 +12,42 @@
 // ============================================================================
 package org.talend.components.api.runtime;
 
-import java.io.Serializable;
 import java.util.Map;
 
-import org.talend.components.api.facet.ExtractionFacet;
-import org.talend.components.api.facet.KryoCoder;
-
-import com.google.cloud.dataflow.sdk.coders.KvCoder;
-import com.google.cloud.dataflow.sdk.coders.SerializableCoder;
 import com.google.cloud.dataflow.sdk.transforms.DoFn;
-import com.google.cloud.dataflow.sdk.transforms.ParDo;
 import com.google.cloud.dataflow.sdk.values.KV;
-import com.google.cloud.dataflow.sdk.values.PCollection;
+import org.talend.components.api.runtime.BaseRuntime;
 
-public class ExtractionRuntime<InputType> implements FrameworkRuntime {
+/**
+ * Code to execute the component's facet. This can be used at runtime or design time as required.
+ */
+public abstract class ExtractionRuntime<InputType> extends DoFn<InputType, KV<Boolean, Map<String, Object>>>
+        implements BaseRuntime {
 
-    ExtractionFacet<InputType> facet;
+    DoFn<InputType, KV<Boolean, Map<String, Object>>>.ProcessContext context;
 
-    PCollection<Map<String, Object>> outputMainRDD;
-
-    PCollection<Map<String, Object>> outputErrorRDD;
-
-    // TODO move this class out
-    public static class retrieveMain extends DoFn<KV<Boolean, Map<String, Object>>, Map<String, Object>> implements Serializable {
-
-        @Override
-        public void processElement(DoFn<KV<Boolean, Map<String, Object>>, Map<String, Object>>.ProcessContext context)
-                throws Exception {
-            KV<Boolean, Map<String, Object>> input = context.element();
-            if (input.getKey()) {
-                context.output(input.getValue());
-            }
-        }
+    @Override
+    public void processElement(DoFn<InputType, KV<Boolean, Map<String, Object>>>.ProcessContext context) throws Exception {
+        this.context = context;
+        InputType input = context.element();
+        execute(input);
     }
 
-    // TODO move this class out
-    public static class retrieveError extends DoFn<KV<Boolean, Map<String, Object>>, Map<String, Object>> implements Serializable {
-
-        @Override
-        public void processElement(DoFn<KV<Boolean, Map<String, Object>>, Map<String, Object>>.ProcessContext context)
-                throws Exception {
-            KV<Boolean, Map<String, Object>> input = context.element();
-            if (!input.getKey()) {
-                context.output(input.getValue());
-            }
-        }
+    public void addToMainOutput(Map<String, Object> output) {
+        this.context.output(KV.of(true, output));
     }
 
-    public ExtractionRuntime(ExtractionFacet<InputType> facet) {
-        this.facet = facet;
+    public void addToErrorOutput(Map<String, Object> output) {
+        this.context.output(KV.of(false, output));
     }
 
     /**
-     * Execute a transformation with a main flow and a reject flow compatible with the current Framework
+     * Apply a transformation on the input value and put the result into the return object
      *
-     * @param inputs
+     * @param inputValue Input field that will be processed.
+     * @param returnObject Object that know how to correctly return the current object for any runtime
      * @throws Exception
      */
-    public void generatePipeline(PCollection<InputType> input) throws Exception {
-        // TODO we cannot use the KryoCoder for a KVCoder.
-        // Also we cannot use KryoCoder for the Key and for the Value, because the KryoCoder is going to kill the
-        // inputStream.
-        PCollection<KV<Boolean, Map<String, Object>>> outputRDD = input.apply(ParDo.of(facet)).setCoder(
-                KvCoder.of(SerializableCoder.of(Boolean.class), KryoCoder.of()));
-        outputMainRDD = outputRDD.apply(ParDo.of(new retrieveMain())).setCoder(KryoCoder.of());
-        outputErrorRDD = outputRDD.apply(ParDo.of(new retrieveError())).setCoder(KryoCoder.of());
-
-    }
-
-    /**
-     * Retrieve the main output for tor the current framework
-     *
-     * @return
-     */
-    public PCollection<Map<String, Object>> getMainOutput() {
-        return outputMainRDD;
-
-    }
-
-    /**
-     * Retrieve the error output for tor the current framework
-     *
-     * @return
-     */
-    public PCollection<Map<String, Object>> getErrorOutput() {
-        return outputErrorRDD;
-
-    }
+    public abstract void execute(InputType inputValue) throws Exception;
 
 }

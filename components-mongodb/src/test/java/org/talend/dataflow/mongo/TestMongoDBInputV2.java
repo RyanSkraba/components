@@ -3,11 +3,12 @@ package org.talend.dataflow.mongo;
 import java.util.Map;
 
 import org.junit.Test;
-import org.talend.components.api.facet.gdf.SimpleInputFacetGDF;
-import org.talend.components.api.facet.gdf.SimpleOutputFacetGDF;
-import org.talend.components.api.runtime.ExtractionRuntime;
+import org.talend.components.engine.gdf.SimpleExtractionGDF;
+import org.talend.components.engine.gdf.SimpleInputGDF;
+import org.talend.components.engine.gdf.SimpleOutputGDF;
 import org.talend.components.mongodb.tmongodbextract.MongoDBExtractRuntime;
-import org.talend.components.mongodb.tmongodboutput.MongoDBOutputFacet;
+import org.talend.components.mongodb.tmongodbinput.MongoDBInputRuntime;
+import org.talend.components.mongodb.tmongodboutput.MongoDBOutputRuntime;
 
 import com.google.cloud.dataflow.sdk.Pipeline;
 import com.google.cloud.dataflow.sdk.options.PipelineOptions;
@@ -42,10 +43,10 @@ public class TestMongoDBInputV2 {
         PipelineOptions options = PipelineOptionsFactory.create();
         Pipeline p = Pipeline.create(options);
 
-        SimpleInputFacetGDF<DBObject> input = new SimpleInputFacetGDF<>(
-                new org.talend.components.mongodb.tmongodbinput.MongoDBInputFacet());
-        ExtractionRuntime<DBObject> extract = new ExtractionRuntime<DBObject>(new MongoDBExtractRuntime());
-        SimpleOutputFacetGDF<Map<String, Object>> output = new SimpleOutputFacetGDF<>(new MongoDBOutputFacet());
+        SimpleInputGDF<DBObject> input = new SimpleInputGDF<>(
+                new MongoDBInputRuntime());
+        SimpleExtractionGDF<DBObject> extract = new SimpleExtractionGDF<DBObject>(new MongoDBExtractRuntime());
+        SimpleOutputGDF<Map<String, Object>> output = new SimpleOutputGDF<>(new MongoDBOutputRuntime());
 
         PCollection<DBObject> inputResult = input.generatePipeline(p);
 
@@ -78,10 +79,10 @@ public class TestMongoDBInputV2 {
         // CassandraInputTransformEvaluator());
         PipelineOptions options = PipelineOptionsFactory.create();
         Pipeline p = Pipeline.create(options);
-        SimpleInputFacetGDF<DBObject> input = new SimpleInputFacetGDF<>(
-                new org.talend.components.mongodb.tmongodbinput.MongoDBInputFacet());
-        ExtractionRuntime<DBObject> extract = new ExtractionRuntime<DBObject>(new MongoDBExtractRuntime());
-        SimpleOutputFacetGDF<Map<String, Object>> output = new SimpleOutputFacetGDF<>(new MongoDBOutputFacet());
+        SimpleInputGDF<DBObject> input = new SimpleInputGDF<>(
+                new MongoDBInputRuntime());
+        SimpleExtractionGDF<DBObject> extract = new SimpleExtractionGDF<DBObject>(new MongoDBExtractRuntime());
+        SimpleOutputGDF<Map<String, Object>> output = new SimpleOutputGDF<>(new MongoDBOutputRuntime());
 
         PCollection<DBObject> inputResult = input.generatePipeline(p);
 

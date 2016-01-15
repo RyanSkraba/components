@@ -14,7 +14,7 @@ package org.talend.components.transformation.tfiltercolumn;
 
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.facet.SimpleTransformationDefinition;
+import org.talend.components.api.component.SimpleTransformationDefinition;
 import org.talend.components.api.runtime.ComponentRuntime;
 
 import aQute.bnd.annotation.component.Component;

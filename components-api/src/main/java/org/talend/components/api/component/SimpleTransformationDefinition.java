@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.component.facet;
+package org.talend.components.api.component;
 
 import java.io.InputStream;
 
@@ -19,24 +19,21 @@ import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ProcessorComponentDefinition;
 
 /**
- * Rejectable transformation component. This component support one input and one or two outputs.
+ * Simple transformation component. This component support one input and one output.
  *
- * One of the two output is the main flow, the second one is the reject flow.
- *
- * It contains the main schema, defined by the user, and the reject schema, which is the main schema plus error fields.
+ * It contains the main schema, defined by the user.
  *
  */
-public abstract class RejectableTransormationDefinition extends ProcessorComponentDefinition {
+public abstract class SimpleTransformationDefinition extends ProcessorComponentDefinition {
 
     private String componentName;
 
     private String pomPath;
 
-    public RejectableTransormationDefinition(String componentName, String pomPath) {
+    public SimpleTransformationDefinition(String componentName, String pomPath) {
         this.componentName = componentName;
         this.pomPath = pomPath;
-        setConnectors(new ComponentConnector(ComponentConnector.Type.FLOW, 1, 0), new ComponentConnector(ComponentConnector.Type.MAIN, 0, 1),
-                new ComponentConnector(ComponentConnector.Type.REJECT, 0, 1));
+        setConnectors(new ComponentConnector(ComponentConnector.Type.FLOW, 1, 1));
         // No Trigger
     }
 

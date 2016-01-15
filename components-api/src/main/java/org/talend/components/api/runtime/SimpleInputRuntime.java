@@ -10,22 +10,17 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.facet;
-
-import org.talend.components.api.facet.gdf.SimpleInputFacetGDF;
-import org.talend.components.api.runtime.SingleOutputConnector;
+package org.talend.components.api.runtime;
 
 /**
  * Code to execute the component's facet. This can be used at runtime or design time as required.
  */
-public abstract class SimpleInputFacet<OutputObject> implements ComponentFacet {
-
-    private static final long serialVersionUID = -5896541157429439623L;
+public abstract class SimpleInputRuntime<OutputObject> implements BaseRuntime {
 
     private SingleOutputConnector<OutputObject> soc;
 
     /**
-     * This must be set by the runtime engine facet implmentation (see {@link SimpleInputFacetGDF})
+     * This must be set by the runtime engine facet implmentation
      * 
      * @param soc connector used to ouput the data for the Input facet.
      */
@@ -35,7 +30,7 @@ public abstract class SimpleInputFacet<OutputObject> implements ComponentFacet {
 
     /**
      * called to create all the inputs values they should all be outputed using the
-     * {@link SimpleInputFacet#addToMainOutput(Object)}
+     * {@link SimpleInputRuntime#addToMainOutput(Object)}
      *
      * @throws Exception
      */

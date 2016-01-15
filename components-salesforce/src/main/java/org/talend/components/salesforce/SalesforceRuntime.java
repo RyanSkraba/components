@@ -33,7 +33,7 @@ import org.talend.components.api.properties.PropertyFactory;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.runtime.ComponentDynamicHolder;
 import org.talend.components.api.runtime.ComponentRuntime;
-import org.talend.components.api.runtime.ComponentRuntimeContainer;
+import org.talend.components.api.engine.ComponentEngine;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.schema.SchemaFactory;
@@ -70,7 +70,7 @@ public class SalesforceRuntime extends ComponentRuntime {
 
     protected ComponentService componentService;
 
-    protected ComponentRuntimeContainer container;
+    protected ComponentEngine container;
 
     protected ComponentProperties properties;
 
@@ -133,12 +133,12 @@ public class SalesforceRuntime extends ComponentRuntime {
         upsertKeyColumn = "";
     }
 
-    public SalesforceRuntime(ComponentRuntimeContainer container) {
+    public SalesforceRuntime(ComponentEngine container) {
         this();
         setContainer(container);
     }
 
-    public SalesforceRuntime(ComponentRuntimeContainer context, int commitLevel, boolean exceptionForErrors, String errorLogFile)
+    public SalesforceRuntime(ComponentEngine context, int commitLevel, boolean exceptionForErrors, String errorLogFile)
             throws Exception {
         this(context);
 
@@ -156,7 +156,7 @@ public class SalesforceRuntime extends ComponentRuntime {
     }
 
     @Override
-    public void setContainer(ComponentRuntimeContainer container) {
+    public void setContainer(ComponentEngine container) {
         this.container = container;
     }
 

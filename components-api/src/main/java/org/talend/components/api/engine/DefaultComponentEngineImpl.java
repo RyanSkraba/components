@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.runtime;
+package org.talend.components.api.engine;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,12 +18,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.talend.components.api.engine.ComponentEngine;
+import org.talend.components.api.runtime.ComponentDynamicHolder;
 import org.talend.components.api.schema.SchemaElement;
 
 /**
  * An implementation of a runtime container for testing purposes.
  */
-public class DefaultComponentRuntimeContainerImpl implements ComponentRuntimeContainer {
+public class DefaultComponentEngineImpl implements ComponentEngine {
 
     private Map<String, Object> globalMap = new HashMap<>();
 
@@ -32,7 +34,7 @@ public class DefaultComponentRuntimeContainerImpl implements ComponentRuntimeCon
         return globalMap;
     }
 
-    class Dynamic implements ComponentDynamicHolder {
+    public class Dynamic implements ComponentDynamicHolder {
 
         private List<SchemaElement> schemaElements;
 

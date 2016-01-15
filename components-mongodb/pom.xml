@@ -49,6 +49,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
+			<artifactId>components-engine-gdf</artifactId>
+			<version>0.3.0.BUILD-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
 			<artifactId>components-common</artifactId>
 			<version>0.3.0.BUILD-SNAPSHOT</version>
 		</dependency>

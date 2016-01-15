@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.facet;
+package org.talend.components.engine.gdf;
 
 import java.io.IOException;
 import java.io.InputStream;

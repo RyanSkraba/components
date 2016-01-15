@@ -15,6 +15,7 @@
     <modules>
         <module>components-parent</module>
         <module>components-api</module>
+        <module>components-engine-gdf</module>
         <module>components-common</module>
         <module>components-common-oauth</module>
         <module>components-salesforce</module>

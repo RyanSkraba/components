@@ -15,6 +15,7 @@ package org.talend.components.api.runtime;
 import java.util.List;
 import java.util.Map;
 
+import org.talend.components.api.engine.ComponentEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.NameAndLabel;
 import org.talend.components.api.properties.ValidationResult;
@@ -26,9 +27,9 @@ import org.talend.components.api.schema.Schema;
 public abstract class ComponentRuntime {
 
     /**
-     * Sets the {@link ComponentRuntimeContainer} for this runtime.
+     * Sets the {@link ComponentEngine} for this runtime.
      */
-    public void setContainer(ComponentRuntimeContainer container) {
+    public void setContainer(ComponentEngine container) {
         // subclass as required
     }
 

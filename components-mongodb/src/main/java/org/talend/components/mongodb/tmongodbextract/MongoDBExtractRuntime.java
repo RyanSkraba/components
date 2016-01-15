@@ -17,12 +17,12 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.facet.ExtractionFacet;
+import org.talend.components.api.runtime.ExtractionRuntime;
 import org.talend.components.api.properties.ComponentProperties;
 
 import com.mongodb.DBObject;
 
-public class MongoDBExtractRuntime extends ExtractionFacet<DBObject> {
+public class MongoDBExtractRuntime extends ExtractionRuntime<DBObject> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBExtractRuntime.class);
 

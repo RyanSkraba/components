@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.facet;
+package org.talend.components.api.runtime;
 
 import java.io.Serializable;
 
@@ -19,7 +19,7 @@ import org.talend.components.api.properties.ComponentProperties;
 /**
  * Code to execute the component's facet. This can be used at runtime or design time as required.
  */
-public interface ComponentFacet extends Serializable {
+public interface BaseRuntime extends Serializable {
 
     /**
      * used to initialise this facet before the process is done.

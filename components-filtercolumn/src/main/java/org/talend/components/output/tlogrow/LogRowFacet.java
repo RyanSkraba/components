@@ -16,11 +16,11 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.facet.SimpleOutputFacetV2;
+import org.talend.components.api.runtime.SimpleOutputRuntime;
 import org.talend.components.api.properties.ComponentProperties;
 
 // TODO slice the component into a write component and an output compoenent
-public class LogRowFacet extends SimpleOutputFacetV2<Map<String, Object>> {
+public class LogRowFacet extends SimpleOutputRuntime<Map<String, Object>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(LogRowFacet.class);
 

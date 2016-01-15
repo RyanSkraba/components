@@ -14,7 +14,7 @@ package org.talend.components.mongodb.tmongodbextract;
 
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.facet.RejectableTransormationDefinition;
+import org.talend.components.api.component.RejectableTransormationDefinition;
 import org.talend.components.api.runtime.ComponentRuntime;
 
 import aQute.bnd.annotation.component.Component;
