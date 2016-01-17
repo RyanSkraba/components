@@ -21,7 +21,7 @@ public class CassandraMetadata {
         List<ColumnMetadata> columns = cluster.getMetadata().getKeyspace(props.keyspace.getStringValue()).getTable(props.columnFamily.getStringValue()).getColumns();
         for (ColumnMetadata column : columns) {
             DataType type = column.getType();
-            props.schema.addChild(SchemaFactory.newDataSchemaElement(CassandraBaseType.FAMILY_NAME, column.getName(), CassandraAPITypeMapping.getType(type.getName())));
+            props.schema.addSchemaChild(SchemaFactory.newDataSchemaElement(CassandraBaseType.FAMILY_NAME, column.getName(), CassandraAPITypeMapping.getType(type.getName())));
         }
     }
 }

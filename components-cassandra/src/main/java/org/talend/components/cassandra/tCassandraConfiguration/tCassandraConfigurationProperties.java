@@ -22,14 +22,14 @@ public class tCassandraConfigurationProperties extends ComponentProperties {
         super(name);
     }
 
-    public Property host = newString("HOST");
+    public Property host = newString("host");
 
-    public Property port = newString("PORT");
+    public Property port = newString("port");
 
-    public Property useAuth = newBoolean("REQUIRED_AUTHENTICATION", false);
+    public Property useAuth = newBoolean("useAuth", false);
 
-    public Property username = newString("USERNAME");
+    public Property username = newString("username");
 
-    public Property password = newString("PASSWORD");
+    public Property password = newString("password");
 
 }

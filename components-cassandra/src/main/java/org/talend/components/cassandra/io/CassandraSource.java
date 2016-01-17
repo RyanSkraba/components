@@ -61,7 +61,7 @@ public class CassandraSource implements Source<Row> {
 
     @Override
     public List<SchemaElement> getSchema() {
-        return ((Schema) props.schema.getValue(props.schema.schema)).getRoot().getChildren();
+        return ((Schema) props.schema.schema.getValue()).getRoot().getChildren();
     }
 
     public class CassandraReader implements Reader<Row> {

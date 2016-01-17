@@ -2,7 +2,6 @@ package org.talend.components.cassandra.tCassandraInput;
 
 import org.talend.components.api.properties.Property;
 import org.talend.components.cassandra.metadata.CassandraMetadataProperties;
-import org.talend.components.common.SchemaProperties;
 
 import static org.talend.components.api.properties.PropertyFactory.*;
 
@@ -21,11 +20,10 @@ public class tCassandraInputSparkProperties extends CassandraMetadataProperties 
     }
 
     //TODO how to hidden host/port in this component?
-    public Property columnFunctionTables = newTable("SELECTED_COLUMN_FUNCTION", newString("COLUMN"), newEnum("FUNCTION", "TTL", "WRITETIME"));
-    public Property filterConditionTables = newTable("FILTER_CONDITION", newString("COLUMN"), newEnum("FUNCTION", "EQ", "LT", "GT", "LE", "GE", "CONTAINS", "CONTAINSKEY", "IN"), newString("VALUE"));
-    public Property order = newEnum("ORDER", "NONE", "ASC", "DESC");
-    public Property useLimit = newBoolean("USE_LIMIT", false);
-    public Property limit = newLong("LIMIT", 100l);
-    public SchemaProperties schema = new SchemaProperties("schema");
+    public Property columnFunctionTables = newTable("columnFunctionTables", newString("COLUMN"), newEnum("FUNCTION", "TTL", "WRITETIME"));
+    public Property filterConditionTables = newTable("filterConditionTables", newString("COLUMN"), newEnum("FUNCTION", "EQ", "LT", "GT", "LE", "GE", "CONTAINS", "CONTAINSKEY", "IN"), newString("VALUE"));
+    public Property order = newEnum("order", "NONE", "ASC", "DESC");
+    public Property useLimit = newBoolean("useLimit", false);
+    public Property limit = newLong("limit", 100l);
 
 }

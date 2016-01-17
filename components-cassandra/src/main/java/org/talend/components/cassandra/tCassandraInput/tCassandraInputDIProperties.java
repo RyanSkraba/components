@@ -19,5 +19,5 @@ public class tCassandraInputDIProperties extends CassandraMetadataProperties {
         super(name);
     }
 
-    public Property query = newString("QUERY", "select id, name from employee");
+    public Property query = newString("query", "select id, name from employee");
 }

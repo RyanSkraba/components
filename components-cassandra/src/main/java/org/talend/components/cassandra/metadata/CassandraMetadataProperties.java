@@ -19,7 +19,7 @@ public class CassandraMetadataProperties extends tCassandraConnectionProperties 
         super(name);
     }
 
-    public Property keyspace = PropertyFactory.newString("KEY_SPACE");
-    public Property columnFamily = PropertyFactory.newString("COLUMN_FAMILY");
+    public Property keyspace = PropertyFactory.newString("keyspace");
+    public Property columnFamily = PropertyFactory.newString("columnFamily");
     public SchemaProperties schema = new SchemaProperties("schema");
 }
