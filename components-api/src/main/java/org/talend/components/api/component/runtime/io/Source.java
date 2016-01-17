@@ -21,4 +21,6 @@ public interface Source<T> {
 
     public List<SchemaElement> getSchema();
 
+    public String getFamilyName();
+
 }

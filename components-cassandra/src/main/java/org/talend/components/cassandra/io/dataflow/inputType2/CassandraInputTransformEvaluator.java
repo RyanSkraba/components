@@ -21,7 +21,7 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
-import org.talend.components.cassandra.io.bd.CassandraInputFormat;
+import org.talend.components.cassandra.io.bd.BDInputFormat;
 import org.talend.row.BaseRowStruct;
 import scala.Tuple2;
 
@@ -32,8 +32,9 @@ public class CassandraInputTransformEvaluator implements TransformEvaluator<Cass
     @Override
     public void evaluate(CassandraIO.Read.Bound<String> transform, EvaluationContext context) {
         JobConf job = new JobConf();
-        job.set("componentProperties", transform.getProperties().toSerialized());
-        JavaPairRDD<NullWritable, BaseRowStruct> pairRDD = context.getSparkContext().hadoopRDD(job, CassandraInputFormat.class, NullWritable.class, BaseRowStruct.class);
+        job.set("input.source", "org.talend.components.cassandra.io.CassandraSource");
+        job.set("input.props", transform.getProperties().toSerialized());
+        JavaPairRDD<NullWritable, BaseRowStruct> pairRDD = context.getSparkContext().hadoopRDD(job, BDInputFormat.class, NullWritable.class, BaseRowStruct.class);
         JavaRDD<String> rdd = pairRDD.map(new Function<Tuple2<NullWritable, BaseRowStruct>, String>() {
             @Override
             public String call(Tuple2<NullWritable, BaseRowStruct> row) throws Exception {

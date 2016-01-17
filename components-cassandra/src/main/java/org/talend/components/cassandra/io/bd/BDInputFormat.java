@@ -4,13 +4,12 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.*;
 import org.talend.components.api.component.runtime.io.Reader;
 import org.talend.components.api.component.runtime.io.SingleSplit;
+import org.talend.components.api.component.runtime.io.Source;
 import org.talend.components.api.component.runtime.io.Split;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.schema.column.type.common.TypeMapping;
 import org.talend.components.api.schema.internal.DataSchemaElement;
-import org.talend.components.cassandra.io.CassandraSource;
-import org.talend.components.cassandra.type.CassandraBaseType;
 import org.talend.row.BaseRowStruct;
 
 import java.io.DataInput;
@@ -24,44 +23,55 @@ import java.util.Map;
  * Created by bchen on 16-1-10.
  */
 //TODO better to and a talend InputFormat to avoid the dependency of MapReduce, just need a method getSplits;no close method for InputFormat?
-public class CassandraInputFormat implements InputFormat<NullWritable, BaseRowStruct>, JobConfigurable {
-    private CassandraSource cassandraSource;
+public class BDInputFormat implements InputFormat<NullWritable, BaseRowStruct>, JobConfigurable {
+    private Source source;
 
     @Override
     public InputSplit[] getSplits(JobConf jobConf, int num) throws IOException {
-        if (cassandraSource.supportSplit()) {
-            Split[] splits = cassandraSource.getSplit(num);
-            CassandraSplit[] cassandraSplits = new CassandraSplit[splits.length];
-            for (int i = 0; i < cassandraSplits.length; i++) {
-                cassandraSplits[i] = new CassandraSplit(splits[i]);
+        if (source.supportSplit()) {
+            Split[] splits = source.getSplit(num);
+            BDInputSplit[] bdInputSplits = new BDInputSplit[splits.length];
+            for (int i = 0; i < bdInputSplits.length; i++) {
+                bdInputSplits[i] = new BDInputSplit(splits[i]);
             }
-            return cassandraSplits;
+            return bdInputSplits;
         } else {
-            return new CassandraSplit[]{new CassandraSplit(new SingleSplit())};
+            return new BDInputSplit[]{new BDInputSplit(new SingleSplit())};
         }
     }
 
     @Override
     public RecordReader<NullWritable, BaseRowStruct> getRecordReader(InputSplit inputSplit, JobConf jobConf, Reporter reporter) throws IOException {
-        return new CassandraRecordReader(cassandraSource.getRecordReader(((CassandraSplit) inputSplit).getRealSplit()), cassandraSource.getSchema());
+        return new BDRecordReader(source.getRecordReader(((BDInputSplit) inputSplit).getRealSplit()), source.getSchema(), source.getFamilyName());
     }
 
     @Override
     public void configure(JobConf jobConf) {
-        cassandraSource = new CassandraSource();
-        String componentPropertiesString = jobConf.get("componentProperties");//TODO cid! then make CassandraSource to Source
+        try {
+            Class<? extends Source> aClass = (Class<? extends Source>) Class.forName(jobConf.get("input.source"));
+            this.source = aClass.newInstance();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        String componentPropertiesString = jobConf.get("input.props");
         ComponentProperties.Deserialized deserialized = ComponentProperties.fromSerialized(componentPropertiesString);
         ComponentProperties properties = deserialized.properties;
-        cassandraSource.init(properties);
+        this.source.init(properties);
     }
 
-    static class CassandraRecordReader implements RecordReader<NullWritable, BaseRowStruct> {
+    static class BDRecordReader implements RecordReader<NullWritable, BaseRowStruct> {
         private Reader reader;
         private List<SchemaElement> schema;
+        private String familyName;
 
-        CassandraRecordReader(Reader reader, List<SchemaElement> schema) {
+        BDRecordReader(Reader reader, List<SchemaElement> schema, String familyName) {
             this.reader = reader;
             this.schema = schema;
+            this.familyName = familyName;
         }
 
         @Override
@@ -72,7 +82,7 @@ public class CassandraInputFormat implements InputFormat<NullWritable, BaseRowSt
                 for (SchemaElement column : schema) {
                     DataSchemaElement col = (DataSchemaElement) column;
                     try {
-                        baseRowStruct.put(col.getName(), TypeMapping.convert(TypeMapping.getDefaultTalendType(CassandraBaseType.FAMILY_NAME, col.getAppColType()),
+                        baseRowStruct.put(col.getName(), TypeMapping.convert(TypeMapping.getDefaultTalendType(familyName, col.getAppColType()),
                                 col.getType(), col.getAppColType().newInstance().retrieveTValue(row, col.getAppColName())));
                     } catch (InstantiationException e) {
                         e.printStackTrace();
@@ -116,14 +126,14 @@ public class CassandraInputFormat implements InputFormat<NullWritable, BaseRowSt
         }
     }
 
-    static class CassandraSplit implements InputSplit, Comparable<CassandraSplit> {
+    static class BDInputSplit implements InputSplit, Comparable<BDInputSplit> {
         private Split split;
 
-        public CassandraSplit() {
+        public BDInputSplit() {
             this(new SingleSplit());
         }
 
-        public CassandraSplit(Split split) {
+        public BDInputSplit(Split split) {
             this.split = split;
         }
 
@@ -132,7 +142,7 @@ public class CassandraInputFormat implements InputFormat<NullWritable, BaseRowSt
         }
 
         @Override
-        public int compareTo(CassandraSplit o) {
+        public int compareTo(BDInputSplit o) {
             return split.compareTo((Split) o);
         }
 
