@@ -9,7 +9,11 @@ import org.talend.components.api.component.runtime.io.SingleSplit;
 import org.talend.components.api.component.runtime.io.Source;
 import org.talend.components.api.component.runtime.io.Split;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.schema.Schema;
+import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.cassandra.tCassandraInput.tCassandraInputDIProperties;
+
+import java.util.List;
 
 /**
  * Created by bchen on 16-1-10.
@@ -52,6 +56,11 @@ public class CassandraSource implements Source<Row> {
     @Override
     public Split[] getSplit(int num) {
         return new Split[0];
+    }
+
+    @Override
+    public List<SchemaElement> getSchema() {
+        return ((Schema) props.schema.getValue(props.schema.schema)).getRoot().getChildren();
     }
 
     public class CassandraReader implements Reader<Row> {

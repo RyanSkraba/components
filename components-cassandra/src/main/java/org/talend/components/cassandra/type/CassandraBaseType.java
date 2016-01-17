@@ -3,19 +3,13 @@ package org.talend.components.cassandra.type;
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Row;
 import org.talend.components.api.schema.column.type.common.ExternalBaseType;
-import org.talend.components.api.schema.column.type.common.TBaseType;
 
 /**
  * Created by bchen on 16-1-10.
  */
-public abstract class CassandraBaseType<AppType extends Object, TalendType extends TBaseType> extends ExternalBaseType {
+public abstract class CassandraBaseType<AppType extends Object, TalendType extends Object> extends ExternalBaseType {
     //TODO pull this up to Definition or Properties?
     public static final String FAMILY_NAME = "Cassandra";
-
-    @Override
-    public String getFamilyName() {
-        return FAMILY_NAME;
-    }
 
     @Override
     protected Object getValue(Object obj, String key) {
@@ -28,12 +22,12 @@ public abstract class CassandraBaseType<AppType extends Object, TalendType exten
     }
 
     @Override
-    protected Object c2AType(TBaseType value) {
+    protected Object c2AType(Object value) {
         return convert2AType((TalendType) value);
     }
 
     @Override
-    protected TBaseType c2TType(Object value) {
+    protected TalendType c2TType(Object value) {
         return convert2TType((AppType) value);
     }
 

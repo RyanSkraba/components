@@ -27,7 +27,7 @@ public class CassandraInputTransformEvaluator implements TransformEvaluator<Cass
     public void evaluate(CassandraIO.Read.Bound<String> transform, EvaluationContext context) {
         JavaRDD<String> rdd = CassandraJavaUtil
                 .javaFunctions(context.getSparkContext())
-                .cassandraTable(transform.getProperties().keySpace.getStringValue(), transform.getProperties().columnFamily.getStringValue(),
+                .cassandraTable(transform.getProperties().keyspace.getStringValue(), transform.getProperties().columnFamily.getStringValue(),
                         CassandraJavaUtil.mapColumnTo(String.class))
                 .select(CassandraJavaUtil.column("name"));//TODO learn how to init schema,then change it
         context.setOutputRDD(transform, rdd);

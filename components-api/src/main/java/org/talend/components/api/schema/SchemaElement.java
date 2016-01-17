@@ -38,6 +38,11 @@ public interface SchemaElement extends NamedThing, ToStringIndent {
         DYNAMIC,
         GROUP,
         SCHEMA,
+        OBJECT,
+        CHARACTER,
+        LIST,
+        SHORT,
+        BYTE,
     }
 
     public static int INFINITE = -1;

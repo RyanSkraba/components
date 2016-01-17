@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.api.schema;
 
+import org.talend.components.api.schema.column.type.common.ExternalBaseType;
+import org.talend.components.api.schema.column.type.common.TypeMapping;
 import org.talend.components.api.schema.internal.DataSchemaElement;
 import org.talend.components.api.schema.internal.SchemaImpl;
 
@@ -35,6 +37,15 @@ public class SchemaFactory {
     public static SchemaElement newSchemaElement(String name) {
         SchemaElement se = new DataSchemaElement();
         se.setName(name);
+        return se;
+    }
+
+    public static DataSchemaElement newDataSchemaElement(String familyName, String name, Class<? extends ExternalBaseType> appType) {
+        DataSchemaElement se = new DataSchemaElement();
+        se.setAppColName(name);
+        se.setAppColType(appType);
+        se.setName(name);
+        se.setType(TypeMapping.getDefaultTalendType(familyName, appType));
         return se;
     }
 

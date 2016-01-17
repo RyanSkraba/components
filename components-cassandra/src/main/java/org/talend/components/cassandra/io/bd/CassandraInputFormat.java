@@ -1,25 +1,24 @@
 package org.talend.components.cassandra.io.bd;
 
-import com.datastax.driver.core.Row;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.*;
 import org.talend.components.api.component.runtime.io.Reader;
 import org.talend.components.api.component.runtime.io.SingleSplit;
 import org.talend.components.api.component.runtime.io.Split;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.schema.SchemaElement;
+import org.talend.components.api.schema.column.type.common.TypeMapping;
+import org.talend.components.api.schema.internal.DataSchemaElement;
 import org.talend.components.cassandra.io.CassandraSource;
 import org.talend.components.cassandra.type.CassandraBaseType;
-import org.talend.components.cassandra.type.TEXT;
 import org.talend.row.BaseRowStruct;
-import org.talend.components.api.schema.column.Column;
-import org.talend.components.api.schema.column.type.common.TBaseType;
-import org.talend.components.api.schema.column.type.TString;
-import org.talend.components.api.schema.column.type.common.TypeMapping;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by bchen on 16-1-10.
@@ -44,7 +43,7 @@ public class CassandraInputFormat implements InputFormat<NullWritable, BaseRowSt
 
     @Override
     public RecordReader<NullWritable, BaseRowStruct> getRecordReader(InputSplit inputSplit, JobConf jobConf, Reporter reporter) throws IOException {
-        return new CassandraRecordReader(cassandraSource.getRecordReader(((CassandraSplit) inputSplit).getRealSplit()));
+        return new CassandraRecordReader(cassandraSource.getRecordReader(((CassandraSplit) inputSplit).getRealSplit()), cassandraSource.getSchema());
     }
 
     @Override
@@ -57,37 +56,24 @@ public class CassandraInputFormat implements InputFormat<NullWritable, BaseRowSt
     }
 
     static class CassandraRecordReader implements RecordReader<NullWritable, BaseRowStruct> {
-        private Reader<Row> reader;
+        private Reader reader;
+        private List<SchemaElement> schema;
 
-        CassandraRecordReader(Reader<Row> reader) {
+        CassandraRecordReader(Reader reader, List<SchemaElement> schema) {
             this.reader = reader;
+            this.schema = schema;
         }
 
         @Override
         public boolean next(NullWritable nullWritable, BaseRowStruct baseRowStruct) throws IOException {
             if (reader.advance()) {
-                //TODO avoid Row
-                Row row = reader.getCurrent();
-                //TODO metadata should be the schmea and get it from properties
-//                List<Column> metadata = new ArrayList<>();
-//                Column col1 = new Column(false, "id", TEXT.class);
-//                Column col2 = new Column(false, "birthday", TIMESTAMP.class);
-//                Column col3 = new Column(false, "age", INT.class);
-//                metadata.addAll(Arrays.asList(new Column[] { col1, col2, col3 }));
-//                metadata.get(0).setTalendType("id", TString.class);
-//                metadata.get(1).setTalendType("birthday", TDate.class);
-//                metadata.get(2).setTalendType("age", TInt.class);
+                Object row = reader.getCurrent();
 
-                //TODO metadata should be the schmea and get it from properties
-                List<Column> metadata = new ArrayList<>();
-                Column col1 = new Column(false, "name", TEXT.class, CassandraBaseType.FAMILY_NAME);
-                metadata.addAll(Arrays.asList(new Column[]{col1}));
-                metadata.get(0).setTalendType("name", TString.class);
-
-                for (Column column : metadata) {
+                for (SchemaElement column : schema) {
+                    DataSchemaElement col = (DataSchemaElement) column;
                     try {
-                        baseRowStruct.put(column.getCol_name(), TypeMapping.convert(TypeMapping.getDefaultTalendType(CassandraBaseType.FAMILY_NAME, column.getApp_col_type()),
-                                column.getCol_type(), column.getApp_col_type().newInstance().retrieveTValue(row, column.getApp_col_name())));
+                        baseRowStruct.put(col.getName(), TypeMapping.convert(TypeMapping.getDefaultTalendType(CassandraBaseType.FAMILY_NAME, col.getAppColType()),
+                                col.getType(), col.getAppColType().newInstance().retrieveTValue(row, col.getAppColName())));
                     } catch (InstantiationException e) {
                         e.printStackTrace();
                     } catch (IllegalAccessException e) {
@@ -107,9 +93,11 @@ public class CassandraInputFormat implements InputFormat<NullWritable, BaseRowSt
 
         @Override
         public BaseRowStruct createValue() {
-            Map<String, Class<? extends TBaseType>> metadata = new HashMap<>();
-            metadata.put("name", TString.class);
-            return new BaseRowStruct(metadata);
+            Map<String, SchemaElement.Type> row_metadata = new HashMap<>();
+            for (SchemaElement field : schema) {
+                row_metadata.put(field.getName(), field.getType());
+            }
+            return new BaseRowStruct(row_metadata);
         }
 
         @Override

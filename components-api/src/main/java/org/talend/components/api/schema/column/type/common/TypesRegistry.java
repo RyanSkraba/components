@@ -1,5 +1,7 @@
 package org.talend.components.api.schema.column.type.common;
 
+import org.talend.components.api.schema.SchemaElement;
+
 import java.util.Map;
 
 /**
@@ -8,5 +10,5 @@ import java.util.Map;
 public interface TypesRegistry {
     public String getFamilyName();
 
-    public Map<Class<? extends ExternalBaseType>, Class<? extends TBaseType>> getMapping();
+    public Map<Class<? extends ExternalBaseType>, SchemaElement.Type> getMapping();
 }

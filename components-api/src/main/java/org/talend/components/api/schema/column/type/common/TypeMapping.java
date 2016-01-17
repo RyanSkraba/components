@@ -13,71 +13,70 @@
 package org.talend.components.api.schema.column.type.common;
 
 
-import org.talend.components.api.schema.column.type.*;
+import org.talend.components.api.schema.SchemaElement;
 
 import java.util.*;
 
 
 public class TypeMapping {
 
-    private static Map<String, Map<Class<? extends ExternalBaseType>, Class<? extends TBaseType>>> externalTypesGroup = new HashMap<>();
+    private static Map<String, Map<Class<? extends ExternalBaseType>, SchemaElement.Type>> externalTypesGroup = new HashMap<>();
 
     public static void registryTypes(TypesRegistry registry) {
         registryExternalTypes(registry.getFamilyName(), registry.getMapping());
     }
 
-    private static void registryExternalTypes(String familyName, Map<Class<? extends ExternalBaseType>, Class<? extends TBaseType>> typeMapping) {
+    private static void registryExternalTypes(String familyName, Map<Class<? extends ExternalBaseType>, SchemaElement.Type> typeMapping) {
         externalTypesGroup.put(familyName, typeMapping);
     }
 
-    public static Class<? extends TBaseType> getDefaultTalendType(String appFamily, Class<? extends ExternalBaseType> appType) {
-        Map<Class<? extends ExternalBaseType>, Class<? extends TBaseType>> appTypesGroup = externalTypesGroup.get(appFamily);
+    public static SchemaElement.Type getDefaultTalendType(String appFamily, Class<? extends ExternalBaseType> appType) {
+        Map<Class<? extends ExternalBaseType>, SchemaElement.Type> appTypesGroup = externalTypesGroup.get(appFamily);
         return appTypesGroup.get(appType);
     }
 
     //TODO re-implement it, now it's very dirty
-    public static List<Class<? extends TBaseType>> getTalendTypes(String appFamily, Class<? extends ExternalBaseType> appType) {
-        List<Class> numberClasses = Arrays.asList(new Class[]{TByte.class, TShort.class, TInt.class, TLong.class, TFloat.class, TDouble.class});
+    public static List<SchemaElement.Type> getTalendTypes(String appFamily, Class<? extends ExternalBaseType> appType) {
+        List<SchemaElement.Type> numberTypes = Arrays.asList(new SchemaElement.Type[]{SchemaElement.Type.BYTE, SchemaElement.Type.SHORT, SchemaElement.Type.INT, SchemaElement.Type.LONG, SchemaElement.Type.FLOAT, SchemaElement.Type.DOUBLE});
 
-        List<Class<? extends TBaseType>> classes = new ArrayList<>();
-        Class<? extends TBaseType> bestType = getDefaultTalendType(appFamily, appType);
+        List<SchemaElement.Type> classes = new ArrayList<>();
+        SchemaElement.Type bestType = getDefaultTalendType(appFamily, appType);
         classes.add(bestType);
-        if (bestType == TCharacter.class) {
-            classes.add(TInt.class);
-        } else if (bestType == TDate.class) {
-            classes.add(TLong.class);
-        } else if (bestType == TLong.class) {
-            classes.add(TDate.class);
-        } else if (numberClasses.contains(bestType)) {
+        if (bestType == SchemaElement.Type.CHARACTER) {
+            classes.add(SchemaElement.Type.INT);
+        } else if (bestType == SchemaElement.Type.DATE) {
+            classes.add(SchemaElement.Type.LONG);
+        } else if (bestType == SchemaElement.Type.LONG) {
+            classes.add(SchemaElement.Type.DATE);
+        } else if (numberTypes.contains(bestType)) {
             boolean find = false;
-            for (Class numberClass : numberClasses) {
+            for (SchemaElement.Type numberType : numberTypes) {
                 if (!find) {
-                    if (numberClass == bestType)
+                    if (numberType == bestType)
                         find = true;
                     continue;
                 } else {
-                    classes.add(numberClass);
+                    classes.add(numberType);
                 }
             }
         }
 
-        if (!classes.contains(TList.class)) {
-            classes.add(TString.class);
-            classes.add(TByteArray.class);
+        if (!classes.contains(SchemaElement.Type.LIST)) {
+            classes.add(SchemaElement.Type.STRING);
+            classes.add(SchemaElement.Type.BYTE_ARRAY);
         }
-        classes.add(TObject.class);
+        classes.add(SchemaElement.Type.OBJECT);
 
         return classes;
     }
 
 
-    public static List<Class<? extends ExternalBaseType>> getAppTypes(String appFamily, Class<? extends
-            TBaseType> talendType) {
+    public static List<Class<? extends ExternalBaseType>> getAppTypes(String appFamily, SchemaElement.Type talendType) {
         //TODO improve the mapping init
-        Map<Class<? extends TBaseType>, List<Class<? extends ExternalBaseType>>> mapping = new HashMap<>();
-        Map<Class<? extends ExternalBaseType>, Class<? extends TBaseType>> appTypes = externalTypesGroup.get(appFamily);
+        Map<SchemaElement.Type, List<Class<? extends ExternalBaseType>>> mapping = new HashMap<>();
+        Map<Class<? extends ExternalBaseType>, SchemaElement.Type> appTypes = externalTypesGroup.get(appFamily);
         for (Class<? extends ExternalBaseType> appType : appTypes.keySet()) {
-            Class<? extends TBaseType> tType = appTypes.get(appType);
+            SchemaElement.Type tType = appTypes.get(appType);
             List<Class<? extends ExternalBaseType>> appTypeList = mapping.get(tType);
             if (appTypeList == null) {
                 appTypeList = new ArrayList<>();
@@ -94,51 +93,45 @@ public class TypeMapping {
     }
 
     //TODO implement all convert between internal talend type
-
-    public static TBaseType convert(Class<? extends TBaseType> inType, Class<? extends TBaseType> outType, TBaseType inValue) {
+    public static Object convert(SchemaElement.Type inType, SchemaElement.Type outType, Object inValue) {
         if (inType == outType) {
             return inValue;
         } else {
-            TBaseType outValue = null;
-            if (outType == TObject.class) {
-                outValue = new TObject();
-                outValue.setValue(inValue.getValue());
-            } else if (outType == TString.class && inType != TList.class) {
-                outValue = convertToString(inType, inValue);
-            } else if (outType == TByteArray.class && inType != TList.class) {
-                outValue = new TBaseType();
-                outValue.setValue(convertToString(inType, inValue).getValue().getBytes());//TODO support encoding for each column in future?
-            } else if (outType == TBigDecimal.class) {
+            if (outType == SchemaElement.Type.OBJECT) {
+                return inValue;
+            } else if (outType == SchemaElement.Type.STRING && inType != SchemaElement.Type.LIST) {
+                return convertToString(inType, inValue);
+            } else if (outType == SchemaElement.Type.BYTE_ARRAY && inType != SchemaElement.Type.LIST) {
+                return (convertToString(inType, inValue).getBytes());//TODO support encoding for each column in future?
+            } else if (outType == SchemaElement.Type.DECIMAL) {
 //                outValue = new TBigDecimal();
 //                if (inType == TString.class) {
 //                    outValue.setValue(new BigDecimal(((TString) inValue).getValue()));
 //                }
-            } else if (outType == TDouble.class) {
-            } else if (outType == TFloat.class) {
-            } else if (outType == TLong.class) {
-                outValue = new TLong();
-                if (inType == TInt.class) {
-                    outValue.setValue(((TInt) inValue).getValue().longValue());
+            } else if (outType == SchemaElement.Type.DOUBLE) {
+            } else if (outType == SchemaElement.Type.FLOAT) {
+            } else if (outType == SchemaElement.Type.LONG) {
+                if (inType == SchemaElement.Type.INT) {
+                    return ((Integer) inValue).longValue();
                 }
-            } else if (outType == TInt.class) {
-            } else if (outType == TShort.class) {
-            } else if (outType == TByte.class) {
+            } else if (outType == SchemaElement.Type.INT) {
+            } else if (outType == SchemaElement.Type.SHORT) {
+            } else if (outType == SchemaElement.Type.BYTE) {
             }
-            return outValue;
         }
+        return null;
     }
 
-    private static TString convertToString(Class<? extends TBaseType> inType, TBaseType inValue) {
-        TString outValue = new TString();
-        if (inType == TByteArray.class) {
-            outValue.setValue(new String(((TByteArray) inValue).getValue()));
-        } else if (inType == TDate.class) {
-            outValue.setValue("");//TODO date pattern
-        } else if (inType == TShort.class || inType == TByte.class) {
-            outValue.setValue(String.valueOf(Integer.valueOf((int) inValue.getValue())));
+    private static String convertToString(SchemaElement.Type inType, Object inValue) {
+        if (inType == SchemaElement.Type.BYTE_ARRAY) {
+            return new String(((byte[]) inValue));
+        } else if (inType == SchemaElement.Type.DATE) {
+            //TODO date pattern
+            return null;
+        } else if (inType == SchemaElement.Type.SHORT || inType == SchemaElement.Type.BYTE) {
+            return String.valueOf(Integer.valueOf((int) inValue));
         } else {
-            outValue.setValue(String.valueOf(inValue.getValue()));
+            return String.valueOf(inValue);
         }
-        return outValue;
     }
 }
