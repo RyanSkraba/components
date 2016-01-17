@@ -22,7 +22,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.talend.components.cassandra.io.bd.BDInputFormat;
-import org.talend.row.BaseRowStruct;
+import org.talend.components.api.runtime.row.BaseRowStruct;
 import scala.Tuple2;
 
 /**

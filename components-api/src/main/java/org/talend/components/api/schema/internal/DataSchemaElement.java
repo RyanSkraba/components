@@ -58,4 +58,14 @@ public class DataSchemaElement extends AbstractSchemaElement {
         this.appColType = appColType;
     }
 
+    private boolean key;
+
+    public boolean isKey() {
+        return key;
+    }
+
+    public void setKey(boolean key) {
+        this.key = key;
+    }
+
 }

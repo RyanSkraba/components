@@ -2,15 +2,15 @@ package org.talend.components.cassandra.io.bd;
 
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.*;
-import org.talend.components.api.component.runtime.io.Reader;
-import org.talend.components.api.component.runtime.io.SingleSplit;
-import org.talend.components.api.component.runtime.io.Source;
-import org.talend.components.api.component.runtime.io.Split;
+import org.talend.components.api.component.runtime.input.Reader;
+import org.talend.components.api.component.runtime.input.SingleSplit;
+import org.talend.components.api.component.runtime.input.Source;
+import org.talend.components.api.component.runtime.input.Split;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.schema.column.type.common.TypeMapping;
 import org.talend.components.api.schema.internal.DataSchemaElement;
-import org.talend.row.BaseRowStruct;
+import org.talend.components.api.runtime.row.BaseRowStruct;
 
 import java.io.DataInput;
 import java.io.DataOutput;

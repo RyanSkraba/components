@@ -1,4 +1,4 @@
-package org.talend.row;
+package org.talend.components.api.runtime.row;
 
 import org.talend.components.api.schema.SchemaElement;
 

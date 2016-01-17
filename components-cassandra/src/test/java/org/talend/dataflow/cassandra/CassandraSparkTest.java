@@ -19,7 +19,7 @@ import org.talend.components.cassandra.type.CassandraTalendTypesRegistry;
 /**
  * Created by bchen on 16-1-9.
  */
-public class CassandraInputTest {
+public class CassandraSparkTest {
     @Before
     public void prepare() {
         TypeMapping.registryTypes(new CassandraTalendTypesRegistry());
