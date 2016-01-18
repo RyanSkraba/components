@@ -14,7 +14,6 @@ package org.talend.components.api.schema.internal;
 
 import org.talend.components.api.schema.AbstractSchemaElement;
 import org.talend.components.api.schema.SchemaElement;
-import org.talend.components.api.schema.column.type.common.ExternalBaseType;
 
 /**
  * Represents meta data elements. This typically defines the DisplayName to be the same
@@ -36,36 +35,6 @@ public class DataSchemaElement extends AbstractSchemaElement {
     public SchemaElement setDisplayName(String name) {
         setName(name);
         return this;
-    }
-
-    private String appColName;
-
-    public String getAppColName() {
-        return appColName;
-    }
-
-    public void setAppColName(String appColName) {
-        this.appColName = appColName;
-    }
-
-    private Class<? extends ExternalBaseType> appColType;
-
-    public Class<? extends ExternalBaseType> getAppColType() {
-        return appColType;
-    }
-
-    public void setAppColType(Class<? extends ExternalBaseType> appColType) {
-        this.appColType = appColType;
-    }
-
-    private boolean key;
-
-    public boolean isKey() {
-        return key;
-    }
-
-    public void setKey(boolean key) {
-        this.key = key;
     }
 
 }
