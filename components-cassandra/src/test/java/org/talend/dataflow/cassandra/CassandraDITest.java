@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.input.Reader;
 import org.talend.components.api.component.runtime.input.SingleSplit;
+import org.talend.components.api.component.runtime.metadata.Metadata;
 import org.talend.components.api.runtime.row.BaseRowStruct;
 import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.schema.column.type.common.TypeMapping;
@@ -71,7 +72,7 @@ public class CassandraDITest {
         outProps.dataAction.setValue("INSERT");
         outProps.useUnloggedBatch.setValue(false);
 
-        CassandraMetadata m = new CassandraMetadata();
+        Metadata m = new CassandraMetadata();
         m.initSchema(props);
         m.initSchema(outProps);
 

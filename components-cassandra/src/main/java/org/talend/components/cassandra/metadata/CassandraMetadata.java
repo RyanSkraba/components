@@ -3,6 +3,7 @@ package org.talend.components.cassandra.metadata;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ColumnMetadata;
 import com.datastax.driver.core.DataType;
+import org.talend.components.api.component.runtime.metadata.Metadata;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.schema.SchemaFactory;
 import org.talend.components.cassandra.type.CassandraAPITypeMapping;
@@ -13,7 +14,8 @@ import java.util.List;
 /**
  * Created by bchen on 16-1-15.
  */
-public class CassandraMetadata {
+public class CassandraMetadata implements Metadata {
+    @Override
     public void initSchema(ComponentProperties properties) {
         CassandraMetadataProperties props = (CassandraMetadataProperties) properties;
 
