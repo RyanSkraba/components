@@ -50,7 +50,7 @@ public class SimpleTransformationGDF<InputType, OutputMain, OutputError> extends
 
         @Override
         public void outputErrorData(OutputError out) {
-            context.sideOutput(new TupleTag<OutputError>(), out);
+            context.sideOutput(errorTag, out);
         }
     }
 
@@ -67,9 +67,6 @@ public class SimpleTransformationGDF<InputType, OutputMain, OutputError> extends
      * @throws Exception
      */
     public PCollectionTuple generatePipeline(PCollection<InputType> input) throws Exception {
-        // TODO we cannot use the KryoCoder for a KVCoder.
-        // Also we cannot use KryoCoder for the Key and for the Value, because the KryoCoder is going to kill the
-        // inputStream.
         PCollectionTuple pColTup = input.apply(ParDo.withOutputTags(mainTag, TupleTagList.of(errorTag)).of(this));
         pColTup.get(mainTag).setCoder(KryoCoder.of());
         pColTup.get(errorTag).setCoder(KryoCoder.of());

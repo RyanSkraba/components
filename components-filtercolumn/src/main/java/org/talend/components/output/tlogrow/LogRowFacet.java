@@ -16,8 +16,8 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.runtime.SimpleOutputRuntime;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.runtime.SimpleOutputRuntime;
 
 // TODO slice the component into a write component and an output compoenent
 public class LogRowFacet extends SimpleOutputRuntime<Map<String, Object>> {
@@ -30,6 +30,7 @@ public class LogRowFacet extends SimpleOutputRuntime<Map<String, Object>> {
 
     @Override
     public void execute(Map<String, Object> inputValue) throws Exception {
+        System.out.println("got results!");
         System.out.println(inputValue);
     }
 
