@@ -16,9 +16,9 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.runtime.SimpleTransformationRuntime;
+import org.talend.components.api.runtime.TransformationRuntime;
 
-public class FilterColumnRuntime extends SimpleTransformationRuntime {
+public class FilterColumnRuntime extends TransformationRuntime<Map<String, Object>, Map<String, Object>, Void> {
 
     private static final Logger LOG = LoggerFactory.getLogger(FilterColumnRuntime.class);
 

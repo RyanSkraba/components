@@ -17,7 +17,9 @@ package org.talend.components.api.runtime;
  * 
  * @param <OutputObject>
  */
-public interface SingleOutputConnector<OutputObject> {
+public interface DoubleOutputConnector<MainObject, ErrorObject> {
 
-    public void outputMainData(OutputObject out);
+    public void outputMainData(MainObject out);
+
+    public void outputErrorData(ErrorObject out);
 }

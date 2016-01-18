@@ -3,7 +3,7 @@ package org.talend.dataflow.mongo;
 import java.util.Map;
 
 import org.junit.Test;
-import org.talend.components.engine.gdf.SimpleExtractionGDF;
+import org.talend.components.engine.gdf.SimpleTransformationGDF;
 import org.talend.components.engine.gdf.SimpleInputGDF;
 import org.talend.components.engine.gdf.SimpleOutputGDF;
 import org.talend.components.mongodb.tmongodbextract.MongoDBExtractRuntime;
@@ -15,6 +15,7 @@ import com.google.cloud.dataflow.sdk.options.PipelineOptions;
 import com.google.cloud.dataflow.sdk.options.PipelineOptionsFactory;
 import com.google.cloud.dataflow.sdk.runners.DirectPipelineRunner;
 import com.google.cloud.dataflow.sdk.values.PCollection;
+import com.google.cloud.dataflow.sdk.values.PCollectionTuple;
 import com.mongodb.DBObject;
 
 public class TestMongoDBInputV2 {
@@ -40,23 +41,23 @@ public class TestMongoDBInputV2 {
      */
     @Test
     public void testWithInsert() throws Exception {
+        // create GDF components
+        SimpleInputGDF<DBObject> input = new SimpleInputGDF<>(new MongoDBInputRuntime());
+        SimpleTransformationGDF<DBObject, Map<String, Object>, Map<String, Object>> extract = new SimpleTransformationGDF<>(
+                new MongoDBExtractRuntime());
+        SimpleOutputGDF<Map<String, Object>> output = new SimpleOutputGDF<>(new MongoDBOutputRuntime());
+
+        // setup pipeline
         PipelineOptions options = PipelineOptionsFactory.create();
         Pipeline p = Pipeline.create(options);
 
-        SimpleInputGDF<DBObject> input = new SimpleInputGDF<>(
-                new MongoDBInputRuntime());
-        SimpleExtractionGDF<DBObject> extract = new SimpleExtractionGDF<DBObject>(new MongoDBExtractRuntime());
-        SimpleOutputGDF<Map<String, Object>> output = new SimpleOutputGDF<>(new MongoDBOutputRuntime());
-
         PCollection<DBObject> inputResult = input.generatePipeline(p);
-
-        extract.generatePipeline(inputResult);
-        PCollection<Map<String, Object>> extractedResult = extract.getMainOutput();
+        PCollectionTuple multiOutPCol = extract.generatePipeline(inputResult);
 
         // not used here currently, but allow me to test empty results
-        PCollection<Map<String, Object>> rejectedResult = extract.getErrorOutput();
+        PCollection<Map<String, Object>> rejectedResult = multiOutPCol.get(extract.errorTag);
 
-        output.generatePipeline(extractedResult);
+        output.generatePipeline(multiOutPCol.get(extract.mainTag));
 
         DirectPipelineRunner.createForTest().run(p);
     }
@@ -77,19 +78,19 @@ public class TestMongoDBInputV2 {
     public void testWithALog() throws Exception {
         // TransformTranslator.addTransformEvaluator(CassandraIO.Read.Bound.class, new
         // CassandraInputTransformEvaluator());
-        PipelineOptions options = PipelineOptionsFactory.create();
-        Pipeline p = Pipeline.create(options);
-        SimpleInputGDF<DBObject> input = new SimpleInputGDF<>(
-                new MongoDBInputRuntime());
-        SimpleExtractionGDF<DBObject> extract = new SimpleExtractionGDF<DBObject>(new MongoDBExtractRuntime());
+        // create GDF components
+        SimpleInputGDF<DBObject> input = new SimpleInputGDF<>(new MongoDBInputRuntime());
+        SimpleTransformationGDF<DBObject, Map<String, Object>, Map<String, Object>> extract = new SimpleTransformationGDF<>(
+                new MongoDBExtractRuntime());
         SimpleOutputGDF<Map<String, Object>> output = new SimpleOutputGDF<>(new MongoDBOutputRuntime());
 
+        // setup pipieline
+        PipelineOptions options = PipelineOptionsFactory.create();
+        Pipeline p = Pipeline.create(options);
+
         PCollection<DBObject> inputResult = input.generatePipeline(p);
-
-        extract.generatePipeline(inputResult);
-        PCollection<Map<String, Object>> extractedResult = extract.getMainOutput();
-
-        output.generatePipeline(extractedResult);
+        PCollectionTuple pColTuple = extract.generatePipeline(inputResult);
+        output.generatePipeline(pColTuple.get(extract.mainTag));
 
         DirectPipelineRunner.createForTest().run(p);
     }

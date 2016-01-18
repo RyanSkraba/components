@@ -37,7 +37,7 @@ public abstract class SimpleInputRuntime<OutputObject> implements BaseRuntime {
     public abstract void execute() throws Exception;
 
     public void addToMainOutput(OutputObject output) {
-        soc.outputData(output);
+        soc.outputMainData(output);
     }
 
 }

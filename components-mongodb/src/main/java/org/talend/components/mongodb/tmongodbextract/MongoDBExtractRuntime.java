@@ -17,12 +17,11 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.runtime.ExtractionRuntime;
-import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.runtime.TransformationRuntime;
 
 import com.mongodb.DBObject;
 
-public class MongoDBExtractRuntime extends ExtractionRuntime<DBObject> {
+public class MongoDBExtractRuntime extends TransformationRuntime<DBObject, Map<String, Object>, Map<String, Object>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBExtractRuntime.class);
 
@@ -77,14 +76,4 @@ public class MongoDBExtractRuntime extends ExtractionRuntime<DBObject> {
         }
     }
 
-    @Override
-    public void tearDown() {
-        // Nothing
-    }
-
-    @Override
-    public void setUp(ComponentProperties context) {
-        // TODO Auto-generated method stub
-
-    }
 }

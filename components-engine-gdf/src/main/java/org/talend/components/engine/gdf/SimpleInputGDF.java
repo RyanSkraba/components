@@ -36,22 +36,29 @@ public class SimpleInputGDF<OutputObject> extends DoFn<Void, OutputObject> {
 
         private static final long serialVersionUID = -2807289784162087247L;
 
+        private ProcessContext processContext;
+
         @Override
-        public void outputData(OutputObject out) {
+        public void outputMainData(OutputObject out) {
             processContext.output(out);
+        }
+
+        void setProcessContext(ProcessContext processContext) {
+            this.processContext = processContext;
 
         }
     }
 
     private static final long serialVersionUID = -6363022558571467775L;
 
-    ProcessContext processContext;
-
     private SimpleInputRuntime<OutputObject> compFacet;
+
+    private SingleOutputConnectorImpl soc;
 
     public SimpleInputGDF(SimpleInputRuntime<OutputObject> compFacet) {
         this.compFacet = compFacet;
-        compFacet.setOutputConnector(new SingleOutputConnectorImpl());
+        soc = new SingleOutputConnectorImpl();
+        compFacet.setOutputConnector(soc);
     }
 
     @Override
@@ -61,9 +68,8 @@ public class SimpleInputGDF<OutputObject> extends DoFn<Void, OutputObject> {
     }
 
     @Override
-    public void processElement(ProcessContext processContext)
-            throws Exception {
-        this.processContext = processContext;
+    public void processElement(ProcessContext processContext) throws Exception {
+        soc.setProcessContext(processContext);
         compFacet.execute();
     }
 
