@@ -17,11 +17,13 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.runtime.DoubleOutputConnector;
 import org.talend.components.api.runtime.TransformationRuntime;
 
 import com.mongodb.DBObject;
 
-public class MongoDBExtractRuntime extends TransformationRuntime<DBObject, Map<String, Object>, Map<String, Object>> {
+public class MongoDBExtractRuntime implements TransformationRuntime<DBObject, Map<String, Object>, Map<String, Object>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBExtractRuntime.class);
 
@@ -57,7 +59,8 @@ public class MongoDBExtractRuntime extends TransformationRuntime<DBObject, Map<S
     }
 
     @Override
-    public void execute(DBObject input) throws Exception {
+    public void execute(DBObject input, DoubleOutputConnector<Map<String, Object>, Map<String, Object>> outputs)
+            throws Exception {
         System.out.println("input:" + input);
         String name = getValue("test.hierarchical", "name", input).toString();
         String value = getValue("test.hierarchical", "value", input).toString();
@@ -70,10 +73,20 @@ public class MongoDBExtractRuntime extends TransformationRuntime<DBObject, Map<S
             Map<String, Object> error = new HashMap<String, Object>();
             error.put("errorMsg", "The input JSON is invalid");
             error.put("inputValue", input);
-            this.addToErrorOutput(error);
+            outputs.outputErrorData(error);
         } else {
-            this.addToMainOutput(output);
+            outputs.outputMainData(output);
         }
+    }
+
+    @Override
+    public void setUp(ComponentProperties context) {
+        // do nothing on purpose
+    }
+
+    @Override
+    public void tearDown() {
+        // do nothing on purpose
     }
 
 }

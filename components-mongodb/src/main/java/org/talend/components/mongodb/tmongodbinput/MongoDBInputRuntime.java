@@ -17,8 +17,9 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.runtime.SimpleInputRuntime;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.runtime.SimpleInputRuntime;
+import org.talend.components.api.runtime.SingleOutputConnector;
 
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -29,7 +30,7 @@ import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 
-public class MongoDBInputRuntime extends SimpleInputRuntime<DBObject> {
+public class MongoDBInputRuntime implements SimpleInputRuntime<DBObject> {
 
     private static final long serialVersionUID = 8345765264712176890L;
 
@@ -49,13 +50,13 @@ public class MongoDBInputRuntime extends SimpleInputRuntime<DBObject> {
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute(SingleOutputConnector<DBObject> soc) throws Exception {
         DBCollection coll = db.getCollection("inputCollection");
         com.mongodb.DBObject myQuery = (com.mongodb.DBObject) com.mongodb.util.JSON.parse("{}");
         com.mongodb.DBObject fields = new com.mongodb.BasicDBObject();
         DBCursor cursor = coll.find(myQuery, fields);
         while (cursor.hasNext()) {
-            this.addToMainOutput(cursor.next());
+            soc.outputMainData(cursor.next());
         }
     }
 
