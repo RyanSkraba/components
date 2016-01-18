@@ -76,10 +76,21 @@ public class SimpleTransformationGDF<InputType, OutputMain, OutputError> extends
     }
 
     @Override
+    public void startBundle(Context context) throws Exception {
+        // TODO pass only the properties
+        runtimeImpl.setUp(null);
+    }
+
+    @Override
     public void processElement(DoFn<InputType, OutputMain>.ProcessContext context) throws Exception {
         this.context = context;
         InputType input = context.element();
         runtimeImpl.execute(input, outputsConnector);
+    }
+
+    @Override
+    public void finishBundle(Context context) throws Exception {
+        runtimeImpl.tearDown();
     }
 
 }
