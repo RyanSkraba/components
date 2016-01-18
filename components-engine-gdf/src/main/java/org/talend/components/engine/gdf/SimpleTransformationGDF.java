@@ -38,6 +38,8 @@ public class SimpleTransformationGDF<InputType, OutputMain, OutputError> extends
 
     public TupleTag<OutputError> errorTag = new TupleTag<>();
 
+    private DoubleOutputGdfImpl outputsConnector;
+
     /**
      * created by sgandon on 18 janv. 2016
      */
@@ -56,7 +58,7 @@ public class SimpleTransformationGDF<InputType, OutputMain, OutputError> extends
 
     public SimpleTransformationGDF(TransformationRuntime<InputType, OutputMain, OutputError> runtimeImpl) {
         this.runtimeImpl = runtimeImpl;
-        runtimeImpl.setOutputConnector(new DoubleOutputGdfImpl());
+        outputsConnector = new DoubleOutputGdfImpl();
     }
 
     /**
@@ -80,7 +82,7 @@ public class SimpleTransformationGDF<InputType, OutputMain, OutputError> extends
     public void processElement(DoFn<InputType, OutputMain>.ProcessContext context) throws Exception {
         this.context = context;
         InputType input = context.element();
-        runtimeImpl.execute(input);
+        runtimeImpl.execute(input, outputsConnector);
     }
 
 }

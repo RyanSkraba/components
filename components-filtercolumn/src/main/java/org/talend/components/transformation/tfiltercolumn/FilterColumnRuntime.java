@@ -16,18 +16,31 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.runtime.DoubleOutputConnector;
 import org.talend.components.api.runtime.TransformationRuntime;
 
-public class FilterColumnRuntime extends TransformationRuntime<Map<String, Object>, Map<String, Object>, Void> {
+public class FilterColumnRuntime implements TransformationRuntime<Map<String, Object>, Map<String, Object>, Void> {
 
     private static final Logger LOG = LoggerFactory.getLogger(FilterColumnRuntime.class);
 
     @Override
-    public void execute(Map<String, Object> inputValue) throws Exception {
+    public void execute(Map<String, Object> inputValue, DoubleOutputConnector<Map<String, Object>, Void> outputs)
+            throws Exception {
         // Do the processing... Let's simplify everything : remove just the field "invalid" if there is any
         if (inputValue.containsKey("invalid")) {
             inputValue.remove("invalid");
         }
-        addToMainOutput(inputValue);
+        outputs.outputMainData(inputValue);
+    }
+
+    @Override
+    public void setUp(ComponentProperties context) {
+        // do nothing on purpose
+    }
+
+    @Override
+    public void tearDown() {
+        // do nothing on purpose
     }
 }

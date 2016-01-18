@@ -15,29 +15,14 @@ package org.talend.components.api.runtime;
 /**
  * Code to execute the component's facet. This can be used at runtime or design time as required.
  */
-public abstract class SimpleInputRuntime<OutputObject> implements BaseRuntime {
-
-    private SingleOutputConnector<OutputObject> soc;
+public interface SimpleInputRuntime<OutputObject> extends BaseRuntime {
 
     /**
-     * This must be set by the runtime engine facet implmentation
+     * called to create all the inputs values they should all be outputed using the soc instance.
      * 
-     * @param soc connector used to ouput the data for the Input facet.
-     */
-    public void setOutputConnector(SingleOutputConnector<OutputObject> soc) {
-        this.soc = soc;
-    }
-
-    /**
-     * called to create all the inputs values they should all be outputed using the
-     * {@link SimpleInputRuntime#addToMainOutput(Object)}
-     *
+     * @param soc object used to ouput things.
      * @throws Exception
      */
-    public abstract void execute() throws Exception;
-
-    public void addToMainOutput(OutputObject output) {
-        soc.outputMainData(output);
-    }
+    public void execute(SingleOutputConnector<OutputObject> soc) throws Exception;
 
 }

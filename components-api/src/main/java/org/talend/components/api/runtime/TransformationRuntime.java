@@ -12,54 +12,20 @@
 // ============================================================================
 package org.talend.components.api.runtime;
 
-import org.talend.components.api.properties.ComponentProperties;
-
 /**
- * Code to execute the component's facet. This can be used at runtime or design time as required.
+ * Transformation interface for components having one input data and have to ouput data after a transformation either on
+ * as main data or as an error object.
  */
-public abstract class TransformationRuntime<InputObject, OutputMainObject, OutputErrorObject> implements BaseRuntime {
-
-    private DoubleOutputConnector<OutputMainObject, OutputErrorObject> doc;
+public interface TransformationRuntime<InputObject, OutputMainObject, OutputErrorObject> extends BaseRuntime {
 
     /**
-     * This must be set by the runtime engine facet implmentation
-     * 
-     * @param doc connector used to ouput the data for the Input facet.
-     */
-    public void setOutputConnector(DoubleOutputConnector<OutputMainObject, OutputErrorObject> doc) {
-        this.doc = doc;
-    }
-
-    public void addToMainOutput(OutputMainObject output) {
-        doc.outputMainData(output);
-    }
-
-    public void addToErrorOutput(OutputErrorObject output) {
-        doc.outputErrorData(output);
-    }
-
-    /**
-     * process the inputValue to output it into main or error connector
+     * process the inputValue to output it into main or error outputs.
      *
      * @param inputValue Input value that will be processed.
+     * @param outputs oubject used to ouput data.
      * @throws Exception
      */
-    public abstract void execute(InputObject inputValue) throws Exception;
-
-    /**
-     * default implmentation is empty
-     */
-    @Override
-    public void tearDown() {
-        // empty on purpose
-    }
-
-    /**
-     * default implmentation is empty
-     */
-    @Override
-    public void setUp(ComponentProperties comp) {
-        // empty on purpose
-    }
+    public abstract void execute(InputObject inputValue, DoubleOutputConnector<OutputMainObject, OutputErrorObject> outputs)
+            throws Exception;
 
 }

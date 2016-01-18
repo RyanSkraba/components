@@ -58,7 +58,6 @@ public class SimpleInputGDF<OutputObject> extends DoFn<Void, OutputObject> {
     public SimpleInputGDF(SimpleInputRuntime<OutputObject> compFacet) {
         this.compFacet = compFacet;
         soc = new SingleOutputConnectorImpl();
-        compFacet.setOutputConnector(soc);
     }
 
     @Override
@@ -70,7 +69,7 @@ public class SimpleInputGDF<OutputObject> extends DoFn<Void, OutputObject> {
     @Override
     public void processElement(ProcessContext processContext) throws Exception {
         soc.setProcessContext(processContext);
-        compFacet.execute();
+        compFacet.execute(soc);
     }
 
     @Override
