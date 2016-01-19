@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.engine.gdf;
 
+import org.talend.components.api.runtime.BaseRuntime;
 import org.talend.components.api.runtime.SimpleOutputRuntime;
 
 import com.google.cloud.dataflow.sdk.transforms.DoFn;
@@ -41,8 +42,7 @@ public class SimpleOutputGDF<InputObject> extends DoFn<InputObject, Void> {
     }
 
     @Override
-    public void processElement(ProcessContext processContext)
-            throws Exception {
+    public void processElement(ProcessContext processContext) throws Exception {
         InputObject input = processContext.element();
         delegate.execute(input);
     }
@@ -59,4 +59,7 @@ public class SimpleOutputGDF<InputObject> extends DoFn<InputObject, Void> {
         input.apply(ParDo.of(this));
     }
 
+    public BaseRuntime getRuntime() {
+        return delegate;
+    }
 }

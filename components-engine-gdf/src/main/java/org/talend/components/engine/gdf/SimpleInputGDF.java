@@ -14,6 +14,7 @@ package org.talend.components.engine.gdf;
 
 import java.io.Serializable;
 
+import org.talend.components.api.runtime.BaseRuntime;
 import org.talend.components.api.runtime.SimpleInputRuntime;
 import org.talend.components.api.runtime.SingleOutputConnector;
 
@@ -85,6 +86,10 @@ public class SimpleInputGDF<OutputObject> extends DoFn<Void, OutputObject> {
     public PCollection<OutputObject> generatePipeline(Pipeline pipeline) {
         return pipeline.begin().apply(Create.of((Void) null)).setCoder(VoidCoder.of()).apply(ParDo.of(this))
                 .setCoder(KryoCoder.of());
+    }
+
+    public BaseRuntime getRuntime() {
+        return compFacet;
     }
 
 }

@@ -14,6 +14,7 @@ package org.talend.components.engine.gdf;
 
 import java.io.Serializable;
 
+import org.talend.components.api.runtime.BaseRuntime;
 import org.talend.components.api.runtime.DoubleOutputConnector;
 import org.talend.components.api.runtime.TransformationRuntime;
 
@@ -24,13 +25,13 @@ import com.google.cloud.dataflow.sdk.values.PCollectionTuple;
 import com.google.cloud.dataflow.sdk.values.TupleTag;
 import com.google.cloud.dataflow.sdk.values.TupleTagList;
 
-public class SimpleTransformationGDF<InputType, OutputMain, OutputError> extends DoFn<InputType, OutputMain> {
+public class SimpleTransformationGDF<InputObject, OutputMain, OutputError> extends DoFn<InputObject, OutputMain> {
 
     private static final long serialVersionUID = 3173778597329077341L;
 
-    TransformationRuntime<InputType, OutputMain, OutputError> facet;
+    TransformationRuntime<InputObject, OutputMain, OutputError> facet;
 
-    private TransformationRuntime<InputType, OutputMain, OutputError> runtimeImpl;
+    private TransformationRuntime<InputObject, OutputMain, OutputError> runtimeImpl;
 
     private ProcessContext context;
 
@@ -56,7 +57,7 @@ public class SimpleTransformationGDF<InputType, OutputMain, OutputError> extends
         }
     }
 
-    public SimpleTransformationGDF(TransformationRuntime<InputType, OutputMain, OutputError> runtimeImpl) {
+    public SimpleTransformationGDF(TransformationRuntime<InputObject, OutputMain, OutputError> runtimeImpl) {
         this.runtimeImpl = runtimeImpl;
         outputsConnector = new DoubleOutputGdfImpl();
     }
@@ -68,7 +69,7 @@ public class SimpleTransformationGDF<InputType, OutputMain, OutputError> extends
      * @return
      * @throws Exception
      */
-    public PCollectionTuple generatePipeline(PCollection<InputType> input) throws Exception {
+    public PCollectionTuple generatePipeline(PCollection<InputObject> input) throws Exception {
         PCollectionTuple pColTup = input.apply(ParDo.withOutputTags(mainTag, TupleTagList.of(errorTag)).of(this));
         pColTup.get(mainTag).setCoder(KryoCoder.of());
         pColTup.get(errorTag).setCoder(KryoCoder.of());
@@ -82,15 +83,19 @@ public class SimpleTransformationGDF<InputType, OutputMain, OutputError> extends
     }
 
     @Override
-    public void processElement(DoFn<InputType, OutputMain>.ProcessContext context) throws Exception {
+    public void processElement(DoFn<InputObject, OutputMain>.ProcessContext context) throws Exception {
         this.context = context;
-        InputType input = context.element();
+        InputObject input = context.element();
         runtimeImpl.execute(input, outputsConnector);
     }
 
     @Override
     public void finishBundle(Context context) throws Exception {
         runtimeImpl.tearDown();
+    }
+
+    public BaseRuntime getRuntime() {
+        return facet;
     }
 
 }
