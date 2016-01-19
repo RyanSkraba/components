@@ -234,16 +234,14 @@ public class SalesforceRuntime extends ComponentRuntime {
     public void connect(ComponentProperties p) throws ConnectionException, AsyncApiException {
     	SalesforceConnectionProperties properties = (SalesforceConnectionProperties) p;
         String refedComponentId = properties.referencedComponentId.getStringValue();
-        if(refedComponentId != null){
-    		if(container != null){
-	    		connection = (PartnerConnection)container.getGlobalMap().get(refedComponentId);
+        if (refedComponentId != null && container != null) {
+            if(!refedComponentId.equals(container.getCurrentComponentName())){
+                connection = (PartnerConnection)container.getGlobalMap().get(refedComponentId);
                 if(connection == null){
                     throw new ConnectionException("Can't find the shared connection instance with refedComponentId: "+refedComponentId);
                 }
-	    		return;
-	    	}else{
-	    		properties = (SalesforceConnectionProperties) componentService.getPropertiesForComponent(refedComponentId);
-	    	}
+                return;
+            }
         }
 
         ConnectorConfig config = new ConnectorConfig();
