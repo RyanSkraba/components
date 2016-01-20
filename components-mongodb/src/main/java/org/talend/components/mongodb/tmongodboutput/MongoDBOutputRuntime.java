@@ -14,12 +14,12 @@ package org.talend.components.mongodb.tmongodboutput;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.runtime.SimpleOutputRuntime;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.runtime.SimpleOutputRuntime;
 
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
@@ -28,7 +28,7 @@ import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 
 // TODO slice the component into a write component and an output compoenent
-public class MongoDBOutputRuntime extends SimpleOutputRuntime<Map<String, Object>> {
+public class MongoDBOutputRuntime extends SimpleOutputRuntime {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBOutputRuntime.class);
 
@@ -36,18 +36,28 @@ public class MongoDBOutputRuntime extends SimpleOutputRuntime<Map<String, Object
 
     private DB db = null;
 
+    // TODO: these must come from component properties. to delete.
+
+    public static String HOST = "localhost";
+
+    public static int PORT = 27017;
+
+    public static String DB_NAME = "test";
+
+    public static String DB_COLLECTION = "outputCollection";
+
     @Override
     public void setUp(ComponentProperties props) {
         MongoClientOptions clientOptions = new MongoClientOptions.Builder().build();
         List<MongoCredential> mongoCredentialList = new ArrayList<MongoCredential>();
-        ServerAddress serverAddress = new ServerAddress("192.168.99.100", 27017);
+        ServerAddress serverAddress = new ServerAddress(HOST, PORT);
         mongo = new MongoClient(serverAddress, mongoCredentialList, clientOptions);
-        this.db = mongo.getDB("test");
+        this.db = mongo.getDB(DB_NAME);
     }
 
     @Override
-    public void execute(Map<String, Object> inputValue) throws Exception {
-        com.mongodb.DBCollection collection = db.getCollection("outputCollection");
+    public void execute(IndexedRecord inputValue) throws Exception {
+        com.mongodb.DBCollection collection = db.getCollection(DB_COLLECTION);
         // initialize objects
         MongoDBOutputUtil updateObjectUtil = new MongoDBOutputUtil();
         updateObjectUtil.setObject(new com.mongodb.BasicDBObject());
@@ -58,8 +68,10 @@ public class MongoDBOutputRuntime extends SimpleOutputRuntime<Map<String, Object
         pathMap.put("defaultColumn", "simplepath");
 
         // create BasicDBObject
-        updateObjectUtil.put(pathMap.get("defaultColumn"), "outputcolumn", "name");
+        updateObjectUtil.put(pathMap.get("defaultColumn"), "outputcolumn", inputValue.get(1));
         com.mongodb.BasicDBObject updateObj = updateObjectUtil.getObject();
+
+        System.out.println(updateObj.toJson());
 
         collection.insert(updateObj);
     }

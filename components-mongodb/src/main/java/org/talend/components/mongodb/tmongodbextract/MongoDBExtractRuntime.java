@@ -12,18 +12,14 @@
 // ============================================================================
 package org.talend.components.mongodb.tmongodbextract;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.DoubleOutputConnector;
 import org.talend.components.api.runtime.TransformationRuntime;
 
-import com.mongodb.DBObject;
-
-public class MongoDBExtractRuntime implements TransformationRuntime<DBObject, Map<String, Object>, Map<String, Object>> {
+public class MongoDBExtractRuntime implements TransformationRuntime<IndexedRecord, IndexedRecord> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBExtractRuntime.class);
 
@@ -59,24 +55,24 @@ public class MongoDBExtractRuntime implements TransformationRuntime<DBObject, Ma
     }
 
     @Override
-    public void execute(DBObject input, DoubleOutputConnector<Map<String, Object>, Map<String, Object>> outputs)
+    public void execute(IndexedRecord input, DoubleOutputConnector<IndexedRecord, IndexedRecord> outputs)
             throws Exception {
-        System.out.println("input:" + input);
-        String name = getValue("test.hierarchical", "name", input).toString();
-        String value = getValue("test.hierarchical", "value", input).toString();
-        String wholeJSON = getValue("", "*", input).toString();
-        Map<String, Object> output = new HashMap<String, Object>();
-        output.put("name", name);
-        output.put("value", value);
-        output.put("wholeJSON", wholeJSON);
-        if (name == null || value == null || wholeJSON == null) {
-            Map<String, Object> error = new HashMap<String, Object>();
-            error.put("errorMsg", "The input JSON is invalid");
-            error.put("inputValue", input);
-            outputs.outputErrorData(error);
-        } else {
-            outputs.outputMainData(output);
-        }
+        // System.out.println("input:" + input);
+        // String name = getValue("test.hierarchical", "name", input).toString();
+        // String value = getValue("test.hierarchical", "value", input).toString();
+        // String wholeJSON = getValue("", "*", input).toString();
+        // Map<String, Object> output = new HashMap<String, Object>();
+        // output.put("name", name);
+        // output.put("value", value);
+        // output.put("wholeJSON", wholeJSON);
+        // if (name == null || value == null || wholeJSON == null) {
+        // Map<String, Object> error = new HashMap<String, Object>();
+        // error.put("errorMsg", "The input JSON is invalid");
+        // error.put("inputValue", input);
+        // outputs.outputErrorData(error);
+        // } else {
+        // outputs.outputMainData(output);
+        // }
     }
 
     @Override

@@ -28,6 +28,14 @@
 			<version>2.24.0</version>
 		</dependency>
 
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>de.flapdoodle.embed</groupId>
+			<artifactId>de.flapdoodle.embed.mongo</artifactId>
+			<version>1.50.2</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- TODO should we keep these dependencies? -->
 		<dependency>
 			<groupId>org.talend.daikon</groupId>

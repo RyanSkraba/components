@@ -20,9 +20,8 @@ import org.talend.components.api.runtime.ComponentRuntime;
 import aQute.bnd.annotation.component.Component;
 
 /**
- * Component that can connect to a salesforce system and get some data out of it.
+ * Component that can connect to a MongoDB system and get some data out of it.
  */
-
 @Component(name = Constants.COMPONENT_BEAN_PREFIX + MongoDBInputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class MongoDBInputDefinition extends SimpleInputDefinition {
 

@@ -12,11 +12,14 @@
 // ============================================================================
 package org.talend.components.api.runtime;
 
+import org.apache.avro.generic.IndexedRecord;
+
 /**
  * Transformation interface for components having one input data and have to ouput data after a transformation either on
  * as main data or as an error object.
  */
-public interface TransformationRuntime<InputObject, OutputMainObject, OutputErrorObject> extends BaseRuntime {
+public interface TransformationRuntime<OutputMainObject extends IndexedRecord, OutputErrorObject extends IndexedRecord>
+        extends BaseRuntime {
 
     /**
      * process the inputValue to output it into main or error outputs.
@@ -25,7 +28,7 @@ public interface TransformationRuntime<InputObject, OutputMainObject, OutputErro
      * @param outputs oubject used to ouput data.
      * @throws Exception
      */
-    public abstract void execute(InputObject inputValue, DoubleOutputConnector<OutputMainObject, OutputErrorObject> outputs)
+    public abstract void execute(IndexedRecord inputValue, DoubleOutputConnector<OutputMainObject, OutputErrorObject> outputs)
             throws Exception;
 
 }

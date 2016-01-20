@@ -13,6 +13,7 @@
 package org.talend.components.engine.gdf;
 
 import org.talend.components.api.runtime.BaseRuntime;
+import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.runtime.SimpleOutputRuntime;
 
 import com.google.cloud.dataflow.sdk.transforms.DoFn;
@@ -22,16 +23,16 @@ import com.google.cloud.dataflow.sdk.values.PCollection;
 /**
  * Code to execute the component's facet. This can be used at runtime or design time as required.
  */
-public class SimpleOutputGDF<InputObject> extends DoFn<InputObject, Void> {
+public class SimpleOutputGDF extends DoFn<IndexedRecord, Void> {
 
     private static final long serialVersionUID = 4551281004426190461L;
 
-    private SimpleOutputRuntime<InputObject> delegate;
+    private SimpleOutputRuntime delegate;
 
     /**
      * DOC sgandon SimpleOutputFacetV2 constructor comment.
      */
-    public SimpleOutputGDF(SimpleOutputRuntime<InputObject> delegate) {
+    public SimpleOutputGDF(SimpleOutputRuntime delegate) {
         this.delegate = delegate;
     }
 
@@ -43,7 +44,7 @@ public class SimpleOutputGDF<InputObject> extends DoFn<InputObject, Void> {
 
     @Override
     public void processElement(ProcessContext processContext) throws Exception {
-        InputObject input = processContext.element();
+        IndexedRecord input = processContext.element();
         delegate.execute(input);
     }
 
@@ -55,7 +56,8 @@ public class SimpleOutputGDF<InputObject> extends DoFn<InputObject, Void> {
     /**
      * Execute a transformation with only a main flow compatible with the current Framework
      */
-    public void generatePipeline(PCollection<InputObject> input) throws Exception {
+
+    public <T extends IndexedRecord> void generatePipeline(PCollection<T> input) throws Exception {
         input.apply(ParDo.of(this));
     }
 

@@ -12,15 +12,14 @@
 // ============================================================================
 package org.talend.components.output.tlogrow;
 
-import java.util.Map;
-
+import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.SimpleOutputRuntime;
 
 // TODO slice the component into a write component and an output compoenent
-public class LogRowFacet extends SimpleOutputRuntime<Map<String, Object>> {
+public class LogRowFacet extends SimpleOutputRuntime {
 
     private static final Logger LOG = LoggerFactory.getLogger(LogRowFacet.class);
 
@@ -29,7 +28,7 @@ public class LogRowFacet extends SimpleOutputRuntime<Map<String, Object>> {
     }
 
     @Override
-    public void execute(Map<String, Object> inputValue) throws Exception {
+    public void execute(IndexedRecord inputValue) throws Exception {
         System.out.println("got results!");
         System.out.println(inputValue);
     }

@@ -12,10 +12,12 @@
 // ============================================================================
 package org.talend.components.api.runtime;
 
+import org.apache.avro.generic.IndexedRecord;
+
 /**
  * Code to execute the component's facet. This can be used at runtime or design time as required.
  */
-public interface SimpleInputRuntime<OutputObject> extends BaseRuntime {
+public interface SimpleInputRuntime<OutputObject extends IndexedRecord> extends BaseRuntime {
 
     /**
      * called to create all the inputs values they should all be outputed using the soc instance.

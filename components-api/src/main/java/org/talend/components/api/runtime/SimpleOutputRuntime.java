@@ -12,10 +12,12 @@
 // ============================================================================
 package org.talend.components.api.runtime;
 
+import org.apache.avro.generic.IndexedRecord;
+
 /**
  * Code to execute the component's facet. This can be used at runtime or design time as required.
  */
-public abstract class SimpleOutputRuntime<InputObject> implements BaseRuntime {
+public abstract class SimpleOutputRuntime implements BaseRuntime {
 
     /**
      * ouput to a final system the data gotten has inputValue
@@ -23,6 +25,6 @@ public abstract class SimpleOutputRuntime<InputObject> implements BaseRuntime {
      * @param inputValue Input value that will be processed.
      * @throws Exception
      */
-    public abstract void execute(InputObject inputValue) throws Exception;
+    public abstract void execute(IndexedRecord inputValue) throws Exception;
 
 }

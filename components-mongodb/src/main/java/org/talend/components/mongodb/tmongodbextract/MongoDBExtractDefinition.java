@@ -36,7 +36,7 @@ public class MongoDBExtractDefinition extends RejectableTransormationDefinition 
 
     @Override
     public String[] getFamilies() {
-        return new String[] { "Processing/Tranformation" };
+        return new String[] { "Processing/Transformation" };
     }
 
     // TODO Where is the create Runtime?

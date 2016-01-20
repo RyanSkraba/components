@@ -12,12 +12,14 @@
 // ============================================================================
 package org.talend.components.api.runtime;
 
+import org.apache.avro.generic.IndexedRecord;
+
 /**
  * created by sgandon on 14 janv. 2016
  * 
  * @param <OutputObject>
  */
-public interface DoubleOutputConnector<MainObject, ErrorObject> {
+public interface DoubleOutputConnector<MainObject extends IndexedRecord, ErrorObject extends IndexedRecord> {
 
     public void outputMainData(MainObject out);
 

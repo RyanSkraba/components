@@ -15,6 +15,7 @@ package org.talend.components.engine.gdf;
 import java.io.Serializable;
 
 import org.talend.components.api.runtime.BaseRuntime;
+import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.runtime.SimpleInputRuntime;
 import org.talend.components.api.runtime.SingleOutputConnector;
 
@@ -28,7 +29,7 @@ import com.google.cloud.dataflow.sdk.values.PCollection;
 /**
  * Code to execute the component's facet. This can be used at runtime or design time as required.
  */
-public class SimpleInputGDF<OutputObject> extends DoFn<Void, OutputObject> {
+public class SimpleInputGDF<OutputObject extends IndexedRecord> extends DoFn<Void, OutputObject> {
 
     /**
      * created by sgandon on 14 janv. 2016

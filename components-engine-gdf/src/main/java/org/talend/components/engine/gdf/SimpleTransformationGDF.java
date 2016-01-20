@@ -15,6 +15,7 @@ package org.talend.components.engine.gdf;
 import java.io.Serializable;
 
 import org.talend.components.api.runtime.BaseRuntime;
+import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.runtime.DoubleOutputConnector;
 import org.talend.components.api.runtime.TransformationRuntime;
 
@@ -25,13 +26,14 @@ import com.google.cloud.dataflow.sdk.values.PCollectionTuple;
 import com.google.cloud.dataflow.sdk.values.TupleTag;
 import com.google.cloud.dataflow.sdk.values.TupleTagList;
 
-public class SimpleTransformationGDF<InputObject, OutputMain, OutputError> extends DoFn<InputObject, OutputMain> {
+public class SimpleTransformationGDF<OutputMain extends IndexedRecord, OutputError extends IndexedRecord>
+        extends DoFn<IndexedRecord, OutputMain> {
 
     private static final long serialVersionUID = 3173778597329077341L;
 
-    TransformationRuntime<InputObject, OutputMain, OutputError> facet;
+    TransformationRuntime<OutputMain, OutputError> facet;
 
-    private TransformationRuntime<InputObject, OutputMain, OutputError> runtimeImpl;
+    private TransformationRuntime<OutputMain, OutputError> runtimeImpl;
 
     private ProcessContext context;
 
@@ -57,7 +59,7 @@ public class SimpleTransformationGDF<InputObject, OutputMain, OutputError> exten
         }
     }
 
-    public SimpleTransformationGDF(TransformationRuntime<InputObject, OutputMain, OutputError> runtimeImpl) {
+    public SimpleTransformationGDF(TransformationRuntime<OutputMain, OutputError> runtimeImpl) {
         this.runtimeImpl = runtimeImpl;
         outputsConnector = new DoubleOutputGdfImpl();
     }
@@ -69,7 +71,7 @@ public class SimpleTransformationGDF<InputObject, OutputMain, OutputError> exten
      * @return
      * @throws Exception
      */
-    public PCollectionTuple generatePipeline(PCollection<InputObject> input) throws Exception {
+    public PCollectionTuple generatePipeline(PCollection<IndexedRecord> input) throws Exception {
         PCollectionTuple pColTup = input.apply(ParDo.withOutputTags(mainTag, TupleTagList.of(errorTag)).of(this));
         pColTup.get(mainTag).setCoder(KryoCoder.of());
         pColTup.get(errorTag).setCoder(KryoCoder.of());
@@ -83,9 +85,9 @@ public class SimpleTransformationGDF<InputObject, OutputMain, OutputError> exten
     }
 
     @Override
-    public void processElement(DoFn<InputObject, OutputMain>.ProcessContext context) throws Exception {
+    public void processElement(DoFn<IndexedRecord, OutputMain>.ProcessContext context) throws Exception {
         this.context = context;
-        InputObject input = context.element();
+        IndexedRecord input = context.element();
         runtimeImpl.execute(input, outputsConnector);
     }
 
