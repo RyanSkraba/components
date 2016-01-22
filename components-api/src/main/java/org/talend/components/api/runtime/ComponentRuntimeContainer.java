@@ -24,7 +24,10 @@ public interface ComponentRuntimeContainer {
 
     // DI global map
     public Map<String, Object> getGlobalMap();
-    
+
+    /**
+     * Get name of the component which current object belongs to.
+     */
     public String getCurrentComponentName();
 
     /**

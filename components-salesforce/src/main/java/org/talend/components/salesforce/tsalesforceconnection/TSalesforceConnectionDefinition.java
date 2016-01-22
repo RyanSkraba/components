@@ -36,11 +36,14 @@ public class TSalesforceConnectionDefinition extends SalesforceDefinition {
         setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
                 new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
     }
-    
+
     @Override
     public ComponentRuntime createRuntime() {
         return new SalesforceRuntime() {
-        	// FIXME - change me
+            //
+            // FIXME - change me
+            // Need to adjust the override after we have a finally solution to split Runtime class
+            //
             @Override
             public void inputBegin(ComponentProperties props) throws Exception {
             	SalesforceConnectionProperties properties = (SalesforceConnectionProperties) props;
