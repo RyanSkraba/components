@@ -16,8 +16,12 @@ import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentConnector;
 import org.talend.components.api.component.ComponentConnector.Type;
 import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ValidationResult;
+import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
+import org.talend.components.salesforce.SalesforceRuntime;
 
 import aQute.bnd.annotation.component.Component;
 
@@ -31,6 +35,25 @@ public class TSalesforceConnectionDefinition extends SalesforceDefinition {
         super(COMPONENT_NAME);
         setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
                 new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
+    }
+
+    @Override
+    public ComponentRuntime createRuntime() {
+        return new SalesforceRuntime() {
+            //
+            // FIXME - change me
+            // Need to adjust the override after we have a finally solution to split Runtime class
+            //
+            @Override
+            public void inputBegin(ComponentProperties props) throws Exception {
+            	SalesforceConnectionProperties properties = (SalesforceConnectionProperties) props;
+            	ValidationResult result = connectWithResult(properties);
+            	if(ValidationResult.Result.ERROR.equals(result.getStatus())){
+            		throw new Exception(result.getMessage());
+            	}
+            }
+
+        };
     }
 
     @Override

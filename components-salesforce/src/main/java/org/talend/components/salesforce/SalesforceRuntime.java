@@ -39,6 +39,7 @@ import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.api.schema.SchemaFactory;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnection;
+import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 
@@ -183,6 +184,12 @@ public class SalesforceRuntime extends ComponentRuntime {
         bulkConfig.setCompression(true);
         bulkConfig.setTraceMessage(false);
         bulkConnection = new BulkConnection(bulkConfig);
+        if(container!=null){
+        	String currentComponent = container.getCurrentComponentName();
+        	if(currentComponent!=null && currentComponent.startsWith(TSalesforceConnectionDefinition.COMPONENT_NAME)){
+        		container.getGlobalMap().put(currentComponent,bulkConnection);
+        	}
+        }
     }
 
     protected void doConnection(SalesforceConnectionProperties properties, ConnectorConfig config)
@@ -193,6 +200,12 @@ public class SalesforceRuntime extends ComponentRuntime {
             config.setAuthEndpoint(SalesforceConnectionProperties.URL);
         }
         connection = new PartnerConnection(config);
+        if(container!=null){
+        	String currentComponent = container.getCurrentComponentName();
+        	if(currentComponent!=null && currentComponent.startsWith(TSalesforceConnectionDefinition.COMPONENT_NAME)){
+        		container.getGlobalMap().put(currentComponent,connection);
+        	}
+        }
         if (properties.bulkConnection.getBooleanValue()) {
             connectBulk(properties, config);
         }
@@ -219,10 +232,16 @@ public class SalesforceRuntime extends ComponentRuntime {
 
     @Override
     public void connect(ComponentProperties p) throws ConnectionException, AsyncApiException {
-        SalesforceConnectionProperties properties = (SalesforceConnectionProperties) p;
+    	SalesforceConnectionProperties properties = (SalesforceConnectionProperties) p;
         String refedComponentId = properties.referencedComponentId.getStringValue();
-        if (refedComponentId != null) {
-            properties = (SalesforceConnectionProperties) componentService.getPropertiesForComponent(refedComponentId);
+        if (refedComponentId != null && container != null) {
+            if(!refedComponentId.equals(container.getCurrentComponentName())){
+                connection = (PartnerConnection)container.getGlobalMap().get(refedComponentId);
+                if(connection == null){
+                    throw new ConnectionException("Can't find the shared connection instance with refedComponentId: "+refedComponentId);
+                }
+                return;
+            }
         }
 
         ConnectorConfig config = new ConnectorConfig();

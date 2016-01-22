@@ -40,6 +40,7 @@ import org.talend.components.api.properties.Repository;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.runtime.ComponentDynamicHolder;
+import org.talend.components.api.runtime.ComponentRuntimeContainer;
 import org.talend.components.api.runtime.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
@@ -582,6 +583,58 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         // Back to using the connection props of the salesforce input component
         props.connection.referencedComponentId.setValue(null);
         runtime.connect(props.connection);
+    }
+
+    @Test
+    public void testUseExistConnection() throws Throwable {
+    	// Connection component create a connection instance and shared in glbalMap
+        ComponentDefinition connDefinition = getComponentService().getComponentDefinition(TSalesforceConnectionDefinition.COMPONENT_NAME);
+        SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) getComponentService()
+                .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
+        setupProps(connProps, DO_NOT_ADD_QUOTES);
+        SalesforceRuntime connRuntime = createRuntime(connDefinition);
+        final Map<String,Object> globalMap = new HashMap<String,Object>();
+        final String currentComponentName = TSalesforceConnectionDefinition.COMPONENT_NAME+"_1";
+        ComponentRuntimeContainer connContainer = new TestRuntimeContainer() {
+            public java.util.Map<String, Object> getGlobalMap() {
+                return globalMap;
+            }
+
+            public String getCurrentComponentName(){
+                return currentComponentName;
+            }
+        };
+        connRuntime.setContainer(connContainer);
+        connRuntime.setComponentService(getComponentService());
+        connProps.referencedComponentId.setValue(null);
+        connRuntime.inputBegin(connProps);
+        assertNotNull(connRuntime.connection);
+        // Input component get connection instance from globalMap
+        ComponentDefinition inputDefinition = getComponentService().getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
+        TSalesforceInputProperties inProps = (TSalesforceInputProperties) getComponentService()
+                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
+        inProps.connection.referencedComponentId.setValue(currentComponentName);
+        setupProps(inProps.connection, DO_NOT_ADD_QUOTES);
+        SalesforceRuntime inputRuntime = createRuntime(inputDefinition);
+        ComponentRuntimeContainer inputContainer = new TestRuntimeContainer() {
+            public java.util.Map<String, Object> getGlobalMap() {
+                return globalMap;
+            }
+
+            public String getCurrentComponentName(){
+                return "tSalesforceInputNew_1";
+            }
+        };
+        inputRuntime.setContainer(inputContainer);
+        inputRuntime.setComponentService(getComponentService());
+        try {
+        	inputRuntime.connect(inProps.connection);
+            assertNotNull(inputRuntime.connection);
+            assertEquals(connRuntime.connection,inputRuntime.connection);
+        } catch (Exception ex) {
+            fail("Get shared connection failed.");
+            System.out.println("Exception: " + ex.getMessage());
+        }
     }
 
     protected void setupModule(SalesforceModuleProperties moduleProps, String module) throws Throwable {

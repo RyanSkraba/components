@@ -26,6 +26,11 @@ public interface ComponentRuntimeContainer {
     public Map<String, Object> getGlobalMap();
 
     /**
+     * Get name of the component which current object belongs to.
+     */
+    public String getCurrentComponentName();
+
+    /**
      * Format the specified date according to the specified pattern.
      */
     public String formatDate(Date date, String pattern);

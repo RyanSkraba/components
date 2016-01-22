@@ -41,7 +41,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     // Only for the wizard use
     public Property name = (Property) newString("name").setRequired();
 
-    public Property referencedComponentId = newString("referencedComponentId");
+    public Property referencedComponentId = newEnum("referencedComponentId");
 
     public static final String LOGIN_BASIC = "Basic";
 
