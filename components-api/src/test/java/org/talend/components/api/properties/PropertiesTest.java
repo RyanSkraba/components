@@ -256,4 +256,23 @@ public class PropertiesTest {
         assertEquals("fooValue", ((Property) desProp.getProperty("initLater")).getTaggedValue("foo"));
         assertEquals("barValue", ((Property) desProp.getProperty("initLater")).getTaggedValue("bar"));
     }
+
+    @Test
+    public void testPropertyValueEvaluation() {
+        TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test").initForRuntime();
+        props.userId.setValue("java.io.tmpdir");
+        assertEquals("java.io.tmpdir", props.userId.getValue());
+        props.setValueEvaluator(new PropertyValueEvaluator() {
+
+            @Override
+            public Object evaluate(Property property, Object storedValue) {
+                return System.getProperty((String) storedValue);
+            }
+        });
+        assertEquals(System.getProperty("java.io.tmpdir"), props.userId.getValue());
+        String s = props.toSerialized();
+        TestComponentProperties desProp = (TestComponentProperties) ComponentProperties.fromSerialized(s).properties;
+        assertEquals("java.io.tmpdir", desProp.userId.getValue());
+
+    }
 }

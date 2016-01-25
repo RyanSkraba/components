@@ -88,22 +88,44 @@ public class Property extends AbstractSchemaElement {
         componentProperties.setValue(this, value);
     }
 
+    public Object getStoredValue() {
+        return componentProperties.getStoredValue(this);
+    }
+
+    /**
+     * @return the value of the property. This value may not be the one Stored with setValue(), it may be evaluated with
+     * {@link PropertyValueEvaluator}.
+     * 
+     * 
+     */
     public Object getValue() {
         return componentProperties.getValue(this);
     }
 
+    /**
+     * @return cast the getValue() into a boolean or return false if null.
+     */
     public boolean getBooleanValue() {
         return componentProperties.getBooleanValue(this);
     }
 
+    /**
+     * @return cast the getValue() into a String.
+     */
     public String getStringValue() {
         return componentProperties.getStringValue(this);
     }
 
+    /**
+     * @return cast the getValue() into a int or return 0 if null.
+     */
     public int getIntValue() {
         return componentProperties.getIntValue(this);
     }
 
+    /**
+     * @return cast the getValue() into a Calendar.
+     */
     public Calendar getCalendarValue() {
         return componentProperties.getCalendarValue(this);
     }

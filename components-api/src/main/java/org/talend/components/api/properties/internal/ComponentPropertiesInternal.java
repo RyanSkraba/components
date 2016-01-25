@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.talend.components.api.ComponentDesigner;
-import org.talend.components.api.NamedThing;
 import org.talend.components.api.properties.Property;
+import org.talend.components.api.properties.PropertyValueEvaluator;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.schema.Schema;
@@ -43,6 +43,8 @@ public class ComponentPropertiesInternal {
     protected ValidationResult validationResult;
 
     protected Map<SchemaElement, Object> propertyValues;
+
+    transient private PropertyValueEvaluator propertyValueEvaluator;
 
     public ComponentPropertiesInternal() {
         forms = new ArrayList<>();
@@ -90,8 +92,12 @@ public class ComponentPropertiesInternal {
         propertyValues.put(property, value);
     }
 
-    public Object getValue(NamedThing property) {
-        return propertyValues.get(property);
+    public Object getValue(Property property) {
+        Object storedValue = getStoredValue(property);
+        if (propertyValueEvaluator != null) {
+            return propertyValueEvaluator.evaluate(property, storedValue);
+        }
+        return storedValue;
     }
 
     public ComponentDesigner getDesigner() {
@@ -149,6 +155,22 @@ public class ComponentPropertiesInternal {
 
     public Calendar getCalendarValue(Property property) {
         return (Calendar) getValue(property);
+    }
+
+    /**
+     * DOC sgandon Comment method "setValueEvaluator".
+     * 
+     * @param ve
+     */
+    public void setValueEvaluator(PropertyValueEvaluator ve) {
+        this.propertyValueEvaluator = ve;
+    }
+
+    /**
+     * @return the stored value without any evaluation.
+     */
+    public Object getStoredValue(Property property) {
+        return propertyValues.get(property);
     }
 
 }
