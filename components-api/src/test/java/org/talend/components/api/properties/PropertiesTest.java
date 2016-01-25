@@ -233,4 +233,27 @@ public class PropertiesTest {
         assertNull(props.mainForm);
     }
 
+    @Test
+    public void testTaggedValue() {
+        Property property = new Property("haha"); //$NON-NLS-1$
+        assertNull(property.getTaggedValue("foo"));
+        assertNull(property.getTaggedValue("bar"));
+        property.setTaggedValue("foo", "fooValue");
+        property.setTaggedValue("bar", "barValue");
+        assertEquals("fooValue", property.getTaggedValue("foo"));
+        assertEquals("barValue", property.getTaggedValue("bar"));
+    }
+
+    @Test
+    public void testTaggedValuesSerialization() {
+        TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test").initForRuntime();
+        assertNull(props.initLater.getTaggedValue("foo"));
+        assertNull(props.initLater.getTaggedValue("bar"));
+        props.initLater.setTaggedValue("foo", "fooValue");
+        props.initLater.setTaggedValue("bar", "barValue");
+        String s = props.toSerialized();
+        ComponentProperties desProp = ComponentProperties.fromSerialized(s).properties;
+        assertEquals("fooValue", ((Property) desProp.getProperty("initLater")).getTaggedValue("foo"));
+        assertEquals("barValue", ((Property) desProp.getProperty("initLater")).getTaggedValue("bar"));
+    }
 }
