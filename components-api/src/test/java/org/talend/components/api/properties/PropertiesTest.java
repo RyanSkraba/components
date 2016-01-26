@@ -275,4 +275,32 @@ public class PropertiesTest {
         assertEquals("java.io.tmpdir", desProp.userId.getValue());
 
     }
+
+    @Test
+    public void testPropertyValueEvaluationWithTaggedValueExample() {
+        TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test").initForRuntime();
+        props.userId.setValue("java.io.tmpdir");
+        // use tagged value to tell the proprty is a system property.
+        props.userId.setTaggedValue("value.language", "sys.prop");
+        assertEquals("java.io.tmpdir", props.userId.getValue());
+        props.setValueEvaluator(new PropertyValueEvaluator() {
+
+            @Override
+            public Object evaluate(Property property, Object storedValue) {
+                // if the prop is a system property then evaluate it.
+                Object taggedValue = property.getTaggedValue("value.language");
+                if (taggedValue != null && ((String) taggedValue).equals("sys.prop")) {
+                    return System.getProperty((String) storedValue);
+                } else {// otherwise just return the value.
+                    return storedValue;
+                }
+            }
+        });
+        assertEquals(System.getProperty("java.io.tmpdir"), props.userId.getValue());
+        String s = props.toSerialized();
+        TestComponentProperties desProp = (TestComponentProperties) ComponentProperties.fromSerialized(s).properties;
+        assertEquals("java.io.tmpdir", desProp.userId.getValue());
+
+    }
+
 }
