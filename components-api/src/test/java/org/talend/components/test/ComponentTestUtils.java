@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Rule;
 import org.junit.rules.ErrorCollector;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.component.ComponentDefinition;
@@ -33,13 +32,11 @@ import org.talend.components.api.wizard.WizardImageType;
 
 public class ComponentTestUtils {
 
-    @Rule
-    public ErrorCollector collector = new ErrorCollector();
-
-    public static ComponentProperties checkSerialize(ComponentProperties props) {
+    public static ComponentProperties checkSerialize(ComponentProperties props, ErrorCollector errorCollector) {
         String s = props.toSerialized();
         ComponentProperties.Deserialized d = ComponentProperties.fromSerialized(s);
         ComponentProperties deserProps = d.properties;
+        checkAllI18N(deserProps, errorCollector);
         assertFalse(d.migration.isMigrated());
         List<NamedThing> newProps = deserProps.getProperties();
         List<Form> newForms = deserProps.getForms();

@@ -157,10 +157,26 @@ public abstract class ComponentProperties extends TranslatableImpl implements Na
             Thread.currentThread().setContextClassLoader(ComponentProperties.class.getClassLoader());
             d.properties = (ComponentProperties) JsonReader.jsonToJava(serialized);
             d.properties.handlePropEncryption(!ENCRYPT);
+            d.properties.setupPropertiesPostDeserialization();
         } finally {
             Thread.currentThread().setContextClassLoader(originalContextClassLoader);
         }
         return d;
+    }
+
+    /**
+     * This will setup all ComponentProperties after the deserialization process. For now it will just setup i18N
+     */
+    private void setupPropertiesPostDeserialization() {
+        List<NamedThing> properties = getProperties();
+        for (NamedThing prop : properties) {
+            if (prop instanceof ComponentProperties) {
+                ((ComponentProperties) prop).setupPropertiesPostDeserialization();
+            } else {
+                prop.setI18nMessageFormater(getI18nMessageFormater());
+            }
+        }
+
     }
 
     /**
@@ -235,10 +251,12 @@ public abstract class ComponentProperties extends TranslatableImpl implements Na
     }
 
     /**
-     * DOC sgandon Comment method "initializeField".
+     * This shall set the value holder for all the properties, set the i18n formatter of this current class to the
+     * properties so that the i18n values are computed agains this class message properties. This calls the
+     * initProperties for all field of type ComponentProperties
      * 
-     * @param f
-     * @param value
+     * @param f field to be initialized
+     * @param value associated with this field, never null
      */
     public void initializeField(Field f, NamedThing value) {
         // check that field name matches the NamedThing name

@@ -16,7 +16,9 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.service.testcomponent.ComponentPropertiesWithDefinedI18N;
@@ -28,10 +30,13 @@ import org.talend.components.test.ComponentTestUtils;
 
 public class PropertiesTest {
 
+    @Rule
+    public ErrorCollector errorCollector = new ErrorCollector();
+
     @Test
     public void testSerializeProp() {
         ComponentProperties props = new TestComponentProperties("test").init();
-        ComponentTestUtils.checkSerialize(props);
+        ComponentTestUtils.checkSerialize(props, errorCollector);
     }
 
     @Test
@@ -45,7 +50,7 @@ public class PropertiesTest {
         NestedComponentProperties nestedProp = (NestedComponentProperties) props.getProperty("nestedProps");
         nestedProp.aGreatProperty.setValue("greatness");
         assertNotNull(nestedProp);
-        props = (TestComponentProperties) ComponentTestUtils.checkSerialize(props);
+        props = (TestComponentProperties) ComponentTestUtils.checkSerialize(props, errorCollector);
 
         // Should be encrypted
         assertFalse(props.toSerialized().contains("testPassword"));
@@ -215,7 +220,7 @@ public class PropertiesTest {
     @Test
     public void testSerialize() {
         TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test").init();
-        ComponentTestUtils.checkSerialize(props);
+        ComponentTestUtils.checkSerialize(props, errorCollector);
     }
 
     @Test
