@@ -1,5 +1,36 @@
+# Talend Components
+http://www.talend.com
 
-#![alt text](http://www.talend.com/sites/all/themes/talend_responsive/images/logo.png "Talend") Components
+![alt text](http://www.talend.com/sites/all/themes/talend_responsive/images/logo.png "Talend")
+
+
+> Contents
+
+This repository contains the Talend Component Framework and implementations of Talend components.
+
+## Folders/Modules/Maven
+
+The group is: org.talend.components.
+
+| Folder                                         | Module                | Artifact              | Description                                      |
+|:----------------------------------------------:|:---------------------:|:---------------------:|:------------------------------------------------:|
+| root                                           | components-root     | components             | *This whole thing*                               |
+| [components-parent](components-parent)             | components-parent       | components-parent       | *Parent pom for everything*        |
+| [components-api](components-api)             | components-api       | components-api       | *API used to define and access component*        |
+| [components-common](components-common)         | components-common     | components-common     | *Code shared by multiple components*             |
+| [components-common-oauth](components-common-oauth) | components-common-oauth | components-common-oauth | *OAuth impolementation*             |
+| [components-salesforce](components-salesforce) | components-salesforce  | components-salesforce | *SFDC components*                                |
+| [components-proptester](components-proptester)       | components-proptester  | components-proptester | *Command line test program*               |
+| [components-webtest](components-webtest)       | components-webtest  | components-webtest | *Temporary code to start the web services for testing*                                |
+| [components-osgitest](components-osgitest)       | components-osgitest  | components-osgitest | *Integration tests for OSGI services*                                |
+| [tooling]                                      | tooling               |                       | *IDE specific config files + some other stuff*   |
+
+
+## Build
+- Build is maven based and there is a top-level pom that builds everything.
+- Specific Maven settings are required. See instructions in [tooling](/tooling/).
+WARNING : make sure to launch `mvn clean install` and not (mvn test) because the OSGI tests are bases on the installed bundle and not the one in the current maven reactor.
+
 
 ## Using the Command Line Test Program
 
@@ -37,29 +68,6 @@ Recommend using [Google Postman](https://chrome.google.com/webstore/detail/postm
 Use [http://localhost:8080/components/tSalesforceConnect/properties](http://localhost:8080/components/tSalesforceConnect/properties) after starting the server.
 
 
-## Folders/Modules/Maven
-
-The group is: org.talend.components.
-
-| Folder                                         | Module                | Artifact              | Description                                      |
-|:----------------------------------------------:|:---------------------:|:---------------------:|:------------------------------------------------:|
-| root                                           | components-root     | components             | *This whole thing*                               |
-| [components-parent](components-parent)             | components-parent       | components-parent       | *Parent pom for everything*        |
-| [components-api](components-api)             | components-api       | components-api       | *API used to define and access component*        |
-| [components-common](components-common)         | components-common     | components-common     | *Code shared by multiple components*             |
-| [components-common-oauth](components-common-oauth) | components-common-oauth | components-common-oauth | *OAuth impolementation*             |
-| [components-salesforce](components-salesforce) | components-salesforce  | components-salesforce | *SFDC components*                                |
-| [components-proptester](components-proptester)       | components-proptester  | components-proptester | *Command line test program*               |
-| [components-webtest](components-webtest)       | components-webtest  | components-webtest | *Temporary code to start the web services for testing*                                |
-| [components-osgitest](components-osgitest)       | components-osgitest  | components-osgitest | *Integration tests for OSGI services*                                |
-| [tooling]                                      | tooling               |                       | *IDE specific config files + some other stuff*   |
-
-
-## Build
-- Build is maven based and there is a top-level pom that builds everything.
-- Specific Maven settings are required. See instructions in [tooling](/tooling/).
-WARNING : make sure to launch `mvn clean install` and not (mvn test) because the OSGI tests are bases on the installed bundle and not the one in the current maven reactor.
-
 ## IDE Setup
 See the [tooling](/tooling/) folder.
 
@@ -90,3 +98,9 @@ Alternatively you can launch the mvn command followed with those system properti
 ```
 -Dsalesforce.user=the_user_name -Dsalesforce.password=the_pazzword -Dsalesforce.key=the_salesforcekey
 ```
+
+## License
+
+Copyright (c) 2006-2016 Talend
+
+Licensed under the Apache V2 License
