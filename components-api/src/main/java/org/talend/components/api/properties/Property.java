@@ -40,10 +40,6 @@ public class Property extends AbstractSchemaElement {
                         */
         ENCRYPT,
                        /**
-                        * Show this in the UI as if it were a password.
-                        */
-        UI_PASSWORD,
-                       /**
                         * Don't log this value in any logs.
                         */
         SUPPRESS_LOGGING;

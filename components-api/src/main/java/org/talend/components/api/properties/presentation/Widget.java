@@ -75,7 +75,11 @@ public class Widget implements ToStringIndent {
                              * The maximum occurrence value of this {@code SchemaElement} is the number of possible rows
                              * in the table.
                              */
-                            TABLE
+                            TABLE,
+                            /*
+                             * a Text editable widget that hides the text to the user, mainly used for passwords.
+                             */
+                            HIDDEN_TEXT
 
     }
 
@@ -246,38 +250,48 @@ public class Widget implements ToStringIndent {
         this.callAfter = callAfter;
     }
 
+    @Override
     public String toString() {
         return toStringIndent(0);
     }
 
+    @Override
     public String toStringIndent(int indent) {
         StringBuilder sb = new StringBuilder();
         String is = ToStringIndentUtil.indentString(indent);
         sb.append(is + "Widget: " + getWidgetType() + " " + getRow() + "/" + getOrder() + " ");
         boolean firstTime = true;
         for (NamedThing n : getProperties()) {
-            if (!firstTime)
+            if (!firstTime) {
                 sb.append(", ");
-            if (n instanceof Form)
+            }
+            if (n instanceof Form) {
                 sb.append("Form: ");
+            }
             sb.append(n.getName());
-            if (n instanceof Form)
+            if (n instanceof Form) {
                 sb.append(" (props: " + ((Form) n).getComponentProperties().getName() + ")");
+            }
             if (n instanceof SchemaElement) {
                 Collection values = ((SchemaElement) n).getPossibleValues();
-                if (values != null)
+                if (values != null) {
                     sb.append(" Values: " + values);
+                }
             }
             firstTime = false;
         }
-        if (isCallBeforeActivate())
+        if (isCallBeforeActivate()) {
             sb.append(" CALL_BEFORE_ACTIVATE");
-        if (isCallBeforePresent())
+        }
+        if (isCallBeforePresent()) {
             sb.append(" CALL_BEFORE_PRESENT");
-        if (isCallAfter())
+        }
+        if (isCallAfter()) {
             sb.append(" CALL_AFTER");
-        if (isCallValidate())
+        }
+        if (isCallValidate()) {
             sb.append(" CALL_VALIDATE");
+        }
         return sb.toString();
     }
 

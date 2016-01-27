@@ -46,7 +46,6 @@ public class PropertiesTest {
         props.password.setValue("testPassword");
         assertTrue(props.password.getFlags().contains(Property.Flags.ENCRYPT));
         assertTrue(props.password.getFlags().contains(Property.Flags.SUPPRESS_LOGGING));
-        assertTrue(props.password.getFlags().contains(Property.Flags.UI_PASSWORD));
         NestedComponentProperties nestedProp = (NestedComponentProperties) props.getProperty("nestedProps");
         nestedProp.aGreatProperty.setValue("greatness");
         assertNotNull(nestedProp);
@@ -70,12 +69,12 @@ public class PropertiesTest {
     }
 
     @Test
-    public void testGetValue(){
+    public void testGetValue() {
         TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test").init();
         props.integer.setValue(1000);
-        assertEquals(1000,props.integer.getIntValue());
+        assertEquals(1000, props.integer.getIntValue());
         props.integer.setValue("1000");
-        assertEquals(1000,props.integer.getIntValue());
+        assertEquals(1000, props.integer.getIntValue());
     }
 
     @Test

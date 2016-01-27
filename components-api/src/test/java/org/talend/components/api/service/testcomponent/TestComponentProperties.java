@@ -27,6 +27,7 @@ import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.ValidationResult.Result;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
+import org.talend.components.api.properties.presentation.Widget.WidgetType;
 import org.talend.components.api.schema.SchemaElement.Type;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
@@ -44,7 +45,7 @@ public class TestComponentProperties extends ComponentProperties {
     public Property userId = (Property) newProperty(USER_ID_PROP_NAME).setRequired(true);
 
     public Property password = ((Property) newProperty("password").setRequired(true))
-            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING, Property.Flags.UI_PASSWORD));
+            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
     public Property nameList = newProperty("nameList");
 
@@ -111,7 +112,7 @@ public class TestComponentProperties extends ComponentProperties {
         Form form = Form.create(this, Form.MAIN, "Test Component");
         mainForm = form;
         form.addRow(userId);
-        form.addRow(password);
+        form.addRow(widget(password).setWidgetType(WidgetType.HIDDEN_TEXT));
         form.addRow(testPI);
         form.addRow(widget(nameList).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
         form.addRow(widget(nameListRef).setWidgetType(Widget.WidgetType.NAME_SELECTION_REFERENCE));
