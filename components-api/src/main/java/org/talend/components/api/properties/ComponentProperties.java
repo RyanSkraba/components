@@ -266,7 +266,6 @@ public abstract class ComponentProperties extends TranslatableImpl implements Na
                     + "] should be named identically to the instance name [" + value.getName() + "]");
         }
         if (value instanceof Property) {
-            ((Property) value).setValueHolder(internal);
             // Do not set the i18N for nested ComponentProperties, they already handle their i18n
             value.setI18nMessageFormater(getI18nMessageFormater());
         } else {// a Component property so setit up
@@ -483,8 +482,21 @@ public abstract class ComponentProperties extends TranslatableImpl implements Na
         ((Property) p).setValue(value);
     }
 
+    /**
+     * Helper method to set the evaluator to all properties handled by this instance and all the nested
+     * ComponentProperties instances.
+     * 
+     * @param ve value evalurator to be used for evaluation.
+     */
     public void setValueEvaluator(PropertyValueEvaluator ve) {
-        internal.setValueEvaluator(ve);
+        List<NamedThing> properties = getProperties();
+        for (NamedThing prop : properties) {
+            if (prop instanceof Property) {
+                ((Property) prop).setValueEvaluator(ve);
+            } else if (prop instanceof ComponentProperties) {
+                ((ComponentProperties) prop).setValueEvaluator(ve);
+            }
+        }
     }
 
     /**
@@ -512,7 +524,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Na
             if (se instanceof ComponentProperties) {
                 ((ComponentProperties) se).copyValuesFrom((ComponentProperties) otherSe);
             } else {
-                Object value = ((Property) otherSe).getValue();
+                Object value = ((Property) otherSe).getStoredValue();
                 ((Property) se).setValue(value);
             }
         }

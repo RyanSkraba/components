@@ -18,8 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.talend.components.api.SimpleNamedThing;
-import org.talend.components.api.properties.internal.ComponentPropertiesInternal;
 import org.talend.components.api.schema.AbstractSchemaElement;
+import org.talend.components.api.schema.Schema;
+import org.talend.components.api.schema.SchemaFactory;
 
 /**
  * A property that is part of a {@link ComponentProperties}.
@@ -28,11 +29,13 @@ public class Property extends AbstractSchemaElement {
 
     private static final String I18N_PROPERTY_PREFIX = "property."; //$NON-NLS-1$
 
-    protected ComponentPropertiesInternal componentProperties;
-
     protected EnumSet<Flags> flags;
 
-    private Map<String, Object> taggedValues = new HashMap<String, Object>();
+    private Map<String, Object> taggedValues = new HashMap<>();
+
+    private Object storedValue;
+
+    transient private PropertyValueEvaluator propertyValueEvaluator;
 
     public enum Flags {
                        /**
@@ -81,11 +84,15 @@ public class Property extends AbstractSchemaElement {
     }
 
     public void setValue(Object value) {
-        componentProperties.setValue(this, value);
+        Object valueToSet = value;
+        if (getType() == Type.SCHEMA && value instanceof String) {
+            valueToSet = SchemaFactory.fromSerialized((String) value);
+        }
+        storedValue = valueToSet;
     }
 
     public Object getStoredValue() {
-        return componentProperties.getStoredValue(this);
+        return storedValue;
     }
 
     /**
@@ -95,45 +102,54 @@ public class Property extends AbstractSchemaElement {
      * 
      */
     public Object getValue() {
-        return componentProperties.getValue(this);
+        if (propertyValueEvaluator != null) {
+            return propertyValueEvaluator.evaluate(this, storedValue);
+        } // else not evaluator so return the storedValue
+        return storedValue;
     }
 
     /**
      * @return cast the getValue() into a boolean or return false if null.
      */
     public boolean getBooleanValue() {
-        return componentProperties.getBooleanValue(this);
+        return Boolean.valueOf(String.valueOf(getValue()));
     }
 
     /**
      * @return cast the getValue() into a String.
      */
     public String getStringValue() {
-        return componentProperties.getStringValue(this);
+        Object value = getValue();
+        if (value != null) {
+            if (value instanceof Schema) {
+                return ((Schema) value).toSerialized();
+            }
+            return String.valueOf(value);
+        }
+        return null;
     }
 
     /**
-     * @return cast the getValue() into a int or return 0 if null.
+     * @return convert the storedValue to an int, return 0 if values is null.
      */
     public int getIntValue() {
-        return componentProperties.getIntValue(this);
+        Object value = getValue();
+        if (value == null) {
+            return 0;
+        }
+        return Integer.valueOf(String.valueOf(value));
     }
 
     /**
-     * @return cast the getValue() into a Calendar.
+     * @return Cast the stored value to a Calendar.
      */
     public Calendar getCalendarValue() {
-        return componentProperties.getCalendarValue(this);
+        return (Calendar) getValue();
     }
 
     @Override
     public String toString() {
         return "Property: " + getName();
-    }
-
-    // Not API
-    void setValueHolder(ComponentPropertiesInternal props) {
-        componentProperties = props;
     }
 
     /**
@@ -165,6 +181,15 @@ public class Property extends AbstractSchemaElement {
      */
     public Object getTaggedValue(String key) {
         return taggedValues.get(key);
+    }
+
+    /**
+     * DOC sgandon Comment method "setValueEvaluator".
+     * 
+     * @param ve
+     */
+    public void setValueEvaluator(PropertyValueEvaluator ve) {
+        this.propertyValueEvaluator = ve;
     }
 
 }

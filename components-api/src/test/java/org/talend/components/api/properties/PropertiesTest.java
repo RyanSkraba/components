@@ -69,12 +69,29 @@ public class PropertiesTest {
     }
 
     @Test
-    public void testGetValue() {
-        TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test").init();
-        props.integer.setValue(1000);
-        assertEquals(1000, props.integer.getIntValue());
-        props.integer.setValue("1000");
-        assertEquals(1000, props.integer.getIntValue());
+    public void testGetValues() {
+        Property prop = new Property("");
+        // integer
+        prop.setValue(1000);
+        assertEquals(1000, prop.getIntValue());
+        prop.setValue("1000");
+        assertEquals(1000, prop.getIntValue());
+        prop.setValue(null);
+        assertEquals(0, prop.getIntValue());
+        // String
+        prop.setValue("a String");
+        assertEquals("a String", prop.getStringValue());
+        prop.setValue(null);
+        assertEquals(null, prop.getStringValue());
+        // Boolean
+        prop.setValue(true);
+        assertEquals(true, prop.getBooleanValue());
+        prop.setValue(false);
+        assertEquals(false, prop.getBooleanValue());
+        prop.setValue(null);
+        assertEquals(false, prop.getBooleanValue());
+        prop.setValue("Any Obj");
+        assertEquals(false, prop.getBooleanValue());
     }
 
     @Test
