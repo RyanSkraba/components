@@ -195,7 +195,8 @@ public class SalesforceRuntime extends ComponentRuntime {
     protected void doConnection(SalesforceConnectionProperties properties, ConnectorConfig config)
             throws AsyncApiException, ConnectionException {
         if (SalesforceConnectionProperties.LOGIN_OAUTH.equals(properties.loginType.getValue())) {
-            new SalesforceOAuthConnection(properties.oauth, SalesforceConnectionProperties.OAUTH_URL, API_VERSION);
+            SalesforceOAuthConnection oauthConnection = new SalesforceOAuthConnection(properties.oauth, SalesforceConnectionProperties.OAUTH_URL, API_VERSION);
+            oauthConnection.login(config);
         } else {
             config.setAuthEndpoint(SalesforceConnectionProperties.URL);
         }

@@ -140,11 +140,11 @@ public class ComponentPropertiesInternal {
     }
 
     public int getIntValue(Property namedThing) {
-        Integer value = (Integer) getValue(namedThing);
+        Object value = getValue(namedThing);
         if (value == null) {
             return 0;
         }
-        return value;
+        return Integer.valueOf(String.valueOf(value));
     }
 
     public Calendar getCalendarValue(Property property) {

@@ -70,6 +70,15 @@ public class PropertiesTest {
     }
 
     @Test
+    public void testGetValue(){
+        TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test").init();
+        props.integer.setValue(1000);
+        assertEquals(1000,props.integer.getIntValue());
+        props.integer.setValue("1000");
+        assertEquals(1000,props.integer.getIntValue());
+    }
+
+    @Test
     public void testFindForm() {
         TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test").init();
         Form main = props.getForm(Form.MAIN);
