@@ -208,7 +208,7 @@ public class ComponentServiceTest extends AbstractComponentTest {
         TestComponentWizard wizard = (TestComponentWizard) getComponentService()
                 .getComponentWizard(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME, "userdata");
         wizard.props = new TestComponentProperties("props").init();
-        ComponentProperties props = wizard.props;
+        ComponentProperties props = (ComponentProperties) wizard.props;
         List<ComponentWizard> wizards = getComponentService().getComponentWizardsForProperties(props, "userdata");
         assertTrue(props == ((TestComponentWizard) wizards.get(0)).props);
     }

@@ -35,7 +35,7 @@ public class PropertiesTest {
 
     @Test
     public void testSerializeProp() {
-        ComponentProperties props = new TestComponentProperties("test").init();
+        ComponentProperties props = (ComponentProperties) new TestComponentProperties("test").init();
         ComponentTestUtils.checkSerialize(props, errorCollector);
     }
 
@@ -291,7 +291,7 @@ public class PropertiesTest {
         props.initLater.setTaggedValue("foo", "fooValue");
         props.initLater.setTaggedValue("bar", "barValue");
         String s = props.toSerialized();
-        ComponentProperties desProp = ComponentProperties.fromSerialized(s).properties;
+        Properties desProp = Properties.fromSerialized(s).properties;
         assertEquals("fooValue", ((Property) desProp.getProperty("initLater")).getTaggedValue("foo"));
         assertEquals("barValue", ((Property) desProp.getProperty("initLater")).getTaggedValue("bar"));
     }

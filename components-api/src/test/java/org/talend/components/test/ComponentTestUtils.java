@@ -25,6 +25,7 @@ import org.talend.components.api.NamedThing;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.Properties;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
@@ -32,10 +33,10 @@ import org.talend.components.api.wizard.WizardImageType;
 
 public class ComponentTestUtils {
 
-    public static ComponentProperties checkSerialize(ComponentProperties props, ErrorCollector errorCollector) {
+    public static Properties checkSerialize(Properties props, ErrorCollector errorCollector) {
         String s = props.toSerialized();
-        ComponentProperties.Deserialized d = ComponentProperties.fromSerialized(s);
-        ComponentProperties deserProps = d.properties;
+        Properties.Deserialized d = Properties.fromSerialized(s);
+        Properties deserProps = d.properties;
         checkAllI18N(deserProps, errorCollector);
         assertFalse(d.migration.isMigrated());
         List<NamedThing> newProps = deserProps.getProperties();
@@ -98,7 +99,7 @@ public class ComponentTestUtils {
      * 
      * @param componentService service to get the components to be checked.
      */
-    static public void checkAllI18N(ComponentProperties checkedProps, ErrorCollector errorCollector) {
+    static public void checkAllI18N(Properties checkedProps, ErrorCollector errorCollector) {
         if (checkedProps == null) {
             System.out.println("No properties to be checked.");
         } else {

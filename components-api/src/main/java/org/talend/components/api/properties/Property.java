@@ -116,7 +116,8 @@ public class Property extends AbstractSchemaElement {
     }
 
     /**
-     * @return cast the getValue() into a String.
+     * @return cast the getValue() into a String. if the property is a Schema then it is serialized before being
+     * returned.
      */
     public String getStringValue() {
         Object value = getValue();
