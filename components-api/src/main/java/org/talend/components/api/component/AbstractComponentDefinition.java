@@ -20,10 +20,16 @@ import org.talend.components.api.properties.ComponentProperties;
 
 public abstract class AbstractComponentDefinition extends AbstractTopLevelDefinition implements ComponentDefinition {
 
-    private ComponentConnector[] connectors;
+    private Connector[] connectors;
 
-    public void setConnectors(ComponentConnector... conns) {
+    private Trigger[] triggers;
+
+    public void setConnectors(Connector... conns) {
         this.connectors = conns;
+    }
+
+    public void setTriggers(Trigger... conns) {
+        this.triggers = conns;
     }
 
     // protected Class<?> propertiesClass;
@@ -35,8 +41,13 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
     }
 
     @Override
-    public ComponentConnector[] getConnectors() {
+    public Connector[] getConnectors() {
         return connectors;
+    }
+
+    @Override
+    public Trigger[] getTriggers() {
+        return triggers;
     }
 
     @Override

@@ -12,15 +12,19 @@
 // ============================================================================
 package org.talend.components.api.component;
 
-public class ComponentConnector {
+/**
+ * A trigger links two components together by a logical relationship. If the input component fulfill the condition, the
+ * output component will be executed. They can use the context of the input component but will not transmit data to the
+ * output component.
+ *
+ * Trigger connections are used to define the different subjobs of a job.
+ */
+public class Trigger extends AbstractComponentConnection {
 
     // FIXME - are the RUN_IF, COMPONENT_OK, COMPONENT_ERROR always present?
 
-    public enum Type {
-        FLOW,
-        MAIN,
+    public enum TriggerType {
         ITERATE,
-        REJECT,
         SUBJOB_OK,
         SUBJOB_ERROR,
         COMPONENT_OK,
@@ -28,40 +32,24 @@ public class ComponentConnector {
         RUN_IF
     }
 
-    protected Type type;
+    protected TriggerType type;
 
-    protected int maxInput;
-
-    protected int maxOutput;
-
-    public ComponentConnector(Type type, int maxInput, int maxOutput) {
+    public Trigger(TriggerType type) {
+        super(1, 1);
         this.type = type;
-        this.maxInput = maxInput;
-        this.maxOutput = maxOutput;
     }
 
-    public Type getType() {
+    public Trigger(TriggerType type, int maxInput, int maxOutput) {
+        super(maxInput, maxOutput);
+        this.type = type;
+    }
+
+    public TriggerType getType() {
         return type;
     }
 
-    public void setType(Type type) {
+    public void setType(TriggerType type) {
         this.type = type;
-    }
-
-    public int getMaxInput() {
-        return maxInput;
-    }
-
-    public void setMaxInput(int maxInput) {
-        this.maxInput = maxInput;
-    }
-
-    public int getMaxOutput() {
-        return maxOutput;
-    }
-
-    public void setMaxOutput(int maxOutput) {
-        this.maxOutput = maxOutput;
     }
 
 }
