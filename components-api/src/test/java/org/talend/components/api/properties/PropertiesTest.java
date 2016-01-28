@@ -179,7 +179,7 @@ public class PropertiesTest {
         TestComponentProperties componentProperties = (TestComponentProperties) new TestComponentProperties("test").init();
         List<NamedThing> pList = componentProperties.getProperties();
         assertTrue(pList.get(0) != null);
-        assertEquals(13, pList.size());
+        assertEquals(14, pList.size());
     }
 
     @Test
@@ -230,6 +230,15 @@ public class PropertiesTest {
     public void testSerialize() {
         TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test").init();
         ComponentTestUtils.checkSerialize(props, errorCollector);
+    }
+
+    @Test
+    // TCOMP-73 Form layout not right after properties deserialized
+    public void testSerializeRefresh() {
+        TestComponentProperties props = (TestComponentProperties) new TestComponentProperties("test").init();
+        props.suppressDate.setValue(Boolean.TRUE);
+        props = (TestComponentProperties) ComponentTestUtils.checkSerialize(props, errorCollector);
+        assertFalse(props.getForm("restoreTest").getWidget("date").isVisible());
     }
 
     @Test

@@ -168,6 +168,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Na
      * This will setup all ComponentProperties after the deserialization process. For now it will just setup i18N
      */
     private void setupPropertiesPostDeserialization() {
+        initLayout();
         List<NamedThing> properties = getProperties();
         for (NamedThing prop : properties) {
             if (prop instanceof ComponentProperties) {
@@ -307,7 +308,11 @@ public abstract class ComponentProperties extends TranslatableImpl implements Na
      */
     public String toSerialized() {
         handlePropEncryption(ENCRYPT);
+        List<Form> forms = internal.getForms();
+        // The forms are recreated upon deserialization
+        internal.resetForms();
         String ser = JsonWriter.objectToJson(this);
+        internal.setforms(forms);
         handlePropEncryption(!ENCRYPT);
         return ser;
     }

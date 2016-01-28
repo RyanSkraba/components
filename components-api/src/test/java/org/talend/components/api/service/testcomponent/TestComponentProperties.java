@@ -58,6 +58,9 @@ public class TestComponentProperties extends ComponentProperties {
 
     public Property dateTime = newProperty(Type.DATETIME, "dateTime");
 
+    // Used in testing refreshLayout
+    public Property suppressDate = newProperty(Type.BOOLEAN, "suppressDate");
+
     public Property initLater = null;
 
     public NestedComponentProperties nestedInitLater = null;
@@ -123,4 +126,14 @@ public class TestComponentProperties extends ComponentProperties {
         form.addRow(dateTime);
         form.addRow(nestedProps.getForm(Form.MAIN));
     }
+
+    @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+        if (form.getName().equals("restoreTest")) {
+            if (suppressDate.getBooleanValue())
+                form.getWidget("date").setVisible(false);
+        }
+    }
+
 }

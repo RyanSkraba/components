@@ -59,6 +59,14 @@ public class ComponentPropertiesInternal {
         return runtimeOnly;
     }
 
+    public void resetForms() {
+        forms = new ArrayList();
+    }
+
+    public void setforms(List<Form> forms) {
+        this.forms = forms;
+    }
+
     public List<Form> getForms() {
         return forms;
     }
