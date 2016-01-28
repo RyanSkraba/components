@@ -324,7 +324,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Na
             if (se instanceof Property) {
                 Property prop = (Property) se;
                 if (prop.isFlag(Property.Flags.ENCRYPT)) {
-                    String value = prop.getStringValue();
+                    String value = (String) prop.getStoredValue();
                     CryptoHelper ch = new CryptoHelper(CryptoHelper.PASSPHRASE);
                     if (encrypt) {
                         prop.setValue(ch.encrypt(value));
@@ -476,6 +476,10 @@ public abstract class ComponentProperties extends TranslatableImpl implements Na
             throw new IllegalArgumentException("setValue but property: " + property + " is not a Property");
         }
         ((Property) p).setValue(value);
+    }
+
+    public void setValueEvaluator(PropertyValueEvaluator ve) {
+        internal.setValueEvaluator(ve);
     }
 
     /**

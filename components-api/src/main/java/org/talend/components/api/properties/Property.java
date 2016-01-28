@@ -14,6 +14,8 @@ package org.talend.components.api.properties;
 
 import java.util.Calendar;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.talend.components.api.SimpleNamedThing;
 import org.talend.components.api.properties.internal.ComponentPropertiesInternal;
@@ -29,6 +31,8 @@ public class Property extends AbstractSchemaElement {
     protected ComponentPropertiesInternal componentProperties;
 
     protected EnumSet<Flags> flags;
+
+    private Map<String, Object> taggedValues = new HashMap<String, Object>();
 
     public enum Flags {
                        /**
@@ -84,22 +88,44 @@ public class Property extends AbstractSchemaElement {
         componentProperties.setValue(this, value);
     }
 
+    public Object getStoredValue() {
+        return componentProperties.getStoredValue(this);
+    }
+
+    /**
+     * @return the value of the property. This value may not be the one Stored with setValue(), it may be evaluated with
+     * {@link PropertyValueEvaluator}.
+     * 
+     * 
+     */
     public Object getValue() {
         return componentProperties.getValue(this);
     }
 
+    /**
+     * @return cast the getValue() into a boolean or return false if null.
+     */
     public boolean getBooleanValue() {
         return componentProperties.getBooleanValue(this);
     }
 
+    /**
+     * @return cast the getValue() into a String.
+     */
     public String getStringValue() {
         return componentProperties.getStringValue(this);
     }
 
+    /**
+     * @return cast the getValue() into a int or return 0 if null.
+     */
     public int getIntValue() {
         return componentProperties.getIntValue(this);
     }
 
+    /**
+     * @return cast the getValue() into a Calendar.
+     */
     public Calendar getCalendarValue() {
         return componentProperties.getCalendarValue(this);
     }
@@ -121,6 +147,28 @@ public class Property extends AbstractSchemaElement {
     @Override
     public String getDisplayName() {
         return displayName != null ? displayName : getI18nMessage(I18N_PROPERTY_PREFIX + name + I18N_DISPLAY_NAME_SUFFIX);
+    }
+
+    /**
+     * This store a value with the given key in a map this will be serialized with the component. This may be used to
+     * identify the context of the value, whether is may be some java string or some context value or system properties.
+     * Use this tag a will as long as the value is serializable.
+     * 
+     * @param key, key to store the object with
+     * @param value, any serializable object.
+     */
+    public void setTaggedValue(String key, Object value) {
+        taggedValues.put(key, value);
+    }
+
+    /**
+     * return the previously stored value using {@link Property#setTaggedValue(String, Object)} and the given key.
+     * 
+     * @param key, identify the value to be fetched
+     * @return the object stored along with the key or null if none found.
+     */
+    public Object getTaggedValue(String key) {
+        return taggedValues.get(key);
     }
 
 }
