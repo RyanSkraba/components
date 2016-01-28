@@ -13,23 +13,26 @@
 package org.talend.components.salesforce.tsalesforcewavebulkexec;
 
 import org.talend.components.api.Constants;
-import org.talend.components.api.component.ComponentConnector;
-import org.talend.components.api.component.ComponentConnector.Type;
+import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.Connector.ConnectorType;
 import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.Trigger;
+import org.talend.components.api.component.Trigger.TriggerType;
 import org.talend.components.salesforce.SalesforceDefinition;
 
 import aQute.bnd.annotation.component.Component;
 
-@Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TSalesforceWaveBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+@Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceWaveBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceWaveBulkExecDefinition extends SalesforceDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceWaveBulkExecNew"; //$NON-NLS-1$
 
     public TSalesforceWaveBulkExecDefinition() {
         super(COMPONENT_NAME);
-        setConnectors(new ComponentConnector(Type.FLOW, 0, 0), new ComponentConnector(Type.ITERATE, 1, 0),
-                new ComponentConnector(Type.SUBJOB_OK, 1, 0), new ComponentConnector(Type.SUBJOB_ERROR, 1, 0));
+
+        setConnectors(new Connector(ConnectorType.FLOW, 0, 0));
+        setTriggers(new Trigger(TriggerType.ITERATE, 1, 0), new Trigger(TriggerType.SUBJOB_OK, 1, 0),
+                new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
     }
 
     @Override
