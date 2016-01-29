@@ -17,8 +17,8 @@ import static org.talend.components.api.properties.presentation.Widget.*;
 
 import java.util.List;
 
+import org.talend.components.api.NamedThing;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.NameAndLabel;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
@@ -33,7 +33,7 @@ public class SalesforceModuleListProperties extends ComponentProperties {
 
     private String repositoryLocation;
 
-    private List<NameAndLabel> moduleNames;
+    private List<NamedThing> moduleNames;
 
     transient private ComponentService compService;
 
@@ -90,8 +90,8 @@ public class SalesforceModuleListProperties extends ComponentProperties {
                 repositoryLocation, null);
 
         @SuppressWarnings("unchecked")
-        List<NameAndLabel> selectedModuleNames = (List<NameAndLabel>) moduleName.getValue();
-        for (NameAndLabel nl : selectedModuleNames) {
+        List<NamedThing> selectedModuleNames = (List<NamedThing>) moduleName.getValue();
+        for (NamedThing nl : selectedModuleNames) {
             SalesforceModuleProperties modProps = new SalesforceModuleProperties(nl.getName()).setConnection(connectionProps);
             modProps.init();
             Schema schema = conn.getSchema(nl.getName());

@@ -17,8 +17,8 @@ import static org.talend.components.api.properties.presentation.Widget.*;
 
 import java.util.List;
 
+import org.talend.components.api.NamedThing;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.NameAndLabel;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.properties.presentation.Form;
@@ -67,7 +67,7 @@ public class SalesforceModuleProperties extends ComponentProperties {
         SalesforceRuntime conn = new SalesforceRuntime();
         ValidationResult vr = conn.connectWithResult(connection);
         if (vr.getStatus() == ValidationResult.Result.OK) {
-            List<NameAndLabel> moduleNames = conn.getSchemaNames();
+            List<NamedThing> moduleNames = conn.getSchemaNames();
             moduleName.setPossibleValues(moduleNames);
         }
         return vr;

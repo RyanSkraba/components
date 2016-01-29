@@ -27,8 +27,9 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.NamedThing;
+import org.talend.components.api.SimpleNamedThing;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.NameAndLabel;
 import org.talend.components.api.properties.PropertyFactory;
 import org.talend.components.api.properties.ValidationResult;
 import org.talend.components.api.runtime.ComponentDynamicHolder;
@@ -184,28 +185,29 @@ public class SalesforceRuntime extends ComponentRuntime {
         bulkConfig.setCompression(true);
         bulkConfig.setTraceMessage(false);
         bulkConnection = new BulkConnection(bulkConfig);
-        if(container!=null){
-        	String currentComponent = container.getCurrentComponentName();
-        	if(currentComponent!=null && currentComponent.startsWith(TSalesforceConnectionDefinition.COMPONENT_NAME)){
-        		container.getGlobalMap().put(currentComponent,bulkConnection);
-        	}
+        if (container != null) {
+            String currentComponent = container.getCurrentComponentName();
+            if (currentComponent != null && currentComponent.startsWith(TSalesforceConnectionDefinition.COMPONENT_NAME)) {
+                container.getGlobalMap().put(currentComponent, bulkConnection);
+            }
         }
     }
 
     protected void doConnection(SalesforceConnectionProperties properties, ConnectorConfig config)
             throws AsyncApiException, ConnectionException {
         if (SalesforceConnectionProperties.LOGIN_OAUTH.equals(properties.loginType.getValue())) {
-            SalesforceOAuthConnection oauthConnection = new SalesforceOAuthConnection(properties.oauth, SalesforceConnectionProperties.OAUTH_URL, API_VERSION);
+            SalesforceOAuthConnection oauthConnection = new SalesforceOAuthConnection(properties.oauth,
+                    SalesforceConnectionProperties.OAUTH_URL, API_VERSION);
             oauthConnection.login(config);
         } else {
             config.setAuthEndpoint(SalesforceConnectionProperties.URL);
         }
         connection = new PartnerConnection(config);
-        if(container!=null){
-        	String currentComponent = container.getCurrentComponentName();
-        	if(currentComponent!=null && currentComponent.startsWith(TSalesforceConnectionDefinition.COMPONENT_NAME)){
-        		container.getGlobalMap().put(currentComponent,connection);
-        	}
+        if (container != null) {
+            String currentComponent = container.getCurrentComponentName();
+            if (currentComponent != null && currentComponent.startsWith(TSalesforceConnectionDefinition.COMPONENT_NAME)) {
+                container.getGlobalMap().put(currentComponent, connection);
+            }
         }
         if (properties.bulkConnection.getBooleanValue()) {
             connectBulk(properties, config);
@@ -233,13 +235,14 @@ public class SalesforceRuntime extends ComponentRuntime {
 
     @Override
     public void connect(ComponentProperties p) throws ConnectionException, AsyncApiException {
-    	SalesforceConnectionProperties properties = (SalesforceConnectionProperties) p;
+        SalesforceConnectionProperties properties = (SalesforceConnectionProperties) p;
         String refedComponentId = properties.referencedComponentId.getStringValue();
         if (refedComponentId != null && container != null) {
-            if(!refedComponentId.equals(container.getCurrentComponentName())){
-                connection = (PartnerConnection)container.getGlobalMap().get(refedComponentId);
-                if(connection == null){
-                    throw new ConnectionException("Can't find the shared connection instance with refedComponentId: "+refedComponentId);
+            if (!refedComponentId.equals(container.getCurrentComponentName())) {
+                connection = (PartnerConnection) container.getGlobalMap().get(refedComponentId);
+                if (connection == null) {
+                    throw new ConnectionException(
+                            "Can't find the shared connection instance with refedComponentId: " + refedComponentId);
                 }
                 return;
             }
@@ -293,13 +296,13 @@ public class SalesforceRuntime extends ComponentRuntime {
     }
 
     @Override
-    public List<NameAndLabel> getSchemaNames() throws ConnectionException {
-        List<NameAndLabel> returnList = new ArrayList<>();
+    public List<NamedThing> getSchemaNames() throws ConnectionException {
+        List<NamedThing> returnList = new ArrayList<>();
         DescribeGlobalResult result = connection.describeGlobal();
         DescribeGlobalSObjectResult[] objects = result.getSobjects();
         for (DescribeGlobalSObjectResult obj : objects) {
             LOG.debug("module label: " + obj.getLabel() + " name: " + obj.getName());
-            returnList.add(new NameAndLabel(obj.getName(), obj.getLabel()));
+            returnList.add(new SimpleNamedThing(obj.getName(), obj.getLabel()));
         }
         return returnList;
     }

@@ -62,7 +62,8 @@ public class SimpleNamedThing extends TranslatableImpl implements NamedThing {
 
     @Override
     public String toString() {
-        return getName();
+        return (getName() != null ? getName() : "") + "/" + (getDisplayName() != null ? getDisplayName() : "") + "/"
+                + (getTitle() != null ? getTitle() : "");
     }
 
 }

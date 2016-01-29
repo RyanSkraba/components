@@ -33,7 +33,6 @@ import org.junit.rules.ErrorCollector;
 import org.talend.components.api.NamedThing;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.NameAndLabel;
 import org.talend.components.api.properties.PresentationItem;
 import org.talend.components.api.properties.Property;
 import org.talend.components.api.properties.Repository;
@@ -345,12 +344,12 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         assertTrue(modForm.isAllowFinish());
         System.out.println(mlProps.moduleName.getValue());
         @SuppressWarnings("unchecked")
-        List<NameAndLabel> all = (List<NameAndLabel>) mlProps.moduleName.getValue();
+        List<NamedThing> all = (List<NamedThing>) mlProps.moduleName.getValue();
         assertNull(all);
         // TCOMP-9 Change the module list to use getPossibleValues() for SalesforceModuleListProperties
-        List<NameAndLabel> possibleValues = (List<NameAndLabel>) mlProps.moduleName.getPossibleValues();
+        List<NamedThing> possibleValues = (List<NamedThing>) mlProps.moduleName.getPossibleValues();
         assertTrue(possibleValues.size() > 50);
-        List<NameAndLabel> selected = new ArrayList<>();
+        List<NamedThing> selected = new ArrayList<>();
         selected.add(possibleValues.get(0));
         selected.add(possibleValues.get(2));
         selected.add(possibleValues.get(3));
@@ -368,7 +367,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
                 assertEquals(password, storedConnProps.userPassword.password.getValue());
             } else {
                 SalesforceModuleProperties storedModule = (SalesforceModuleProperties) rp.props;
-                assertEquals(selected.get(i - 1).name, storedModule.moduleName.getValue());
+                assertEquals(selected.get(i - 1).getName(), storedModule.moduleName.getValue());
                 assertTrue(rp.schema.getRoot().getChildren().size() > 10);
                 assertTrue(storedModule.schema.schema.getValue() == rp.schema);
             }

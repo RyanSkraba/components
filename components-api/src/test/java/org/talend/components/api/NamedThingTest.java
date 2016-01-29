@@ -10,23 +10,24 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.properties;
+package org.talend.components.api;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class NameAndLabelTest {
+public class NamedThingTest {
 
     @Test
-    public void testNameAndLabel() {
-        NameAndLabel nameAndLabel = new NameAndLabel("testName", "testLabel");
+    public void testSimpleNamedThing() {
+        NamedThing nameAndLabel = new SimpleNamedThing("testName", "testLabel");
         assertEquals("testName", nameAndLabel.getName());
-        assertEquals("testLabel", nameAndLabel.getLabel());
-        nameAndLabel.setName("newTestName");
-        assertEquals("newTestName", nameAndLabel.getName());
-        nameAndLabel.setLabel("newTestLabel");
-        assertEquals("newTestLabel", nameAndLabel.getLabel());
+        assertEquals("testLabel", nameAndLabel.getDisplayName());
+        assertNull(nameAndLabel.getTitle());
+        nameAndLabel = new SimpleNamedThing("testName", "testLabel", "testTitle");
+        assertEquals("testName", nameAndLabel.getName());
+        assertEquals("testLabel", nameAndLabel.getDisplayName());
+        assertEquals("testTitle", nameAndLabel.getTitle());
     }
 
 }
