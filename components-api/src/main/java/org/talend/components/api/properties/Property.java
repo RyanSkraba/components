@@ -25,7 +25,7 @@ import org.talend.components.api.schema.SchemaFactory;
 /**
  * A property that is part of a {@link ComponentProperties}.
  */
-public class Property extends AbstractSchemaElement {
+public class Property extends AbstractSchemaElement implements AnyProperty {
 
     private static final String I18N_PROPERTY_PREFIX = "property."; //$NON-NLS-1$
 
@@ -191,6 +191,11 @@ public class Property extends AbstractSchemaElement {
      */
     public void setValueEvaluator(PropertyValueEvaluator ve) {
         this.propertyValueEvaluator = ve;
+    }
+
+    @Override
+    public void accept(AnyPropertyVisitor visitor) {
+        visitor.visit(this);
     }
 
 }

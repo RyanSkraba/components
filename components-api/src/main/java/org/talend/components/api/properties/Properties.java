@@ -86,7 +86,7 @@ import com.cedarsoftware.util.io.JsonWriter;
  * call {@link SchemaElement#setI18nMessageFormater(I18nMessages)} manually.
  */
 
-public abstract class Properties extends TranslatableImpl implements NamedThing, ToStringIndent {
+public abstract class Properties extends TranslatableImpl implements AnyProperty, ToStringIndent {
 
     static final String METHOD_BEFORE = "before";
 
@@ -328,26 +328,27 @@ public abstract class Properties extends TranslatableImpl implements NamedThing,
 
     protected static final boolean ENCRYPT = true;
 
-    protected void handlePropEncryption(boolean encrypt) {
-        List<NamedThing> props = getProperties();
-        for (NamedThing se : props) {
-            if (se instanceof Properties) {
-                ((Properties) se).handlePropEncryption(encrypt);
-                continue;
+    protected void handlePropEncryption(final boolean encrypt) {
+        accept(new AnyPropertyVisitor() {
+
+            @Override
+            public void visit(Properties properties) {
+                // nothing to be encrypted here
             }
-            if (se instanceof Property) {
-                Property prop = (Property) se;
-                if (prop.isFlag(Property.Flags.ENCRYPT)) {
-                    String value = (String) prop.getStoredValue();
+
+            @Override
+            public void visit(Property property) {
+                if (property.isFlag(Property.Flags.ENCRYPT)) {
+                    String value = (String) property.getStoredValue();
                     CryptoHelper ch = new CryptoHelper(CryptoHelper.PASSPHRASE);
                     if (encrypt) {
-                        prop.setValue(ch.encrypt(value));
+                        property.setValue(ch.encrypt(value));
                     } else {
-                        prop.setValue(ch.decrypt(value));
+                        property.setValue(ch.decrypt(value));
                     }
                 }
             }
-        }
+        });
     }
 
     /**
@@ -395,7 +396,7 @@ public abstract class Properties extends TranslatableImpl implements NamedThing,
      * @return all properties associated with this object (including those defined in superclasses).
      */
     public List<NamedThing> getProperties() {
-
+        // TODO this should be changed to AnyProperty type but it as impact everywhere
         List<NamedThing> properties = new ArrayList<>();
         Field[] fields = getClass().getFields();
         for (Field f : fields) {
@@ -413,6 +414,17 @@ public abstract class Properties extends TranslatableImpl implements NamedThing,
             }
         }
         return properties;
+    }
+
+    @Override
+    public void accept(AnyPropertyVisitor visitor) {
+        List<NamedThing> properties = getProperties();
+        for (NamedThing nt : properties) {
+            if (nt instanceof AnyProperty) {
+                ((AnyProperty) nt).accept(visitor);
+            }
+        }
+        visitor.visit(this);
     }
 
     /**
