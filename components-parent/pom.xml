@@ -37,6 +37,17 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.talend.daikon</groupId>
+            <artifactId>daikon</artifactId>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.daikon</groupId>
+            <artifactId>daikon-spring</artifactId>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 
 	<dependencyManagement>
@@ -93,6 +104,15 @@
 				<artifactId>daikon</artifactId>
 				<version>0.3.0.BUILD-SNAPSHOT</version>
 			</dependency>
+	        <dependency>
+	            <groupId>org.talend.daikon</groupId>
+	            <artifactId>daikon</artifactId>
+                <version>0.3.0.BUILD-SNAPSHOT</version>
+	            <classifier>tests</classifier>
+	            <scope>test</scope>
+	        </dependency>
+			
+			
 		</dependencies>
 	</dependencyManagement>
 	<repositories>

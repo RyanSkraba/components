@@ -63,7 +63,11 @@
                             <instructions>
                                 <Import-Package>org.talend*</Import-Package>
                                 <Service-Component>*</Service-Component>
-                                <Embed-Dependency>!components*</Embed-Dependency>
+                                <Embed-Dependency>!components*,*;scope=compile|runtime;inline=false</Embed-Dependency>
+<!--                                 <Embed-Dependency> -->
+<!--                                     !org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api|javax.servlet-api|javax.inject|daikon -->
+<!--                                 </Embed-Dependency> -->
+                                
                             </instructions>
                         </configuration>
                     </execution>

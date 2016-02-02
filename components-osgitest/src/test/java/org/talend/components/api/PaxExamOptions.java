@@ -27,16 +27,31 @@ public class PaxExamOptions {
 
     public static Option[] getOptions() {
         return options(mavenBundle("org.apache.felix", "org.apache.felix.scr"), //
-                mavenBundle("org.slf4j", "slf4j-api", "1.7.12"), mavenBundle("commons-lang", "commons-lang", "2.4"),
-                mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("bundle"), //
-                mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("tests").noStart(),
-                mavenBundle().groupId("org.talend.components").artifactId("components-common").classifier("bundle"),
-                mavenBundle().groupId("org.talend.components").artifactId("components-common").classifier("tests").noStart(),
+                mavenBundle("org.slf4j", "slf4j-api", "1.7.12"), //
+                mavenBundle("commons-lang", "commons-lang", "2.4"), //
+                mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-annotations"), //
+                mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-core"), //
+                mavenBundle().groupId("com.cedarsoftware").artifactId("json-io"), //
+                mavenBundle().groupId("commons-codec").artifactId("commons-codec"), //
+                mavenBundle().groupId("org.talend.daikon").artifactId("daikon").version("0.3.0.BUILD-SNAPSHOT"),
+                // //
+                mavenBundle().groupId("org.talend.daikon").artifactId("daikon").classifier("tests")
+                        .version("0.3.0.BUILD-SNAPSHOT").noStart(),
+                mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("bundle")
+                        .version("0.3.0.BUILD-SNAPSHOT"), //
+                mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("tests")
+                        .version("0.3.0.BUILD-SNAPSHOT").noStart(),
+                mavenBundle().groupId("org.talend.components").artifactId("components-common").classifier("bundle")
+                        .version("0.3.0.BUILD-SNAPSHOT"),
+                mavenBundle().groupId("org.talend.components").artifactId("components-common").classifier("tests")
+                        .version("0.3.0.BUILD-SNAPSHOT").noStart(),
                 mavenBundle().groupId("org.talend.components").artifactId("components-common-oauth").classifier("bundle"),
                 mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("bundle"),
                 mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("tests").noStart(),
                 // //
-                junitBundles(), mavenBundle("org.ops4j.pax.tipi", "org.ops4j.pax.tipi.hamcrest.core", "1.3.0.1"), cleanCaches());
+                junitBundles(), mavenBundle("org.ops4j.pax.tipi", "org.ops4j.pax.tipi.hamcrest.core", "1.3.0.1"), cleanCaches() //
+        // ,vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5010"), systemTimeout(0)//
+        );
     }
 
     // public static Option[] getOptions() {

@@ -12,15 +12,15 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.properties.PropertyFactory.*;
-import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.*;
 
 import java.util.EnumSet;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Property;
-import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Widget.WidgetType;
+import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget.WidgetType;
 
 public class UserPasswordProperties extends ComponentProperties {
 

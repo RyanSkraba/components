@@ -15,6 +15,8 @@ package org.talend.components.api;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.talend.daikon.NamedThing;
+import org.talend.daikon.SimpleNamedThing;
 
 public class NamedThingTest {
 

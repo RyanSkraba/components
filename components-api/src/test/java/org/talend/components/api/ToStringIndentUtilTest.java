@@ -15,6 +15,7 @@ package org.talend.components.api;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.talend.daikon.strings.ToStringIndentUtil;
 
 /**
  * created by pbailly on 16 Dec 2015 Detailled comment

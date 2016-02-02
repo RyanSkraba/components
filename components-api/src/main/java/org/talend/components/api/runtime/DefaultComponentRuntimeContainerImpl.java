@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.talend.components.api.schema.SchemaElement;
+import org.talend.daikon.schema.SchemaElement;
 
 /**
  * An implementation of a runtime container for testing purposes.

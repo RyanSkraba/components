@@ -14,10 +14,24 @@ package org.talend.components.api.service.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.*;
+import org.apache.maven.model.building.DefaultModelBuilderFactory;
+import org.apache.maven.model.building.DefaultModelBuildingRequest;
+import org.apache.maven.model.building.ModelBuilder;
+import org.apache.maven.model.building.ModelBuildingException;
+import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelBuildingResult;
+import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectModelResolver;
@@ -48,26 +62,23 @@ import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.error.ComponentsErrorCode;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Repository;
-import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.schema.Schema;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.exception.ExceptionContext;
+import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.service.PropertiesServiceImpl;
 
 /**
  * Main Component Service implementation that is not related to any framework (neither OSGI, nor Spring) it uses a
  * ComponentRegistry implementation that will be provided by framework specific Service classes
  */
-public class ComponentServiceImpl implements ComponentService {
+public class ComponentServiceImpl extends PropertiesServiceImpl<ComponentProperties>implements ComponentService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ComponentServiceImpl.class);
 
     private Map<Artifact, Set<Dependency>> dependenciesCache = new HashMap<>();
-
-    private Repository repository;
 
     private ComponentRegistry componentRegistry;
 
@@ -158,8 +169,9 @@ public class ComponentServiceImpl implements ComponentService {
     @Override
     public ComponentProperties makeFormCancelable(ComponentProperties properties, String formName) {
         Form form = properties.getForm(formName);
-        if (form == null)
+        if (form == null) {
             throw new IllegalArgumentException("Form: " + formName + " not found");
+        }
         form.setCancelable(true);
         return properties;
     }
@@ -167,8 +179,9 @@ public class ComponentServiceImpl implements ComponentService {
     @Override
     public ComponentProperties commitFormValues(ComponentProperties properties, String formName) {
         Form form = properties.getForm(formName);
-        if (form == null)
+        if (form == null) {
             throw new IllegalArgumentException("Form: " + formName + " not found");
+        }
         form.commitValues();
         return properties;
     }
@@ -265,28 +278,6 @@ public class ComponentServiceImpl implements ComponentService {
             LOGGER.warn("The defintion of [" + definition.getName() + "] did not specify any icon"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return result;
-    }
-
-    @Override
-    public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation,
-            Schema schema) {
-        if (repository != null) {
-            return repository.storeComponentProperties(properties, name, repositoryLocation, schema);
-        }
-        return null;
-    }
-
-    @Override
-    public ComponentProperties getPropertiesForComponent(String componentId) {
-        if (repository != null) {
-            return repository.getPropertiesForComponent(componentId);
-        }
-        return null;
-    }
-
-    @Override
-    public void setRepository(Repository repository) {
-        this.repository = repository;
     }
 
     @Override

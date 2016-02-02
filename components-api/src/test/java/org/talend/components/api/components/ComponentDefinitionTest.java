@@ -32,4 +32,11 @@ public class ComponentDefinitionTest {
         assertNull(prop.mainForm);
     }
 
+    @Test
+    public void testi18NForComponentDefintion() {
+        TestComponentDefinition tcd = new TestComponentDefinition();
+        assertEquals("Test Component", tcd.getDisplayName());
+        assertEquals("Ze Test Component Title", tcd.getTitle());
+    }
+
 }

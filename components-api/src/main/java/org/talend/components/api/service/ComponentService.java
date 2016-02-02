@@ -20,16 +20,16 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Repository;
-import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
+import org.talend.daikon.properties.service.PropertiesService;
+import org.talend.daikon.properties.service.Repository;
 
 /**
  * The Main service provided by this project to get access to all registered components and their properties.
  */
-public interface ComponentService extends Repository {
+public interface ComponentService extends PropertiesService<ComponentProperties> {
 
     /**
      * Get the list of all the component names that are registered
@@ -92,11 +92,11 @@ public interface ComponentService extends Repository {
     /**
      * Creates {@link ComponentWizard}(s) that are populated by the given properties.
      *
-     * This is used when you already have the {@link ComponentProperties} object from a previous execution of the wizard
-     * and you wish to show wizards applicable to the those properties.
+     * This is used when you already have the {@link T} object from a previous execution of the wizard and you wish to
+     * show wizards applicable to the those properties.
      * 
-     * @param properties a {@link ComponentProperties} object previously created
-     * @param location the repository location of where the {@link ComponentProperties} were stored.
+     * @param properties a {@link T} object previously created
+     * @param location the repository location of where the {@link T} were stored.
      * @return a {@link List} of {@code ComponentWizard} object(s)
      */
     List<ComponentWizard> getComponentWizardsForProperties(ComponentProperties properties, String location);
@@ -109,26 +109,6 @@ public interface ComponentService extends Repository {
      * @return the list of compatbible {@link ComponentDefinition} objects.
      */
     List<ComponentDefinition> getPossibleComponents(ComponentProperties properties) throws Throwable;
-
-    ComponentProperties makeFormCancelable(ComponentProperties properties, String formName);
-
-    ComponentProperties commitFormValues(ComponentProperties properties, String formName);
-
-    ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable;
-
-    ComponentProperties beforePropertyActivate(String propName, ComponentProperties properties) throws Throwable;
-
-    ComponentProperties beforePropertyPresent(String propName, ComponentProperties properties) throws Throwable;
-
-    ComponentProperties afterProperty(String propName, ComponentProperties properties) throws Throwable;
-
-    ComponentProperties beforeFormPresent(String formName, ComponentProperties properties) throws Throwable;
-
-    ComponentProperties afterFormNext(String formName, ComponentProperties properties) throws Throwable;
-
-    ComponentProperties afterFormBack(String formName, ComponentProperties properties) throws Throwable;
-
-    ComponentProperties afterFormFinish(String formName, ComponentProperties properties) throws Throwable;
 
     /**
      * Return the png image related to the given wizard
@@ -155,6 +135,7 @@ public interface ComponentService extends Repository {
      * 
      * @param repository
      */
+    @Override
     void setRepository(Repository repository);
 
     /**

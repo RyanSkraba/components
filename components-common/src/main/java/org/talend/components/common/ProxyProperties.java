@@ -12,12 +12,12 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.PropertyFactory.*;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Property;
-import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.schema.SchemaElement;
+import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.schema.SchemaElement;
 
 public class ProxyProperties extends ComponentProperties {
 

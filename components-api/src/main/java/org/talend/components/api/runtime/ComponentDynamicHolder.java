@@ -14,7 +14,7 @@ package org.talend.components.api.runtime;
 
 import java.util.List;
 
-import org.talend.components.api.schema.SchemaElement;
+import org.talend.daikon.schema.SchemaElement;
 
 /**
  * A holder for dynamic schema information.

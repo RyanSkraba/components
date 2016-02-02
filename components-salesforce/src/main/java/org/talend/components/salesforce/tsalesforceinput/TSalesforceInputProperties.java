@@ -12,12 +12,14 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceinput;
 
-import static org.talend.components.api.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.PropertyFactory.*;
 
-import org.talend.components.api.properties.Property;
-import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.schema.SchemaElement;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
+import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.schema.SchemaElement;
 
 public class TSalesforceInputProperties extends SalesforceConnectionModuleProperties {
 
@@ -51,8 +53,8 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
     @Override
     public void setupProperties() {
         super.setupProperties();
-        returns = setReturnsProperty();
-        newReturnProperty(returns, SchemaElement.Type.INT, "NB_LINE");
+        returns = ComponentProperties.setReturnsProperty();
+        ComponentPropertyFactory.newReturnProperty(returns, SchemaElement.Type.INT, "NB_LINE");
         // FIXME - should use default value
         batchSize.setValue(100);
 

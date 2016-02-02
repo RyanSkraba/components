@@ -10,21 +10,23 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.schema;
+package org.talend.components.api.test;
+
+import org.talend.components.api.service.internal.ComponentRegistry;
+import org.talend.components.api.service.internal.ComponentServiceImpl;
 
 /**
- * A schema that can be used by the component service
+ * created by sgandon on 14 déc. 2015
  */
-public interface Schema {
-
-    public SchemaElement getRoot();
-
-    public SchemaElement setRoot(SchemaElement root);
+public class SimpleComponentService extends ComponentServiceImpl {
 
     /**
-     * Returns a string that is the serialized form of this Schema. Use {@link SchemaFactory#fromSerialized(String)} to
-     * materialize the object from the string.
+     * DOC sgandon SimpleComponentService constructor comment.
+     * 
+     * @param componentRegistry
      */
-    public String toSerialized();
+    public SimpleComponentService(ComponentRegistry componentRegistry) {
+        super(componentRegistry);
+    }
 
 }

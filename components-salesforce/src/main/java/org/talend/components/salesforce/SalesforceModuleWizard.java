@@ -13,9 +13,9 @@
 package org.talend.components.salesforce;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
+import org.talend.daikon.properties.presentation.Form;
 
 /**
  * A single-page wizard that just handles the selection of modules. This must always be created with the connection

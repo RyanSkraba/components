@@ -37,8 +37,6 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Repository;
-import org.talend.components.api.schema.Schema;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentRegistry;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
@@ -46,6 +44,8 @@ import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.exception.error.CommonErrorCodes;
+import org.talend.daikon.properties.service.Repository;
+import org.talend.daikon.schema.Schema;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -327,15 +327,15 @@ public class ComponentServiceSpring implements ComponentService {
 
     // FIXME - make this work for web
     @Override
-    public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation,
-            Schema schema) {
-        return componentServiceDelegate.storeComponentProperties(properties, name, repositoryLocation, schema);
+    public String storeProperties(ComponentProperties properties, String name, String repositoryLocation, Schema schema) {
+        return componentServiceDelegate.storeProperties(properties, name, repositoryLocation, schema);
     }
 
     // FIXME - make this work for web
     @Override
     public ComponentProperties getPropertiesForComponent(String componentId) {
-        return componentServiceDelegate.getPropertiesForComponent(componentId);
+        throw new IllegalAccessError("not implmented yet");
+        // return componentServiceDelegate.getPropertiesForComponent(componentId);
     }
 
 }

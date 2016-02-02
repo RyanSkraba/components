@@ -23,11 +23,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.stereotype.Service;
-import org.talend.components.api.NamedThing;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Property;
 import org.talend.components.api.service.ComponentService;
+import org.talend.daikon.NamedThing;
+import org.talend.daikon.properties.Property;
 import org.talend.daikon.spring.BndToSpringBeanNameGenerator;
 
 import jline.console.ConsoleReader;

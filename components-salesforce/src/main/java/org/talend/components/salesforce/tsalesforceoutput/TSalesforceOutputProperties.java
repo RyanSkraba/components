@@ -12,19 +12,21 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
-import static org.talend.components.api.properties.PropertyFactory.*;
-import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.*;
 
-import org.talend.components.api.properties.Property;
-import org.talend.components.api.properties.ValidationResult;
-import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Widget;
-import org.talend.components.api.schema.Schema;
-import org.talend.components.api.schema.SchemaElement;
-import org.talend.components.api.schema.SchemaElement.Type;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceModuleProperties;
+import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.schema.Schema;
+import org.talend.daikon.schema.SchemaElement;
+import org.talend.daikon.schema.SchemaElement.Type;
 
 public class TSalesforceOutputProperties extends SalesforceConnectionModuleProperties {
 
@@ -112,10 +114,10 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
     @Override
     public void setupProperties() {
         super.setupProperties();
-        returns = setReturnsProperty();
-        newReturnProperty(returns, SchemaElement.Type.INT, "NB_LINE"); //$NON-NLS-1$
-        newReturnProperty(returns, SchemaElement.Type.INT, "NB_SUCCESS"); //$NON-NLS-1$
-        newReturnProperty(returns, SchemaElement.Type.INT, "NB_REJECT"); //$NON-NLS-1$
+        returns = ComponentProperties.setReturnsProperty();
+        ComponentPropertyFactory.newReturnProperty(returns, SchemaElement.Type.INT, "NB_LINE"); //$NON-NLS-1$
+        ComponentPropertyFactory.newReturnProperty(returns, SchemaElement.Type.INT, "NB_SUCCESS"); //$NON-NLS-1$
+        ComponentPropertyFactory.newReturnProperty(returns, SchemaElement.Type.INT, "NB_REJECT"); //$NON-NLS-1$
 
         schemaReject.addSchemaChild(newProperty("errorCode")); //$NON-NLS-1$
         schemaReject.addSchemaChild(newProperty("errorFields")); //$NON-NLS-1$

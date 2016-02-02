@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.api;
 
-import org.talend.components.api.context.GlobalContext;
-import org.talend.components.api.i18n.TranslatableImpl;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.TranslatableImpl;
 
 public abstract class AbstractTopLevelDefinition extends TranslatableImpl implements TopLevelDefinition {
 
@@ -21,7 +21,7 @@ public abstract class AbstractTopLevelDefinition extends TranslatableImpl implem
 
     private static final String I18N_TITLE_SUFFIX = ".title"; //$NON-NLS-1$
 
-    protected GlobalContext globalContext;
+    protected GlobalI18N globalContext;
 
     @Override
     public String getDisplayName() {

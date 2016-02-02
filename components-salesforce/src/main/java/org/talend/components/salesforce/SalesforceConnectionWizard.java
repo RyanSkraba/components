@@ -13,10 +13,10 @@
 package org.talend.components.salesforce;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
+import org.talend.daikon.properties.presentation.Form;
 
 /**
  * Handles the creating a connection and creating the modules associated with the connection.

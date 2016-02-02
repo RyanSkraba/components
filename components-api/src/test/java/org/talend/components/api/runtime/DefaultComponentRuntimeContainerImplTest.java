@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.talend.components.api.properties.Property;
-import org.talend.components.api.schema.SchemaElement;
+import org.talend.daikon.properties.Property;
+import org.talend.daikon.schema.SchemaElement;
 
 /**
  * created by pbailly on 16 Dec 2015 Detailled comment

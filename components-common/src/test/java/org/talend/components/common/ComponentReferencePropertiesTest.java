@@ -15,9 +15,9 @@ package org.talend.components.common;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Widget;
 import org.talend.components.common.ComponentReferenceProperties.ReferenceType;
+import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 
 /**
  * created by pbailly on 10 Dec 2015 Detailled comment

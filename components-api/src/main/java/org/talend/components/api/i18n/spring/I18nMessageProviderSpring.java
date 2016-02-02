@@ -15,7 +15,7 @@ package org.talend.components.api.i18n.spring;
 import javax.inject.Inject;
 
 import org.springframework.stereotype.Component;
-import org.talend.components.api.i18n.I18nMessageProvider;
+import org.talend.daikon.i18n.I18nMessageProvider;
 import org.talend.daikon.i18n.LocaleProvider;
 
 /**

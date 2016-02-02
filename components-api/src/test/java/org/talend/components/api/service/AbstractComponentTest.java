@@ -12,15 +12,10 @@
 // ============================================================================
 package org.talend.components.api.service;
 
-import static org.junit.Assert.*;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
-import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.service.ComponentService;
 
 public abstract class AbstractComponentTest {
 
@@ -38,26 +33,6 @@ public abstract class AbstractComponentTest {
     @After
     public void after() throws Exception {
         System.out.println("<<<<< " + name.getMethodName() + " time: " + (System.currentTimeMillis() - startTime));
-    }
-
-    protected ComponentProperties checkAndBeforeActivate(Form form, String propName, ComponentProperties props) throws Throwable {
-        assertTrue(form.getWidget(propName).isCallBeforeActivate());
-        return getComponentService().beforePropertyActivate(propName, props);
-    }
-
-    protected ComponentProperties checkAndBeforePresent(Form form, String propName, ComponentProperties props) throws Throwable {
-        assertTrue(form.getWidget(propName).isCallBeforePresent());
-        return getComponentService().beforePropertyPresent(propName, props);
-    }
-
-    protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props) throws Throwable {
-        assertTrue(form.getWidget(propName).isCallAfter());
-        return getComponentService().afterProperty(propName, props);
-    }
-
-    protected ComponentProperties checkAndValidate(Form form, String propName, ComponentProperties props) throws Throwable {
-        assertTrue(form.getWidget(propName).isCallValidate());
-        return getComponentService().validateProperty(propName, props);
     }
 
     /**

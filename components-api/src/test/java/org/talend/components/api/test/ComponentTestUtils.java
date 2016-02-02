@@ -10,64 +10,29 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.test;
+package org.talend.components.api.test;
 
 import static org.hamcrest.CoreMatchers.*;
 // import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.io.InputStream;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.rules.ErrorCollector;
-import org.talend.components.api.NamedThing;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Properties;
-import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
+import org.talend.daikon.properties.Properties;
+import org.talend.daikon.properties.test.PropertiesTestUtils;
 
 public class ComponentTestUtils {
 
     public static Properties checkSerialize(Properties props, ErrorCollector errorCollector) {
-        String s = props.toSerialized();
-        Properties.Deserialized d = Properties.fromSerialized(s);
-        Properties deserProps = d.properties;
-        checkAllI18N(deserProps, errorCollector);
-        assertFalse(d.migration.isMigrated());
-        List<NamedThing> newProps = deserProps.getProperties();
-        List<Form> newForms = deserProps.getForms();
-        int i = 0;
-        for (NamedThing prop : props.getProperties()) {
-            System.out.println(prop.getName());
-            assertEquals(prop.getName(), newProps.get(i).getName());
-            i++;
-        }
-        i = 0;
-        for (Form form : props.getForms()) {
-            System.out.println("Form: " + form.getName());
-            Form newForm = newForms.get(i++);
-            assertEquals(form.getName(), form.getName());
-            for (NamedThing formChild : form.getChildren()) {
-                String name = formChild.getName();
-                if (formChild instanceof Form) {
-                    name = ((Form) formChild).getComponentProperties().getName();
-                }
-                System.out.println("  prop: " + formChild.getName() + " name to be used: " + name);
-                NamedThing newChild = newForm.getChild(name);
-                String newName = newChild.getName();
-                if (newChild instanceof Form) {
-                    newName = ((Form) newChild).getComponentProperties().getName();
-                }
-                assertEquals(name, newName);
-            }
-        }
-        return deserProps;
-
+        return PropertiesTestUtils.checkSerialize(props, errorCollector);
     }
 
     /**
@@ -100,38 +65,7 @@ public class ComponentTestUtils {
      * @param componentService service to get the components to be checked.
      */
     static public void checkAllI18N(Properties checkedProps, ErrorCollector errorCollector) {
-        if (checkedProps == null) {
-            System.out.println("No properties to be checked.");
-        } else {
-            // checking properties
-            System.out.println("Checking: " + checkedProps);
-            List<NamedThing> properties = checkedProps.getProperties();
-            for (NamedThing prop : properties) {
-                if (!(prop instanceof ComponentProperties)) {
-                    errorCollector.checkThat(
-                            "property [" + checkedProps.getClass().getCanonicalName() + "/" + prop.getName()
-                                    + "] should have a translated message key [property." + prop.getName()
-                                    + ".displayName] in [the proper messages.properties]",
-                            prop.getDisplayName().endsWith(".displayName"), is(false));
-                } else {
-                    checkAllI18N((ComponentProperties) prop, errorCollector);
-                }
-            }
-            // check forms
-            List<Form> forms = checkedProps.getForms();
-            for (Form form : forms) {
-                errorCollector.checkThat(
-                        "Form [" + form.getComponentProperties().getClass().getCanonicalName() + "/" + form.getName()
-                                + "] should have a translated message key [form." + form.getName()
-                                + ".displayName] in [the proper messages.properties]",
-                        form.getDisplayName().endsWith(".displayName"), is(false));
-                errorCollector.checkThat("Form [" + form.getComponentProperties().getClass().getCanonicalName() + "/"
-                        + form.getName() + "] should have a translated message key [form." + form.getName()
-                        + ".title] in [the proper messages.properties]", form.getTitle().endsWith(".title"), is(false));
-
-            }
-
-        }
+        PropertiesTestUtils.checkAllI18N(checkedProps, errorCollector);
     }
 
     /**

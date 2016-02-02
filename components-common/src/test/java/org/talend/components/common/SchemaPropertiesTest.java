@@ -15,12 +15,12 @@ package org.talend.components.common;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.talend.components.api.properties.PropertyFactory;
-import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Widget;
-import org.talend.components.api.schema.Schema;
-import org.talend.components.api.schema.SchemaElement;
-import org.talend.components.api.schema.internal.SchemaImpl;
+import org.talend.daikon.properties.PropertyFactory;
+import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.schema.Schema;
+import org.talend.daikon.schema.SchemaElement;
+import org.talend.daikon.schema.internal.SchemaImpl;
 
 /**
  * created by pbailly on 10 Dec 2015 Detailled comment

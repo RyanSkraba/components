@@ -15,9 +15,9 @@ package org.talend.components.api.wizard;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.talend.components.api.i18n.TranslatableImpl;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.presentation.Form;
+import org.talend.daikon.i18n.TranslatableImpl;
+import org.talend.daikon.properties.presentation.Form;
 
 /**
  * A component wizard is used to create {@link ComponentProperties } objects

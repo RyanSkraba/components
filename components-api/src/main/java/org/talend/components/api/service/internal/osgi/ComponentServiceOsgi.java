@@ -13,7 +13,11 @@
 package org.talend.components.api.service.internal.osgi;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -23,16 +27,16 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
-import org.talend.components.api.context.GlobalContext;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Repository;
-import org.talend.components.api.schema.Schema;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentRegistry;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.properties.service.Repository;
+import org.talend.daikon.schema.Schema;
 
 import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
@@ -47,10 +51,10 @@ public class ComponentServiceOsgi implements ComponentService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ComponentServiceOsgi.class);
 
-    GlobalContext gctx;
+    GlobalI18N gctx;
 
     @Reference
-    public void osgiInjectGlobalContext(GlobalContext aGctx) {
+    public void osgiInjectGlobalContext(GlobalI18N aGctx) {
         this.gctx = aGctx;
     }
 
@@ -217,18 +221,18 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
-    public String storeComponentProperties(ComponentProperties properties, String name, String repositoryLocation, Schema schema) {
-        return componentServiceDelegate.storeComponentProperties(properties, name, repositoryLocation, schema);
-    }
-
-    @Override
-    public ComponentProperties getPropertiesForComponent(String componentId) {
-        return componentServiceDelegate.getPropertiesForComponent(componentId);
+    public String storeProperties(ComponentProperties properties, String name, String repositoryLocation, Schema schema) {
+        return componentServiceDelegate.storeProperties(properties, name, repositoryLocation, schema);
     }
 
     @Override
     public void setRepository(Repository repository) {
         componentServiceDelegate.setRepository(repository);
+    }
+
+    @Override
+    public ComponentProperties getPropertiesForComponent(String componentId) {
+        return componentServiceDelegate.getPropertiesForComponent(componentId);
     }
 
     @Override

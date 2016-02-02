@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.api.i18n.osgi;
 
-import org.talend.components.api.i18n.I18nMessageProvider;
+import org.talend.daikon.i18n.I18nMessageProvider;
 import org.talend.daikon.i18n.LocaleProvider;
 
 import aQute.bnd.annotation.component.Component;

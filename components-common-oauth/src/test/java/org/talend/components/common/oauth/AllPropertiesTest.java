@@ -15,7 +15,7 @@ package org.talend.components.common.oauth;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
-import org.talend.components.test.ComponentTestUtils;
+import org.talend.components.api.test.ComponentTestUtils;
 
 public class AllPropertiesTest {
 

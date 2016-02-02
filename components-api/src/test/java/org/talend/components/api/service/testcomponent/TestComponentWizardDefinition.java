@@ -13,11 +13,11 @@
 package org.talend.components.api.service.testcomponent;
 
 import org.talend.components.api.Constants;
-import org.talend.components.api.context.GlobalContext;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.wizard.AbstractComponentWizardDefintion;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.WizardImageType;
+import org.talend.daikon.i18n.GlobalI18N;
 
 import aQute.bnd.annotation.component.Component;
 
@@ -46,7 +46,7 @@ public class TestComponentWizardDefinition extends AbstractComponentWizardDefint
 
     @Override
     public ComponentWizard createWizard(String location) {
-        return new TestComponentWizard(this, location, GlobalContext.getI18nMessageProvider());
+        return new TestComponentWizard(this, location, GlobalI18N.getI18nMessageProvider());
     }
 
     @Override

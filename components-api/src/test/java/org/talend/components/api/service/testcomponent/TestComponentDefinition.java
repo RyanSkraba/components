@@ -17,10 +17,10 @@ import java.util.Map;
 
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
-import org.talend.components.api.component.Connector;
-import org.talend.components.api.component.Connector.ConnectorType;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
+import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.Connector.ConnectorType;
 import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
 import org.talend.components.api.properties.ComponentProperties;

@@ -17,14 +17,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
-import org.talend.components.api.context.GlobalContext;
-import org.talend.components.api.i18n.I18nMessageProvider;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessageProvider;
 
 /**
  * GlobalContext implementation for Spring container
  */
 @Component
-public class GlobalContextSpring extends GlobalContext implements ApplicationContextAware {
+public class GlobalContextSpring extends GlobalI18N implements ApplicationContextAware {
 
     private static final Logger LOG = LoggerFactory.getLogger(GlobalContextSpring.class);
 

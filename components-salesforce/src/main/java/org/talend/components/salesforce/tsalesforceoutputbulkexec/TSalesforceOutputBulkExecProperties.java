@@ -12,11 +12,11 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutputbulkexec;
 
-import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.presentation.Widget.*;
 
-import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.salesforce.SalesforceBulkProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
+import org.talend.daikon.properties.presentation.Form;
 
 public class TSalesforceOutputBulkExecProperties extends TSalesforceOutputProperties {
 

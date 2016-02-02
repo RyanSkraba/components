@@ -13,8 +13,8 @@
 package org.talend.components.salesforce;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.schema.Schema;
+import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.schema.Schema;
 
 /**
  * Properties common to input and output Salesforce components.

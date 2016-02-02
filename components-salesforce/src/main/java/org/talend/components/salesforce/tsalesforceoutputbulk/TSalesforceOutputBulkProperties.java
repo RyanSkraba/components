@@ -12,16 +12,16 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutputbulk;
 
-import static org.talend.components.api.properties.PropertyFactory.*;
-import static org.talend.components.api.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.*;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Property;
-import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Widget;
-import org.talend.components.api.schema.SchemaElement;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
+import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.schema.SchemaElement;
 
 public class TSalesforceOutputBulkProperties extends ComponentProperties {
 

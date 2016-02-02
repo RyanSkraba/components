@@ -12,10 +12,10 @@
 // ============================================================================
 package org.talend.components.api.service.testcomponent.nestedprop.inherited;
 
-import static org.talend.components.api.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.PropertyFactory.*;
 
-import org.talend.components.api.properties.Property;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
+import org.talend.daikon.properties.Property;
 
 public class InheritedComponentProperties extends NestedComponentProperties {
 

@@ -12,10 +12,17 @@
 // ============================================================================
 package org.talend.components.api.properties;
 
-import org.talend.components.api.properties.presentation.Form;
-import org.talend.components.api.properties.presentation.Widget;
-import org.talend.components.api.schema.SchemaElement;
+import java.lang.reflect.Field;
+
 import org.talend.daikon.i18n.I18nMessages;
+import org.talend.daikon.properties.PresentationItem;
+import org.talend.daikon.properties.Properties;
+import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.PropertyFactory;
+import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.schema.SchemaElement;
 
 /**
  * The {@code ComponentProperties} class contains the definitions of the properties associated with a component. These
@@ -86,6 +93,23 @@ public abstract class ComponentProperties extends Properties {
      */
     public ComponentProperties(String name) {
         super(name);
+    }
+
+    @Override
+    protected boolean acceptUninitializedField(Field f) {
+        // we accept that return field is not intialized after setupProperties.
+        return RETURNS.equals(f.getName());
+    }
+
+    /**
+     * Used if there are returns to set the "returns" property with a {@link Property} that contains the returns
+     * properties.
+     *
+     * @return a {@link Property} that will contain the return properties
+     */
+    public static Property setReturnsProperty() {
+        // Container for the returns
+        return new Property(RETURNS);
     }
 
 }

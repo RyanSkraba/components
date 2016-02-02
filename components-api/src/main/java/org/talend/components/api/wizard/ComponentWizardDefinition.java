@@ -12,10 +12,8 @@
 // ============================================================================
 package org.talend.components.api.wizard;
 
-import org.talend.components.api.ComponentDesigner;
 import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Repository;
 
 /**
  */

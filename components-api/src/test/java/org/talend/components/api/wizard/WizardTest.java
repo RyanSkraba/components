@@ -37,7 +37,7 @@ public class WizardTest {
         assertEquals("testLoc", wiz.getRepositoryLocation());
         assertTrue(cwd == wiz.getDefinition());
         assertEquals(1, wiz.getForms().size());
-        assertTrue(wiz.props == wiz.getForms().get(0).getComponentProperties());
+        assertTrue(wiz.props == wiz.getForms().get(0).getProperties());
     }
 
 }

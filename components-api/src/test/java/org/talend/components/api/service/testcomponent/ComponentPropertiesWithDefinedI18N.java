@@ -12,12 +12,12 @@
 // ============================================================================
 package org.talend.components.api.service.testcomponent;
 
-import static org.talend.components.api.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.PropertyFactory.*;
 
-import org.talend.components.api.context.GlobalContext;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.Property;
+import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
+import org.talend.daikon.properties.Property;
 
 public class ComponentPropertiesWithDefinedI18N extends ComponentProperties {
 
@@ -37,7 +37,7 @@ public class ComponentPropertiesWithDefinedI18N extends ComponentProperties {
      */
     @Override
     protected I18nMessages createI18nMessageFormater() {
-        return GlobalContext.getI18nMessageProvider().getI18nMessages(this.getClass().getClassLoader(),
+        return GlobalI18N.getI18nMessageProvider().getI18nMessages(this.getClass().getClassLoader(),
                 "org/talend/components/api/service/specificmessages");
     }
 

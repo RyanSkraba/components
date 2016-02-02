@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.api;
 
+import org.talend.daikon.NamedThing;
+
 /**
  * This interface is used by top level element that need to be presented to a user with a name a displayname and an
  * image

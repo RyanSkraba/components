@@ -37,6 +37,7 @@
             <artifactId>components-api</artifactId>
             <version>0.3.0.BUILD-SNAPSHOT</version>
             <classifier>tests</classifier>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -59,7 +60,7 @@
                             <instructions>
                                 <Import-Package>org.talend*</Import-Package>
                                 <Service-Component>*</Service-Component>
-                                <Embed-Dependency>!components*</Embed-Dependency>
+                                <Embed-Dependency>!components*,*;scope=compile|runtime;inline=false</Embed-Dependency>
                             </instructions>
                         </configuration>
                     </execution>
