@@ -157,7 +157,7 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
         if (form.getName().equals(Form.ADVANCED)) {
             ((Schema) schemaFlow.schema.getValue()).setRoot(null);
             if (!extendInsert.getBooleanValue() && retrieveInsertId.getStringValue() != null
-                    && outputAction.getValue() == OutputAction.INSERT) {
+                    && ACTION_INSERT.equals(outputAction.getValue())) {
                 schemaFlow.addSchemaChild(newProperty("salesforce_id"));
             }
         }
