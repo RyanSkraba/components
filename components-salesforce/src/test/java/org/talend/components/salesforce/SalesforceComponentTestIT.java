@@ -548,6 +548,31 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
     }
 
     @Test
+    public void testOutputActionType() throws Throwable {
+        ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
+        TSalesforceOutputProperties  outputProps = (TSalesforceOutputProperties) getComponentService()
+                .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
+        setupProps(outputProps.connection, DO_NOT_ADD_QUOTES);
+
+        outputProps.outputAction.setValue(TSalesforceOutputProperties.ACTION_DELETE);
+        setupModule(outputProps.module, "Account");
+
+        ComponentTestUtils.checkSerialize(outputProps, errorCollector);
+        SalesforceRuntime runtime = createRuntime(definition);
+
+        Map<String, Object> row = new HashMap<>();
+        runtime.outputBegin(outputProps);
+        try {
+            runtime.outputMain(row);
+        }catch (Exception ex){
+            if(ex instanceof ClassCastException){
+                System.out.println("Exception: " + ex.getMessage());
+                fail("Get error before delete!");
+            }
+        }
+    }
+
+    @Test
     public void testInputConnectionRef() throws Throwable {
         ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
         TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()

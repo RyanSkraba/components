@@ -478,7 +478,7 @@ public class SalesforceRuntime extends ComponentRuntime {
     @Override
     public void outputMain(Map<String, Object> row) throws Exception {
         TSalesforceOutputProperties sprops = (TSalesforceOutputProperties) properties;
-        if (sprops.outputAction.getValue() != TSalesforceOutputProperties.OutputAction.DELETE) {
+        if (!TSalesforceOutputProperties.ACTION_DELETE.equals(sprops.outputAction.getValue())) {
             SObject so = new SObject();
             so.setType(sprops.module.moduleName.getStringValue());
 
@@ -501,7 +501,7 @@ public class SalesforceRuntime extends ComponentRuntime {
                 }
             }
 
-            switch ((TSalesforceOutputProperties.OutputAction) sprops.outputAction.getValue()) {
+            switch (TSalesforceOutputProperties.OutputAction.valueOf(sprops.outputAction.getStringValue())) {
             case INSERT:
                 insert(so);
                 break;
