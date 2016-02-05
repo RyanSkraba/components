@@ -331,11 +331,4 @@ public class ComponentServiceSpring implements ComponentService {
         return componentServiceDelegate.storeProperties(properties, name, repositoryLocation, schema);
     }
 
-    // FIXME - make this work for web
-    @Override
-    public ComponentProperties getPropertiesForComponent(String componentId) {
-        throw new IllegalAccessError("not implmented yet");
-        // return componentServiceDelegate.getPropertiesForComponent(componentId);
-    }
-
 }

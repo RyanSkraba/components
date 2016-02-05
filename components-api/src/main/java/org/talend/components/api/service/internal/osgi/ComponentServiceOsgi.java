@@ -231,11 +231,6 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
-    public ComponentProperties getPropertiesForComponent(String componentId) {
-        return componentServiceDelegate.getPropertiesForComponent(componentId);
-    }
-
-    @Override
     public Set<String> getMavenUriDependencies(String componentName) {
         return componentServiceDelegate.getMavenUriDependencies(componentName);
     }

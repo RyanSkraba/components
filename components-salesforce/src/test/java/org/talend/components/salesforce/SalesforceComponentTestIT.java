@@ -245,12 +245,6 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
             return repositoryLocation + ++locationNum;
         }
 
-        @Override
-        public Properties getPropertiesForComponent(String componentId) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
     }
 
     class TestRuntimeContainer extends DefaultComponentRuntimeContainerImpl {
@@ -715,13 +709,17 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         Map<String, Object> row = new HashMap<>();
 
         int count = 10;
+        // store rows in SF to retreive them afterward to test the input.
         List<Map<String, Object>> outputRows = makeRows(count);
         outputRows = writeRows(runtime, props, outputRows);
-
-        List<Map<String, Object>> rows = new ArrayList<>();
-        runtime.input(props, rows);
-        checkRows(rows, count);
-        deleteRows(runtime, outputRows);
+        checkRows(outputRows, count);
+        try {// retreive the row and make sure they are correct
+            List<Map<String, Object>> rows = new ArrayList<>();
+            runtime.input(props, rows);
+            checkRows(rows, count);
+        } finally {// make sure everything is clear.
+            deleteRows(runtime, outputRows);
+        }
     }
 
     protected boolean setupDynamic() {
