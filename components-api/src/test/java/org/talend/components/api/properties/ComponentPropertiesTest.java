@@ -26,14 +26,14 @@ public class ComponentPropertiesTest {
 
     @Test
     public void testSetReturnsProperty() {
-        SchemaElement element = ComponentProperties.setReturnsProperty();
+        SchemaElement element = ComponentPropertyFactory.newReturnsProperty();
         assertEquals("returns", element.getName());
         assertEquals(Type.STRING, element.getType());
     }
 
     @Test
     public void testNewReturnProperty() throws IllegalAccessException {
-        Property element = ComponentProperties.setReturnsProperty();
+        Property element = ComponentPropertyFactory.newReturnsProperty();
         Property returnProperty = ComponentPropertyFactory.newReturnProperty(element, Type.BOOLEAN, "childName");
         assertEquals("childName", returnProperty.getName());
         assertEquals(Type.BOOLEAN, returnProperty.getType());

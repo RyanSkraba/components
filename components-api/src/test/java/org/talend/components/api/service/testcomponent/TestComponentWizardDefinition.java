@@ -37,8 +37,8 @@ public class TestComponentWizardDefinition extends AbstractComponentWizardDefint
     }
 
     @Override
-    public boolean supportsProperties(ComponentProperties properties) {
-        if (properties instanceof TestComponentProperties) {
+    public boolean supportsProperties(Class<? extends ComponentProperties> propertiesClass) {
+        if (propertiesClass.isAssignableFrom(TestComponentProperties.class)) {
             return true;
         }
         return false;

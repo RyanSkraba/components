@@ -12,6 +12,11 @@
 // ============================================================================
 package org.talend.components.api.properties;
 
+import org.talend.components.api.exception.ComponentException;
+import org.talend.components.api.exception.error.ComponentsErrorCode;
+import org.talend.daikon.exception.ExceptionContext;
+import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.schema.SchemaElement;
 
@@ -26,7 +31,7 @@ public class ComponentPropertyFactory {
      *
      * @return a {@link Property} that will contain the return properties
      */
-    public static Property setReturnsProperty() {
+    public static Property newReturnsProperty() {
         // Container for the returns
         return new Property(ComponentProperties.RETURNS);
     }
@@ -34,13 +39,19 @@ public class ComponentPropertyFactory {
     /**
      * Adds a new return property.
      *
-     * @param returns the {@link Property} returned by {@link #setReturnsProperty()}
+     * @param returns the {@link Property} returned by {@link #newReturnsProperty()}
      * @param type the type of the returns property
      * @param name the name of the returns property
      * @return a {@link Property}
      */
     public static Property newReturnProperty(Property returns, SchemaElement.Type type, String name) {
-        // TODO Check if the property's name is equals ComponentProperties.RETURNS
+        if (returns == null) {
+            throw new TalendRuntimeException(CommonErrorCodes.UNEXPECTED_EXCEPTION, new NullPointerException());
+        }
+        if (!ComponentProperties.RETURNS.equals(returns.getName())) {
+            throw new ComponentException(ComponentsErrorCode.WRONG_RETURNS_TYPE_NAME,
+                    ExceptionContext.build().put("name", returns.getName()));
+        }
         Property p = new Property(type, name);
         returns.addChild(p);
         return p;

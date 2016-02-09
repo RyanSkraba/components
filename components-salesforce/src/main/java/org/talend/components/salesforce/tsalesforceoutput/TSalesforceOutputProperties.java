@@ -15,7 +15,8 @@ package org.talend.components.salesforce.tsalesforceoutput;
 import static org.talend.daikon.properties.PropertyFactory.*;
 import static org.talend.daikon.properties.presentation.Widget.*;
 
-import org.talend.components.api.properties.ComponentProperties;
+import java.util.ArrayList;
+
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
@@ -101,7 +102,7 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
 
     public static void setupUpsertRelation(Property ur, boolean poly) {
         // They might have been set previously in some inheritance cases
-        ur.setChildren(null);
+        ur.setChildren(new ArrayList<SchemaElement>());
         ur.addChild(newProperty("columnName")); //$NON-NLS-1$
         ur.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
         ur.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
@@ -114,7 +115,7 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
     @Override
     public void setupProperties() {
         super.setupProperties();
-        returns = ComponentProperties.setReturnsProperty();
+        returns = ComponentPropertyFactory.newReturnsProperty();
         ComponentPropertyFactory.newReturnProperty(returns, SchemaElement.Type.INT, "NB_LINE"); //$NON-NLS-1$
         ComponentPropertyFactory.newReturnProperty(returns, SchemaElement.Type.INT, "NB_SUCCESS"); //$NON-NLS-1$
         ComponentPropertyFactory.newReturnProperty(returns, SchemaElement.Type.INT, "NB_REJECT"); //$NON-NLS-1$

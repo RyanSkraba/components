@@ -14,7 +14,6 @@ package org.talend.components.salesforce.tsalesforceinput;
 
 import static org.talend.daikon.properties.PropertyFactory.*;
 
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.daikon.properties.Property;
@@ -53,7 +52,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
     @Override
     public void setupProperties() {
         super.setupProperties();
-        returns = ComponentProperties.setReturnsProperty();
+        returns = ComponentPropertyFactory.newReturnsProperty();
         ComponentPropertyFactory.newReturnProperty(returns, SchemaElement.Type.INT, "NB_LINE");
         // FIXME - should use default value
         batchSize.setValue(100);

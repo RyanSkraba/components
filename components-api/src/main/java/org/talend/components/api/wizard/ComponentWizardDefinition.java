@@ -17,12 +17,15 @@ import org.talend.components.api.properties.ComponentProperties;
 
 /**
  */
+/**
+ * created by sgandon on 8 févr. 2016
+ */
 public interface ComponentWizardDefinition extends TopLevelDefinition {
 
     public String getMenuItemName();
 
     /**
-     * Creates a {@link ComponentWizard} based on the this definition.
+     * Creates an empty {@link ComponentWizard} based on the this definition.
      *
      * Optionally asks the wizard to remembers a repository location string to allow the wizard to notify the
      * {@link ComponentDesigner} when {@link ComponentProperties} objects are created.
@@ -47,9 +50,9 @@ public interface ComponentWizardDefinition extends TopLevelDefinition {
     ComponentWizard createWizard(ComponentProperties properties, String location);
 
     /**
-     * This shall be a path relative to the current Wizard definition, ideally is should just be the name of the png
-     * image if placed in the same resource folder that the current class. This icon will be computed with the following
-     * code
+     * return the image path used to decorate the wizard and and possible tree node related to it. This shall be a path
+     * relative to the current Wizard definition, ideally is should just be the name of the png image if placed in the
+     * same resource folder that the current class. This icon will be computed with the following code
      * 
      * <pre>
      * {@code
@@ -61,11 +64,22 @@ public interface ComponentWizardDefinition extends TopLevelDefinition {
      * @param imageType the type of image requested
      * @return the path to the png resource
      */
-
     public abstract String getPngImagePath(WizardImageType imageType);
 
-    public boolean supportsProperties(ComponentProperties properties);
+    /**
+     * tell whether this Wizard is allowed to edit the given properties.
+     * 
+     * @param propertiesClass, the class to be checked upon.
+     * @return true is this wizard can handle the specific properties.
+     */
+    public boolean supportsProperties(Class<? extends ComponentProperties> propertiesClass);
 
+    /**
+     * This tell the client whether this wizard is of type connector instead of specific input/output data specification
+     * that may be just lower level specification.
+     * 
+     * @return true is the wizard edits top level connections.
+     */
     public boolean isTopLevel();
 
 }

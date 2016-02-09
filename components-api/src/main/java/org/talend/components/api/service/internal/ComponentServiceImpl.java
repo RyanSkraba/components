@@ -147,7 +147,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl<ComponentPropert
     public List<ComponentWizard> getComponentWizardsForProperties(ComponentProperties properties, String location) {
         List<ComponentWizard> wizards = new ArrayList<>();
         for (ComponentWizardDefinition wizardDefinition : componentRegistry.getComponentWizards().values()) {
-            if (wizardDefinition.supportsProperties(properties)) {
+            if (wizardDefinition.supportsProperties(properties.getClass())) {
                 ComponentWizard wizard = wizardDefinition.createWizard(properties, location);
                 wizards.add(wizard);
             }

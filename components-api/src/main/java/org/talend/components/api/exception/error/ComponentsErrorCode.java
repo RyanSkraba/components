@@ -28,7 +28,8 @@ public enum ComponentsErrorCode implements ErrorCode {
 
                                                       WRONG_COMPONENT_NAME(HttpServletResponse.SC_BAD_REQUEST, "name"), //$NON-NLS-1$
                                                       WRONG_WIZARD_NAME(HttpServletResponse.SC_BAD_REQUEST, "name"), //$NON-NLS-1$
-                                                      COMPUTE_DEPENDENCIES_FAILED(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                                                      COMPUTE_DEPENDENCIES_FAILED(HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
+                                                      WRONG_RETURNS_TYPE_NAME(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "name"); //$NON-NLS-1$
 
     /** The http status to use. */
     private int httpStatus;
