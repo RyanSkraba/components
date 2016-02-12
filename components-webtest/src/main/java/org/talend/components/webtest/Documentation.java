@@ -18,13 +18,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.talend.daikon.schema.SchemaElement;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mangofactory.swagger.configuration.SpringSwaggerConfig;
 import com.mangofactory.swagger.models.dto.ApiInfo;
 import com.mangofactory.swagger.plugin.EnableSwagger;
@@ -56,30 +52,6 @@ public class Documentation {
         ApiInfo apiInfo = new ApiInfo(serviceDisplayName, serviceDescription, StringUtils.EMPTY, StringUtils.EMPTY,
                 StringUtils.EMPTY, StringUtils.EMPTY);
         return new SwaggerSpringMvcPlugin(springSwaggerConfig).apiInfo(apiInfo).includePatterns(servicePaths);
-    }
-
-    // @Bean
-    // public ObjectMapper objectMapper() {
-    // final ObjectMapper mapper = new ObjectMapper();
-    // mapper.addMixInAnnotations(org.talend.daikon.schema.AbstractSchemaElement.class,
-    // AbstractSchemaElementMixIn.class);
-    // return mapper;
-    // }
-
-    @Bean
-    @Primary
-    public Jackson2ObjectMapperBuilder objectMapperBuilder() {
-        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
-        builder.mixIn(org.talend.daikon.schema.AbstractSchemaElement.class, AbstractSchemaElementMixIn.class);
-        return builder;
-    }
-
-    @Bean
-    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter(ObjectMapper objectMapper) {
-        objectMapper.addMixIn(org.talend.daikon.schema.AbstractSchemaElement.class, AbstractSchemaElementMixIn.class);
-        objectMapper.addMixInAnnotations(org.talend.daikon.schema.AbstractSchemaElement.class, AbstractSchemaElementMixIn.class);
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter(objectMapper);
-        return converter;
     }
 
     interface AbstractSchemaElementMixIn {
