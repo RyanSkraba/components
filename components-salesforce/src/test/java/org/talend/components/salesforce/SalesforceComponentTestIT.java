@@ -296,8 +296,9 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connFormWizard.getProperties();
 
         Form af = connProps.getForm(Form.ADVANCED);
-        assertTrue(((PresentationItem) connFormWizard.getChild("advanced")).getFormtoShow() + " should be == to " + af,
-                ((PresentationItem) connFormWizard.getChild("advanced")).getFormtoShow() == af);
+        assertTrue(((PresentationItem) connFormWizard.getWidget("advanced").getProperties()[0]).getFormtoShow()
+                + " should be == to " + af,
+                ((PresentationItem) connFormWizard.getWidget("advanced").getProperties()[0]).getFormtoShow() == af);
 
         Object image = getComponentService().getWizardPngImage(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
                 WizardImageType.TREE_ICON_16X16);
@@ -312,11 +313,11 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         assertEquals("Name", connProps.getProperty("name").getDisplayName());
         connProps.name.setValue("connName");
         setupProps(connProps, DO_NOT_ADD_QUOTES);
-        Form userPassword = (Form) connFormWizard.getChild("userPassword");
-        SchemaElement passwordSe = (SchemaElement) userPassword.getChild("password");
+        Form userPassword = (Form) connFormWizard.getWidget("userPassword").getProperties()[0];
+        SchemaElement passwordSe = (SchemaElement) userPassword.getWidget("password").getProperties()[0];
         assertEquals("Password", passwordSe.getDisplayName());
         // check name i18n
-        NamedThing nameProp = connFormWizard.getChild("name"); //$NON-NLS-1$
+        NamedThing nameProp = connFormWizard.getWidget("name").getProperties()[0]; //$NON-NLS-1$
         assertEquals("Name", nameProp.getDisplayName());
         connProps = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), connFormWizard,
                 "testConnection", connProps);
@@ -521,7 +522,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         ComponentProperties moduleProps = (ComponentProperties) f.getProperties();
         moduleProps = (ComponentProperties) PropertiesServiceTest.checkAndBeforeActivate(getComponentService(), f, "moduleName",
                 moduleProps);
-        SchemaElement prop = (SchemaElement) f.getChild("moduleName");
+        SchemaElement prop = (SchemaElement) f.getWidget("moduleName").getProperties()[0];
         assertTrue(prop.getPossibleValues().size() > 100);
         System.out.println(prop.getPossibleValues());
         System.out.println(moduleProps.getValidationResult());
