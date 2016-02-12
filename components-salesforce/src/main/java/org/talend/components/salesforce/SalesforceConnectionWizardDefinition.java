@@ -12,35 +12,20 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import javax.inject.Inject;
-
 import org.talend.components.api.Constants;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.AbstractComponentWizardDefintion;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 
 import aQute.bnd.annotation.component.Component;
-import aQute.bnd.annotation.component.Reference;
 
 @Component(name = Constants.COMPONENT_WIZARD_BEAN_PREFIX
         + SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, provide = ComponentWizardDefinition.class)
 public class SalesforceConnectionWizardDefinition extends AbstractComponentWizardDefintion {
 
     public static final String COMPONENT_WIZARD_NAME = "salesforce"; //$NON-NLS-1$
-
-    @Inject
-    ComponentService compService;
-
-    /**
-     * this will be used when in OSGI or may be used when not in a container at all.
-     */
-    @Reference
-    public void setupComponentService(ComponentService compService) {
-        this.compService = compService;
-    }
 
     @Override
     public String getName() {
@@ -49,7 +34,7 @@ public class SalesforceConnectionWizardDefinition extends AbstractComponentWizar
 
     @Override
     public ComponentWizard createWizard(String location) {
-        return new SalesforceConnectionWizard(this, location, compService);
+        return new SalesforceConnectionWizard(this, location);
     }
 
     @Override

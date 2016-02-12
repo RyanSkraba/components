@@ -18,12 +18,13 @@ import static org.talend.daikon.properties.presentation.Widget.*;
 import java.util.List;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.service.ComponentService;
 import org.talend.daikon.NamedThing;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement;
 
@@ -34,8 +35,6 @@ public class SalesforceModuleListProperties extends ComponentProperties {
     private String repositoryLocation;
 
     private List<NamedThing> moduleNames;
-
-    transient private ComponentService compService;
 
     //
     // Properties
@@ -79,14 +78,14 @@ public class SalesforceModuleListProperties extends ComponentProperties {
         getForm(Form.MAIN).setAllowFinish(true);
     }
 
-    public ValidationResult afterFormFinishMain() throws Exception {
+    public ValidationResult afterFormFinishMain(Repository<Properties> repo) throws Exception {
         SalesforceRuntime conn = new SalesforceRuntime();
         ValidationResult vr = conn.connectWithResult(connectionProps);
         if (vr.getStatus() != ValidationResult.Result.OK) {
             return vr;
         }
 
-        String connRepLocation = compService.storeProperties(connectionProps, (String) connectionProps.name.getValue(),
+        String connRepLocation = repo.storeProperties(connectionProps, (String) connectionProps.name.getValue(),
                 repositoryLocation, null);
 
         @SuppressWarnings("unchecked")
@@ -97,19 +96,9 @@ public class SalesforceModuleListProperties extends ComponentProperties {
             Schema schema = conn.getSchema(nl.getName());
             modProps.moduleName.setValue(nl.getName());
             modProps.schema.schema.setValue(schema);
-            compService.storeProperties(modProps, nl.getName(), connRepLocation, schema);
+            repo.storeProperties(modProps, nl.getName(), connRepLocation, schema);
         }
         return ValidationResult.OK;
     }
 
-    /**
-     * Sets the compService.
-     *
-     * @param compService the compService to set
-     * @return
-     */
-    public SalesforceModuleListProperties setComponentService(ComponentService compService) {
-        this.compService = compService;
-        return this;
-    }
 }

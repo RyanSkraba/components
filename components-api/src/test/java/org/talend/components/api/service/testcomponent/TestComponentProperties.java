@@ -24,12 +24,14 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
 import org.talend.daikon.properties.PresentationItem;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.presentation.Widget.WidgetType;
+import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.schema.SchemaElement.Type;
 
 public class TestComponentProperties extends ComponentProperties {
@@ -91,7 +93,7 @@ public class TestComponentProperties extends ComponentProperties {
         nameListRef.setPossibleValues(values);
     }
 
-    public ValidationResult afterFormFinishMain() {
+    public ValidationResult afterFormFinishMain(Repository<Properties> repo) {
         return new ValidationResult().setStatus(Result.ERROR);
     }
 
@@ -132,8 +134,9 @@ public class TestComponentProperties extends ComponentProperties {
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals("restoreTest")) {
-            if (suppressDate.getBooleanValue())
+            if (suppressDate.getBooleanValue()) {
                 form.getWidget("date").setVisible(false);
+            }
         }
     }
 

@@ -67,7 +67,6 @@ import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.exception.ExceptionContext;
-import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.PropertiesServiceImpl;
 
 /**
@@ -164,74 +163,6 @@ public class ComponentServiceImpl extends PropertiesServiceImpl<ComponentPropert
             }
         }
         return returnList;
-    }
-
-    @Override
-    public ComponentProperties makeFormCancelable(ComponentProperties properties, String formName) {
-        Form form = properties.getForm(formName);
-        if (form == null) {
-            throw new IllegalArgumentException("Form: " + formName + " not found");
-        }
-        form.setCancelable(true);
-        return properties;
-    }
-
-    @Override
-    public ComponentProperties commitFormValues(ComponentProperties properties, String formName) {
-        Form form = properties.getForm(formName);
-        if (form == null) {
-            throw new IllegalArgumentException("Form: " + formName + " not found");
-        }
-        form.commitValues();
-        return properties;
-    }
-
-    @Override
-    public ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable {
-        properties.validateProperty(propName);
-        return properties;
-    }
-
-    @Override
-    public ComponentProperties beforePropertyActivate(String propName, ComponentProperties properties) throws Throwable {
-        properties.beforePropertyActivate(propName);
-        return properties;
-    }
-
-    @Override
-    public ComponentProperties beforePropertyPresent(String propName, ComponentProperties properties) throws Throwable {
-        properties.beforePropertyPresent(propName);
-        return properties;
-    }
-
-    @Override
-    public ComponentProperties afterProperty(String propName, ComponentProperties properties) throws Throwable {
-        properties.afterProperty(propName);
-        return properties;
-    }
-
-    @Override
-    public ComponentProperties beforeFormPresent(String formName, ComponentProperties properties) throws Throwable {
-        properties.beforeFormPresent(formName);
-        return properties;
-    }
-
-    @Override
-    public ComponentProperties afterFormNext(String formName, ComponentProperties properties) throws Throwable {
-        properties.afterFormNext(formName);
-        return properties;
-    }
-
-    @Override
-    public ComponentProperties afterFormBack(String formName, ComponentProperties properties) throws Throwable {
-        properties.afterFormBack(formName);
-        return properties;
-    }
-
-    @Override
-    public ComponentProperties afterFormFinish(String formName, ComponentProperties properties) throws Throwable {
-        properties.afterFormFinish(formName);
-        return properties;
     }
 
     @Override

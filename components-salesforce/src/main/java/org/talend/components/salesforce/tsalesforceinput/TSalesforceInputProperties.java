@@ -20,6 +20,8 @@ import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.schema.SchemaElement;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class TSalesforceInputProperties extends SalesforceConnectionModuleProperties {
 
     public static final String QUERY_QUERY = "Query";
@@ -45,7 +47,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
     public Property columnNameDelimiter = newProperty("columnNameDelimiter"); //$NON-NLS-1$
 
-    public TSalesforceInputProperties(String name) {
+    public TSalesforceInputProperties(@JsonProperty("name") String name) {
         super(name);
     }
 

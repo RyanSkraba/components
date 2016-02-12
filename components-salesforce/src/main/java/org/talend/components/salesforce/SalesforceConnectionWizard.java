@@ -13,7 +13,6 @@
 package org.talend.components.salesforce;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.daikon.properties.presentation.Form;
@@ -27,15 +26,15 @@ public class SalesforceConnectionWizard extends ComponentWizard {
 
     SalesforceModuleListProperties mProps;
 
-    SalesforceConnectionWizard(ComponentWizardDefinition def, String repositoryLocation, ComponentService compService) {
+    SalesforceConnectionWizard(ComponentWizardDefinition def, String repositoryLocation) {
         super(def, repositoryLocation);
 
         cProps = new SalesforceConnectionProperties("connection");
         cProps.init();
         addForm(cProps.getForm(SalesforceConnectionProperties.FORM_WIZARD));
 
-        mProps = new SalesforceModuleListProperties("mProps").setConnection(cProps).setRepositoryLocation(getRepositoryLocation())
-                .setComponentService(compService);
+        mProps = new SalesforceModuleListProperties("mProps").setConnection(cProps)
+                .setRepositoryLocation(getRepositoryLocation());
         mProps.init();
         addForm(mProps.getForm(Form.MAIN));
     }

@@ -112,7 +112,6 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
             testComponentRegistry.addWizard(SalesforceConnectionEditWizardDefinition.COMPONENT_WIZARD_NAME,
                     new SalesforceConnectionEditWizardDefinition());
             componentService = new SimpleComponentService(testComponentRegistry);
-            scwd.setupComponentService(componentService);
         }
         return componentService;
     }
