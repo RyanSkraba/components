@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 
-        package ${package};
+package ${package};
 
 import java.io.InputStream;
 
@@ -36,7 +36,7 @@ public class ${componentName}Definition extends AbstractComponentDefinition {
 
     @Override
     public InputStream getMavenPom() {
-        return null;
+        return this.getClass().getResourceAsStream("pom.xml");
     }
 
     @Override
