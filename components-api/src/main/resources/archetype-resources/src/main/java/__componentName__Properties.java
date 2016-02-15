@@ -3,7 +3,7 @@
 #set( $symbol_escape = '\' )
 
 
-        package ${package};
+package ${package};
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Property;

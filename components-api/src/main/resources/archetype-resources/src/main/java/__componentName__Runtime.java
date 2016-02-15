@@ -2,31 +2,35 @@
         #set( $symbol_dollar = '$' )
         #set( $symbol_escape = '\' )
 
-        package ${package};
+package ${package};
 
-        import java.util.Map;
-        import java.util.HashMap;
-        import java.io.FileReader;
-        import java.io.BufferedReader;
+import java.util.Map;
+import java.util.HashMap;
+import java.io.FileReader;
+import java.io.BufferedReader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
+import org.talend.components.dataprep.DatasetOutputRuntime;
 
 public class ${componentName}Runtime extends ComponentRuntime {
+   private static final Logger LOGGER = LoggerFactory.getLogger(${componentName}Runtime.class);
 
-        ${componentName}Properties _properties;
+   ${componentName}Properties _properties;
    BufferedReader _reader;
 
     @Override
     public void inputBegin(ComponentProperties props) throws Exception {
         _properties = (${componentName}Properties)props;
-        System.out.println("open: " + _properties.filename.getStringValue());
+        LOGGER.debug("open: " + _properties.filename.getStringValue());
         _reader = new BufferedReader(new FileReader(_properties.filename.getStringValue()));
     }
 
     @Override
     public Map<String, Object> inputRow() throws Exception {
-        System.out.println("read: " + _properties.filename.getStringValue());
+        LOGGER.debug("read: " + _properties.filename.getStringValue());
         Map<String, Object> row = new HashMap();
         String line = _reader.readLine();
         if (line == null)
@@ -37,7 +41,7 @@ public class ${componentName}Runtime extends ComponentRuntime {
 
     @Override
     public void inputEnd() throws Exception {
-        System.out.println("end: " + _properties.filename.getStringValue());
+        LOGGER.debug("end: " + _properties.filename.getStringValue());
         _reader.close();
     }
 

@@ -69,8 +69,16 @@ public class ${componentName}Test {
     @Test
     public void testAlli18n() {
         ComponentTestUtils.checkAllI18N(new ${componentName}Properties(null).init(), errorCollector);
-        ;
     }
     
+    @Test
+    public void testAllImagePath() {
+        ComponentTestUtils.testAllImages(getComponentService());
+    }
+
+    @Test
+    public void testAllRuntimes() {
+        ComponentTestUtils.testAllRuntimeAvaialble(getComponentService());
+    }
     
 }
