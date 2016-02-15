@@ -35,7 +35,8 @@ public class SalesforceConnectionModuleProperties extends ComponentProperties {
     public void setupProperties() {
         super.setupProperties();
         // Allow for subclassing
-        module = new SalesforceModuleProperties("module").setConnection(connection);
+        module = new SalesforceModuleProperties("module");
+        module.connection = connection;
     }
 
     public Schema getSchema() {

@@ -91,7 +91,8 @@ public class SalesforceModuleListProperties extends ComponentProperties {
         @SuppressWarnings("unchecked")
         List<NamedThing> selectedModuleNames = (List<NamedThing>) moduleName.getValue();
         for (NamedThing nl : selectedModuleNames) {
-            SalesforceModuleProperties modProps = new SalesforceModuleProperties(nl.getName()).setConnection(connectionProps);
+            SalesforceModuleProperties modProps = new SalesforceModuleProperties(nl.getName());
+            modProps.connection = connectionProps;
             modProps.init();
             Schema schema = conn.getSchema(nl.getName());
             modProps.moduleName.setValue(nl.getName());
