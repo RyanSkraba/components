@@ -18,9 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.talend.daikon.schema.SchemaElement;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mangofactory.swagger.configuration.SpringSwaggerConfig;
 import com.mangofactory.swagger.models.dto.ApiInfo;
 import com.mangofactory.swagger.plugin.EnableSwagger;
@@ -54,10 +52,4 @@ public class Documentation {
         return new SwaggerSpringMvcPlugin(springSwaggerConfig).apiInfo(apiInfo).includePatterns(servicePaths);
     }
 
-    interface AbstractSchemaElementMixIn {
-
-        @JsonIgnore
-        public SchemaElement setPossibleValues(Object... values); // we don't need it!
-
-    }
 }
