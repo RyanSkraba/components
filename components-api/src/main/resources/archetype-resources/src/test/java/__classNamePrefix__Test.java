@@ -2,24 +2,24 @@
         #set( $symbol_dollar = '$' )
         #set( $symbol_escape = '\' )
 
-        package ${package};
+package ${package};
 
-        import java.io.File;
-        import java.io.PrintWriter;
-        import java.util.List;
-        import java.util.Map;
-        import java.util.ArrayList;
+import java.io.File;
+import java.io.PrintWriter;
+import java.util.List;
+import java.util.Map;
+import java.util.ArrayList;
 
-        import static org.junit.Assert.*;
-        import org.junit.Before;
+import static org.junit.Assert.*;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
-        import org.talend.components.api.runtime.ComponentRuntime;
-        import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.runtime.ComponentRuntime;
+import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
-import org.talend.components.test.ComponentTestUtils;
-import org.talend.components.test.SimpleComponentRegistry;
+import org.talend.components.api.test.ComponentTestUtils;
+import org.talend.components.api.test.SimpleComponentRegistry;
 
 public class ${classNamePrefix}Test {
 
