@@ -9,7 +9,7 @@
         <relativePath>../components-parent/pom.xml</relativePath>
     </parent>
 
-    <name>Components - ${classNamePrefix}</name>
+    <name>Components - ${componentName}</name>
     <groupId>${groupId}</groupId>
     <artifactId>${artifactId}</artifactId>
     <version>${version}</version>

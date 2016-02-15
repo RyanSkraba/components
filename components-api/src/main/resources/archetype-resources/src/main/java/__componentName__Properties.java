@@ -11,13 +11,13 @@ import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.presentation.Form;
 
 /**
- * Define properties and layout for the ${classNamePrefix} component
+ * Define properties and layout for the ${componentName} component
  */
-public class ${classNamePrefix}Properties extends ComponentProperties {
+public class ${componentName}Properties extends ComponentProperties {
 
     public Property filename = PropertyFactory.newString("filename"); //$NON-NLS-1$
 
-    public ${classNamePrefix}Properties(String name) {
+    public ${componentName}Properties(String name) {
         super(name);
     }
 

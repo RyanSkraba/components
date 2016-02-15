@@ -5,8 +5,8 @@
         xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <requiredProperties>
-        <requiredProperty key="classNamePrefix">
-            <!-- <defaultValue>MyComponent</defaultValue>-->
+        <requiredProperty key="componentName">
+            <defaultValue>FileInput</defaultValue>
         </requiredProperty>
     </requiredProperties>
     <fileSets>
@@ -16,17 +16,11 @@
                 <include>**/*.java</include>
             </includes>
         </fileSet>
-        <fileSet filtered="true" encoding="UTF-8">
+        <fileSet encoding="UTF-8" packaged="true" >
             <directory>src/main/resources</directory>
             <includes>
-                <include>**/*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet encoding="UTF-8">
-            <directory>src/main/resources</directory>
-            <includes>
-                <include>**/*.md</include>
                 <include>**/*.png</include>
+                <include>**/*.properties</include>
             </includes>
         </fileSet>
         <fileSet filtered="true" packaged="true" encoding="UTF-8">

@@ -12,14 +12,14 @@
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
 
-public class ${classNamePrefix}Runtime extends ComponentRuntime {
+public class ${componentName}Runtime extends ComponentRuntime {
 
-        ${classNamePrefix}Properties _properties;
+        ${componentName}Properties _properties;
    BufferedReader _reader;
 
     @Override
     public void inputBegin(ComponentProperties props) throws Exception {
-        _properties = (${classNamePrefix}Properties)props;
+        _properties = (${componentName}Properties)props;
         System.out.println("open: " + _properties.filename.getStringValue());
         _reader = new BufferedReader(new FileReader(_properties.filename.getStringValue()));
     }
