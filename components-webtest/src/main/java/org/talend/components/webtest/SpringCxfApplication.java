@@ -46,7 +46,7 @@ public class SpringCxfApplication {
 
     @Bean
     public ServletRegistrationBean servletRegistrationBean(ApplicationContext context) {
-        return new ServletRegistrationBean(new CXFServlet(), "/services/*");
+        return new ServletRegistrationBean(new CXFServlet(), "/components/*");
     }
 
 }

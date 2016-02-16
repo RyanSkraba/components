@@ -58,7 +58,7 @@ import com.wordnik.swagger.annotations.ApiParam;
 
 @Api(value = "components", basePath = ComponentServiceSpring.BASE_PATH, description = "Component services")
 @Service
-@Path("/components")
+@Path("")
 public class ComponentServiceSpring implements ComponentService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ComponentServiceSpring.class);
@@ -128,7 +128,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Path("/wizardForProperties/{repositoryLocation}")
     @Produces(MediaType.APPLICATION_JSON_VALUE)
     public List<ComponentWizard> getComponentWizardsForProperties(
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties,
+            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties,
             @PathParam("repositoryLocation") @ApiParam(name = "repositoryLocation", value = "Repository location") String repositoryLocation) {
         return componentServiceDelegate.getComponentWizardsForProperties(properties, repositoryLocation);
     }
@@ -138,7 +138,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Path("/possibleComponents")
     @Produces(MediaType.APPLICATION_JSON_VALUE)
     public List<ComponentDefinition> getPossibleComponents(
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
+            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties)
                     throws Throwable {
         return componentServiceDelegate.getPossibleComponents(properties);
     }
@@ -148,7 +148,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Path("/makeFormCancelable")
     @Produces(MediaType.APPLICATION_JSON_VALUE)
     public ComponentProperties makeFormCancelable(
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties,
+            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties,
             @ApiParam(name = "formName", value = "Name of the form") String formName) {
         return componentServiceDelegate.makeFormCancelable(properties, formName);
     }
@@ -158,7 +158,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Path("/commitFormValues")
     @Produces(MediaType.APPLICATION_JSON_VALUE)
     public ComponentProperties commitFormValues(
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties,
+            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties,
             @ApiParam(name = "formName", value = "Name of the form") String formName) {
         return componentServiceDelegate.commitFormValues(properties, formName);
     }
@@ -169,7 +169,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Produces(MediaType.APPLICATION_JSON_VALUE)
     public ComponentProperties validateProperty(
             @PathParam("propName") @ApiParam(name = "propName", value = "Name of property") String propName,
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
+            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties)
                     throws Throwable {
         componentServiceDelegate.validateProperty(propName, properties);
         return properties;
@@ -181,7 +181,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Produces(MediaType.APPLICATION_JSON_VALUE)
     public ComponentProperties beforePropertyActivate(
             @PathParam("propName") @ApiParam(name = "propName", value = "Name of property") String propName,
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
+            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties)
                     throws Throwable {
         componentServiceDelegate.beforePropertyActivate(propName, properties);
         return properties;
@@ -193,7 +193,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Produces(MediaType.APPLICATION_JSON_VALUE)
     public ComponentProperties beforePropertyPresent(
             @PathParam("propName") @ApiParam(name = "propName", value = "Name of property") String propName,
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
+            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties)
                     throws Throwable {
         componentServiceDelegate.beforePropertyPresent(propName, properties);
         return properties;
@@ -205,7 +205,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Produces(MediaType.APPLICATION_JSON_VALUE)
     public ComponentProperties afterProperty(
             @PathParam("propName") @ApiParam(name = "propName", value = "Name of property") String propName,
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
+            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties)
                     throws Throwable {
         componentServiceDelegate.afterProperty(propName, properties);
         return properties;
@@ -217,7 +217,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Produces(MediaType.APPLICATION_JSON_VALUE)
     public ComponentProperties beforeFormPresent(
             @PathParam("formName") @ApiParam(name = "formName", value = "Name of form") String formName,
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
+            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties)
                     throws Throwable {
         componentServiceDelegate.beforeFormPresent(formName, properties);
         return properties;
@@ -229,7 +229,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Produces(MediaType.APPLICATION_JSON_VALUE)
     public ComponentProperties afterFormNext(
             @PathParam("formName") @ApiParam(name = "formName", value = "Name of form") String formName,
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
+            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties)
                     throws Throwable {
         componentServiceDelegate.afterFormNext(formName, properties);
         return properties;
@@ -241,7 +241,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Produces(MediaType.APPLICATION_JSON_VALUE)
     public ComponentProperties afterFormBack(
             @PathParam("formName") @ApiParam(name = "formName", value = "Name of form") String formName,
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
+            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties)
                     throws Throwable {
         componentServiceDelegate.afterFormBack(formName, properties);
         return properties;
@@ -253,7 +253,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Produces(MediaType.APPLICATION_JSON_VALUE)
     public ComponentProperties afterFormFinish(
             @PathParam("formName") @ApiParam(name = "formName", value = "Name of form") String formName,
-            @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties properties)
+            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties)
                     throws Throwable {
         componentServiceDelegate.afterFormFinish(formName, properties);
         return properties;
