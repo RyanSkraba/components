@@ -49,9 +49,4 @@ public class SpringCxfApplication {
         return new ServletRegistrationBean(new CXFServlet(), "/services/*");
     }
 
-    @Bean
-    SayHelloService createBean() {
-        return new SayHelloService();
-    }
-
 }
