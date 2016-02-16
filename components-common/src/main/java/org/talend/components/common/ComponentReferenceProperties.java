@@ -34,14 +34,24 @@ public class ComponentReferenceProperties extends ComponentProperties {
                                COMPONENT_INSTANCE
     }
 
-    //
-    // Properties
-    //
-    public Property referenceType = (Property) newProperty("referenceType").setEnumClass(ReferenceType.class); //$NON-NLS-1$
+    public static class InnerProperties extends ComponentProperties {
 
-    public Property componentType = newProperty("componentType"); //$NON-NLS-1$
+        public InnerProperties(String name) {
+            super(name);
+        }
 
-    public Property componentInstanceId = newProperty("componentInstanceId"); //$NON-NLS-1$
+        //
+        // Properties
+        //
+        public Property referenceType = (Property) newProperty("referenceType").setEnumClass(ReferenceType.class); //$NON-NLS-1$
+
+        public Property componentType = newProperty("componentType"); //$NON-NLS-1$
+
+        public Property componentInstanceId = newProperty("componentInstanceId"); //$NON-NLS-1$
+
+    }
+
+    public InnerProperties properties = new InnerProperties("properties");
 
     public ComponentReferenceProperties(String name) {
         super(name);
@@ -50,9 +60,8 @@ public class ComponentReferenceProperties extends ComponentProperties {
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form reference = Form.create(this, Form.REFERENCE, "Component");
-        reference.addRow(
-                widget(referenceType, componentType, componentInstanceId).setWidgetType(Widget.WidgetType.COMPONENT_REFERENCE));
+        Form reference = Form.create(this, Form.REFERENCE, "Reference");
+        reference.addRow(widget(properties).setWidgetType(Widget.WidgetType.COMPONENT_REFERENCE));
     }
 
 }
