@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
-import org.talend.components.dataprep.DatasetOutputRuntime;
 
 public class ${componentName}Runtime extends ComponentRuntime {
    private static final Logger LOGGER = LoggerFactory.getLogger(${componentName}Runtime.class);

@@ -20,7 +20,6 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.test.SimpleComponentRegistry;
-import org.talend.components.dataprep.DatasetOutputProperties;
 
 public class ${componentName}Test {
 
