@@ -268,6 +268,7 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
+    @GET
     @Path("/definitions")
     @Produces(MediaType.APPLICATION_JSON_VALUE)
     public Set<ComponentDefinition> getAllComponents() {
