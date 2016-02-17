@@ -12,8 +12,6 @@
 // ============================================================================
 package org.talend.components.webtest;
 
-import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.spring.SpringComponentScanServer;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +27,6 @@ import org.springframework.context.annotation.Import;
 import org.talend.daikon.spring.BndToSpringBeanNameGenerator;
 import org.talend.jsonio.jaxrs.JsonIoProvider;
 
-import javax.servlet.ServletConfig;
-
 /**
  * Used the test the component service and the Salesforce components with an external web service.
  */
@@ -38,10 +34,6 @@ import javax.servlet.ServletConfig;
 @ComponentScan(basePackages = "org.talend.components.webtest", nameGenerator = BndToSpringBeanNameGenerator.class, includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = aQute.bnd.annotation.component.Component.class) , excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = ".*Osgi") )
 @Import(SpringComponentScanServer.class)
 public class SpringCxfApplication {
-    //
-    // launch this app and go to http://localhost:8080/services/hello/francis
-    // to call the cxf rest api.
-    //
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -58,8 +50,6 @@ public class SpringCxfApplication {
     @Bean
     @DependsOn("jsonProvider")
     public ServletRegistrationBean servletRegistrationBean(ApplicationContext context) {
-        CXFServlet servlet = new CXFServlet();
-        ServletConfig servletConfig = servlet.getServletConfig();
-        return new ServletRegistrationBean(servlet, "/components/*");
+        return new ServletRegistrationBean(new CXFServlet(), "/components/*");
     }
 }
