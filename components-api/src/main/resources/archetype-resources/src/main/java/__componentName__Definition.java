@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 
-        package ${package};
+package ${package};
 
 import java.io.InputStream;
 
@@ -14,14 +14,14 @@ import org.talend.components.api.runtime.ComponentRuntime;
 
 import aQute.bnd.annotation.component.Component;
 
-@Component(name = Constants.COMPONENT_BEAN_PREFIX + ${classNamePrefix}Definition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class ${classNamePrefix}Definition extends AbstractComponentDefinition {
+@Component(name = Constants.COMPONENT_BEAN_PREFIX + ${componentName}Definition.COMPONENT_NAME, provide = ComponentDefinition.class)
+public class ${componentName}Definition extends AbstractComponentDefinition {
 
-    public static final String COMPONENT_NAME = "${classNamePrefix}"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "${componentName}"; //$NON-NLS-1$
 
     @Override
     public ComponentRuntime createRuntime() {
-        return new ${classNamePrefix}Runtime();
+        return new ${componentName}Runtime();
     }
 
     @Override
@@ -36,7 +36,7 @@ public class ${classNamePrefix}Definition extends AbstractComponentDefinition {
 
     @Override
     public InputStream getMavenPom() {
-        return null;
+        return this.getClass().getResourceAsStream("pom.xml");
     }
 
     @Override
@@ -46,6 +46,6 @@ public class ${classNamePrefix}Definition extends AbstractComponentDefinition {
 
     @Override
     public Class<?> getPropertyClass() {
-        return ${classNamePrefix}Properties.class;
+        return ${componentName}Properties.class;
     }
 }

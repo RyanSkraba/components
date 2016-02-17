@@ -126,7 +126,8 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
 
         setupUpsertRelation(upsertRelation, !POLY);
 
-        module = new ModuleSubclass("module").setConnection(connection);
+        module = new ModuleSubclass("module");
+        module.connection = connection;
         module.setupProperties();
     }
 

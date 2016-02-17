@@ -29,7 +29,10 @@ The group is: org.talend.components.
 ## Build
 - Build is maven based and there is a top-level pom that builds everything.
 - Specific Maven settings are required. See instructions in [tooling](/tooling/).
+- You may use -DskipITs to skip integration tests if you are not connected to internet or do not have any the appropriate credentials (see **Tests Associated with Maven Build** below).
+
 WARNING : make sure to launch `mvn clean install` and not (mvn test) because the OSGI tests are bases on the installed bundle and not the one in the current maven reactor.
+
 
 
 ## Using the Command Line Test Program

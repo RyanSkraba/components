@@ -29,10 +29,16 @@ public class SalesforceGetDeletedUpdatedProperties extends ComponentProperties {
     //
     public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection");
 
-    public SalesforceModuleProperties module = new SalesforceModuleProperties("module").setConnection(connection);
+    public SalesforceModuleProperties module = new SalesforceModuleProperties("module");
 
     public SalesforceGetDeletedUpdatedProperties(String name) {
         super(name);
+    }
+
+    @Override
+    public void setupProperties() {
+        super.setupProperties();
+        module.connection = connection;
     }
 
     @Override

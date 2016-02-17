@@ -2,26 +2,26 @@
         #set( $symbol_dollar = '$' )
         #set( $symbol_escape = '\' )
 
-        package ${package};
+package ${package};
 
-        import java.io.File;
-        import java.io.PrintWriter;
-        import java.util.List;
-        import java.util.Map;
-        import java.util.ArrayList;
+import java.io.File;
+import java.io.PrintWriter;
+import java.util.List;
+import java.util.Map;
+import java.util.ArrayList;
 
-        import static org.junit.Assert.*;
-        import org.junit.Before;
+import static org.junit.Assert.*;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
-        import org.talend.components.api.runtime.ComponentRuntime;
-        import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.runtime.ComponentRuntime;
+import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
-import org.talend.components.test.ComponentTestUtils;
-import org.talend.components.test.SimpleComponentRegistry;
+import org.talend.components.api.test.ComponentTestUtils;
+import org.talend.components.api.test.SimpleComponentRegistry;
 
-public class ${classNamePrefix}Test {
+public class ${componentName}Test {
 
     @Rule
     public ErrorCollector errorCollector = new ErrorCollector();
@@ -38,7 +38,7 @@ public class ${classNamePrefix}Test {
     public ComponentService getComponentService() {
         if (componentService == null) {
             SimpleComponentRegistry testComponentRegistry = new SimpleComponentRegistry();
-            testComponentRegistry.addComponent(${classNamePrefix}Definition.COMPONENT_NAME, new ${classNamePrefix}Definition());
+            testComponentRegistry.addComponent(${componentName}Definition.COMPONENT_NAME, new ${componentName}Definition());
             componentService = new ComponentServiceImpl(testComponentRegistry);
         }
         return componentService;
@@ -46,9 +46,9 @@ public class ${classNamePrefix}Test {
 
     @Test
     public void testComponent() throws Exception {
-        ${classNamePrefix}Definition def = (${classNamePrefix}Definition)getComponentService().getComponentDefinition("${classNamePrefix}");
-        ${classNamePrefix}Properties props = (${classNamePrefix}Properties)getComponentService().getComponentProperties("${classNamePrefix}");
-        File temp = File.createTempFile("${classNamePrefix}testFile", ".txt");
+        ${componentName}Definition def = (${componentName}Definition)getComponentService().getComponentDefinition("${componentName}");
+        ${componentName}Properties props = (${componentName}Properties)getComponentService().getComponentProperties("${componentName}");
+        File temp = File.createTempFile("${componentName}testFile", ".txt");
 
         PrintWriter writer = new PrintWriter(temp.getAbsolutePath(), "UTF-8");
         writer.println("The first line");
@@ -65,4 +65,19 @@ public class ${classNamePrefix}Test {
         assertEquals("The second line", rows.get(1).get("line"));
     }
 
+    @Test
+    public void testAlli18n() {
+        ComponentTestUtils.checkAllI18N(new ${componentName}Properties(null).init(), errorCollector);
+    }
+    
+    @Test
+    public void testAllImagePath() {
+        ComponentTestUtils.testAllImages(getComponentService());
+    }
+
+    @Test
+    public void testAllRuntimes() {
+        ComponentTestUtils.testAllRuntimeAvaialble(getComponentService());
+    }
+    
 }

@@ -27,7 +27,7 @@ import org.talend.daikon.properties.presentation.Widget;
 
 public class SalesforceModuleProperties extends ComponentProperties {
 
-    private SalesforceConnectionProperties connection;
+    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection");
 
     //
     // Properties
@@ -38,13 +38,6 @@ public class SalesforceModuleProperties extends ComponentProperties {
 
     public SalesforceModuleProperties(String name) {
         super(name);
-    }
-
-    // FIXME - OK what about if we are using a connection from a separate component
-    // that defines the connection, how do we get that separate component?
-    public SalesforceModuleProperties setConnection(SalesforceConnectionProperties conn) {
-        connection = conn;
-        return this;
     }
 
     @Override

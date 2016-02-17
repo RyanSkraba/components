@@ -6,10 +6,9 @@
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
         <version>0.3.0.BUILD-SNAPSHOT</version>
-        <relativePath>../components-parent/pom.xml</relativePath>
     </parent>
 
-    <name>Components - ${classNamePrefix}</name>
+    <name>Components - ${componentName}</name>
     <groupId>${groupId}</groupId>
     <artifactId>${artifactId}</artifactId>
     <version>${version}</version>
@@ -17,16 +16,11 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.talend.daikon</groupId>
-            <artifactId>daikon-spring</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
             <version>0.3.0.BUILD-SNAPSHOT</version>
         </dependency>
+
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
@@ -34,14 +28,7 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>biz.aQute</groupId>
-            <artifactId>bndlib</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-        </dependency>
+
     </dependencies>
 
     <build>
@@ -59,7 +46,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/classes/org/talend/components/salesforce</outputDirectory>
+                            <outputDirectory>${basedir}/target/classes/${packageInPathFormat}</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${basedir}</directory>
@@ -77,7 +64,7 @@
                 <extensions>true</extensions>
                 <executions>
                     <execution>
-                        <id>default-jar</id>
+                        <id>osgi-bundle</id>
                         <phase>package</phase>
                         <goals>
                             <goal>bundle</goal>
@@ -85,10 +72,9 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
-                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*</Import-Package>
                                 <Service-Component>*</Service-Component>
-                                <Embed-Dependency>!components*,*;scope=compile|runtime</Embed-Dependency>
-                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
+                                <Import-Package>*,aQute.bnd.annotation.component</Import-Package>
+                                <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*</Embed-Dependency>
                             </instructions>
                         </configuration>
                     </execution>
@@ -100,7 +86,7 @@
                         </goals>
                         <configuration>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.salesforce.lib</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>${package}.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                             </instructions>
                         </configuration>
@@ -116,9 +102,9 @@
                             <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
                             <instructions>
                                 <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*</Import-Package>
-                                <Bundle-SymbolicName>org.talend.components.salesforce.test</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>${package}.test</Bundle-SymbolicName>
                                 <Bundle-Name>Test Fragment for ${project.name}</Bundle-Name>
-                                <Fragment-Host>org.talend.components.salesforce</Fragment-Host>
+                                <Fragment-Host>${package}</Fragment-Host>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                                 <DynamicImport-Package>*</DynamicImport-Package>
                                 <Embed-Dependency></Embed-Dependency>
