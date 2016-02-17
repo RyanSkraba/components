@@ -12,70 +12,45 @@
 // ============================================================================
 package org.talend.components.webtest;
 
+import org.apache.cxf.jaxrs.spring.SpringComponentScanServer;
+import org.apache.cxf.transport.servlet.CXFServlet;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.embedded.ServletRegistrationBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.context.annotation.Import;
 import org.talend.daikon.spring.BndToSpringBeanNameGenerator;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.talend.jsonio.jaxrs.JsonIoProvider;
 
 /**
  * Used the test the component service and the Salesforce components with an external web service.
  */
 @SpringBootApplication
 @ComponentScan(basePackages = "org.talend.components", nameGenerator = BndToSpringBeanNameGenerator.class, includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = aQute.bnd.annotation.component.Component.class) , excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = ".*Osgi") )
-// @Configuration
-// @EnableWebMvc
-public class Application {// extends WebMvcConfigurerAdapter {
+@Import(SpringComponentScanServer.class)
+public class Application {
+
+    @Value("${service.basepath}")
+    private String serviceBasePath;
 
     @Bean
-    public Jackson2ObjectMapperBuilder jacksonBuilder() {
-        return new Jackson2ObjectMapperBuilder() {
-
-            @Override
-            public void configure(ObjectMapper objectMapper) {
-                super.configure(objectMapper);
-                objectMapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
-                objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
-            }
-        };
+    public JsonIoProvider jsonProvider(ApplicationContext context) {
+        return new JsonIoProvider();
     }
 
-    // @Override
-    // public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-    // super.configureMessageConverters(converters);
-    // removeJacksonConverter(converters);
-    // // converters.add(createJsonIoHttpMessageConverter());
-    //
-    // }
-    //
-    // /**
-    // * DOC sgandon Comment method "removeJacksonConverter".
-    // *
-    // * @param converters
-    // */
-    // private void removeJacksonConverter(List<HttpMessageConverter<?>> converters) {
-    // Iterator<HttpMessageConverter<?>> it = converters.iterator();
-    // while (it.hasNext()) {
-    // HttpMessageConverter<?> converter = it.next();
-    // if (converter instanceof AbstractJackson2HttpMessageConverter) {
-    // it.remove();
-    // }
-    // }
-    //
-    // }
-    //
-    // private HttpMessageConverter<Object> createJsonIoHttpMessageConverter() {
-    //
-    // return null;
-    // }
+    @Bean
+    @DependsOn("jsonProvider")
+    public ServletRegistrationBean servletRegistrationBean(ApplicationContext context) {
+        return new ServletRegistrationBean(new CXFServlet(), "/" + serviceBasePath + "/*");
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
+
 }

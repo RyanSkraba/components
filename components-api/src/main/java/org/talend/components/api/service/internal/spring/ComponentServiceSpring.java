@@ -24,13 +24,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
@@ -46,9 +46,9 @@ import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.schema.Schema;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 /**
  * This is a spring only class that is instantiated by the spring framework. It delegates all its calls to the
@@ -56,8 +56,8 @@ import com.wordnik.swagger.annotations.ApiParam;
  * specific to spring.
  */
 
-@Api(value = "components", basePath = ComponentServiceSpring.BASE_PATH, description = "Component services")
 @Service
+@Api(value = "components")
 @Path("")
 public class ComponentServiceSpring implements ComponentService {
 
@@ -89,7 +89,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @GET
     @Path("/properties/{name}")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public ComponentProperties getComponentProperties(
             @PathParam("name") @ApiParam(name = "name", value = "Name of the component") String name) {
         return componentServiceDelegate.getComponentProperties(name);
@@ -98,7 +98,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @GET
     @Path("/definition/{name}")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public ComponentDefinition getComponentDefinition(
             @PathParam("name") @ApiParam(name = "name", value = "Name of the component") String name) {
         return componentServiceDelegate.getComponentDefinition(name);
@@ -107,7 +107,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @GET
     @Path("/dependencies/{name}")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public Set<String> getMavenUriDependencies(
             @PathParam("name") @ApiParam(name = "name", value = "Name of the component") String name) {
         return componentServiceDelegate.getMavenUriDependencies(name);
@@ -116,7 +116,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @GET
     @Path("/wizard/{name}/{repositoryLocation}")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public ComponentWizard getComponentWizard(
             @PathParam("name") @ApiParam(name = "name", value = "Name of the component") String name,
             @PathParam("repositoryLocation") @ApiParam(name = "repositoryLocation", value = "Repository location") String repositoryLocation) {
@@ -126,9 +126,9 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @POST
     @Path("/wizardForProperties/{repositoryLocation}")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public List<ComponentWizard> getComponentWizardsForProperties(
-            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties,
+            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties,
             @PathParam("repositoryLocation") @ApiParam(name = "repositoryLocation", value = "Repository location") String repositoryLocation) {
         return componentServiceDelegate.getComponentWizardsForProperties(properties, repositoryLocation);
     }
@@ -136,19 +136,18 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @POST
     @Path("/possibleComponents")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public List<ComponentDefinition> getPossibleComponents(
-            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties)
-                    throws Throwable {
+            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties) throws Throwable {
         return componentServiceDelegate.getPossibleComponents(properties);
     }
 
     @Override
     @POST
     @Path("/makeFormCancelable")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public ComponentProperties makeFormCancelable(
-            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties,
+            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties,
             @ApiParam(name = "formName", value = "Name of the form") String formName) {
         return componentServiceDelegate.makeFormCancelable(properties, formName);
     }
@@ -156,9 +155,9 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @POST
     @Path("/commitFormValues")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public ComponentProperties commitFormValues(
-            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties,
+            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties,
             @ApiParam(name = "formName", value = "Name of the form") String formName) {
         return componentServiceDelegate.commitFormValues(properties, formName);
     }
@@ -166,11 +165,10 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @POST
     @Path("/properties/{propName}/validate")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public ComponentProperties validateProperty(
             @PathParam("propName") @ApiParam(name = "propName", value = "Name of property") String propName,
-            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties)
-                    throws Throwable {
+            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties) throws Throwable {
         componentServiceDelegate.validateProperty(propName, properties);
         return properties;
     }
@@ -178,11 +176,10 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @POST
     @Path("/properties/{propName}/beforeActivate")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public ComponentProperties beforePropertyActivate(
             @PathParam("propName") @ApiParam(name = "propName", value = "Name of property") String propName,
-            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties)
-                    throws Throwable {
+            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties) throws Throwable {
         componentServiceDelegate.beforePropertyActivate(propName, properties);
         return properties;
     }
@@ -190,11 +187,10 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @POST
     @Path("/properties/{propName}/beforeRender")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public ComponentProperties beforePropertyPresent(
             @PathParam("propName") @ApiParam(name = "propName", value = "Name of property") String propName,
-            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties)
-                    throws Throwable {
+            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties) throws Throwable {
         componentServiceDelegate.beforePropertyPresent(propName, properties);
         return properties;
     }
@@ -202,11 +198,10 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @POST
     @Path("/properties/{propName}/after")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public ComponentProperties afterProperty(
             @PathParam("propName") @ApiParam(name = "propName", value = "Name of property") String propName,
-            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties)
-                    throws Throwable {
+            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties) throws Throwable {
         componentServiceDelegate.afterProperty(propName, properties);
         return properties;
     }
@@ -214,11 +209,10 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @POST
     @Path("/properties/beforeFormPresent/{formName}")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public ComponentProperties beforeFormPresent(
             @PathParam("formName") @ApiParam(name = "formName", value = "Name of form") String formName,
-            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties)
-                    throws Throwable {
+            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties) throws Throwable {
         componentServiceDelegate.beforeFormPresent(formName, properties);
         return properties;
     }
@@ -226,11 +220,10 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @POST
     @Path("/properties/afterFormNext/{formName}")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public ComponentProperties afterFormNext(
             @PathParam("formName") @ApiParam(name = "formName", value = "Name of form") String formName,
-            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties)
-                    throws Throwable {
+            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties) throws Throwable {
         componentServiceDelegate.afterFormNext(formName, properties);
         return properties;
     }
@@ -238,11 +231,10 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @POST
     @Path("/properties/afterFormBack/{formName}")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public ComponentProperties afterFormBack(
             @PathParam("formName") @ApiParam(name = "formName", value = "Name of form") String formName,
-            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties)
-                    throws Throwable {
+            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties) throws Throwable {
         componentServiceDelegate.afterFormBack(formName, properties);
         return properties;
     }
@@ -250,11 +242,10 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @POST
     @Path("/properties/afterFormFinish/{formName}")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public ComponentProperties afterFormFinish(
             @PathParam("formName") @ApiParam(name = "formName", value = "Name of form") String formName,
-            @ApiParam(name = "properties", value = "Component properties")  ComponentProperties properties)
-                    throws Throwable {
+            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties) throws Throwable {
         componentServiceDelegate.afterFormFinish(formName, properties);
         return properties;
     }
@@ -262,7 +253,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @GET
     @Path("/names")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public Set<String> getAllComponentNames() {
         return componentServiceDelegate.getAllComponentNames();
     }
@@ -270,7 +261,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @GET
     @Path("/definitions")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public Set<ComponentDefinition> getAllComponents() {
         return componentServiceDelegate.getAllComponents();
     }
@@ -278,7 +269,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     @GET
     @Path("/wizards/definitions")
-    @Produces(MediaType.APPLICATION_JSON_VALUE)
+    @Produces(MediaType.APPLICATION_JSON)
     public Set<ComponentWizardDefinition> getTopLevelComponentWizards() {
         return componentServiceDelegate.getTopLevelComponentWizards();
     }
@@ -291,7 +282,7 @@ public class ComponentServiceSpring implements ComponentService {
 
     @GET
     @Path("/wizards/{name}/icon/{type}")
-    @Produces(MediaType.IMAGE_PNG_VALUE)
+    @Produces(MediaType.MEDIA_TYPE_WILDCARD)
     @ApiOperation(value = "Return the icon related to the wizard", notes = "return the png image related to the wizard parameter.")
     public void getWizardImageRest(@PathParam("name") @ApiParam(name = "name", value = "Name of wizard") String name,
             @PathParam("type") @ApiParam(name = "type", value = "Type of the icon requested") WizardImageType type,
@@ -332,7 +323,7 @@ public class ComponentServiceSpring implements ComponentService {
 
     @GET
     @Path("/icon/{name}")
-    @Produces(MediaType.IMAGE_PNG_VALUE)
+    @Produces(MediaType.MEDIA_TYPE_WILDCARD)
     @ApiOperation(value = "Return the icon related to the Component", notes = "return the png image related to the Component name parameter.")
     public void getComponentsImageRest(@PathParam("name") @ApiParam(name = "name", value = "Name of Component") String name,
             @PathParam("type") @ApiParam(name = "type", value = "Type of the icon requested") ComponentImageType type,

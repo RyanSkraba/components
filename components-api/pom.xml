@@ -56,9 +56,9 @@
 		</dependency>
 		<!-- SWAGGER DEPENDENCIES -->
 		<dependency>
-			<groupId>com.mangofactory</groupId>
-			<artifactId>swagger-springmvc</artifactId>
-			<version>1.0.2</version>
+			<groupId>io.swagger</groupId>
+			<artifactId>swagger-annotations</artifactId>
+			<version>1.5.4</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
