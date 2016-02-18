@@ -113,12 +113,7 @@ import java.io.Serializable;
  * worker.
  *
  */
-public interface Sink  {
-  /**
-   * Ensures that the sink is valid and can be written to before the write operation begins. One
-   * should use {@link com.google.common.base.Preconditions} to implement this method.
-   */
-  public abstract void validate(AdaptorOptions options);
+public interface Sink extends SourceOrSink {
 
   /**
    * Returns an instance of a {@link WriteOperation} that can write to this Sink.

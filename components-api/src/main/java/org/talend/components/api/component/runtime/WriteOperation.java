@@ -18,7 +18,7 @@ import org.talend.components.api.adaptor.AdaptorOptions;
  * A {@link WriteOperation} defines the process of a parallel write of objects to a Sink.
  *
  * <p>The {@code WriteOperation} defines how to perform initialization and finalization of a
- * parallel write to a sink as well as how to create a {@link Sink.Writer} object that can write
+ * parallel write to a sink as well as how to create a {@link Writer} object that can write
  * a bundle to the sink.
  *
  * <p>Since operations in Dataflow may be run multiple times for redundancy or fault-tolerance,

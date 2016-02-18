@@ -13,6 +13,13 @@
 
 package org.talend.components.api.component.runtime;
 
+import java.util.List;
+
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.NamedThing;
+import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.schema.Schema;
+
 /**
  * Base class for defining input formats and creating a {@code Source} for reading the input.
  *
@@ -37,14 +44,6 @@ package org.talend.components.api.component.runtime;
  * messages.
  *
  */
-public interface Source {
-
-    /**
-     * Checks that this source is valid, before it can be used in a pipeline.
-     *
-     * <p>
-     * It is recommended to use {@link com.google.common.base.Preconditions} for implementing this method.
-     */
-    public abstract void validate();
+public interface Source extends SourceOrSink {
 
 }

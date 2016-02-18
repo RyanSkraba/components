@@ -35,11 +35,6 @@ import org.talend.components.api.adaptor.AdaptorOptions;
  *   do not guarantee that a given record will only be read a single time.
  * </ul>
  *
- * <p>See {@link com.google.cloud.dataflow.sdk.transforms.windowing.Window} and
- * {@link com.google.cloud.dataflow.sdk.transforms.windowing.Trigger} for more information on
- * timestamps and watermarks.
- *
- * @param <OutputT> Type of records output by this source.
  * @param <CheckpointMarkT> Type of checkpoint marks used by the readers of this source.
  */
 public interface UnboundedSource<
