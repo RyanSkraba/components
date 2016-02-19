@@ -24,7 +24,7 @@ import org.talend.daikon.exception.error.ErrorCode;
 /**
  * Error codes for the Component service
  */
-public enum ComponentsErrorCode implements ErrorCode {
+public enum ComponentsApiErrorCode implements ErrorCode {
 
                                                       WRONG_COMPONENT_NAME(HttpServletResponse.SC_BAD_REQUEST, "name"), //$NON-NLS-1$
                                                       WRONG_WIZARD_NAME(HttpServletResponse.SC_BAD_REQUEST, "name"), //$NON-NLS-1$
@@ -37,12 +37,12 @@ public enum ComponentsErrorCode implements ErrorCode {
     /** Expected entries to be in the context. */
     private List<String> expectedContextEntries;
 
-    ComponentsErrorCode(int httpStatus) {
+    ComponentsApiErrorCode(int httpStatus) {
         this.httpStatus = httpStatus;
         this.expectedContextEntries = Collections.emptyList();
     }
 
-    ComponentsErrorCode(int httpStatus, String... contextEntries) {
+    ComponentsApiErrorCode(int httpStatus, String... contextEntries) {
         this.httpStatus = httpStatus;
         this.expectedContextEntries = Arrays.asList(contextEntries);
     }

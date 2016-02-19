@@ -60,7 +60,7 @@ import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.exception.ComponentException;
-import org.talend.components.api.exception.error.ComponentsErrorCode;
+import org.talend.components.api.exception.error.ComponentsApiErrorCode;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
@@ -126,7 +126,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl<ComponentPropert
         final String beanName = Constants.COMPONENT_BEAN_PREFIX + name;
         ComponentDefinition compDef = componentRegistry.getComponents().get(beanName);
         if (compDef == null) {
-            throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME, ExceptionContext.build().put("name", name)); //$NON-NLS-1$
+            throw new ComponentException(ComponentsApiErrorCode.WRONG_COMPONENT_NAME, ExceptionContext.build().put("name", name)); //$NON-NLS-1$
         } // else got the def so use it
         return compDef;
     }
@@ -136,7 +136,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl<ComponentPropert
         final String beanName = Constants.COMPONENT_WIZARD_BEAN_PREFIX + name;
         ComponentWizardDefinition wizardDefinition = componentRegistry.getComponentWizards().get(beanName);
         if (wizardDefinition == null) {
-            throw new ComponentException(ComponentsErrorCode.WRONG_WIZARD_NAME, ExceptionContext.build().put("name", name)); //$NON-NLS-1$
+            throw new ComponentException(ComponentsApiErrorCode.WRONG_WIZARD_NAME, ExceptionContext.build().put("name", name)); //$NON-NLS-1$
         }
         ComponentWizard wizard = wizardDefinition.createWizard(location);
         return wizard;
@@ -172,7 +172,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl<ComponentPropert
         if (wizardDefinition != null) {
             return getImageStream(wizardDefinition, wizardDefinition.getPngImagePath(imageType));
         } else {
-            throw new ComponentException(ComponentsErrorCode.WRONG_WIZARD_NAME, ExceptionContext.build().put("name", wizardName)); //$NON-NLS-1$
+            throw new ComponentException(ComponentsApiErrorCode.WRONG_WIZARD_NAME, ExceptionContext.build().put("name", wizardName)); //$NON-NLS-1$
         }
 
     }
@@ -184,7 +184,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl<ComponentPropert
         if (componentDefinition != null) {
             return getImageStream(componentDefinition, componentDefinition.getPngImagePath(imageType));
         } else {
-            throw new ComponentException(ComponentsErrorCode.WRONG_COMPONENT_NAME,
+            throw new ComponentException(ComponentsApiErrorCode.WRONG_COMPONENT_NAME,
                     ExceptionContext.build().put("name", componentName)); //$NON-NLS-1$
         }
     }
@@ -219,7 +219,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl<ComponentPropert
             return computeDependenciesFromPom(mavenPomStream, "test", "provided"); //$NON-NLS-1$
         } catch (IOException | XmlPullParserException | DependencyCollectionException
                 | org.eclipse.aether.resolution.DependencyResolutionException | ModelBuildingException e) {
-            throw new ComponentException(ComponentsErrorCode.COMPUTE_DEPENDENCIES_FAILED, e);
+            throw new ComponentException(ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED, e);
         }
     }
 
