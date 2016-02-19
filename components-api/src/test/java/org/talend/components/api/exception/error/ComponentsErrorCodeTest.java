@@ -25,7 +25,7 @@ public class ComponentsErrorCodeTest {
     @Test
     public void test() {
         assertEquals(500, ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED.getHttpStatus());
-        assertEquals("Talend", ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED.getProduct());
+        assertEquals("TCOMP", ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED.getProduct());
         assertEquals("ALL", ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED.getGroup());
         assertEquals("COMPUTE_DEPENDENCIES_FAILED", ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED.toString());
         assertEquals(0, ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED.getExpectedContextEntries().size());

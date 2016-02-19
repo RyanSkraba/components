@@ -40,6 +40,12 @@ public class ${componentName}Definition extends AbstractComponentDefinition {
         return new ${componentName}Runtime();
     }
 
+    
+    @Override
+    public boolean isStartable() {
+        return true;
+    }    
+
     @Override
     public String getPngImagePath(ComponentImageType imageType) {
         switch (imageType) {

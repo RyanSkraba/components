@@ -20,16 +20,14 @@ import org.talend.daikon.exception.error.DefaultErrorCode;
 import org.talend.daikon.exception.error.ErrorCode;
 
 /**
- * Error codes for the Component service
+ * Error codes related to the Component from the component designer perspectve
  */
-public enum ComponentsApiErrorCode implements ErrorCode {
-
-                                                         WRONG_COMPONENT_NAME(HttpServletResponse.SC_BAD_REQUEST, "name"), //$NON-NLS-1$
-                                                         WRONG_WIZARD_NAME(HttpServletResponse.SC_BAD_REQUEST, "name"), //$NON-NLS-1$
-                                                         COMPUTE_DEPENDENCIES_FAILED(HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
-                                                         WRONG_RETURNS_TYPE_NAME(
-                                                                                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                                                                                 "name"); //$NON-NLS-1$
+public enum ComponentsErrorCode implements ErrorCode {
+                                                      /** used when a component schema has a wrong type */
+    SCHEMA_TYPE_MISMATCH(HttpServletResponse.SC_BAD_REQUEST, "component", "expected", "current"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                                      /** used when a component axpect a schema and none is set */
+    SCHEMA_MISSING(HttpServletResponse.SC_BAD_REQUEST, "component") //$NON-NLS-1$
+    ;
 
     private DefaultErrorCode errorCodeDelegate;
 
@@ -38,7 +36,7 @@ public enum ComponentsApiErrorCode implements ErrorCode {
      * 
      * @param httpStatus the http status to use.
      */
-    ComponentsApiErrorCode(int httpStatus) {
+    ComponentsErrorCode(int httpStatus) {
         this.errorCodeDelegate = new DefaultErrorCode(httpStatus);
     }
 
@@ -47,7 +45,7 @@ public enum ComponentsApiErrorCode implements ErrorCode {
      *
      * @param httpStatus the http status to use.
      */
-    ComponentsApiErrorCode(int httpStatus, String... contextEntries) {
+    ComponentsErrorCode(int httpStatus, String... contextEntries) {
         this.errorCodeDelegate = new DefaultErrorCode(httpStatus, contextEntries);
     }
 
