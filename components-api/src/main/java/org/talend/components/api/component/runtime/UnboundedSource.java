@@ -18,10 +18,8 @@ package org.talend.components.api.component.runtime;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.NoSuchElementException;
 
-import org.joda.time.Instant;
-import org.talend.components.api.adaptor.AdaptorOptions;
+import org.talend.components.api.adaptor.Adaptor;
 
 /**
  * A {@link Source} that reads an unbounded amount of input and, because of that, supports
@@ -58,14 +56,14 @@ public interface UnboundedSource<
    * will limit the amount of parallelism in the source.
    */
   public abstract List<? extends UnboundedSource<CheckpointMarkT>> generateInitialSplits(
-      int desiredNumSplits, AdaptorOptions options) throws Exception;
+      int desiredNumSplits, Adaptor options) throws Exception;
 
   /**
    * Create a new {@link UnboundedReader} to read from this source, resuming from the given
    * checkpoint if present.
    */
   public abstract UnboundedReader createReader(
-          AdaptorOptions options, CheckpointMarkT checkpointMark);
+          Adaptor options, CheckpointMarkT checkpointMark);
 
 
   /**

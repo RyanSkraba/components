@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.runtime;
+package org.talend.components.api.adaptor;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.talend.components.api.adaptor.ComponentDynamicHolder;
+import org.talend.components.api.runtime.ComponentRuntimeContainer;
 import org.talend.daikon.schema.SchemaElement;
 
 /**

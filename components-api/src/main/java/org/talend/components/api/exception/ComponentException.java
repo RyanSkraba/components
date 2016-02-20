@@ -14,12 +14,17 @@ package org.talend.components.api.exception;
 
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.exception.error.ErrorCode;
 
 public class ComponentException extends TalendRuntimeException {
 
     public ComponentException(ErrorCode code) {
         super(code);
+    }
+
+    public ComponentException(Throwable cause) {
+        super(CommonErrorCodes.UNEXPECTED_EXCEPTION, cause);
     }
 
     public ComponentException(ErrorCode code, Throwable cause) {

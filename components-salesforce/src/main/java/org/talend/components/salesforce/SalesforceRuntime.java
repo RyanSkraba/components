@@ -28,7 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.runtime.ComponentDynamicHolder;
+import org.talend.components.api.adaptor.ComponentDynamicHolder;
 import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.api.runtime.ComponentRuntimeContainer;
 import org.talend.components.api.service.ComponentService;

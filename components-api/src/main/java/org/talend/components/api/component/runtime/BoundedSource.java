@@ -18,10 +18,8 @@ package org.talend.components.api.component.runtime;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.NoSuchElementException;
 
-import org.joda.time.Instant;
-import org.talend.components.api.adaptor.AdaptorOptions;
+import org.talend.components.api.adaptor.Adaptor;
 
 /**
  * A {@link Source} that reads a finite amount of input and, because of that, supports
@@ -44,24 +42,24 @@ public interface BoundedSource extends Source {
    * Splits the source into bundles of approximately {@code desiredBundleSizeBytes}.
    */
   public abstract List<? extends BoundedSource> splitIntoBundles(
-      long desiredBundleSizeBytes, AdaptorOptions options) throws Exception;
+      long desiredBundleSizeBytes, Adaptor adaptor) throws Exception;
 
   /**
    * An estimate of the total size (in bytes) of the data that would be read from this source.
    * This estimate is in terms of external storage size, before any decompression or other
    * processing done by the reader.
    */
-  public abstract long getEstimatedSizeBytes(AdaptorOptions options) throws Exception;
+  public abstract long getEstimatedSizeBytes(Adaptor adaptor) throws Exception;
 
   /**
    * Whether this source is known to produce key/value pairs sorted by lexicographic order on
    * the bytes of the encoded key.
    */
-  public abstract boolean producesSortedKeys(AdaptorOptions options) throws Exception;
+  public abstract boolean producesSortedKeys(Adaptor adaptor) throws Exception;
 
   /**
    * Returns a new {@link BoundedReader} that reads from this source.
    */
-  public abstract BoundedReader createReader(AdaptorOptions options) throws IOException;
+  public abstract BoundedReader createReader(Adaptor adaptor) throws IOException;
 
 }

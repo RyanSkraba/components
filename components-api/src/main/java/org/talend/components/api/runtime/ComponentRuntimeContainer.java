@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.api.runtime;
 
+import org.talend.components.api.adaptor.ComponentDynamicHolder;
+
 import java.util.Date;
 import java.util.Map;
 
