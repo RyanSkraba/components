@@ -13,7 +13,7 @@
 package org.talend.components.api.properties;
 
 import org.talend.components.api.exception.ComponentException;
-import org.talend.components.api.exception.error.ComponentsErrorCode;
+import org.talend.components.api.exception.error.ComponentsApiErrorCode;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
@@ -49,7 +49,7 @@ public class ComponentPropertyFactory {
             throw new TalendRuntimeException(CommonErrorCodes.UNEXPECTED_EXCEPTION, new NullPointerException());
         }
         if (!ComponentProperties.RETURNS.equals(returns.getName())) {
-            throw new ComponentException(ComponentsErrorCode.WRONG_RETURNS_TYPE_NAME,
+            throw new ComponentException(ComponentsApiErrorCode.WRONG_RETURNS_TYPE_NAME,
                     ExceptionContext.build().put("name", returns.getName()));
         }
         Property p = new Property(type, name);

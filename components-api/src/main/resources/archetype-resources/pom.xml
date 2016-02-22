@@ -15,12 +15,21 @@
     <packaging>bundle</packaging>
     <dependencies>
 
+        <!-- APIs for all Components -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
             <version>0.3.0.BUILD-SNAPSHOT</version>
         </dependency>
 
+        <!-- Shared component properties such as Use/Password or Schema -->
+        <dependency>
+          <groupId>org.talend.components</groupId>
+          <artifactId>components-common</artifactId>
+          <version>0.3.0.BUILD-SNAPSHOT</version>
+        </dependency>
+        
+        <!-- Jar containing Test utils methods -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>

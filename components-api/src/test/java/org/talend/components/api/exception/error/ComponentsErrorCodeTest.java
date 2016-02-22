@@ -24,11 +24,11 @@ public class ComponentsErrorCodeTest {
 
     @Test
     public void test() {
-        assertEquals(500, ComponentsErrorCode.COMPUTE_DEPENDENCIES_FAILED.getHttpStatus());
-        assertEquals("Talend", ComponentsErrorCode.COMPUTE_DEPENDENCIES_FAILED.getProduct());
-        assertEquals("ALL", ComponentsErrorCode.COMPUTE_DEPENDENCIES_FAILED.getGroup());
-        assertEquals("COMPUTE_DEPENDENCIES_FAILED", ComponentsErrorCode.COMPUTE_DEPENDENCIES_FAILED.toString());
-        assertEquals(0, ComponentsErrorCode.COMPUTE_DEPENDENCIES_FAILED.getExpectedContextEntries().size());
+        assertEquals(500, ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED.getHttpStatus());
+        assertEquals("TCOMP", ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED.getProduct());
+        assertEquals("ALL", ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED.getGroup());
+        assertEquals("COMPUTE_DEPENDENCIES_FAILED", ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED.toString());
+        assertEquals(0, ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED.getExpectedContextEntries().size());
 
     }
 
