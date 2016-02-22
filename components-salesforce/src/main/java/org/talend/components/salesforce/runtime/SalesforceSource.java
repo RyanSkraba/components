@@ -30,10 +30,9 @@ public class SalesforceSource extends SalesforceSourceOrSink implements BoundedS
     public SalesforceSource() {
     }
 
-
     @Override
     public List<? extends BoundedSource> splitIntoBundles(long desiredBundleSizeBytes, Adaptor adaptor) throws Exception {
-        List list = new ArrayList();
+        List<BoundedSource> list = new ArrayList<>();
         list.add(this);
         return list;
     }
@@ -50,8 +49,9 @@ public class SalesforceSource extends SalesforceSourceOrSink implements BoundedS
 
     @Override
     public BoundedReader createReader(Adaptor adaptor) throws IOException {
-        if (properties instanceof TSalesforceInputProperties)
+        if (properties instanceof TSalesforceInputProperties) {
             return new SalesforceInputReader(adaptor, this, (TSalesforceInputProperties) properties);
+        }
         return null;
     }
 }

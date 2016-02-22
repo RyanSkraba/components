@@ -55,9 +55,6 @@ public class SalesforceSourceOrSink implements SourceOrSink {
 
     protected ComponentProperties properties;
 
-    public SalesforceSourceOrSink() {
-    }
-
     @Override
     public void initialize(Adaptor adaptor, ComponentProperties properties) {
         this.properties = properties;
@@ -78,8 +75,9 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     }
 
     protected SalesforceConnectionProperties getConnectionProperties() {
-        if (properties instanceof SalesforceConnectionProperties)
+        if (properties instanceof SalesforceConnectionProperties) {
             return (SalesforceConnectionProperties) properties;
+        }
         return ((SalesforceConnectionModuleProperties) properties).connection;
     }
 
@@ -126,6 +124,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     }
 
     class ConnectionHolder {
+
         PartnerConnection connection;
     }
 

@@ -12,7 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,22 +20,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import com.sforce.soap.partner.PartnerConnection;
 import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.adaptor.Adaptor;
+import org.talend.components.api.adaptor.ComponentDynamicHolder;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
-import org.talend.components.api.adaptor.ComponentDynamicHolder;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement;
 
+import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.QueryResult;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.bind.XmlObject;
+
 public class SalesforceInputReader implements BoundedReader {
 
     private static final Logger LOG = LoggerFactory.getLogger(SalesforceInputReader.class);
@@ -44,8 +44,6 @@ public class SalesforceInputReader implements BoundedReader {
     protected TSalesforceInputProperties properties;
 
     protected boolean exceptionForErrors;
-
-    protected BufferedWriter logWriter;
 
     protected int commitLevel;
 
@@ -187,7 +185,7 @@ public class SalesforceInputReader implements BoundedReader {
     @Override
     public Object getCurrent() throws NoSuchElementException {
         ComponentDynamicHolder dynamicHolder = null;
-        if (dynamicField != null) {
+        if (dynamicFieldMap != null) {
             dynamicHolder = adaptor.createDynamicHolder();
             dynamicHolder.setSchemaElements(dynamicFieldList);
         }
@@ -215,9 +213,6 @@ public class SalesforceInputReader implements BoundedReader {
 
     @Override
     public void close() throws IOException {
-        if (logWriter != null) {
-            logWriter.close();
-        }
     }
 
     @Override
