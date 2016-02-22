@@ -23,6 +23,12 @@ public class ComponentException extends TalendRuntimeException {
         super(code);
     }
 
+    /**
+     * calls {@link #ComponentException(ErrorCode, Throwable)} with a {@link CommonErrorCodes.UNEXPECTED_EXCEPTION} for
+     * the error code.
+     * 
+     * @param cause origin of the exection.
+     */
     public ComponentException(Throwable cause) {
         super(CommonErrorCodes.UNEXPECTED_EXCEPTION, cause);
     }
