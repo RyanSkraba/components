@@ -154,12 +154,12 @@ public class ComponentServiceSpring implements ComponentService {
 
     @Override
     @POST
-    @Path("/commitFormValues")
+    @Path("/cancelFormValues")
     @Produces(MediaType.APPLICATION_JSON)
-    public ComponentProperties commitFormValues(
+    public ComponentProperties cancelFormValues(
             @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties,
             @ApiParam(name = "formName", value = "Name of the form") String formName) {
-        return componentServiceDelegate.commitFormValues(properties, formName);
+        return componentServiceDelegate.cancelFormValues(properties, formName);
     }
 
     @Override
