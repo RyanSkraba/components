@@ -33,6 +33,8 @@ public class SalesforceConnectionProperties extends ComponentProperties implemen
 
     public static final String OAUTH_URL = "https://login.salesforce.com/services/oauth2";
 
+    public Property endpoint = (Property)newString("endpoint").setRequired().setDefaultValue(URL);
+
     public static final String FORM_WIZARD = "Wizard";
 
     //
@@ -56,7 +58,7 @@ public class SalesforceConnectionProperties extends ComponentProperties implemen
 
     public Property timeout = newInteger("timeout"); //$NON-NLS-1$
 
-    public Property httpTraceMessage = newString("httpTraceMessage"); //$NON-NLS-1$
+    public Property httpTraceMessage = newBoolean("httpTraceMessage"); //$NON-NLS-1$
 
     public Property clientId = newString("clientId"); //$NON-NLS-1$
 
@@ -89,10 +91,12 @@ public class SalesforceConnectionProperties extends ComponentProperties implemen
         super.setupLayout();
 
         loginType.setValue(LOGIN_BASIC);
+        endpoint.setValue(URL);
 
         Form wizardForm = new Form(this, FORM_WIZARD);
         wizardForm.addRow(name);
         wizardForm.addRow(widget(loginType).setDeemphasize(true));
+        wizardForm.addRow(endpoint);
         wizardForm.addRow(oauth.getForm(Form.MAIN));
         wizardForm.addRow(userPassword.getForm(Form.MAIN));
         wizardForm.addRow(widget(advanced).setWidgetType(WidgetType.BUTTON));
@@ -100,6 +104,7 @@ public class SalesforceConnectionProperties extends ComponentProperties implemen
 
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(loginType);
+        mainForm.addRow(endpoint);
         mainForm.addRow(oauth.getForm(Form.MAIN));
         mainForm.addRow(userPassword.getForm(Form.MAIN));
 
@@ -144,9 +149,11 @@ public class SalesforceConnectionProperties extends ComponentProperties implemen
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN) || form.getName().equals(FORM_WIZARD)) {
             if (LOGIN_OAUTH.equals(loginType.getValue())) {
+                form.setValue(endpoint.getName(),OAUTH_URL);
                 form.getWidget(OAUTH).setVisible(true);
                 form.getWidget(USERPASSWORD).setVisible(false);
             } else if (LOGIN_BASIC.equals(loginType.getValue())) {
+                form.setValue(endpoint.getName(),URL);
                 form.getWidget(OAUTH).setVisible(false);
                 form.getWidget(USERPASSWORD).setVisible(true);
             } else {

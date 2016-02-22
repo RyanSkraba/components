@@ -42,6 +42,9 @@ import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.SocketAddress;
 
 public class SalesforceSourceOrSink implements SourceOrSink {
 
@@ -136,6 +139,15 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         config.setUsername(StringUtils.strip(connProps.userPassword.userId.getStringValue(), "\""));
         config.setPassword(StringUtils.strip(connProps.userPassword.password.getStringValue(), "\"")
                 + StringUtils.strip(connProps.userPassword.securityKey.getStringValue(), "\""));
+
+        if(connProps.proxy.useProxy.getBooleanValue()){
+            java.util.Properties props = System.getProperties();
+            props.put("socksProxyHost",connProps.proxy.host.getStringValue());
+            props.put("socksProxyPort",connProps.proxy.port.getStringValue());
+            props.put("java.net.socks.username", connProps.proxy.userPassword.userId.getStringValue());
+            props.put("java.net.socks.password", connProps.proxy.userPassword.password.getStringValue());
+        }
+        setProxy(config);
 
         // Notes on how to test this
         // http://thysmichels.com/2014/02/15/salesforce-wsc-partner-connection-session-renew-when-session-timeout/
@@ -280,4 +292,43 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             throw new IOException(e);
         }
     }
+
+    private void setProxy(ConnectorConfig config){
+        String proxyHost =null;
+        String proxyPort =null;
+        String proxyUser = null;
+        String proxyPwd = null;
+        Proxy.Type proxyType= Proxy.Type.HTTP;
+        if(System.getProperty("https.proxyHost")!=null){
+            proxyHost = System.getProperty("https.proxyHost");
+            proxyPort = System.getProperty("https.proxyPort");
+            proxyUser = System.getProperty("https.proxyUser");
+            proxyPwd = System.getProperty("https.proxyPassword");
+        }else if(System.getProperty("http.proxyHost")!=null){
+            proxyHost = System.getProperty("http.proxyHost");
+            proxyPort = System.getProperty("http.proxyPort");
+            proxyUser = System.getProperty("http.proxyUser");
+            proxyPwd = System.getProperty("http.proxyPassword");
+        }else if( System.getProperty("socksProxyHost")!=null){
+            proxyHost = System.getProperty("socksProxyHost");
+            proxyPort = System.getProperty("socksProxyPort");
+            proxyUser = System.getProperty("java.net.socks.username");
+            proxyPwd = System.getProperty("java.net.socks.password");
+            proxyType = Proxy.Type.SOCKS;
+        }
+
+        if(proxyHost!=null){
+            SocketAddress addr = new InetSocketAddress(proxyHost, Integer.parseInt(proxyPort));
+            config.setProxy(new Proxy(proxyType,addr));
+            if(proxyUser!=null && proxyUser.length() > 0){
+                config.setProxyUsername(proxyUser);
+            }
+            if(proxyPwd!=null && proxyPwd.length() > 0){
+                config.setProxyPassword(proxyPwd);
+            }
+        }else{
+            //No proxy.
+        }
+    }
+
 }
