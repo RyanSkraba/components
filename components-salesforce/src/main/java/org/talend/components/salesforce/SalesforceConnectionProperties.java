@@ -60,6 +60,8 @@ public class SalesforceConnectionProperties extends ComponentProperties implemen
 
     public Property httpTraceMessage = newBoolean("httpTraceMessage"); //$NON-NLS-1$
 
+    public Property httpChunked = newBoolean("httpChunked"); //$NON-NLS-1$
+
     public Property clientId = newString("clientId"); //$NON-NLS-1$
 
     //
@@ -91,7 +93,7 @@ public class SalesforceConnectionProperties extends ComponentProperties implemen
         super.setupLayout();
 
         loginType.setValue(LOGIN_BASIC);
-        endpoint.setValue(URL);
+        endpoint.setValue("\""+URL+"\"");
 
         Form wizardForm = new Form(this, FORM_WIZARD);
         wizardForm.addRow(name);
@@ -112,6 +114,7 @@ public class SalesforceConnectionProperties extends ComponentProperties implemen
         advancedForm.addRow(bulkConnection);
         advancedForm.addRow(needCompression);
         advancedForm.addRow(httpTraceMessage);
+        advancedForm.addRow(httpChunked);
         advancedForm.addRow(clientId);
         advancedForm.addRow(timeout);
         advancedForm.addRow(proxy.getForm(Form.MAIN));
@@ -149,11 +152,9 @@ public class SalesforceConnectionProperties extends ComponentProperties implemen
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN) || form.getName().equals(FORM_WIZARD)) {
             if (LOGIN_OAUTH.equals(loginType.getValue())) {
-                form.setValue(endpoint.getName(),OAUTH_URL);
                 form.getWidget(OAUTH).setVisible(true);
                 form.getWidget(USERPASSWORD).setVisible(false);
             } else if (LOGIN_BASIC.equals(loginType.getValue())) {
-                form.setValue(endpoint.getName(),URL);
                 form.getWidget(OAUTH).setVisible(false);
                 form.getWidget(USERPASSWORD).setVisible(true);
             } else {
