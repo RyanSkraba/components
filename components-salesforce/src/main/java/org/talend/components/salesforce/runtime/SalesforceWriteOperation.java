@@ -13,14 +13,16 @@
 package org.talend.components.salesforce.runtime;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.talend.components.api.adaptor.Adaptor;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
+import org.talend.components.api.component.runtime.WriterResult;
 
-final class SalesforceWriteOperation implements WriteOperation<Map<String, Object>> {
+import com.sforce.soap.partner.PartnerConnection;
+
+final class SalesforceWriteOperation implements WriteOperation<WriterResult> {
 
     private SalesforceSink ssink;
 
@@ -40,38 +42,34 @@ final class SalesforceWriteOperation implements WriteOperation<Map<String, Objec
     }
 
     @Override
-    public void finalize(Iterable<Map<String, Object>> writerResults, Adaptor adaptor) {
+    public void finalize(Iterable<WriterResult> writerResults, Adaptor adaptor) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public Writer<Map<String, Object>> createWriter(Adaptor adaptor) {
-        return new Writer<Map<String, Object>>() {
+    public Writer<WriterResult> createWriter(Adaptor adaptor) {
+        return new SalesforceWriter(this, adaptor);
+    }
 
-            @Override
-            public void open(String uId) throws IOException {
-                // TODO Auto-generated method stub
+    /**
+     * DOC sgandon Comment method "connect".
+     * 
+     * @return
+     * @return
+     * @throws IOException
+     */
+    public PartnerConnection connect() throws IOException {
+        return ssink.connect();
+    }
 
-            }
-
-            @Override
-            public void write(Object object) throws IOException {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public Map<String, Object> close() throws IOException {
-                // TODO Auto-generated method stub
-                return null;
-            }
-
-            @Override
-            public WriteOperation<Map<String, Object>> getWriteOperation() {
-                // TODO Auto-generated method stub
-                return null;
-            }
-        };
+    /**
+     * DOC sgandon Comment method "getSalesforConnectionModuleProperties".
+     * 
+     * @return
+     */
+    public Object getSalesforConnectionModuleProperties() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

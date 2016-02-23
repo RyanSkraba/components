@@ -13,8 +13,6 @@
 
 package org.talend.components.api.component.runtime;
 
-import org.talend.components.api.adaptor.Adaptor;
-
 /**
  * A {@code Sink} represents a resource that can be written to using the {@link Write} transform.
  *
@@ -112,6 +110,6 @@ public interface Sink extends SourceOrSink {
     /**
      * Returns an instance of a {@link WriteOperation} that can write to this Sink.
      */
-    public abstract WriteOperation<?> createWriteOperation(Adaptor adaptor);
+    public abstract WriteOperation<?> createWriteOperation();
 
 }
