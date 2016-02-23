@@ -12,18 +12,11 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.adaptor.Adaptor;
-import org.talend.components.api.component.runtime.BoundedReader;
-import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
-import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
 public class SalesforceSink extends SalesforceSourceOrSink implements Sink {
 
@@ -34,6 +27,6 @@ public class SalesforceSink extends SalesforceSourceOrSink implements Sink {
 
     @Override
     public WriteOperation<?> createWriteOperation(Adaptor adaptor) {
-        return null;
+        return new SalesforceWriteOperation(this);
     }
 }

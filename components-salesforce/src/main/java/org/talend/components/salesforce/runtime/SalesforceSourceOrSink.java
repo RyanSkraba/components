@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,7 +66,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         ValidationResult vr = new ValidationResult();
         try {
             connect();
-        } catch (ComponentException ex) {
+        } catch (IOException ex) {
             // FIXME - do a better job here
             vr.setMessage(ex.getMessage());
             vr.setStatus(ValidationResult.Result.ERROR);
@@ -105,7 +106,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         }
     }
 
-    protected PartnerConnection doConnection(ConnectorConfig config) throws ComponentException {
+    protected PartnerConnection doConnection(ConnectorConfig config) throws ConnectionException {
         SalesforceConnectionProperties connProps = getConnectionProperties();
         if (SalesforceConnectionProperties.LOGIN_OAUTH.equals(connProps.loginType.getValue())) {
             SalesforceOAuthConnection oauthConnection = new SalesforceOAuthConnection(connProps.oauth,
@@ -115,11 +116,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             config.setAuthEndpoint(SalesforceConnectionProperties.URL);
         }
         PartnerConnection connection;
-        try {
-            connection = new PartnerConnection(config);
-        } catch (ConnectionException e) {
-            throw new ComponentException(e);
-        }
+        connection = new PartnerConnection(config);
         return connection;
     }
 
@@ -128,7 +125,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         PartnerConnection connection;
     }
 
-    protected PartnerConnection connect() throws ComponentException {
+    protected PartnerConnection connect() throws IOException {
         final SalesforceConnectionProperties connProps = getConnectionProperties();
         final ConnectionHolder ch = new ConnectionHolder();
 
@@ -166,13 +163,18 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             config.setTraceMessage(true);
         }
 
-        ch.connection = doConnection(config);
-        return ch.connection;
+        try {
+            ch.connection = doConnection(config);
+            return ch.connection;
+        } catch (ConnectionException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
-    public List<NamedThing> getSchemaNames(Adaptor adaptor) throws ComponentException {
-        PartnerConnection connection = connect();
+    public List<NamedThing> getSchemaNames(Adaptor adaptor) throws IOException {
+        PartnerConnection connection;
+        connection = connect();
         List<NamedThing> returnList = new ArrayList<>();
         DescribeGlobalResult result = null;
         try {
@@ -218,25 +220,26 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     }
 
     @Override
-    public Schema getSchema(Adaptor adaptor, String module) throws ComponentException {
-        PartnerConnection connection = connect();
-        Schema schema = SchemaFactory.newSchema();
-        SchemaElement root = SchemaFactory.newSchemaElement("Root");
-        schema.setRoot(root);
-
-        DescribeSObjectResult[] describeSObjectResults = new DescribeSObjectResult[0];
+    public Schema getSchema(Adaptor adaptor, String module) throws IOException {
+        PartnerConnection connection;
         try {
+            connection = connect();
+            Schema schema = SchemaFactory.newSchema();
+            SchemaElement root = SchemaFactory.newSchemaElement("Root");
+            schema.setRoot(root);
+
+            DescribeSObjectResult[] describeSObjectResults = new DescribeSObjectResult[0];
             describeSObjectResults = connection.describeSObjects(new String[] { module });
+            Field fields[] = describeSObjectResults[0].getFields();
+            for (Field field : fields) {
+                SchemaElement child = PropertyFactory.newProperty(field.getName());
+                setupSchemaElement(field, child);
+                root.addChild(child);
+            }
+            return schema;
         } catch (ConnectionException e) {
-            throw new ComponentException(e);
+            throw new IOException(e);
         }
-        Field fields[] = describeSObjectResults[0].getFields();
-        for (Field field : fields) {
-            SchemaElement child = PropertyFactory.newProperty(field.getName());
-            setupSchemaElement(field, child);
-            root.addChild(child);
-        }
-        return schema;
     }
 
 }

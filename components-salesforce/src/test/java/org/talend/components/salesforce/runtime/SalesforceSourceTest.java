@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedSource;
-import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
 public class SalesforceSourceTest {
 
@@ -73,9 +72,6 @@ public class SalesforceSourceTest {
     public void testCreateReader() throws IOException {
         SalesforceSource salesforceSource = new SalesforceSource();
         assertNull(salesforceSource.createReader(null));
-        // initialize it
-        salesforceSource.initialize(null, new TSalesforceInputProperties(null));
-        assertNotNull(salesforceSource);
     }
 
 }

@@ -92,7 +92,6 @@ public class SalesforceInputReader implements BoundedReader {
     @Override
     public boolean start() throws IOException {
         connection = source.connect();
-
         Schema schema = source.getSchema(adaptor, properties.module.moduleName.getStringValue());
         fieldMap = schema.getRoot().getChildMap();
         fieldList = schema.getRoot().getChildren();

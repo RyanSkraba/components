@@ -13,17 +13,16 @@
 package org.talend.components.salesforce.runtime;
 
 import static org.junit.Assert.*;
+import static org.talend.components.salesforce.SalesforceTestHelper.*;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.junit.Test;
-import org.talend.components.api.exception.ComponentException;
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.NamedThing;
-import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement.Type;
@@ -33,20 +32,6 @@ import com.sforce.soap.partner.Field;
 import com.sforce.soap.partner.FieldType;
 
 public class SalesforceSourceOrSinkTestIT {
-
-    private static final boolean ADD_QUOTES = true;
-
-    String userId;
-
-    String password;
-
-    String securityKey;
-
-    public SalesforceSourceOrSinkTestIT() {
-        userId = System.getProperty("salesforce.user");
-        password = System.getProperty("salesforce.password");
-        securityKey = System.getProperty("salesforce.key");
-    }
 
     /**
      * Test method for
@@ -100,9 +85,11 @@ public class SalesforceSourceOrSinkTestIT {
      * Test method for
      * {@link org.talend.components.salesforce.runtime.SalesforceSourceOrSink#getSchemaNames(org.talend.components.api.adaptor.Adaptor)}
      * .
+     * 
+     * @throws IOException
      */
     @Test
-    public void testGetSchemaNames() {
+    public void testGetSchemaNames() throws IOException {
         SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
         SalesforceSourceOrSink salesforceSourceOrSink = new SalesforceSourceOrSink();
         salesforceSourceOrSink.initialize(null, scp);
@@ -153,9 +140,11 @@ public class SalesforceSourceOrSinkTestIT {
      * Test method for
      * {@link org.talend.components.salesforce.runtime.SalesforceSourceOrSink#getSchema(org.talend.components.api.adaptor.Adaptor, java.lang.String)}
      * .
+     * 
+     * @throws IOException
      */
     @Test
-    public void testGetSchema() {
+    public void testGetSchema() throws IOException {
         SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
         SalesforceSourceOrSink salesforceSourceOrSink = new SalesforceSourceOrSink();
         salesforceSourceOrSink.initialize(null, scp);
@@ -165,20 +154,9 @@ public class SalesforceSourceOrSinkTestIT {
         try {
             Schema schema = salesforceSourceOrSink.getSchema(null, "module that does not exists");
             fail("Should have throw an exception when not finding the module");
-        } catch (ComponentException ce) {
+        } catch (IOException ce) {
             // exception expected so ignor
         }
-    }
-
-    private SalesforceConnectionProperties setupProps(SalesforceConnectionProperties props, boolean addQuotes) {
-        if (props == null) {
-            props = (SalesforceConnectionProperties) new SalesforceConnectionProperties("foo").init();
-        }
-        ComponentProperties userPassword = (ComponentProperties) props.getProperty("userPassword");
-        ((Property) userPassword.getProperty("userId")).setValue(addQuotes ? "\"" + userId + "\"" : userId);
-        ((Property) userPassword.getProperty("password")).setValue(addQuotes ? "\"" + password + "\"" : password);
-        ((Property) userPassword.getProperty("securityKey")).setValue(addQuotes ? "\"" + securityKey + "\"" : securityKey);
-        return props;
     }
 
 }

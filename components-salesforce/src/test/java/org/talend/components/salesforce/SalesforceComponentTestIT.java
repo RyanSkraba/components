@@ -30,11 +30,11 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import org.talend.components.api.adaptor.ComponentDynamicHolder;
+import org.talend.components.api.adaptor.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.adaptor.ComponentDynamicHolder;
 import org.talend.components.api.runtime.ComponentRuntimeContainer;
-import org.talend.components.api.adaptor.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.service.AbstractComponentTest;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.ComponentTestUtils;
@@ -120,12 +120,6 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
 
     static final boolean DO_NOT_ADD_QUOTES = false;
 
-    String userId;
-
-    String password;
-
-    String securityKey;
-
     // Test schema
     Schema schema;
 
@@ -140,9 +134,6 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
 
     public SalesforceComponentTestIT() {
         random = Integer.toString(ThreadLocalRandom.current().nextInt(1, 100000));
-        userId = System.getProperty("salesforce.user");
-        password = System.getProperty("salesforce.password");
-        securityKey = System.getProperty("salesforce.key");
     }
 
     protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props) throws Throwable {
@@ -295,7 +286,8 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connFormWizard.getProperties();
 
         Form af = connProps.getForm(Form.ADVANCED);
-        assertTrue(((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() + " should be == to " + af,
+        assertTrue(
+                ((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() + " should be == to " + af,
                 ((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() == af);
 
         Object image = getComponentService().getWizardPngImage(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
@@ -310,7 +302,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         // check password i18n
         assertEquals("Name", connProps.getProperty("name").getDisplayName());
         connProps.name.setValue("connName");
-        setupProps(connProps, DO_NOT_ADD_QUOTES);
+        SalesforceTestHelper.setupProps(connProps, DO_NOT_ADD_QUOTES);
         Form userPassword = (Form) connFormWizard.getWidget("userPassword").getContent();
         SchemaElement passwordSe = (SchemaElement) userPassword.getWidget("password").getContent();
         assertEquals("Password", passwordSe.getDisplayName());
@@ -355,8 +347,8 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
             if (i == 0) {
                 assertEquals("connName", rp.name);
                 SalesforceConnectionProperties storedConnProps = (SalesforceConnectionProperties) rp.props;
-                assertEquals(userId, storedConnProps.userPassword.userId.getValue());
-                assertEquals(password, storedConnProps.userPassword.password.getValue());
+                assertEquals(SalesforceTestHelper.userId, storedConnProps.userPassword.userId.getValue());
+                assertEquals(SalesforceTestHelper.password, storedConnProps.userPassword.password.getValue());
             } else {
                 SalesforceModuleProperties storedModule = (SalesforceModuleProperties) rp.props;
                 assertEquals(selected.get(i - 1).getName(), storedModule.moduleName.getValue());
@@ -400,21 +392,9 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         assertEquals("Add SalesforceNew Modules", subWizards[2].getDefinition().getMenuItemName());
     }
 
-    private SalesforceConnectionProperties setupProps(SalesforceConnectionProperties props, boolean addQuotes) {
-        if (props == null) {
-            props = (SalesforceConnectionProperties) getComponentService()
-                    .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
-        }
-        ComponentProperties userPassword = (ComponentProperties) props.getProperty("userPassword");
-        ((Property) userPassword.getProperty("userId")).setValue(addQuotes ? "\"" + userId + "\"" : userId);
-        ((Property) userPassword.getProperty("password")).setValue(addQuotes ? "\"" + password + "\"" : password);
-        ((Property) userPassword.getProperty("securityKey")).setValue(addQuotes ? "\"" + securityKey + "\"" : securityKey);
-        return props;
-    }
-
     @Test
     public void testLogin() throws Throwable {
-        SalesforceConnectionProperties props = setupProps(null, DO_NOT_ADD_QUOTES);
+        SalesforceConnectionProperties props = SalesforceTestHelper.setupProps(null, DO_NOT_ADD_QUOTES);
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
         props = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), f,
                 "testConnection", props);
@@ -424,7 +404,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
 
     @Test
     public void testLoginWithQuotes() throws Throwable {
-        SalesforceConnectionProperties props = setupProps(null, ADD_QUOTES);
+        SalesforceConnectionProperties props = SalesforceTestHelper.setupProps(null, ADD_QUOTES);
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
         props = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), f,
                 "testConnection", props);
@@ -434,7 +414,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
 
     @Test
     public void testLoginFail() throws Throwable {
-        SalesforceConnectionProperties props = setupProps(null, DO_NOT_ADD_QUOTES);
+        SalesforceConnectionProperties props = SalesforceTestHelper.setupProps(null, DO_NOT_ADD_QUOTES);
         props.userPassword.userId.setValue("blah");
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
         props = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), f,
@@ -445,7 +425,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
 
     @Test
     public void testBulkLogin() throws Throwable {
-        SalesforceConnectionProperties props = setupProps(null, DO_NOT_ADD_QUOTES);
+        SalesforceConnectionProperties props = SalesforceTestHelper.setupProps(null, DO_NOT_ADD_QUOTES);
         props.bulkConnection.setValue(true);
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
         props = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), f,
@@ -456,7 +436,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
 
     @Test
     public void testBulkLoginWithQuotes() throws Throwable {
-        SalesforceConnectionProperties props = setupProps(null, ADD_QUOTES);
+        SalesforceConnectionProperties props = SalesforceTestHelper.setupProps(null, ADD_QUOTES);
         props.bulkConnection.setValue(true);
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
         props = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), f,
@@ -508,7 +488,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
     public void testModuleNames() throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
-        setupProps(props.connection, DO_NOT_ADD_QUOTES);
+        SalesforceTestHelper.setupProps(props.connection, DO_NOT_ADD_QUOTES);
         ComponentTestUtils.checkSerialize(props, errorCollector);
 
         assertEquals(2, props.getForms().size());
@@ -530,7 +510,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
     public void testSchema() throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
-        setupProps(props.connection, DO_NOT_ADD_QUOTES);
+        SalesforceTestHelper.setupProps(props.connection, DO_NOT_ADD_QUOTES);
 
         Form f = props.module.getForm(Form.REFERENCE);
         SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
@@ -552,7 +532,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
         TSalesforceOutputProperties outputProps = (TSalesforceOutputProperties) getComponentService()
                 .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
-        setupProps(outputProps.connection, DO_NOT_ADD_QUOTES);
+        SalesforceTestHelper.setupProps(outputProps.connection, DO_NOT_ADD_QUOTES);
 
         outputProps.outputAction.setValue(TSalesforceOutputProperties.ACTION_DELETE);
         setupModule(outputProps.module, "Account");
@@ -577,7 +557,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
         TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
-        setupProps(props.connection, DO_NOT_ADD_QUOTES);
+        SalesforceTestHelper.setupProps(props.connection, DO_NOT_ADD_QUOTES);
         SalesforceRuntime runtime = createRuntime(definition);
         runtime.setComponentService(getComponentService());
         runtime.connect(props.connection);
@@ -585,7 +565,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         // Referenced properties simulating salesforce connect component
         SalesforceConnectionProperties cProps = (SalesforceConnectionProperties) getComponentService()
                 .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
-        setupProps(cProps, DO_NOT_ADD_QUOTES);
+        SalesforceTestHelper.setupProps(cProps, DO_NOT_ADD_QUOTES);
         cProps.userPassword.password.setValue("xxx");
 
         String compId = "comp1";
@@ -617,7 +597,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
                 .getComponentDefinition(TSalesforceConnectionDefinition.COMPONENT_NAME);
         SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) getComponentService()
                 .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
-        setupProps(connProps, DO_NOT_ADD_QUOTES);
+        SalesforceTestHelper.setupProps(connProps, DO_NOT_ADD_QUOTES);
         SalesforceRuntime connRuntime = createRuntime(connDefinition);
         final Map<String, Object> globalMap = new HashMap<String, Object>();
         final String currentComponentName = TSalesforceConnectionDefinition.COMPONENT_NAME + "_1";
@@ -644,7 +624,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         TSalesforceInputProperties inProps = (TSalesforceInputProperties) getComponentService()
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         inProps.connection.referencedComponentId.setValue(currentComponentName);
-        setupProps(inProps.connection, DO_NOT_ADD_QUOTES);
+        SalesforceTestHelper.setupProps(inProps.connection, DO_NOT_ADD_QUOTES);
         SalesforceRuntime inputRuntime = createRuntime(inputDefinition);
         ComponentRuntimeContainer inputContainer = new TestRuntimeContainer() {
 
@@ -695,7 +675,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
         TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
-        setupProps(props.connection, DO_NOT_ADD_QUOTES);
+        SalesforceTestHelper.setupProps(props.connection, DO_NOT_ADD_QUOTES);
 
         setupModule(props.module, "Account");
         if (isDynamic) {
@@ -877,7 +857,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         TSalesforceBulkExecProperties props;
         props = (TSalesforceBulkExecProperties) getComponentService()
                 .getComponentProperties(TSalesforceBulkExecDefinition.COMPONENT_NAME);
-        setupProps(props.connection, DO_NOT_ADD_QUOTES);
+        SalesforceTestHelper.setupProps(props.connection, DO_NOT_ADD_QUOTES);
 
         if (false) {
             Form f = props.module.getForm(Form.REFERENCE);
@@ -914,7 +894,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         TSalesforceOutputProperties props;
         props = (TSalesforceOutputProperties) getComponentService()
                 .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
-        setupProps(props.connection, DO_NOT_ADD_QUOTES);
+        SalesforceTestHelper.setupProps(props.connection, DO_NOT_ADD_QUOTES);
 
         setupModule(props.module, "Account");
         if (isDynamic) {
@@ -938,7 +918,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         TSalesforceOutputProperties props;
         props = (TSalesforceOutputProperties) getComponentService()
                 .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
-        setupProps(props.connection, DO_NOT_ADD_QUOTES);
+        SalesforceTestHelper.setupProps(props.connection, DO_NOT_ADD_QUOTES);
 
         setupModule(props.module, "Account");
         props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.UPSERT);
@@ -969,7 +949,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         TSalesforceGetServerTimestampProperties props;
         props = (TSalesforceGetServerTimestampProperties) getComponentService()
                 .getComponentProperties(TSalesforceGetServerTimestampDefinition.COMPONENT_NAME);
-        setupProps(props.connection, DO_NOT_ADD_QUOTES);
+        SalesforceTestHelper.setupProps(props.connection, DO_NOT_ADD_QUOTES);
 
         SalesforceRuntime runtime = createRuntime(definition);
         runtime.inputBegin(props);

@@ -12,7 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,17 +37,17 @@ public class SalesforceSource extends SalesforceSourceOrSink implements BoundedS
     }
 
     @Override
-    public long getEstimatedSizeBytes(Adaptor adaptor) throws Exception {
+    public long getEstimatedSizeBytes(Adaptor adaptor) {
         return 0;
     }
 
     @Override
-    public boolean producesSortedKeys(Adaptor adaptor) throws Exception {
+    public boolean producesSortedKeys(Adaptor adaptor) {
         return false;
     }
 
     @Override
-    public BoundedReader createReader(Adaptor adaptor) throws IOException {
+    public BoundedReader createReader(Adaptor adaptor) {
         if (properties instanceof TSalesforceInputProperties) {
             return new SalesforceInputReader(adaptor, this, (TSalesforceInputProperties) properties);
         }
