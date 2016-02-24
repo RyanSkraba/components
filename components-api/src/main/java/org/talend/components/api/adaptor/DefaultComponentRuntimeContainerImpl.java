@@ -18,17 +18,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.talend.components.api.adaptor.ComponentDynamicHolder;
 import org.talend.components.api.runtime.ComponentRuntimeContainer;
 import org.talend.daikon.schema.SchemaElement;
 
 /**
  * An implementation of a runtime container for testing purposes.
  */
-public class DefaultComponentRuntimeContainerImpl implements ComponentRuntimeContainer {
+public class DefaultComponentRuntimeContainerImpl implements ComponentRuntimeContainer, Adaptor {
 
     private Map<String, Object> globalMap = new HashMap<>();
-    
+
     private String currentComponentName;
 
     @Override
@@ -79,9 +78,9 @@ public class DefaultComponentRuntimeContainerImpl implements ComponentRuntimeCon
         return new Dynamic();
     }
 
-	@Override
-	public String getCurrentComponentName() {
-		return currentComponentName;
-	}
+    @Override
+    public String getCurrentComponentName() {
+        return currentComponentName;
+    }
 
 }

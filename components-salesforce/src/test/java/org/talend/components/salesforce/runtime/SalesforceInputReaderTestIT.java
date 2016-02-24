@@ -13,26 +13,14 @@
 package org.talend.components.salesforce.runtime;
 
 import static org.junit.Assert.*;
-import static org.talend.components.salesforce.SalesforceTestHelper.*;
 
 import java.io.IOException;
 
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedReader;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceTestHelper;
-import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
 public class SalesforceInputReaderTestIT {
-
-    public BoundedReader createSalesforceInputReaderFromAccount(String moduleName) {
-        TSalesforceInputProperties tsip = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
-        SalesforceConnectionProperties conProps = setupProps(tsip.connection, !ADD_QUOTES);
-        tsip.module.moduleName.setValue(moduleName);
-        SalesforceSource salesforceSource = new SalesforceSource();
-        salesforceSource.initialize(null, tsip);
-        return salesforceSource.createReader(null);
-    }
 
     /**
      * Test method for {@link org.talend.components.salesforce.runtime.SalesforceInputReader#start()}.
@@ -41,7 +29,8 @@ public class SalesforceInputReaderTestIT {
      */
     @Test
     public void testStartAdvanceGetCurrent() throws IOException {
-        BoundedReader salesforceInputReader = createSalesforceInputReaderFromAccount(SalesforceTestHelper.EXISTING_MODULE_NAME);
+        BoundedReader salesforceInputReader = SalesforceTestHelper
+                .createSalesforceInputReaderFromAccount(SalesforceTestHelper.EXISTING_MODULE_NAME);
         try {
             assertTrue(salesforceInputReader.start());
             assertTrue(salesforceInputReader.advance());
@@ -58,8 +47,8 @@ public class SalesforceInputReaderTestIT {
      */
     @Test(expected = IOException.class)
     public void testStartException() throws IOException {
-        BoundedReader salesforceInputReader = createSalesforceInputReaderFromAccount(
-                SalesforceTestHelper.NOT_EXISTING_MODULE_NAME);
+        BoundedReader salesforceInputReader = SalesforceTestHelper
+                .createSalesforceInputReaderFromAccount(SalesforceTestHelper.NOT_EXISTING_MODULE_NAME);
         try {
             assertTrue(salesforceInputReader.start());
         } finally {

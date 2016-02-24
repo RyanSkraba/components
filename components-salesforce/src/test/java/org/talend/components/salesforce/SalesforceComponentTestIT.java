@@ -130,8 +130,6 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
     // Used to make sure we have our own data
     String random;
 
-    public static final String TEST_KEY = "Address2 456";
-
     public SalesforceComponentTestIT() {
         random = Integer.toString(ThreadLocalRandom.current().nextInt(1, 100000));
     }
@@ -749,7 +747,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         for (int i = 0; i < count; i++) {
             Map<String, Object> row = new HashMap<>();
             row.put("Name", "TestName");
-            row.put("ShippingStreet", TEST_KEY);
+            row.put("ShippingStreet", SalesforceTestHelper.TEST_KEY);
             row.put("ShippingPostalCode", Integer.toString(i));
             row.put("BillingStreet", "123 Main Street");
             row.put("BillingState", "CA");
@@ -771,7 +769,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
             System.out.println("check: " + row.get("Name") + " id: " + row.get("Id") + " post: " + row.get("BillingPostalCode")
                     + " st: " + " post: " + row.get("BillingStreet"));
             String check = (String) row.get("ShippingStreet");
-            if (check == null || !check.equals(TEST_KEY)) {
+            if (check == null || !check.equals(SalesforceTestHelper.TEST_KEY)) {
                 continue;
             }
             check = (String) row.get("BillingPostalCode");
@@ -803,7 +801,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
             System.out.println("del: " + row.get("Name") + " id: " + row.get("Id") + " post: " + row.get("BillingPostalCode")
                     + " st: " + " post: " + row.get("BillingStreet"));
             String check = (String) row.get("ShippingStreet");
-            if (check == null || !check.equals(TEST_KEY)) {
+            if (check == null || !check.equals(SalesforceTestHelper.TEST_KEY)) {
                 continue;
             }
             ids.add((String) row.get("Id"));

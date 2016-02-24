@@ -35,7 +35,6 @@ public class Documentation {
         feature.setBasePath(serviceBasePath);
         feature.setDescription(serviceDescription);
         feature.setRunAsFilter(true);
-        feature.setResourcePackage("org.talend.components");
         return feature;
     }
 }
