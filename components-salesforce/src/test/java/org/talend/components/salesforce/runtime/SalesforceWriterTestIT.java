@@ -67,7 +67,7 @@ public class SalesforceWriterTestIT {
         SalesforceWriteOperation writeOperation = (SalesforceWriteOperation) salesforceSink.createWriteOperation();
         Writer<WriterResult> saleforceWriter = writeOperation.createWriter(new DefaultComponentRuntimeContainerImpl());
 
-        List<Map<String, Object>> outputRows = SalesforceTestHelper.makeRows(10, schema, isDynamic,
+        List<Map<String, Object>> outputRows = SalesforceTestHelper.makeRows(10, isDynamic, schema,
                 new DefaultComponentRuntimeContainerImpl(), random);
         try {
             WriterResult writeResult = SalesforceTestHelper.writeRows(saleforceWriter, outputRows);

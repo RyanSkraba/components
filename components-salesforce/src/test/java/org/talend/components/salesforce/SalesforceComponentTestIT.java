@@ -70,6 +70,9 @@ import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement;
 import org.talend.daikon.schema.SchemaFactory;
 
+import com.sforce.async.AsyncApiException;
+import com.sforce.ws.ConnectionException;
+
 public class SalesforceComponentTestIT extends AbstractComponentTest {
 
     @Rule
@@ -795,7 +798,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         return checkedRows;
     }
 
-    protected List<String> getDeleteIds(List<Map<String, Object>> rows) {
+    static public List<String> getDeleteIds(List<Map<String, Object>> rows) {
         List<String> ids = new ArrayList<>();
         for (Map<String, Object> row : rows) {
             System.out.println("del: " + row.get("Name") + " id: " + row.get("Id") + " post: " + row.get("BillingPostalCode")
@@ -979,6 +982,49 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
     @Test
     public void testAllRuntime() {
         ComponentTestUtils.testAllRuntimeAvaialble(getComponentService());
+    }
+
+    public static void main(String[] args) throws Exception {
+        // deleteAllAccountTestRows();
+
+    }
+
+    public static void deleteAllAccountTestRows() throws ConnectionException, AsyncApiException, Exception {
+        SalesforceRuntime runtime = new SalesforceRuntime(new DefaultComponentRuntimeContainerImpl());
+        SalesforceComponentTestIT salesforceComponentTestIT = new SalesforceComponentTestIT();
+        TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init();
+        SalesforceTestHelper.setupProps(props.connection, DO_NOT_ADD_QUOTES);
+        props.batchSize.setValue(200);
+        props.module.moduleName.setValue("Account");
+        // connecting
+        runtime.connect(props.connection);
+        // getting schema
+        props.module.schema.schema.setValue(runtime.getSchema("Account"));
+        // getting all rows
+        List<Map<String, Object>> rows = new ArrayList<>();
+        runtime.input(props, rows);
+        // filtering rows
+        List<Map<String, Object>> rowToBeDeleted = getAllTestRows(rows);
+        // deleting rows
+        List<String> ids = salesforceComponentTestIT.getDeleteIds(rowToBeDeleted);
+        for (String id : ids) {
+            runtime.delete(id);
+        }
+    }
+
+    static List<Map<String, Object>> getAllTestRows(List<Map<String, Object>> rows) {
+        List<Map<String, Object>> checkedRows = new ArrayList<>();
+
+        for (Map<String, Object> row : rows) {
+            String check = (String) row.get("ShippingStreet");
+            if (check == null || !check.equals(SalesforceTestHelper.TEST_KEY)) {
+                continue;
+            }
+            System.out.println("Test row is: " + row.get("Name") + " id: " + row.get("Id") + " post: "
+                    + row.get("BillingPostalCode") + " st: " + " post: " + row.get("BillingStreet"));
+            checkedRows.add(row);
+        }
+        return checkedRows;
     }
 
 }

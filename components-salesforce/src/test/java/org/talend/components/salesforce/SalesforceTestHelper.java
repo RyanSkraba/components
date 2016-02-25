@@ -114,7 +114,7 @@ public class SalesforceTestHelper {
         return result;
     }
 
-    public static List<Map<String, Object>> makeRows(int count, Schema schema, boolean isDynamic, Adaptor adaptator,
+    public static List<Map<String, Object>> makeRows(int count, boolean isDynamic, Schema schema, Adaptor adaptator,
             String billingPostalCode) {
         List<Map<String, Object>> outputRows = new ArrayList<>();
         for (int i = 0; i < count; i++) {
