@@ -25,6 +25,8 @@ import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
+import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
+import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
 
 import aQute.bnd.annotation.component.Component;
 
@@ -104,8 +106,15 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     }
 
     @Override
-    public Class<?> getPropertyClass() {
+    public Class<? extends ComponentProperties> getPropertyClass() {
         return TestComponentProperties.class;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
+        return new Class[] { NestedComponentProperties.class, ComponentPropertiesWithDefinedI18N.class,
+                InheritedComponentProperties.class };
     }
 
 }

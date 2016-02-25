@@ -141,7 +141,7 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
-    public List<ComponentDefinition> getPossibleComponents(ComponentProperties properties) throws Throwable {
+    public List<ComponentDefinition> getPossibleComponents(ComponentProperties... properties) throws Throwable {
         return componentServiceDelegate.getPossibleComponents(properties);
     }
 

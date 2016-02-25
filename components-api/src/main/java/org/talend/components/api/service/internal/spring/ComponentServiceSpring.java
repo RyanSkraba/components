@@ -138,7 +138,7 @@ public class ComponentServiceSpring implements ComponentService {
     @Path("/possibleComponents")
     @Produces(MediaType.APPLICATION_JSON)
     public List<ComponentDefinition> getPossibleComponents(
-            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties) throws Throwable {
+            @ApiParam(name = "properties", value = "Component properties") ComponentProperties... properties) throws Throwable {
         return componentServiceDelegate.getPossibleComponents(properties);
     }
 
