@@ -15,83 +15,30 @@ package org.talend.components.salesforce.runtime;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
 
-import org.joda.time.Instant;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.api.adaptor.Adaptor;
-import org.talend.components.api.adaptor.ComponentDynamicHolder;
-import org.talend.components.api.component.runtime.BoundedReader;
-import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement;
 
-import com.sforce.soap.partner.PartnerConnection;
-import com.sforce.soap.partner.QueryResult;
-import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
-import com.sforce.ws.bind.XmlObject;
 
-public class SalesforceInputReader implements BoundedReader {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SalesforceInputReader.class);
+public class SalesforceInputReader extends SalesforceReader {
 
     protected TSalesforceInputProperties properties;
 
-    protected boolean exceptionForErrors;
-
     protected int commitLevel;
 
-    protected QueryResult inputResult;
-
-    protected SObject[] inputRecords;
-
-    protected int inputRecordsIndex;
-
-    protected Map<String, SchemaElement> fieldMap;
-
-    protected List<SchemaElement> fieldList;
-
-    /*
-     * Used on input only, this is read from the module schema, it contains all of the fields from the salesforce
-     * definition of the module that are not already in the field list.
-     */
-    protected List<SchemaElement> dynamicFieldList;
-
-    protected Map<String, SchemaElement> dynamicFieldMap;
-
-    /*
-     * The actual fields we read on input which is a combination of the fields specified in the schema and the dynamic
-     * fields.
-     */
-    protected List<SchemaElement> inputFieldsToUse;
-
-    /*
-     * The dynamic column that is specified on the input schema.
-     */
-    protected SchemaElement dynamicField;
-
-    protected PartnerConnection connection;
-
-    protected SalesforceSource source;
-
-    protected Adaptor adaptor;
-
     public SalesforceInputReader(Adaptor adaptor, SalesforceSource source, TSalesforceInputProperties props) {
-        this.source = source;
-        this.adaptor = adaptor;
+        super(adaptor, source);
         properties = props;
         commitLevel = props.batchSize.getIntValue();
     }
 
     @Override
     public boolean start() throws IOException {
-        connection = source.connect();
+        super.start();
         Schema schema = source.getSchema(adaptor, properties.module.moduleName.getStringValue());
         fieldMap = schema.getRoot().getChildMap();
         fieldList = schema.getRoot().getChildren();
@@ -162,71 +109,6 @@ public class SalesforceInputReader implements BoundedReader {
         inputRecords = inputResult.getRecords();
         inputRecordsIndex = 0;
         return inputResult.getSize() > 0;
-    }
-
-    @Override
-    public boolean advance() throws IOException {
-        if (++inputRecordsIndex >= inputRecords.length) {
-            if (inputResult.isDone()) {
-                return false;
-            }
-            try {
-                inputResult = connection.queryMore(inputResult.getQueryLocator());
-            } catch (ConnectionException e) {
-                throw new IOException(e);
-            }
-            inputRecordsIndex = 0;
-            return inputResult.getSize() > 0;
-        }
-        return true;
-    }
-
-    @Override
-    public Object getCurrent() throws NoSuchElementException {
-        ComponentDynamicHolder dynamicHolder = null;
-        if (dynamicFieldMap != null) {
-            dynamicHolder = adaptor.createDynamicHolder();
-            dynamicHolder.setSchemaElements(dynamicFieldList);
-        }
-        Iterator<XmlObject> it = inputRecords[inputRecordsIndex].getChildren();
-        Map<String, Object> columns = new HashMap<>();
-        while (it.hasNext()) {
-            XmlObject obj = it.next();
-            String localName = obj.getName().getLocalPart();
-            if (dynamicFieldMap != null && dynamicFieldMap.get(localName) != null) {
-                dynamicHolder.addFieldValue(localName, obj.getValue());
-            } else {
-                columns.put(localName, obj.getValue());
-            }
-        }
-        if (dynamicHolder != null) {
-            columns.put(dynamicField.getName(), dynamicHolder);
-        }
-        return columns;
-    }
-
-    @Override
-    public Instant getCurrentTimestamp() throws NoSuchElementException {
-        return null;
-    }
-
-    @Override
-    public void close() throws IOException {
-    }
-
-    @Override
-    public Double getFractionConsumed() {
-        return null;
-    }
-
-    @Override
-    public BoundedSource getCurrentSource() {
-        return source;
-    }
-
-    @Override
-    public BoundedSource splitAtFraction(double fraction) {
-        return null;
     }
 
 }

@@ -16,7 +16,6 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,7 +48,6 @@ import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecP
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 import org.talend.components.salesforce.tsalesforcegetdeleted.TSalesforceGetDeletedDefinition;
 import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampDefinition;
-import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
 import org.talend.components.salesforce.tsalesforcegetupdated.TSalesforceGetUpdatedDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
@@ -882,95 +880,6 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
     }
 
     @Test
-    public void testOutputInsert() throws Throwable {
-        runOutputInsert(!DYNAMIC);
-    }
-
-    @Test
-    public void testOutputInsertDynamic() throws Throwable {
-        runOutputInsert(DYNAMIC);
-    }
-
-    protected void runOutputInsert(boolean isDynamic) throws Throwable {
-        ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
-        TSalesforceOutputProperties props;
-        props = (TSalesforceOutputProperties) getComponentService()
-                .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
-        SalesforceTestHelper.setupProps(props.connection, DO_NOT_ADD_QUOTES);
-
-        setupModule(props.module, "Account");
-        if (isDynamic) {
-            fixSchemaForDynamic();
-        }
-        props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
-
-        ComponentTestUtils.checkSerialize(props, errorCollector);
-
-        SalesforceRuntime runtime = createRuntime(definition);
-
-        int count = 10;
-        List<Map<String, Object>> outputRows = makeRows(count);
-        runtime.output(props, outputRows);
-        checkAndDelete(runtime, props, count);
-    }
-
-    @Test
-    public void testOutputUpsert() throws Throwable {
-        ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
-        TSalesforceOutputProperties props;
-        props = (TSalesforceOutputProperties) getComponentService()
-                .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
-        SalesforceTestHelper.setupProps(props.connection, DO_NOT_ADD_QUOTES);
-
-        setupModule(props.module, "Account");
-        props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.UPSERT);
-        checkAndAfter(props.getForm(Form.MAIN), "outputAction", props);
-
-        SchemaElement se = (Property) props.getProperty("upsertKeyColumn");
-        System.out.println("--upsertKeyColumn - possible values");
-        System.out.println(se.getPossibleValues());
-        assertTrue(se.getPossibleValues().size() > 10);
-
-        ComponentTestUtils.checkSerialize(props, errorCollector);
-
-        createRuntime(definition);
-
-        Map<String, Object> row = new HashMap<>();
-        row.put("Name", "TestName");
-        row.put("BillingStreet", "123 Main Street");
-        row.put("BillingState", "CA");
-        List<Map<String, Object>> outputRows = new ArrayList<>();
-        outputRows.add(row);
-        // FIXME - finish this test
-    }
-
-    @Test
-    public void testGetServerTimestamp() throws Throwable {
-        ComponentDefinition definition = getComponentService()
-                .getComponentDefinition(TSalesforceGetServerTimestampDefinition.COMPONENT_NAME);
-        TSalesforceGetServerTimestampProperties props;
-        props = (TSalesforceGetServerTimestampProperties) getComponentService()
-                .getComponentProperties(TSalesforceGetServerTimestampDefinition.COMPONENT_NAME);
-        SalesforceTestHelper.setupProps(props.connection, DO_NOT_ADD_QUOTES);
-
-        SalesforceRuntime runtime = createRuntime(definition);
-        runtime.inputBegin(props);
-
-        Map<String, Object> row;
-        row = runtime.inputRow();
-        // TODO we need to make sure about the server and local time zone are the same.
-        Calendar now = Calendar.getInstance();
-        Calendar date = (Calendar) row.get("ServerTimestamp");
-        long nowMillis = now.getTimeInMillis();
-        long dateMillis = date.getTimeInMillis();
-        System.out.println("now: " + nowMillis);
-        System.out.println(dateMillis);
-        long delta = nowMillis - dateMillis;
-        assertTrue(Math.abs(delta) < 50000);
-        assertNull(runtime.inputRow());
-    }
-
-    @Test
     public void testAlli18n() {
         ComponentTestUtils.testAlli18n(getComponentService(), errorCollector);
     }
@@ -986,7 +895,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
     }
 
     public static void main(String[] args) throws Exception {
-        // deleteAllAccountTestRows();
+        deleteAllAccountTestRows();
 
     }
 

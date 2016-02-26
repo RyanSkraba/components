@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.adaptor.Adaptor;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
+import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
 public class SalesforceSource extends SalesforceSourceOrSink implements BoundedSource {
@@ -50,6 +51,8 @@ public class SalesforceSource extends SalesforceSourceOrSink implements BoundedS
     public BoundedReader createReader(Adaptor adaptor) {
         if (properties instanceof TSalesforceInputProperties) {
             return new SalesforceInputReader(adaptor, this, (TSalesforceInputProperties) properties);
+        } else if (properties instanceof TSalesforceGetServerTimestampProperties) {
+            return new SalesforceServerTimeStampReader(adaptor, this, (TSalesforceGetServerTimestampProperties) properties);
         }
         return null;
     }

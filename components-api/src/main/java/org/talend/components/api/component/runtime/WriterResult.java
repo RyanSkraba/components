@@ -20,6 +20,8 @@ public class WriterResult implements Serializable {
 
     protected String uId;
 
+    private int dataCount;
+
     /**
      * Getter for uId.
      * 
@@ -30,24 +32,23 @@ public class WriterResult implements Serializable {
     }
 
     /**
-     * Getter for type.
+     * create a writer result for a single writer.
      * 
-     * @return the type
+     * @param uId unique Id provided when calling {@link Writer#open(String)}
+     * @param dataCount
      */
-    public Type getType() {
-        return this.type;
-    }
-
-    private Type type;
-
-    public static enum Type {
-                             OK,
-                             FAILED;
-    }
-
-    public WriterResult(String uId, Type type) {
+    public WriterResult(String uId, int dataCount) {
         this.uId = uId;
-        this.type = type;
+        this.dataCount = dataCount;
+    }
+
+    /**
+     * Getter for dataCount.
+     * 
+     * @return the dataCount
+     */
+    public int getDataCount() {
+        return dataCount;
     }
 
 }

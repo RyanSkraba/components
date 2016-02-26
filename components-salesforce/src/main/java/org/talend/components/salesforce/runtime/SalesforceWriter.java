@@ -15,6 +15,7 @@ package org.talend.components.salesforce.runtime;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,6 @@ import org.talend.components.api.adaptor.ComponentDynamicHolder;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
-import org.talend.components.api.component.runtime.WriterResult.Type;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement;
@@ -71,6 +71,8 @@ final class SalesforceWriter implements Writer<WriterResult> {
 
     protected boolean exceptionForErrors;
 
+    private int dataCount;
+
     /**
      * DOC sgandon SalesforceWriter constructor comment.
      * 
@@ -82,6 +84,14 @@ final class SalesforceWriter implements Writer<WriterResult> {
         this.adaptor = adaptor;
         sink = (SalesforceSink) salesforceWriteOperation.getSink();
         sprops = sink.getSalesforceOutputProperties();
+        commitLevel = 1;
+        int arraySize = commitLevel * 2;
+        deleteItems = new ArrayList<>(arraySize);
+        insertItems = new ArrayList<>(arraySize);
+        updateItems = new ArrayList<>(arraySize);
+        upsertItems = new ArrayList<>(arraySize);
+        upsertKeyColumn = "";
+
     }
 
     @Override
@@ -150,6 +160,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
                 delete(id);
             }
         }
+        dataCount++;
     }
 
     protected String getIdValue(Map<String, Object> row) {
@@ -354,7 +365,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
         logout();
         // this should be computed according to the result of the write I guess but I don't know yet how exceptions are
         // handled by Beam.
-        return new WriterResult(uId, Type.OK);
+        return new WriterResult(uId, dataCount);
     }
 
     protected void logout() throws IOException {

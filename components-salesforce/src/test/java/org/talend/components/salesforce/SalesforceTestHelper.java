@@ -140,10 +140,48 @@ public class SalesforceTestHelper {
         return createBounderReader(tsip);
     }
 
-    public static BoundedReader createBounderReader(TSalesforceInputProperties tsip) {
+    public static BoundedReader createBounderReader(ComponentProperties tsip) {
         SalesforceSource salesforceSource = new SalesforceSource();
         salesforceSource.initialize(null, tsip);
         return salesforceSource.createReader(null);
+    }
+
+    static public List<String> getDeleteIds(List<Map<String, Object>> rows) {
+        List<String> ids = new ArrayList<>();
+        for (Map<String, Object> row : rows) {
+            System.out.println("del: " + row.get("Name") + " id: " + row.get("Id") + " post: " + row.get("BillingPostalCode")
+                    + " st: " + " post: " + row.get("BillingStreet"));
+            String check = (String) row.get("ShippingStreet");
+            if (check == null || !check.equals(SalesforceTestHelper.TEST_KEY)) {
+                continue;
+            }
+            ids.add((String) row.get("Id"));
+        }
+        return ids;
+    }
+
+    /**
+     * @return the list of row match the TEST_KEY, and if a random values it specified it also filter row against the
+     */
+    public static List<Map<String, Object>> filterAllTestRows(List<Map<String, Object>> rows, String randomValue) {
+        List<Map<String, Object>> checkedRows = new ArrayList<>();
+
+        for (Map<String, Object> row : rows) {
+            String check = (String) row.get("ShippingStreet");
+            if (check == null || !check.equals(SalesforceTestHelper.TEST_KEY)) {
+                continue;
+            }
+            if (randomValue != null) {// check the random value if specified
+                check = (String) row.get("BillingPostalCode");
+                if (check == null || !check.equals(randomValue)) {
+                    continue;
+                }
+            }
+            System.out.println("Test row is: " + row.get("Name") + " id: " + row.get("Id") + " post: "
+                    + row.get("BillingPostalCode") + " st: " + " post: " + row.get("BillingStreet"));
+            checkedRows.add(row);
+        }
+        return checkedRows;
     }
 
 }

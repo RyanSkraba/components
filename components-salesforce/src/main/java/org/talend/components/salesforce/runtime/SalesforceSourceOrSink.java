@@ -28,6 +28,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnection;
+import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.PropertyFactory;
@@ -78,6 +79,8 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     protected SalesforceConnectionProperties getConnectionProperties() {
         if (properties instanceof SalesforceConnectionProperties) {
             return (SalesforceConnectionProperties) properties;
+        } else if (properties instanceof TSalesforceGetServerTimestampProperties) {
+            return ((TSalesforceGetServerTimestampProperties) properties).connection;
         }
         return ((SalesforceConnectionModuleProperties) properties).connection;
     }
