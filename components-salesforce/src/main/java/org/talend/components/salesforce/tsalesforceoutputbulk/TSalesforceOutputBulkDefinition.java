@@ -23,6 +23,8 @@ import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 
 import aQute.bnd.annotation.component.Component;
+import org.talend.components.salesforce.SalesforceModuleProperties;
+import org.talend.daikon.schema.Schema;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceOutputBulkDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
@@ -50,7 +52,8 @@ public class TSalesforceOutputBulkDefinition extends SalesforceDefinition {
     @SuppressWarnings("unchecked")
     @Override
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
-        return new Class[] { SchemaProperties.class };
+        return concatPropertiesClasses(super.getNestedCompatibleComponentPropertiesClass(),
+                new Class[] {SchemaProperties.class });
     }
 
 }

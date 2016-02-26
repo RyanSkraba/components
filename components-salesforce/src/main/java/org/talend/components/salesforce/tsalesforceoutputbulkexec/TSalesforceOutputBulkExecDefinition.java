@@ -22,6 +22,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 
 import aQute.bnd.annotation.component.Component;
+import org.talend.components.salesforce.SalesforceModuleProperties;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceOutputBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
@@ -52,4 +53,10 @@ public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition {
         return TSalesforceOutputBulkExecProperties.class;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
+        return concatPropertiesClasses(super.getNestedCompatibleComponentPropertiesClass(),
+                new Class[] { SalesforceModuleProperties.class });
+    }
 }

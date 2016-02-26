@@ -17,7 +17,11 @@ import java.io.InputStream;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
+import org.talend.components.common.ProxyProperties;
+import org.talend.components.common.UserPasswordProperties;
+import org.talend.components.common.oauth.OauthProperties;
 
 public abstract class SalesforceDefinition extends AbstractComponentDefinition {
 
@@ -61,5 +65,12 @@ public abstract class SalesforceDefinition extends AbstractComponentDefinition {
     public InputStream getMavenPom() {
         return this.getClass().getResourceAsStream("/org/talend/components/salesforce/pom.xml");
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
+        return new Class[] { SalesforceConnectionProperties.class };
+    }
+
 
 }

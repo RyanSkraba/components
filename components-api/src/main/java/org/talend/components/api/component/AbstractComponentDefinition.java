@@ -16,6 +16,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -158,5 +159,13 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
 
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return (Class<? extends ComponentProperties>[]) Array.newInstance(Class.class, 0);
+    }
+
+
+    public Class<? extends ComponentProperties>[] concatPropertiesClasses(Class<? extends ComponentProperties>[] first,
+            Class<? extends ComponentProperties>[] second) {
+        Class<? extends ComponentProperties>[] result = Arrays.copyOf(first, first.length + second.length);
+        System.arraycopy(second, 0, result, first.length, second.length);
+        return result;
     }
 }
