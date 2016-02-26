@@ -155,8 +155,17 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
      * @return the associated ComponentProperties class associated with the Component. This shall be used to initialised
      * the runtime classes.
      */
+    // TODO we should rename this
     abstract public Class<? extends ComponentProperties> getPropertyClass();
 
+    /**
+     * return the list of ComponentProperties that may be assigned to nested properties of the main ComponentProperties
+     * class(see {@link AbstractComponentDefinition#getPropertyClass()} associated with this definiton.<br/>
+     * This method uses static class definition to avoid ComponentProperties instanciation.
+     * 
+     * @return return the list of ComponentProperties that may be assigned to a nested property of this component
+     * associated ComponentProperties.
+     */
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return (Class<? extends ComponentProperties>[]) Array.newInstance(Class.class, 0);
     }
