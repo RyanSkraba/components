@@ -155,7 +155,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl<ComponentPropert
     }
 
     @Override
-    public List<ComponentDefinition> getPossibleComponents(ComponentProperties properties) {
+    public List<ComponentDefinition> getPossibleComponents(ComponentProperties... properties) {
         List<ComponentDefinition> returnList = new ArrayList<>();
         for (ComponentDefinition cd : componentRegistry.getComponents().values()) {
             if (cd.supportsProperties(properties)) {
@@ -172,7 +172,8 @@ public class ComponentServiceImpl extends PropertiesServiceImpl<ComponentPropert
         if (wizardDefinition != null) {
             return getImageStream(wizardDefinition, wizardDefinition.getPngImagePath(imageType));
         } else {
-            throw new ComponentException(ComponentsApiErrorCode.WRONG_WIZARD_NAME, ExceptionContext.build().put("name", wizardName)); //$NON-NLS-1$
+            throw new ComponentException(ComponentsApiErrorCode.WRONG_WIZARD_NAME,
+                    ExceptionContext.build().put("name", wizardName)); //$NON-NLS-1$
         }
 
     }

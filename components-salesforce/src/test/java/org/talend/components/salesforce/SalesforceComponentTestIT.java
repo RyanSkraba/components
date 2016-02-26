@@ -66,6 +66,7 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.PropertiesServiceTest;
 import org.talend.daikon.properties.service.Repository;
+import org.talend.daikon.properties.test.PropertiesTestUtils;
 import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement;
 import org.talend.daikon.schema.SchemaFactory;
@@ -295,7 +296,8 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connFormWizard.getProperties();
 
         Form af = connProps.getForm(Form.ADVANCED);
-        assertTrue(((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() + " should be == to " + af,
+        assertTrue(
+                ((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() + " should be == to " + af,
                 ((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() == af);
 
         Object image = getComponentService().getWizardPngImage(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
@@ -1001,6 +1003,17 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
     @Test
     public void testAllRuntime() {
         ComponentTestUtils.testAllRuntimeAvaialble(getComponentService());
+    }
+
+    @Test
+    public void generateJavaNestedCompPropClassNames() {
+        Set<ComponentDefinition> allComponents = getComponentService().getAllComponents();
+        for (ComponentDefinition cd : allComponents) {
+            ComponentProperties props = cd.createProperties();
+            String javaCode = PropertiesTestUtils.generatedNestedComponentCompatibilitiesJavaCode(props);
+            System.out.println("Nested Props for (" + cd.getClass().getSimpleName() + ".java:1)" + javaCode);
+        }
+
     }
 
 }

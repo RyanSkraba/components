@@ -25,6 +25,7 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
+import org.talend.components.api.service.testcomponent.ComponentPropertiesWithDefinedI18N;
 import org.talend.components.api.service.testcomponent.TestComponentDefinition;
 import org.talend.components.api.service.testcomponent.TestComponentProperties;
 import org.talend.components.api.service.testcomponent.TestComponentWizard;
@@ -36,6 +37,18 @@ import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.WizardImageType;
 
 public class ComponentServiceTest extends AbstractComponentTest {
+
+    static class NotExistingComponentProperties extends ComponentProperties {
+
+        /**
+         * DOC sgandon NotExistingComponentProperties constructor comment.
+         * 
+         * @param name
+         */
+        public NotExistingComponentProperties() {
+            super("foo");
+        }
+    }
 
     @Rule
     public ErrorCollector errorCollector = new ErrorCollector();
@@ -64,10 +77,13 @@ public class ComponentServiceTest extends AbstractComponentTest {
     @Test
     public void testSupportsProps() throws Throwable {
         ComponentProperties props = getComponentService().getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
-        List<ComponentDefinition> comps = getComponentService().getPossibleComponents(props);
+        ComponentPropertiesWithDefinedI18N anotherProp = (ComponentPropertiesWithDefinedI18N) new ComponentPropertiesWithDefinedI18N(
+                "foo").init();
+        List<ComponentDefinition> comps = getComponentService().getPossibleComponents(props, anotherProp);
         assertEquals("TestComponent", comps.get(0).getName());
-        props = new NestedComponentProperties("props");
-        comps = getComponentService().getPossibleComponents(props);
+
+        comps = getComponentService().getPossibleComponents(new NestedComponentProperties("props"),
+                new NotExistingComponentProperties());
         assertEquals(0, comps.size());
     }
 
