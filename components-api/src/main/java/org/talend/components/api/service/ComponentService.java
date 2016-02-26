@@ -108,7 +108,7 @@ public interface ComponentService extends PropertiesService<ComponentProperties>
      * @param properties the {@link ComponentProperties} object to look for.
      * @return the list of compatbible {@link ComponentDefinition} objects.
      */
-    List<ComponentDefinition> getPossibleComponents(ComponentProperties properties) throws Throwable;
+    List<ComponentDefinition> getPossibleComponents(ComponentProperties... properties) throws Throwable;
 
     /**
      * Return the png image related to the given wizard

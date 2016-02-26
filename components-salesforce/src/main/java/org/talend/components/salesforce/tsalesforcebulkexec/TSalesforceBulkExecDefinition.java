@@ -13,16 +13,26 @@
 package org.talend.components.salesforce.tsalesforcebulkexec;
 
 import org.talend.components.api.Constants;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.Connector.ConnectorType;
-import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.common.ProxyProperties;
+import org.talend.components.common.SchemaProperties;
+import org.talend.components.common.UserPasswordProperties;
+import org.talend.components.common.oauth.OauthProperties;
+import org.talend.components.salesforce.SalesforceBulkProperties;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
+import org.talend.components.salesforce.SalesforceUserPasswordProperties;
+import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties.ModuleSubclass;
 
 import aQute.bnd.annotation.component.Component;
 
-@Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+@Component(name = Constants.COMPONENT_BEAN_PREFIX
+        + TSalesforceBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceBulkExecDefinition extends SalesforceDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceBulkExecNew"; //$NON-NLS-1$
@@ -46,8 +56,16 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition {
     }
 
     @Override
-    public Class<?> getPropertyClass() {
+    public Class<? extends ComponentProperties> getPropertyClass() {
         return TSalesforceBulkExecProperties.class;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
+        return new Class[] { SchemaProperties.class, ModuleSubclass.class, SalesforceConnectionProperties.class,
+                OauthProperties.class, SalesforceUserPasswordProperties.class, ProxyProperties.class,
+                UserPasswordProperties.class, SalesforceBulkProperties.class };
     }
 
 }

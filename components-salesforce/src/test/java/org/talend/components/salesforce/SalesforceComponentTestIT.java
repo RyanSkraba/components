@@ -66,6 +66,7 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.PropertiesServiceTest;
 import org.talend.daikon.properties.service.Repository;
+import org.talend.daikon.properties.test.PropertiesTestUtils;
 import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement;
 import org.talend.daikon.schema.SchemaFactory;
@@ -1025,6 +1026,17 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
             checkedRows.add(row);
         }
         return checkedRows;
+    }
+
+    @Test
+    public void generateJavaNestedCompPropClassNames() {
+        Set<ComponentDefinition> allComponents = getComponentService().getAllComponents();
+        for (ComponentDefinition cd : allComponents) {
+            ComponentProperties props = cd.createProperties();
+            String javaCode = PropertiesTestUtils.generatedNestedComponentCompatibilitiesJavaCode(props);
+            System.out.println("Nested Props for (" + cd.getClass().getSimpleName() + ".java:1)" + javaCode);
+        }
+
     }
 
 }

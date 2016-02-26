@@ -17,6 +17,8 @@ import static org.talend.daikon.properties.presentation.Widget.*;
 
 import java.util.List;
 
+import org.talend.components.api.component.Connector.ConnectorType;
+import org.talend.components.api.component.StudioConstants;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.daikon.NamedThing;
@@ -38,6 +40,12 @@ public class SalesforceModuleProperties extends ComponentProperties {
 
     public SalesforceModuleProperties(String name) {
         super(name);
+    }
+
+    @Override
+    public void setupProperties() {
+        super.setupProperties();
+        schema.schema.setTaggedValue(StudioConstants.CONNECTOR_TYPE_SCHEMA_KEY, ConnectorType.FLOW);
     }
 
     @Override

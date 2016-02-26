@@ -15,6 +15,8 @@ package org.talend.components.salesforce.tsalesforceoutputbulk;
 import static org.talend.daikon.properties.PropertyFactory.*;
 import static org.talend.daikon.properties.presentation.Widget.*;
 
+import org.talend.components.api.component.Connector.ConnectorType;
+import org.talend.components.api.component.StudioConstants;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
@@ -47,6 +49,7 @@ public class TSalesforceOutputBulkProperties extends ComponentProperties {
     public void setupProperties() {
         super.setupProperties();
         TSalesforceOutputProperties.setupUpsertRelation(upsertRelation, TSalesforceOutputProperties.POLY);
+        schema.schema.setTaggedValue(StudioConstants.CONNECTOR_TYPE_SCHEMA_KEY, ConnectorType.FLOW);
     }
 
     @Override

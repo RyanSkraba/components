@@ -5,6 +5,8 @@
 
 package ${package};
 
+import org.talend.components.api.component.StudioConstants;
+import org.talend.components.api.component.Connector.ConnectorType;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.daikon.properties.Property;
@@ -30,6 +32,7 @@ public class ${componentName}Properties extends ComponentProperties {
         super.setupProperties();
         // create an default shema element that is
         schema.schema.addChild(SchemaFactory.newSchemaElement(Type.STRING, "line"));
+        schema.schema.setTaggedValue(StudioConstants.CONNECTOR_TYPE_SCHEMA_KEY, ConnectorType.FLOW);
     }
     
 

@@ -24,8 +24,14 @@ import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
+import org.talend.components.common.ProxyProperties;
+import org.talend.components.common.SchemaProperties;
+import org.talend.components.common.UserPasswordProperties;
+import org.talend.components.common.oauth.OauthProperties;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceRuntime;
+import org.talend.components.salesforce.SalesforceUserPasswordProperties;
 import org.talend.daikon.schema.Schema;
 
 import aQute.bnd.annotation.component.Component;
@@ -86,8 +92,15 @@ public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinitio
     }
 
     @Override
-    public Class<?> getPropertyClass() {
+    public Class<? extends ComponentProperties> getPropertyClass() {
         return TSalesforceGetServerTimestampProperties.class;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
+        return new Class[] { SchemaProperties.class, SalesforceConnectionProperties.class, OauthProperties.class,
+                SalesforceUserPasswordProperties.class, ProxyProperties.class, UserPasswordProperties.class };
     }
 
 }

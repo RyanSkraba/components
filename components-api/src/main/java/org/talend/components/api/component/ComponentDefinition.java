@@ -61,9 +61,10 @@ public interface ComponentDefinition extends TopLevelDefinition {
     public Trigger[] getTriggers();
 
     /**
-     * Returns true if this {@code ComponentDefinition} will work with the specified {@link ComponentProperties}.
+     * Returns true if this {@code ComponentDefinition} will work with the specified list of {@link ComponentProperties}
+     * .
      */
-    public boolean supportsProperties(ComponentProperties properties);
+    public boolean supportsProperties(ComponentProperties... properties);
 
     /**
      * This shall be a path relative to the current Component definition, ideally is should just be the name of the png
@@ -97,6 +98,10 @@ public interface ComponentDefinition extends TopLevelDefinition {
     // FIXME - An ENUM perhaps?
     public String getPartitioning();
 
+    /**
+     * @return a stream on the maven pom.xml related to the component. This will be used to compute all the component
+     * dependencies.
+     */
     public InputStream getMavenPom();
 
 }
