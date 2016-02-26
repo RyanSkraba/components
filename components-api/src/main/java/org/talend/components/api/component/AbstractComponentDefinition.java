@@ -42,7 +42,7 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
     @Override
     public String[] getFamilies() {
         // Subclass me
-        return new String[] {};
+        return new String[]{};
     }
 
     @Override
@@ -69,7 +69,7 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
 
     /**
      * DOC sgandon Comment method "instanciateComponentProperties".
-     * 
+     *
      * @param compProp
      * @return
      */
@@ -81,7 +81,7 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
                 return null;// TODO throw an exception
             } // else keep going
             Constructor<?> c = propertyClass.getConstructor(String.class);
-            compProp = (ComponentProperties) c.newInstance(new Object[] { "root" });
+            compProp = (ComponentProperties) c.newInstance(new Object[]{"root"});
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
@@ -131,6 +131,7 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
         return false;
     }
 
+    //FIXME use InputComponenetDefinition
     @Override
     public boolean isStartable() {
         return false;
@@ -163,7 +164,7 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
 
 
     public Class<? extends ComponentProperties>[] concatPropertiesClasses(Class<? extends ComponentProperties>[] first,
-            Class<? extends ComponentProperties>[] second) {
+                                                                          Class<? extends ComponentProperties>[] second) {
         Class<? extends ComponentProperties>[] result = Arrays.copyOf(first, first.length + second.length);
         System.arraycopy(second, 0, result, first.length, second.length);
         return result;

@@ -25,6 +25,9 @@ public class SalesforceSink extends SalesforceSourceOrSink implements Sink {
 
     private static final Logger LOG = LoggerFactory.getLogger(SalesforceSink.class);
 
+    public SalesforceSink() {
+    }
+
     @Override
     public ValidationResult validate(Adaptor adaptor) {
         ValidationResult validate = super.validate(adaptor);
@@ -46,7 +49,7 @@ public class SalesforceSink extends SalesforceSourceOrSink implements Sink {
     /**
      * this should never becalled before {@link #validate(Adaptor)} is called but this should not be the case anyway
      * cause validate is called before the pipeline is created.
-     * 
+     *
      * @return the properties
      */
     public TSalesforceOutputProperties getSalesforceOutputProperties() {

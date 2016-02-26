@@ -12,24 +12,19 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
+import aQute.bnd.annotation.component.Component;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.Connector.ConnectorType;
+import org.talend.components.api.component.OutputComponentDefinition;
 import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
+import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.common.ProxyProperties;
-import org.talend.components.common.SchemaProperties;
-import org.talend.components.common.UserPasswordProperties;
-import org.talend.components.common.oauth.OauthProperties;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceModuleProperties;
-import org.talend.components.salesforce.SalesforceUserPasswordProperties;
-import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties.ModuleSubclass;
-
-import aQute.bnd.annotation.component.Component;
+import org.talend.components.salesforce.runtime.SalesforceSink;
 
 /**
  * Component that can connect to a salesforce system and put some data into it.
@@ -37,7 +32,7 @@ import aQute.bnd.annotation.component.Component;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TSalesforceOutputDefinition extends SalesforceDefinition {
+public class TSalesforceOutputDefinition extends SalesforceDefinition implements OutputComponentDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceOutputNew"; //$NON-NLS-1$
 
@@ -73,6 +68,11 @@ public class TSalesforceOutputDefinition extends SalesforceDefinition {
     @Override
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return concatPropertiesClasses(super.getNestedCompatibleComponentPropertiesClass(),
-                new Class[] { SalesforceModuleProperties.class });
+                new Class[]{SalesforceModuleProperties.class});
+    }
+
+    @Override
+    public Sink getRuntime() {
+        return new SalesforceSink();
     }
 }
