@@ -16,21 +16,26 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.BoundedReader;
+import org.talend.components.api.test.ComponentTestUtils;
+import org.talend.components.salesforce.SalesforceRuntime;
 import org.talend.components.salesforce.SalesforceTestBase;
+import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
+import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
 public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
-    /**
-     * Test method for {@link org.talend.components.salesforce.runtime.SalesforceInputReader#start()}.
-     * 
-     * @throws IOException
-     */
     @Test
     public void testStartAdvanceGetCurrent() throws IOException {
-        BoundedReader salesforceInputReader = createSalesforceInputReaderFromAccount(SalesforceTestBase.EXISTING_MODULE_NAME);
+        BoundedReader salesforceInputReader = createSalesforceInputReaderFromAccount(EXISTING_MODULE_NAME);
         try {
             assertTrue(salesforceInputReader.start());
             assertTrue(salesforceInputReader.advance());
@@ -40,11 +45,6 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         }
     }
 
-    /**
-     * Test method for {@link org.talend.components.salesforce.runtime.SalesforceInputReader#start()}.
-     * 
-     * @throws IOException
-     */
     @Test(expected = IOException.class)
     public void testStartException() throws IOException {
         BoundedReader salesforceInputReader = createSalesforceInputReaderFromAccount(SalesforceTestBase.NOT_EXISTING_MODULE_NAME);
@@ -54,5 +54,51 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
             salesforceInputReader.close();
         }
     }
+
+    @Ignore("not finished")
+    @Test
+    public void testInput() throws Throwable {
+        runInputTest(!DYNAMIC);
+    }
+
+    @Ignore("not finished")
+    @Test
+    public void testInputDynamic() throws Throwable {
+        runInputTest(DYNAMIC);
+    }
+
+    protected static final boolean DYNAMIC = true;
+
+    // FIXME - convert to new runtime
+    protected void runInputTest(boolean isDynamic) throws Throwable {
+        ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
+        TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
+                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
+        setupProps(props.connection, !ADD_QUOTES);
+
+        setupModule(props.module, "Account");
+        if (isDynamic) {
+            fixSchemaForDynamic();
+        }
+
+        ComponentTestUtils.checkSerialize(props, errorCollector);
+        SalesforceRuntime runtime = null;
+
+        Map<String, Object> row = new HashMap<>();
+
+        int count = 10;
+        // store rows in SF to retreive them afterward to test the input.
+        List<Map<String, Object>> outputRows = makeRows(count);
+        outputRows = writeRows(runtime, props, outputRows);
+        checkRows(outputRows, count);
+        try {// retreive the row and make sure they are correct
+            List<Map<String, Object>> rows = new ArrayList<>();
+            runtime.input(props, rows);
+            checkRows(rows, count);
+        } finally {// make sure everything is clear.
+            deleteRows(runtime, outputRows);
+        }
+    }
+
 
 }
