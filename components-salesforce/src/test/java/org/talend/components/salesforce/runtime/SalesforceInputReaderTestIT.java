@@ -12,15 +12,16 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedReader;
-import org.talend.components.salesforce.SalesforceTestHelper;
+import org.talend.components.salesforce.SalesforceTestBase;
 
-public class SalesforceInputReaderTestIT {
+public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
     /**
      * Test method for {@link org.talend.components.salesforce.runtime.SalesforceInputReader#start()}.
@@ -29,8 +30,7 @@ public class SalesforceInputReaderTestIT {
      */
     @Test
     public void testStartAdvanceGetCurrent() throws IOException {
-        BoundedReader salesforceInputReader = SalesforceTestHelper
-                .createSalesforceInputReaderFromAccount(SalesforceTestHelper.EXISTING_MODULE_NAME);
+        BoundedReader salesforceInputReader = createSalesforceInputReaderFromAccount(SalesforceTestBase.EXISTING_MODULE_NAME);
         try {
             assertTrue(salesforceInputReader.start());
             assertTrue(salesforceInputReader.advance());
@@ -47,8 +47,7 @@ public class SalesforceInputReaderTestIT {
      */
     @Test(expected = IOException.class)
     public void testStartException() throws IOException {
-        BoundedReader salesforceInputReader = SalesforceTestHelper
-                .createSalesforceInputReaderFromAccount(SalesforceTestHelper.NOT_EXISTING_MODULE_NAME);
+        BoundedReader salesforceInputReader = createSalesforceInputReaderFromAccount(SalesforceTestBase.NOT_EXISTING_MODULE_NAME);
         try {
             assertTrue(salesforceInputReader.start());
         } finally {

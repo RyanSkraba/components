@@ -13,7 +13,7 @@
 package org.talend.components.salesforce.runtime;
 
 import static org.junit.Assert.*;
-import static org.talend.components.salesforce.SalesforceTestHelper.*;
+import static org.talend.components.salesforce.SalesforceTestBase.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,6 +21,7 @@ import java.util.List;
 import org.junit.Test;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult.Result;
@@ -31,7 +32,7 @@ import org.talend.daikon.schema.SchemaFactory;
 import com.sforce.soap.partner.Field;
 import com.sforce.soap.partner.FieldType;
 
-public class SalesforceSourceOrSinkTestIT {
+public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
 
     /**
      * Test method for

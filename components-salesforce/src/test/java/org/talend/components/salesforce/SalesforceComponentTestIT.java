@@ -12,50 +12,37 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
-import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ErrorCollector;
-import org.talend.components.api.adaptor.ComponentDynamicHolder;
 import org.talend.components.api.adaptor.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntimeContainer;
-import org.talend.components.api.service.AbstractComponentTest;
-import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.ComponentTestUtils;
-import org.talend.components.api.test.SimpleComponentRegistry;
-import org.talend.components.api.test.SimpleComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.common.oauth.OauthProperties;
-import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
-import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
-import org.talend.components.salesforce.tsalesforcegetdeleted.TSalesforceGetDeletedDefinition;
-import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampDefinition;
-import org.talend.components.salesforce.tsalesforcegetupdated.TSalesforceGetUpdatedDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
-import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
-import org.talend.components.salesforce.tsalesforcewavebulkexec.TSalesforceWaveBulkExecDefinition;
-import org.talend.components.salesforce.tsalesforcewaveoutputbulkexec.TSalesforceWaveOutputBulkExecDefinition;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.Properties;
@@ -67,73 +54,11 @@ import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
 import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement;
-import org.talend.daikon.schema.SchemaFactory;
 
-import com.sforce.async.AsyncApiException;
-import com.sforce.ws.ConnectionException;
-
-public class SalesforceComponentTestIT extends AbstractComponentTest {
-
-    @Rule
-    public ErrorCollector errorCollector = new ErrorCollector();
-
-    private ComponentService componentService;
-
-    @Before
-    public void initializeComponentRegistryAnsService() {
-        // reset the component service
-        componentService = null;
-    }
-
-    // default implementation for pure java test. Shall be overriden of Spring or OSGI tests
-    @Override
-    public ComponentService getComponentService() {
-        if (componentService == null) {
-            SimpleComponentRegistry testComponentRegistry = new SimpleComponentRegistry();
-            testComponentRegistry.addComponent(TSalesforceConnectionDefinition.COMPONENT_NAME,
-                    new TSalesforceConnectionDefinition());
-            testComponentRegistry.addComponent(TSalesforceBulkExecDefinition.COMPONENT_NAME, new TSalesforceBulkExecDefinition());
-            testComponentRegistry.addComponent(TSalesforceGetServerTimestampDefinition.COMPONENT_NAME,
-                    new TSalesforceGetServerTimestampDefinition());
-            testComponentRegistry.addComponent(TSalesforceInputDefinition.COMPONENT_NAME, new TSalesforceInputDefinition());
-            testComponentRegistry.addComponent(TSalesforceOutputDefinition.COMPONENT_NAME, new TSalesforceOutputDefinition());
-            testComponentRegistry.addComponent(TSalesforceGetDeletedDefinition.COMPONENT_NAME,
-                    new TSalesforceGetDeletedDefinition());
-            testComponentRegistry.addComponent(TSalesforceGetUpdatedDefinition.COMPONENT_NAME,
-                    new TSalesforceGetUpdatedDefinition());
-            testComponentRegistry.addComponent(TSalesforceOutputBulkDefinition.COMPONENT_NAME,
-                    new TSalesforceOutputBulkDefinition());
-            testComponentRegistry.addComponent(TSalesforceWaveBulkExecDefinition.COMPONENT_NAME,
-                    new TSalesforceWaveBulkExecDefinition());
-            testComponentRegistry.addComponent(TSalesforceWaveOutputBulkExecDefinition.COMPONENT_NAME,
-                    new TSalesforceWaveOutputBulkExecDefinition());
-            SalesforceConnectionWizardDefinition scwd = new SalesforceConnectionWizardDefinition();
-            testComponentRegistry.addWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, scwd);
-            testComponentRegistry.addWizard(SalesforceModuleWizardDefinition.COMPONENT_WIZARD_NAME,
-                    new SalesforceModuleWizardDefinition());
-            testComponentRegistry.addWizard(SalesforceConnectionEditWizardDefinition.COMPONENT_WIZARD_NAME,
-                    new SalesforceConnectionEditWizardDefinition());
-            componentService = new SimpleComponentService(testComponentRegistry);
-        }
-        return componentService;
-    }
-
-    static final boolean ADD_QUOTES = true;
-
-    static final boolean DO_NOT_ADD_QUOTES = false;
-
-    // Test schema
-    Schema schema;
-
-    ComponentDynamicHolder dynamic;
-
-    // SalesforceRuntime runtime;
-
-    // Used to make sure we have our own data
-    String random;
+public class SalesforceComponentTestIT extends SalesforceTestBase {
 
     public SalesforceComponentTestIT() {
-        random = Integer.toString(ThreadLocalRandom.current().nextInt(1, 100000));
+        super();
     }
 
     protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props) throws Throwable {
@@ -302,7 +227,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         // check password i18n
         assertEquals("Name", connProps.getProperty("name").getDisplayName());
         connProps.name.setValue("connName");
-        SalesforceTestHelper.setupProps(connProps, DO_NOT_ADD_QUOTES);
+        setupProps(connProps, !ADD_QUOTES);
         Form userPassword = (Form) connFormWizard.getWidget("userPassword").getContent();
         SchemaElement passwordSe = (SchemaElement) userPassword.getWidget("password").getContent();
         assertEquals("Password", passwordSe.getDisplayName());
@@ -347,8 +272,8 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
             if (i == 0) {
                 assertEquals("connName", rp.name);
                 SalesforceConnectionProperties storedConnProps = (SalesforceConnectionProperties) rp.props;
-                assertEquals(SalesforceTestHelper.userId, storedConnProps.userPassword.userId.getValue());
-                assertEquals(SalesforceTestHelper.password, storedConnProps.userPassword.password.getValue());
+                assertEquals(userId, storedConnProps.userPassword.userId.getValue());
+                assertEquals(password, storedConnProps.userPassword.password.getValue());
             } else {
                 SalesforceModuleProperties storedModule = (SalesforceModuleProperties) rp.props;
                 assertEquals(selected.get(i - 1).getName(), storedModule.moduleName.getValue());
@@ -394,7 +319,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
 
     @Test
     public void testLogin() throws Throwable {
-        SalesforceConnectionProperties props = SalesforceTestHelper.setupProps(null, DO_NOT_ADD_QUOTES);
+        SalesforceConnectionProperties props = setupProps(null, !ADD_QUOTES);
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
         props = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), f,
                 "testConnection", props);
@@ -404,7 +329,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
 
     @Test
     public void testLoginWithQuotes() throws Throwable {
-        SalesforceConnectionProperties props = SalesforceTestHelper.setupProps(null, ADD_QUOTES);
+        SalesforceConnectionProperties props = setupProps(null, ADD_QUOTES);
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
         props = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), f,
                 "testConnection", props);
@@ -414,7 +339,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
 
     @Test
     public void testLoginFail() throws Throwable {
-        SalesforceConnectionProperties props = SalesforceTestHelper.setupProps(null, DO_NOT_ADD_QUOTES);
+        SalesforceConnectionProperties props = setupProps(null, !ADD_QUOTES);
         props.userPassword.userId.setValue("blah");
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
         props = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), f,
@@ -425,7 +350,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
 
     @Test
     public void testBulkLogin() throws Throwable {
-        SalesforceConnectionProperties props = SalesforceTestHelper.setupProps(null, DO_NOT_ADD_QUOTES);
+        SalesforceConnectionProperties props = setupProps(null, !ADD_QUOTES);
         props.bulkConnection.setValue(true);
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
         props = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), f,
@@ -436,7 +361,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
 
     @Test
     public void testBulkLoginWithQuotes() throws Throwable {
-        SalesforceConnectionProperties props = SalesforceTestHelper.setupProps(null, ADD_QUOTES);
+        SalesforceConnectionProperties props = setupProps(null, ADD_QUOTES);
         props.bulkConnection.setValue(true);
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
         props = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), f,
@@ -488,7 +413,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
     public void testModuleNames() throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
-        SalesforceTestHelper.setupProps(props.connection, DO_NOT_ADD_QUOTES);
+        setupProps(props.connection, !ADD_QUOTES);
         ComponentTestUtils.checkSerialize(props, errorCollector);
 
         assertEquals(2, props.getForms().size());
@@ -510,7 +435,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
     public void testSchema() throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
-        SalesforceTestHelper.setupProps(props.connection, DO_NOT_ADD_QUOTES);
+        setupProps(props.connection, !ADD_QUOTES);
 
         Form f = props.module.getForm(Form.REFERENCE);
         SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
@@ -532,7 +457,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
         TSalesforceOutputProperties outputProps = (TSalesforceOutputProperties) getComponentService()
                 .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
-        SalesforceTestHelper.setupProps(outputProps.connection, DO_NOT_ADD_QUOTES);
+        setupProps(outputProps.connection, !ADD_QUOTES);
 
         outputProps.outputAction.setValue(TSalesforceOutputProperties.ACTION_DELETE);
         setupModule(outputProps.module, "Account");
@@ -557,7 +482,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
         TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
-        SalesforceTestHelper.setupProps(props.connection, DO_NOT_ADD_QUOTES);
+        setupProps(props.connection, !ADD_QUOTES);
         SalesforceRuntime runtime = createRuntime(definition);
         runtime.setComponentService(getComponentService());
         runtime.connect(props.connection);
@@ -565,7 +490,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         // Referenced properties simulating salesforce connect component
         SalesforceConnectionProperties cProps = (SalesforceConnectionProperties) getComponentService()
                 .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
-        SalesforceTestHelper.setupProps(cProps, DO_NOT_ADD_QUOTES);
+        setupProps(cProps, !ADD_QUOTES);
         cProps.userPassword.password.setValue("xxx");
 
         String compId = "comp1";
@@ -597,7 +522,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
                 .getComponentDefinition(TSalesforceConnectionDefinition.COMPONENT_NAME);
         SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) getComponentService()
                 .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
-        SalesforceTestHelper.setupProps(connProps, DO_NOT_ADD_QUOTES);
+        setupProps(connProps, !ADD_QUOTES);
         SalesforceRuntime connRuntime = createRuntime(connDefinition);
         final Map<String, Object> globalMap = new HashMap<String, Object>();
         final String currentComponentName = TSalesforceConnectionDefinition.COMPONENT_NAME + "_1";
@@ -624,7 +549,7 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         TSalesforceInputProperties inProps = (TSalesforceInputProperties) getComponentService()
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         inProps.connection.referencedComponentId.setValue(currentComponentName);
-        SalesforceTestHelper.setupProps(inProps.connection, DO_NOT_ADD_QUOTES);
+        setupProps(inProps.connection, !ADD_QUOTES);
         SalesforceRuntime inputRuntime = createRuntime(inputDefinition);
         ComponentRuntimeContainer inputContainer = new TestRuntimeContainer() {
 
@@ -650,232 +575,13 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
         }
     }
 
-    protected void setupModule(SalesforceModuleProperties moduleProps, String module) throws Throwable {
-        Form f = moduleProps.getForm(Form.REFERENCE);
-        moduleProps = (SalesforceModuleProperties) PropertiesServiceTest.checkAndBeforeActivate(getComponentService(), f,
-                "moduleName", moduleProps);
-        moduleProps.moduleName.setValue(module);
-        moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
-        schema = (Schema) moduleProps.schema.schema.getValue();
-    }
-
     @Test
-    public void testInput() throws Throwable {
-        runInputTest(!DYNAMIC);
-    }
-
-    @Test
-    public void testInputDynamic() throws Throwable {
-        runInputTest(DYNAMIC);
-    }
-
-    protected static final boolean DYNAMIC = true;
-
-    protected void runInputTest(boolean isDynamic) throws Throwable {
-        ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
-        TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
-                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
-        SalesforceTestHelper.setupProps(props.connection, DO_NOT_ADD_QUOTES);
-
-        setupModule(props.module, "Account");
-        if (isDynamic) {
-            fixSchemaForDynamic();
-        }
-
-        ComponentTestUtils.checkSerialize(props, errorCollector);
-        SalesforceRuntime runtime = createRuntime(definition);
-
-        Map<String, Object> row = new HashMap<>();
-
-        int count = 10;
-        // store rows in SF to retreive them afterward to test the input.
-        List<Map<String, Object>> outputRows = makeRows(count);
-        outputRows = writeRows(runtime, props, outputRows);
-        checkRows(outputRows, count);
-        try {// retreive the row and make sure they are correct
-            List<Map<String, Object>> rows = new ArrayList<>();
-            runtime.input(props, rows);
-            checkRows(rows, count);
-        } finally {// make sure everything is clear.
-            deleteRows(runtime, outputRows);
-        }
-    }
-
-    protected boolean setupDynamic() {
-        if (dynamic != null) {
-            return true;
-        }
-        if (schema == null) {
-            return false;
-        }
-        for (SchemaElement se : schema.getRoot().getChildren()) {
-            if (se.getType() == SchemaElement.Type.DYNAMIC) {
-                if (dynamic == null) {
-                    TestRuntimeContainer container = new TestRuntimeContainer();
-                    dynamic = container.createDynamicHolder();
-                    Schema dynSchema = SchemaFactory.newSchema();
-                    dynSchema.setRoot(SchemaFactory.newSchemaElement(SchemaElement.Type.STRING, "Root"));
-                    dynSchema.getRoot().addChild(SchemaFactory.newSchemaElement(SchemaElement.Type.STRING, "ShippingState"));
-                    dynamic.setSchemaElements(dynSchema.getRoot().getChildren());
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected void addDynamicColumn(Map<String, Object> row) {
-        if (setupDynamic()) {
-            dynamic.addFieldValue("ShippingState", "CA");
-            row.put("dynamic", dynamic);
-        }
-    }
-
-    protected void fixSchemaForDynamic() {
-        SchemaElement dynElement = SchemaFactory.newSchemaElement(SchemaElement.Type.DYNAMIC, "dynamic");
-        schema.getRoot().addChild(dynElement);
-        Iterator<SchemaElement> it = schema.getRoot().getChildren().iterator();
-        while (it.hasNext()) {
-            SchemaElement se = it.next();
-            if (se.getName().equals("ShippingState")) {
-                it.remove();
-                break;
-            }
-        }
-    }
-
-    protected List<Map<String, Object>> makeRows(int count) {
-        List<Map<String, Object>> outputRows = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            Map<String, Object> row = new HashMap<>();
-            row.put("Name", "TestName");
-            row.put("ShippingStreet", SalesforceTestHelper.TEST_KEY);
-            row.put("ShippingPostalCode", Integer.toString(i));
-            row.put("BillingStreet", "123 Main Street");
-            row.put("BillingState", "CA");
-            row.put("BillingPostalCode", random);
-            addDynamicColumn(row);
-            System.out.println("out: " + row.get("Name") + " id: " + row.get("Id") + " post: " + row.get("BillingPostalCode")
-                    + " st: " + " street: " + row.get("BillingStreet"));
-            outputRows.add(row);
-        }
-        return outputRows;
-    }
-
-    protected List<Map<String, Object>> checkRows(List<Map<String, Object>> rows, int count) {
-        List<Map<String, Object>> checkedRows = new ArrayList<>();
-
-        int checkCount = 0;
-        int checkDynamicCount = 0;
-        for (Map<String, Object> row : rows) {
-            System.out.println("check: " + row.get("Name") + " id: " + row.get("Id") + " post: " + row.get("BillingPostalCode")
-                    + " st: " + " post: " + row.get("BillingStreet"));
-            String check = (String) row.get("ShippingStreet");
-            if (check == null || !check.equals(SalesforceTestHelper.TEST_KEY)) {
-                continue;
-            }
-            check = (String) row.get("BillingPostalCode");
-            if (check == null || !check.equals(random)) {
-                continue;
-            }
-            checkCount++;
-            if (dynamic != null) {
-                ComponentDynamicHolder d = (ComponentDynamicHolder) row.get("dynamic");
-                assertEquals("CA", d.getFieldValue("ShippingState"));
-                checkDynamicCount++;
-            }
-            assertEquals("TestName", row.get("Name"));
-            assertEquals("123 Main Street", row.get("BillingStreet"));
-            assertEquals("CA", row.get("BillingState"));
-            checkedRows.add(row);
-        }
-        assertEquals(count, checkCount);
-        if (dynamic != null) {
-            assertEquals(count, checkDynamicCount);
-            System.out.println("Check dynamic rows: " + checkDynamicCount);
-        }
-        return checkedRows;
-    }
-
-    static public List<String> getDeleteIds(List<Map<String, Object>> rows) {
-        List<String> ids = new ArrayList<>();
-        for (Map<String, Object> row : rows) {
-            System.out.println("del: " + row.get("Name") + " id: " + row.get("Id") + " post: " + row.get("BillingPostalCode")
-                    + " st: " + " post: " + row.get("BillingStreet"));
-            String check = (String) row.get("ShippingStreet");
-            if (check == null || !check.equals(SalesforceTestHelper.TEST_KEY)) {
-                continue;
-            }
-            ids.add((String) row.get("Id"));
-        }
-        return ids;
-    }
-
-    protected List<Map<String, Object>> readAndCheckRows(SalesforceRuntime runtime, SalesforceConnectionModuleProperties props,
-            int count) throws Exception {
-        List<Map<String, Object>> inputRows = new ArrayList<>();
-        TSalesforceInputProperties inputProps = (TSalesforceInputProperties) getComponentService()
-                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
-        inputProps.connection = props.connection;
-        inputProps.module = props.module;
-        inputProps.batchSize.setValue(200);
-        runtime.input(inputProps, inputRows);
-        return checkRows(inputRows, count);
-    }
-
-    // Returns the rows written (having been re-read so they have their Ids)
-    protected List<Map<String, Object>> writeRows(SalesforceRuntime runtime, SalesforceConnectionModuleProperties props,
-            List<Map<String, Object>> outputRows) throws Exception {
-        TSalesforceOutputProperties outputProps;
-        outputProps = (TSalesforceOutputProperties) getComponentService()
-                .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
-        outputProps.connection = props.connection;
-        outputProps.module = props.module;
-        outputProps.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
-        runtime.output(outputProps, outputRows);
-        return readAndCheckRows(runtime, props, outputRows.size());
-    }
-
-    protected void deleteRows(SalesforceRuntime runtime, List<Map<String, Object>> inputRows) throws Exception {
-        List<String> ids = getDeleteIds(inputRows);
-        for (String id : ids) {
-            runtime.delete(id);
-        }
-    }
-
-    protected void checkAndDelete(SalesforceRuntime runtime, SalesforceConnectionModuleProperties props, int count)
-            throws Exception {
-        List<Map<String, Object>> inputRows = readAndCheckRows(runtime, props, count);
-        deleteRows(runtime, inputRows);
-        readAndCheckRows(runtime, props, 0);
-    }
-
-    @Test
-    public void testBulkExec() throws Throwable {
-        ComponentDefinition definition = getComponentService()
-                .getComponentDefinition(TSalesforceBulkExecDefinition.COMPONENT_NAME);
-        TSalesforceBulkExecProperties props;
-        props = (TSalesforceBulkExecProperties) getComponentService()
-                .getComponentProperties(TSalesforceBulkExecDefinition.COMPONENT_NAME);
-        SalesforceTestHelper.setupProps(props.connection, DO_NOT_ADD_QUOTES);
-
-        if (false) {
-            Form f = props.module.getForm(Form.REFERENCE);
-            SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
-            moduleProps = (SalesforceModuleProperties) PropertiesServiceTest.checkAndBeforePresent(getComponentService(), f,
-                    "moduleName", moduleProps);
-            moduleProps.moduleName.setValue("Account");
-            checkAndAfter(f, "moduleName", moduleProps);
-            props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
-
-            ComponentTestUtils.checkSerialize(props, errorCollector);
-
-            SalesforceRuntime runtime = createRuntime(definition);
-
-            int count = 10;
-            List<Map<String, Object>> outputRows = makeRows(count);
-            runtime.output(props, outputRows);
-            checkAndDelete(runtime, props, count);
+    public void generateJavaNestedCompPropClassNames() {
+        Set<ComponentDefinition> allComponents = getComponentService().getAllComponents();
+        for (ComponentDefinition cd : allComponents) {
+            ComponentProperties props = cd.createProperties();
+            String javaCode = PropertiesTestUtils.generatedNestedComponentCompatibilitiesJavaCode(props);
+            System.out.println("Nested Props for (" + cd.getClass().getSimpleName() + ".java:1)" + javaCode);
         }
     }
 
@@ -893,59 +599,4 @@ public class SalesforceComponentTestIT extends AbstractComponentTest {
     public void testAllRuntime() {
         ComponentTestUtils.testAllRuntimeAvaialble(getComponentService());
     }
-
-    public static void main(String[] args) throws Exception {
-        deleteAllAccountTestRows();
-
-    }
-
-    public static void deleteAllAccountTestRows() throws ConnectionException, AsyncApiException, Exception {
-        SalesforceRuntime runtime = new SalesforceRuntime(new DefaultComponentRuntimeContainerImpl());
-        SalesforceComponentTestIT salesforceComponentTestIT = new SalesforceComponentTestIT();
-        TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init();
-        SalesforceTestHelper.setupProps(props.connection, DO_NOT_ADD_QUOTES);
-        props.batchSize.setValue(200);
-        props.module.moduleName.setValue("Account");
-        // connecting
-        runtime.connect(props.connection);
-        // getting schema
-        props.module.schema.schema.setValue(runtime.getSchema("Account"));
-        // getting all rows
-        List<Map<String, Object>> rows = new ArrayList<>();
-        runtime.input(props, rows);
-        // filtering rows
-        List<Map<String, Object>> rowToBeDeleted = getAllTestRows(rows);
-        // deleting rows
-        List<String> ids = salesforceComponentTestIT.getDeleteIds(rowToBeDeleted);
-        for (String id : ids) {
-            runtime.delete(id);
-        }
-    }
-
-    static List<Map<String, Object>> getAllTestRows(List<Map<String, Object>> rows) {
-        List<Map<String, Object>> checkedRows = new ArrayList<>();
-
-        for (Map<String, Object> row : rows) {
-            String check = (String) row.get("ShippingStreet");
-            if (check == null || !check.equals(SalesforceTestHelper.TEST_KEY)) {
-                continue;
-            }
-            System.out.println("Test row is: " + row.get("Name") + " id: " + row.get("Id") + " post: "
-                    + row.get("BillingPostalCode") + " st: " + " post: " + row.get("BillingStreet"));
-            checkedRows.add(row);
-        }
-        return checkedRows;
-    }
-
-    @Test
-    public void generateJavaNestedCompPropClassNames() {
-        Set<ComponentDefinition> allComponents = getComponentService().getAllComponents();
-        for (ComponentDefinition cd : allComponents) {
-            ComponentProperties props = cd.createProperties();
-            String javaCode = PropertiesTestUtils.generatedNestedComponentCompatibilitiesJavaCode(props);
-            System.out.println("Nested Props for (" + cd.getClass().getSimpleName() + ".java:1)" + javaCode);
-        }
-
-    }
-
 }

@@ -12,24 +12,26 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Calendar;
 import java.util.Map;
 
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedReader;
-import org.talend.components.salesforce.SalesforceTestHelper;
+import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
 
-public class SalesforceServerTimeStampReaderTestIT {
+public class SalesforceServerTimeStampReaderTestIT extends SalesforceTestBase {
 
     @Test
     public void testGetServerTimestamp() throws Throwable {
         TSalesforceGetServerTimestampProperties props = (TSalesforceGetServerTimestampProperties) new TSalesforceGetServerTimestampProperties(
                 "foo").init();
-        SalesforceTestHelper.setupProps(props.connection, !SalesforceTestHelper.ADD_QUOTES);
-        BoundedReader bounderReader = SalesforceTestHelper.createBounderReader(props);
+        setupProps(props.connection, !ADD_QUOTES);
+        BoundedReader bounderReader = createBoundedReader(props);
         try {
             assertTrue(bounderReader.start());
             assertFalse(bounderReader.advance());

@@ -18,7 +18,7 @@ import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 
-final class SalesforceWriteOperation implements WriteOperation<WriterResult> {
+public final class SalesforceWriteOperation implements WriteOperation<WriterResult> {
 
     private SalesforceSink ssink;
 
