@@ -12,7 +12,7 @@
             <defaultValue>file-input</defaultValue>
         </requiredProperty>
         <requiredProperty key="version">
-            <defaultValue>0.1.0.BUILD-SNAPSHOT</defaultValue>
+            <defaultValue>0.1.0.SNAPSHOT</defaultValue>
         </requiredProperty>
         <requiredProperty key="package">
             <defaultValue>org.talend.components.fileinput</defaultValue>

@@ -11,19 +11,21 @@ import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.Connector;
-import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Connector.ConnectorType;
+import org.talend.components.api.component.InputComponentDefinition;
+import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
-import org.talend.components.api.runtime.ComponentRuntime;
+import org.talend.components.api.component.runtime.Source;
+import org.talend.components.api.properties.ComponentProperties;
 
 import aQute.bnd.annotation.component.Component;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX + ${componentName}Definition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class ${componentName}Definition extends AbstractComponentDefinition {
+public class ${componentName}Definition extends AbstractComponentDefinition implements InputComponentDefinition {
 
     public static final String COMPONENT_NAME = "${componentName}"; //$NON-NLS-1$
 
-    
+
     public ${componentName}Definition() {
         setConnectors(new Connector(ConnectorType.FLOW, 0, 1));
         setTriggers(new Trigger(TriggerType.ITERATE, 1, 1), new Trigger(TriggerType.SUBJOB_OK, 1, 0),
@@ -34,17 +36,6 @@ public class ${componentName}Definition extends AbstractComponentDefinition {
     public String[] getFamilies() {
         return new String[] { "File/input" };
     }
-    
-    @Override
-    public ComponentRuntime createRuntime() {
-        return new ${componentName}Runtime();
-    }
-
-    
-    @Override
-    public boolean isStartable() {
-        return true;
-    }    
 
     @Override
     public String getPngImagePath(ComponentImageType imageType) {
@@ -67,7 +58,12 @@ public class ${componentName}Definition extends AbstractComponentDefinition {
     }
 
     @Override
-    public Class<?> getPropertyClass() {
+    public Class<? extends ComponentProperties> getPropertyClass() {
         return ${componentName}Properties.class;
+    }
+
+    @Override
+    public Source getRuntime() {
+        return new ${componentName}Source();
     }
 }
