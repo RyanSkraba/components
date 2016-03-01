@@ -12,33 +12,29 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcegetservertimestamp;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.Connector.ConnectorType;
+import org.talend.components.api.component.InputComponentDefinition;
 import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
+import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
-import org.talend.components.salesforce.SalesforceRuntime;
 import org.talend.components.salesforce.SalesforceUserPasswordProperties;
-import org.talend.daikon.schema.Schema;
+import org.talend.components.salesforce.runtime.SalesforceSource;
 
 import aQute.bnd.annotation.component.Component;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceGetServerTimestampDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinition {
+public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinition implements InputComponentDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceGetServerTimestampNew"; //$NON-NLS-1$
 
@@ -51,42 +47,6 @@ public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinitio
     }
 
     @Override
-    public ComponentRuntime createRuntime() {
-        return new SalesforceRuntime() {
-
-            Calendar result;
-
-            Schema schema;
-
-            @Override
-            public void inputBegin(ComponentProperties props) throws Exception {
-                TSalesforceGetServerTimestampProperties gdProps = (TSalesforceGetServerTimestampProperties) props;
-                connect(gdProps.connection);
-                schema = (Schema) gdProps.schema.schema.getValue();
-                result = connection.getServerTimestamp().getTimestamp();
-            }
-
-            @Override
-            public Map<String, Object> inputRow() throws Exception {
-                if (result == null) {
-                    return null;
-                }
-
-                Map<String, Object> map = new HashMap<>();
-                // FIXME - error checking - what if there are no columns
-                map.put(schema.getRoot().getChildren().get(0).getName(), result);
-                result = null;
-                return map;
-            }
-        };
-    }
-
-    @Override
-    public boolean isStartable() {
-        return true;
-    }
-
-    @Override
     public String getPartitioning() {
         return AUTO;
     }
@@ -96,4 +56,8 @@ public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinitio
         return TSalesforceGetServerTimestampProperties.class;
     }
 
+    @Override
+    public Source getRuntime() {
+        return new SalesforceSource();
+    }
 }

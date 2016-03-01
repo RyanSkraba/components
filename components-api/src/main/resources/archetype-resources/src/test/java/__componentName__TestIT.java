@@ -35,7 +35,7 @@ public class ${componentName}TestIT {
     }
 
     @Test
-    // this is an integration test to check that the pom is porperly copied into the built artifact.
+    // this is an integration test to check that the pom is properly copied into the built artifact.
     public void testDependencies() {
         ${componentName}Definition def = (${componentName}Definition) getComponentService().getComponentDefinition("${componentName}");
         assertNotNull(def.getMavenPom());

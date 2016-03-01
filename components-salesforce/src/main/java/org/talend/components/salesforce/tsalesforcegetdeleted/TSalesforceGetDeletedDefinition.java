@@ -16,26 +16,19 @@ import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.Connector.ConnectorType;
+import org.talend.components.api.component.InputComponentDefinition;
 import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
+import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.runtime.ComponentRuntime;
-import org.talend.components.common.ProxyProperties;
-import org.talend.components.common.UserPasswordProperties;
-import org.talend.components.common.oauth.OauthProperties;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
-import org.talend.components.salesforce.SalesforceGetDeletedUpdatedProperties;
-import org.talend.components.salesforce.SalesforceRuntime;
-import org.talend.components.salesforce.SalesforceUserPasswordProperties;
-
-import com.sforce.soap.partner.GetDeletedResult;
+import org.talend.components.salesforce.runtime.SalesforceSource;
 
 import aQute.bnd.annotation.component.Component;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceGetDeletedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TSalesforceGetDeletedDefinition extends SalesforceDefinition {
+public class TSalesforceGetDeletedDefinition extends SalesforceDefinition implements InputComponentDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceGetDeletedNew"; //$NON-NLS-1$
 
@@ -47,37 +40,17 @@ public class TSalesforceGetDeletedDefinition extends SalesforceDefinition {
     }
 
     @Override
-    public ComponentRuntime createRuntime() {
-        return new SalesforceRuntime() {
-
-            @Override
-            public void inputBegin(ComponentProperties props) throws Exception {
-
-                SalesforceGetDeletedUpdatedProperties gdProps = (SalesforceGetDeletedUpdatedProperties) props;
-                String module = gdProps.module.moduleName.getStringValue();
-
-                GetDeletedResult result = connection.getDeleted(module, gdProps.startDate.getCalendarValue(),
-                        gdProps.endDate.getCalendarValue());
-
-                // FIXME - finish this
-            }
-
-        };
-    }
-
-    @Override
-    public boolean isStartable() {
-        return true;
-    }
-
-    @Override
     public String getPartitioning() {
         return AUTO;
     }
 
     @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
-        return SalesforceConnectionProperties.class;
+        return TSalesforceGetDeletedProperties.class;
     }
 
+    @Override
+    public Source getRuntime() {
+        return new SalesforceSource();
+    }
 }

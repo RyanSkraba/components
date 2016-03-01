@@ -14,12 +14,27 @@ package org.talend.components.api.exception;
 
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.exception.error.ErrorCode;
+import org.talend.daikon.properties.ValidationResult;
 
 public class ComponentException extends TalendRuntimeException {
 
+    private static final long serialVersionUID = -84662653622272070L;
+
+    private ValidationResult validationResult;
+
     public ComponentException(ErrorCode code) {
         super(code);
+    }
+
+    public ComponentException(Throwable cause) {
+        super(CommonErrorCodes.UNEXPECTED_EXCEPTION, cause);
+    }
+
+    public ComponentException(ValidationResult vr) {
+        super(CommonErrorCodes.UNEXPECTED_EXCEPTION);
+        setValidationResult(vr);
     }
 
     public ComponentException(ErrorCode code, Throwable cause) {
@@ -34,6 +49,11 @@ public class ComponentException extends TalendRuntimeException {
         super(code, cause, context);
     }
 
-    private static final long serialVersionUID = -84662653622272070L;
-    // FIXME this should be similar to dataprep Exception, be will be gathered into a common back-end project
+    public ValidationResult getValidationResult() {
+        return validationResult;
+    }
+
+    public void setValidationResult(ValidationResult validationResult) {
+        this.validationResult = validationResult;
+    }
 }

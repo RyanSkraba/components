@@ -16,8 +16,10 @@ import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.Connector.ConnectorType;
+import org.talend.components.api.component.InputComponentDefinition;
 import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
+import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.SchemaProperties;
@@ -28,13 +30,14 @@ import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.SalesforceUserPasswordProperties;
+import org.talend.components.salesforce.runtime.SalesforceSource;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties.ModuleSubclass;
 
 import aQute.bnd.annotation.component.Component;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TSalesforceBulkExecDefinition extends SalesforceDefinition {
+public class TSalesforceBulkExecDefinition extends SalesforceDefinition implements InputComponentDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceBulkExecNew"; //$NON-NLS-1$
 
@@ -44,11 +47,6 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition {
         setConnectors(new Connector(ConnectorType.FLOW, 0, 0), new Connector(ConnectorType.MAIN, 0, 1),
                 new Connector(ConnectorType.REJECT, 0, 1));
         setTriggers(new Trigger(TriggerType.SUBJOB_OK, 1, 0), new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
-    }
-
-    @Override
-    public boolean isStartable() {
-        return true;
     }
 
     @Override
@@ -68,4 +66,8 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition {
                 new Class[] { SalesforceModuleProperties.class });
     }
 
+    @Override
+    public Source getRuntime() {
+        return new SalesforceSource();
+    }
 }

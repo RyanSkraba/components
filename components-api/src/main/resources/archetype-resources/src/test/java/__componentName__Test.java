@@ -19,12 +19,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.talend.components.api.exception.error.ComponentsErrorCode;
-import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.test.SimpleComponentRegistry;
 import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.schema.SchemaElement;
 import org.talend.daikon.schema.SchemaElement.Type;
 import org.talend.daikon.schema.SchemaFactory;
@@ -37,7 +37,7 @@ public class ${componentName}Test {
     private ComponentServiceImpl componentService;
 
     @Before
-    public void initializeComponentRegistryAnsService() {
+    public void initializeComponentRegistryAndService() {
         // reset the component service
         componentService = null;
     }
@@ -64,9 +64,16 @@ public class ${componentName}Test {
             writer.close();
 
             props.filename.setValue(temp.getAbsolutePath());
-            ComponentRuntime runtime = def.createRuntime();
+            ${componentName}Source source = (${componentName}Source) def.getRuntime();
+            source.initialize(null, props);
+            ${componentName}Reader reader = (${componentName}Reader) source.createReader(null);
+            boolean available;
             List<Map<String, Object>> rows = new ArrayList<>();
-            runtime.input(props, rows);
+            for (available = reader.start(); available; available = reader.advance()) {
+                Map<String, Object> row = (Map<String, Object>) reader.getCurrent();
+                rows.add(row);
+            }
+            reader.close();
             System.out.println(rows);
             assertEquals(2, rows.size());
             assertEquals("The first line", rows.get(0).get("line"));
@@ -82,9 +89,13 @@ public class ${componentName}Test {
         ${componentName}Properties props = (${componentName}Properties) getComponentService().getComponentProperties("${componentName}");
         // check empty schema exception
         props.schema.schema.setChildren(Collections.EMPTY_LIST);
-        ComponentRuntime runtime = def.createRuntime();
+        ${componentName}Source source;
+        source = (${componentName}Source) def.getRuntime();
+        source.initialize(null, props);
+        ${componentName}Reader reader;
+        reader = (${componentName}Reader) source.createReader(null);
         try {
-            runtime.inputBegin(props);
+            reader.start();
             fail("Should have thrown an exception");
         } catch (Exception e) {
             if (!(e instanceof TalendRuntimeException
@@ -97,8 +108,13 @@ public class ${componentName}Test {
         // check wrong schema exception
         props.schema.schema.setChildren(new ArrayList<SchemaElement>());
         props.schema.schema.addChild(SchemaFactory.newSchemaElement(Type.INT, "line"));
+
+        source = (${componentName}Source) def.getRuntime();
+        source.initialize(null, props);
+        reader = (${componentName}Reader) source.createReader(null);
+
         try {
-            runtime.inputBegin(props);
+            reader.start();
             fail("Should have thrown an exception");
         } catch (Exception e) {
             if (!(e instanceof TalendRuntimeException
@@ -108,7 +124,6 @@ public class ${componentName}Test {
                 fail("wrong exception caught :" + stack.toString());
             }
         }
-
     }
     
     

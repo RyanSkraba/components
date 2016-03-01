@@ -18,6 +18,7 @@ import static org.talend.daikon.properties.presentation.Widget.*;
 import java.util.List;
 
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.Property;
@@ -28,7 +29,7 @@ import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement;
 
-public class SalesforceModuleListProperties extends ComponentProperties {
+public class SalesforceModuleListProperties extends ComponentProperties implements SalesforceProvideConnectionProperties {
 
     private SalesforceConnectionProperties connectionProps;
 
@@ -70,17 +71,14 @@ public class SalesforceModuleListProperties extends ComponentProperties {
     }
 
     public void beforeFormPresentMain() throws Exception {
-        SalesforceRuntime conn = new SalesforceRuntime();
-        conn.connect(connectionProps);
-        moduleNames = conn.getSchemaNames();
+        moduleNames = SalesforceSourceOrSink.getSchemaNames(this);
         moduleName.setPossibleValues(moduleNames);
         getForm(Form.MAIN).setAllowBack(true);
         getForm(Form.MAIN).setAllowFinish(true);
     }
 
     public ValidationResult afterFormFinishMain(Repository<Properties> repo) throws Exception {
-        SalesforceRuntime conn = new SalesforceRuntime();
-        ValidationResult vr = conn.connectWithResult(connectionProps);
+        ValidationResult vr = SalesforceSourceOrSink.validateConnection(this);
         if (vr.getStatus() != ValidationResult.Result.OK) {
             return vr;
         }
@@ -94,7 +92,7 @@ public class SalesforceModuleListProperties extends ComponentProperties {
             SalesforceModuleProperties modProps = new SalesforceModuleProperties(nl.getName());
             modProps.connection = connectionProps;
             modProps.init();
-            Schema schema = conn.getSchema(nl.getName());
+            Schema schema = SalesforceSourceOrSink.getSchema(this, nl.getName());
             modProps.moduleName.setValue(nl.getName());
             modProps.schema.schema.setValue(schema);
             repo.storeProperties(modProps, nl.getName(), connRepLocation, schema);
@@ -102,4 +100,8 @@ public class SalesforceModuleListProperties extends ComponentProperties {
         return ValidationResult.OK;
     }
 
+    @Override
+    public SalesforceConnectionProperties getConnectionProperties() {
+        return connectionProps;
+    }
 }

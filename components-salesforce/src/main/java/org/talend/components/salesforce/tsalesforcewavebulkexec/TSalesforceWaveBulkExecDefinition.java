@@ -16,16 +16,19 @@ import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.Connector.ConnectorType;
+import org.talend.components.api.component.InputComponentDefinition;
 import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
+import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
+import org.talend.components.salesforce.runtime.SalesforceSource;
 
 import aQute.bnd.annotation.component.Component;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceWaveBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TSalesforceWaveBulkExecDefinition extends SalesforceDefinition {
+public class TSalesforceWaveBulkExecDefinition extends SalesforceDefinition implements InputComponentDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceWaveBulkExecNew"; //$NON-NLS-1$
 
@@ -38,11 +41,6 @@ public class TSalesforceWaveBulkExecDefinition extends SalesforceDefinition {
     }
 
     @Override
-    public boolean isStartable() {
-        return true;
-    }
-
-    @Override
     public String getPartitioning() {
         return NONE;
     }
@@ -52,4 +50,8 @@ public class TSalesforceWaveBulkExecDefinition extends SalesforceDefinition {
         return TSalesforceWaveBulkExecProperties.class;
     }
 
+    @Override
+    public Source getRuntime() {
+        return new SalesforceSource();
+    }
 }

@@ -10,48 +10,23 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.runtime;
+package org.talend.components.api.container;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.schema.SchemaElement;
 
-/**
- * created by pbailly on 16 Dec 2015 Detailled comment
- *
- */
 public class DefaultComponentRuntimeContainerImplTest {
-
-    @Test
-    public void testGlobalMap() {
-        DefaultComponentRuntimeContainerImpl runtimeContainer = new DefaultComponentRuntimeContainerImpl();
-        Map<String, Object> globalMap = runtimeContainer.getGlobalMap();
-        assertEquals(0, globalMap.size());
-        globalMap.put("key", "value");
-        assertEquals(1, runtimeContainer.getGlobalMap().size());
-    }
-
-    @Test
-    public void testGetCurrentComponentName() {
-        DefaultComponentRuntimeContainerImpl runtimeContainer = new DefaultComponentRuntimeContainerImpl();
-        assertNull(runtimeContainer.getCurrentComponentName());
-        runtimeContainer = new DefaultComponentRuntimeContainerImpl(){
-            @Override
-            public String getCurrentComponentName() {
-                return "tSalesforceConnectionNew_1";
-            }
-        };
-        assertEquals("tSalesforceConnectionNew_1", runtimeContainer.getCurrentComponentName());
-    }
 
     @Test
     public void testFormatDate() throws ParseException {

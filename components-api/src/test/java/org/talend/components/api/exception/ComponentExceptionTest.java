@@ -20,11 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.exception.error.ComponentsApiErrorCode;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.error.CommonErrorCodes;
+import org.talend.daikon.properties.ValidationResult;
 
-/**
- * created by pbailly on 16 Dec 2015 Detailled comment
- *
- */
 public class ComponentExceptionTest {
 
     @Test
@@ -47,6 +44,16 @@ public class ComponentExceptionTest {
         exception = new ComponentException(ComponentsApiErrorCode.WRONG_WIZARD_NAME, new Throwable("message v2"));
         assertEquals(ComponentsApiErrorCode.WRONG_WIZARD_NAME, exception.getCode());
         assertEquals("message v2", exception.getCause().getMessage());
+
+        ValidationResult vr = new ValidationResult();
+        vr.setMessage("vr");
+        exception = new ComponentException(vr);
+        assertTrue(vr == exception.getValidationResult());
+
+        ValidationResult vr2 = new ValidationResult();
+        vr2.setMessage("vr2");
+        exception.setValidationResult(vr2);
+        assertTrue(vr2 == exception.getValidationResult());
 
         LOG.warn("End of test.");
         LOG.warn("____________________");

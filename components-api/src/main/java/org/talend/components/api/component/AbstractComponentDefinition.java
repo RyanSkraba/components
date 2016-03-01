@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.talend.components.api.AbstractTopLevelDefinition;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.exception.TalendRuntimeException;
 
 public abstract class AbstractComponentDefinition extends AbstractTopLevelDefinition implements ComponentDefinition {
 
@@ -37,12 +38,10 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
         this.triggers = conns;
     }
 
-    // protected Class<?> propertiesClass;
-
     @Override
     public String[] getFamilies() {
         // Subclass me
-        return new String[] {};
+        return new String[]{};
     }
 
     @Override
@@ -62,18 +61,12 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
 
     @Override
     public ComponentProperties createProperties() {
-        ComponentProperties compProp = instanciateComponentProperties();
+        ComponentProperties compProp = instantiateComponentProperties();
         compProp.init();
         return compProp;
     }
 
-    /**
-     * DOC sgandon Comment method "instanciateComponentProperties".
-     * 
-     * @param compProp
-     * @return
-     */
-    public ComponentProperties instanciateComponentProperties() {
+    public ComponentProperties instantiateComponentProperties() {
         ComponentProperties compProp = null;
         try {
             Class<?> propertyClass = getPropertyClass();
@@ -81,22 +74,16 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
                 return null;// TODO throw an exception
             } // else keep going
             Constructor<?> c = propertyClass.getConstructor(String.class);
-            compProp = (ComponentProperties) c.newInstance(new Object[] { "root" });
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e.getCause());
+            compProp = (ComponentProperties) c.newInstance(new Object[]{"root"});
+        } catch (Exception e) {
+            TalendRuntimeException.unexpectedException(e);
         }
         return compProp;
     }
 
     @Override
     public ComponentProperties createRuntimeProperties() {
-        ComponentProperties compProp = instanciateComponentProperties();
+        ComponentProperties compProp = instantiateComponentProperties();
         compProp.initForRuntime();
         return compProp;
     }
@@ -133,6 +120,8 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
 
     @Override
     public boolean isStartable() {
+        if (this instanceof InputComponentDefinition)
+            return true;
         return false;
     }
 
@@ -172,7 +161,7 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
 
 
     public Class<? extends ComponentProperties>[] concatPropertiesClasses(Class<? extends ComponentProperties>[] first,
-            Class<? extends ComponentProperties>[] second) {
+                                                                          Class<? extends ComponentProperties>[] second) {
         Class<? extends ComponentProperties>[] result = Arrays.copyOf(first, first.length + second.length);
         System.arraycopy(second, 0, result, first.length, second.length);
         return result;
