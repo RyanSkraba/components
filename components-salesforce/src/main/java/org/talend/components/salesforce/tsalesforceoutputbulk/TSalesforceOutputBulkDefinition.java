@@ -57,4 +57,8 @@ public class TSalesforceOutputBulkDefinition extends SalesforceDefinition implem
                 new Class[] {SchemaProperties.class });
     }
 
+    @Override
+    public Sink getRuntime() {
+        return new SalesforceSink();
+    }
 }

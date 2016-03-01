@@ -16,20 +16,13 @@ import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.Connector.ConnectorType;
-import org.talend.components.api.component.InputComponentDefinition;
 import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
-import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.common.ProxyProperties;
-import org.talend.components.common.UserPasswordProperties;
-import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
-import org.talend.components.salesforce.SalesforceUserPasswordProperties;
 
 import aQute.bnd.annotation.component.Component;
-import org.talend.components.salesforce.runtime.SalesforceSource;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceConnectionDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)

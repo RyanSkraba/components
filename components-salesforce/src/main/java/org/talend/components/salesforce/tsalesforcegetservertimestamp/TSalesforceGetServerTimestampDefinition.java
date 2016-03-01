@@ -56,4 +56,8 @@ public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinitio
         return TSalesforceGetServerTimestampProperties.class;
     }
 
+    @Override
+    public Source getRuntime() {
+        return new SalesforceSource();
+    }
 }

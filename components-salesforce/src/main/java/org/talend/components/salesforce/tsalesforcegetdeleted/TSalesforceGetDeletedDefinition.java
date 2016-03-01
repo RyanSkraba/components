@@ -21,11 +21,7 @@ import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.common.ProxyProperties;
-import org.talend.components.common.UserPasswordProperties;
-import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
-import org.talend.components.salesforce.SalesforceUserPasswordProperties;
 import org.talend.components.salesforce.runtime.SalesforceSource;
 
 import aQute.bnd.annotation.component.Component;
@@ -53,4 +49,8 @@ public class TSalesforceGetDeletedDefinition extends SalesforceDefinition implem
         return TSalesforceGetDeletedProperties.class;
     }
 
+    @Override
+    public Source getRuntime() {
+        return new SalesforceSource();
+    }
 }
