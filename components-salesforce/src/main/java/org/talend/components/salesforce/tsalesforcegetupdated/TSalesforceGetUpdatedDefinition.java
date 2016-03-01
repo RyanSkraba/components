@@ -72,11 +72,4 @@ public class TSalesforceGetUpdatedDefinition extends SalesforceDefinition {
         return SalesforceGetDeletedUpdatedProperties.class;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
-        return new Class[] { SchemaProperties.class, SalesforceModuleProperties.class, SalesforceConnectionProperties.class,
-                OauthProperties.class, SalesforceUserPasswordProperties.class, ProxyProperties.class,
-                UserPasswordProperties.class };
-    }
 }

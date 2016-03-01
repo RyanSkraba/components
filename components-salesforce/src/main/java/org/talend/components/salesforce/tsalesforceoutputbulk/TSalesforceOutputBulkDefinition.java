@@ -49,11 +49,4 @@ public class TSalesforceOutputBulkDefinition extends SalesforceDefinition {
         return TSalesforceOutputBulkProperties.class;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
-        return concatPropertiesClasses(super.getNestedCompatibleComponentPropertiesClass(),
-                new Class[] {SchemaProperties.class });
-    }
-
 }

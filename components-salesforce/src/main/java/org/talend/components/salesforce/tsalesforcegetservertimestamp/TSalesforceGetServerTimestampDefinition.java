@@ -96,11 +96,4 @@ public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinitio
         return TSalesforceGetServerTimestampProperties.class;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
-        return new Class[] { SchemaProperties.class, SalesforceConnectionProperties.class, OauthProperties.class,
-                SalesforceUserPasswordProperties.class, ProxyProperties.class, UserPasswordProperties.class };
-    }
-
 }

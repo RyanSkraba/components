@@ -73,11 +73,4 @@ public class TSalesforceConnectionDefinition extends SalesforceDefinition {
     public Class<? extends ComponentProperties> getPropertyClass() {
         return SalesforceConnectionProperties.class;
     }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
-        return new Class[] { OauthProperties.class, SalesforceUserPasswordProperties.class, ProxyProperties.class,
-                UserPasswordProperties.class };
-    }
 }
