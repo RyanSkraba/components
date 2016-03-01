@@ -13,8 +13,6 @@
 package org.talend.components.salesforce.runtime;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -22,17 +20,15 @@ import java.util.NoSuchElementException;
 import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.container.ComponentDynamicHolder;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.daikon.schema.SchemaElement;
 
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.QueryResult;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
-import com.sforce.ws.bind.XmlObject;
 
 public class SalesforceReader implements BoundedReader {
 
@@ -46,15 +42,15 @@ public class SalesforceReader implements BoundedReader {
 
     protected int inputRecordsIndex;
 
-    protected Map<String, SchemaElement> fieldMap;
+    // protected Map<String, SchemaElement> fieldMap;
 
-    protected List<SchemaElement> fieldList;
+    // protected List<SchemaElement> fieldList;
 
     /*
      * Used on input only, this is read from the module schema, it contains all of the fields from the salesforce
      * definition of the module that are not already in the field list.
      */
-    protected List<SchemaElement> dynamicFieldList;
+    // protected List<SchemaElement> dynamicFieldList;
 
     protected Map<String, SchemaElement> dynamicFieldMap;
 
@@ -105,26 +101,28 @@ public class SalesforceReader implements BoundedReader {
 
     @Override
     public Object getCurrent() throws NoSuchElementException {
-        ComponentDynamicHolder dynamicHolder = null;
-        if (dynamicFieldMap != null) {
-            dynamicHolder = adaptor.createDynamicHolder();
-            dynamicHolder.setSchemaElements(dynamicFieldList);
-        }
-        Iterator<XmlObject> it = inputRecords[inputRecordsIndex].getChildren();
-        Map<String, Object> columns = new HashMap<>();
-        while (it.hasNext()) {
-            XmlObject obj = it.next();
-            String localName = obj.getName().getLocalPart();
-            if (dynamicFieldMap != null && dynamicFieldMap.get(localName) != null) {
-                dynamicHolder.addFieldValue(localName, obj.getValue());
-            } else {
-                columns.put(localName, obj.getValue());
-            }
-        }
-        if (dynamicHolder != null) {
-            columns.put(dynamicField.getName(), dynamicHolder);
-        }
-        return columns;
+        // DO NOT SUBMIT:
+        // ComponentDynamicHolder dynamicHolder = null;
+        // if (dynamicFieldMap != null) {
+        // dynamicHolder = adaptor.createDynamicHolder();
+        // dynamicHolder.setSchemaElements(dynamicFieldList);
+        // }
+        // Iterator<XmlObject> it = inputRecords[inputRecordsIndex].getChildren();
+        // Map<String, Object> columns = new HashMap<>();
+        // while (it.hasNext()) {
+        // XmlObject obj = it.next();
+        // String localName = obj.getName().getLocalPart();
+        // if (dynamicFieldMap != null && dynamicFieldMap.get(localName) != null) {
+        // dynamicHolder.addFieldValue(localName, obj.getValue());
+        // } else {
+        // columns.put(localName, obj.getValue());
+        // }
+        // }
+        // if (dynamicHolder != null) {
+        // columns.put(dynamicField.getName(), dynamicHolder);
+        // }
+        // return columns;
+        return inputRecords[inputRecordsIndex];
     }
 
     @Override

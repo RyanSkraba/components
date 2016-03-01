@@ -12,10 +12,9 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static junit.framework.TestCase.*;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.apache.avro.Schema;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ErrorCollector;
@@ -57,7 +57,6 @@ import org.talend.components.salesforce.tsalesforcewaveoutputbulkexec.TSalesforc
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.PropertiesServiceTest;
-import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement;
 import org.talend.daikon.schema.SchemaFactory;
 
@@ -370,8 +369,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
     }
 
     // Returns the rows written (having been re-read so they have their Ids)
-    protected void doWriteRows(SalesforceConnectionModuleProperties props, List<Map<String, Object>> outputRows)
-            throws Exception {
+    protected void doWriteRows(SalesforceConnectionModuleProperties props, List<Map<String, Object>> outputRows) throws Exception {
         SalesforceSink salesforceSink = new SalesforceSink();
         salesforceSink.initialize(adaptor, props);
         SalesforceWriteOperation writeOperation = (SalesforceWriteOperation) salesforceSink.createWriteOperation();
@@ -380,8 +378,8 @@ public class SalesforceTestBase extends AbstractComponentTest {
     }
 
     // Returns the rows written (having been re-read so they have their Ids)
-    protected List<Map<String, Object>> writeRows(SalesforceConnectionModuleProperties props,
-            List<Map<String, Object>> outputRows) throws Exception {
+    protected List<Map<String, Object>> writeRows(SalesforceConnectionModuleProperties props, List<Map<String, Object>> outputRows)
+            throws Exception {
         TSalesforceOutputProperties outputProps = new TSalesforceOutputProperties("output"); //$NON-NLS-1$
         outputProps.copyValuesFrom(props);
         outputProps.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);

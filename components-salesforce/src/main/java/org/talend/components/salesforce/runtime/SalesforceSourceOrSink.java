@@ -18,6 +18,11 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
+import org.apache.avro.SchemaBuilder.BaseFieldTypeBuilder;
+import org.apache.avro.SchemaBuilder.FieldAssembler;
+import org.apache.avro.SchemaBuilder.FieldBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,11 +35,7 @@ import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
 import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnection;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
-import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.ValidationResult;
-import org.talend.daikon.schema.Schema;
-import org.talend.daikon.schema.SchemaElement;
-import org.talend.daikon.schema.SchemaFactory;
 
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.BulkConnection;
@@ -211,33 +212,59 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         return returnList;
     }
 
-    public void setupSchemaElement(Field field, SchemaElement element) {
+    public FieldAssembler<Schema> setupSchemaElement(Field field, FieldAssembler<Schema> builder) {
+
+        FieldAssembler<Schema> fa = builder;
+        FieldBuilder<Schema> fieldBuilder = fa.name(field.getName());
+
+        BaseFieldTypeBuilder<Schema> fieldTypeBuilder;
+        if (field.getNillable()) {
+            fieldTypeBuilder = fieldBuilder.type().nullable();
+        } else {
+            fieldTypeBuilder = fieldBuilder.type();
+        }
+
         String type = field.getType().toString();
         if (type.equals("boolean")) { //$NON-NLS-1$
-            element.setType(SchemaElement.Type.BOOLEAN);
+            if (field.getDefaultValueFormula() != null) {
+                fa = fieldTypeBuilder.booleanType().booleanDefault(Boolean.parseBoolean(field.getDefaultValueFormula()));
+            } else {
+                fa = fieldTypeBuilder.booleanType().noDefault();
+            }
         } else if (type.equals("int")) { //$NON-NLS-1$
-            element.setType(SchemaElement.Type.INT);
+            if (field.getDefaultValueFormula() != null) {
+                fa = fieldTypeBuilder.intType().intDefault(Integer.parseInt(field.getDefaultValueFormula()));
+            } else {
+                fa = fieldTypeBuilder.intType().noDefault();
+            }
         } else if (type.equals("date")) { //$NON-NLS-1$
-            element.setType(SchemaElement.Type.DATE);
-            element.setPattern("\"yyyy-MM-dd\""); //$NON-NLS-1$
+            // DO NOT SUBMIT
+            // builder.setType(SchemaElement.Type.DATE);
+            //            builder.setPattern("\"yyyy-MM-dd\""); //$NON-NLS-1$
         } else if (type.equals("datetime")) { //$NON-NLS-1$
-            element.setType(SchemaElement.Type.DATETIME);
-            element.setPattern("\"yyyy-MM-dd\'T\'HH:mm:ss\'.000Z\'\""); //$NON-NLS-1$
+            // DO NOT SUBMIT
+            // builder.setType(SchemaElement.Type.DATETIME);
+            //            builder.setPattern("\"yyyy-MM-dd\'T\'HH:mm:ss\'.000Z\'\""); //$NON-NLS-1$
         } else if (type.equals("double")) { //$NON-NLS-1$
-            element.setType(SchemaElement.Type.DOUBLE);
+            if (field.getDefaultValueFormula() != null) {
+                fa = fieldTypeBuilder.doubleType().doubleDefault(Double.parseDouble(field.getDefaultValueFormula()));
+            } else {
+                fa = fieldTypeBuilder.doubleType().noDefault();
+            }
         } else if (type.equals("currency")) { //$NON-NLS-1$
-            element.setType(SchemaElement.Type.DECIMAL);
+            // DO NOT SUBMIT
+            // builder.setType(SchemaElement.Type.DECIMAL);
         }
-        element.setNullable(field.getNillable());
 
-        if (element.getType() == SchemaElement.Type.STRING) {
-            element.setSize(field.getLength());
-            element.setPrecision(field.getPrecision());
-        } else {
-            element.setSize(field.getPrecision());
-            element.setPrecision(field.getScale());
-        }
-        element.setDefaultValue(field.getDefaultValueFormula());
+        // DO NOT SUBMIT
+        // if (builder.getType() == SchemaElement.Type.STRING) {
+        // builder.setSize(field.getLength());
+        // builder.setPrecision(field.getPrecision());
+        // } else {
+        // builder.setSize(field.getPrecision());
+        // builder.setPrecision(field.getScale());
+        // }
+        return fa;
     }
 
     public static Schema getSchema(SalesforceProvideConnectionProperties properties, String module) throws IOException {
@@ -259,22 +286,17 @@ public class SalesforceSourceOrSink implements SourceOrSink {
 
     public Schema getSchema(PartnerConnection connection, String module) throws IOException {
         try {
-            Schema schema = SchemaFactory.newSchema();
-            SchemaElement root = SchemaFactory.newSchemaElement("Root");
-            schema.setRoot(root);
+            FieldAssembler<Schema> builder = SchemaBuilder.builder().record(module).fields();
 
             DescribeSObjectResult[] describeSObjectResults = new DescribeSObjectResult[0];
             describeSObjectResults = connection.describeSObjects(new String[] { module });
             Field fields[] = describeSObjectResults[0].getFields();
             for (Field field : fields) {
-                SchemaElement child = PropertyFactory.newProperty(field.getName());
-                setupSchemaElement(field, child);
-                root.addChild(child);
+                builder = setupSchemaElement(field, builder);
             }
-            return schema;
+            return builder.endRecord();
         } catch (ConnectionException e) {
             throw new IOException(e);
         }
     }
-
 }
