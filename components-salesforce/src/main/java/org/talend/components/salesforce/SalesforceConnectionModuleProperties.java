@@ -19,7 +19,7 @@ import org.talend.daikon.schema.Schema;
 /**
  * Properties common to input and output Salesforce components.
  */
-public class SalesforceConnectionModuleProperties extends ComponentProperties {
+public class SalesforceConnectionModuleProperties extends ComponentProperties implements SalesforceProvideConnectionProperties {
 
     // Collections
     //
@@ -51,4 +51,8 @@ public class SalesforceConnectionModuleProperties extends ComponentProperties {
         mainForm.addRow(module.getForm(Form.REFERENCE));
     }
 
+    @Override
+    public SalesforceConnectionProperties getConnectionProperties() {
+        return connection;
+    }
 }

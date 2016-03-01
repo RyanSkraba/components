@@ -28,12 +28,12 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ErrorCollector;
-import org.talend.components.api.adaptor.Adaptor;
-import org.talend.components.api.adaptor.ComponentDynamicHolder;
-import org.talend.components.api.adaptor.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.api.container.ComponentDynamicHolder;
+import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.AbstractComponentTest;
 import org.talend.components.api.service.ComponentService;
@@ -76,7 +76,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
 
     protected ComponentDynamicHolder dynamic;
 
-    protected Adaptor adaptor;
+    protected RuntimeContainer adaptor;
 
     public static final boolean ADD_QUOTES = true;
 
@@ -85,6 +85,8 @@ public class SalesforceTestBase extends AbstractComponentTest {
     public final String password = System.getProperty("salesforce.password");
 
     public final String securityKey = System.getProperty("salesforce.key");
+
+    protected static final boolean DYNAMIC = true;
 
     public SalesforceTestBase() {
         random = Integer.toString(ThreadLocalRandom.current().nextInt(1, 100000));
@@ -183,24 +185,8 @@ public class SalesforceTestBase extends AbstractComponentTest {
         return false;
     }
 
-    protected void addDynamicColumn(Map<String, Object> row) {
-        if (setupDynamic()) {
-            dynamic.addFieldValue("ShippingState", "CA");
-            row.put("dynamic", dynamic);
-        }
-    }
-
     protected void fixSchemaForDynamic() {
-        SchemaElement dynElement = SchemaFactory.newSchemaElement(SchemaElement.Type.DYNAMIC, "dynamic");
-        schema.getRoot().addChild(dynElement);
-        Iterator<SchemaElement> it = schema.getRoot().getChildren().iterator();
-        while (it.hasNext()) {
-            SchemaElement se = it.next();
-            if (se.getName().equals("ShippingState")) {
-                it.remove();
-                break;
-            }
-        }
+        fixSchemaForDynamic(schema.getRoot());
     }
 
     public void fixSchemaForDynamic(SchemaElement schemaElement) {
@@ -222,19 +208,6 @@ public class SalesforceTestBase extends AbstractComponentTest {
             dynamic.addFieldValue("ShippingState", "CA");
             row.put("dynamic", dynamic);
         }
-    }
-
-    public <T> T writeRows(Writer<T> writer, List<Map<String, Object>> outputRows) throws IOException {
-        T result;
-        writer.open("foo");
-        try {
-            for (Map<String, Object> row : outputRows) {
-                writer.write(row);
-            }
-        } finally {
-            result = writer.close();
-        }
-        return result;
     }
 
     public List<Map<String, Object>> makeRows(int count) {
@@ -308,68 +281,6 @@ public class SalesforceTestBase extends AbstractComponentTest {
         return ids;
     }
 
-    protected List<Map<String, Object>> readAndCheckRows(SalesforceRuntime runtime, SalesforceConnectionModuleProperties props,
-            int count) throws Exception {
-        List<Map<String, Object>> inputRows = new ArrayList<>();
-        TSalesforceInputProperties inputProps = (TSalesforceInputProperties) getComponentService()
-                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
-        inputProps.connection = props.connection;
-        inputProps.module = props.module;
-        inputProps.batchSize.setValue(200);
-        runtime.input(inputProps, inputRows);
-        return checkRows(inputRows, count);
-    }
-
-    // Returns the rows written (having been re-read so they have their Ids)
-    protected List<Map<String, Object>> writeRows(SalesforceRuntime runtime, SalesforceConnectionModuleProperties props,
-            List<Map<String, Object>> outputRows) throws Exception {
-        TSalesforceOutputProperties outputProps;
-        outputProps = (TSalesforceOutputProperties) getComponentService()
-                .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
-        outputProps.connection = props.connection;
-        outputProps.module = props.module;
-        outputProps.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
-        runtime.output(outputProps, outputRows);
-        return readAndCheckRows(runtime, props, outputRows.size());
-    }
-
-    protected void deleteRows(SalesforceRuntime runtime, List<Map<String, Object>> inputRows) throws Exception {
-        List<String> ids = getDeleteIds(inputRows);
-        for (String id : ids) {
-            runtime.delete(id);
-        }
-    }
-
-    protected void checkAndDelete(SalesforceRuntime runtime, SalesforceConnectionModuleProperties props, int count)
-            throws Exception {
-        List<Map<String, Object>> inputRows = readAndCheckRows(runtime, props, count);
-        deleteRows(runtime, inputRows);
-        readAndCheckRows(runtime, props, 0);
-    }
-
-    public void deleteAllAccountTestRows() throws Exception {
-        SalesforceRuntime runtime = new SalesforceRuntime(new DefaultComponentRuntimeContainerImpl());
-        SalesforceComponentTestIT salesforceComponentTestIT = new SalesforceComponentTestIT();
-        TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init();
-        setupProps(props.connection, !ADD_QUOTES);
-        props.batchSize.setValue(200);
-        props.module.moduleName.setValue("Account");
-        // connecting
-        runtime.connect(props.connection);
-        // getting schema
-        props.module.schema.schema.setValue(runtime.getSchema("Account"));
-        // getting all rows
-        List<Map<String, Object>> rows = new ArrayList<>();
-        runtime.input(props, rows);
-        // filtering rows
-        List<Map<String, Object>> rowToBeDeleted = getAllTestRows(rows);
-        // deleting rows
-        List<String> ids = salesforceComponentTestIT.getDeleteIds(rowToBeDeleted);
-        for (String id : ids) {
-            runtime.delete(id);
-        }
-    }
-
     /**
      * @return the list of row match the TEST_KEY, and if a random values it specified it also filter row against the
      */
@@ -409,16 +320,6 @@ public class SalesforceTestBase extends AbstractComponentTest {
         return checkedRows;
     }
 
-    protected void checkRows(List<Map<String, Object>> outputRows, SalesforceConnectionModuleProperties props) throws Exception {
-        TSalesforceInputProperties inputProps = (TSalesforceInputProperties) new TSalesforceInputProperties("bar").init();
-        inputProps.connection = props.connection;
-        inputProps.module = props.module;
-        inputProps.batchSize.setValue(200);
-        List<Map<String, Object>> inputRows = readRows(inputProps);
-        assertThat(inputRows, containsInAnyOrder(outputRows.toArray()));
-
-    }
-
     protected List<Map<String, Object>> readRows(TSalesforceInputProperties inputProps) throws IOException {
         BoundedReader reader = createBoundedReader(inputProps);
         boolean hasRecord = reader.start();
@@ -430,17 +331,69 @@ public class SalesforceTestBase extends AbstractComponentTest {
         return rows;
     }
 
-    protected void deleteRows(List<Map<String, Object>> rows, TSalesforceOutputProperties props) throws Exception {
-        // copy the props cause we are changing it
+    protected List<Map<String, Object>> readRows(SalesforceConnectionModuleProperties props) throws IOException {
+        TSalesforceInputProperties inputProps = (TSalesforceInputProperties) new TSalesforceInputProperties("bar").init();
+        inputProps.connection = props.connection;
+        inputProps.module = props.module;
+        inputProps.batchSize.setValue(200);
+        List<Map<String, Object>> inputRows = readRows(inputProps);
+        return inputRows;
+    }
+
+    protected List<Map<String, Object>> readAndCheckRows(SalesforceConnectionModuleProperties props, int count) throws Exception {
+        List<Map<String, Object>> inputRows = readRows(props);
+        return checkRows(inputRows, count);
+    }
+
+    protected void checkRows(List<Map<String, Object>> outputRows, SalesforceConnectionModuleProperties props) throws Exception {
+        List<Map<String, Object>> inputRows = readRows(props);
+        assertThat(inputRows, containsInAnyOrder(outputRows.toArray()));
+    }
+
+    protected void checkAndDelete(SalesforceConnectionModuleProperties props, int count) throws Exception {
+        List<Map<String, Object>> inputRows = readAndCheckRows(props, count);
+        deleteRows(inputRows, props);
+        readAndCheckRows(props, 0);
+    }
+
+    public <T> T writeRows(Writer<T> writer, List<Map<String, Object>> outputRows) throws IOException {
+        T result;
+        writer.open("foo");
+        try {
+            for (Map<String, Object> row : outputRows) {
+                writer.write(row);
+            }
+        } finally {
+            result = writer.close();
+        }
+        return result;
+    }
+
+    // Returns the rows written (having been re-read so they have their Ids)
+    protected void doWriteRows(SalesforceConnectionModuleProperties props, List<Map<String, Object>> outputRows)
+            throws Exception {
+        SalesforceSink salesforceSink = new SalesforceSink();
+        salesforceSink.initialize(adaptor, props);
+        SalesforceWriteOperation writeOperation = (SalesforceWriteOperation) salesforceSink.createWriteOperation();
+        Writer<WriterResult> saleforceWriter = writeOperation.createWriter(adaptor);
+        writeRows(saleforceWriter, outputRows);
+    }
+
+    // Returns the rows written (having been re-read so they have their Ids)
+    protected List<Map<String, Object>> writeRows(SalesforceConnectionModuleProperties props,
+            List<Map<String, Object>> outputRows) throws Exception {
+        TSalesforceOutputProperties outputProps = new TSalesforceOutputProperties("output"); //$NON-NLS-1$
+        outputProps.copyValuesFrom(props);
+        outputProps.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
+        doWriteRows(outputProps, outputRows);
+        return readAndCheckRows(props, outputRows.size());
+    }
+
+    protected void deleteRows(List<Map<String, Object>> rows, SalesforceConnectionModuleProperties props) throws Exception {
         TSalesforceOutputProperties deleteProperties = new TSalesforceOutputProperties("delete"); //$NON-NLS-1$
         deleteProperties.copyValuesFrom(props);
         deleteProperties.outputAction.setValue(TSalesforceOutputProperties.ACTION_DELETE);
-
-        SalesforceSink salesforceSink = new SalesforceSink();
-        salesforceSink.initialize(new DefaultComponentRuntimeContainerImpl(), deleteProperties);
-        SalesforceWriteOperation writeOperation = (SalesforceWriteOperation) salesforceSink.createWriteOperation();
-        Writer<WriterResult> saleforceWriter = writeOperation.createWriter(new DefaultComponentRuntimeContainerImpl());
-        writeRows(saleforceWriter, rows);
+        doWriteRows(deleteProperties, rows);
     }
 
     public BoundedReader createSalesforceInputReaderFromAccount(String moduleName) {

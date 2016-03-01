@@ -16,22 +16,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.talend.components.api.adaptor.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
-import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceTestBase;
-import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.schema.Schema;
@@ -39,16 +34,14 @@ import org.talend.daikon.schema.SchemaElement;
 
 public class SalesforceWriterTestIT extends SalesforceTestBase {
 
-    public String random = Integer.toString(ThreadLocalRandom.current().nextInt(1, 100000));
-
     @Test
     public void testOutputInsertAndDelete() throws Throwable {
-        runOutputInsert(false);
+        runOutputInsert(!DYNAMIC);
     }
 
     @Test
     public void testOutputInsertAndDeleteDynamic() throws Throwable {
-        runOutputInsert(true);
+        runOutputInsert(DYNAMIC);
     }
 
     @Test
@@ -108,10 +101,10 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         TSalesforceOutputProperties props = createAccountSalesforceoutputProperties();
         setupProps(props.connection, !SalesforceTestBase.ADD_QUOTES);
 
-        props.module.moduleName.setValue("Account");
+        props.module.moduleName.setValue(EXISTING_MODULE_NAME);
         schema = (Schema) props.module.schema.schema.getValue();
         if (isDynamic) {
-            fixSchemaForDynamic(props.module.schema.schema);
+            fixSchemaForDynamic(schema.getRoot());
         }
         props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
         props.afterOutputAction();
@@ -123,45 +116,35 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         try {
             WriterResult writeResult = writeRows(saleforceWriter, outputRows);
             assertEquals(outputRows.size(), writeResult.getDataCount());
-            inputRows = readAllRows(props);
+            inputRows = readRows(props);
             List<Map<String, Object>> allReadTestRows = filterAllTestRows(inputRows, random);
             assertNotEquals(0, allReadTestRows.size());
             assertEquals(outputRows.size(), allReadTestRows.size());
         } finally {
             if (inputRows == null) {
-                inputRows = readAllRows(props);
+                inputRows = readRows(props);
             }
             List<Map<String, Object>> allReadTestRows = filterAllTestRows(inputRows, random);
             deleteRows(allReadTestRows, props);
-            inputRows = readAllRows(props);
+            inputRows = readRows(props);
             assertEquals(0, filterAllTestRows(inputRows, random).size());
         }
     }
 
     public Writer<WriterResult> createSalesforceOutputWriter(TSalesforceOutputProperties props) {
         SalesforceSink salesforceSink = new SalesforceSink();
-        salesforceSink.initialize(new DefaultComponentRuntimeContainerImpl(), props);
+        salesforceSink.initialize(adaptor, props);
         SalesforceWriteOperation writeOperation = (SalesforceWriteOperation) salesforceSink.createWriteOperation();
-        Writer<WriterResult> saleforceWriter = writeOperation.createWriter(new DefaultComponentRuntimeContainerImpl());
+        Writer<WriterResult> saleforceWriter = writeOperation.createWriter(adaptor);
         return saleforceWriter;
     }
 
     public TSalesforceOutputProperties createAccountSalesforceoutputProperties() throws Exception {
         TSalesforceOutputProperties props = (TSalesforceOutputProperties) new TSalesforceOutputProperties("foo").init();
         setupProps(props.connection, !ADD_QUOTES);
-
-        props.module.moduleName.setValue("Account");
+        props.module.moduleName.setValue(EXISTING_MODULE_NAME);
         props.module.afterModuleName();// to setup schema.
         return props;
-    }
-
-    private List<Map<String, Object>> readAllRows(SalesforceConnectionModuleProperties props) throws IOException {
-        TSalesforceInputProperties inputProps = (TSalesforceInputProperties) new TSalesforceInputProperties("bar").init();
-        inputProps.connection = props.connection;
-        inputProps.module = props.module;
-        inputProps.batchSize.setValue(200);
-        List<Map<String, Object>> inputRows = readRows(inputProps);
-        return inputRows;
     }
 
 }

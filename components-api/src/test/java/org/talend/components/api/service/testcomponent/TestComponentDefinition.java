@@ -13,7 +13,6 @@
 package org.talend.components.api.service.testcomponent;
 
 import java.io.InputStream;
-import java.util.Map;
 
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
@@ -24,7 +23,6 @@ import org.talend.components.api.component.Connector.ConnectorType;
 import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
 
@@ -42,48 +40,6 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     }
 
     protected TestComponentProperties properties;
-
-    @Override
-    public ComponentRuntime createRuntime() {
-        return new ComponentRuntime() {
-
-            @Override
-            public void outputMain(Map<String, Object> row) throws Exception {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void outputEnd() throws Exception {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void outputBegin(ComponentProperties props) throws Exception {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public Map<String, Object> inputRow() throws Exception {
-                // TODO Auto-generated method stub
-                return null;
-            }
-
-            @Override
-            public void inputEnd() throws Exception {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void inputBegin(ComponentProperties props) throws Exception {
-                // TODO Auto-generated method stub
-
-            }
-        };
-    }
 
     @Override
     public String[] getFamilies() {

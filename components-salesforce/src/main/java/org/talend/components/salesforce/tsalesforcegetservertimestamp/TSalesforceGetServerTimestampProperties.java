@@ -15,13 +15,14 @@ package org.talend.components.salesforce.tsalesforcegetservertimestamp;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
 import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaFactory;
 import org.talend.daikon.schema.SchemaElement.Type;
 
-public class TSalesforceGetServerTimestampProperties extends ComponentProperties {
+public class TSalesforceGetServerTimestampProperties extends ComponentProperties implements SalesforceProvideConnectionProperties {
 
     //
     // Collections
@@ -51,4 +52,8 @@ public class TSalesforceGetServerTimestampProperties extends ComponentProperties
         mainForm.addRow(schema.getForm(Form.REFERENCE));
     }
 
+    @Override
+    public SalesforceConnectionProperties getConnectionProperties() {
+        return connection;
+    }
 }

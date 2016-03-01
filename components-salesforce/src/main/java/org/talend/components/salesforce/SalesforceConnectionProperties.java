@@ -18,6 +18,7 @@ import static org.talend.daikon.properties.presentation.Widget.*;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.oauth.OauthProperties;
+import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.Property;
@@ -26,7 +27,7 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.presentation.Widget.WidgetType;
 
-public class SalesforceConnectionProperties extends ComponentProperties {
+public class SalesforceConnectionProperties extends ComponentProperties implements SalesforceProvideConnectionProperties {
 
     public static final String URL = "https://www.salesforce.com/services/Soap/u/34.0";
 
@@ -129,8 +130,7 @@ public class SalesforceConnectionProperties extends ComponentProperties {
     }
 
     public ValidationResult validateTestConnection() throws Exception {
-        SalesforceRuntime conn = new SalesforceRuntime();
-        ValidationResult vr = conn.connectWithResult(this);
+        ValidationResult vr = SalesforceSourceOrSink.validateConnection(this);
         if (vr.getStatus() == ValidationResult.Result.OK) {
             getForm(FORM_WIZARD).setAllowForward(true);
         } else {
@@ -159,4 +159,8 @@ public class SalesforceConnectionProperties extends ComponentProperties {
         // FIXME - what about the advanced form?
     }
 
+    @Override
+    public SalesforceConnectionProperties getConnectionProperties() {
+        return this;
+    }
 }

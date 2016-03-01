@@ -18,7 +18,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 
-public class SalesforceGetDeletedUpdatedProperties extends ComponentProperties {
+public class SalesforceGetDeletedUpdatedProperties extends ComponentProperties implements SalesforceProvideConnectionProperties {
 
     public Property startDate = newDate("startDate");
 
@@ -51,4 +51,8 @@ public class SalesforceGetDeletedUpdatedProperties extends ComponentProperties {
         mainForm.addRow(endDate);
     }
 
+    @Override
+    public SalesforceConnectionProperties getConnectionProperties() {
+        return connection;
+    }
 }

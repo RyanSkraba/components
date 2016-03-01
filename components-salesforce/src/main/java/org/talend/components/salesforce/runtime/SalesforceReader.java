@@ -22,8 +22,8 @@ import java.util.NoSuchElementException;
 import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.adaptor.Adaptor;
-import org.talend.components.api.adaptor.ComponentDynamicHolder;
+import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.container.ComponentDynamicHolder;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.daikon.schema.SchemaElement;
@@ -73,9 +73,9 @@ public class SalesforceReader implements BoundedReader {
 
     protected SalesforceSource source;
 
-    protected Adaptor adaptor;
+    protected RuntimeContainer adaptor;
 
-    public SalesforceReader(Adaptor adaptor, SalesforceSource source) {
+    public SalesforceReader(RuntimeContainer adaptor, SalesforceSource source) {
         this.source = source;
         this.adaptor = adaptor;
     }

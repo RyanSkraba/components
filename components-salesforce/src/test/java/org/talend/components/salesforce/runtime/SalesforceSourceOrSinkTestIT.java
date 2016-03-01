@@ -12,8 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.junit.Assert.*;
-import static org.talend.components.salesforce.SalesforceTestBase.*;
+import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,11 +36,6 @@ import com.sforce.soap.partner.FieldType;
 
 public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
 
-    /**
-     * Test method for
-     * {@link org.talend.components.salesforce.runtime.SalesforceSourceOrSink#initialize(org.talend.components.api.adaptor.Adaptor, org.talend.components.api.properties.ComponentProperties)}
-     * .
-     */
     @Test
     public void testInitialize() {
         SalesforceSourceOrSink salesforceSourceOrSink = new SalesforceSourceOrSink();
@@ -47,11 +44,6 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
         assertEquals(properties.connection, salesforceSourceOrSink.getConnectionProperties());
     }
 
-    /**
-     * Test method for
-     * {@link org.talend.components.salesforce.runtime.SalesforceSourceOrSink#validate(org.talend.components.api.adaptor.Adaptor)}
-     * .
-     */
     @Test
     public void testValidate() {
         // check validate is OK with proper creadentials
@@ -64,10 +56,6 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
         assertEquals(Result.ERROR, salesforceSourceOrSink.validate(null).getStatus());
     }
 
-    /**
-     * Test method for {@link org.talend.components.salesforce.runtime.SalesforceSourceOrSink#getConnectionProperties()}
-     * .
-     */
     @Test
     public void testGetConnectionProperties() {
         // using SalesforceConnectionProperties
@@ -82,27 +70,13 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
         assertEquals(scmp.connection, salesforceSourceOrSink.getConnectionProperties());
     }
 
-    /**
-     * Test method for
-     * {@link org.talend.components.salesforce.runtime.SalesforceSourceOrSink#getSchemaNames(org.talend.components.api.adaptor.Adaptor)}
-     * .
-     * 
-     * @throws IOException
-     */
     @Test
     public void testGetSchemaNames() throws IOException {
         SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
-        SalesforceSourceOrSink salesforceSourceOrSink = new SalesforceSourceOrSink();
-        salesforceSourceOrSink.initialize(null, scp);
-        List<NamedThing> schemaNames = salesforceSourceOrSink.getSchemaNames(null);
+        List<NamedThing> schemaNames = SalesforceSourceOrSink.getSchemaNames(scp);
         assertTrue(schemaNames.size() > 50);
     }
 
-    /**
-     * Test method for
-     * {@link org.talend.components.salesforce.runtime.SalesforceSourceOrSink#setupSchemaElement(com.sforce.soap.partner.Field, org.talend.daikon.schema.SchemaElement)}
-     * .
-     */
     @Test
     public void testSetupSchemaElement() {
         Field field = new Field();
@@ -134,29 +108,24 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
         field.setType(FieldType.currency);
         salesforceSourceOrSink.setupSchemaElement(field, newSchema.getRoot());
         assertEquals(Type.DECIMAL, newSchema.getRoot().getType());
-
     }
 
-    /**
-     * Test method for
-     * {@link org.talend.components.salesforce.runtime.SalesforceSourceOrSink#getSchema(org.talend.components.api.adaptor.Adaptor, java.lang.String)}
-     * .
-     * 
-     * @throws IOException
-     */
     @Test
     public void testGetSchema() throws IOException {
         SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
-        SalesforceSourceOrSink salesforceSourceOrSink = new SalesforceSourceOrSink();
-        salesforceSourceOrSink.initialize(null, scp);
-        List<NamedThing> schemaNames = salesforceSourceOrSink.getSchemaNames(null);
-        assertFalse(schemaNames.isEmpty());
-        // check for not existing module
+        Schema schema = SalesforceSourceOrSink.getSchema(scp, EXISTING_MODULE_NAME);
+        assertNotNull(schema);
+        assertTrue(schema.getRoot().getChildren().size() > 10);
+    }
+
+    @Test
+    public void testGetSchemaFail() throws IOException {
+        SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
         try {
-            Schema schema = salesforceSourceOrSink.getSchema(null, "module that does not exists");
+            Schema schema = SalesforceSourceOrSink.getSchema(scp, "module that does not exist");
             fail("Should have throw an exception when not finding the module");
         } catch (IOException ce) {
-            // exception expected so ignor
+            assertTrue(ce.getMessage().contains("does not exist"));
         }
     }
 

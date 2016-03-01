@@ -16,17 +16,20 @@ import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.Connector.ConnectorType;
+import org.talend.components.api.component.OutputComponentDefinition;
 import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
+import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 
 import aQute.bnd.annotation.component.Component;
 import org.talend.components.salesforce.SalesforceModuleProperties;
+import org.talend.components.salesforce.runtime.SalesforceSink;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceOutputBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition {
+public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition implements OutputComponentDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceOutputBulkExecNew"; //$NON-NLS-1$
 
@@ -58,5 +61,10 @@ public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition {
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return concatPropertiesClasses(super.getNestedCompatibleComponentPropertiesClass(),
                 new Class[] { SalesforceModuleProperties.class });
+    }
+
+    @Override
+    public Sink getRuntime() {
+        return new SalesforceSink();
     }
 }

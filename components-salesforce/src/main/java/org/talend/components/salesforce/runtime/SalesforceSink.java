@@ -14,7 +14,7 @@ package org.talend.components.salesforce.runtime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.adaptor.Adaptor;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
@@ -29,7 +29,7 @@ public class SalesforceSink extends SalesforceSourceOrSink implements Sink {
     }
 
     @Override
-    public ValidationResult validate(Adaptor adaptor) {
+    public ValidationResult validate(RuntimeContainer adaptor) {
         ValidationResult validate = super.validate(adaptor);
         // also check that the properties is the right type
         if (validate.getStatus() != Result.ERROR) {
@@ -47,7 +47,7 @@ public class SalesforceSink extends SalesforceSourceOrSink implements Sink {
     }
 
     /**
-     * this should never becalled before {@link #validate(Adaptor)} is called but this should not be the case anyway
+     * this should never becalled before {@link #validate(RuntimeContainer)} is called but this should not be the case anyway
      * cause validate is called before the pipeline is created.
      *
      * @return the properties

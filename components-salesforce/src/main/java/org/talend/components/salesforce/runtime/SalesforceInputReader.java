@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.talend.components.api.adaptor.Adaptor;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement;
@@ -30,7 +30,7 @@ public class SalesforceInputReader extends SalesforceReader {
 
     protected int commitLevel;
 
-    public SalesforceInputReader(Adaptor adaptor, SalesforceSource source, TSalesforceInputProperties props) {
+    public SalesforceInputReader(RuntimeContainer adaptor, SalesforceSource source, TSalesforceInputProperties props) {
         super(adaptor, source);
         properties = props;
         commitLevel = props.batchSize.getIntValue();

@@ -13,13 +13,6 @@
 
 package org.talend.components.api.component.runtime;
 
-import java.util.List;
-
-import org.talend.components.api.properties.ComponentProperties;
-import org.talend.daikon.NamedThing;
-import org.talend.daikon.properties.ValidationResult;
-import org.talend.daikon.schema.Schema;
-
 /**
  * Base class for defining input formats and creating a {@code Source} for reading the input.
  *

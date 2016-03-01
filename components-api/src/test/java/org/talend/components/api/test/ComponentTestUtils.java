@@ -12,9 +12,8 @@
 // ============================================================================
 package org.talend.components.api.test;
 
-import static org.hamcrest.CoreMatchers.*;
-// import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.InputStream;
 import java.util.Set;
@@ -22,12 +21,17 @@ import java.util.Set;
 import org.junit.rules.ErrorCollector;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
+import org.talend.components.api.component.InputComponentDefinition;
+import org.talend.components.api.component.OutputComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.service.testcomponent.TestComponentDefinition;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
+
+// import static org.hamcrest.Matchers.*;
 
 public class ComponentTestUtils {
 
@@ -57,13 +61,6 @@ public class ComponentTestUtils {
         }
     }
 
-    /**
-     * check that all Components have theirs internationnalisation properties setup correctly.
-     * 
-     * @param errorCollector
-     * 
-     * @param componentService service to get the components to be checked.
-     */
     static public void checkAllI18N(Properties checkedProps, ErrorCollector errorCollector) {
         PropertiesTestUtils.checkAllI18N(checkedProps, errorCollector);
     }
@@ -114,8 +111,18 @@ public class ComponentTestUtils {
     public static void testAllRuntimeAvaialble(ComponentService componentService) {
         Set<ComponentDefinition> allComponents = componentService.getAllComponents();
         for (ComponentDefinition cd : allComponents) {
-            assertNotNull("the Runtime associated with component [" + cd.getName() + "] should never be null.",
-                    cd.createRuntime());
+            if (cd instanceof TestComponentDefinition)
+                continue;
+            Object runtime = null;
+            if (cd instanceof InputComponentDefinition)
+                runtime = ((InputComponentDefinition) cd).getRuntime();
+            else if (cd instanceof OutputComponentDefinition)
+                runtime = ((OutputComponentDefinition) cd).getRuntime();
+            else {
+                continue;
+                // FIXME - need to add support for transformation runtime
+            }
+            assertNotNull("the Runtime associated with component [" + cd.getName() + "] should never be null.", runtime);
         }
     }
 

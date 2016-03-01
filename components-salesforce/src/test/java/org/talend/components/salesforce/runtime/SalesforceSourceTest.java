@@ -12,7 +12,9 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,13 +24,6 @@ import org.talend.components.api.component.runtime.BoundedSource;
 
 public class SalesforceSourceTest {
 
-    /**
-     * Test method for
-     * {@link org.talend.components.salesforce.runtime.SalesforceSource#splitIntoBundles(long, org.talend.components.api.adaptor.Adaptor)}
-     * .
-     * 
-     * @throws Exception
-     */
     @Test
     public void testSplitIntoBundles() throws Exception {
         SalesforceSource salesforceSource = new SalesforceSource();
@@ -37,37 +32,16 @@ public class SalesforceSourceTest {
         assertEquals(salesforceSource, bundles.get(0));
     }
 
-    /**
-     * Test method for
-     * {@link org.talend.components.salesforce.runtime.SalesforceSource#getEstimatedSizeBytes(org.talend.components.api.adaptor.Adaptor)}
-     * .
-     * 
-     * @throws Exception
-     */
     @Test
     public void testGetEstimatedSizeBytes() throws Exception {
         assertEquals(0, new SalesforceSource().getEstimatedSizeBytes(null));
     }
 
-    /**
-     * Test method for
-     * {@link org.talend.components.salesforce.runtime.SalesforceSource#producesSortedKeys(org.talend.components.api.adaptor.Adaptor)}
-     * .
-     * 
-     * @throws Exception
-     */
     @Test
     public void testProducesSortedKeys() throws Exception {
         assertFalse(new SalesforceSource().producesSortedKeys(null));
     }
 
-    /**
-     * Test method for
-     * {@link org.talend.components.salesforce.runtime.SalesforceSource#createReader(org.talend.components.api.adaptor.Adaptor)}
-     * .
-     * 
-     * @throws IOException
-     */
     @Test
     public void testCreateReader() throws IOException {
         SalesforceSource salesforceSource = new SalesforceSource();

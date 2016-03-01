@@ -1,11 +1,11 @@
-package org.talend.components.api.adaptor;
+package org.talend.components.api.container;
 
 import java.util.Date;
 
 /**
  *
  */
-public interface Adaptor {
+public interface RuntimeContainer {
 
     /**
      * Format the specified date according to the specified pattern.

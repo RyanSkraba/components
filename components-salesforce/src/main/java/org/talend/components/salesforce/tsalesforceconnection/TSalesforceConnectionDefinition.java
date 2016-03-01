@@ -16,20 +16,20 @@ import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.Connector.ConnectorType;
+import org.talend.components.api.component.InputComponentDefinition;
 import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
+import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
-import org.talend.components.salesforce.SalesforceRuntime;
 import org.talend.components.salesforce.SalesforceUserPasswordProperties;
-import org.talend.daikon.properties.ValidationResult;
 
 import aQute.bnd.annotation.component.Component;
+import org.talend.components.salesforce.runtime.SalesforceSource;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceConnectionDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
@@ -42,31 +42,6 @@ public class TSalesforceConnectionDefinition extends SalesforceDefinition {
         setConnectors(new Connector(ConnectorType.FLOW, 0, 0));
         setTriggers(new Trigger(TriggerType.ITERATE, 1, 0), new Trigger(TriggerType.SUBJOB_OK, 1, 0),
                 new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
-    }
-
-    @Override
-    public ComponentRuntime createRuntime() {
-        return new SalesforceRuntime() {
-
-            //
-            // FIXME - change me
-            // Need to adjust the override after we have a finally solution to split Runtime class
-            //
-            @Override
-            public void inputBegin(ComponentProperties props) throws Exception {
-                SalesforceConnectionProperties properties = (SalesforceConnectionProperties) props;
-                ValidationResult result = connectWithResult(properties);
-                if (ValidationResult.Result.ERROR.equals(result.getStatus())) {
-                    throw new Exception(result.getMessage());
-                }
-            }
-
-        };
-    }
-
-    @Override
-    public boolean isStartable() {
-        return true;
     }
 
     @Override

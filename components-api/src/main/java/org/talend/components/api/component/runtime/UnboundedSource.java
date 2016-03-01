@@ -16,7 +16,7 @@ package org.talend.components.api.component.runtime;
 import java.io.IOException;
 import java.util.List;
 
-import org.talend.components.api.adaptor.Adaptor;
+import org.talend.components.api.container.RuntimeContainer;
 
 /**
  * A {@link Source} that reads an unbounded amount of input and, because of that, supports some additional operations
@@ -53,12 +53,12 @@ public interface UnboundedSource<CheckpointMarkT extends UnboundedSource.Checkpo
      * The size of the returned list should be as close to {@code desiredNumSplits} as possible, but does not have to
      * match exactly. A low number of splits will limit the amount of parallelism in the source.
      */
-    public abstract List<? extends UnboundedSource<CheckpointMarkT>> generateInitialSplits(int desiredNumSplits, Adaptor options);
+    public abstract List<? extends UnboundedSource<CheckpointMarkT>> generateInitialSplits(int desiredNumSplits, RuntimeContainer options);
 
     /**
      * Create a new {@link UnboundedReader} to read from this source, resuming from the given checkpoint if present.
      */
-    public abstract UnboundedReader createReader(Adaptor options, CheckpointMarkT checkpointMark);
+    public abstract UnboundedReader createReader(RuntimeContainer options, CheckpointMarkT checkpointMark);
 
     /**
      * Returns whether this source requires explicit deduping.

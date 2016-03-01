@@ -13,27 +13,23 @@
 package org.talend.components.salesforce.runtime;
 
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
-import org.talend.daikon.schema.Schema;
+import org.talend.components.salesforce.SalesforceGetDeletedUpdatedProperties;
 
 import com.sforce.ws.ConnectionException;
 
-public class SalesforceServerTimeStampReader extends SalesforceReader {
+public abstract class SalesforceGetDeletedUpdatedReader extends SalesforceReader {
 
-    private TSalesforceGetServerTimestampProperties props;
+    protected SalesforceGetDeletedUpdatedProperties props;
 
-    private Calendar result;
+    protected String module = props.module.moduleName.getStringValue();
 
-    private Schema schema;
+    protected boolean hasResult;
 
-    public SalesforceServerTimeStampReader(RuntimeContainer adaptor, SalesforceSource source,
-                                           TSalesforceGetServerTimestampProperties props) {
+    public SalesforceGetDeletedUpdatedReader(RuntimeContainer adaptor, SalesforceSource source,
+            SalesforceGetDeletedUpdatedProperties props) {
         super(adaptor, source);
         this.props = props;
     }
@@ -41,32 +37,31 @@ public class SalesforceServerTimeStampReader extends SalesforceReader {
     @Override
     public boolean start() throws IOException {
         super.start();
-        TSalesforceGetServerTimestampProperties gdProps = props;
-        schema = (Schema) gdProps.schema.schema.getValue();
+
+        module = props.module.moduleName.getStringValue();
         try {
-            result = connection.getServerTimestamp().getTimestamp();
-            return result != null;
+            hasResult = getResult();
         } catch (ConnectionException e) {
             throw new IOException(e);
         }
+        return hasResult;
     }
+
+    abstract protected boolean getResult() throws ConnectionException;
+
+    abstract protected Object returnResult();
 
     @Override
     public boolean advance() throws IOException {
-        return false;// only one record is avalable for this reader.
+        // only one record is avalable for this reader.
+        return false;
     }
 
     @Override
     public Object getCurrent() throws NoSuchElementException {
-        if (result == null) {
+        if (!hasResult)
             return null;
-        }
-
-        Map<String, Object> map = new HashMap<>();
-        // FIXME - error checking - what if there are no columns
-        map.put(schema.getRoot().getChildren().get(0).getName(), result);
-        result = null;
-        return map;
+        return returnResult();
     }
 
 }

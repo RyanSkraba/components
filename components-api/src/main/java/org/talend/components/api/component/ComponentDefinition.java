@@ -16,7 +16,6 @@ import java.io.InputStream;
 
 import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.runtime.ComponentRuntime;
 
 /**
  * Component definition service.
@@ -40,11 +39,6 @@ public interface ComponentDefinition extends TopLevelDefinition {
      * create the ComponentProperties and initialize it's properties only and not the UI Layout not usefull for runtime
      */
     public ComponentProperties createRuntimeProperties();
-
-    /**
-     * Create a {@link ComponentRuntime} object.
-     */
-    public ComponentRuntime createRuntime();
 
     /**
      * Returns the types of {@link Connector} objects supported by this component.

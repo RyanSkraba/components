@@ -20,8 +20,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.talend.components.api.adaptor.Adaptor;
-import org.talend.components.api.adaptor.ComponentDynamicHolder;
+import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.container.ComponentDynamicHolder;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
@@ -47,7 +47,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
 
     private SalesforceSink sink;
 
-    private Adaptor adaptor;
+    private RuntimeContainer adaptor;
 
     private Map<String, SchemaElement> fieldMap;
 
@@ -79,7 +79,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
      * @param salesforceWriteOperation
      * @param adaptor
      */
-    public SalesforceWriter(SalesforceWriteOperation salesforceWriteOperation, Adaptor adaptor) {
+    public SalesforceWriter(SalesforceWriteOperation salesforceWriteOperation, RuntimeContainer adaptor) {
         this.salesforceWriteOperation = salesforceWriteOperation;
         this.adaptor = adaptor;
         sink = (SalesforceSink) salesforceWriteOperation.getSink();
@@ -308,22 +308,12 @@ final class SalesforceWriter implements Writer<WriterResult> {
         if (success) {
             // TODO: send back the ID
         } else {
-            errors = addLog(resultErrors,
-                    batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx] : "Batch index out of bounds");
+            errors = SalesforceRuntime.addLog(resultErrors,
+                    batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx] : "Batch index out of bounds", null);
         }
         if (exceptionForErrors && errors.toString().length() > 0) {
             throw new IOException(errors.toString());
         }
-    }
-
-    protected StringBuilder addLog(Error[] resultErrors, String row_key) {
-        StringBuilder errors = new StringBuilder("");
-        if (resultErrors != null) {
-            for (Error error : resultErrors) {
-                errors.append(error.getMessage()).append("\n");
-            }
-        }
-        return errors;
     }
 
     protected DeleteResult[] delete(String id) throws IOException {

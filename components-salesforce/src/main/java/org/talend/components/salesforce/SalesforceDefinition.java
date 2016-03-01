@@ -15,13 +15,8 @@ package org.talend.components.salesforce;
 import java.io.InputStream;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
-import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.runtime.ComponentRuntime;
-import org.talend.components.common.ProxyProperties;
-import org.talend.components.common.UserPasswordProperties;
-import org.talend.components.common.oauth.OauthProperties;
 
 public abstract class SalesforceDefinition extends AbstractComponentDefinition {
 
@@ -34,11 +29,6 @@ public abstract class SalesforceDefinition extends AbstractComponentDefinition {
     @Override
     public String[] getFamilies() {
         return new String[] { "Business/Salesforce", "Cloud/Salesforce" };
-    }
-
-    @Override
-    public ComponentRuntime createRuntime() {
-        return new SalesforceRuntime();
     }
 
     @Override
@@ -71,6 +61,5 @@ public abstract class SalesforceDefinition extends AbstractComponentDefinition {
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return new Class[] { SalesforceConnectionProperties.class };
     }
-
 
 }

@@ -15,7 +15,7 @@ package org.talend.components.api.component.runtime;
 
 import java.util.List;
 
-import org.talend.components.api.adaptor.Adaptor;
+import org.talend.components.api.container.RuntimeContainer;
 
 /**
  * A {@link Source} that reads a finite amount of input and, because of that, supports some additional operations.
@@ -36,23 +36,23 @@ public interface BoundedSource extends Source {
     /**
      * Splits the source into bundles of approximately {@code desiredBundleSizeBytes}.
      */
-    public abstract List<? extends BoundedSource> splitIntoBundles(long desiredBundleSizeBytes, Adaptor adaptor) throws Exception;
+    public abstract List<? extends BoundedSource> splitIntoBundles(long desiredBundleSizeBytes, RuntimeContainer adaptor) throws Exception;
 
     /**
      * An estimate of the total size (in bytes) of the data that would be read from this source. This estimate is in
      * terms of external storage size, before any decompression or other processing done by the reader.
      */
-    public abstract long getEstimatedSizeBytes(Adaptor adaptor);
+    public abstract long getEstimatedSizeBytes(RuntimeContainer adaptor);
 
     /**
      * Whether this source is known to produce key/value pairs sorted by lexicographic order on the bytes of the encoded
      * key.
      */
-    public abstract boolean producesSortedKeys(Adaptor adaptor);
+    public abstract boolean producesSortedKeys(RuntimeContainer adaptor);
 
     /**
      * Returns a new {@link BoundedReader} that reads from this source.
      */
-    public abstract BoundedReader createReader(Adaptor adaptor);
+    public abstract BoundedReader createReader(RuntimeContainer adaptor);
 
 }

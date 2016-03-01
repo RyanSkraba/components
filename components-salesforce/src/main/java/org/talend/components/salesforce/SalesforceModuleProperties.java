@@ -12,22 +12,24 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
-import static org.talend.daikon.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.PropertyFactory.newEnum;
+import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import java.util.List;
 
 import org.talend.components.api.component.Connector.ConnectorType;
 import org.talend.components.api.component.StudioConstants;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.SchemaProperties;
+import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 
-public class SalesforceModuleProperties extends ComponentProperties {
+public class SalesforceModuleProperties extends ComponentProperties implements SalesforceProvideConnectionProperties {
 
     public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection");
 
@@ -65,22 +67,26 @@ public class SalesforceModuleProperties extends ComponentProperties {
     // consider beforeActivate and beforeRender (change after to afterActivate)l
 
     public ValidationResult beforeModuleName() throws Exception {
-        SalesforceRuntime conn = new SalesforceRuntime();
-        ValidationResult vr = conn.connectWithResult(connection);
-        if (vr.getStatus() == ValidationResult.Result.OK) {
-            List<NamedThing> moduleNames = conn.getSchemaNames();
+        try {
+            List<NamedThing> moduleNames = SalesforceSourceOrSink.getSchemaNames(connection);
             moduleName.setPossibleValues(moduleNames);
+        } catch (ComponentException ex) {
+            return ex.getValidationResult();
         }
-        return vr;
+        return ValidationResult.OK;
     }
 
     public ValidationResult afterModuleName() throws Exception {
-        SalesforceRuntime conn = new SalesforceRuntime();
-        ValidationResult vr = conn.connectWithResult(connection);
-        if (vr.getStatus() == ValidationResult.Result.OK) {
-            schema.schema.setValue(conn.getSchema(moduleName.getStringValue()));
+        try {
+            schema.schema.setValue(SalesforceSourceOrSink.getSchema(connection, moduleName.getStringValue()));
+        } catch (ComponentException ex) {
+            return ex.getValidationResult();
         }
-        return vr;
+        return ValidationResult.OK;
     }
 
+    @Override
+    public SalesforceConnectionProperties getConnectionProperties() {
+        return connection;
+    }
 }

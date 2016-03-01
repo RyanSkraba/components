@@ -14,7 +14,7 @@ package org.talend.components.api.component.runtime;
 
 import java.io.Serializable;
 
-import org.talend.components.api.adaptor.Adaptor;
+import org.talend.components.api.container.RuntimeContainer;
 
 /**
  * A {@link WriteOperation} defines the process of a parallel write of objects to a Sink.
@@ -43,7 +43,7 @@ public interface WriteOperation<WriteT> extends Serializable {
     /**
      * Performs initialization before writing to the sink. Called before writing begins.
      */
-    public abstract void initialize(Adaptor adaptor);
+    public abstract void initialize(RuntimeContainer adaptor);
 
     /**
      * Given an Iterable of results from bundle writes, performs finalization after writing and closes the sink. Called
@@ -66,7 +66,7 @@ public interface WriteOperation<WriteT> extends Serializable {
      *
      * @param writerResults an Iterable of results from successful bundle writes.
      */
-    public abstract void finalize(Iterable<WriteT> writerResults, Adaptor adaptor);
+    public abstract void finalize(Iterable<WriteT> writerResults, RuntimeContainer adaptor);
 
     /**
      * Creates a new {@link Writer} to write a bundle of the input to the sink.
@@ -77,7 +77,7 @@ public interface WriteOperation<WriteT> extends Serializable {
      * <p>
      * Must not mutate the state of the WriteOperation.
      */
-    public abstract Writer<WriteT> createWriter(Adaptor adaptor);
+    public abstract Writer<WriteT> createWriter(RuntimeContainer adaptor);
 
     /**
      * Returns the Sink that this write operation writes to.
