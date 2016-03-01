@@ -4,6 +4,7 @@
 
 package ${package};
 
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.io.File;
@@ -11,20 +12,21 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import org.talend.components.api.component.runtime.BoundedSource;
+import org.talend.components.api.component.runtime.Reader;
+import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.exception.error.ComponentsErrorCode;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.test.SimpleComponentRegistry;
 import org.talend.daikon.exception.TalendRuntimeException;
-import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.schema.SchemaElement;
 import org.talend.daikon.schema.SchemaElement.Type;
 import org.talend.daikon.schema.SchemaFactory;
@@ -64,74 +66,71 @@ public class ${componentName}Test {
             writer.close();
 
             props.filename.setValue(temp.getAbsolutePath());
-            ${componentName}Source source = (${componentName}Source) def.getRuntime();
+            Source source = def.getRuntime();
             source.initialize(null, props);
-            ${componentName}Reader reader = (${componentName}Reader) source.createReader(null);
-            boolean available;
-            List<Map<String, Object>> rows = new ArrayList<>();
-            for (available = reader.start(); available; available = reader.advance()) {
-                Map<String, Object> row = (Map<String, Object>) reader.getCurrent();
-                rows.add(row);
-            }
-            reader.close();
-            System.out.println(rows);
-            assertEquals(2, rows.size());
-            assertEquals("The first line", rows.get(0).get("line"));
-            assertEquals("The second line", rows.get(1).get("line"));
+            assertThat(source, instanceOf(${componentName}Source.class));
+
+            Reader reader = ((BoundedSource) source).createReader(null);
+            assertThat(reader.start(), is(true));
+            assertThat(reader.getCurrent(), is((Object) "The first line"));
+            // No auto advance when calling getCurrent more than once.
+            assertThat(reader.getCurrent(), is((Object) "The first line"));
+            assertThat(reader.advance(), is(true));
+            assertThat(reader.getCurrent(), is((Object) "The second line"));
+            assertThat(reader.advance(), is(false));
         } finally {// remote the temp file
             temp.delete();
         }
     }
 
+    @Ignore("To revisit.  The spec should be validated by the time it gets to the runtime.")
     @Test
     public void test${componentName}RuntimeException() {
         ${componentName}Definition def = (${componentName}Definition) getComponentService().getComponentDefinition("${componentName}");
         ${componentName}Properties props = (${componentName}Properties) getComponentService().getComponentProperties("${componentName}");
+
         // check empty schema exception
         props.schema.schema.setChildren(Collections.EMPTY_LIST);
-        ${componentName}Source source;
-        source = (${componentName}Source) def.getRuntime();
+        BoundedSource source = (BoundedSource) def.getRuntime();
         source.initialize(null, props);
-        ${componentName}Reader reader;
-        reader = (${componentName}Reader) source.createReader(null);
+        Reader reader;
+        reader = source.createReader(null);
         try {
             reader.start();
             fail("Should have thrown an exception");
         } catch (Exception e) {
-            if (!(e instanceof TalendRuntimeException
-                    && ((TalendRuntimeException) e).getCode() == ComponentsErrorCode.SCHEMA_MISSING)) {
+            if (!(e instanceof TalendRuntimeException && ((TalendRuntimeException) e).getCode() == ComponentsErrorCode.SCHEMA_MISSING)) {
                 StringWriter stack = new StringWriter();
                 e.printStackTrace(new PrintWriter(stack));
                 fail("wrong exception caught :" + stack.toString());
             }
         }
+
         // check wrong schema exception
         props.schema.schema.setChildren(new ArrayList<SchemaElement>());
         props.schema.schema.addChild(SchemaFactory.newSchemaElement(Type.INT, "line"));
 
-        source = (${componentName}Source) def.getRuntime();
+        source = (BoundedSource) def.getRuntime();
         source.initialize(null, props);
-        reader = (${componentName}Reader) source.createReader(null);
+        reader = source.createReader(null);
 
         try {
             reader.start();
             fail("Should have thrown an exception");
         } catch (Exception e) {
-            if (!(e instanceof TalendRuntimeException
-                    && ((TalendRuntimeException) e).getCode() == ComponentsErrorCode.SCHEMA_TYPE_MISMATCH)) {
+            if (!(e instanceof TalendRuntimeException && ((TalendRuntimeException) e).getCode() == ComponentsErrorCode.SCHEMA_TYPE_MISMATCH)) {
                 StringWriter stack = new StringWriter();
                 e.printStackTrace(new PrintWriter(stack));
                 fail("wrong exception caught :" + stack.toString());
             }
         }
     }
-    
-    
+
     @Test
     public void testAlli18n() {
         ComponentTestUtils.checkAllI18N(new ${componentName}Properties(null).init(), errorCollector);
     }
-    
+
     @Test
     public void testAllImagePath() {
         ComponentTestUtils.testAllImages(getComponentService());
@@ -141,5 +140,5 @@ public class ${componentName}Test {
     public void testAllRuntimes() {
         ComponentTestUtils.testAllRuntimeAvaialble(getComponentService());
     }
-    
+
 }

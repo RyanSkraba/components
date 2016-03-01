@@ -4,72 +4,35 @@
 
 package ${package};
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.talend.components.api.component.runtime.BoundedReader;
-import org.talend.components.api.component.runtime.BoundedSource;
+import org.talend.components.api.component.runtime.util.UnshardedInputSource;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 
-import org.talend.daikon.NamedThing;
-import org.talend.daikon.properties.ValidationResult;
-import org.talend.daikon.schema.Schema;
+/**
+ * The ${componentName}Source provides the mechanism to supply data to other
+ * components at run-time.
+ * 
+ * Based on the Apache Beam project, the Source mechanism is appropriate to
+ * describe distributed and non-distributed data sources and can be adapted
+ * to scalable big data execution engines on a cluster, or run locally.
+ * 
+ * This example component describes an input source that is guaranteed to be
+ * run in a single JVM (whether on a cluster or locally), so:
+ * 
+ * <ul>
+ * <li>the simplified logic for reading is found in the {@link ${componentName}UnshardedInput}, 
+ *     and</li>
+ * <li>adapted to the full Source specification via a helper 
+ *     {@link UnshardedInputSource}.</li>
+ * </ul>
+ */
+public class ${componentName}Source extends UnshardedInputSource<String> {
 
-public class ${componentName}Source implements BoundedSource {
-
-    private static final Logger LOG = LoggerFactory.getLogger(${componentName}Source.class);
-
-    private ${componentName}Properties properties;
-
-    public ${componentName}Source() {
-    }
+    /** Default serial version UID. */
+    private static final long serialVersionUID = 1L;
 
     @Override
     public void initialize(RuntimeContainer adaptor, ComponentProperties properties) {
-        this.properties = (${componentName}Properties) properties;
+        setUnshardedInput(new ${componentName}UnshardedInput(((${componentName}Properties) properties).filename.getStringValue()));
     }
-
-    @Override
-    public ValidationResult validate(RuntimeContainer adaptor) {
-        return new ValidationResult();
-    }
-
-    @Override
-    public BoundedReader createReader(RuntimeContainer adaptor) {
-        return new ${componentName}Reader(adaptor, this, properties);
-    }
-
-    @Override
-    public List<? extends BoundedSource> splitIntoBundles(long desiredBundleSizeBytes, RuntimeContainer adaptor)
-            throws Exception {
-        List<BoundedSource> list = new ArrayList<>();
-        list.add(this);
-        return list;
-    }
-
-    @Override
-    public long getEstimatedSizeBytes(RuntimeContainer adaptor) {
-        return 0;
-    }
-
-    @Override
-    public boolean producesSortedKeys(RuntimeContainer adaptor) {
-        return false;
-    }
-
-    @Override
-    public Schema getSchema(RuntimeContainer adaptor, String schemaName) throws IOException {
-        return null;
-    }
-
-    @Override
-    public List<NamedThing> getSchemaNames(RuntimeContainer adaptor) throws IOException {
-        return null;
-    }
-
-
 }

@@ -16,12 +16,29 @@ import org.talend.daikon.schema.SchemaElement.Type;
 import org.talend.daikon.schema.SchemaFactory;
 
 /**
- * Define properties and layout for the ${componentName} component
+ * The ComponentProperties subclass provided by a component stores the 
+ * configuration of a component and is used for:
+ * 
+ * <ol>
+ * <li>Specifying the format and type of information (properties) that is 
+ *     provided at design-time to configure a component for run-time,</li>
+ * <li>Validating the properties of the component at design-time,</li>
+ * <li>Containing the untyped values of the properties, and</li>
+ * <li>All of the UI information for laying out and presenting the 
+ *     properties to the user.</li>
+ * </ol>
+ * 
+ * The ${componentName}Properties has two properties:
+ * <ol>
+ * <li>{code filename}, a simple property which is a String containing the 
+ *     file path that this component will read.</li>
+ * <li>{code schema}, an embedded property referring to a Schema.</li>
+ * </ol>
  */
 public class ${componentName}Properties extends ComponentProperties {
 
     public Property filename = PropertyFactory.newString("filename"); //$NON-NLS-1$
-    public SchemaProperties schema = new SchemaProperties("schema");
+    public SchemaProperties schema = new SchemaProperties("schema"); //$NON-NLS-1$
 
     public ${componentName}Properties(String name) {
         super(name);

@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
+import org.apache.avro.Schema;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
-import org.talend.daikon.schema.Schema;
 
 public interface SourceOrSink extends Serializable {
 

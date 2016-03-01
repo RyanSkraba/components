@@ -20,6 +20,11 @@ import org.talend.components.api.properties.ComponentProperties;
 
 import aQute.bnd.annotation.component.Component;
 
+/**
+ * The ${componentName}Definition acts as an entry point for all of services that 
+ * a component provides to integrate with the Studio (at design-time) and other 
+ * components (at run-time).
+ */
 @Component(name = Constants.COMPONENT_BEAN_PREFIX + ${componentName}Definition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class ${componentName}Definition extends AbstractComponentDefinition implements InputComponentDefinition {
 
