@@ -28,6 +28,7 @@ import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.SalesforceBulkProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
+import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.SalesforceUserPasswordProperties;
 import org.talend.components.salesforce.runtime.SalesforceSource;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties.ModuleSubclass;
@@ -61,9 +62,8 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition implemen
     @SuppressWarnings("unchecked")
     @Override
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
-        return new Class[] { SchemaProperties.class, ModuleSubclass.class, SalesforceConnectionProperties.class,
-                OauthProperties.class, SalesforceUserPasswordProperties.class, ProxyProperties.class,
-                UserPasswordProperties.class, SalesforceBulkProperties.class };
+        return concatPropertiesClasses(super.getNestedCompatibleComponentPropertiesClass(),
+                new Class[] { SalesforceModuleProperties.class });
     }
 
     @Override

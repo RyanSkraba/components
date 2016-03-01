@@ -53,16 +53,4 @@ public class TSalesforceGetDeletedDefinition extends SalesforceDefinition implem
         return TSalesforceGetDeletedProperties.class;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
-        return new Class[] { OauthProperties.class, SalesforceUserPasswordProperties.class, ProxyProperties.class,
-                UserPasswordProperties.class };
-    }
-
-    @Override
-    public Source getRuntime() {
-        return new SalesforceSource();
-    }
-
 }

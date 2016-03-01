@@ -54,11 +54,7 @@ public class TSalesforceOutputBulkDefinition extends SalesforceDefinition implem
     @Override
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return concatPropertiesClasses(super.getNestedCompatibleComponentPropertiesClass(),
-                new Class[] { SchemaProperties.class });
+                new Class[] {SchemaProperties.class });
     }
 
-    @Override
-    public Sink getRuntime() {
-        return new SalesforceSink();
-    }
 }
