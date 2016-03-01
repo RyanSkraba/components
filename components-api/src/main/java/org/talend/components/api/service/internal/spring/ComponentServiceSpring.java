@@ -334,8 +334,8 @@ public class ComponentServiceSpring implements ComponentService {
 
     // FIXME - make this work for web
     @Override
-    public String storeProperties(ComponentProperties properties, String name, String repositoryLocation, Schema schema) {
-        return componentServiceDelegate.storeProperties(properties, name, repositoryLocation, schema);
+    public String storeProperties(ComponentProperties properties, String name, String repositoryLocation, String schemaPropertyName) {
+        return componentServiceDelegate.storeProperties(properties, name, repositoryLocation, schemaPropertyName);
     }
 
 }

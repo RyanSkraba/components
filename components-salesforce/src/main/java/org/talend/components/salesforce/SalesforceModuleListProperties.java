@@ -95,7 +95,7 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
             Schema schema = SalesforceSourceOrSink.getSchema(this, nl.getName());
             modProps.moduleName.setValue(nl.getName());
             modProps.schema.schema.setValue(schema);
-            repo.storeProperties(modProps, nl.getName(), connRepLocation, schema);
+            repo.storeProperties(modProps, nl.getName(), connRepLocation, "schema.schema");
         }
         return ValidationResult.OK;
     }

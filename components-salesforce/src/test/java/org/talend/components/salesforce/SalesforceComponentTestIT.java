@@ -117,11 +117,15 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
         Schema schema;
 
-        RepoProps(Properties props, String name, String repoLocation, Schema schema) {
+        String schemaPropertyName;
+
+        RepoProps(Properties props, String name, String repoLocation, String schemaPropertyName) {
             this.props = props;
             this.name = name;
             this.repoLocation = repoLocation;
-            this.schema = schema;
+            this.schemaPropertyName = schemaPropertyName;
+            if (schemaPropertyName != null)
+                this.schema = (Schema) props.getValuedProperty(schemaPropertyName).getValue();
         }
 
         @Override
@@ -145,8 +149,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         }
 
         @Override
-        public String storeProperties(Properties properties, String name, String repositoryLocation, Schema schema) {
-            RepoProps rp = new RepoProps(properties, name, repositoryLocation, schema);
+        public String storeProperties(Properties properties, String name, String repositoryLocation, String schemaPropertyName) {
+            RepoProps rp = new RepoProps(properties, name, repositoryLocation, schemaPropertyName);
             repoProps.add(rp);
             System.out.println(rp);
             return repositoryLocation + ++locationNum;
