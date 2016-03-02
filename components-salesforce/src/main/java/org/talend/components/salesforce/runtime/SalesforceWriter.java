@@ -20,12 +20,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.container.ComponentDynamicHolder;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
-import org.talend.components.api.container.ComponentDynamicHolder;
-import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
+import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement;
 
 import com.sforce.soap.partner.DeleteResult;
@@ -97,10 +98,9 @@ final class SalesforceWriter implements Writer<WriterResult> {
     public void open(String uId) throws IOException {
         this.uId = uId;
         connection = sink.connect();
-        // DO NOT SUBMIT
-        // Schema schema = null; //sink.getSchema(adaptor, sprops.module.moduleName.getStringValue());
-        // fieldMap = schema.getRoot().getChildMap();
-        // fieldList = schema.getRoot().getChildren();
+        Schema schema = sink.getSchema(adaptor, sprops.module.moduleName.getStringValue());
+        fieldMap = schema.getRoot().getChildMap();
+        fieldList = schema.getRoot().getChildren();
 
         for (SchemaElement se : fieldList) {
             if (se.getType() == SchemaElement.Type.DYNAMIC) {
@@ -308,8 +308,8 @@ final class SalesforceWriter implements Writer<WriterResult> {
         if (success) {
             // TODO: send back the ID
         } else {
-            errors = SalesforceRuntime.addLog(resultErrors, batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx]
-                    : "Batch index out of bounds", null);
+            errors = SalesforceRuntime.addLog(resultErrors,
+                    batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx] : "Batch index out of bounds", null);
         }
         if (exceptionForErrors && errors.toString().length() > 0) {
             throw new IOException(errors.toString());

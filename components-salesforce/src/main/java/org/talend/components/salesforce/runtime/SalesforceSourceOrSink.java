@@ -299,4 +299,5 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             throw new IOException(e);
         }
     }
+
 }
