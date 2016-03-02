@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.avro.Schema;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.Writer;
@@ -29,7 +30,6 @@ import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.Property;
-import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement;
 
 public class SalesforceWriterTestIT extends SalesforceTestBase {

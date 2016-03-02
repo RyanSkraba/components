@@ -17,12 +17,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.avro.Schema;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
-import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement;
 
 import com.sforce.ws.ConnectionException;
+import org.talend.daikon.schema.avro.util.AvroUtils;
 
 public class SalesforceInputReader extends SalesforceReader {
 
@@ -40,10 +41,10 @@ public class SalesforceInputReader extends SalesforceReader {
     public boolean start() throws IOException {
         super.start();
         Schema schema = source.getSchema(adaptor, properties.module.moduleName.getStringValue());
-        fieldMap = schema.getRoot().getChildMap();
-        fieldList = schema.getRoot().getChildren();
+        fieldMap = AvroUtils.makeFieldMap(schema);
+        fieldList = schema.getFields();
 
-        for (SchemaElement se : fieldList) {
+        for (Schema.Field se : fieldList) {
             if (se.getType() == SchemaElement.Type.DYNAMIC) {
                 dynamicField = se;
                 break;
@@ -58,21 +59,21 @@ public class SalesforceInputReader extends SalesforceReader {
          */
         if (dynamicField != null) {
             dynamicFieldMap = new HashMap<>();
-            List<SchemaElement> filteredDynamicFields = new ArrayList<>();
+            List<Schema.Field> filteredDynamicFields = new ArrayList<>();
             Schema dynSchema = schema;
 
-            for (SchemaElement se : dynSchema.getRoot().getChildren()) {
-                if (fieldMap.containsKey(se.getName())) {
+            for (Schema.Field se : dynSchema.getFields()) {
+                if (fieldMap.containsKey(se.name())) {
                     continue;
                 }
                 filteredDynamicFields.add(se);
-                dynamicFieldMap.put(se.getName(), se);
+                dynamicFieldMap.put(se.name(), se);
             }
             dynamicFieldList = filteredDynamicFields;
         }
 
         inputFieldsToUse = new ArrayList<>();
-        for (SchemaElement s : fieldList) {
+        for (Schema.Field s : fieldList) {
             if (s.getType() == SchemaElement.Type.DYNAMIC) {
                 continue;
             }
@@ -89,11 +90,11 @@ public class SalesforceInputReader extends SalesforceReader {
             StringBuilder sb = new StringBuilder();
             sb.append("select ");
             int count = 0;
-            for (SchemaElement se : inputFieldsToUse) {
+            for (Schema.Field se : inputFieldsToUse) {
                 if (count++ > 0) {
                     sb.append(", ");
                 }
-                sb.append(se.getName());
+                sb.append(se.name());
             }
             sb.append(" from ");
             sb.append(properties.module.moduleName.getStringValue());

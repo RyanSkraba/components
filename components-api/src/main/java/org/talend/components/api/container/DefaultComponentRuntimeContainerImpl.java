@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.talend.daikon.schema.SchemaElement;
+import org.apache.avro.Schema;
 
 /**
  * An implementation of a runtime container for testing purposes.
@@ -31,17 +31,17 @@ public class DefaultComponentRuntimeContainerImpl implements RuntimeContainer {
 
     class Dynamic implements ComponentDynamicHolder {
 
-        private List<SchemaElement> schemaElements;
+        private List<Schema.Field> schemaElements;
 
         private Map<String, Object> values = new HashMap<>();
 
         @Override
-        public List<SchemaElement> getSchemaElements() {
+        public List<Schema.Field> getSchemaElements() {
             return schemaElements;
         }
 
         @Override
-        public void setSchemaElements(List<SchemaElement> elements) {
+        public void setSchemaElements(List<Schema.Field> elements) {
             this.schemaElements = elements;
         }
 

@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.apache.avro.Schema;
 import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,28 +47,28 @@ public class SalesforceReader implements BoundedReader {
 
     protected int inputRecordsIndex;
 
-    protected Map<String, SchemaElement> fieldMap;
+    protected Map<String, Schema.Field> fieldMap;
 
-    protected List<SchemaElement> fieldList;
+    protected List<Schema.Field> fieldList;
 
     /*
      * Used on input only, this is read from the module schema, it contains all of the fields from the salesforce
      * definition of the module that are not already in the field list.
      */
-    protected List<SchemaElement> dynamicFieldList;
+    protected List<Schema.Field> dynamicFieldList;
 
-    protected Map<String, SchemaElement> dynamicFieldMap;
+    protected Map<String, Schema.Field> dynamicFieldMap;
 
     /*
      * The actual fields we read on input which is a combination of the fields specified in the schema and the dynamic
      * fields.
      */
-    protected List<SchemaElement> inputFieldsToUse;
+    protected List<Schema.Field> inputFieldsToUse;
 
     /*
      * The dynamic column that is specified on the input schema.
      */
-    protected SchemaElement dynamicField;
+    protected Schema.Field dynamicField;
 
     protected PartnerConnection connection;
 
@@ -122,7 +123,7 @@ public class SalesforceReader implements BoundedReader {
             }
         }
         if (dynamicHolder != null) {
-            columns.put(dynamicField.getName(), dynamicHolder);
+            columns.put(dynamicField.name(), dynamicHolder);
         }
         return columns;
     }

@@ -20,13 +20,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.avro.Schema;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.container.ComponentDynamicHolder;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
-import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement;
 
 import com.sforce.soap.partner.DeleteResult;
@@ -36,6 +36,7 @@ import com.sforce.soap.partner.SaveResult;
 import com.sforce.soap.partner.UpsertResult;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
+import org.talend.daikon.schema.avro.util.AvroUtils;
 
 final class SalesforceWriter implements Writer<WriterResult> {
 
@@ -49,11 +50,11 @@ final class SalesforceWriter implements Writer<WriterResult> {
 
     private RuntimeContainer adaptor;
 
-    private Map<String, SchemaElement> fieldMap;
+    private Map<String, Schema.Field> fieldMap;
 
-    private List<SchemaElement> fieldList;
+    private List<Schema.Field> fieldList;
 
-    private SchemaElement dynamicField;
+    private Schema.Field dynamicField;
 
     private TSalesforceOutputProperties sprops;
 
@@ -99,10 +100,10 @@ final class SalesforceWriter implements Writer<WriterResult> {
         this.uId = uId;
         connection = sink.connect();
         Schema schema = sink.getSchema(adaptor, sprops.module.moduleName.getStringValue());
-        fieldMap = schema.getRoot().getChildMap();
-        fieldList = schema.getRoot().getChildren();
+        fieldMap = AvroUtils.makeFieldMap(schema);
+        fieldList = schema.getFields();
 
-        for (SchemaElement se : fieldList) {
+        for (Schema.Field se : fieldList) {
             if (se.getType() == SchemaElement.Type.DYNAMIC) {
                 dynamicField = se;
                 break;
@@ -124,7 +125,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
             for (String key : row.keySet()) {
                 Object value = row.get(key);
                 if (value != null) {
-                    SchemaElement se = fieldMap.get(key);
+                    Schema.Field se = fieldMap.get(key);
                     if (se != null && se.getType() != SchemaElement.Type.DYNAMIC) {
                         addSObjectField(so, se, value);
                     }
@@ -132,10 +133,10 @@ final class SalesforceWriter implements Writer<WriterResult> {
             }
 
             if (dynamicField != null) {
-                ComponentDynamicHolder dynamic = (ComponentDynamicHolder) row.get(dynamicField.getName());
-                List<SchemaElement> dynamicSes = dynamic.getSchemaElements();
-                for (SchemaElement dynamicSe : dynamicSes) {
-                    Object value = dynamic.getFieldValue(dynamicSe.getName());
+                ComponentDynamicHolder dynamic = (ComponentDynamicHolder) row.get(dynamicField.name());
+                List<Schema.Field> dynamicSes = dynamic.getSchemaElements();
+                for (Schema.Field dynamicSe : dynamicSes) {
+                    Object value = dynamic.getFieldValue(dynamicSe.name());
                     addSObjectField(so, dynamicSe, value);
                 }
             }
@@ -166,7 +167,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
     protected String getIdValue(Map<String, Object> row) {
         String ID = "Id";
         if (row.get(ID) != null) {
-            SchemaElement se = fieldMap.get(ID);
+            Schema.Field se = fieldMap.get(ID);
             if (se.getType() != SchemaElement.Type.DYNAMIC) {
                 return (String) row.get(ID);
             }
@@ -176,10 +177,10 @@ final class SalesforceWriter implements Writer<WriterResult> {
             throw new RuntimeException("Expected dynamic column to be available");
         }
 
-        ComponentDynamicHolder dynamic = (ComponentDynamicHolder) row.get(dynamicField.getName());
-        List<SchemaElement> dynamicSes = dynamic.getSchemaElements();
-        for (SchemaElement dynamicSe : dynamicSes) {
-            if (dynamicSe.getName().equals(ID)) {
+        ComponentDynamicHolder dynamic = (ComponentDynamicHolder) row.get(dynamicField.name());
+        List<Schema.Field> dynamicSes = dynamic.getSchemaElements();
+        for (Schema.Field dynamicSe : dynamicSes) {
+            if (dynamicSe.name().equals(ID)) {
                 return (String) dynamic.getFieldValue(ID);
             }
         }
@@ -188,7 +189,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
         throw new RuntimeException(ID + " not found in dynamic columns");
     }
 
-    protected void addSObjectField(SObject sObject, SchemaElement se, Object value) {
+    protected void addSObjectField(SObject sObject, Schema.Field se, Object value) {
         Object valueToAdd;
         switch (se.getType()) {
         case BYTE_ARRAY:
@@ -202,7 +203,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
             valueToAdd = value;
             break;
         }
-        sObject.setField(se.getName(), valueToAdd);
+        sObject.setField(se.name(), valueToAdd);
     }
 
     protected SaveResult[] insert(SObject sObject) throws IOException {

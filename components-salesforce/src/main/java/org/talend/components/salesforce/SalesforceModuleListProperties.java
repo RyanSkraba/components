@@ -17,6 +17,7 @@ import static org.talend.daikon.properties.presentation.Widget.*;
 
 import java.util.List;
 
+import org.apache.avro.Schema;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 import org.talend.daikon.NamedThing;
@@ -26,7 +27,6 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.service.Repository;
-import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement;
 
 public class SalesforceModuleListProperties extends ComponentProperties implements SalesforceProvideConnectionProperties {

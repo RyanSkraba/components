@@ -20,6 +20,7 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.avro.Schema;
 import org.junit.Test;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
@@ -27,7 +28,6 @@ import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult.Result;
-import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement.Type;
 import org.talend.daikon.schema.SchemaFactory;
 
