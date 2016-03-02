@@ -19,10 +19,6 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.apache.avro.Schema;
-import org.apache.avro.SchemaBuilder;
-import org.apache.avro.SchemaBuilder.BaseFieldTypeBuilder;
-import org.apache.avro.SchemaBuilder.FieldAssembler;
-import org.apache.avro.SchemaBuilder.FieldBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +38,6 @@ import com.sforce.async.BulkConnection;
 import com.sforce.soap.partner.DescribeGlobalResult;
 import com.sforce.soap.partner.DescribeGlobalSObjectResult;
 import com.sforce.soap.partner.DescribeSObjectResult;
-import com.sforce.soap.partner.Field;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.SessionHeader_element;
 import com.sforce.ws.ConnectionException;
@@ -212,61 +207,6 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         return returnList;
     }
 
-    public FieldAssembler<Schema> setupSchemaElement(Field field, FieldAssembler<Schema> builder) {
-
-        FieldAssembler<Schema> fa = builder;
-        FieldBuilder<Schema> fieldBuilder = fa.name(field.getName());
-
-        BaseFieldTypeBuilder<Schema> fieldTypeBuilder;
-        if (field.getNillable()) {
-            fieldTypeBuilder = fieldBuilder.type().nullable();
-        } else {
-            fieldTypeBuilder = fieldBuilder.type();
-        }
-
-        String type = field.getType().toString();
-        if (type.equals("boolean")) { //$NON-NLS-1$
-            if (field.getDefaultValueFormula() != null) {
-                fa = fieldTypeBuilder.booleanType().booleanDefault(Boolean.parseBoolean(field.getDefaultValueFormula()));
-            } else {
-                fa = fieldTypeBuilder.booleanType().noDefault();
-            }
-        } else if (type.equals("int")) { //$NON-NLS-1$
-            if (field.getDefaultValueFormula() != null) {
-                fa = fieldTypeBuilder.intType().intDefault(Integer.parseInt(field.getDefaultValueFormula()));
-            } else {
-                fa = fieldTypeBuilder.intType().noDefault();
-            }
-        } else if (type.equals("date")) { //$NON-NLS-1$
-            // DO NOT SUBMIT
-            // builder.setType(SchemaElement.Type.DATE);
-            //            builder.setPattern("\"yyyy-MM-dd\""); //$NON-NLS-1$
-        } else if (type.equals("datetime")) { //$NON-NLS-1$
-            // DO NOT SUBMIT
-            // builder.setType(SchemaElement.Type.DATETIME);
-            //            builder.setPattern("\"yyyy-MM-dd\'T\'HH:mm:ss\'.000Z\'\""); //$NON-NLS-1$
-        } else if (type.equals("double")) { //$NON-NLS-1$
-            if (field.getDefaultValueFormula() != null) {
-                fa = fieldTypeBuilder.doubleType().doubleDefault(Double.parseDouble(field.getDefaultValueFormula()));
-            } else {
-                fa = fieldTypeBuilder.doubleType().noDefault();
-            }
-        } else if (type.equals("currency")) { //$NON-NLS-1$
-            // DO NOT SUBMIT
-            // builder.setType(SchemaElement.Type.DECIMAL);
-        }
-
-        // DO NOT SUBMIT
-        // if (builder.getType() == SchemaElement.Type.STRING) {
-        // builder.setSize(field.getLength());
-        // builder.setPrecision(field.getPrecision());
-        // } else {
-        // builder.setSize(field.getPrecision());
-        // builder.setPrecision(field.getScale());
-        // }
-        return fa;
-    }
-
     public static Schema getSchema(SalesforceProvideConnectionProperties properties, String module) throws IOException {
         SalesforceSourceOrSink ss = new SalesforceSourceOrSink();
         ss.initialize(null, (ComponentProperties) properties);
@@ -286,18 +226,11 @@ public class SalesforceSourceOrSink implements SourceOrSink {
 
     public Schema getSchema(PartnerConnection connection, String module) throws IOException {
         try {
-            FieldAssembler<Schema> builder = SchemaBuilder.builder().record(module).fields();
-
             DescribeSObjectResult[] describeSObjectResults = new DescribeSObjectResult[0];
             describeSObjectResults = connection.describeSObjects(new String[] { module });
-            Field fields[] = describeSObjectResults[0].getFields();
-            for (Field field : fields) {
-                builder = setupSchemaElement(field, builder);
-            }
-            return builder.endRecord();
+            return SalesforceAvroRegistry.get().inferSchema(describeSObjectResults[0]);
         } catch (ConnectionException e) {
             throw new IOException(e);
         }
     }
-
 }

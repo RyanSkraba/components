@@ -12,12 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,6 +54,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         super();
     }
 
+    @Override
     protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props) throws Throwable {
         assertTrue(form.getWidget(propName).isCallAfter());
         return getComponentService().afterProperty(propName, props);
@@ -124,8 +120,9 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
             this.name = name;
             this.repoLocation = repoLocation;
             this.schemaPropertyName = schemaPropertyName;
-            if (schemaPropertyName != null)
+            if (schemaPropertyName != null) {
                 this.schema = (Schema) props.getValuedProperty(schemaPropertyName).getValue();
+            }
         }
 
         @Override
@@ -186,8 +183,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         }
         assertEquals(1, count);
         assertEquals("Create SalesforceNew Connection", wizardDef.getMenuItemName());
-        ComponentWizard wiz = getComponentService().getComponentWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
-                "nodeSalesforce");
+        ComponentWizard wiz = getComponentService().getComponentWizard(
+                SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, "nodeSalesforce");
         assertNotNull(wiz);
         assertEquals("nodeSalesforce", wiz.getRepositoryLocation());
         SalesforceConnectionWizard swiz = (SalesforceConnectionWizard) wiz;
@@ -205,9 +202,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connFormWizard.getProperties();
 
         Form af = connProps.getForm(Form.ADVANCED);
-        assertTrue(
-                ((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() + " should be == to " + af,
-                ((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() == af);
+        assertTrue(((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() + " should be == to "
+                + af, ((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() == af);
 
         Object image = getComponentService().getWizardPngImage(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
                 WizardImageType.TREE_ICON_16X16);
@@ -228,8 +224,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         // check name i18n
         NamedThing nameProp = connFormWizard.getWidget("name").getContent(); //$NON-NLS-1$
         assertEquals("Name", nameProp.getDisplayName());
-        connProps = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), connFormWizard,
-                "testConnection", connProps);
+        connProps = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(),
+                connFormWizard, "testConnection", connProps);
         assertTrue(connFormWizard.isAllowForward());
 
         Form modForm = forms.get(1);
@@ -280,14 +276,14 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
     @Test
     public void testModuleWizard() throws Throwable {
-        ComponentWizard wiz = getComponentService().getComponentWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
-                "nodeSalesforce");
+        ComponentWizard wiz = getComponentService().getComponentWizard(
+                SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, "nodeSalesforce");
         List<Form> forms = wiz.getForms();
         Form connFormWizard = forms.get(0);
         SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connFormWizard.getProperties();
 
-        ComponentWizard[] subWizards = getComponentService().getComponentWizardsForProperties(connProps, "location")
-                .toArray(new ComponentWizard[3]);
+        ComponentWizard[] subWizards = getComponentService().getComponentWizardsForProperties(connProps, "location").toArray(
+                new ComponentWizard[3]);
         Arrays.sort(subWizards, new Comparator<ComponentWizard>() {
 
             @Override
@@ -366,8 +362,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
     private SalesforceConnectionProperties setupOAuthProps(SalesforceConnectionProperties props) throws Throwable {
         if (props == null) {
-            props = (SalesforceConnectionProperties) getComponentService()
-                    .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
+            props = (SalesforceConnectionProperties) getComponentService().getComponentProperties(
+                    TSalesforceConnectionDefinition.COMPONENT_NAME);
         }
         props.loginType.setValue(SalesforceConnectionProperties.LOGIN_OAUTH);
         Form mainForm = props.getForm(Form.MAIN);
@@ -405,8 +401,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
     @Test
     public void testModuleNames() throws Throwable {
-        TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
-                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
+        TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService().getComponentProperties(
+                TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection, !ADD_QUOTES);
         ComponentTestUtils.checkSerialize(props, errorCollector);
 
@@ -427,8 +423,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
     @Test
     public void testSchema() throws Throwable {
-        TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
-                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
+        TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService().getComponentProperties(
+                TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection, !ADD_QUOTES);
 
         Form f = props.module.getForm(Form.REFERENCE);
@@ -449,8 +445,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
     @Test
     public void testOutputActionType() throws Throwable {
         ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
-        TSalesforceOutputProperties outputProps = (TSalesforceOutputProperties) getComponentService()
-                .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
+        TSalesforceOutputProperties outputProps = (TSalesforceOutputProperties) getComponentService().getComponentProperties(
+                TSalesforceOutputDefinition.COMPONENT_NAME);
         setupProps(outputProps.connection, !ADD_QUOTES);
 
         outputProps.outputAction.setValue(TSalesforceOutputProperties.ACTION_DELETE);

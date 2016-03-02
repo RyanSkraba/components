@@ -12,10 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,11 +26,6 @@ import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult.Result;
-import org.talend.daikon.schema.SchemaElement.Type;
-import org.talend.daikon.schema.SchemaFactory;
-
-import com.sforce.soap.partner.Field;
-import com.sforce.soap.partner.FieldType;
 
 public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
 
@@ -78,44 +71,12 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
     }
 
     @Test
-    public void testSetupSchemaElement() {
-        Field field = new Field();
-        Schema newSchema = SchemaFactory.newSchema();
-        field.setType(FieldType._boolean);
-        SalesforceSourceOrSink salesforceSourceOrSink = new SalesforceSourceOrSink();
-        newSchema.setRoot(SchemaFactory.newSchemaElement(Type.SCHEMA, ""));
-        assertEquals(Type.SCHEMA, newSchema.getRoot().getType());
-        //
-        salesforceSourceOrSink.setupSchemaElement(field, newSchema.getRoot());
-        assertEquals(Type.BOOLEAN, newSchema.getRoot().getType());
-        //
-        field.setType(FieldType._int);
-        salesforceSourceOrSink.setupSchemaElement(field, newSchema.getRoot());
-        assertEquals(Type.INT, newSchema.getRoot().getType());
-        //
-        field.setType(FieldType.date);
-        salesforceSourceOrSink.setupSchemaElement(field, newSchema.getRoot());
-        assertEquals(Type.DATE, newSchema.getRoot().getType());
-        //
-        field.setType(FieldType.datetime);
-        salesforceSourceOrSink.setupSchemaElement(field, newSchema.getRoot());
-        assertEquals(Type.DATETIME, newSchema.getRoot().getType());
-        //
-        field.setType(FieldType._double);
-        salesforceSourceOrSink.setupSchemaElement(field, newSchema.getRoot());
-        assertEquals(Type.DOUBLE, newSchema.getRoot().getType());
-        //
-        field.setType(FieldType.currency);
-        salesforceSourceOrSink.setupSchemaElement(field, newSchema.getRoot());
-        assertEquals(Type.DECIMAL, newSchema.getRoot().getType());
-    }
-
-    @Test
     public void testGetSchema() throws IOException {
         SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
         Schema schema = SalesforceSourceOrSink.getSchema(scp, EXISTING_MODULE_NAME);
         assertNotNull(schema);
-        assertTrue(schema.getRoot().getChildren().size() > 10);
+        assertThat(schema.getFields(), hasSize(greaterThan(10)));
+        // assertTrue(schema.getRoot().getChildren().size() > 10);
     }
 
     @Test

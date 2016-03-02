@@ -12,22 +12,21 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import static org.talend.daikon.talend6.Talend6SchemaOutputEnforcer.*;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.avro.Schema;
-import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.container.ComponentDynamicHolder;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.api.container.ComponentDynamicHolder;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
-import org.talend.daikon.schema.SchemaElement;
+import org.talend.daikon.schema.avro.util.AvroUtils;
 
 import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.Error;
@@ -36,7 +35,6 @@ import com.sforce.soap.partner.SaveResult;
 import com.sforce.soap.partner.UpsertResult;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
-import org.talend.daikon.schema.avro.util.AvroUtils;
 
 final class SalesforceWriter implements Writer<WriterResult> {
 
@@ -104,7 +102,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
         fieldList = schema.getFields();
 
         for (Schema.Field se : fieldList) {
-            if (se.getType() == SchemaElement.Type.DYNAMIC) {
+            if (isDynamic(se)) {
                 dynamicField = se;
                 break;
             }
@@ -126,7 +124,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
                 Object value = row.get(key);
                 if (value != null) {
                     Schema.Field se = fieldMap.get(key);
-                    if (se != null && se.getType() != SchemaElement.Type.DYNAMIC) {
+                    if (se != null && !isDynamic(se)) {
                         addSObjectField(so, se, value);
                     }
                 }
@@ -168,7 +166,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
         String ID = "Id";
         if (row.get(ID) != null) {
             Schema.Field se = fieldMap.get(ID);
-            if (se.getType() != SchemaElement.Type.DYNAMIC) {
+            if (!isDynamic(se)) {
                 return (String) row.get(ID);
             }
         }
@@ -190,19 +188,21 @@ final class SalesforceWriter implements Writer<WriterResult> {
     }
 
     protected void addSObjectField(SObject sObject, Schema.Field se, Object value) {
-        Object valueToAdd;
-        switch (se.getType()) {
-        case BYTE_ARRAY:
-            valueToAdd = Charset.defaultCharset().decode(ByteBuffer.wrap((byte[]) value)).toString();
-            break;
-        case DATE:
-        case DATETIME:
-            valueToAdd = adaptor.formatDate((Date) value, se.getPattern());
-            break;
-        default:
-            valueToAdd = value;
-            break;
-        }
+        Object valueToAdd = null;
+        // DO NOT SUBMIT
+        // Object valueToAdd;
+        // switch (se.getType()) {
+        // case BYTE_ARRAY:
+        // valueToAdd = Charset.defaultCharset().decode(ByteBuffer.wrap((byte[]) value)).toString();
+        // break;
+        // case DATE:
+        // case DATETIME:
+        // valueToAdd = adaptor.formatDate((Date) value, se.getPattern());
+        // break;
+        // default:
+        // valueToAdd = value;
+        // break;
+        // }
         sObject.setField(se.name(), valueToAdd);
     }
 
@@ -309,8 +309,8 @@ final class SalesforceWriter implements Writer<WriterResult> {
         if (success) {
             // TODO: send back the ID
         } else {
-            errors = SalesforceRuntime.addLog(resultErrors,
-                    batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx] : "Batch index out of bounds", null);
+            errors = SalesforceRuntime.addLog(resultErrors, batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx]
+                    : "Batch index out of bounds", null);
         }
         if (exceptionForErrors && errors.toString().length() > 0) {
             throw new IOException(errors.toString());

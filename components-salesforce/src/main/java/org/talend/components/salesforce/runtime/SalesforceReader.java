@@ -23,11 +23,10 @@ import org.apache.avro.Schema;
 import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.container.ComponentDynamicHolder;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
-import org.talend.daikon.schema.SchemaElement;
+import org.talend.components.api.container.ComponentDynamicHolder;
+import org.talend.components.api.container.RuntimeContainer;
 
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.QueryResult;

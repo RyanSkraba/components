@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import static org.talend.daikon.talend6.Talend6SchemaOutputEnforcer.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,10 +22,9 @@ import java.util.List;
 import org.apache.avro.Schema;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
-import org.talend.daikon.schema.SchemaElement;
+import org.talend.daikon.schema.avro.util.AvroUtils;
 
 import com.sforce.ws.ConnectionException;
-import org.talend.daikon.schema.avro.util.AvroUtils;
 
 public class SalesforceInputReader extends SalesforceReader {
 
@@ -45,7 +46,7 @@ public class SalesforceInputReader extends SalesforceReader {
         fieldList = schema.getFields();
 
         for (Schema.Field se : fieldList) {
-            if (se.getType() == SchemaElement.Type.DYNAMIC) {
+            if (isDynamic(se)) {
                 dynamicField = se;
                 break;
             }
@@ -74,7 +75,7 @@ public class SalesforceInputReader extends SalesforceReader {
 
         inputFieldsToUse = new ArrayList<>();
         for (Schema.Field s : fieldList) {
-            if (s.getType() == SchemaElement.Type.DYNAMIC) {
+            if (isDynamic(s)) {
                 continue;
             }
             inputFieldsToUse.add(s);
@@ -111,5 +112,4 @@ public class SalesforceInputReader extends SalesforceReader {
         inputRecordsIndex = 0;
         return inputResult.getSize() > 0;
     }
-
 }
