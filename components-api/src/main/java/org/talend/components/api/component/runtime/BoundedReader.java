@@ -1,11 +1,11 @@
 /*
  * Copyright (C) 2015 Google Inc.
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -50,7 +50,7 @@ import org.joda.time.Instant;
  * rebalancing, please use that class to implement it if possible; if not possible, please contact the team at
  * <i>dataflow-feedback@google.com</i>.
  */
-public interface BoundedReader extends Reader {
+public interface BoundedReader<T> extends Reader<T> {
 
     /**
      * Returns a value in [0, 1] representing approximately what fraction of the {@link #getCurrentSource current
@@ -103,7 +103,7 @@ public interface BoundedReader extends Reader {
      *   public FooReader(FooSource<T> source) {
      *     super(source);
      *   }
-     *
+     * 
      *   public FooSource<T> getCurrentSource() {
      *     return (FooSource<T>)super.getCurrentSource();
      *   }
@@ -115,11 +115,11 @@ public interface BoundedReader extends Reader {
      * <pre>
      * {@code
      *   private final FooSource<T> source;
-     *
+     * 
      *   public FooReader(FooSource<T> source) {
      *     this.source = source;
      *   }
-     *
+     * 
      *   public FooSource<T> getCurrentSource() {
      *     return source;
      *   }
@@ -132,15 +132,15 @@ public interface BoundedReader extends Reader {
      * <pre>
      * {@code
      *   private FooSource<T> source;
-     *
+     * 
      *   public FooReader(FooSource<T> source) {
      *     this.source = source;
      *   }
-     *
+     * 
      *   public synchronized FooSource<T> getCurrentSource() {
      *     return source;
      *   }
-     *
+     * 
      *   public synchronized FooSource<T> splitAtFraction(double fraction) {
      *     ...
      *     FooSource<T> primary = ...;

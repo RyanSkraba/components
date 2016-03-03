@@ -1,4 +1,3 @@
-
 package ${package};
 
 import static org.junit.Assert.*;
@@ -11,6 +10,7 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.test.SimpleComponentRegistry;
 
+@SuppressWarnings("nls")
 public class ${componentName}TestIT {
 
     @Rule

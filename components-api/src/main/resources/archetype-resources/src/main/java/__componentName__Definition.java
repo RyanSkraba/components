@@ -39,7 +39,7 @@ public class ${componentName}Definition extends AbstractComponentDefinition impl
 
     @Override
     public String[] getFamilies() {
-        return new String[] { "File/input" };
+        return new String[] { "File/input" }; //$NON-NLS-1$
     }
 
     @Override
@@ -54,7 +54,7 @@ public class ${componentName}Definition extends AbstractComponentDefinition impl
 
     @Override
     public InputStream getMavenPom() {
-        return this.getClass().getResourceAsStream("pom.xml");
+        return this.getClass().getResourceAsStream("pom.xml"); //$NON-NLS-1$
     }
 
     @Override

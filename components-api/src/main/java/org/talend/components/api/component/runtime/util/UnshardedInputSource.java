@@ -14,7 +14,7 @@ import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 
 /**
- * A wrapper for the an {@link UnshardedInput} so that it can be run remotely.
+ * A wrapper for the an {@link UnshardedInputIterator} so that it can be run remotely.
  * 
  * This implements all of the methods for a sharded (or multi-partitioned) input, but guarantees that only one partition
  * will be assigned used.
@@ -26,18 +26,31 @@ public abstract class UnshardedInputSource<T> implements BoundedSource {
     /** Default serial version UID. */
     private static final long serialVersionUID = 1L;
 
-    /** The actual implementation of the unsharded reader. */
-    private UnshardedInput<T> unshardedInput;
+    /** The actual implementation of the unsharded reader (only one of these will be non-null). */
+    private UnshardedInputIterator<T> unshardedInputIterator;
 
-    /** The actual implementation of the unsharded reader. */
+    /** The actual implementation of the unsharded reader (only one of these will be non-null). */
+    private UnshardedInputAdvancer<T> unshardedInputAdvancer;
+
+    /** Whether this implementation produces sorted keys. */
     private boolean producesSortedKeys = false;
 
     /**
      * Set up the unsharded input for this source. This must be called before the BoundedReader supplied by
      * {@link #createReader(RuntimeContainer)} method is used.
      */
-    protected void setUnshardedInput(UnshardedInput<T> unshardedInput) {
-        this.unshardedInput = unshardedInput;
+    protected void setUnshardedInput(UnshardedInputIterator<T> unshardedInput) {
+        this.unshardedInputIterator = unshardedInput;
+        this.unshardedInputAdvancer = null;
+    }
+
+    /**
+     * Set up the unsharded input for this source. This must be called before the BoundedReader supplied by
+     * {@link #createReader(RuntimeContainer)} method is used.
+     */
+    protected void setUnshardedInput(UnshardedInputAdvancer<T> unshardedInput) {
+        this.unshardedInputIterator = null;
+        this.unshardedInputAdvancer = unshardedInput;
     }
 
     /**
@@ -66,7 +79,14 @@ public abstract class UnshardedInputSource<T> implements BoundedSource {
 
     @Override
     public BoundedReader createReader(RuntimeContainer adaptor) {
-        return new UnshardedInputBoundedReader();
+        if (unshardedInputIterator != null) {
+            return new UnshardedInputIteratorBoundedReader();
+        }
+        if (unshardedInputAdvancer != null) {
+            return new UnshardedInputAdvancerBoundedReader();
+        }
+        // This must never occur.
+        throw new IllegalArgumentException("Missing input implementation");
     }
 
     /**
@@ -96,22 +116,25 @@ public abstract class UnshardedInputSource<T> implements BoundedSource {
     /**
      * A guaranteed unsplittable BoundedReader. By contract, this should only be executed in a single JVM.
      */
-    public class UnshardedInputBoundedReader implements BoundedReader {
+    private class UnshardedInputIteratorBoundedReader implements BoundedReader<T> {
 
         T current = null;
+
+        boolean started = false;
 
         @Override
         public boolean start() throws IOException {
             // Called once at the beginning, advance to the first element.
-            unshardedInput.setup();
+            unshardedInputIterator.setup();
+            started = true;
             return advance();
         }
 
         @Override
         public boolean advance() throws IOException {
             try {
-                if (unshardedInput.hasNext()) {
-                    current = unshardedInput.next();
+                if (unshardedInputIterator.hasNext()) {
+                    current = unshardedInputIterator.next();
                     return true;
                 }
                 current = null;
@@ -126,13 +149,16 @@ public abstract class UnshardedInputSource<T> implements BoundedSource {
         }
 
         @Override
-        public Object getCurrent() throws NoSuchElementException {
+        public T getCurrent() throws NoSuchElementException {
+            if (!started) {
+                throw new NoSuchElementException();
+            }
             return current;
         }
 
         @Override
         public void close() throws IOException {
-            unshardedInput.close();
+            unshardedInputIterator.close();
         }
 
         @Override
@@ -154,9 +180,70 @@ public abstract class UnshardedInputSource<T> implements BoundedSource {
 
         @Override
         public Instant getCurrentTimestamp() throws NoSuchElementException {
+            if (!started) {
+                throw new NoSuchElementException();
+            }
             // There is no relevant timestamp.
             return null;
         }
+    }
 
+    /**
+     * A guaranteed unsplittable BoundedReader. By contract, this should only be executed in a single JVM.
+     */
+    private class UnshardedInputAdvancerBoundedReader implements BoundedReader<T> {
+
+        boolean started = false;
+
+        @Override
+        public boolean start() throws IOException {
+            // Called once at the beginning, advance to the first element.
+            started = true;
+            return unshardedInputAdvancer.start();
+        }
+
+        @Override
+        public boolean advance() throws IOException {
+            return unshardedInputAdvancer.advance();
+        }
+
+        @Override
+        public T getCurrent() throws NoSuchElementException {
+            if (!started) {
+                throw new NoSuchElementException();
+            }
+            return unshardedInputAdvancer.getCurrent();
+        }
+
+        @Override
+        public void close() throws IOException {
+            unshardedInputAdvancer.close();
+        }
+
+        @Override
+        public Double getFractionConsumed() {
+            // No estimate available.
+            return null;
+        }
+
+        @Override
+        public BoundedSource getCurrentSource() {
+            return UnshardedInputSource.this;
+        }
+
+        @Override
+        public BoundedSource splitAtFraction(double fraction) {
+            // Refuse the requested split.
+            return null;
+        }
+
+        @Override
+        public Instant getCurrentTimestamp() throws NoSuchElementException {
+            if (!started) {
+                throw new NoSuchElementException();
+            }
+            // There is no relevant timestamp.
+            return null;
+        }
     }
 }

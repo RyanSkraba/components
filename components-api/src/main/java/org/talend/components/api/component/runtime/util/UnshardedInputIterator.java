@@ -9,9 +9,10 @@ import java.util.Iterator;
  * A simplified interface for input sources that can never be split across multiple shards and will only be run within
  * one worker/thread.
  *
+ * @see UnshardedInputAdvancer
  * @param <T> The type of row that this source will generate.
  */
-public interface UnshardedInput<T> extends Iterator<T>, Serializable, Closeable {
+public interface UnshardedInputIterator<T> extends Iterator<T>, Serializable, Closeable {
 
     public void setup() throws IOException;
 }

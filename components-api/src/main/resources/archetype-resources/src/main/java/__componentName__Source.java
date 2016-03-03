@@ -1,7 +1,6 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-
 package ${package};
 
 import java.io.File;
@@ -34,9 +33,13 @@ public class ${componentName}Source extends UnshardedInputSource<String> {
     /** Default serial version UID. */
     private static final long serialVersionUID = 1L;
 
+    /** Configuration extracted from the input properties. */
+    private String filename;
+
     @Override
     public void initialize(RuntimeContainer adaptor, ComponentProperties properties) {
-        setUnshardedInput(new ${componentName}UnshardedInput(((${componentName}Properties) properties).filename.getStringValue()));
+        filename = ((${componentName}Properties) properties).filename.getStringValue();
+        setUnshardedInput(new ${componentName}UnshardedInput(filename));
     }
     
     @Override

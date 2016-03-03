@@ -8,7 +8,19 @@ import org.joda.time.Instant;
 /**
  * Basic implementation of {@link BoundedReader}, useful for those readers that don't require sharding.
  */
-public abstract class AbstractBoundedReader implements BoundedReader {
+public abstract class AbstractBoundedReader<T> implements BoundedReader<T> {
+
+    private final BoundedSource source;
+
+    protected AbstractBoundedReader(BoundedSource source) {
+        this.source = source;
+    }
+
+    @Override
+    public BoundedSource getCurrentSource() {
+        // This is guaranteed not to change since an unsharded input will never support dynamic load rebalancing.
+        return source;
+    }
 
     @Override
     public Double getFractionConsumed() {
@@ -17,36 +29,19 @@ public abstract class AbstractBoundedReader implements BoundedReader {
     }
 
     @Override
-    public abstract BoundedSource getCurrentSource();
-
-    @Override
     public BoundedSource splitAtFraction(double fraction) {
         // Not supported
         return null;
     }
 
     @Override
-    public boolean start() throws IOException {
-        return false;
-    }
-
-    @Override
-    public boolean advance() throws IOException {
-        return false;
-    }
-
-    @Override
-    public Object getCurrent() throws NoSuchElementException {
-        return null;
-    }
-
-    @Override
     public Instant getCurrentTimestamp() throws NoSuchElementException {
+        // NB. Should return BoundedWindow.TIMESTAMP_MIN_VALUE
         return null;
     }
 
     @Override
     public void close() throws IOException {
-
+        // TODO:
     }
 }

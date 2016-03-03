@@ -1,7 +1,6 @@
 #set( $symbol_pound = '#' )
-        #set( $symbol_dollar = '$' )
-        #set( $symbol_escape = '\' )
-
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
 package ${package};
 
 import static org.hamcrest.Matchers.*;
@@ -10,7 +9,6 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Collections;
 
 import org.junit.Before;
@@ -22,17 +20,13 @@ import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.exception.error.ComponentsErrorCode;
-import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.test.SimpleComponentRegistry;
 import org.talend.daikon.exception.TalendRuntimeException;
-import org.talend.daikon.properties.ValidationResult;
-import org.talend.daikon.schema.SchemaElement;
-import org.talend.daikon.schema.SchemaElement.Type;
-import org.talend.daikon.schema.SchemaFactory;
 
+@SuppressWarnings("nls")
 public class ${componentName}Test {
 
     @Rule
@@ -72,7 +66,7 @@ public class ${componentName}Test {
             source.initialize(null, props);
             assertThat(source, instanceOf(${componentName}Source.class));
 
-            Reader reader = ((BoundedSource) source).createReader(null);
+            Reader<?> reader = ((BoundedSource) source).createReader(null);
             assertThat(reader.start(), is(true));
             assertThat(reader.getCurrent(), is((Object) "The first line"));
             // No auto advance when calling getCurrent more than once.
@@ -95,7 +89,7 @@ public class ${componentName}Test {
         props.schema.schema.setChildren(Collections.EMPTY_LIST);
         BoundedSource source = (BoundedSource) def.getRuntime();
         source.initialize(null, props);
-        Reader reader;
+        Reader<?> reader;
         reader = source.createReader(null);
         try {
             reader.start();
@@ -109,8 +103,8 @@ public class ${componentName}Test {
         }
 
         // check wrong schema exception
-        props.schema.schema.setChildren(new ArrayList<SchemaElement>());
-        props.schema.schema.addChild(SchemaFactory.newSchemaElement(Type.INT, "line"));
+        // props.schema.schema.setChildren(new ArrayList<SchemaElement>());
+        // props.schema.schema.addChild(SchemaFactory.newSchemaElement(Type.INT, "line"));
 
         source = (BoundedSource) def.getRuntime();
         source.initialize(null, props);

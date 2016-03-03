@@ -1,7 +1,6 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-
 package ${package};
 
 import java.io.BufferedReader;
@@ -10,12 +9,12 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.component.runtime.util.UnshardedInput;
+import org.talend.components.api.component.runtime.util.UnshardedInputIterator;
 
 /**
  * Simplified input to build an UnshardedInputSource.
  */
-public class ${componentName}UnshardedInput implements UnshardedInput<String> {
+public class ${componentName}UnshardedInput implements UnshardedInputIterator<String> {
 
     /** Default serial version UID. */
     private static final long serialVersionUID = 1L;
