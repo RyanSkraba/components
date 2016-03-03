@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.avro.Schema;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
@@ -45,8 +46,6 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.PropertiesServiceTest;
 import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
-import org.talend.daikon.schema.Schema;
-import org.talend.daikon.schema.SchemaElement;
 
 public class SalesforceComponentTestIT extends SalesforceTestBase {
 
@@ -219,7 +218,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         connProps.name.setValue("connName");
         setupProps(connProps, !ADD_QUOTES);
         Form userPassword = (Form) connFormWizard.getWidget("userPassword").getContent();
-        SchemaElement passwordSe = (SchemaElement) userPassword.getWidget("password").getContent();
+        Property passwordSe = (Property) userPassword.getWidget("password").getContent();
         assertEquals("Password", passwordSe.getDisplayName());
         // check name i18n
         NamedThing nameProp = connFormWizard.getWidget("name").getContent(); //$NON-NLS-1$
@@ -415,7 +414,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         ComponentProperties moduleProps = (ComponentProperties) f.getProperties();
         moduleProps = (ComponentProperties) PropertiesServiceTest.checkAndBeforeActivate(getComponentService(), f, "moduleName",
                 moduleProps);
-        SchemaElement prop = (SchemaElement) f.getWidget("moduleName").getContent();
+        Property prop = (Property) f.getWidget("moduleName").getContent();
         assertTrue(prop.getPossibleValues().size() > 100);
         System.out.println(prop.getPossibleValues());
         System.out.println(moduleProps.getValidationResult());

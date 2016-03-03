@@ -17,8 +17,8 @@ import static org.talend.daikon.properties.PropertyFactory.*;
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.Property.Type;
 import org.talend.daikon.properties.presentation.Form;
-import org.talend.daikon.schema.SchemaElement;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -28,20 +28,20 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
     public static final String QUERY_BULK = "Bulk";
 
-    public Property queryMode = newProperty(SchemaElement.Type.ENUM, "queryMode"); //$NON-NLS-1$
+    public Property queryMode = newProperty(Type.ENUM, "queryMode"); //$NON-NLS-1$
 
     public Property condition = newProperty("condition"); //$NON-NLS-1$
 
-    public Property manualQuery = newProperty(SchemaElement.Type.BOOLEAN, "manualQuery"); //$NON-NLS-1$
+    public Property manualQuery = newProperty(Type.BOOLEAN, "manualQuery"); //$NON-NLS-1$
 
     public Property query = newProperty("query"); //$NON-NLS-1$
 
-    public Property includeDeleted = newProperty(SchemaElement.Type.BOOLEAN, "includeDeleted"); //$NON-NLS-1$
+    public Property includeDeleted = newProperty(Type.BOOLEAN, "includeDeleted"); //$NON-NLS-1$
 
     //
     // Advanced
     //
-    public Property batchSize = newProperty(SchemaElement.Type.INT, "batchSize"); //$NON-NLS-1$
+    public Property batchSize = newProperty(Type.INT, "batchSize"); //$NON-NLS-1$
 
     public Property normalizeDelimiter = newProperty("normalizeDelimiter"); //$NON-NLS-1$
 
@@ -55,7 +55,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
     public void setupProperties() {
         super.setupProperties();
         returns = ComponentPropertyFactory.newReturnsProperty();
-        ComponentPropertyFactory.newReturnProperty(returns, SchemaElement.Type.INT, "NB_LINE");
+        ComponentPropertyFactory.newReturnProperty(returns, Type.INT, "NB_LINE");
         // FIXME - should use default value
         batchSize.setValue(100);
 

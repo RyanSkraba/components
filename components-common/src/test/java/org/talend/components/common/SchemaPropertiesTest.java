@@ -14,6 +14,7 @@ package org.talend.components.common;
 
 import static org.junit.Assert.*;
 
+import org.apache.avro.Schema;
 import org.junit.Test;
 import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.presentation.Form;
@@ -33,7 +34,7 @@ public class SchemaPropertiesTest {
 
         assertEquals("schema", schemaProperties.schema.getName());
         assertNotNull(schemaProperties.schema.getValue());
-        assertEquals(SchemaImpl.class, schemaProperties.schema.getValue().getClass());
+        assertEquals(Schema.class, schemaProperties.schema.getValue().getClass());
 
         // check the automatic getLayer
         assertEquals(2, schemaProperties.getForms().size());

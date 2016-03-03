@@ -58,8 +58,6 @@ import org.talend.components.salesforce.tsalesforcewaveoutputbulkexec.TSalesforc
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.PropertiesServiceTest;
-import org.talend.daikon.schema.SchemaElement;
-import org.talend.daikon.schema.SchemaFactory;
 
 public class SalesforceTestBase extends AbstractComponentTest {
 

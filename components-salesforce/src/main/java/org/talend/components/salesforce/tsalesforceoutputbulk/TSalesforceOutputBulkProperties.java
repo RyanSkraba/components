@@ -21,17 +21,17 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.Property.Type;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
-import org.talend.daikon.schema.SchemaElement;
 
 public class TSalesforceOutputBulkProperties extends ComponentProperties {
 
     public Property fileName = newProperty("fileName"); //$NON-NLS-1$
 
-    public Property append = newProperty(SchemaElement.Type.BOOLEAN, "append"); //$NON-NLS-1$
+    public Property append = newProperty(Type.BOOLEAN, "append"); //$NON-NLS-1$
 
-    public Property ignoreNull = newProperty(SchemaElement.Type.BOOLEAN, "ignoreNull"); //$NON-NLS-1$
+    public Property ignoreNull = newProperty(Type.BOOLEAN, "ignoreNull"); //$NON-NLS-1$
 
     public Property upsertRelation = (Property) newProperty("upsertRelation").setOccurMaxTimes(-1); //$NON-NLS-1$
 

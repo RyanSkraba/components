@@ -27,7 +27,6 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.service.Repository;
-import org.talend.daikon.schema.SchemaElement;
 
 public class SalesforceModuleListProperties extends ComponentProperties implements SalesforceProvideConnectionProperties {
 
@@ -40,7 +39,7 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
     //
     // Properties
     //
-    public Property moduleName = (Property) newString("moduleName").setOccurMaxTimes(SchemaElement.INFINITE); //$NON-NLS-1$
+    public Property moduleName = (Property) newString("moduleName").setOccurMaxTimes(Property.INFINITE); //$NON-NLS-1$
 
     public SalesforceModuleListProperties(String name) {
         super(name);
