@@ -12,11 +12,11 @@
 // ============================================================================
 package org.talend.components.common;
 
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import org.apache.avro.Schema;
 import org.junit.Test;
-import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 
@@ -34,7 +34,7 @@ public class SchemaPropertiesTest {
 
         assertEquals("schema", schemaProperties.schema.getName());
         assertNotNull(schemaProperties.schema.getValue());
-        assertEquals(Schema.class, schemaProperties.schema.getValue().getClass());
+        assertThat(schemaProperties.schema.getValue(), instanceOf(Schema.class));
 
         // check the automatic getLayer
         assertEquals(2, schemaProperties.getForms().size());
@@ -55,13 +55,7 @@ public class SchemaPropertiesTest {
 
         // add element
         Schema schema = (Schema) schemaProperties.schema.getValue();
-        assertNull(schema.getRoot());
-        SchemaElement element = PropertyFactory.newBoolean("testBoolean", false);
-        schemaProperties.addSchemaChild(element);
-        assertNotNull(schema.getRoot());
-        SchemaElement root = schema.getRoot();
-        assertEquals(1, root.getChildMap().size());
-        assertEquals(root.getChild("testBoolean"), element);
+        assertThat(schema, not(nullValue()));
     }
 
 }
