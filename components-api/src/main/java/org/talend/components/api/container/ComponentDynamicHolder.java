@@ -15,7 +15,6 @@ package org.talend.components.api.container;
 import java.util.List;
 
 import org.apache.avro.Schema;
-import org.talend.daikon.schema.SchemaElement;
 
 /**
  * A holder for dynamic schema information.
@@ -27,12 +26,12 @@ import org.talend.daikon.schema.SchemaElement;
 public interface ComponentDynamicHolder {
 
     /**
-     * Returns the {@link SchemaElement}s represented by this dynamic object.
+     * Returns the {@link org.apache.avro.Schema.Field}s represented by this dynamic object.
      */
     public List<Schema.Field> getSchemaElements();
 
     /**
-     * Sets the {@link SchemaElement}s associated with this dynamic object.
+     * Sets the {@link org.apache.avro.Schema.Field}s associated with this dynamic object.
      */
     public void setSchemaElements(List<Schema.Field> elements);
 

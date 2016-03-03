@@ -32,7 +32,7 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.presentation.Widget.WidgetType;
 import org.talend.daikon.properties.service.Repository;
-import org.talend.daikon.schema.SchemaElement.Type;
+import org.talend.daikon.properties.Property.Type;
 
 public class TestComponentProperties extends ComponentProperties {
 

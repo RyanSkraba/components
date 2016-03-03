@@ -8,11 +8,11 @@ import org.apache.avro.LogicalType;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.junit.Test;
-import org.talend.daikon.schema.avro.util.AvroUtils;
 
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
 import com.sforce.soap.partner.FieldType;
+import org.talend.daikon.avro.util.AvroUtils;
 
 /**
  * Unit tests for the {@link SalesforceAvroRegistry}.

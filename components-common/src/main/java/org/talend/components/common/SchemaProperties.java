@@ -17,12 +17,10 @@ import static org.talend.daikon.properties.presentation.Widget.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.Property.Type;
 import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
-import org.talend.daikon.schema.Schema;
-import org.talend.daikon.schema.SchemaElement;
-import org.talend.daikon.schema.SchemaFactory;
 
 public class SchemaProperties extends ComponentProperties {
 
@@ -33,8 +31,7 @@ public class SchemaProperties extends ComponentProperties {
     //
     // Properties
     //
-    // FIXME - change to Schema
-    public Property schema = newProperty(SchemaElement.Type.SCHEMA, "schema"); //$NON-NLS-1$
+    public Property schema = newProperty(Type.SCHEMA, "schema"); //$NON-NLS-1$
 
     @Override
     public void setupProperties() {

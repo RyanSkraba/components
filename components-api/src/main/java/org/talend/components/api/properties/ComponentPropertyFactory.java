@@ -18,7 +18,6 @@ import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.Property;
-import org.talend.daikon.schema.SchemaElement;
 
 /**
  * Make new {@link Property} objects.
@@ -44,7 +43,7 @@ public class ComponentPropertyFactory {
      * @param name the name of the returns property
      * @return a {@link Property}
      */
-    public static Property newReturnProperty(Property returns, SchemaElement.Type type, String name) {
+    public static Property newReturnProperty(Property returns, Property.Type type, String name) {
         if (returns == null) {
             throw new TalendRuntimeException(CommonErrorCodes.UNEXPECTED_EXCEPTION, new NullPointerException());
         }

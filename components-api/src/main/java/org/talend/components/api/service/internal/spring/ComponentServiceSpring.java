@@ -44,7 +44,6 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.service.Repository;
-import org.talend.daikon.schema.Schema;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -334,7 +333,8 @@ public class ComponentServiceSpring implements ComponentService {
 
     // FIXME - make this work for web
     @Override
-    public String storeProperties(ComponentProperties properties, String name, String repositoryLocation, String schemaPropertyName) {
+    public String storeProperties(ComponentProperties properties, String name, String repositoryLocation,
+            String schemaPropertyName) {
         return componentServiceDelegate.storeProperties(properties, name, repositoryLocation, schemaPropertyName);
     }
 

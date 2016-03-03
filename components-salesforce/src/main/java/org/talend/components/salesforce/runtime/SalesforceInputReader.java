@@ -12,8 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.talend.daikon.talend6.Talend6SchemaOutputEnforcer.*;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,9 +20,9 @@ import java.util.List;
 import org.apache.avro.Schema;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
-import org.talend.daikon.schema.avro.util.AvroUtils;
 
 import com.sforce.ws.ConnectionException;
+import org.talend.daikon.avro.util.AvroUtils;
 
 public class SalesforceInputReader extends SalesforceReader {
 

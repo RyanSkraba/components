@@ -10,14 +10,14 @@ import org.apache.avro.LogicalTypes.Decimal;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
+import org.talend.daikon.avro.AvroConverter;
+import org.talend.daikon.avro.AvroRegistry;
+import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.java8.SerializableFunction;
-import org.talend.daikon.schema.avro.AvroConverter;
-import org.talend.daikon.schema.avro.AvroRegistry;
-import org.talend.daikon.schema.avro.util.AvroUtils;
-import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
+import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 /**
  * 
@@ -103,7 +103,7 @@ public class SalesforceAvroRegistry extends AvroRegistry {
      * cached where possible. The return type will be the Avro Schema that can contain the field data without loss of
      * precision.
      * 
-     * @param in the Field to analyse.
+     * @param field the Field to analyse.
      * @return the schema for data that the field describes.
      */
     private Schema inferSchemaField(Field field) {

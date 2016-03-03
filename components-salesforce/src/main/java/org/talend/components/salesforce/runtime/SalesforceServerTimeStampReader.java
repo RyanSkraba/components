@@ -20,7 +20,6 @@ import java.util.NoSuchElementException;
 
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
-import org.talend.daikon.schema.Schema;
 
 import com.sforce.ws.ConnectionException;
 

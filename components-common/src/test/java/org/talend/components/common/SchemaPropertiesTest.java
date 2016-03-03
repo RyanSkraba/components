@@ -18,14 +18,7 @@ import org.junit.Test;
 import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
-import org.talend.daikon.schema.Schema;
-import org.talend.daikon.schema.SchemaElement;
-import org.talend.daikon.schema.internal.SchemaImpl;
 
-/**
- * created by pbailly on 10 Dec 2015 Detailled comment
- *
- */
 public class SchemaPropertiesTest {
 
     @Test

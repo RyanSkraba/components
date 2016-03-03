@@ -36,7 +36,6 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.properties.service.Repository;
-import org.talend.daikon.schema.Schema;
 
 import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;

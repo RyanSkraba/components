@@ -16,12 +16,12 @@ import static org.talend.daikon.properties.PropertyFactory.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.Property.Type;
 import org.talend.daikon.properties.presentation.Form;
-import org.talend.daikon.schema.SchemaElement;
 
 public class ProxyProperties extends ComponentProperties {
 
-    public Property useProxy = (Property) newProperty(SchemaElement.Type.BOOLEAN, "useProxy").setRequired(true); //$NON-NLS-1$
+    public Property useProxy = (Property) newProperty(Type.BOOLEAN, "useProxy").setRequired(true); //$NON-NLS-1$
 
     private static final String HOST = "host";
 

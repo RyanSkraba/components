@@ -20,9 +20,9 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.apache.avro.Schema;
-import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.ComponentDynamicHolder;
@@ -34,7 +34,7 @@ import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.bind.XmlObject;
 
-public class SalesforceReader implements BoundedReader {
+public class SalesforceReader extends AbstractBoundedReader implements BoundedReader {
 
     private static final Logger LOG = LoggerFactory.getLogger(SalesforceReader.class);
 
@@ -128,27 +128,12 @@ public class SalesforceReader implements BoundedReader {
     }
 
     @Override
-    public Instant getCurrentTimestamp() throws NoSuchElementException {
-        return null;
-    }
-
-    @Override
     public void close() throws IOException {
-    }
-
-    @Override
-    public Double getFractionConsumed() {
-        return null;
     }
 
     @Override
     public BoundedSource getCurrentSource() {
         return source;
-    }
-
-    @Override
-    public BoundedSource splitAtFraction(double fraction) {
-        return null;
     }
 
 }

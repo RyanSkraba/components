@@ -12,8 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.talend.daikon.talend6.Talend6SchemaOutputEnforcer.*;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +24,6 @@ import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.ComponentDynamicHolder;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
-import org.talend.daikon.schema.avro.util.AvroUtils;
 
 import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.Error;
@@ -35,6 +32,7 @@ import com.sforce.soap.partner.SaveResult;
 import com.sforce.soap.partner.UpsertResult;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
+import org.talend.daikon.avro.util.AvroUtils;
 
 final class SalesforceWriter implements Writer<WriterResult> {
 

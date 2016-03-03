@@ -30,7 +30,6 @@ import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.Property;
-import org.talend.daikon.schema.SchemaElement;
 
 public class SalesforceWriterTestIT extends SalesforceTestBase {
 
@@ -82,7 +81,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.UPSERT);
         props.afterOutputAction();
 
-        SchemaElement se = (Property) props.getProperty("upsertKeyColumn");
+        Property se = (Property) props.getProperty("upsertKeyColumn");
         assertTrue(se.getPossibleValues().size() > 10);
 
         Writer<WriterResult> saleforceWriter = createSalesforceOutputWriter(props);

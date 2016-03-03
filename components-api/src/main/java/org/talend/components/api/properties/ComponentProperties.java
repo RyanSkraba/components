@@ -16,7 +16,6 @@ import java.lang.reflect.Field;
 
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.Property;
-import org.talend.daikon.schema.SchemaElement;
 
 /**
  * for all details see {@link Properties}. This class adds a specific {@link ComponentProperties#returns} property which
@@ -31,7 +30,7 @@ public abstract class ComponentProperties extends Properties {
     public static final String RETURNS = "returns";
 
     /**
-     * A special property for the values that a component returns. If this is used, this will be a {@link SchemaElement}
+     * A special property for the values that a component returns. If this is used, this will be a {@link Property}
      * that contains each of the values the component returns.
      */
     public Property returns;

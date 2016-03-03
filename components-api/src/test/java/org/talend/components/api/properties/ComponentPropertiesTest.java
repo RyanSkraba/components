@@ -16,27 +16,22 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.talend.daikon.properties.Property;
-import org.talend.daikon.schema.SchemaElement;
-import org.talend.daikon.schema.SchemaElement.Type;
 
-/**
- * created by sgandon on 1 févr. 2016
- */
 public class ComponentPropertiesTest {
 
     @Test
     public void testSetReturnsProperty() {
-        SchemaElement element = ComponentPropertyFactory.newReturnsProperty();
+        Property element = ComponentPropertyFactory.newReturnsProperty();
         assertEquals("returns", element.getName());
-        assertEquals(Type.STRING, element.getType());
+        assertEquals(Property.Type.STRING, element.getType());
     }
 
     @Test
     public void testNewReturnProperty() throws IllegalAccessException {
         Property element = ComponentPropertyFactory.newReturnsProperty();
-        Property returnProperty = ComponentPropertyFactory.newReturnProperty(element, Type.BOOLEAN, "childName");
+        Property returnProperty = ComponentPropertyFactory.newReturnProperty(element, Property.Type.BOOLEAN, "childName");
         assertEquals("childName", returnProperty.getName());
-        assertEquals(Type.BOOLEAN, returnProperty.getType());
+        assertEquals(Property.Type.BOOLEAN, returnProperty.getType());
         assertEquals(returnProperty, element.getChild("childName"));
     }
 

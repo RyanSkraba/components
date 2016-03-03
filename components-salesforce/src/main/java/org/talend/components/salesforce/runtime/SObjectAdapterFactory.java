@@ -3,10 +3,10 @@ package org.talend.components.salesforce.runtime;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
-import org.talend.daikon.schema.avro.AvroConverter;
-import org.talend.daikon.schema.avro.IndexedRecordAdapterFactory;
 
 import com.sforce.soap.partner.sobject.SObject;
+import org.talend.daikon.avro.AvroConverter;
+import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 
 /**
  * Creates an {@link IndexedRecordAdapterFactory} that knows how to interpret Salesforce {@link SObject} objects.
