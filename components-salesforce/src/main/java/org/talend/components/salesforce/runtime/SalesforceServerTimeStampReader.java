@@ -64,7 +64,7 @@ public class SalesforceServerTimeStampReader extends SalesforceReader {
 
         Map<String, Object> map = new HashMap<>();
         // FIXME - error checking - what if there are no columns
-        map.put(schema.getRoot().getChildren().get(0).getName(), result);
+        map.put(schema.getFields().get(0).name(), result);
         result = null;
         return map;
     }

@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
-import org.talend.components.api.container.ComponentDynamicHolder;
 import org.talend.components.api.container.RuntimeContainer;
 
 import com.sforce.soap.partner.PartnerConnection;
@@ -76,6 +75,7 @@ public class SalesforceReader extends AbstractBoundedReader implements BoundedRe
     protected RuntimeContainer adaptor;
 
     public SalesforceReader(RuntimeContainer adaptor, SalesforceSource source) {
+        super(source);
         this.source = source;
         this.adaptor = adaptor;
     }

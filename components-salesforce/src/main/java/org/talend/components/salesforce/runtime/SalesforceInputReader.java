@@ -44,7 +44,7 @@ public class SalesforceInputReader extends SalesforceReader {
         fieldList = schema.getFields();
 
         for (Schema.Field se : fieldList) {
-            if (isDynamic(se)) {
+            if (AvroUtils.isDynamic(se.schema())) {
                 dynamicField = se;
                 break;
             }
@@ -73,7 +73,7 @@ public class SalesforceInputReader extends SalesforceReader {
 
         inputFieldsToUse = new ArrayList<>();
         for (Schema.Field s : fieldList) {
-            if (isDynamic(s)) {
+            if (AvroUtils.isDynamic(s.schema())) {
                 continue;
             }
             inputFieldsToUse.add(s);
