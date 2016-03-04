@@ -100,7 +100,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
         fieldList = schema.getFields();
 
         for (Schema.Field se : fieldList) {
-            if (isDynamic(se)) {
+            if (AvroUtils.isDynamic(se.schema())) {
                 dynamicField = se;
                 break;
             }
@@ -122,7 +122,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
                 Object value = row.get(key);
                 if (value != null) {
                     Schema.Field se = fieldMap.get(key);
-                    if (se != null && !isDynamic(se)) {
+                    if (se != null && !AvroUtils.isDynamic(se.schema())) {
                         addSObjectField(so, se, value);
                     }
                 }
@@ -164,7 +164,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
         String ID = "Id";
         if (row.get(ID) != null) {
             Schema.Field se = fieldMap.get(ID);
-            if (!isDynamic(se)) {
+            if (!AvroUtils.isDynamic(se.schema())) {
                 return (String) row.get(ID);
             }
         }

@@ -10,11 +10,7 @@ public interface RuntimeContainer {
     /**
      * Format the specified date according to the specified pattern.
      */
+    // FIXME - remove this
     public String formatDate(Date date, String pattern);
-
-    /**
-     * Creates a {@link ComponentDynamicHolder} object.
-     */
-    public ComponentDynamicHolder createDynamicHolder();
 
 }

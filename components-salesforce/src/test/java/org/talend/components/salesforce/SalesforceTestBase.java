@@ -187,7 +187,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
         fixSchemaForDynamic(schema.getRoot());
     }
 
-    public void fixSchemaForDynamic(SchemaElement schemaElement) {
+    public void fixSchemaForDynamic(Schema schema) {
         SchemaElement dynElement = SchemaFactory.newSchemaElement(SchemaElement.Type.DYNAMIC, "dynamic");
         schemaElement.addChild(dynElement);
         Iterator<SchemaElement> it = schemaElement.getChildren().iterator();

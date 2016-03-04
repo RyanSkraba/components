@@ -25,51 +25,10 @@ import org.apache.avro.Schema;
  */
 public class DefaultComponentRuntimeContainerImpl implements RuntimeContainer {
 
-    private Map<String, Object> globalMap = new HashMap<>();
-
-    private String currentComponentName;
-
-    class Dynamic implements ComponentDynamicHolder {
-
-        private List<Schema.Field> schemaElements;
-
-        private Map<String, Object> values = new HashMap<>();
-
-        @Override
-        public List<Schema.Field> getSchemaElements() {
-            return schemaElements;
-        }
-
-        @Override
-        public void setSchemaElements(List<Schema.Field> elements) {
-            this.schemaElements = elements;
-        }
-
-        @Override
-        public Object getFieldValue(String fieldName) {
-            return values.get(fieldName);
-        }
-
-        @Override
-        public void addFieldValue(String fieldName, Object value) {
-            values.put(fieldName, value);
-        }
-
-        @Override
-        public void resetValues() {
-            values.clear();
-        }
-    }
-
     @Override
     public String formatDate(Date date, String pattern) {
         SimpleDateFormat format = new SimpleDateFormat(pattern);
         return format.format(date);
-    }
-
-    @Override
-    public Dynamic createDynamicHolder() {
-        return new Dynamic();
     }
 
 }
