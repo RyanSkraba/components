@@ -76,6 +76,7 @@ public class SalesforceReader extends AbstractBoundedReader implements BoundedRe
     protected RuntimeContainer adaptor;
 
     public SalesforceReader(RuntimeContainer adaptor, SalesforceSource source) {
+        super(source);
         this.source = source;
         this.adaptor = adaptor;
     }

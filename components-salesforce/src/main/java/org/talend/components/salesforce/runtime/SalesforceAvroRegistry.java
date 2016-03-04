@@ -14,17 +14,17 @@ import org.talend.daikon.avro.AvroConverter;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.java8.SerializableFunction;
+import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
-import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 /**
  * 
  */
 public class SalesforceAvroRegistry extends AvroRegistry {
 
-    public static final String FAMILY_NAME = "Salesforce";
+    public static final String FAMILY_NAME = "Salesforce"; //$NON-NLS-1$
 
     /** When inferring a schema from a query, store the String identifier of the query. */
     public static final String PROP_QUERY_RESULT = FAMILY_NAME.toLowerCase() + ".queryResult"; //$NON-NLS-1$
@@ -87,7 +87,7 @@ public class SalesforceAvroRegistry extends AvroRegistry {
     private Schema inferSchemaDescribeSObjectResult(DescribeSObjectResult in) {
         FieldAssembler<Schema> builder = SchemaBuilder.builder().record(in.getName()).fields();
         for (Field field : in.getFields()) {
-            Schema fieldSchema = SalesforceAvroRegistry.get().inferSchema(field);
+            Schema fieldSchema = inferSchema(field);
             String fieldDefault = field.getDefaultValueFormula();
             if (null == fieldDefault) {
                 builder = builder.name(field.getName()).type(fieldSchema).noDefault();
@@ -134,11 +134,11 @@ public class SalesforceAvroRegistry extends AvroRegistry {
             break;
         case date:
             base = Schema.create(Schema.Type.LONG);
-            base.addProp(Talend6SchemaConstants.TALEND6_PATTERN, "yyyy-MM-dd"); //$NON-NLS-1$
+            base.addProp(Talend6SchemaConstants.TALEND6_COLUMN_PATTERN, "yyyy-MM-dd"); //$NON-NLS-1$
             break;
         case datetime:
             base = Schema.create(Schema.Type.LONG);
-            base.addProp(Talend6SchemaConstants.TALEND6_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'"); //$NON-NLS-1$
+            base.addProp(Talend6SchemaConstants.TALEND6_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'"); //$NON-NLS-1$
             break;
         default:
             base = Schema.create(Schema.Type.STRING);
@@ -147,14 +147,14 @@ public class SalesforceAvroRegistry extends AvroRegistry {
 
         // Add some Talend6 custom properties to the schema.
         if (base.getType() == Schema.Type.STRING) {
-            base.addProp(Talend6SchemaConstants.TALEND6_SIZE, field.getLength());
-            base.addProp(Talend6SchemaConstants.TALEND6_PRECISION, field.getPrecision());
+            base.addProp(Talend6SchemaConstants.TALEND6_COLUMN_LENGTH, field.getLength());
+            base.addProp(Talend6SchemaConstants.TALEND6_COLUMN_PRECISION, field.getPrecision());
         } else {
-            base.addProp(Talend6SchemaConstants.TALEND6_SIZE, field.getPrecision());
-            base.addProp(Talend6SchemaConstants.TALEND6_PRECISION, field.getScale());
+            base.addProp(Talend6SchemaConstants.TALEND6_COLUMN_LENGTH, field.getPrecision());
+            base.addProp(Talend6SchemaConstants.TALEND6_COLUMN_PRECISION, field.getScale());
         }
         if (field.getDefaultValueFormula() != null) {
-            base.addProp(Talend6SchemaConstants.TALEND6_DEFAULT_VALUE, field.getDefaultValueFormula());
+            base.addProp(Talend6SchemaConstants.TALEND6_COLUMN_DEFAULT, field.getDefaultValueFormula());
         }
 
         // Optionally union with Schema.Type.NULL
@@ -268,7 +268,7 @@ public class SalesforceAvroRegistry extends AvroRegistry {
 
         StringToDateConverter(Schema schema) {
             super(schema);
-            String pattern = schema.getProp(Talend6SchemaConstants.TALEND6_PATTERN);
+            String pattern = schema.getProp(Talend6SchemaConstants.TALEND6_COLUMN_PATTERN);
             // TODO: null handling
             format = new SimpleDateFormat(pattern);
         }
