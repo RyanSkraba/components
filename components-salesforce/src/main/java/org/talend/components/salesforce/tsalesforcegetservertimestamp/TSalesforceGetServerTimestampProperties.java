@@ -12,17 +12,16 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcegetservertimestamp;
 
+import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
-import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.presentation.Form;
-import org.talend.daikon.schema.Schema;
-import org.talend.daikon.schema.SchemaFactory;
-import org.talend.daikon.schema.SchemaElement.Type;
 
-public class TSalesforceGetServerTimestampProperties extends ComponentProperties implements SalesforceProvideConnectionProperties {
+public class TSalesforceGetServerTimestampProperties extends ComponentProperties
+        implements SalesforceProvideConnectionProperties {
 
     //
     // Collections
@@ -39,9 +38,9 @@ public class TSalesforceGetServerTimestampProperties extends ComponentProperties
     @Override
     public void setupProperties() {
         super.setupProperties();
-        Schema s = (Schema) schema.schema.getValue();
-        s.setRoot(SchemaFactory.newSchemaElement(Type.GROUP, "Root"));
-        s.getRoot().addChild(PropertyFactory.newDate("ServerTimestamp"));
+        // FIXME - need to specify the date type
+        Schema s = SchemaBuilder.record("Root").fields().name("ServerTimeStamp").type().stringType().noDefault().endRecord();
+        schema.schema.setValue(s);
     }
 
     @Override

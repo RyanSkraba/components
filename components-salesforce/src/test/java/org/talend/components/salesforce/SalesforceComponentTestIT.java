@@ -266,7 +266,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
             } else {
                 SalesforceModuleProperties storedModule = (SalesforceModuleProperties) rp.props;
                 assertEquals(selected.get(i - 1).getName(), storedModule.moduleName.getValue());
-                assertTrue(rp.schema.getRoot().getChildren().size() > 10);
+                assertTrue(rp.schema.getFields().size() > 10);
                 assertTrue(storedModule.schema.schema.getValue() == rp.schema);
             }
             i++;
@@ -434,11 +434,11 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
         Schema schema = (Schema) moduleProps.schema.schema.getValue();
         System.out.println(schema);
-        for (SchemaElement child : schema.getRoot().getChildren()) {
-            System.out.println(child.getName());
+        for (Schema.Field child : schema.getFields()) {
+            System.out.println(child.name());
         }
-        assertEquals("Id", schema.getRoot().getChildren().get(0).getName());
-        assertTrue(schema.getRoot().getChildren().size() > 50);
+        assertEquals("Id", schema.getFields().get(0).name());
+        assertTrue(schema.getFields().size() > 50);
     }
 
     @Test

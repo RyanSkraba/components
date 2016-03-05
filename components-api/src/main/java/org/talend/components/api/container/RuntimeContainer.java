@@ -1,5 +1,7 @@
 package org.talend.components.api.container;
 
+import org.apache.avro.Schema;
+
 import java.util.Date;
 
 /**

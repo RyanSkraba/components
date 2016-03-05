@@ -103,7 +103,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
         schema = (Schema) props.module.schema.schema.getValue();
         if (isDynamic) {
-            fixSchemaForDynamic(schema.getRoot());
+            fixSchemaForDynamic();
         }
         props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
         props.afterOutputAction();

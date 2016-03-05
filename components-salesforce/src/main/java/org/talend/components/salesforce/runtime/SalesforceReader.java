@@ -45,44 +45,20 @@ public class SalesforceReader extends AbstractBoundedReader implements BoundedRe
 
     protected int inputRecordsIndex;
 
-    protected Map<String, Schema.Field> fieldMap;
-
     protected List<Schema.Field> fieldList;
 
-    /*
-     * Used on input only, this is read from the module schema, it contains all of the fields from the salesforce
-     * definition of the module that are not already in the field list.
-     */
-    protected List<Schema.Field> dynamicFieldList;
-
-    protected Map<String, Schema.Field> dynamicFieldMap;
-
-    /*
-     * The actual fields we read on input which is a combination of the fields specified in the schema and the dynamic
-     * fields.
-     */
-    protected List<Schema.Field> inputFieldsToUse;
-
-    /*
-     * The dynamic column that is specified on the input schema.
-     */
-    protected Schema.Field dynamicField;
-
     protected PartnerConnection connection;
-
-    protected SalesforceSource source;
 
     protected RuntimeContainer adaptor;
 
     public SalesforceReader(RuntimeContainer adaptor, SalesforceSource source) {
         super(source);
-        this.source = source;
         this.adaptor = adaptor;
     }
 
     @Override
     public boolean start() throws IOException {
-        connection = source.connect();
+        connection = ((SalesforceSource)getCurrentSource()).connect();
         return false;
     }
 
@@ -105,35 +81,18 @@ public class SalesforceReader extends AbstractBoundedReader implements BoundedRe
 
     @Override
     public Object getCurrent() throws NoSuchElementException {
-        ComponentDynamicHolder dynamicHolder = null;
-        if (dynamicFieldMap != null) {
-            dynamicHolder = adaptor.createDynamicHolder();
-            dynamicHolder.setSchemaElements(dynamicFieldList);
-        }
         Iterator<XmlObject> it = inputRecords[inputRecordsIndex].getChildren();
         Map<String, Object> columns = new HashMap<>();
         while (it.hasNext()) {
             XmlObject obj = it.next();
             String localName = obj.getName().getLocalPart();
-            if (dynamicFieldMap != null && dynamicFieldMap.get(localName) != null) {
-                dynamicHolder.addFieldValue(localName, obj.getValue());
-            } else {
-                columns.put(localName, obj.getValue());
-            }
-        }
-        if (dynamicHolder != null) {
-            columns.put(dynamicField.name(), dynamicHolder);
+            columns.put(localName, obj.getValue());
         }
         return columns;
     }
 
     @Override
     public void close() throws IOException {
-    }
-
-    @Override
-    public BoundedSource getCurrentSource() {
-        return source;
     }
 
 }

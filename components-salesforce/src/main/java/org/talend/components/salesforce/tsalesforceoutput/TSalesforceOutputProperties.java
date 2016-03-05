@@ -18,6 +18,7 @@ import static org.talend.daikon.properties.presentation.Widget.*;
 import java.util.ArrayList;
 
 import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
@@ -65,7 +66,7 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
     // FIXME - should be file
     public Property logFileName = newString("logFileName"); //$NON-NLS-1$
 
-    public Property upsertRelation = (Property) newProperty("upsertRelation").setOccurMaxTimes(SchemaElement.INFINITE); //$NON-NLS-1$
+    public Property upsertRelation = (Property) newProperty("upsertRelation").setOccurMaxTimes(Property.INFINITE); //$NON-NLS-1$
 
     //
     // Collections
@@ -90,9 +91,9 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
         public ValidationResult afterModuleName() throws Exception {
             ValidationResult validationResult = super.afterModuleName();
             Schema s = (Schema) schema.schema.getValue();
-            // FIXME - we probably only want the names, not the SchemaElements
-            upsertKeyColumn.setPossibleValues(s.getRoot().getChildren());
-            upsertRelation.getChild("columnName").setPossibleValues(s.getRoot().getChildren());
+            // FIXME - we probably only want the names, not the Schema.Field
+            upsertKeyColumn.setPossibleValues(s.getFields());
+            upsertRelation.getChild("columnName").setPossibleValues(s.getFields());
             return validationResult;
         }
     }
@@ -101,7 +102,7 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
 
     public static void setupUpsertRelation(Property ur, boolean poly) {
         // They might have been set previously in some inheritance cases
-        ur.setChildren(new ArrayList<SchemaElement>());
+        ur.setChildren(new ArrayList<Property>());
         ur.addChild(newProperty("columnName")); //$NON-NLS-1$
         ur.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
         ur.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
@@ -119,9 +120,12 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
         ComponentPropertyFactory.newReturnProperty(returns, Type.INT, "NB_SUCCESS"); //$NON-NLS-1$
         ComponentPropertyFactory.newReturnProperty(returns, Type.INT, "NB_REJECT"); //$NON-NLS-1$
 
-        schemaReject.addSchemaChild(newProperty("errorCode")); //$NON-NLS-1$
-        schemaReject.addSchemaChild(newProperty("errorFields")); //$NON-NLS-1$
-        schemaReject.addSchemaChild(newProperty("errorMessage")); //$NON-NLS-1$
+        Schema s = SchemaBuilder.record("Reject").fields()
+                .name("errorCode").type().intType().noDefault()
+                .name("errorFields").type().stringType().noDefault()
+                .name("errorMessage").type().stringType().noDefault()
+                .endRecord();
+        schemaReject.schema.setValue(s);
 
         setupUpsertRelation(upsertRelation, !POLY);
 
@@ -158,10 +162,15 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
         super.refreshLayout(form);
 
         if (form.getName().equals(Form.ADVANCED)) {
-            ((Schema) schemaFlow.schema.getValue()).setRoot(null);
+            Schema s = SchemaBuilder.record("Main").fields()
+                    .endRecord();
+            schemaFlow.schema.setValue(s);
             if (!extendInsert.getBooleanValue() && retrieveInsertId.getStringValue() != null
                     && ACTION_INSERT.equals(outputAction.getValue())) {
-                schemaFlow.addSchemaChild(newProperty("salesforce_id"));
+                s = SchemaBuilder.record("Main").fields()
+                        .name("salesforce_id").type().intType().noDefault()
+                        .endRecord();
+                schemaFlow.schema.setValue(s);
             }
         }
         if (form.getName().equals(Form.MAIN)) {
