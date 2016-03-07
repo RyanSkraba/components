@@ -29,9 +29,9 @@ import org.talend.daikon.properties.presentation.Widget;
 public class ComponentReferenceProperties extends ComponentProperties {
 
     public enum ReferenceType {
-                               THIS_COMPONENT,
-                               COMPONENT_TYPE,
-                               COMPONENT_INSTANCE
+        THIS_COMPONENT,
+        COMPONENT_TYPE,
+        COMPONENT_INSTANCE
     }
 
     public static class InnerProperties extends ComponentProperties {

@@ -1,16 +1,15 @@
 package org.talend.components.api.component.runtime;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.avro.Schema;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.avro.util.AvroUtils;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Helper methods for use by components.
@@ -26,16 +25,16 @@ public class RuntimeHelper {
      * @param designSchema the design time {@link Schema}.
      * @return a {@link Schema} modified as described above.
      */
-    public static Schema resolveSchema(RuntimeContainer container, ComponentProperties properties, SourceOrSink ss, Schema designSchema)
-            throws IOException {
+    public static Schema resolveSchema(RuntimeContainer container, ComponentProperties properties, SourceOrSink ss,
+            Schema designSchema) throws IOException {
         Schema runtimeSchema = ss.getSchema(container, properties);
 
         Map<String, Schema.Field> fieldMap = AvroUtils.makeFieldMap(designSchema);
         List<Schema.Field> fieldList = designSchema.getFields();
-        List<Schema.Field> copyFieldList = new ArrayList();
+        List<Schema.Field> copyFieldList = new ArrayList<>();
 
         for (Schema.Field se : fieldList) {
-            copyFieldList.add(new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultValue()));
+            copyFieldList.add(new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal()));
         }
 
         int dynamicIndex = 0;
@@ -46,8 +45,9 @@ public class RuntimeHelper {
             dynamicIndex++;
         }
 
-        Stream beforeDyn = copyFieldList.stream().limit(dynamicIndex);
-        Stream afterDyn = copyFieldList.stream().skip(dynamicIndex + 1);
+        List<Schema.Field> beforeDyn = copyFieldList.subList(0, dynamicIndex);
+        List<Schema.Field> afterDyn = dynamicIndex < copyFieldList.size() ? copyFieldList.subList(dynamicIndex + 1,
+                copyFieldList.size()) : Collections.<Schema.Field> emptyList();
 
         List<Schema.Field> filteredDynamicFields = new ArrayList<>();
         for (Schema.Field se : runtimeSchema.getFields()) {
@@ -57,19 +57,19 @@ public class RuntimeHelper {
             filteredDynamicFields.add(se);
         }
 
-        List<Schema.Field> copyFilteredDynamicFields = new ArrayList();
+        List<Schema.Field> copyFilteredDynamicFields = new ArrayList<>();
         for (Schema.Field se : filteredDynamicFields) {
-            copyFilteredDynamicFields.add(new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultValue()));
+            copyFilteredDynamicFields.add(new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal()));
         }
 
-        Stream beforeStream = Stream.concat(beforeDyn, copyFilteredDynamicFields.stream());
-        List<Schema.Field> runtimeFields = (List<Schema.Field>) Stream.concat(beforeStream, afterDyn)
-                .collect(Collectors.toList());
+        List<Schema.Field> runtimeFields = new ArrayList<>();
+        runtimeFields.addAll(beforeDyn);
+        runtimeFields.addAll(copyFilteredDynamicFields);
+        runtimeFields.addAll(afterDyn);
 
         Schema resolvedSchema = Schema.createRecord(designSchema.getName(), designSchema.getDoc(), designSchema.getNamespace(),
                 false);
         resolvedSchema.setFields(runtimeFields);
         return resolvedSchema;
     }
-
 }

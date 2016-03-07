@@ -15,7 +15,6 @@ package org.talend.components.common;
 import static org.talend.daikon.properties.PropertyFactory.*;
 import static org.talend.daikon.properties.presentation.Widget.*;
 
-import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Property;
@@ -26,7 +25,7 @@ import org.talend.daikon.properties.presentation.Widget;
 public class SchemaProperties extends ComponentProperties {
 
     /** An empty schema is used for an uninitialized SchemaProperties. */
-    public static final Schema EMPTY_SCHEMA = SchemaBuilder.builder().record("EmptyRecord").fields().endRecord(); //$NON-NLS-1$
+    public static final String EMPTY_SCHEMA = SchemaBuilder.builder().record("EmptyRecord").fields().endRecord().toString(); //$NON-NLS-1$
 
     public SchemaProperties(String name) {
         super(name);
