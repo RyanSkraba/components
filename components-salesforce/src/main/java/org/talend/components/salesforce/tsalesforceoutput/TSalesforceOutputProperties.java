@@ -16,6 +16,7 @@ import static org.talend.daikon.properties.PropertyFactory.*;
 import static org.talend.daikon.properties.presentation.Widget.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -40,10 +41,10 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
     public static final String ACTION_DELETE = "DELETE";
 
     public enum OutputAction {
-                              INSERT,
-                              UPDATE,
-                              UPSERT,
-                              DELETE
+        INSERT,
+        UPDATE,
+        UPSERT,
+        DELETE
     }
 
     public Property outputAction = newEnum("outputAction", ACTION_INSERT, ACTION_UPDATE, ACTION_UPSERT, ACTION_DELETE); // $NON-NLS-1$
@@ -66,7 +67,7 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
     // FIXME - should be file
     public Property logFileName = newString("logFileName"); //$NON-NLS-1$
 
-    public Property upsertRelation = (Property) newProperty("upsertRelation").setOccurMaxTimes(Property.INFINITE); //$NON-NLS-1$
+    public Property upsertRelation = newProperty("upsertRelation").setOccurMaxTimes(Property.INFINITE); //$NON-NLS-1$
 
     //
     // Collections
@@ -90,10 +91,15 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
         @Override
         public ValidationResult afterModuleName() throws Exception {
             ValidationResult validationResult = super.afterModuleName();
-            Schema s = (Schema) schema.schema.getValue();
+            String sJson = schema.schema.getStringValue();
+            Schema s = new Schema.Parser().parse(sJson);
+            List<String> fieldNames = new ArrayList<>();
+            for (Schema.Field f : s.getFields()) {
+                fieldNames.add(f.name());
+            }
             // FIXME - we probably only want the names, not the Schema.Field
-            upsertKeyColumn.setPossibleValues(s.getFields());
-            upsertRelation.getChild("columnName").setPossibleValues(s.getFields());
+            upsertKeyColumn.setPossibleValues(fieldNames);
+            upsertRelation.getChild("columnName").setPossibleValues(fieldNames);
             return validationResult;
         }
     }
@@ -120,11 +126,8 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
         ComponentPropertyFactory.newReturnProperty(returns, Type.INT, "NB_SUCCESS"); //$NON-NLS-1$
         ComponentPropertyFactory.newReturnProperty(returns, Type.INT, "NB_REJECT"); //$NON-NLS-1$
 
-        Schema s = SchemaBuilder.record("Reject").fields()
-                .name("errorCode").type().intType().noDefault()
-                .name("errorFields").type().stringType().noDefault()
-                .name("errorMessage").type().stringType().noDefault()
-                .endRecord();
+        Schema s = SchemaBuilder.record("Reject").fields().name("errorCode").type().intType().noDefault().name("errorFields")
+                .type().stringType().noDefault().name("errorMessage").type().stringType().noDefault().endRecord();
         schemaReject.schema.setValue(s);
 
         setupUpsertRelation(upsertRelation, !POLY);
@@ -162,14 +165,11 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
         super.refreshLayout(form);
 
         if (form.getName().equals(Form.ADVANCED)) {
-            Schema s = SchemaBuilder.record("Main").fields()
-                    .endRecord();
+            Schema s = SchemaBuilder.record("Main").fields().endRecord();
             schemaFlow.schema.setValue(s);
             if (!extendInsert.getBooleanValue() && retrieveInsertId.getStringValue() != null
                     && ACTION_INSERT.equals(outputAction.getValue())) {
-                s = SchemaBuilder.record("Main").fields()
-                        .name("salesforce_id").type().intType().noDefault()
-                        .endRecord();
+                s = SchemaBuilder.record("Main").fields().name("salesforce_id").type().intType().noDefault().endRecord();
                 schemaFlow.schema.setValue(s);
             }
         }

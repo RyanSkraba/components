@@ -12,19 +12,23 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import com.sforce.ws.ConnectionException;
+import java.io.IOException;
+
 import org.apache.avro.Schema;
+import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.RuntimeHelper;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
-import java.io.IOException;
+import com.sforce.ws.ConnectionException;
 
-public class SalesforceInputReader extends SalesforceReader {
+public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
 
     protected TSalesforceInputProperties properties;
 
     protected int commitLevel;
+
+    transient private SObjectAdapterFactory factory = new SObjectAdapterFactory();
 
     public SalesforceInputReader(RuntimeContainer adaptor, SalesforceSource source, TSalesforceInputProperties props) {
         super(adaptor, source);
@@ -36,7 +40,8 @@ public class SalesforceInputReader extends SalesforceReader {
     public boolean start() throws IOException {
         super.start();
         Schema schema = RuntimeHelper.resolveSchema(adaptor, properties.module, getCurrentSource(),
-                (Schema) properties.module.schema.schema.getValue());
+                new Schema.Parser().parse(properties.module.schema.schema.getStringValue()));
+        factory.setSchema(schema);
         fieldList = schema.getFields();
 
         connection.setQueryOptions(properties.batchSize.getIntValue());
@@ -69,4 +74,10 @@ public class SalesforceInputReader extends SalesforceReader {
         inputRecordsIndex = 0;
         return inputResult.getSize() > 0;
     }
+
+    @Override
+    public IndexedRecord getCurrent() {
+        return this.factory.convertToAvro(getCurrentSObject());
+    }
+
 }

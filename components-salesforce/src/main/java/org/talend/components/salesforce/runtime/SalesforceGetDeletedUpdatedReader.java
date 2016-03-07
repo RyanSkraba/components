@@ -59,8 +59,9 @@ public abstract class SalesforceGetDeletedUpdatedReader extends SalesforceReader
 
     @Override
     public Object getCurrent() throws NoSuchElementException {
-        if (!hasResult)
+        if (!hasResult) {
             return null;
+        }
         return returnResult();
     }
 

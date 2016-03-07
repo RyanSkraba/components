@@ -12,9 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -101,7 +99,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         setupProps(props.connection, !SalesforceTestBase.ADD_QUOTES);
 
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
-        schema = (Schema) props.module.schema.schema.getValue();
+        schema = new Schema.Parser().parse(props.module.schema.schema.getStringValue());
         if (isDynamic) {
             fixSchemaForDynamic();
         }

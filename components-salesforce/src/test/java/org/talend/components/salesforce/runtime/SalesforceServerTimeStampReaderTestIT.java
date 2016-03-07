@@ -12,12 +12,9 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Calendar;
-import java.util.Map;
 
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedReader;
@@ -35,11 +32,11 @@ public class SalesforceServerTimeStampReaderTestIT extends SalesforceTestBase {
         try {
             assertTrue(bounderReader.start());
             assertFalse(bounderReader.advance());
-            Map<String, Object> row = (Map<String, Object>) bounderReader.getCurrent();
+            Object row = bounderReader.getCurrent();
             assertNotNull(row);
             // TODO we need to make sure about the server and local time zone are the same.
             Calendar now = Calendar.getInstance();
-            Calendar date = (Calendar) row.get("ServerTimestamp");
+            Calendar date = (Calendar) row;
             long nowMillis = now.getTimeInMillis();
             long dateMillis = date.getTimeInMillis();
             System.out.println("now: " + nowMillis);

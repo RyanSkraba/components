@@ -12,13 +12,13 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.avro.generic.IndexedRecord;
 import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.BoundedReader;
@@ -31,7 +31,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
     @Test
     public void testStartAdvanceGetCurrent() throws IOException {
-        BoundedReader salesforceInputReader = createSalesforceInputReaderFromAccount(EXISTING_MODULE_NAME);
+        BoundedReader salesforceInputReader = createSalesforceInputReaderFromModule(EXISTING_MODULE_NAME);
         try {
             assertTrue(salesforceInputReader.start());
             assertTrue(salesforceInputReader.advance());
@@ -43,7 +43,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
     @Test(expected = IOException.class)
     public void testStartException() throws IOException {
-        BoundedReader salesforceInputReader = createSalesforceInputReaderFromAccount(SalesforceTestBase.NOT_EXISTING_MODULE_NAME);
+        BoundedReader<IndexedRecord> salesforceInputReader = createSalesforceInputReaderFromModule(SalesforceTestBase.NOT_EXISTING_MODULE_NAME);
         try {
             assertTrue(salesforceInputReader.start());
         } finally {
@@ -63,8 +63,8 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
     protected void runInputTest(boolean isDynamic) throws Throwable {
         ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
-        TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
-                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
+        TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService().getComponentProperties(
+                TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection, !ADD_QUOTES);
 
         setupModule(props.module, "Account");

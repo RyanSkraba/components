@@ -14,8 +14,6 @@ package org.talend.components.salesforce.runtime;
 
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.apache.avro.Schema;
@@ -24,7 +22,7 @@ import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforc
 
 import com.sforce.ws.ConnectionException;
 
-public class SalesforceServerTimeStampReader extends SalesforceReader {
+public class SalesforceServerTimeStampReader extends SalesforceReader<Calendar> {
 
     private TSalesforceGetServerTimestampProperties props;
 
@@ -33,7 +31,7 @@ public class SalesforceServerTimeStampReader extends SalesforceReader {
     private Schema schema;
 
     public SalesforceServerTimeStampReader(RuntimeContainer adaptor, SalesforceSource source,
-                                           TSalesforceGetServerTimestampProperties props) {
+            TSalesforceGetServerTimestampProperties props) {
         super(adaptor, source);
         this.props = props;
     }
@@ -42,7 +40,7 @@ public class SalesforceServerTimeStampReader extends SalesforceReader {
     public boolean start() throws IOException {
         super.start();
         TSalesforceGetServerTimestampProperties gdProps = props;
-        schema = (Schema) gdProps.schema.schema.getValue();
+        schema = new Schema.Parser().parse(gdProps.schema.schema.getStringValue());
         try {
             result = connection.getServerTimestamp().getTimestamp();
             return result != null;
@@ -57,16 +55,8 @@ public class SalesforceServerTimeStampReader extends SalesforceReader {
     }
 
     @Override
-    public Object getCurrent() throws NoSuchElementException {
-        if (result == null) {
-            return null;
-        }
-
-        Map<String, Object> map = new HashMap<>();
-        // FIXME - error checking - what if there are no columns
-        map.put(schema.getFields().get(0).name(), result);
-        result = null;
-        return map;
+    public Calendar getCurrent() throws NoSuchElementException {
+        return result;
     }
 
 }

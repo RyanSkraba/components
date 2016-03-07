@@ -12,6 +12,16 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.IndexedRecord;
@@ -43,21 +53,10 @@ import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputPrope
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
 import org.talend.components.salesforce.tsalesforcewavebulkexec.TSalesforceWaveBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcewaveoutputbulkexec.TSalesforceWaveOutputBulkExecDefinition;
-import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.PropertiesServiceTest;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
-
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.*;
 
 public class SalesforceTestBase extends AbstractComponentTest {
 
@@ -70,7 +69,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
     protected String random;
 
     // Test schema
-    protected Schema schema;
+    protected transient Schema schema;
 
     protected RuntimeContainer adaptor;
 
@@ -156,7 +155,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
                 "moduleName", moduleProps);
         moduleProps.moduleName.setValue(module);
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
-        schema = (Schema) moduleProps.schema.schema.getValue();
+        schema = new Schema.Parser().parse(moduleProps.schema.schema.getStringValue());
     }
 
     protected void fixSchemaForDynamic() {
@@ -166,8 +165,9 @@ public class SalesforceTestBase extends AbstractComponentTest {
 
         List<Schema.Field> newFields = new ArrayList();
         for (Schema.Field field : fields) {
-            if (field.name().equals("ShippingState"))
+            if (field.name().equals("ShippingState")) {
                 continue;
+            }
             newFields.add(new Schema.Field(field.name(), schema, field.doc(), null));
         }
         Schema.Field dynField = new Schema.Field("dynamic", schema, "dynamic", null);
@@ -283,18 +283,21 @@ public class SalesforceTestBase extends AbstractComponentTest {
     }
 
     protected List<Map<String, Object>> readRows(TSalesforceInputProperties inputProps) throws IOException {
-        IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory = null;
-        BoundedReader reader = createBoundedReader(inputProps);
+        BoundedReader<IndexedRecord> reader = createBoundedReader(inputProps);
         boolean hasRecord = reader.start();
         List<Map<String, Object>> rows = new ArrayList<>();
         while (hasRecord) {
             Map<String, Object> r = new HashMap<>();
-            if (factory == null)
-                factory = (IndexedRecordAdapterFactory<Object, ? extends org.apache.avro.generic.IndexedRecord>) new org.talend.daikon.avro.AvroRegistry()
-                        .createAdapterFactory(reader.getCurrent().getClass());
-            org.apache.avro.generic.IndexedRecord unenforced = factory.convertToAvro(reader.getCurrent());
+            org.apache.avro.generic.IndexedRecord unenforced = reader.getCurrent();
             for (Schema.Field field : unenforced.getSchema().getFields()) {
                 r.put(field.name(), unenforced.get(field.pos()));
+                if ("ShippingState".equals(field.name())) {
+                    String k = field.name();
+                    Object v = unenforced.get(field.pos());
+                    System.out.println(k + ":" + v);
+                    v = unenforced.get(field.pos());
+                }
+
             }
             rows.add(r);
             hasRecord = reader.advance();
@@ -341,8 +344,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
     }
 
     // Returns the rows written (having been re-read so they have their Ids)
-    protected void doWriteRows(SalesforceConnectionModuleProperties props, List<Map<String, Object>> outputRows)
-            throws Exception {
+    protected void doWriteRows(SalesforceConnectionModuleProperties props, List<Map<String, Object>> outputRows) throws Exception {
         SalesforceSink salesforceSink = new SalesforceSink();
         salesforceSink.initialize(adaptor, props);
         SalesforceWriteOperation writeOperation = (SalesforceWriteOperation) salesforceSink.createWriteOperation();
@@ -351,8 +353,8 @@ public class SalesforceTestBase extends AbstractComponentTest {
     }
 
     // Returns the rows written (having been re-read so they have their Ids)
-    protected List<Map<String, Object>> writeRows(SalesforceConnectionModuleProperties props,
-                                                  List<Map<String, Object>> outputRows) throws Exception {
+    protected List<Map<String, Object>> writeRows(SalesforceConnectionModuleProperties props, List<Map<String, Object>> outputRows)
+            throws Exception {
         TSalesforceOutputProperties outputProps = new TSalesforceOutputProperties("output"); //$NON-NLS-1$
         outputProps.copyValuesFrom(props);
         outputProps.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
@@ -367,14 +369,14 @@ public class SalesforceTestBase extends AbstractComponentTest {
         doWriteRows(deleteProperties, rows);
     }
 
-    public BoundedReader createSalesforceInputReaderFromAccount(String moduleName) {
+    public <T> BoundedReader<T> createSalesforceInputReaderFromModule(String moduleName) {
         TSalesforceInputProperties tsip = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
         SalesforceConnectionProperties conProps = setupProps(tsip.connection, !ADD_QUOTES);
         tsip.module.moduleName.setValue(moduleName);
         return createBoundedReader(tsip);
     }
 
-    public BoundedReader createBoundedReader(ComponentProperties tsip) {
+    public <T> BoundedReader<T> createBoundedReader(ComponentProperties tsip) {
         SalesforceSource salesforceSource = new SalesforceSource();
         salesforceSource.initialize(null, tsip);
         return salesforceSource.createReader(null);

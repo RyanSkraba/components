@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -120,7 +121,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
             this.repoLocation = repoLocation;
             this.schemaPropertyName = schemaPropertyName;
             if (schemaPropertyName != null) {
-                this.schema = (Schema) props.getValuedProperty(schemaPropertyName).getValue();
+                this.schema = new Schema.Parser().parse(props.getValuedProperty(schemaPropertyName).getStringValue());
             }
         }
 
@@ -267,7 +268,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
                 SalesforceModuleProperties storedModule = (SalesforceModuleProperties) rp.props;
                 assertEquals(selected.get(i - 1).getName(), storedModule.moduleName.getValue());
                 assertTrue(rp.schema.getFields().size() > 10);
-                assertTrue(storedModule.schema.schema.getValue() == rp.schema);
+                assertThat(storedModule.schema.schema.getStringValue(), is(rp.schema.toString()));
             }
             i++;
         }
@@ -432,7 +433,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
                 "moduleName", moduleProps);
         moduleProps.moduleName.setValue("Account");
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
-        Schema schema = (Schema) moduleProps.schema.schema.getValue();
+        Schema schema = new Schema.Parser().parse(moduleProps.schema.schema.getStringValue());
         System.out.println(schema);
         for (Schema.Field child : schema.getFields()) {
             System.out.println(child.name());
@@ -452,7 +453,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         setupModule(outputProps.module, "Account");
 
         ComponentTestUtils.checkSerialize(outputProps, errorCollector);
-        List<Map<String, Object>> rows = new ArrayList();
+        List<Map<String, Object>> rows = new ArrayList<>();
         try {
             writeRows(outputProps, rows);
         } catch (Exception ex) {

@@ -12,10 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import com.sforce.soap.partner.PartnerConnection;
-import com.sforce.soap.partner.QueryResult;
-import com.sforce.soap.partner.sobject.SObject;
-import com.sforce.ws.ConnectionException;
+import java.io.IOException;
+import java.util.List;
+import java.util.NoSuchElementException;
+
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +23,12 @@ import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.container.RuntimeContainer;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.NoSuchElementException;
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.QueryResult;
+import com.sforce.soap.partner.sobject.SObject;
+import com.sforce.ws.ConnectionException;
 
-public class SalesforceReader extends AbstractBoundedReader implements BoundedReader {
+public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> implements BoundedReader<T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(SalesforceReader.class);
 
@@ -73,8 +74,7 @@ public class SalesforceReader extends AbstractBoundedReader implements BoundedRe
         return true;
     }
 
-    @Override
-    public Object getCurrent() throws NoSuchElementException {
+    public SObject getCurrentSObject() throws NoSuchElementException {
         return inputRecords[inputRecordsIndex];
     }
 

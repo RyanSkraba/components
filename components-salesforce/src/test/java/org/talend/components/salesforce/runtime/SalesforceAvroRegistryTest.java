@@ -2,17 +2,17 @@ package org.talend.components.salesforce.runtime;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static org.talend.daikon.talend6.Talend6SchemaConstants.*;
+import static org.talend.daikon.avro.SchemaConstants.*;
 
 import org.apache.avro.LogicalType;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.junit.Test;
+import org.talend.daikon.avro.util.AvroUtils;
 
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
 import com.sforce.soap.partner.FieldType;
-import org.talend.daikon.avro.util.AvroUtils;
 
 /**
  * Unit tests for the {@link SalesforceAvroRegistry}.
@@ -50,7 +50,7 @@ public class SalesforceAvroRegistryTest {
         Schema.Field f = s.getFields().get(0);
         assertThat(f.name(), is("valid"));
         assertThat(f.schema().getType(), is(Schema.Type.BOOLEAN));
-        assertThat(f.schema().getObjectProps().keySet(), containsInAnyOrder(TALEND6_SIZE, TALEND6_PRECISION));
+        assertThat(f.schema().getObjectProps().keySet(), empty());
     }
 
     /**
@@ -66,9 +66,7 @@ public class SalesforceAvroRegistryTest {
         Schema s = sRegistry.inferSchema(f);
         assertThat(s.getType(), is(Schema.Type.BOOLEAN));
         // The properties injected into boolean.
-        assertThat(s.getObjectProps().keySet(), containsInAnyOrder(TALEND6_SIZE, TALEND6_PRECISION));
-        assertThat(s.getObjectProp(TALEND6_SIZE), is((Object) 0));
-        assertThat(s.getObjectProp(TALEND6_PRECISION), is((Object) 0));
+        assertThat(s.getObjectProps().keySet(), empty());
 
         // The same thing if nullable.
         f.setNillable(true);
@@ -78,9 +76,7 @@ public class SalesforceAvroRegistryTest {
         assertThat(s.getObjectProps().keySet(), empty());
         s = AvroUtils.unwrapIfNullable(s);
         assertThat(s.getType(), is(Schema.Type.BOOLEAN));
-        assertThat(s.getObjectProps().keySet(), containsInAnyOrder(TALEND6_SIZE, TALEND6_PRECISION));
-        assertThat(s.getObjectProp(TALEND6_SIZE), is((Object) 0));
-        assertThat(s.getObjectProp(TALEND6_PRECISION), is((Object) 0));
+        assertThat(s.getObjectProps().keySet(), empty());
 
         // The same thing if a default value.
         f.setDefaultValueFormula(Boolean.TRUE.toString());
@@ -90,10 +86,8 @@ public class SalesforceAvroRegistryTest {
         assertThat(s.getObjectProps().keySet(), empty());
         s = AvroUtils.unwrapIfNullable(s);
         assertThat(s.getType(), is(Schema.Type.BOOLEAN));
-        assertThat(s.getObjectProps().keySet(), containsInAnyOrder(TALEND6_SIZE, TALEND6_PRECISION, TALEND6_DEFAULT_VALUE));
-        assertThat(s.getObjectProp(TALEND6_SIZE), is((Object) 0));
-        assertThat(s.getObjectProp(TALEND6_PRECISION), is((Object) 0));
-        assertThat(s.getProp(TALEND6_DEFAULT_VALUE), is(Boolean.TRUE.toString()));
+        assertThat(s.getObjectProps().keySet(), containsInAnyOrder(TALEND_COLUMN_DEFAULT));
+        assertThat(s.getProp(TALEND_COLUMN_DEFAULT), is(Boolean.TRUE.toString()));
 
         f = new Field();
         f.setType(FieldType._int);

@@ -12,12 +12,14 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
 import org.talend.daikon.avro.AvroConverter;
 import org.talend.daikon.avro.AvroRegistry;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.java8.SerializableFunction;
 import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
+import com.sforce.soap.partner.sobject.SObject;
 
 /**
  * 
@@ -63,7 +65,6 @@ public class SalesforceAvroRegistry extends AvroRegistry {
             }
 
         });
-
     }
 
     public static SalesforceAvroRegistry get() {
@@ -134,11 +135,11 @@ public class SalesforceAvroRegistry extends AvroRegistry {
             break;
         case date:
             base = Schema.create(Schema.Type.LONG);
-            base.addProp(Talend6SchemaConstants.TALEND6_COLUMN_PATTERN, "yyyy-MM-dd"); //$NON-NLS-1$
+            base.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd"); //$NON-NLS-1$
             break;
         case datetime:
             base = Schema.create(Schema.Type.LONG);
-            base.addProp(Talend6SchemaConstants.TALEND6_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'"); //$NON-NLS-1$
+            base.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'"); //$NON-NLS-1$
             break;
         default:
             base = Schema.create(Schema.Type.STRING);
@@ -147,14 +148,22 @@ public class SalesforceAvroRegistry extends AvroRegistry {
 
         // Add some Talend6 custom properties to the schema.
         if (base.getType() == Schema.Type.STRING) {
-            base.addProp(Talend6SchemaConstants.TALEND6_COLUMN_LENGTH, field.getLength());
-            base.addProp(Talend6SchemaConstants.TALEND6_COLUMN_PRECISION, field.getPrecision());
+            if (field.getLength() != 0) {
+                base.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, field.getLength());
+            }
+            if (field.getPrecision() != 0) {
+                base.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, field.getPrecision());
+            }
         } else {
-            base.addProp(Talend6SchemaConstants.TALEND6_COLUMN_LENGTH, field.getPrecision());
-            base.addProp(Talend6SchemaConstants.TALEND6_COLUMN_PRECISION, field.getScale());
+            if (field.getPrecision() != 0) {
+                base.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, field.getPrecision());
+            }
+            if (field.getScale() != 0) {
+                base.addProp(SchemaConstants.TALEND_COLUMN_SCALE, field.getScale());
+            }
         }
         if (field.getDefaultValueFormula() != null) {
-            base.addProp(Talend6SchemaConstants.TALEND6_COLUMN_DEFAULT, field.getDefaultValueFormula());
+            base.addProp(SchemaConstants.TALEND_COLUMN_DEFAULT, field.getDefaultValueFormula());
         }
 
         // Optionally union with Schema.Type.NULL
