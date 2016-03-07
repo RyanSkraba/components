@@ -13,17 +13,20 @@
 package org.talend.components.salesforce.runtime;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.avro.Schema;
+import org.talend.components.api.component.runtime.RuntimeHelper;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
-import org.talend.components.api.container.ComponentDynamicHolder;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
+import org.talend.daikon.avro.util.AvroUtils;
 
 import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.Error;
@@ -32,7 +35,6 @@ import com.sforce.soap.partner.SaveResult;
 import com.sforce.soap.partner.UpsertResult;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
-import org.talend.daikon.avro.util.AvroUtils;
 
 final class SalesforceWriter implements Writer<WriterResult> {
 
@@ -70,12 +72,6 @@ final class SalesforceWriter implements Writer<WriterResult> {
 
     private int dataCount;
 
-    /**
-     * DOC sgandon SalesforceWriter constructor comment.
-     * 
-     * @param salesforceWriteOperation
-     * @param adaptor
-     */
     public SalesforceWriter(SalesforceWriteOperation salesforceWriteOperation, RuntimeContainer adaptor) {
         this.salesforceWriteOperation = salesforceWriteOperation;
         this.adaptor = adaptor;
@@ -95,18 +91,11 @@ final class SalesforceWriter implements Writer<WriterResult> {
     public void open(String uId) throws IOException {
         this.uId = uId;
         connection = sink.connect();
-        Schema schema = sink.getSchema(adaptor, sprops.module.moduleName.getStringValue());
-        fieldMap = AvroUtils.makeFieldMap(schema);
+        Schema schema = RuntimeHelper.resolveSchema(adaptor, sprops.module.moduleName.getStringValue(), sink,
+                (Schema) sprops.module.schema.schema.getValue());
         fieldList = schema.getFields();
-
-        for (Schema.Field se : fieldList) {
-            if (AvroUtils.isDynamic(se.schema())) {
-                dynamicField = se;
-                break;
-            }
-        }
+        fieldMap = AvroUtils.makeFieldMap(schema);
         upsertKeyColumn = sprops.upsertKeyColumn.getStringValue();
-
     }
 
     @Override
@@ -122,18 +111,9 @@ final class SalesforceWriter implements Writer<WriterResult> {
                 Object value = row.get(key);
                 if (value != null) {
                     Schema.Field se = fieldMap.get(key);
-                    if (se != null && !AvroUtils.isDynamic(se.schema())) {
+                    if (se != null) {
                         addSObjectField(so, se, value);
                     }
-                }
-            }
-
-            if (dynamicField != null) {
-                ComponentDynamicHolder dynamic = (ComponentDynamicHolder) row.get(dynamicField.name());
-                List<Schema.Field> dynamicSes = dynamic.getSchemaElements();
-                for (Schema.Field dynamicSe : dynamicSes) {
-                    Object value = dynamic.getFieldValue(dynamicSe.name());
-                    addSObjectField(so, dynamicSe, value);
                 }
             }
 
@@ -164,43 +144,28 @@ final class SalesforceWriter implements Writer<WriterResult> {
         String ID = "Id";
         if (row.get(ID) != null) {
             Schema.Field se = fieldMap.get(ID);
-            if (!AvroUtils.isDynamic(se.schema())) {
+            if (se != null) {
                 return (String) row.get(ID);
             }
         }
-        // FIXME - need better exception
-        if (dynamicField == null) {
-            throw new RuntimeException("Expected dynamic column to be available");
-        }
-
-        ComponentDynamicHolder dynamic = (ComponentDynamicHolder) row.get(dynamicField.name());
-        List<Schema.Field> dynamicSes = dynamic.getSchemaElements();
-        for (Schema.Field dynamicSe : dynamicSes) {
-            if (dynamicSe.name().equals(ID)) {
-                return (String) dynamic.getFieldValue(ID);
-            }
-        }
-
-        // FIXME - need better exception
-        throw new RuntimeException(ID + " not found in dynamic columns");
+        throw new RuntimeException(ID + " not found");
     }
 
     protected void addSObjectField(SObject sObject, Schema.Field se, Object value) {
         Object valueToAdd = null;
-        // DO NOT SUBMIT
-        // Object valueToAdd;
-        // switch (se.getType()) {
-        // case BYTE_ARRAY:
-        // valueToAdd = Charset.defaultCharset().decode(ByteBuffer.wrap((byte[]) value)).toString();
-        // break;
-        // case DATE:
-        // case DATETIME:
-        // valueToAdd = adaptor.formatDate((Date) value, se.getPattern());
-        // break;
-        // default:
-        // valueToAdd = value;
-        // break;
-        // }
+        // Convert stuff here
+        switch (se.schema().getType()) {
+        case BYTES:
+            valueToAdd = Charset.defaultCharset().decode(ByteBuffer.wrap((byte[]) value)).toString();
+            break;
+        //case DATE:
+        //case DATETIME:
+        //    valueToAdd = adaptor.formatDate((Date) value, se.getPattern());
+        //    break;
+        default:
+            valueToAdd = value;
+            break;
+        }
         sObject.setField(se.name(), valueToAdd);
     }
 
@@ -307,8 +272,8 @@ final class SalesforceWriter implements Writer<WriterResult> {
         if (success) {
             // TODO: send back the ID
         } else {
-            errors = SalesforceRuntime.addLog(resultErrors, batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx]
-                    : "Batch index out of bounds", null);
+            errors = SalesforceRuntime.addLog(resultErrors,
+                    batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx] : "Batch index out of bounds", null);
         }
         if (exceptionForErrors && errors.toString().length() > 0) {
             throw new IOException(errors.toString());

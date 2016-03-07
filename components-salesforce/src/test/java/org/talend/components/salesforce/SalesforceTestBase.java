@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -20,19 +20,18 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ErrorCollector;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
-import org.talend.components.api.container.ComponentDynamicHolder;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
@@ -55,6 +54,7 @@ import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputPrope
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
 import org.talend.components.salesforce.tsalesforcewavebulkexec.TSalesforceWaveBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcewaveoutputbulkexec.TSalesforceWaveOutputBulkExecDefinition;
+import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.PropertiesServiceTest;
@@ -71,8 +71,6 @@ public class SalesforceTestBase extends AbstractComponentTest {
 
     // Test schema
     protected Schema schema;
-
-    protected ComponentDynamicHolder dynamic;
 
     protected RuntimeContainer adaptor;
 
@@ -161,50 +159,25 @@ public class SalesforceTestBase extends AbstractComponentTest {
         schema = (Schema) moduleProps.schema.schema.getValue();
     }
 
-    protected boolean setupDynamic() {
-        if (dynamic != null) {
-            return true;
-        }
-        if (schema == null) {
-            return false;
-        }
-        for (SchemaElement se : schema.getRoot().getChildren()) {
-            if (se.getType() == SchemaElement.Type.DYNAMIC) {
-                if (dynamic == null) {
-                    dynamic = adaptor.createDynamicHolder();
-                    Schema dynSchema = SchemaFactory.newSchema();
-                    dynSchema.setRoot(SchemaFactory.newSchemaElement(SchemaElement.Type.STRING, "Root"));
-                    dynSchema.getRoot().addChild(SchemaFactory.newSchemaElement(SchemaElement.Type.STRING, "ShippingState"));
-                    dynamic.setSchemaElements(dynSchema.getRoot().getChildren());
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
     protected void fixSchemaForDynamic() {
-        fixSchemaForDynamic(schema.getRoot());
-    }
+        List<Schema.Field> fields = schema.getFields();
 
-    public void fixSchemaForDynamic(Schema schema) {
-        SchemaElement dynElement = SchemaFactory.newSchemaElement(SchemaElement.Type.DYNAMIC, "dynamic");
-        schemaElement.addChild(dynElement);
-        Iterator<SchemaElement> it = schemaElement.getChildren().iterator();
-        while (it.hasNext()) {
-            SchemaElement se = it.next();
-            if (se.getName().equals("ShippingState")) {
-                it.remove();
-                break;
-            }
+        schema = SchemaBuilder.record("record").fields().endRecord();
+
+        List<Schema.Field> newFields = new ArrayList();
+        for (Schema.Field field : fields) {
+            if (field.name().equals("ShippingState"))
+                continue;
+            newFields.add(new Schema.Field(field.name(), schema, field.doc(), null));
         }
+        Schema.Field dynField = new Schema.Field("dynamic", schema, "dynamic", null);
+        AvroUtils.setFieldDynamic(dynField);
+        newFields.add(dynField);
     }
 
     public void addDynamicColumn(Map<String, Object> row, boolean isDynamic) {
         if (isDynamic) {
-            setupDynamic();
-            dynamic.addFieldValue("ShippingState", "CA");
-            row.put("dynamic", dynamic);
+            row.put("ShippingState", "CA");
         }
     }
 
@@ -234,7 +207,6 @@ public class SalesforceTestBase extends AbstractComponentTest {
         List<Map<String, Object>> checkedRows = new ArrayList<>();
 
         int checkCount = 0;
-        int checkDynamicCount = 0;
         for (Map<String, Object> row : rows) {
             System.out.println("check: " + row.get("Name") + " id: " + row.get("Id") + " post: " + row.get("BillingPostalCode")
                     + " st: " + " post: " + row.get("BillingStreet"));
@@ -247,21 +219,13 @@ public class SalesforceTestBase extends AbstractComponentTest {
                 continue;
             }
             checkCount++;
-            if (dynamic != null) {
-                ComponentDynamicHolder d = (ComponentDynamicHolder) row.get("dynamic");
-                assertEquals("CA", d.getFieldValue("ShippingState"));
-                checkDynamicCount++;
-            }
+            assertEquals("CA", row.get("ShippingState"));
             assertEquals("TestName", row.get("Name"));
             assertEquals("123 Main Street", row.get("BillingStreet"));
             assertEquals("CA", row.get("BillingState"));
             checkedRows.add(row);
         }
         assertEquals(count, checkCount);
-        if (dynamic != null) {
-            assertEquals(count, checkDynamicCount);
-            System.out.println("Check dynamic rows: " + checkDynamicCount);
-        }
         return checkedRows;
     }
 
@@ -368,7 +332,8 @@ public class SalesforceTestBase extends AbstractComponentTest {
     }
 
     // Returns the rows written (having been re-read so they have their Ids)
-    protected void doWriteRows(SalesforceConnectionModuleProperties props, List<Map<String, Object>> outputRows) throws Exception {
+    protected void doWriteRows(SalesforceConnectionModuleProperties props, List<Map<String, Object>> outputRows)
+            throws Exception {
         SalesforceSink salesforceSink = new SalesforceSink();
         salesforceSink.initialize(adaptor, props);
         SalesforceWriteOperation writeOperation = (SalesforceWriteOperation) salesforceSink.createWriteOperation();
@@ -377,8 +342,8 @@ public class SalesforceTestBase extends AbstractComponentTest {
     }
 
     // Returns the rows written (having been re-read so they have their Ids)
-    protected List<Map<String, Object>> writeRows(SalesforceConnectionModuleProperties props, List<Map<String, Object>> outputRows)
-            throws Exception {
+    protected List<Map<String, Object>> writeRows(SalesforceConnectionModuleProperties props,
+            List<Map<String, Object>> outputRows) throws Exception {
         TSalesforceOutputProperties outputProps = new TSalesforceOutputProperties("output"); //$NON-NLS-1$
         outputProps.copyValuesFrom(props);
         outputProps.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
