@@ -1,14 +1,14 @@
 package org.talend.components.api.component.runtime;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.List;
-
 import org.apache.avro.Schema;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.List;
 
 public interface SourceOrSink extends Serializable {
 
@@ -30,6 +30,6 @@ public interface SourceOrSink extends Serializable {
     /**
      * Return the schema associated with the specified schema name for this {@code Source}
      */
-    public Schema getSchema(RuntimeContainer adaptor, String schemaName) throws IOException;
+    public Schema getSchema(RuntimeContainer adaptor, ComponentProperties properties) throws IOException;
 
 }

@@ -12,15 +12,13 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import java.io.IOException;
-
+import com.sforce.ws.ConnectionException;
 import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.RuntimeHelper;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
-import org.talend.daikon.avro.util.AvroUtils;
 
-import com.sforce.ws.ConnectionException;
+import java.io.IOException;
 
 public class SalesforceInputReader extends SalesforceReader {
 
@@ -37,7 +35,7 @@ public class SalesforceInputReader extends SalesforceReader {
     @Override
     public boolean start() throws IOException {
         super.start();
-        Schema schema = RuntimeHelper.resolveSchema(adaptor, properties.module.moduleName.getStringValue(), getCurrentSource(),
+        Schema schema = RuntimeHelper.resolveSchema(adaptor, properties.module, getCurrentSource(),
                 (Schema) properties.module.schema.schema.getValue());
         fieldList = schema.getFields();
 
