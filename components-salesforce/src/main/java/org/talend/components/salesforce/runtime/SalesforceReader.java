@@ -12,26 +12,20 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.QueryResult;
+import com.sforce.soap.partner.sobject.SObject;
+import com.sforce.ws.ConnectionException;
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.BoundedReader;
-import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
 
-import com.sforce.soap.partner.PartnerConnection;
-import com.sforce.soap.partner.QueryResult;
-import com.sforce.soap.partner.sobject.SObject;
-import com.sforce.ws.ConnectionException;
-import com.sforce.ws.bind.XmlObject;
+import java.io.IOException;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 public class SalesforceReader extends AbstractBoundedReader implements BoundedReader {
 
@@ -58,7 +52,7 @@ public class SalesforceReader extends AbstractBoundedReader implements BoundedRe
 
     @Override
     public boolean start() throws IOException {
-        connection = ((SalesforceSource)getCurrentSource()).connect();
+        connection = ((SalesforceSource) getCurrentSource()).connect();
         return false;
     }
 
@@ -81,14 +75,7 @@ public class SalesforceReader extends AbstractBoundedReader implements BoundedRe
 
     @Override
     public Object getCurrent() throws NoSuchElementException {
-        Iterator<XmlObject> it = inputRecords[inputRecordsIndex].getChildren();
-        Map<String, Object> columns = new HashMap<>();
-        while (it.hasNext()) {
-            XmlObject obj = it.next();
-            String localName = obj.getName().getLocalPart();
-            columns.put(localName, obj.getValue());
-        }
-        return columns;
+        return inputRecords[inputRecordsIndex];
     }
 
     @Override

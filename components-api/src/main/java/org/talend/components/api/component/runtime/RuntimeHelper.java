@@ -1,15 +1,16 @@
 package org.talend.components.api.component.runtime;
 
+import org.apache.avro.Schema;
+import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.avro.util.AvroUtils;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.apache.avro.Schema;
-import org.talend.components.api.container.RuntimeContainer;
-import org.talend.daikon.avro.util.AvroUtils;
 
 /**
  * Helper methods for use by components.
@@ -25,9 +26,9 @@ public class RuntimeHelper {
      * @param designSchema the design time {@link Schema}.
      * @return a {@link Schema} modified as described above.
      */
-    public static Schema resolveSchema(RuntimeContainer container, String schemaName, SourceOrSink ss, Schema designSchema)
+    public static Schema resolveSchema(RuntimeContainer container, ComponentProperties properties, SourceOrSink ss, Schema designSchema)
             throws IOException {
-        Schema runtimeSchema = ss.getSchema(container, schemaName);
+        Schema runtimeSchema = ss.getSchema(container, properties);
 
         Map<String, Schema.Field> fieldMap = AvroUtils.makeFieldMap(designSchema);
         List<Schema.Field> fieldList = designSchema.getFields();

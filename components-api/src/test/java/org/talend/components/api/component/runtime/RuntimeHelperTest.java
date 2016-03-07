@@ -10,6 +10,7 @@ import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.properties.ValidationResult;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -28,7 +29,12 @@ public class RuntimeHelperTest {
 
         AvroUtils.setFieldDynamic(designSchema.getField("dynamic"));
 
-        Schema resolved = RuntimeHelper.resolveSchema(null, "schema1", new SourceOrSink() {
+        Schema resolved = RuntimeHelper.resolveSchema(null, new ComponentProperties("schema1") {
+            @Override
+            protected boolean acceptUninitializedField(Field f) {
+                return super.acceptUninitializedField(f);
+            }
+        }, new SourceOrSink() {
             @Override
             public void initialize(RuntimeContainer adaptor, ComponentProperties properties) {
             }
@@ -44,7 +50,7 @@ public class RuntimeHelperTest {
             }
 
             @Override
-            public Schema getSchema(RuntimeContainer adaptor, String schemaName) throws IOException {
+            public Schema getSchema(RuntimeContainer adaptor, ComponentProperties properties) throws IOException {
                 Schema runtimeSchema = SchemaBuilder.record("design").fields()
                         .name("f1").type().stringType().noDefault()
                         .name("r1").type().stringType().noDefault()

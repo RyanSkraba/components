@@ -1,21 +1,22 @@
 package org.talend.components.api.component.runtime.util;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
-
 import org.apache.avro.Schema;
 import org.joda.time.Instant;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.NoSuchElementException;
+
 /**
  * A wrapper for the an {@link UnshardedInputIterator} so that it can be run remotely.
- * 
+ * <p>
  * This implements all of the methods for a sharded (or multi-partitioned) input, but guarantees that only one partition
  * will be assigned used.
  *
@@ -23,16 +24,24 @@ import org.talend.daikon.properties.ValidationResult;
  */
 public abstract class UnshardedInputSource<T> implements BoundedSource {
 
-    /** Default serial version UID. */
+    /**
+     * Default serial version UID.
+     */
     private static final long serialVersionUID = 1L;
 
-    /** The actual implementation of the unsharded reader (only one of these will be non-null). */
+    /**
+     * The actual implementation of the unsharded reader (only one of these will be non-null).
+     */
     private UnshardedInputIterator<T> unshardedInputIterator;
 
-    /** The actual implementation of the unsharded reader (only one of these will be non-null). */
+    /**
+     * The actual implementation of the unsharded reader (only one of these will be non-null).
+     */
     private UnshardedInputAdvancer<T> unshardedInputAdvancer;
 
-    /** Whether this implementation produces sorted keys. */
+    /**
+     * Whether this implementation produces sorted keys.
+     */
     private boolean producesSortedKeys = false;
 
     /**
@@ -109,7 +118,7 @@ public abstract class UnshardedInputSource<T> implements BoundedSource {
      * By default, no schemas can be fetched.
      */
     @Override
-    public Schema getSchema(RuntimeContainer adaptor, String schemaName) throws IOException {
+    public Schema getSchema(RuntimeContainer adaptor, ComponentProperties properties) throws IOException {
         return null;
     }
 

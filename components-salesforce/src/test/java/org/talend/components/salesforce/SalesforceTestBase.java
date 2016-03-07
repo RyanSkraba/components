@@ -12,20 +12,9 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
-
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.generic.IndexedRecord;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ErrorCollector;
@@ -54,10 +43,21 @@ import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputPrope
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
 import org.talend.components.salesforce.tsalesforcewavebulkexec.TSalesforceWaveBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcewaveoutputbulkexec.TSalesforceWaveOutputBulkExecDefinition;
+import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.PropertiesServiceTest;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
+
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.*;
 
 public class SalesforceTestBase extends AbstractComponentTest {
 
@@ -283,11 +283,20 @@ public class SalesforceTestBase extends AbstractComponentTest {
     }
 
     protected List<Map<String, Object>> readRows(TSalesforceInputProperties inputProps) throws IOException {
+        IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory = null;
         BoundedReader reader = createBoundedReader(inputProps);
         boolean hasRecord = reader.start();
         List<Map<String, Object>> rows = new ArrayList<>();
         while (hasRecord) {
-            rows.add((Map<String, Object>) reader.getCurrent());
+            Map<String, Object> r = new HashMap<>();
+            if (factory == null)
+                factory = (IndexedRecordAdapterFactory<Object, ? extends org.apache.avro.generic.IndexedRecord>) new org.talend.daikon.avro.AvroRegistry()
+                        .createAdapterFactory(reader.getCurrent().getClass());
+            org.apache.avro.generic.IndexedRecord unenforced = factory.convertToAvro(reader.getCurrent());
+            for (Schema.Field field : unenforced.getSchema().getFields()) {
+                r.put(field.name(), unenforced.get(field.pos()));
+            }
+            rows.add(r);
             hasRecord = reader.advance();
         }
         return rows;
@@ -343,7 +352,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
 
     // Returns the rows written (having been re-read so they have their Ids)
     protected List<Map<String, Object>> writeRows(SalesforceConnectionModuleProperties props,
-            List<Map<String, Object>> outputRows) throws Exception {
+                                                  List<Map<String, Object>> outputRows) throws Exception {
         TSalesforceOutputProperties outputProps = new TSalesforceOutputProperties("output"); //$NON-NLS-1$
         outputProps.copyValuesFrom(props);
         outputProps.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);

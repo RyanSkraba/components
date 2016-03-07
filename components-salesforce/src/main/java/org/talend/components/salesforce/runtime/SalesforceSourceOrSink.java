@@ -12,12 +12,12 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.namespace.QName;
-
+import com.sforce.async.AsyncApiException;
+import com.sforce.async.BulkConnection;
+import com.sforce.soap.partner.*;
+import com.sforce.ws.ConnectionException;
+import com.sforce.ws.ConnectorConfig;
+import com.sforce.ws.SessionRenewer;
 import org.apache.avro.Schema;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -27,22 +27,17 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
 import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnection;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.sforce.async.AsyncApiException;
-import com.sforce.async.BulkConnection;
-import com.sforce.soap.partner.DescribeGlobalResult;
-import com.sforce.soap.partner.DescribeGlobalSObjectResult;
-import com.sforce.soap.partner.DescribeSObjectResult;
-import com.sforce.soap.partner.PartnerConnection;
-import com.sforce.soap.partner.SessionHeader_element;
-import com.sforce.ws.ConnectionException;
-import com.sforce.ws.ConnectorConfig;
-import com.sforce.ws.SessionRenewer;
+import javax.xml.namespace.QName;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SalesforceSourceOrSink implements SourceOrSink {
 
@@ -220,14 +215,14 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     }
 
     @Override
-    public Schema getSchema(RuntimeContainer adaptor, String module) throws IOException {
-        return getSchema(connect(), module);
+    public Schema getSchema(RuntimeContainer adaptor, ComponentProperties properties) throws IOException {
+        return getSchema(connect(), ((SalesforceModuleProperties) properties).moduleName.getStringValue());
     }
 
     public Schema getSchema(PartnerConnection connection, String module) throws IOException {
         try {
             DescribeSObjectResult[] describeSObjectResults = new DescribeSObjectResult[0];
-            describeSObjectResults = connection.describeSObjects(new String[] { module });
+            describeSObjectResults = connection.describeSObjects(new String[]{module});
             return SalesforceAvroRegistry.get().inferSchema(describeSObjectResults[0]);
         } catch (ConnectionException e) {
             throw new IOException(e);
