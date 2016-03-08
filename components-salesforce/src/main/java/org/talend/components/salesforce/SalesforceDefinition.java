@@ -12,8 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import java.io.InputStream;
-
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
@@ -51,15 +49,20 @@ public abstract class SalesforceDefinition extends AbstractComponentDefinition {
         return getName();
     }
 
-    @Override
-    public InputStream getMavenPom() {
-        return this.getClass().getResourceAsStream("/org/talend/components/salesforce/pom.xml");
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return new Class[] { SalesforceConnectionProperties.class };
+    }
+
+    @Override
+    public String getMavenGroupId() {
+        return "org.talend.components";
+    }
+
+    @Override
+    public String getMavenArtifactId() {
+        return "components-salesforce";
     }
 
 }

@@ -12,8 +12,6 @@
 // ============================================================================
 package org.talend.components.api.component;
 
-import java.io.InputStream;
-
 import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 
@@ -93,9 +91,17 @@ public interface ComponentDefinition extends TopLevelDefinition {
     public String getPartitioning();
 
     /**
-     * @return a stream on the maven pom.xml related to the component. This will be used to compute all the component
-     * dependencies.
+     * is used for computing the dependencies by finding the pom.xml and dependencies.properties in the META-INF/ folder
+     * 
+     * @return the maven Group Id of the component familly
      */
-    public InputStream getMavenPom();
+    public String getMavenGroupId();
+
+    /**
+     * is used for computing the dependencies by finding the pom.xml and dependencies.properties in the META-INF/ folder
+     * 
+     * @return the maven Artifact Id of the component familly
+     */
+    public String getMavenArtifactId();
 
 }

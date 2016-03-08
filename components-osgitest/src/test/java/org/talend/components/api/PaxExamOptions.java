@@ -59,8 +59,6 @@ public class PaxExamOptions {
                 mavenBundle().groupId("org.talend.components").artifactId("components-common-oauth").classifier("bundle"),
                 mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("bundle"),
                 mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("tests").noStart(),
-                // be carefull to p^lace the following hamcrest bundle before the junitBundles definition because
-                // they both export org.hamcrest but the junitBundle is missing some usefull classes
                 mavenBundle("org.apache.servicemix.bundles", "org.apache.servicemix.bundles.hamcrest", "1.3_1"), //
                 // this is copied from junitBundles() to remove the default pax-exam hamcrest bundle that does
                 // not contains all the nice hamcrest Matchers

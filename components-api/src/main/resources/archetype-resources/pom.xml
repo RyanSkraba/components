@@ -42,30 +42,6 @@
 
     <build>
         <plugins>
-            <!-- The pom is a resource of the component this is why it is copied as
-                such at the top level package -->
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.7</version>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/classes/${packageInPathFormat}</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}</directory>
-                                    <include>pom.xml</include>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -84,6 +60,7 @@
                                 <Service-Component>*</Service-Component>
                                 <Import-Package>*,aQute.bnd.annotation.component</Import-Package>
                                 <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*</Embed-Dependency>
+                                <Include-Resource>{maven-resources},META-INF/maven/${groupId}/${artifactId}/dependencies.properties=target/classes/META-INF/maven/dependencies.properties</Include-Resource>
                             </instructions>
                         </configuration>
                     </execution>
@@ -97,6 +74,7 @@
                             <instructions>
                                 <Bundle-SymbolicName>${package}.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
+                                <Include-Resource>{maven-resources},META-INF/maven/${groupId}/${artifactId}/dependencies.properties=target/classes/META-INF/maven/dependencies.properties</Include-Resource>
                             </instructions>
                         </configuration>
                     </execution>

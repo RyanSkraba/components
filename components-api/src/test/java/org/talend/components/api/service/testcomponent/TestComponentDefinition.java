@@ -12,8 +12,6 @@
 // ============================================================================
 package org.talend.components.api.service.testcomponent;
 
-import java.io.InputStream;
-
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentDefinition;
@@ -57,11 +55,6 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     }
 
     @Override
-    public InputStream getMavenPom() {
-        return this.getClass().getResourceAsStream("pom.xml");
-    }
-
-    @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return TestComponentProperties.class;
     }
@@ -71,6 +64,16 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return new Class[] { NestedComponentProperties.class, ComponentPropertiesWithDefinedI18N.class,
                 InheritedComponentProperties.class };
+    }
+
+    @Override
+    public String getMavenGroupId() {
+        return "org.talend.components.api.test";
+    }
+
+    @Override
+    public String getMavenArtifactId() {
+        return "test-components";
     }
 
 }

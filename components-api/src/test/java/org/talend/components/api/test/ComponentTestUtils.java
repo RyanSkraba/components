@@ -13,7 +13,9 @@
 package org.talend.components.api.test;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.*;
 
 import java.io.InputStream;
 import java.util.Set;
@@ -111,18 +113,35 @@ public class ComponentTestUtils {
     public static void testAllRuntimeAvaialble(ComponentService componentService) {
         Set<ComponentDefinition> allComponents = componentService.getAllComponents();
         for (ComponentDefinition cd : allComponents) {
-            if (cd instanceof TestComponentDefinition)
+            if (cd instanceof TestComponentDefinition) {
                 continue;
+            }
             Object runtime = null;
-            if (cd instanceof InputComponentDefinition)
+            if (cd instanceof InputComponentDefinition) {
                 runtime = ((InputComponentDefinition) cd).getRuntime();
-            else if (cd instanceof OutputComponentDefinition)
+            } else if (cd instanceof OutputComponentDefinition) {
                 runtime = ((OutputComponentDefinition) cd).getRuntime();
-            else {
+            } else {
                 continue;
                 // FIXME - need to add support for transformation runtime
             }
             assertNotNull("the Runtime associated with component [" + cd.getName() + "] should never be null.", runtime);
+        }
+    }
+
+    /**
+     * check that the depenencies file is present during integration test.
+     * 
+     * @param componentService service to get the components to be checked.
+     */
+    public static void testAllDesignDependenciesPresent(ComponentService componentService, ErrorCollector errorCollector) {
+        Set<ComponentDefinition> allComponents = componentService.getAllComponents();
+        for (ComponentDefinition compDef : allComponents) {
+            errorCollector.checkThat(compDef.getMavenGroupId(), is(not(nullValue())));
+            errorCollector.checkThat(compDef.getMavenArtifactId(), is(not(nullValue())));
+            Set<String> mavenUriDependencies = componentService.getMavenUriDependencies(compDef.getName());
+            errorCollector.checkThat(mavenUriDependencies, is(not(nullValue())));
+            errorCollector.checkThat(mavenUriDependencies.isEmpty(), is(false));
         }
     }
 

@@ -52,11 +52,16 @@ public class ${componentName}Definition extends AbstractComponentDefinition impl
         }
     }
 
-    @Override
-    public InputStream getMavenPom() {
-        return this.getClass().getResourceAsStream("pom.xml"); //$NON-NLS-1$
+    public String getMavenGroupId() {
+        return "${groupId}";
     }
 
+    @Override
+    public String getMavenArtifactId() {
+        return "${artifactId}";
+    }
+    
+    
     @Override
     public String getName() {
         return COMPONENT_NAME;

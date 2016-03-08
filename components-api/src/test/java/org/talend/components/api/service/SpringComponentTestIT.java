@@ -21,7 +21,7 @@ import org.talend.components.api.test.SpringApp;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
-public class SpringComponentTestIT extends ComponentServiceAbstractForIT {
+public class SpringComponentTestIT extends ComponentServiceTest {
 
     @Inject
     private ComponentService componentService;

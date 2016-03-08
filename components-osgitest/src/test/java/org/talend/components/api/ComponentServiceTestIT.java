@@ -32,7 +32,7 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.service.ComponentServiceAbstractForIT;
+import org.talend.components.api.service.ComponentServiceTest;
 import org.talend.components.api.service.testcomponent.TestComponentDefinition;
 import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
@@ -42,7 +42,7 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
  */
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class ComponentServiceTestIT extends ComponentServiceAbstractForIT {
+public class ComponentServiceTestIT extends ComponentServiceTest {
 
     @Inject
     private ComponentService osgiCompService;

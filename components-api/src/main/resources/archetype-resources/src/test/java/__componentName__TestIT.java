@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
+import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.test.SimpleComponentRegistry;
 
 @SuppressWarnings("nls")
@@ -35,9 +36,9 @@ public class ${componentName}TestIT {
     }
 
     @Test
-    // this is an integration test to check that the pom is properly copied into the built artifact.
+    // this is an integration test to check that the dependencies file is properly generated.
     public void testDependencies() {
-        ${componentName}Definition def = (${componentName}Definition) getComponentService().getComponentDefinition("${componentName}");
-        assertNotNull(def.getMavenPom());
+        ComponentTestUtils.testAllDesignDependenciesPresent(getComponentService(), errorCollector);
     }
+
 }
