@@ -16,7 +16,6 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Test;
@@ -53,12 +52,12 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
     @Test
     public void testInput() throws Throwable {
-        runInputTest(!DYNAMIC);
+        runInputTest(false);
     }
 
     @Test
     public void testInputDynamic() throws Throwable {
-        runInputTest(DYNAMIC);
+        runInputTest(true);
     }
 
     protected void runInputTest(boolean isDynamic) throws Throwable {
@@ -67,22 +66,21 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
                 TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection, !ADD_QUOTES);
 
-        setupModule(props.module, "Account");
-        if (isDynamic) {
-            fixSchemaForDynamic();
-        }
+        setupModule(props.module, EXISTING_MODULE_NAME);
+
         ComponentTestUtils.checkSerialize(props, errorCollector);
 
+        String random = createNewRandom();
         int count = 10;
         // store rows in SF to retrieve them afterward to test the input.
-        List<Map<String, Object>> outputRows = makeRows(count);
-        outputRows = writeRows(props, outputRows);
-        checkRows(outputRows, count);
+        List<IndexedRecord> outputRows = makeRows(random, count, true);
+        outputRows = writeRows(random, props, outputRows);
+        checkRows(random, outputRows, count);
         try {
-            List<Map<String, Object>> rows = readRows(props);
-            checkRows(rows, count);
+            List<IndexedRecord> rows = readRows(props);
+            checkRows(random, rows, count);
         } finally {
-            deleteRows(outputRows, props);
+            deleteRows(random, outputRows, props);
         }
     }
 

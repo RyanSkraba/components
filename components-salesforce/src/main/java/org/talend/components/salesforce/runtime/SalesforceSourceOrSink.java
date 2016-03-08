@@ -12,12 +12,12 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import com.sforce.async.AsyncApiException;
-import com.sforce.async.BulkConnection;
-import com.sforce.soap.partner.*;
-import com.sforce.ws.ConnectionException;
-import com.sforce.ws.ConnectorConfig;
-import com.sforce.ws.SessionRenewer;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import org.apache.avro.Schema;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -34,10 +34,16 @@ import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.ValidationResult;
 
-import javax.xml.namespace.QName;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import com.sforce.async.AsyncApiException;
+import com.sforce.async.BulkConnection;
+import com.sforce.soap.partner.DescribeGlobalResult;
+import com.sforce.soap.partner.DescribeGlobalSObjectResult;
+import com.sforce.soap.partner.DescribeSObjectResult;
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.SessionHeader_element;
+import com.sforce.ws.ConnectionException;
+import com.sforce.ws.ConnectorConfig;
+import com.sforce.ws.SessionRenewer;
 
 public class SalesforceSourceOrSink implements SourceOrSink {
 
@@ -222,7 +228,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     public Schema getSchema(PartnerConnection connection, String module) throws IOException {
         try {
             DescribeSObjectResult[] describeSObjectResults = new DescribeSObjectResult[0];
-            describeSObjectResults = connection.describeSObjects(new String[]{module});
+            describeSObjectResults = connection.describeSObjects(new String[] { module });
             return SalesforceAvroRegistry.get().inferSchema(describeSObjectResults[0]);
         } catch (ConnectionException e) {
             throw new IOException(e);

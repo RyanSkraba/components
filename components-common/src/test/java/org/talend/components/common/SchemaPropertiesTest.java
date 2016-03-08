@@ -34,7 +34,7 @@ public class SchemaPropertiesTest {
 
         assertEquals("schema", schemaProperties.schema.getName());
         assertNotNull(schemaProperties.schema.getValue());
-        assertThat(schemaProperties.schema.getValue(), instanceOf(Schema.class));
+        assertThat(schemaProperties.schema.getValue(), instanceOf(String.class));
 
         // check the automatic getLayer
         assertEquals(2, schemaProperties.getForms().size());
@@ -54,7 +54,7 @@ public class SchemaPropertiesTest {
                 schemaProperties.getForm(Form.REFERENCE).getWidget(schemaProperties.schema.getName()).getWidgetType());
 
         // add element
-        Schema schema = (Schema) schemaProperties.schema.getValue();
+        Schema schema = new Schema.Parser().parse(schemaProperties.schema.getStringValue());
         assertThat(schema, not(nullValue()));
     }
 

@@ -19,10 +19,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.apache.avro.generic.IndexedRecord;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
@@ -453,9 +453,9 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         setupModule(outputProps.module, "Account");
 
         ComponentTestUtils.checkSerialize(outputProps, errorCollector);
-        List<Map<String, Object>> rows = new ArrayList<>();
+        List<IndexedRecord> rows = new ArrayList<>();
         try {
-            writeRows(outputProps, rows);
+            writeRows(null, outputProps, rows);
         } catch (Exception ex) {
             if (ex instanceof ClassCastException) {
                 System.out.println("Exception: " + ex.getMessage());

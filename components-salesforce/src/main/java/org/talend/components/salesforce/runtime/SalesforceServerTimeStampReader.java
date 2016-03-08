@@ -16,31 +16,25 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.NoSuchElementException;
 
-import org.apache.avro.Schema;
+import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
 
+import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.ws.ConnectionException;
 
-public class SalesforceServerTimeStampReader extends SalesforceReader<Calendar> {
+public class SalesforceServerTimeStampReader extends AbstractBoundedReader<Calendar> {
 
-    private TSalesforceGetServerTimestampProperties props;
-
-    private Calendar result;
-
-    private Schema schema;
+    private transient Calendar result;
 
     public SalesforceServerTimeStampReader(RuntimeContainer adaptor, SalesforceSource source,
             TSalesforceGetServerTimestampProperties props) {
-        super(adaptor, source);
-        this.props = props;
+        super(source);
     }
 
     @Override
     public boolean start() throws IOException {
-        super.start();
-        TSalesforceGetServerTimestampProperties gdProps = props;
-        schema = new Schema.Parser().parse(gdProps.schema.schema.getStringValue());
+        PartnerConnection connection = ((SalesforceSource) getCurrentSource()).connect();
         try {
             result = connection.getServerTimestamp().getTimestamp();
             return result != null;
@@ -51,7 +45,7 @@ public class SalesforceServerTimeStampReader extends SalesforceReader<Calendar> 
 
     @Override
     public boolean advance() throws IOException {
-        return false;// only one record is avalable for this reader.
+        return false;// only one record is available for this reader.
     }
 
     @Override

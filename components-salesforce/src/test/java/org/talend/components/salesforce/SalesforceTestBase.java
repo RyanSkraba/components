@@ -17,13 +17,13 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.SchemaBuilder.FieldAssembler;
+import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Before;
 import org.junit.Rule;
@@ -53,23 +53,17 @@ import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputPrope
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
 import org.talend.components.salesforce.tsalesforcewavebulkexec.TSalesforceWaveBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcewaveoutputbulkexec.TSalesforceWaveOutputBulkExecDefinition;
-import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.PropertiesServiceTest;
 
+@SuppressWarnings("nls")
 public class SalesforceTestBase extends AbstractComponentTest {
 
     @Rule
     public ErrorCollector errorCollector = new ErrorCollector();
 
     private ComponentService componentService;
-
-    // Used to make sure we have our own data - the billingPostalCode is set to this value
-    protected String random;
-
-    // Test schema
-    protected transient Schema schema;
 
     protected RuntimeContainer adaptor;
 
@@ -81,11 +75,12 @@ public class SalesforceTestBase extends AbstractComponentTest {
 
     public final String securityKey = System.getProperty("salesforce.key");
 
-    protected static final boolean DYNAMIC = true;
-
     public SalesforceTestBase() {
-        random = Integer.toString(ThreadLocalRandom.current().nextInt(1, 100000));
         adaptor = new DefaultComponentRuntimeContainerImpl();
+    }
+
+    public String createNewRandom() {
+        return Integer.toString(ThreadLocalRandom.current().nextInt(1, 100000));
     }
 
     @Before
@@ -155,90 +150,104 @@ public class SalesforceTestBase extends AbstractComponentTest {
                 "moduleName", moduleProps);
         moduleProps.moduleName.setValue(module);
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
-        schema = new Schema.Parser().parse(moduleProps.schema.schema.getStringValue());
     }
 
-    protected void fixSchemaForDynamic() {
-        List<Schema.Field> fields = schema.getFields();
-
-        schema = SchemaBuilder.record("record").fields().endRecord();
-
-        List<Schema.Field> newFields = new ArrayList();
-        for (Schema.Field field : fields) {
-            if (field.name().equals("ShippingState")) {
-                continue;
-            }
-            newFields.add(new Schema.Field(field.name(), schema, field.doc(), null));
-        }
-        Schema.Field dynField = new Schema.Field("dynamic", schema, "dynamic", null);
-        AvroUtils.setFieldDynamic(dynField);
-        newFields.add(dynField);
-    }
-
-    public void addDynamicColumn(Map<String, Object> row, boolean isDynamic) {
+    public Schema getMakeRowSchema(boolean isDynamic) {
+        FieldAssembler<Schema> fa = SchemaBuilder.builder().record("MakeRowRecord").fields() //
+                .name("Name").type().nullable().stringType().noDefault() //
+                .name("ShippingStreet").type().nullable().stringType().noDefault() //
+                .name("ShippingPostalCode").type().nullable().intType().noDefault() //
+                .name("BillingStreet").type().nullable().stringType().noDefault() //
+                .name("BillingState").type().nullable().stringType().noDefault() //
+                .name("BillingPostalCode").type().nullable().stringType().noDefault();
         if (isDynamic) {
-            row.put("ShippingState", "CA");
+            fa = fa.name("ShippingState").type().nullable().stringType().noDefault();
         }
+
+        return fa.endRecord();
     }
 
-    public List<Map<String, Object>> makeRows(int count) {
-        return makeRows(count, false);
-    }
-
-    public List<Map<String, Object>> makeRows(int count, boolean isDynamic) {
-        List<Map<String, Object>> outputRows = new ArrayList<>();
+    public List<IndexedRecord> makeRows(String random, int count, boolean isDynamic) {
+        List<IndexedRecord> outputRows = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            Map<String, Object> row = new HashMap<>();
+            GenericData.Record row = new GenericData.Record(getMakeRowSchema(isDynamic));
             row.put("Name", "TestName");
             row.put("ShippingStreet", TEST_KEY);
             row.put("ShippingPostalCode", Integer.toString(i));
             row.put("BillingStreet", "123 Main Street");
             row.put("BillingState", "CA");
             row.put("BillingPostalCode", random);
-            addDynamicColumn(row, isDynamic);
-            System.out.println("out: " + row.get("Name") + " id: " + row.get("Id") + " post: " + row.get("BillingPostalCode")
-                    + " st: " + " street: " + row.get("BillingStreet"));
+            if (isDynamic) {
+                row.put("ShippingState", "CA");
+            }
+            System.out.println("Row to insert: " + row.get("Name") //
+                    + " id: " + row.get("Id") //
+                    + " shippingPostalCode: " + row.get("ShippingPostalCode") //
+                    + " billingPostalCode: " + row.get("BillingPostalCode") //
+                    + " billingStreet: " + row.get("BillingStreet"));
             outputRows.add(row);
         }
         return outputRows;
     }
 
-    protected List<Map<String, Object>> checkRows(List<Map<String, Object>> rows, int count) {
-        List<Map<String, Object>> checkedRows = new ArrayList<>();
+    protected List<IndexedRecord> checkRows(String random, List<IndexedRecord> rows, int count) {
+        List<IndexedRecord> checkedRows = new ArrayList<>();
+
+        Schema rowSchema = null;
+        int iName = 0;
+        int iId = 0;
+        int iBillingPostalCode = 0;
+        int iBillingStreet = 0;
+        int iShippingStreet = 0;
+        int iShippingState = 0;
+        int iBillingState = 0;
 
         int checkCount = 0;
-        for (Map<String, Object> row : rows) {
-            System.out.println("check: " + row.get("Name") + " id: " + row.get("Id") + " post: " + row.get("BillingPostalCode")
-                    + " st: " + " post: " + row.get("BillingStreet"));
-            String check = (String) row.get("ShippingStreet");
+        for (IndexedRecord row : rows) {
+            if (rowSchema == null) {
+                rowSchema = row.getSchema();
+                iName = rowSchema.getField("Name").pos();
+                iId = rowSchema.getField("Id").pos();
+                iBillingPostalCode = rowSchema.getField("BillingPostalCode").pos();
+                iBillingStreet = rowSchema.getField("BillingStreet").pos();
+                iBillingState = rowSchema.getField("BillingState").pos();
+                iShippingStreet = rowSchema.getField("ShippingStreet").pos();
+                iShippingState = rowSchema.getField("ShippingState").pos();
+            }
+
+            System.out.println("check: " + row.get(iName) + " id: " + row.get(iId) + " post: " + row.get(iBillingPostalCode)
+                    + " st: " + " post: " + row.get(iBillingStreet));
+            String check = (String) row.get(iShippingStreet);
             if (check == null || !check.equals(SalesforceTestBase.TEST_KEY)) {
                 continue;
             }
-            check = (String) row.get("BillingPostalCode");
+            check = (String) row.get(iBillingPostalCode);
             if (check == null || !check.equals(random)) {
                 continue;
             }
             checkCount++;
-            assertEquals("CA", row.get("ShippingState"));
-            assertEquals("TestName", row.get("Name"));
-            assertEquals("123 Main Street", row.get("BillingStreet"));
-            assertEquals("CA", row.get("BillingState"));
+            assertEquals("CA", row.get(iShippingState));
+            assertEquals("TestName", row.get(iName));
+            assertEquals("123 Main Street", row.get(iBillingStreet));
+            assertEquals("CA", row.get(iBillingState));
             checkedRows.add(row);
         }
         assertEquals(count, checkCount);
         return checkedRows;
     }
 
-    public List<String> getDeleteIds(List<Map<String, Object>> rows) {
+    public List<String> getDeleteIds(List<IndexedRecord> rows) {
         List<String> ids = new ArrayList<>();
-        for (Map<String, Object> row : rows) {
-            System.out.println("del: " + row.get("Name") + " id: " + row.get("Id") + " post: " + row.get("BillingPostalCode")
-                    + " st: " + " post: " + row.get("BillingStreet"));
-            String check = (String) row.get("ShippingStreet");
+        for (IndexedRecord row : rows) {
+            System.out.println("del: " + row.get(row.getSchema().getField("Name").pos()) + " id: "
+                    + row.get(row.getSchema().getField("Id").pos()) + " post: "
+                    + row.get(row.getSchema().getField("BillingPostalCode").pos()) + " st: " + " post: "
+                    + row.get(row.getSchema().getField("BillingStreet").pos()));
+            String check = (String) row.get(row.getSchema().getField("ShippingStreet").pos());
             if (check == null || !check.equals(SalesforceTestBase.TEST_KEY)) {
                 continue;
             }
-            ids.add((String) row.get("Id"));
+            ids.add((String) row.get(row.getSchema().getField("Id").pos()));
         }
         return ids;
     }
@@ -246,95 +255,89 @@ public class SalesforceTestBase extends AbstractComponentTest {
     /**
      * @return the list of row match the TEST_KEY, and if a random values it specified it also filter row against the
      */
-    public List<Map<String, Object>> filterAllTestRows(List<Map<String, Object>> rows, String randomValue) {
-        List<Map<String, Object>> checkedRows = new ArrayList<>();
+    public List<IndexedRecord> filterAllTestRows(String random, List<IndexedRecord> rows) {
+        List<IndexedRecord> checkedRows = new ArrayList<>();
 
-        for (Map<String, Object> row : rows) {
-            String check = (String) row.get("ShippingStreet");
+        for (IndexedRecord row : rows) {
+            String check = (String) row.get(row.getSchema().getField("ShippingStreet").pos());
             if (check == null || !check.equals(TEST_KEY)) {
                 continue;
             }
-            if (randomValue != null) {// check the random value if specified
-                check = (String) row.get("BillingPostalCode");
-                if (check == null || !check.equals(randomValue)) {
+            if (random != null) {// check the random value if specified
+                check = (String) row.get(row.getSchema().getField("BillingPostalCode").pos());
+                if (check == null || !check.equals(random)) {
                     continue;
                 }
             }
-            System.out.println("Test row is: " + row.get("Name") + " id: " + row.get("Id") + " post: "
-                    + row.get("BillingPostalCode") + " st: " + " post: " + row.get("BillingStreet"));
+            System.out.println("Found match: " + row.get(row.getSchema().getField("Name").pos()) //
+                    + " id: " + row.get(row.getSchema().getField("Id").pos()) //
+                    + " shippingPostalCode: " + row.get(row.getSchema().getField("ShippingPostalCode").pos()) //
+                    + " billingPostalCode: " + row.get(row.getSchema().getField("BillingPostalCode").pos()) //
+                    + " billingStreet: " + row.get(row.getSchema().getField("BillingStreet").pos())); //
             checkedRows.add(row);
         }
         return checkedRows;
     }
 
-    public List<Map<String, Object>> getAllTestRows(List<Map<String, Object>> rows) {
-        List<Map<String, Object>> checkedRows = new ArrayList<>();
+    public List<IndexedRecord> getAllTestRows(List<IndexedRecord> rows) {
+        List<IndexedRecord> checkedRows = new ArrayList<>();
 
-        for (Map<String, Object> row : rows) {
-            String check = (String) row.get("ShippingStreet");
+        for (IndexedRecord row : rows) {
+            String check = (String) row.get(row.getSchema().getField("ShippingStreet").pos());
             if (check == null || !check.equals(TEST_KEY)) {
                 continue;
             }
-            System.out.println("Test row is: " + row.get("Name") + " id: " + row.get("Id") + " post: "
-                    + row.get("BillingPostalCode") + " st: " + " post: " + row.get("BillingStreet"));
+            System.out.println("Test row is: " + row.get(row.getSchema().getField("Name").pos()) + " id: "
+                    + row.get(row.getSchema().getField("Id").pos()) + " post: "
+                    + row.get(row.getSchema().getField("BillingPostalCode").pos()) + " st: " + " post: "
+                    + row.get(row.getSchema().getField("BillingStreet").pos()));
             checkedRows.add(row);
         }
         return checkedRows;
     }
 
-    protected List<Map<String, Object>> readRows(TSalesforceInputProperties inputProps) throws IOException {
+    protected List<IndexedRecord> readRows(TSalesforceInputProperties inputProps) throws IOException {
         BoundedReader<IndexedRecord> reader = createBoundedReader(inputProps);
         boolean hasRecord = reader.start();
-        List<Map<String, Object>> rows = new ArrayList<>();
+        List<IndexedRecord> rows = new ArrayList<>();
         while (hasRecord) {
-            Map<String, Object> r = new HashMap<>();
             org.apache.avro.generic.IndexedRecord unenforced = reader.getCurrent();
-            for (Schema.Field field : unenforced.getSchema().getFields()) {
-                r.put(field.name(), unenforced.get(field.pos()));
-                if ("ShippingState".equals(field.name())) {
-                    String k = field.name();
-                    Object v = unenforced.get(field.pos());
-                    System.out.println(k + ":" + v);
-                    v = unenforced.get(field.pos());
-                }
-
-            }
-            rows.add(r);
+            rows.add(unenforced);
             hasRecord = reader.advance();
         }
         return rows;
     }
 
-    protected List<Map<String, Object>> readRows(SalesforceConnectionModuleProperties props) throws IOException {
+    protected List<IndexedRecord> readRows(SalesforceConnectionModuleProperties props) throws IOException {
         TSalesforceInputProperties inputProps = (TSalesforceInputProperties) new TSalesforceInputProperties("bar").init();
         inputProps.connection = props.connection;
         inputProps.module = props.module;
         inputProps.batchSize.setValue(200);
-        List<Map<String, Object>> inputRows = readRows(inputProps);
+        List<IndexedRecord> inputRows = readRows(inputProps);
         return inputRows;
     }
 
-    protected List<Map<String, Object>> readAndCheckRows(SalesforceConnectionModuleProperties props, int count) throws Exception {
-        List<Map<String, Object>> inputRows = readRows(props);
-        return checkRows(inputRows, count);
+    List<IndexedRecord> readAndCheckRows(String random, SalesforceConnectionModuleProperties props, int count) throws Exception {
+        List<IndexedRecord> inputRows = readRows(props);
+        return checkRows(random, inputRows, count);
     }
 
-    protected void checkRows(List<Map<String, Object>> outputRows, SalesforceConnectionModuleProperties props) throws Exception {
-        List<Map<String, Object>> inputRows = readRows(props);
+    protected void checkRows(List<IndexedRecord> outputRows, SalesforceConnectionModuleProperties props) throws Exception {
+        List<IndexedRecord> inputRows = readRows(props);
         assertThat(inputRows, containsInAnyOrder(outputRows.toArray()));
     }
 
-    protected void checkAndDelete(SalesforceConnectionModuleProperties props, int count) throws Exception {
-        List<Map<String, Object>> inputRows = readAndCheckRows(props, count);
-        deleteRows(inputRows, props);
-        readAndCheckRows(props, 0);
+    protected void checkAndDelete(String random, SalesforceConnectionModuleProperties props, int count) throws Exception {
+        List<IndexedRecord> inputRows = readAndCheckRows(random, props, count);
+        deleteRows(random, inputRows, props);
+        readAndCheckRows(random, props, 0);
     }
 
-    public <T> T writeRows(Writer<T> writer, List<Map<String, Object>> outputRows) throws IOException {
+    public <T> T writeRows(Writer<T> writer, List<IndexedRecord> outputRows) throws IOException {
         T result;
         writer.open("foo");
         try {
-            for (Map<String, Object> row : outputRows) {
+            for (IndexedRecord row : outputRows) {
                 writer.write(row);
             }
         } finally {
@@ -344,7 +347,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
     }
 
     // Returns the rows written (having been re-read so they have their Ids)
-    protected void doWriteRows(SalesforceConnectionModuleProperties props, List<Map<String, Object>> outputRows) throws Exception {
+    protected void doWriteRows(SalesforceConnectionModuleProperties props, List<IndexedRecord> outputRows) throws Exception {
         SalesforceSink salesforceSink = new SalesforceSink();
         salesforceSink.initialize(adaptor, props);
         SalesforceWriteOperation writeOperation = (SalesforceWriteOperation) salesforceSink.createWriteOperation();
@@ -353,16 +356,17 @@ public class SalesforceTestBase extends AbstractComponentTest {
     }
 
     // Returns the rows written (having been re-read so they have their Ids)
-    protected List<Map<String, Object>> writeRows(SalesforceConnectionModuleProperties props, List<Map<String, Object>> outputRows)
-            throws Exception {
+    protected List<IndexedRecord> writeRows(String random, SalesforceConnectionModuleProperties props,
+            List<IndexedRecord> outputRows) throws Exception {
         TSalesforceOutputProperties outputProps = new TSalesforceOutputProperties("output"); //$NON-NLS-1$
         outputProps.copyValuesFrom(props);
         outputProps.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
         doWriteRows(outputProps, outputRows);
-        return readAndCheckRows(props, outputRows.size());
+        return readAndCheckRows(random, props, outputRows.size());
     }
 
-    protected void deleteRows(List<Map<String, Object>> rows, SalesforceConnectionModuleProperties props) throws Exception {
+    protected void deleteRows(String random, List<IndexedRecord> rows, SalesforceConnectionModuleProperties props)
+            throws Exception {
         TSalesforceOutputProperties deleteProperties = new TSalesforceOutputProperties("delete"); //$NON-NLS-1$
         deleteProperties.copyValuesFrom(props);
         deleteProperties.outputAction.setValue(TSalesforceOutputProperties.ACTION_DELETE);

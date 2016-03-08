@@ -12,32 +12,30 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import java.io.IOException;
+import java.util.NoSuchElementException;
+
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.SalesforceGetDeletedUpdatedProperties;
-import org.talend.daikon.exception.TalendRuntimeException;
 
 import com.sforce.soap.partner.GetUpdatedResult;
 import com.sforce.ws.ConnectionException;
 
-public class SalesforceGetUpdatedReader extends SalesforceGetDeletedReader {
-
-    private GetUpdatedResult result;
+public class SalesforceGetUpdatedReader extends SalesforceGetDeletedUpdatedReader<GetUpdatedResult, Object> {
 
     public SalesforceGetUpdatedReader(RuntimeContainer adaptor, SalesforceSource source,
             SalesforceGetDeletedUpdatedProperties props) {
         super(adaptor, source, props);
     }
 
-    protected boolean getResult() throws ConnectionException {
-        result = connection.getUpdated(module, props.startDate.getCalendarValue(), props.endDate.getCalendarValue());
-        return result != null;
+    @Override
+    protected GetUpdatedResult getResult() throws IOException, ConnectionException {
+        return getConnection().getUpdated(module, props.startDate.getCalendarValue(), props.endDate.getCalendarValue());
     }
 
     @Override
-    protected Object returnResult() {
-        // FIXME - implement me
-        TalendRuntimeException.unexpectedException("Implement me");
-        return null;
+    public Object getCurrent() throws NoSuchElementException {
+        // TODO: Update to use an Avro-izable object.
+        return result;
     }
-
 }

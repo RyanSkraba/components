@@ -13,56 +13,47 @@
 package org.talend.components.salesforce.runtime;
 
 import java.io.IOException;
-import java.util.NoSuchElementException;
 
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.SalesforceGetDeletedUpdatedProperties;
 
 import com.sforce.ws.ConnectionException;
 
-public abstract class SalesforceGetDeletedUpdatedReader extends SalesforceReader {
+public abstract class SalesforceGetDeletedUpdatedReader<ResultT, T> extends SalesforceReader<T> {
 
     protected SalesforceGetDeletedUpdatedProperties props;
 
-    protected String module = props.module.moduleName.getStringValue();
+    protected String module;
 
-    protected boolean hasResult;
+    protected transient ResultT result;
 
     public SalesforceGetDeletedUpdatedReader(RuntimeContainer adaptor, SalesforceSource source,
             SalesforceGetDeletedUpdatedProperties props) {
-        super(adaptor, source);
+        super(source);
         this.props = props;
+        module = props.module.moduleName.getStringValue();
     }
 
     @Override
     public boolean start() throws IOException {
-        super.start();
-
-        module = props.module.moduleName.getStringValue();
         try {
-            hasResult = getResult();
+            result = getResult();
         } catch (ConnectionException e) {
             throw new IOException(e);
         }
-        return hasResult;
+        return result != null;
     }
-
-    abstract protected boolean getResult() throws ConnectionException;
-
-    abstract protected Object returnResult();
 
     @Override
     public boolean advance() throws IOException {
-        // only one record is avalable for this reader.
+        // only one record is available for this reader.
+        result = null;
         return false;
     }
 
-    @Override
-    public Object getCurrent() throws NoSuchElementException {
-        if (!hasResult) {
-            return null;
-        }
-        return returnResult();
-    }
-
+    /**
+     * @return the Salesforce object containing the results of the call.
+     * @throws ConnectionException
+     */
+    abstract protected ResultT getResult() throws IOException, ConnectionException;
 }

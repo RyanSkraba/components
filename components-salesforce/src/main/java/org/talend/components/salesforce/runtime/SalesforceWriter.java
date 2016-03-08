@@ -17,16 +17,16 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.avro.Schema;
+import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.RuntimeHelper;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
-import org.talend.daikon.avro.util.AvroUtils;
+import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 
 import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.Error;
@@ -48,12 +48,6 @@ final class SalesforceWriter implements Writer<WriterResult> {
 
     private RuntimeContainer adaptor;
 
-    private Map<String, Schema.Field> fieldMap;
-
-    private List<Schema.Field> fieldList;
-
-    private Schema.Field dynamicField;
-
     private TSalesforceOutputProperties sprops;
 
     private String upsertKeyColumn;
@@ -71,6 +65,10 @@ final class SalesforceWriter implements Writer<WriterResult> {
     protected boolean exceptionForErrors;
 
     private int dataCount;
+
+    private transient IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory;
+
+    private transient Schema schema;
 
     public SalesforceWriter(SalesforceWriteOperation salesforceWriteOperation, RuntimeContainer adaptor) {
         this.salesforceWriteOperation = salesforceWriteOperation;
@@ -91,28 +89,36 @@ final class SalesforceWriter implements Writer<WriterResult> {
     public void open(String uId) throws IOException {
         this.uId = uId;
         connection = sink.connect();
-        Schema schema = RuntimeHelper.resolveSchema(adaptor, sprops.module, sink,
+        schema = RuntimeHelper.resolveSchema(adaptor, sprops.module, sink,
                 new Schema.Parser().parse(sprops.module.schema.schema.getStringValue()));
-        fieldList = schema.getFields();
-        fieldMap = AvroUtils.makeFieldMap(schema);
         upsertKeyColumn = sprops.upsertKeyColumn.getStringValue();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void write(Object object) throws IOException {
-        // todo handle generic type and direct type if we want.
-        // of course the following cast is not meant to be there, let wait for Ryan's work
-        Map<String, Object> row = (Map<String, Object>) object;
+    public void write(Object datum) throws IOException {
+        // Ignore empty rows.
+        if (null == datum) {
+            return;
+        }
+
+        // This is all we need to do in order to ensure that we can process the incoming value as an IndexedRecord.
+        if (null == factory) {
+            factory = (IndexedRecordAdapterFactory<Object, ? extends IndexedRecord>) SalesforceAvroRegistry.get()
+                    .createAdapterFactory(datum.getClass());
+        }
+        IndexedRecord input = factory.convertToAvro(datum);
+
         if (!TSalesforceOutputProperties.ACTION_DELETE.equals(sprops.outputAction.getValue())) {
             SObject so = new SObject();
             so.setType(sprops.module.moduleName.getStringValue());
 
-            for (String key : row.keySet()) {
-                Object value = row.get(key);
+            for (Schema.Field f : input.getSchema().getFields()) {
+                Object value = input.get(f.pos());
                 if (value != null) {
-                    Schema.Field se = fieldMap.get(key);
+                    Schema.Field se = schema.getField(f.name());
                     if (se != null) {
-                        addSObjectField(so, se, value);
+                        addSObjectField(so, f, se, value);
                     }
                 }
             }
@@ -132,7 +138,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
                 throw new RuntimeException("Impossible");
             }
         } else { // DELETE
-            String id = getIdValue(row);
+            String id = getIdValue(input);
             if (id != null) {
                 delete(id);
             }
@@ -140,21 +146,19 @@ final class SalesforceWriter implements Writer<WriterResult> {
         dataCount++;
     }
 
-    protected String getIdValue(Map<String, Object> row) {
+    protected String getIdValue(IndexedRecord input) {
         String ID = "Id";
-        if (row.get(ID) != null) {
-            Schema.Field se = fieldMap.get(ID);
-            if (se != null) {
-                return (String) row.get(ID);
-            }
+        Schema.Field idField = input.getSchema().getField(ID);
+        if (null != idField) {
+            return (String) input.get(idField.pos());
         }
         throw new RuntimeException(ID + " not found");
     }
 
-    protected void addSObjectField(SObject sObject, Schema.Field se, Object value) {
+    protected void addSObjectField(SObject sObject, Schema.Field actual, Schema.Field expected, Object value) {
         Object valueToAdd = null;
         // Convert stuff here
-        switch (se.schema().getType()) {
+        switch (expected.schema().getType()) {
         case BYTES:
             valueToAdd = Charset.defaultCharset().decode(ByteBuffer.wrap((byte[]) value)).toString();
             break;
@@ -166,7 +170,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
             valueToAdd = value;
             break;
         }
-        sObject.setField(se.name(), valueToAdd);
+        sObject.setField(expected.name(), valueToAdd);
     }
 
     protected SaveResult[] insert(SObject sObject) throws IOException {

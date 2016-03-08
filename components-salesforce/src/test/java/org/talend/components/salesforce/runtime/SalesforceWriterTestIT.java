@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.avro.Schema;
+import org.apache.avro.generic.IndexedRecord;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.Writer;
@@ -33,12 +33,12 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
     @Test
     public void testOutputInsertAndDelete() throws Throwable {
-        runOutputInsert(!DYNAMIC);
+        runOutputInsert(false);
     }
 
     @Test
     public void testOutputInsertAndDeleteDynamic() throws Throwable {
-        runOutputInsert(DYNAMIC);
+        runOutputInsert(true);
     }
 
     @Test
@@ -69,7 +69,6 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         saleforceWriter = createSalesforceOutputWriter(props);
         writeResult = writeRows(saleforceWriter, Collections.EMPTY_LIST);
         assertEquals(0, writeResult.getDataCount());
-
     }
 
     @Ignore("test not finished")
@@ -94,37 +93,39 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         // WriterResult writeResult = SalesforceTestHelper.writeRows(saleforceWriter, outputRows);
     }
 
-    protected void runOutputInsert(boolean isDynamic) throws Throwable {
+    /**
+     * @param isDynamic true if the actual rows should contain more columns than the schema specified in the component
+     * properties.
+     */
+    protected void runOutputInsert(boolean isDynamic) throws Exception {
         TSalesforceOutputProperties props = createAccountSalesforceoutputProperties();
         setupProps(props.connection, !SalesforceTestBase.ADD_QUOTES);
 
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
-        schema = new Schema.Parser().parse(props.module.schema.schema.getStringValue());
-        if (isDynamic) {
-            fixSchemaForDynamic();
-        }
+
         props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
         props.afterOutputAction();
 
         Writer<WriterResult> saleforceWriter = createSalesforceOutputWriter(props);
 
-        List<Map<String, Object>> outputRows = makeRows(10, isDynamic);
-        List<Map<String, Object>> inputRows = null;
+        String random = createNewRandom();
+        List<IndexedRecord> outputRows = makeRows(random, 10, isDynamic);
+        List<IndexedRecord> inputRows = null;
         try {
             WriterResult writeResult = writeRows(saleforceWriter, outputRows);
             assertEquals(outputRows.size(), writeResult.getDataCount());
             inputRows = readRows(props);
-            List<Map<String, Object>> allReadTestRows = filterAllTestRows(inputRows, random);
+            List<IndexedRecord> allReadTestRows = filterAllTestRows(random, inputRows);
             assertNotEquals(0, allReadTestRows.size());
             assertEquals(outputRows.size(), allReadTestRows.size());
         } finally {
             if (inputRows == null) {
                 inputRows = readRows(props);
             }
-            List<Map<String, Object>> allReadTestRows = filterAllTestRows(inputRows, random);
-            deleteRows(allReadTestRows, props);
+            List<IndexedRecord> allReadTestRows = filterAllTestRows(random, inputRows);
+            deleteRows(random, allReadTestRows, props);
             inputRows = readRows(props);
-            assertEquals(0, filterAllTestRows(inputRows, random).size());
+            assertEquals(0, filterAllTestRows(random, inputRows).size());
         }
     }
 

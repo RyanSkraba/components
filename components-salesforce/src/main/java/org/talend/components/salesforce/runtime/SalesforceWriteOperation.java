@@ -12,13 +12,16 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.api.container.RuntimeContainer;
 
 public final class SalesforceWriteOperation implements WriteOperation<WriterResult> {
+
+    /** Default serial version UID. */
+    private static final long serialVersionUID = 1L;
 
     private SalesforceSink ssink;
 
@@ -28,6 +31,7 @@ public final class SalesforceWriteOperation implements WriteOperation<WriterResu
 
     @Override
     public void initialize(RuntimeContainer adaptor) {
+        // Nothing to be done.
     }
 
     @Override
@@ -37,6 +41,7 @@ public final class SalesforceWriteOperation implements WriteOperation<WriterResu
 
     @Override
     public void finalize(Iterable<WriterResult> writerResults, RuntimeContainer adaptor) {
+        // Nothing to be done.
     }
 
     @Override
