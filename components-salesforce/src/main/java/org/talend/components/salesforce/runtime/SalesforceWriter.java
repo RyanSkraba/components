@@ -70,7 +70,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
         this.salesforceWriteOperation = salesforceWriteOperation;
         this.adaptor = adaptor;
         sink = (SalesforceSink) salesforceWriteOperation.getSink();
-        sprops = sink.getSalesforceOutputProperties();
+        sprops = (TSalesforceOutputProperties)sink.getSalesforceOutputProperties();
         commitLevel = 1;
         int arraySize = commitLevel * 2;
         deleteItems = new ArrayList<>(arraySize);

@@ -12,11 +12,13 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
-import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkProperties;
 
 public final class SalesforceWriteOperation implements WriteOperation<WriterResult> {
 
@@ -46,7 +48,12 @@ public final class SalesforceWriteOperation implements WriteOperation<WriterResu
 
     @Override
     public Writer<WriterResult> createWriter(RuntimeContainer adaptor) {
-        return new SalesforceWriter(this, adaptor);
+        ComponentProperties componentProperties = ssink.getSalesforceOutputProperties();
+        if(componentProperties instanceof TSalesforceOutputBulkProperties){
+            return new SalesforceBulkFileWriter(this, adaptor);
+        }else{
+            return new SalesforceWriter(this, adaptor);
+        }
     }
 
 }

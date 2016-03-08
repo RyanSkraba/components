@@ -52,11 +52,11 @@ public class SalesforceSourceOrSink implements SourceOrSink {
 
     protected static final String API_VERSION = "34.0";
 
-    protected SalesforceProvideConnectionProperties properties;
+    protected ComponentProperties properties;
 
     @Override
     public void initialize(RuntimeContainer adaptor, ComponentProperties properties) {
-        this.properties = (SalesforceProvideConnectionProperties) properties;
+        this.properties = properties;
     }
 
     @Override
@@ -85,11 +85,11 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     }
 
     public SalesforceConnectionProperties getConnectionProperties() {
-        return properties.getConnectionProperties();
+        return ((SalesforceProvideConnectionProperties)properties).getConnectionProperties();
     }
 
     protected BulkConnection connectBulk(ConnectorConfig config) throws ComponentException {
-        final SalesforceConnectionProperties connProps = properties.getConnectionProperties();
+        final SalesforceConnectionProperties connProps = ((SalesforceProvideConnectionProperties)properties).getConnectionProperties();
         /*
          * When PartnerConnection is instantiated, a login is implicitly executed and, if successful, a valid session is
          * stored in the ConnectorConfig instance. Use this key to initialize a BulkConnection:
@@ -115,7 +115,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     }
 
     protected PartnerConnection doConnection(ConnectorConfig config) throws ConnectionException {
-        SalesforceConnectionProperties connProps = properties.getConnectionProperties();
+        SalesforceConnectionProperties connProps = ((SalesforceProvideConnectionProperties)properties).getConnectionProperties();
         if (SalesforceConnectionProperties.LOGIN_OAUTH.equals(connProps.loginType.getValue())) {
             SalesforceOAuthConnection oauthConnection = new SalesforceOAuthConnection(connProps.oauth,
                     SalesforceConnectionProperties.OAUTH_URL, API_VERSION);
@@ -136,7 +136,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     }
 
     protected ConnectionHolder connect() throws IOException {
-        final SalesforceConnectionProperties connProps = properties.getConnectionProperties();
+        final SalesforceConnectionProperties connProps = ((SalesforceProvideConnectionProperties)properties).getConnectionProperties();
         final ConnectionHolder ch = new ConnectionHolder();
 
         // FIXME add back reffed connection
