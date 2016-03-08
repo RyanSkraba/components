@@ -12,9 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -139,7 +137,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         return saleforceWriter;
     }
 
-    public TSalesforceOutputProperties createAccountSalesforceoutputProperties() throws Exception {
+    public static TSalesforceOutputProperties createAccountSalesforceoutputProperties() throws Exception {
         TSalesforceOutputProperties props = (TSalesforceOutputProperties) new TSalesforceOutputProperties("foo").init();
         setupProps(props.connection, !ADD_QUOTES);
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);

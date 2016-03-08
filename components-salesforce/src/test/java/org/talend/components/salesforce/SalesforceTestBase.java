@@ -13,8 +13,8 @@
 package org.talend.components.salesforce;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -42,6 +42,7 @@ import org.talend.components.api.test.SimpleComponentService;
 import org.talend.components.salesforce.runtime.SalesforceSink;
 import org.talend.components.salesforce.runtime.SalesforceSource;
 import org.talend.components.salesforce.runtime.SalesforceWriteOperation;
+import org.talend.components.salesforce.runtime.SalesforceWriterTestIT;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 import org.talend.components.salesforce.tsalesforcegetdeleted.TSalesforceGetDeletedDefinition;
@@ -60,6 +61,9 @@ import org.talend.daikon.properties.service.PropertiesServiceTest;
 import org.talend.daikon.schema.Schema;
 import org.talend.daikon.schema.SchemaElement;
 import org.talend.daikon.schema.SchemaFactory;
+
+import com.sforce.async.AsyncApiException;
+import com.sforce.ws.ConnectionException;
 
 public class SalesforceTestBase extends AbstractComponentTest {
 
@@ -80,11 +84,11 @@ public class SalesforceTestBase extends AbstractComponentTest {
 
     public static final boolean ADD_QUOTES = true;
 
-    public final String userId = System.getProperty("salesforce.user");
+    static public final String userId = System.getProperty("salesforce.user");
 
-    public final String password = System.getProperty("salesforce.password");
+    static public final String password = System.getProperty("salesforce.password");
 
-    public final String securityKey = System.getProperty("salesforce.key");
+    static public final String securityKey = System.getProperty("salesforce.key");
 
     protected static final boolean DYNAMIC = true;
 
@@ -137,7 +141,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
         return getComponentService().afterProperty(propName, props);
     }
 
-    public SalesforceConnectionProperties setupProps(SalesforceConnectionProperties props, boolean addQuotes) {
+    static public SalesforceConnectionProperties setupProps(SalesforceConnectionProperties props, boolean addQuotes) {
         if (props == null) {
             props = (SalesforceConnectionProperties) new SalesforceConnectionProperties("foo").init();
         }
@@ -305,21 +309,6 @@ public class SalesforceTestBase extends AbstractComponentTest {
         return checkedRows;
     }
 
-    public List<Map<String, Object>> getAllTestRows(List<Map<String, Object>> rows) {
-        List<Map<String, Object>> checkedRows = new ArrayList<>();
-
-        for (Map<String, Object> row : rows) {
-            String check = (String) row.get("ShippingStreet");
-            if (check == null || !check.equals(TEST_KEY)) {
-                continue;
-            }
-            System.out.println("Test row is: " + row.get("Name") + " id: " + row.get("Id") + " post: "
-                    + row.get("BillingPostalCode") + " st: " + " post: " + row.get("BillingStreet"));
-            checkedRows.add(row);
-        }
-        return checkedRows;
-    }
-
     protected List<Map<String, Object>> readRows(TSalesforceInputProperties inputProps) throws IOException {
         BoundedReader reader = createBoundedReader(inputProps);
         boolean hasRecord = reader.start();
@@ -393,6 +382,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
         TSalesforceOutputProperties deleteProperties = new TSalesforceOutputProperties("delete"); //$NON-NLS-1$
         deleteProperties.copyValuesFrom(props);
         deleteProperties.outputAction.setValue(TSalesforceOutputProperties.ACTION_DELETE);
+        System.out.println("deleting " + rows.size() + " rows");
         doWriteRows(deleteProperties, rows);
     }
 
@@ -407,6 +397,47 @@ public class SalesforceTestBase extends AbstractComponentTest {
         SalesforceSource salesforceSource = new SalesforceSource();
         salesforceSource.initialize(null, tsip);
         return salesforceSource.createReader(null);
+    }
+
+    public static void main(String[] args) throws Exception {
+        deleteAllAccountTestRows();
+
+    }
+
+    public static void deleteAllAccountTestRows() throws ConnectionException, AsyncApiException, Exception {
+        BoundedReader salesforceInputReader = new SalesforceTestBase()
+                .createSalesforceInputReaderFromAccount(EXISTING_MODULE_NAME);
+        // getting all rows
+        List<Map<String, Object>> rows = new ArrayList<>();
+        try {
+            salesforceInputReader.start();
+            while (salesforceInputReader.advance()) {
+                rows.add((Map<String, Object>) salesforceInputReader.getCurrent());
+            }
+        } finally {
+            salesforceInputReader.close();
+        }
+        // filtering rows
+        List<Map<String, Object>> rowToBeDeleted = getAllTestRows(rows);
+        // deleting rows
+        TSalesforceOutputProperties salesforceoutputProperties = SalesforceWriterTestIT.createAccountSalesforceoutputProperties();
+        setupProps(salesforceoutputProperties.connection, !ADD_QUOTES);
+        new SalesforceTestBase().deleteRows(rowToBeDeleted, salesforceoutputProperties);
+    }
+
+    static List<Map<String, Object>> getAllTestRows(List<Map<String, Object>> rows) {
+        List<Map<String, Object>> checkedRows = new ArrayList<>();
+
+        for (Map<String, Object> row : rows) {
+            String check = (String) row.get("ShippingStreet");
+            if (check == null || !check.equals(TEST_KEY)) {
+                continue;
+            }
+            System.out.println("Test row is: " + row.get("Name") + " id: " + row.get("Id") + " post: "
+                    + row.get("BillingPostalCode") + " st: " + " post: " + row.get("BillingStreet"));
+            checkedRows.add(row);
+        }
+        return checkedRows;
     }
 
 }
