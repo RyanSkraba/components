@@ -64,6 +64,10 @@ public class TSalesforceOutputBulkProperties extends ComponentProperties {
         Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(widget(upsertRelation).setWidgetType(Widget.WidgetType.TABLE));
 
+        Form refForm = new Form(this, Form.REFERENCE);
+        refForm.addRow(append);
+        refForm.addRow(ignoreNull);
+
     }
 
 }

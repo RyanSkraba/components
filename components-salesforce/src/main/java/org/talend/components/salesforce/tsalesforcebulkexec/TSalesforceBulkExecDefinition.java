@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcebulkexec;
 
+import aQute.bnd.annotation.component.Component;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
@@ -28,12 +29,9 @@ import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.SalesforceBulkProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
-import org.talend.components.salesforce.SalesforceModuleProperties;
+import org.talend.components.salesforce.SalesforceOutputProperties.ModuleSubclass;
 import org.talend.components.salesforce.SalesforceUserPasswordProperties;
 import org.talend.components.salesforce.runtime.SalesforceSource;
-import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties.ModuleSubclass;
-
-import aQute.bnd.annotation.component.Component;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
@@ -62,8 +60,9 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition implemen
     @SuppressWarnings("unchecked")
     @Override
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
-        return concatPropertiesClasses(super.getNestedCompatibleComponentPropertiesClass(),
-                new Class[] { SalesforceModuleProperties.class });
+        return new Class[] { SchemaProperties.class, ModuleSubclass.class, SalesforceConnectionProperties.class,
+                OauthProperties.class, SalesforceUserPasswordProperties.class, ProxyProperties.class,
+                UserPasswordProperties.class, SalesforceBulkProperties.class };
     }
 
     @Override

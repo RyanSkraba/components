@@ -16,11 +16,12 @@ import static org.talend.daikon.properties.PropertyFactory.*;
 import static org.talend.daikon.properties.presentation.Widget.*;
 
 import org.talend.components.salesforce.SalesforceBulkProperties;
+import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 
-public class TSalesforceBulkExecProperties extends TSalesforceOutputProperties {
+public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
 
     public Property bulkFilePath = newProperty("bulkFilePath");
 
@@ -34,9 +35,10 @@ public class TSalesforceBulkExecProperties extends TSalesforceOutputProperties {
     public void setupLayout() {
         super.setupLayout();
         Form mainForm = getForm(Form.MAIN);
-
         mainForm.addRow(bulkFilePath);
-        mainForm.addRow(widget(bulkProperties.getForm(Form.MAIN).setName("bulkProperties")));
+
+        Form advancedForm = getForm(Form.ADVANCED);
+        advancedForm.addRow(widget(bulkProperties.getForm(Form.MAIN).setName("bulkProperties")));
     }
 
 }

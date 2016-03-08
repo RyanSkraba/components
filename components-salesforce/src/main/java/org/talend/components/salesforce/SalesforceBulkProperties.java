@@ -42,7 +42,7 @@ public class SalesforceBulkProperties extends ComponentProperties {
         Form mainForm = Form.create(this, Form.MAIN, "Salesforce Bulk Properties");
         mainForm.addRow(concurrencyMode);
         mainForm.addRow(rowsToCommit);
-        mainForm.addRow(bytesToCommit);
+        mainForm.addColumn(bytesToCommit);
         mainForm.addRow(waitTimeCheckBatchState);
     }
 

@@ -68,7 +68,7 @@ public class TSalesforceOutputDefinition extends SalesforceDefinition implements
     @Override
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return concatPropertiesClasses(super.getNestedCompatibleComponentPropertiesClass(),
-                new Class[]{SalesforceModuleProperties.class});
+                new Class[] { SalesforceModuleProperties.class });
     }
 
     @Override
