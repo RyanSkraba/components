@@ -201,7 +201,7 @@
 							<instructions>
 								<Service-Component>*</Service-Component>
 								<Import-Package>org.osgi*,javax.net.ssl,javax.security.auth.x500,
-									org.slf4j*, org.talend.daikon*
+									org.slf4j*, org.talend.daikon*, org.apache.avro
 								</Import-Package>
 								<Embed-Transitive>true</Embed-Transitive>
 								<Embed-Dependency>
