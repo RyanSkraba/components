@@ -49,7 +49,13 @@ public class ComponentServiceTestIT extends ComponentServiceAbstractForIT {
 
     @Configuration
     public Option[] config() {
-        return PaxExamOptions.getOptions();
+        try {
+            return PaxExamOptions.getOptions();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+
     }
 
     @Before

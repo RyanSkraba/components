@@ -15,6 +15,8 @@ package org.talend.components.api;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.options.DefaultCompositeOption;
+import org.ops4j.pax.exam.options.libraries.JUnitBundlesOption;
 
 /**
  * created by sgandon on 8 sept. 2015 Detailled comment
@@ -27,8 +29,9 @@ public class PaxExamOptions {
 
     public static Option[] getOptions() {
         return options(mavenBundle("org.apache.felix", "org.apache.felix.scr"), //
-                mavenBundle("org.slf4j", "slf4j-api", "1.7.12"), //
-                mavenBundle("commons-lang", "commons-lang", "2.4"), //
+
+        mavenBundle("org.slf4j", "slf4j-api"), //
+                mavenBundle("org.slf4j", "slf4j-simple").noStart(), mavenBundle("commons-lang", "commons-lang", "2.4"), //
                 mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-annotations"), //
                 mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-core"), //
                 mavenBundle().groupId("com.cedarsoftware").artifactId("json-io"), //
@@ -56,8 +59,14 @@ public class PaxExamOptions {
                 mavenBundle().groupId("org.talend.components").artifactId("components-common-oauth").classifier("bundle"),
                 mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("bundle"),
                 mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("tests").noStart(),
-                // //
-                junitBundles(), mavenBundle("org.ops4j.pax.tipi", "org.ops4j.pax.tipi.hamcrest.core", "1.3.0.1"), cleanCaches() //
+                // be carefull to p^lace the following hamcrest bundle before the junitBundles definition because
+                // they both export org.hamcrest but the junitBundle is missing some usefull classes
+                mavenBundle("org.apache.servicemix.bundles", "org.apache.servicemix.bundles.hamcrest", "1.3_1"), //
+                // this is copied from junitBundles() to remove the default pax-exam hamcrest bundle that does
+                // not contains all the nice hamcrest Matchers
+                new DefaultCompositeOption(new JUnitBundlesOption(), systemProperty("pax.exam.invoker").value("junit"),
+                        bundle("link:classpath:META-INF/links/org.ops4j.pax.exam.invoker.junit.link")),
+                cleanCaches() //
                 , frameworkProperty("org.osgi.framework.system.packages.extra").value("sun.misc")
         // ,vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5010"), systemTimeout(0)//
         );
