@@ -156,6 +156,13 @@
 			<artifactId>org.ops4j.pax.tipi.hamcrest.core</artifactId>
 			<version>1.3.0.1</version>
 		</dependency>
+		<dependency>
+		<!-- added because Avro bundle has an import package for com.google.common.collect and it's pom
+		does not import this bundle. -->
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>15.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
