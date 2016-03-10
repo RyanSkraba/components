@@ -5,14 +5,10 @@ import org.apache.avro.Schema;
 import java.util.Date;
 
 /**
- *
+ * Expected to be implemented by the container in which components execute.
  */
 public interface RuntimeContainer {
 
-    /**
-     * Format the specified date according to the specified pattern.
-     */
-    // FIXME - remove this
-    public String formatDate(Date date, String pattern);
+    // Nothing defined right now
 
 }

@@ -25,10 +25,4 @@ import org.apache.avro.Schema;
  */
 public class DefaultComponentRuntimeContainerImpl implements RuntimeContainer {
 
-    @Override
-    public String formatDate(Date date, String pattern) {
-        SimpleDateFormat format = new SimpleDateFormat(pattern);
-        return format.format(date);
-    }
-
 }

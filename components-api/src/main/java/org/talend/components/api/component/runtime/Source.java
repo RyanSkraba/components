@@ -13,6 +13,8 @@
 
 package org.talend.components.api.component.runtime;
 
+import org.talend.components.api.container.RuntimeContainer;
+
 /**
  * Base class for defining input formats and creating a {@code Source} for reading the input.
  *
@@ -38,5 +40,12 @@ package org.talend.components.api.component.runtime;
  *
  */
 public interface Source extends SourceOrSink {
+
+    /**
+     * Returns a new {@link Reader} that reads from this source.
+     */
+    public abstract Reader createReader(RuntimeContainer adaptor);
+
+
 
 }
