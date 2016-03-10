@@ -4,7 +4,9 @@
 package ${package};
 
 import java.io.File;
+import java.io.IOException;
 
+import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.util.UnshardedInputSource;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
@@ -53,4 +55,15 @@ public class ${componentName}Source extends UnshardedInputSource<String> {
         }
         return ValidationResult.OK;
     }
+    
+    @Override
+    public Schema getSchemaFromProperties(RuntimeContainer adaptor) throws IOException {
+        return null;
+    }
+
+    @Override
+    public Schema getPossibleSchemaFromProperties(RuntimeContainer adaptor) throws IOException {
+        return null;
+    }
+    
 }
