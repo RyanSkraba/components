@@ -36,34 +36,46 @@ public class ${componentName}Source extends UnshardedInputSource<String> {
     private static final long serialVersionUID = 1L;
 
     /** Configuration extracted from the input properties. */
-    private String filename;
+    private ${componentName}Properties properties;
+    
+    private transient Schema schema;
 
     @Override
     public void initialize(RuntimeContainer adaptor, ComponentProperties properties) {
-        filename = ((${componentName}Properties) properties).filename.getStringValue();
-        setUnshardedInput(new ${componentName}UnshardedInput(filename));
+        this.properties = (${componentName}Properties) properties; 
+        schema = new Schema.Parser().parse(this.properties.schema.schema.getStringValue()); 
+        setUnshardedInput(new ${componentName}Reader(this, this.properties.filename.getStringValue()));
     }
     
     @Override
     public ValidationResult validate(RuntimeContainer adaptor) {
-        File f = new File(filename);
+        // Check that the file exists.
+        File f = new File(this.properties.filename.getStringValue());
         if (!f.exists()) {
             ValidationResult vr = new ValidationResult();
-            vr.setMessage("The file '" + filename + "' does not exist."); //$NON-NLS-1$//$NON-NLS-2$
+            vr.setMessage("The file '" + f.getPath() + "' does not exist."); //$NON-NLS-1$//$NON-NLS-2$
             vr.setStatus(ValidationResult.Result.ERROR);
             return vr;
         }
+        // Check that there is exactly one column to contain the output.
+        if (schema.getFields().size() != 1) {
+            ValidationResult vr = new ValidationResult();
+            vr.setMessage("The schema must have exactly one column."); //$NON-NLS-1$
+            vr.setStatus(ValidationResult.Result.ERROR);
+            return vr;
+        }
+        
         return ValidationResult.OK;
     }
     
     @Override
     public Schema getSchemaFromProperties(RuntimeContainer adaptor) throws IOException {
-        return null;
+        return schema;
     }
 
     @Override
     public Schema getPossibleSchemaFromProperties(RuntimeContainer adaptor) throws IOException {
-        return null;
+        return schema;
     }
     
 }

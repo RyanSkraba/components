@@ -6,15 +6,18 @@ package ${package};
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.component.runtime.util.UnshardedInputIterator;
+import org.talend.components.api.component.runtime.AbstractBoundedReader;
+import org.talend.components.api.component.runtime.BoundedSource;
+import org.talend.components.api.component.runtime.util.UnshardedInputAdvancer;
 
 /**
- * Simplified input to build an UnshardedInputSource.
+ * Simple implementation of a reader.
  */
-public class ${componentName}UnshardedInput implements UnshardedInputIterator<String> {
+public class ${componentName}Reader extends AbstractBoundedReader<String> implements UnshardedInputAdvancer<String> {
 
     /** Default serial version UID. */
     private static final long serialVersionUID = 1L;
@@ -23,40 +26,38 @@ public class ${componentName}UnshardedInput implements UnshardedInputIterator<St
 
     private final String filename;
 
+    private boolean started = false;
+
     private BufferedReader reader = null;
 
     private transient String current;
 
-    public FileInputUnshardedInput(String filename) {
+    public ${componentName}Reader(BoundedSource source, String filename) {
+        super(source);
         this.filename = filename;
     }
 
     @Override
-    public void setup() throws IOException {
+    public boolean start() throws IOException {
+        started = true;
         LOGGER.debug("open: " + filename); //$NON-NLS-1$
         reader = new BufferedReader(new FileReader(filename));
         current = reader.readLine();
-    }
-
-    @Override
-    public boolean hasNext() {
         return current != null;
     }
 
     @Override
-    public String next() {
-        try {
-            String oldCurrent = current;
-            current = reader.readLine();
-            return oldCurrent;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public boolean advance() throws IOException {
+        current = reader.readLine();
+        return current != null;
     }
 
     @Override
-    public void remove() {
-        throw new UnsupportedOperationException();
+    public String getCurrent() throws NoSuchElementException {
+        if (!started) {
+            throw new NoSuchElementException();
+        }
+        return current;
     }
 
     @Override
