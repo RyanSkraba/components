@@ -13,6 +13,7 @@ import java.util.*;
 import com.sforce.async.*;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
+import org.talend.components.salesforce.SalesforceOutputProperties;
 
 /*
 * Reuse the code in talend lib salesforceBulkAPI.jar
@@ -38,16 +39,18 @@ public class SalesforceBulkRuntime {
 
     private List<BatchInfo> batchInfoList;
 
+    private BufferedReader br;
+
     private void setBulkOperation(String sObjectType, String operationStr, String externalIdFieldName, String contentTypeStr,
             String bulkFileName, int maxBytes, int maxRows) {
         this.sObjectType = sObjectType;
-        if ("insert".equals(operationStr)) {
+        if (SalesforceOutputProperties.ACTION_INSERT.equals(operationStr)) {
             operation = OperationEnum.insert;
-        } else if ("update".equals(operationStr)) {
+        } else if (SalesforceOutputProperties.ACTION_UPDATE.equals(operationStr)) {
             operation = OperationEnum.update;
-        } else if ("upsert".equals(operationStr)) {
+        } else if (SalesforceOutputProperties.ACTION_UPSERT.equals(operationStr)) {
             operation = OperationEnum.upsert;
-        } else if ("delete".equals(operationStr)) {
+        } else if (SalesforceOutputProperties.ACTION_DELETE.equals(operationStr)) {
             operation = OperationEnum.delete;
         }
 
@@ -91,8 +94,9 @@ public class SalesforceBulkRuntime {
     }
 
     private void prepareLog() throws IOException {
-        baseFileReader = new CSVReader(new BufferedReader(new InputStreamReader(
-                new FileInputStream(bulkFileName), FILE_ENCODING)), ',');
+        br = new BufferedReader(new InputStreamReader(
+                new FileInputStream(bulkFileName), FILE_ENCODING));
+        baseFileReader = new CSVReader(br, ',');
 //        if ((baseFileHeader = baseFileReader.nextRecord()) {
 //            baseFileHeader = Arrays.asList(baseFileReader.getValues());
 //        }
@@ -253,21 +257,21 @@ public class SalesforceBulkRuntime {
         }
     }
 
-    private Map<String, String> getBaseFileRow() throws IOException {
-        Map<String, String> dataInfo = new HashMap<String, String>();
+    private BulkResult getBaseFileRow() throws IOException {
+        BulkResult dataInfo = new BulkResult();
         List<String> row = null;
         if ((row = baseFileReader.nextRecord())!=null) {
             for (int i = 0; i < row.size(); i++) {
-                dataInfo.put(baseFileHeader.get(i), row.get(i));
+                dataInfo.setValue(baseFileHeader.get(i), row.get(i));
             }
         }
         return dataInfo;
     }
 
-    public List<Map<String, String>> getBatchLog(int batchNum) throws AsyncApiException, IOException, ConnectionException {
+    public List<BulkResult> getBatchLog(int batchNum) throws AsyncApiException, IOException, ConnectionException {
         // batchInfoList was populated when batches were created and submitted
-        List<Map<String, String>> resultInfoList = new ArrayList<Map<String, String>>();
-        Map<String, String> resultInfo;
+        List<BulkResult> resultInfoList = new ArrayList<BulkResult>();
+        BulkResult resultInfo;
         BatchInfo b = batchInfoList.get(batchNum);
         CSVReader rdr = new CSVReader(getBatchResultStream(job.getId(), b.getId()));
 
@@ -275,10 +279,10 @@ public class SalesforceBulkRuntime {
         int resultCols = resultHeader.size();
         List<String> row;
         while ((row = rdr.nextRecord()) != null) {
-            resultInfo = new HashMap<String, String>();
-            resultInfo.putAll(getBaseFileRow());
+            resultInfo = new BulkResult();
+            resultInfo.copyValues(getBaseFileRow());
             for (int i = 0; i < resultCols; i++) {
-                resultInfo.put(resultHeader.get(i), row.get(i));
+                resultInfo.setValue(resultHeader.get(i), row.get(i));
             }
             resultInfoList.add(resultInfo);
             // boolean success = Boolean.valueOf(resultInfo.get("Success"));
@@ -398,7 +402,7 @@ public class SalesforceBulkRuntime {
             return connection.createJob(job);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                //renewSession();
+                renewSession();
                 return createJob(job);
             }
             throw sfException;
@@ -411,7 +415,7 @@ public class SalesforceBulkRuntime {
             return connection.createBatchFromStream(job, inputStream);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                //renewSession();
+                renewSession();
                 return createBatchFromStream(job, inputStream);
             }
             throw sfException;
@@ -423,7 +427,7 @@ public class SalesforceBulkRuntime {
             return connection.updateJob(job);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                //renewSession();
+                renewSession();
                 return updateJob(job);
             }
             throw sfException;
@@ -435,7 +439,7 @@ public class SalesforceBulkRuntime {
             return connection.getBatchInfoList(jobID);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                //renewSession();
+                renewSession();
                 return getBatchInfoList(jobID);
             }
             throw sfException;
@@ -447,7 +451,7 @@ public class SalesforceBulkRuntime {
             return connection.getBatchResultStream(jobID, batchID);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                //renewSession();
+                renewSession();
                 return getBatchResultStream(jobID, batchID);
             }
             throw sfException;
@@ -459,7 +463,7 @@ public class SalesforceBulkRuntime {
             return connection.getJobStatus(jobID);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                //renewSession();
+                renewSession();
                 return getJobStatus(jobID);
             }
             throw sfException;
@@ -472,7 +476,7 @@ public class SalesforceBulkRuntime {
             return connection.createBatchFromStream(job, byteArrayInputStream);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                //renewSession();
+                renewSession();
                 return createBatchFromStream(job, byteArrayInputStream);
             }
             throw sfException;
@@ -484,10 +488,16 @@ public class SalesforceBulkRuntime {
             return connection.getBatchInfo(jobID, batchID);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                //renewSession();
+                renewSession();
                 return getBatchInfo(jobID, batchID);
             }
             throw sfException;
+        }
+    }
+
+    public void close() throws IOException {
+        if(br!=null){
+            br.close();
         }
     }
 
@@ -496,7 +506,7 @@ public class SalesforceBulkRuntime {
             return connection.getQueryResultList(jobID, batchID);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                //renewSession();
+                renewSession();
                 return getQueryResultList(jobID, batchID);
             }
             throw sfException;
@@ -509,12 +519,17 @@ public class SalesforceBulkRuntime {
             return connection.getQueryResultStream(jobID, batchID, resultID);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                //renewSession();
+                renewSession();
                 return getQueryResultStream(jobID, batchID, resultID);
             }
             throw sfException;
         }
     }
+
+    private void renewSession() {
+        //  FIXME need to finish it.
+    }
+
 
     public String nextResultId(){
         String resultId = null;
@@ -535,15 +550,15 @@ public class SalesforceBulkRuntime {
             this.header = header;
         }
 
-        public SObject next() throws IOException {
+        public BulkResult next() throws IOException {
 
-            SObject result = null;
+            BulkResult result = null;
             List<String> row = null;
 
             if ((row = reader.nextRecord()) != null) {
-                result = new SObject();
+                result = new BulkResult();
                 for (int i = 0; i < this.header.size(); i++) {
-                    result.addField(header.get(i), row.get(i));
+                    result.setValue(header.get(i), row.get(i));
                 }
             }
             if(result == null){
@@ -557,4 +572,27 @@ public class SalesforceBulkRuntime {
         }
 
     }
+
+    class BulkResult{
+        Map<String,Object> values;
+        public BulkResult() {
+            values = new HashMap<String,Object>();
+        }
+        public void setValue(String field , Object vlaue){
+            values.put(field,vlaue);
+        }
+        public Object getValue(String fieldName){
+            return values.get(fieldName);
+        }
+        public void copyValues(BulkResult result){
+            if(result == null){
+                return;
+            }else{
+                for(String key:result.values.keySet()){
+                    values.put(key,result.values.get(key));
+                }
+            }
+        }
+    }
+
 }

@@ -14,15 +14,14 @@ package org.talend.components.salesforce.runtime;
 
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.BulkConnection;
-import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.component.runtime.RuntimeHelper;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResultSet;
+import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResult;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
 import java.io.IOException;
@@ -39,7 +38,7 @@ public class SalesforceBulkQuryInputReader extends SalesforceReader<IndexedRecor
 
     private transient Schema querySchema;
 
-    private transient SObjectAdapterFactory factory;
+    private transient BulkResultAdapterFactory factory;
 
     protected boolean isBulkQuery;
 
@@ -49,7 +48,7 @@ public class SalesforceBulkQuryInputReader extends SalesforceReader<IndexedRecor
 
     protected BulkResultSet bulkResultSet;
 
-    protected SObject currentRecord;
+    protected BulkResult currentRecord;
 
     public SalesforceBulkQuryInputReader(RuntimeContainer adaptor, SalesforceSource source, TSalesforceInputProperties props) {
         super(source);
@@ -72,9 +71,9 @@ public class SalesforceBulkQuryInputReader extends SalesforceReader<IndexedRecor
         return querySchema;
     }
 
-    private SObjectAdapterFactory getFactory() throws IOException {
+    private BulkResultAdapterFactory getFactory() throws IOException {
         if (null == factory) {
-            factory = new SObjectAdapterFactory();
+            factory = new BulkResultAdapterFactory();
             factory.setSchema(getSchema());
         }
         return factory;
@@ -113,7 +112,7 @@ public class SalesforceBulkQuryInputReader extends SalesforceReader<IndexedRecor
         return true;
     }
 
-    public SObject getCurrentRecord() throws NoSuchElementException {
+    public BulkResult getCurrentRecord() throws NoSuchElementException {
         return currentRecord;
     }
 

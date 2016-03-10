@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforcegetdeleted.TSalesforceGetDeletedProperties;
 import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
 import org.talend.components.salesforce.tsalesforcegetupdated.TSalesforceGetUpdatedProperties;
@@ -65,6 +66,8 @@ public class SalesforceSource extends SalesforceSourceOrSink implements BoundedS
             return new SalesforceGetDeletedReader(adaptor, this, (TSalesforceGetDeletedProperties) properties);
         } else if (properties instanceof TSalesforceGetUpdatedProperties) {
             return new SalesforceGetUpdatedReader(adaptor, this, (TSalesforceGetUpdatedProperties) properties);
+        }else if (properties instanceof TSalesforceBulkExecProperties) {
+            return new SalesforceBulkExecReader(adaptor, this, (TSalesforceBulkExecProperties) properties);
         }
         return null;
     }

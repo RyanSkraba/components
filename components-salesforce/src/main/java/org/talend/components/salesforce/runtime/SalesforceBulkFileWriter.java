@@ -99,14 +99,16 @@ final class SalesforceBulkFileWriter implements Writer<WriterResult> {
 
         File file = new File(sprops.fileName.getStringValue());
         this.rawWriter = new BufferedWriter(new OutputStreamWriter(
-                new java.io.FileOutputStream(file, false), "UTF-8"));
+                new java.io.FileOutputStream(file, sprops.append.getBooleanValue()), "UTF-8"));
         this.pw = new PrintWriter(this.rawWriter);
 
-        List<String> headers = new ArrayList<String>();
-        for(Schema.Field f :schema.getFields()){
-            headers.add(f.name());
+        if(!sprops.append.getBooleanValue()){
+            List<String> headers = new ArrayList<String>();
+            for(Schema.Field f :schema.getFields()){
+                headers.add(f.name());
+            }
+            writeNext(headers.toArray(new String[headers.size()]));
         }
-        writeNext(headers.toArray(new String[headers.size()]));
     }
 
     @SuppressWarnings("unchecked")
@@ -126,7 +128,15 @@ final class SalesforceBulkFileWriter implements Writer<WriterResult> {
 
         List<String> values = new ArrayList<String>();
         for (Schema.Field f : input.getSchema().getFields()) {
-            values.add(String.valueOf(input.get(f.pos())));
+            if(input.get(f.pos())==null){
+                if(sprops.ignoreNull.getBooleanValue()){
+                    values.add("");
+                }else{
+                    values.add("#N/A");
+                }
+            }else{
+                values.add(String.valueOf(input.get(f.pos())));
+            }
         }
         writeNext(values.toArray(new String[values.size()]));
         dataCount++;
@@ -280,9 +290,7 @@ final class SalesforceBulkFileWriter implements Writer<WriterResult> {
      * @throws IOException if bad things happen
      */
     public void flush() throws IOException {
-
         pw.flush();
-
     }
 
     @Override
