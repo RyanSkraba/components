@@ -42,7 +42,8 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
     @Test(expected = IOException.class)
     public void testStartException() throws IOException {
-        BoundedReader<IndexedRecord> salesforceInputReader = createSalesforceInputReaderFromModule(SalesforceTestBase.NOT_EXISTING_MODULE_NAME);
+        BoundedReader<IndexedRecord> salesforceInputReader = createSalesforceInputReaderFromModule(
+                SalesforceTestBase.NOT_EXISTING_MODULE_NAME);
         try {
             assertTrue(salesforceInputReader.start());
         } finally {
@@ -62,8 +63,8 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
     protected void runInputTest(boolean isDynamic) throws Throwable {
         ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
-        TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService().getComponentProperties(
-                TSalesforceInputDefinition.COMPONENT_NAME);
+        TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
+                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection, !ADD_QUOTES);
 
         setupModule(props.module, EXISTING_MODULE_NAME);
@@ -80,7 +81,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
             List<IndexedRecord> rows = readRows(props);
             checkRows(random, rows, count);
         } finally {
-            deleteRows(random, outputRows, props);
+            deleteRows(outputRows, props);
         }
     }
 

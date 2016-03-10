@@ -123,7 +123,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
                 inputRows = readRows(props);
             }
             List<IndexedRecord> allReadTestRows = filterAllTestRows(random, inputRows);
-            deleteRows(random, allReadTestRows, props);
+            deleteRows(allReadTestRows, props);
             inputRows = readRows(props);
             assertEquals(0, filterAllTestRows(random, inputRows).size());
         }
@@ -137,7 +137,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         return saleforceWriter;
     }
 
-    public TSalesforceOutputProperties createAccountSalesforceoutputProperties() throws Exception {
+    public static TSalesforceOutputProperties createAccountSalesforceoutputProperties() throws Exception {
         TSalesforceOutputProperties props = (TSalesforceOutputProperties) new TSalesforceOutputProperties("foo").init();
         setupProps(props.connection, !ADD_QUOTES);
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);

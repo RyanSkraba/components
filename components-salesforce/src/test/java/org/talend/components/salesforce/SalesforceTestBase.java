@@ -41,6 +41,7 @@ import org.talend.components.api.test.SimpleComponentService;
 import org.talend.components.salesforce.runtime.SalesforceSink;
 import org.talend.components.salesforce.runtime.SalesforceSource;
 import org.talend.components.salesforce.runtime.SalesforceWriteOperation;
+import org.talend.components.salesforce.runtime.SalesforceWriterTestIT;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 import org.talend.components.salesforce.tsalesforcegetdeleted.TSalesforceGetDeletedDefinition;
@@ -57,6 +58,9 @@ import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.PropertiesServiceTest;
 
+import com.sforce.async.AsyncApiException;
+import com.sforce.ws.ConnectionException;
+
 @SuppressWarnings("nls")
 public class SalesforceTestBase extends AbstractComponentTest {
 
@@ -69,11 +73,11 @@ public class SalesforceTestBase extends AbstractComponentTest {
 
     public static final boolean ADD_QUOTES = true;
 
-    public final String userId = System.getProperty("salesforce.user");
+    static public final String userId = System.getProperty("salesforce.user");
 
-    public final String password = System.getProperty("salesforce.password");
+    static public final String password = System.getProperty("salesforce.password");
 
-    public final String securityKey = System.getProperty("salesforce.key");
+    static public final String securityKey = System.getProperty("salesforce.key");
 
     public SalesforceTestBase() {
         adaptor = new DefaultComponentRuntimeContainerImpl();
@@ -127,7 +131,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
         return getComponentService().afterProperty(propName, props);
     }
 
-    public SalesforceConnectionProperties setupProps(SalesforceConnectionProperties props, boolean addQuotes) {
+    static public SalesforceConnectionProperties setupProps(SalesforceConnectionProperties props, boolean addQuotes) {
         if (props == null) {
             props = (SalesforceConnectionProperties) new SalesforceConnectionProperties("foo").init();
         }
@@ -279,7 +283,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
         return checkedRows;
     }
 
-    public List<IndexedRecord> getAllTestRows(List<IndexedRecord> rows) {
+    static public List<IndexedRecord> getAllTestRows(List<IndexedRecord> rows) {
         List<IndexedRecord> checkedRows = new ArrayList<>();
 
         for (IndexedRecord row : rows) {
@@ -329,7 +333,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
 
     protected void checkAndDelete(String random, SalesforceConnectionModuleProperties props, int count) throws Exception {
         List<IndexedRecord> inputRows = readAndCheckRows(random, props, count);
-        deleteRows(random, inputRows, props);
+        deleteRows(inputRows, props);
         readAndCheckRows(random, props, 0);
     }
 
@@ -365,11 +369,11 @@ public class SalesforceTestBase extends AbstractComponentTest {
         return readAndCheckRows(random, props, outputRows.size());
     }
 
-    protected void deleteRows(String random, List<IndexedRecord> rows, SalesforceConnectionModuleProperties props)
-            throws Exception {
+    protected void deleteRows(List<IndexedRecord> rows, SalesforceConnectionModuleProperties props) throws Exception {
         TSalesforceOutputProperties deleteProperties = new TSalesforceOutputProperties("delete"); //$NON-NLS-1$
         deleteProperties.copyValuesFrom(props);
         deleteProperties.outputAction.setValue(TSalesforceOutputProperties.ACTION_DELETE);
+        System.out.println("deleting " + rows.size() + " rows");
         doWriteRows(deleteProperties, rows);
     }
 
@@ -384,6 +388,32 @@ public class SalesforceTestBase extends AbstractComponentTest {
         SalesforceSource salesforceSource = new SalesforceSource();
         salesforceSource.initialize(null, tsip);
         return salesforceSource.createReader(null);
+    }
+
+    public static void main(String[] args) throws Exception {
+        deleteAllAccountTestRows();
+
+    }
+
+    public static void deleteAllAccountTestRows() throws ConnectionException, AsyncApiException, Exception {
+        BoundedReader salesforceInputReader = new SalesforceTestBase()
+                .createSalesforceInputReaderFromModule(EXISTING_MODULE_NAME);
+        // getting all rows
+        List<IndexedRecord> rows = new ArrayList<>();
+        try {
+            salesforceInputReader.start();
+            while (salesforceInputReader.advance()) {
+                rows.add((IndexedRecord) salesforceInputReader.getCurrent());
+            }
+        } finally {
+            salesforceInputReader.close();
+        }
+        // filtering rows
+        List<IndexedRecord> rowToBeDeleted = getAllTestRows(rows);
+        // deleting rows
+        TSalesforceOutputProperties salesforceoutputProperties = SalesforceWriterTestIT.createAccountSalesforceoutputProperties();
+        setupProps(salesforceoutputProperties.connection, !ADD_QUOTES);
+        new SalesforceTestBase().deleteRows(rowToBeDeleted, salesforceoutputProperties);
     }
 
 }
