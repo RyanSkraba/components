@@ -5,7 +5,6 @@ import org.joda.time.Instant;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 
@@ -118,7 +117,7 @@ public abstract class UnshardedInputSource<T> implements BoundedSource {
      * By default, no schemas can be fetched.
      */
     @Override
-    public Schema getSchema(RuntimeContainer adaptor, ComponentProperties properties) throws IOException {
+    public Schema getSchema(RuntimeContainer adaptor, String schemaName) throws IOException {
         return null;
     }
 

@@ -12,9 +12,9 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import java.io.IOException;
-import java.util.NoSuchElementException;
-
+import com.sforce.soap.partner.QueryResult;
+import com.sforce.soap.partner.sobject.SObject;
+import com.sforce.ws.ConnectionException;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
@@ -23,9 +23,8 @@ import org.talend.components.api.component.runtime.RuntimeHelper;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
-import com.sforce.soap.partner.QueryResult;
-import com.sforce.soap.partner.sobject.SObject;
-import com.sforce.ws.ConnectionException;
+import java.io.IOException;
+import java.util.NoSuchElementException;
 
 public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
 
@@ -54,7 +53,7 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
     private Schema getSchema() throws IOException {
         if (null == querySchema) {
             querySchema = new Schema.Parser().parse(properties.module.schema.schema.getStringValue());
-            querySchema = RuntimeHelper.resolveSchema(adaptor, properties.module, getCurrentSource(), querySchema);
+            querySchema = RuntimeHelper.resolveSchema(adaptor, getCurrentSource(), querySchema);
         }
         return querySchema;
     }

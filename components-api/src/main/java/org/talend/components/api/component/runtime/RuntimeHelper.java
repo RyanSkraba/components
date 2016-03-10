@@ -1,15 +1,14 @@
 package org.talend.components.api.component.runtime;
 
+import org.apache.avro.Schema;
+import org.talend.components.api.container.RuntimeContainer;
+import org.talend.daikon.avro.util.AvroUtils;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.avro.Schema;
-import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.properties.ComponentProperties;
-import org.talend.daikon.avro.util.AvroUtils;
 
 /**
  * Helper methods for use by components.
@@ -18,16 +17,16 @@ public class RuntimeHelper {
 
     /**
      * Used to resolve the dynamic fields in the schema with the actual fields available at runtime.
-     *
+     * <p>
      * This returns a schema where the dynamic field is replaced by the fields obtained from the {@link SourceOrSink}.
-     * 
-     * @param ss the {@link SourceOrSink} to use to get the runtime schema.
+     *
+     * @param ss           the {@link SourceOrSink} to use to get the runtime schema.
      * @param designSchema the design time {@link Schema}.
      * @return a {@link Schema} modified as described above.
      */
-    public static Schema resolveSchema(RuntimeContainer container, ComponentProperties properties, SourceOrSink ss,
-            Schema designSchema) throws IOException {
-        Schema runtimeSchema = ss.getSchema(container, properties);
+    public static Schema resolveSchema(RuntimeContainer container, SourceOrSink ss,
+                                       Schema designSchema) throws IOException {
+        Schema runtimeSchema = ss.getPossibleSchemaFromProperties(container);
 
         Map<String, Schema.Field> fieldMap = AvroUtils.makeFieldMap(designSchema);
         List<Schema.Field> fieldList = designSchema.getFields();
@@ -47,7 +46,7 @@ public class RuntimeHelper {
 
         List<Schema.Field> beforeDyn = copyFieldList.subList(0, dynamicIndex);
         List<Schema.Field> afterDyn = dynamicIndex < copyFieldList.size() ? copyFieldList.subList(dynamicIndex + 1,
-                copyFieldList.size()) : Collections.<Schema.Field> emptyList();
+                copyFieldList.size()) : Collections.<Schema.Field>emptyList();
 
         List<Schema.Field> filteredDynamicFields = new ArrayList<>();
         for (Schema.Field se : runtimeSchema.getFields()) {

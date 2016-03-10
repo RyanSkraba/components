@@ -12,12 +12,12 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.namespace.QName;
-
+import com.sforce.async.AsyncApiException;
+import com.sforce.async.BulkConnection;
+import com.sforce.soap.partner.*;
+import com.sforce.ws.ConnectionException;
+import com.sforce.ws.ConnectorConfig;
+import com.sforce.ws.SessionRenewer;
 import org.apache.avro.Schema;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -27,23 +27,21 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
-import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
 import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnection;
+import org.talend.components.salesforce.tsalesforcegetdeleted.TSalesforceGetDeletedProperties;
+import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
+import org.talend.components.salesforce.tsalesforcegetupdated.TSalesforceGetUpdatedProperties;
+import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
+import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.sforce.async.AsyncApiException;
-import com.sforce.async.BulkConnection;
-import com.sforce.soap.partner.DescribeGlobalResult;
-import com.sforce.soap.partner.DescribeGlobalSObjectResult;
-import com.sforce.soap.partner.DescribeSObjectResult;
-import com.sforce.soap.partner.PartnerConnection;
-import com.sforce.soap.partner.SessionHeader_element;
-import com.sforce.ws.ConnectionException;
-import com.sforce.ws.ConnectorConfig;
-import com.sforce.ws.SessionRenewer;
+import javax.xml.namespace.QName;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SalesforceSourceOrSink implements SourceOrSink {
 
@@ -221,14 +219,62 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     }
 
     @Override
-    public Schema getSchema(RuntimeContainer adaptor, ComponentProperties properties) throws IOException {
-        return getSchema(connect(), ((SalesforceModuleProperties) properties).moduleName.getStringValue());
+    public Schema getSchema(RuntimeContainer adaptor, String schemaName) throws IOException {
+        return getSchema(connect(), schemaName);
     }
 
-    public Schema getSchema(PartnerConnection connection, String module) throws IOException {
+    /**
+     * get Schema from the init properties, but is it really a good place to hold this code?
+     *
+     * @param adaptor
+     * @return
+     * @throws IOException
+     */
+    @Override
+    public Schema getSchemaFromProperties(RuntimeContainer adaptor) throws IOException {
+        String schemaString = null;
+
+        if (properties instanceof TSalesforceInputProperties) {
+            schemaString = ((TSalesforceInputProperties) properties).module.schema.schema.getStringValue();
+        } else if (properties instanceof TSalesforceGetServerTimestampProperties) {
+            schemaString = ((TSalesforceGetServerTimestampProperties) properties).schema.schema.getStringValue();
+        } else if (properties instanceof TSalesforceGetDeletedProperties) {
+            schemaString = ((TSalesforceGetDeletedProperties) properties).module.schema.schema.getStringValue();
+        } else if (properties instanceof TSalesforceGetUpdatedProperties) {
+            schemaString = ((TSalesforceGetUpdatedProperties) properties).module.schema.schema.getStringValue();
+        } else if (properties instanceof TSalesforceOutputProperties) {
+            schemaString = ((TSalesforceOutputProperties) properties).module.schema.schema.getStringValue();
+        }
+
+        return schemaString == null ? null : new Schema.Parser().parse(schemaString);
+    }
+
+    @Override
+    public Schema getPossibleSchemaFromProperties(RuntimeContainer adaptor) throws IOException {
+        if (!(properties instanceof TSalesforceInputProperties) || !((TSalesforceInputProperties) properties).manualQuery.getBooleanValue()) {
+            String moduleName = null;
+            if (properties instanceof TSalesforceInputProperties) {
+                moduleName = ((TSalesforceInputProperties) properties).module.moduleName.getStringValue();
+            } else if (properties instanceof TSalesforceGetServerTimestampProperties) {
+                //FIXME throw exception for this component
+            } else if (properties instanceof TSalesforceGetDeletedProperties) {
+                moduleName = ((TSalesforceGetDeletedProperties) properties).module.moduleName.getStringValue();
+            } else if (properties instanceof TSalesforceGetUpdatedProperties) {
+                moduleName = ((TSalesforceGetUpdatedProperties) properties).module.moduleName.getStringValue();
+            } else if (properties instanceof TSalesforceOutputProperties) {
+                moduleName = ((TSalesforceOutputProperties) properties).module.moduleName.getStringValue();
+            }
+            return getSchema(connect(), moduleName);
+        } else {// for custom query, need Reader!
+
+        }
+        return null;
+    }
+
+    protected Schema getSchema(PartnerConnection connection, String module) throws IOException {
         try {
             DescribeSObjectResult[] describeSObjectResults = new DescribeSObjectResult[0];
-            describeSObjectResults = connection.describeSObjects(new String[] { module });
+            describeSObjectResults = connection.describeSObjects(new String[]{module});
             return SalesforceAvroRegistry.get().inferSchema(describeSObjectResults[0]);
         } catch (ConnectionException e) {
             throw new IOException(e);
