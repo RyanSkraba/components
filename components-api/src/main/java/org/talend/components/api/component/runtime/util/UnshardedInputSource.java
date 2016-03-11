@@ -1,7 +1,6 @@
 package org.talend.components.api.component.runtime.util;
 
 import org.apache.avro.Schema;
-import org.joda.time.Instant;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
@@ -9,6 +8,7 @@ import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;

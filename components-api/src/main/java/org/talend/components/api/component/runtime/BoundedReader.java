@@ -12,9 +12,8 @@
  */
 package org.talend.components.api.component.runtime;
 
+import java.time.Instant;
 import java.util.NoSuchElementException;
-
-import org.joda.time.Instant;
 
 /**
  * A {@code Reader} that reads a bounded amount of input and supports some additional operations, such as progress

@@ -1,8 +1,7 @@
 package org.talend.components.api.component.runtime;
 
-import org.joda.time.Instant;
-
 import java.io.IOException;
+import java.time.Instant;
 import java.util.NoSuchElementException;
 
 /**
