@@ -39,7 +39,7 @@ public class ${componentName}Definition extends AbstractComponentDefinition impl
 
     @Override
     public String[] getFamilies() {
-        return new String[] { "File/input" }; //$NON-NLS-1$
+        return new String[] { "File/Input" }; //$NON-NLS-1$
     }
 
     @Override
