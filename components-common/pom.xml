@@ -53,25 +53,6 @@
                 <extensions>true</extensions>
                 <executions>
                     <execution>
-                        <id>bundle-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>bundle</classifier>
-                            <instructions>
-                                <Import-Package>org.talend*,org.apache.avro*</Import-Package>
-                                <Service-Component>*</Service-Component>
-                                <Embed-Dependency>!components*,*;scope=compile|runtime;artifactId=avro;inline=false</Embed-Dependency>
-<!--                                 <Embed-Dependency> -->
-<!--                                     !org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api|javax.servlet-api|javax.inject|daikon -->
-<!--                                 </Embed-Dependency> -->
-                                
-                            </instructions>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>lib-jar</id>
                         <phase>package</phase>
                         <goals>
@@ -103,6 +84,25 @@
                                 <Export-Package>*</Export-Package>
                                 <Include-Resource>=target/test-classes/
                                 </Include-Resource>
+                            </instructions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>bundle-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>bundle</classifier>
+                            <instructions>
+                                <Import-Package>org.talend*,org.apache.avro*</Import-Package>
+                                <Service-Component>*</Service-Component>
+                                <Embed-Dependency>!components*,*;scope=compile|runtime;artifactId=avro;inline=false</Embed-Dependency>
+<!--                                 <Embed-Dependency> -->
+<!--                                     !org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api|javax.servlet-api|javax.inject|daikon -->
+<!--                                 </Embed-Dependency> -->
+                                
                             </instructions>
                         </configuration>
                     </execution>

@@ -191,29 +191,6 @@
 				<extensions>true</extensions>
 				<executions>
 					<execution>
-						<id>bundle-jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>bundle</goal>
-						</goals>
-						<configuration>
-							<classifier>bundle</classifier>
-							<instructions>
-								<Service-Component>*</Service-Component>
-								<Import-Package>org.osgi*,javax.net.ssl,javax.security.auth.x500,
-									org.slf4j*, org.talend.daikon*, org.apache.avro
-								</Import-Package>
-								<Embed-Transitive>true</Embed-Transitive>
-								<Embed-Dependency>
-									!org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api|javax.servlet-api|javax.inject|daikon
-								</Embed-Dependency>
-								<_exportcontents>!*.internal,!*.osgi,org.talend.*</_exportcontents>
-								<!-- used to remove the spring classes -->
-								<Private-Package>!org.talend.components.*.spring,org.talend.components.*</Private-Package>
-							</instructions>
-						</configuration>
-					</execution>
-					<execution>
 						<id>lib-jar</id>
 						<phase>package</phase>
 						<goals>
@@ -248,6 +225,29 @@
 							</instructions>
 						</configuration>
 					</execution>
+                    <execution>
+                        <id>bundle-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>bundle</classifier>
+                            <instructions>
+                                <Service-Component>*</Service-Component>
+                                <Import-Package>org.osgi*,javax.net.ssl,javax.security.auth.x500,
+                                    org.slf4j*, org.talend.daikon*, org.apache.avro
+                                </Import-Package>
+                                <Embed-Transitive>true</Embed-Transitive>
+                                <Embed-Dependency>
+                                    !org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api|javax.servlet-api|javax.inject|daikon
+                                </Embed-Dependency>
+                                <_exportcontents>!*.internal,!*.osgi,org.talend.*</_exportcontents>
+                                <!-- used to remove the spring classes -->
+                                <Private-Package>!org.talend.components.*.spring,org.talend.components.*</Private-Package>
+                            </instructions>
+                        </configuration>
+                    </execution>
 				</executions>
 			</plugin>
 			<plugin>

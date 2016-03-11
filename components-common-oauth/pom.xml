@@ -50,6 +50,19 @@
                 <extensions>true</extensions>
                 <executions>
                     <execution>
+                        <id>lib-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                        <configuration>
+                            <instructions>
+                                <Bundle-SymbolicName>org.talend.components.common-oauth.lib</Bundle-SymbolicName>
+                                <Bundle-Name>${project.name} lib</Bundle-Name>
+                            </instructions>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>default-jar</id>
                         <phase>package</phase>
                         <goals>
@@ -61,19 +74,6 @@
                                 <Import-Package>org.talend*</Import-Package>
                                 <Service-Component>*</Service-Component>
                                 <Embed-Dependency>!components*,*;scope=compile|runtime;inline=false</Embed-Dependency>
-                            </instructions>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>lib-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                        <configuration>
-                            <instructions>
-                                <Bundle-SymbolicName>org.talend.components.common-oauth.lib</Bundle-SymbolicName>
-                                <Bundle-Name>${project.name} lib</Bundle-Name>
                             </instructions>
                         </configuration>
                     </execution>
