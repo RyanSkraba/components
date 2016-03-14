@@ -53,7 +53,12 @@ public class SalesforceSource extends SalesforceSourceOrSink implements BoundedS
     @Override
     public BoundedReader createReader(RuntimeContainer adaptor) {
         if (properties instanceof TSalesforceInputProperties) {
-            return new SalesforceInputReader(adaptor, this, (TSalesforceInputProperties) properties);
+            TSalesforceInputProperties sfInProperties = (TSalesforceInputProperties) properties;
+            if(TSalesforceInputProperties.QUERY_QUERY.equals(sfInProperties.queryMode.getStringValue())){
+                return new SalesforceInputReader(adaptor, this, sfInProperties);
+            }else{
+                return new SalesforceBulkQuryInputReader(adaptor, this, sfInProperties);
+            }
         } else if (properties instanceof TSalesforceGetServerTimestampProperties) {
             return new SalesforceServerTimeStampReader(adaptor, this, (TSalesforceGetServerTimestampProperties) properties);
         } else if (properties instanceof TSalesforceGetDeletedProperties) {

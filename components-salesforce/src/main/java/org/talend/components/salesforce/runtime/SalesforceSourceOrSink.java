@@ -89,6 +89,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     }
 
     protected BulkConnection connectBulk(ConnectorConfig config) throws ComponentException {
+        final SalesforceConnectionProperties connProps = properties.getConnectionProperties();
         /*
          * When PartnerConnection is instantiated, a login is implicitly executed and, if successful, a valid session is
          * stored in the ConnectorConfig instance. Use this key to initialize a BulkConnection:
@@ -103,8 +104,9 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         String restEndpoint = soapEndpoint.substring(0, soapEndpoint.indexOf("Soap/")) + "async/" + API_VERSION;
         bulkConfig.setRestEndpoint(restEndpoint);
         // This should only be false when doing debugging.
-        bulkConfig.setCompression(true);
-        bulkConfig.setTraceMessage(false);
+        bulkConfig.setCompression(connProps.needCompression.getBooleanValue());
+        bulkConfig.setTraceMessage(connProps.httpTraceMessage.getBooleanValue());
+
         try {
             return new BulkConnection(bulkConfig);
         } catch (AsyncApiException e) {
@@ -129,11 +131,15 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     class ConnectionHolder {
 
         PartnerConnection connection;
+
+        BulkConnection bulkConnection;
     }
 
-    protected PartnerConnection connect() throws IOException {
+    protected ConnectionHolder connect() throws IOException {
         final SalesforceConnectionProperties connProps = properties.getConnectionProperties();
         final ConnectionHolder ch = new ConnectionHolder();
+
+        // FIXME add back reffed connection
 
         ConnectorConfig config = new ConnectorConfig();
         config.setUsername(StringUtils.strip(connProps.userPassword.userId.getStringValue(), "\""));
@@ -174,13 +180,23 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             config.setConnectionTimeout(connProps.timeout.getIntValue());
         }
         config.setCompression(connProps.needCompression.getBooleanValue());
-        if (false) {
-            config.setTraceMessage(true);
-        }
+        //  config.setTraceMessage(connProps.httpTraceMessage.getBooleanValue());
+        config.setUseChunkedPost(connProps.httpChunked.getBooleanValue());
+
 
         try {
             ch.connection = doConnection(config);
-            return ch.connection;
+            if(ch.connection!=null){
+                String clientId = connProps.clientId.getStringValue();
+                if(clientId!=null){
+                    // Need the test.
+                    ch.connection.setCallOptions(clientId,null);
+                }
+            }
+            if(connProps.bulkConnection.getBooleanValue()){
+                ch.bulkConnection = connectBulk(ch.connection.getConfig());
+            }
+            return ch;
         } catch (ConnectionException e) {
             throw new IOException(e);
         }
@@ -190,7 +206,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         SalesforceSourceOrSink ss = new SalesforceSourceOrSink();
         ss.initialize(null, (ComponentProperties) properties);
         try {
-            PartnerConnection connection = ss.connect();
+            PartnerConnection connection = ss.connect().connection;
             return ss.getSchemaNames(connection);
         } catch (Exception ex) {
             throw new ComponentException(exceptionToValidationResult(ex));
@@ -199,7 +215,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
 
     @Override
     public List<NamedThing> getSchemaNames(RuntimeContainer adaptor) throws IOException {
-        return getSchemaNames(connect());
+        return getSchemaNames(connect().connection);
     }
 
     protected List<NamedThing> getSchemaNames(PartnerConnection connection) throws IOException {
@@ -223,7 +239,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         ss.initialize(null, (ComponentProperties) properties);
         PartnerConnection connection = null;
         try {
-            connection = ss.connect();
+            connection = ss.connect().connection;
         } catch (IOException ex) {
             throw new ComponentException(exceptionToValidationResult(ex));
         }
@@ -232,7 +248,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
 
     @Override
     public Schema getSchema(RuntimeContainer adaptor, String schemaName) throws IOException {
-        return getSchema(connect(), schemaName);
+        return getSchema(connect().connection, schemaName);
     }
 
     /**
@@ -276,9 +292,9 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             } else if (properties instanceof TSalesforceOutputProperties) {
                 moduleName = ((TSalesforceOutputProperties) properties).module.moduleName.getStringValue();
             }
-            return getSchema(connect(), moduleName);
-        } else {// for custom query, need Reader!
-
+            return getSchema(connect().connection, moduleName);
+        } else {
+            // TODO for custom query, need Reader!
         }
         return null;
     }

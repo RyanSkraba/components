@@ -84,7 +84,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
     @Override
     public void open(String uId) throws IOException {
         this.uId = uId;
-        connection = sink.connect();
+        connection = sink.connect().connection;
         schema = RuntimeHelper.resolveSchema(adaptor, sink,
                 new Schema.Parser().parse(sprops.module.schema.schema.getStringValue()));
         upsertKeyColumn = sprops.upsertKeyColumn.getStringValue();

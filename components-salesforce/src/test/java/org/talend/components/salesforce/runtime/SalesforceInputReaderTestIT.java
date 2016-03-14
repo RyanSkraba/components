@@ -17,7 +17,10 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.IndexedRecord;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.BoundedReader;
@@ -53,21 +56,48 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
     @Test
     public void testInput() throws Throwable {
-        runInputTest(false);
+        runInputTest(false, false);
     }
 
     @Test
     public void testInputDynamic() throws Throwable {
-        runInputTest(true);
+        // FIXME - finish this test
+        runInputTest(true, false);
     }
 
-    protected void runInputTest(boolean isDynamic) throws Throwable {
+    @Test
+    public void testInputBulkQuery() throws Throwable {
+        runInputTest(false, true);
+    }
+
+    @Ignore ("Bulk query doesn't support")
+    @Test
+    public void testInputBulkQueryDynamic() throws Throwable {
+        runInputTest(true, true);
+    }
+
+
+    protected void runInputTest(boolean isDynamic, boolean isBulkQury) throws Throwable {
         ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
         TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
-        setupProps(props.connection, !ADD_QUOTES);
+        if (isBulkQury) {
+            props.queryMode.setValue(TSalesforceInputProperties.QUERY_BULK);
+            props.connection.bulkConnection.setValue(true);
+            props.manualQuery.setValue(true);
+            props.query.setValue("select Id,Name,ShippingStreet,ShippingPostalCode,BillingStreet,BillingState,BillingPostalCode from Account");
 
-        setupModule(props.module, EXISTING_MODULE_NAME);
+            setupProps(props.connection, !ADD_QUOTES);
+
+            props.module.moduleName.setValue(EXISTING_MODULE_NAME);
+            props.module.schema.schema.setValue(getMakeRowSchema(false));
+
+
+        } else {
+            props.queryMode.setValue(TSalesforceInputProperties.QUERY_QUERY);
+            setupProps(props.connection, !ADD_QUOTES);
+            setupModule(props.module, EXISTING_MODULE_NAME);
+        }
 
         ComponentTestUtils.checkSerialize(props, errorCollector);
 
@@ -85,4 +115,20 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         }
     }
 
+    @Override
+    public Schema getMakeRowSchema(boolean isDynamic) {
+        SchemaBuilder.FieldAssembler<Schema> fa = SchemaBuilder.builder().record("MakeRowRecord").fields() //
+                .name("Id").type().nullable().stringType().noDefault() //
+                .name("Name").type().nullable().stringType().noDefault() //
+                .name("ShippingStreet").type().nullable().stringType().noDefault() //
+                .name("ShippingPostalCode").type().nullable().intType().noDefault() //
+                .name("BillingStreet").type().nullable().stringType().noDefault() //
+                .name("BillingState").type().nullable().stringType().noDefault() //
+                .name("BillingPostalCode").type().nullable().stringType().noDefault();
+        if (isDynamic) {
+            fa = fa.name("ShippingState").type().nullable().stringType().noDefault();
+        }
+
+        return fa.endRecord();
+    }
 }

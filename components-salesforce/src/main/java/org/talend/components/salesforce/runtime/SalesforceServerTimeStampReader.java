@@ -34,7 +34,7 @@ public class SalesforceServerTimeStampReader extends AbstractBoundedReader<Calen
 
     @Override
     public boolean start() throws IOException {
-        PartnerConnection connection = ((SalesforceSource) getCurrentSource()).connect();
+        PartnerConnection connection = ((SalesforceSource) getCurrentSource()).connect().connection;
         try {
             result = connection.getServerTimestamp().getTimestamp();
             return result != null;

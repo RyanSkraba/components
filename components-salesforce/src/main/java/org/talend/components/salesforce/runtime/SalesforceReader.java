@@ -28,7 +28,7 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
 
     protected PartnerConnection getConnection() throws IOException {
         if (connection == null) {
-            connection = ((SalesforceSource) getCurrentSource()).connect();
+            connection = ((SalesforceSource) getCurrentSource()).connect().connection;
         }
         return connection;
     }

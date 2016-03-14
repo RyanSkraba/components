@@ -12,7 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import com.sforce.soap.partner.QueryResult;
+import com.sforce.async.AsyncApiException;
+import com.sforce.async.BulkConnection;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import org.apache.avro.Schema;
@@ -21,39 +22,52 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.RuntimeHelper;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResultSet;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
+public class SalesforceBulkQuryInputReader extends SalesforceReader<IndexedRecord> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SalesforceInputReader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SalesforceBulkQuryInputReader.class);
 
     protected RuntimeContainer adaptor;
 
     protected TSalesforceInputProperties properties;
 
-    private transient QueryResult inputResult;
-
-    private transient SObject[] inputRecords;
-
-    private transient int inputRecordsIndex;
 
     private transient Schema querySchema;
 
     private transient SObjectAdapterFactory factory;
 
-    public SalesforceInputReader(RuntimeContainer adaptor, SalesforceSource source, TSalesforceInputProperties props) {
+    protected boolean isBulkQuery;
+
+    protected BulkConnection bulkConnection;
+
+    protected SalesforceBulkRuntime bulkUtil;
+
+    protected BulkResultSet bulkResultSet;
+
+    protected SObject currentRecord;
+
+    public SalesforceBulkQuryInputReader(RuntimeContainer adaptor, SalesforceSource source, TSalesforceInputProperties props) {
         super(source);
         properties = props;
         this.adaptor = adaptor;
     }
 
+    protected BulkConnection getBulkConnection() throws IOException {
+        if (bulkConnection == null) {
+            bulkConnection = ((SalesforceSource) getCurrentSource()).connect().bulkConnection;
+        }
+        return bulkConnection;
+    }
+
     private Schema getSchema() throws IOException {
         if (null == querySchema) {
             querySchema = new Schema.Parser().parse(properties.module.schema.schema.getStringValue());
-            querySchema = RuntimeHelper.resolveSchema(adaptor, getCurrentSource(), querySchema);
+            //  querySchema = RuntimeHelper.resolveSchema(adaptor, getCurrentSource(), querySchema);
         }
         return querySchema;
     }
@@ -69,14 +83,11 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
     @Override
     public boolean start() throws IOException {
         try {
-            inputResult = executeSalesforceQuery();
-            if (inputResult.getSize() == 0) {
-                return false;
-            }
-            inputRecords = inputResult.getRecords();
-            inputRecordsIndex = 0;
-            return inputRecords.length > 0;
-        } catch (ConnectionException e) {
+            executeSalesforceBulkQuery();
+            bulkResultSet = bulkUtil.getQueryResultSet( bulkUtil.nextResultId());
+            currentRecord = bulkResultSet.next();
+            return currentRecord !=null;
+        } catch (ConnectionException|AsyncApiException e) {
             // Wrap the exception in an IOException.
             throw new IOException(e);
         }
@@ -84,33 +95,30 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
 
     @Override
     public boolean advance() throws IOException {
-        inputRecordsIndex++;
-
-        // Fast return conditions.
-        if (inputRecordsIndex < inputRecords.length) {
-            return true;
+        currentRecord = bulkResultSet.next();
+        if(currentRecord == null ){
+            String resultId = bulkUtil.nextResultId();
+            if(resultId != null){
+                try {
+                    bulkResultSet = bulkUtil.getQueryResultSet(resultId);
+                    currentRecord = bulkResultSet.next();
+                    return bulkResultSet.hasNext();
+                } catch (AsyncApiException | ConnectionException e) {
+                    throw new IOException(e);
+                }
+            }else{
+                return false;
+            }
         }
-        if (inputResult.isDone()) {
-            return false;
-        }
-
-        try {
-            inputResult = getConnection().queryMore(inputResult.getQueryLocator());
-            inputRecords = inputResult.getRecords();
-            inputRecordsIndex = 0;
-            return inputResult.getSize() > 0;
-        } catch (ConnectionException e) {
-            // Wrap the exception in an IOException.
-            throw new IOException(e);
-        }
-
+        return true;
     }
 
-    public SObject getCurrentSObject() throws NoSuchElementException {
-        return inputRecords[inputRecordsIndex];
+    public SObject getCurrentRecord() throws NoSuchElementException {
+        return currentRecord;
     }
 
-    protected QueryResult executeSalesforceQuery() throws IOException, ConnectionException {
+    // FIXME some duplicate code
+    protected void executeSalesforceBulkQuery() throws IOException, ConnectionException {
         String queryText;
         if (properties.manualQuery.getBooleanValue()) {
             queryText = properties.query.getStringValue();
@@ -134,14 +142,18 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
             queryText = sb.toString();
         }
 
-        getConnection().setQueryOptions(properties.batchSize.getIntValue());
-        return getConnection().query(queryText);
+        bulkUtil =new SalesforceBulkRuntime(getBulkConnection());
+        try {
+            bulkUtil.doBulkQuery(properties.module.moduleName.getStringValue(),queryText,30);
+        } catch (AsyncApiException |InterruptedException | ConnectionException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
     public IndexedRecord getCurrent() {
         try {
-            return getFactory().convertToAvro(getCurrentSObject());
+            return getFactory().convertToAvro(getCurrentRecord());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

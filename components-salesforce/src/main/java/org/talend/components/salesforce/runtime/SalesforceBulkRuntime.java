@@ -11,7 +11,12 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 import com.sforce.async.*;
+import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
+
+/*
+* Reuse the code in talend lib salesforceBulkAPI.jar
+* */
 
 public class SalesforceBulkRuntime {
 
@@ -530,15 +535,15 @@ public class SalesforceBulkRuntime {
             this.header = header;
         }
 
-        public Map<String, Object> next() throws IOException {
+        public SObject next() throws IOException {
 
-            Map<String, Object> result = null;
+            SObject result = null;
             List<String> row = null;
 
             if ((row = reader.nextRecord()) != null) {
-                result = new HashMap<String, Object>();
+                result = new SObject();
                 for (int i = 0; i < this.header.size(); i++) {
-                    result.put(header.get(i), row.get(i));
+                    result.addField(header.get(i), row.get(i));
                 }
             }
             if(result == null){
