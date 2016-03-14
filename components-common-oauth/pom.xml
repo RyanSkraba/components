@@ -71,6 +71,7 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
+                                <Bundle-SymbolicName>org.talend.components.common-oauth</Bundle-SymbolicName>
                                 <Import-Package>org.talend*</Import-Package>
                                 <Service-Component>*</Service-Component>
                                 <Embed-Dependency>!components*,*;scope=compile|runtime;inline=false</Embed-Dependency>

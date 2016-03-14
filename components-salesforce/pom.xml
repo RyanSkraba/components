@@ -118,7 +118,7 @@
                             <instructions>
                                 <Bundle-SymbolicName>org.talend.components.salesforce.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
-                                <Include-Resource>{maven-resources},META-INF/maven/${groupId}/${artifactId}/dependencies.properties=target/classes/META-INF/maven/dependencies.properties</Include-Resource>
+                                <Include-Resource>{maven-resources},META-INF/maven/${groupId}/${artifactId}/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
                             </instructions>
                         </configuration>
                     </execution>
@@ -153,11 +153,12 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
+                                <Bundle-SymbolicName>org.talend.components.salesforce</Bundle-SymbolicName>
                                 <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*,org.apache.avro.*</Import-Package>
                                 <Service-Component>*</Service-Component>
                                 <Embed-Dependency>!components*,*;scope=compile|runtime</Embed-Dependency>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                                <Include-Resource>{maven-resources},META-INF/maven/${groupId}/${artifactId}/dependencies.properties=target/classes/META-INF/maven/dependencies.properties</Include-Resource>
+                                <Include-Resource>{maven-resources},META-INF/maven/${groupId}/${artifactId}/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
                             </instructions>
                         </configuration>
                     </execution>

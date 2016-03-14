@@ -153,11 +153,11 @@ public class ComponentServiceTest extends AbstractComponentTest {
         Set<String> mavenUriDependencies = getComponentService().getMavenUriDependencies(TestComponentDefinition.COMPONENT_NAME);
         assertEquals(5, mavenUriDependencies.size());
         assertThat(mavenUriDependencies,
-                containsInAnyOrder("mvn:org.talend.components/file-input/0.1.0.SNAPSHOT"//
-                        , "mvn:aopalliance/aopalliance/1.0/jar"//
-                        , "mvn:asm/asm/3.3.1/jar"//
-                        , "mvn:biz.aQute/bndlib/1.50.0/jar"//
-                        , "mvn:com.fasterxml.jackson.core/jackson-core/2.5.3/jar"//
+                containsInAnyOrder("mvn:org.apache.maven/maven-core/3.3.3/jar", //
+                        "mvn:org.eclipse.sisu/org.eclipse.sisu.plexus/0.0.0.M2a/jar", //
+                        "mvn:org.apache.maven/maven-artifact/3.3.3/jar", //
+                        "mvn:org.eclipse.aether/aether-transport-file/1.0.0.v20140518/jar", //
+                        "mvn:org.talend.components/file-input/0.1.0.SNAPSHOT/jar"//
         ));
     }
 

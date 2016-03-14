@@ -170,6 +170,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+        <!-- end of maven dependencies feature deps  -->
 		<dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-library</artifactId>
@@ -234,9 +235,10 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
+                                <Bundle-SymbolicName>org.talend.components.api</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
                                 <Import-Package>org.osgi*,javax.net.ssl,javax.security.auth.x500,
-                                    org.slf4j*, org.talend.daikon*, org.apache.avro
+                                    org.slf4j*,org.talend.daikon*,org.apache.avro,org.apache.commons.lang
                                 </Import-Package>
                                 <Embed-Transitive>true</Embed-Transitive>
                                 <Embed-Dependency>
@@ -249,14 +251,6 @@
                         </configuration>
                     </execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
