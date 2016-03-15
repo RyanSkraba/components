@@ -76,11 +76,9 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         runInputTest(true, true);
     }
 
-
-    protected void runInputTest(boolean isDynamic, boolean isBulkQury) throws Throwable {
-        ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
-        TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
-                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
+    protected  TSalesforceInputProperties createTSalesforceInputProperties(boolean isBulkQury) throws Throwable {
+        TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
+        props.connection.timeout.setValue(60000);
         if (isBulkQury) {
             props.queryMode.setValue(TSalesforceInputProperties.QUERY_BULK);
             props.connection.bulkConnection.setValue(true);
@@ -94,13 +92,19 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
 
         } else {
-            props.queryMode.setValue(TSalesforceInputProperties.QUERY_QUERY);
             setupProps(props.connection, !ADD_QUOTES);
             setupModule(props.module, EXISTING_MODULE_NAME);
         }
 
         ComponentTestUtils.checkSerialize(props, errorCollector);
 
+        return props;
+    }
+
+
+    protected void runInputTest(boolean isDynamic, boolean isBulkQury) throws Throwable {
+
+        TSalesforceInputProperties props = createTSalesforceInputProperties(isBulkQury);
         String random = createNewRandom();
         int count = 10;
         // store rows in SF to retrieve them afterward to test the input.
