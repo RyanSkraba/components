@@ -26,6 +26,7 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.apache.avro.Schema;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SalesforceOutputProperties extends SalesforceConnectionModuleProperties {
 
@@ -75,10 +76,15 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         @Override
         public ValidationResult afterModuleName() throws Exception {
             ValidationResult validationResult = super.afterModuleName();
-            Schema s = (Schema) schema.schema.getValue();
+            String sJson = schema.schema.getStringValue();
+            Schema s = new Schema.Parser().parse(sJson);
+            List<String> fieldNames = new ArrayList<>();
+            for (Schema.Field f : s.getFields()) {
+                fieldNames.add(f.name());
+            }
             // FIXME - we probably only want the names, not the Schema.Field
-            upsertKeyColumn.setPossibleValues(s.getFields());
-            upsertRelation.getChild("columnName").setPossibleValues(s.getFields());
+            upsertKeyColumn.setPossibleValues(fieldNames);
+            upsertRelation.getChild("columnName").setPossibleValues(fieldNames);
             return validationResult;
         }
     }
