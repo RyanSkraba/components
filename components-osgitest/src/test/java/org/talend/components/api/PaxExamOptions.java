@@ -44,18 +44,18 @@ public class PaxExamOptions {
 
         mavenBundle().groupId("org.apache.avro").artifactId("avro").version("1.8.0"), //
                 mavenBundle().groupId("org.talend.daikon").artifactId("daikon").classifier("bundle")
-                        .version("0.4.0.BUILD-SNAPSHOT"),
+                        .version("0.5.0-SNAPSHOT"),
                 // //
                 mavenBundle().groupId("org.talend.daikon").artifactId("daikon").classifier("tests")
-                        .version("0.4.0.BUILD-SNAPSHOT").noStart(),
+                        .version("0.5.0-SNAPSHOT").noStart(),
                 mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("bundle")
-                        .version("0.4.0.BUILD-SNAPSHOT"), //
+                        .version("0.5.0-SNAPSHOT"), //
                 mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("tests")
-                        .version("0.4.0.BUILD-SNAPSHOT").noStart(),
+                        .version("0.5.0-SNAPSHOT").noStart(),
                 mavenBundle().groupId("org.talend.components").artifactId("components-common").classifier("bundle")
-                        .version("0.4.0.BUILD-SNAPSHOT"),
+                        .version("0.5.0-SNAPSHOT"),
                 mavenBundle().groupId("org.talend.components").artifactId("components-common").classifier("tests")
-                        .version("0.4.0.BUILD-SNAPSHOT").noStart(),
+                        .version("0.5.0-SNAPSHOT").noStart(),
                 mavenBundle().groupId("org.talend.components").artifactId("components-common-oauth").classifier("bundle"),
                 mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("bundle"),
                 mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("tests").noStart(),
