@@ -44,6 +44,12 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
         super(name);
     }
 
+    @Override
+    public void setupProperties() {
+        super.setupProperties();
+        commitLevel.setDefaultValue("200");
+        ceaseForError.setDefaultValue("true");
+    }
 
     @Override
     public void setupLayout() {
@@ -80,11 +86,8 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
             }
             form.getWidget("commitLevel").setVisible(extendInsert.getBooleanValue());
             form.getWidget("retrieveInsertId").setVisible(extendInsert.getBooleanValue() && ACTION_INSERT.equals(outputAction.getValue()));
+            form.getWidget("ignoreNull").setVisible(ACTION_UPDATE.equals(outputAction.getValue())||ACTION_UPSERT.equals(outputAction.getValue()));
 
-//            ((Schema) schemaFlow.schema.getValue()).setRoot(null);
-//            if(form.getWidget("retrieveInsertId").isVisible()){
-//                schemaFlow.addSchemaChild(newProperty("salesforce_id"));
-//            }
         }
     }
 

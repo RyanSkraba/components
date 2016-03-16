@@ -106,6 +106,9 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
     @Override
     public void setupProperties() {
         super.setupProperties();
+
+        outputAction.setDefaultValue(ACTION_INSERT);
+
         returns = ComponentPropertyFactory.newReturnsProperty();
         ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_LINE"); //$NON-NLS-1$
         ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_SUCCESS"); //$NON-NLS-1$
@@ -150,16 +153,11 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         if (form.getName().equals(Form.MAIN)) {
             Form advForm = getForm(Form.ADVANCED);
             if (advForm != null) {
-                if (ACTION_UPSERT.equals(outputAction.getValue())) {
-                    form.getWidget("upsertKeyColumn").setVisible(true);
-                    advForm.getWidget("upsertRelation").setVisible(true);
-                } else {
-                    form.getWidget("upsertKeyColumn").setVisible(false);
-                    advForm.getWidget("upsertRelation").setVisible(false);
-                }
+                boolean isUpsert = ACTION_UPSERT.equals(outputAction.getValue());
+                form.getWidget("upsertKeyColumn").setVisible(isUpsert);
+                advForm.getWidget("upsertRelation").setVisible(isUpsert);
             }
         }
-
     }
 
 }

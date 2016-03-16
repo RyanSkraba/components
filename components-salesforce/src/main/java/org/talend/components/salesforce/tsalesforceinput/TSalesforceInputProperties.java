@@ -56,8 +56,11 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         super.setupProperties();
         returns = ComponentPropertyFactory.newReturnsProperty();
         ComponentPropertyFactory.newReturnProperty(returns, Type.INT, "NB_LINE");
-        // FIXME - should use default value
-        batchSize.setValue(100);
+
+        batchSize.setDefaultValue("250");
+        queryMode.setDefaultValue(QUERY_QUERY);
+        normalizeDelimiter.setDefaultValue(";");
+        columnNameDelimiter.setDefaultValue("_");
 
         queryMode.setPossibleValues(QUERY_QUERY, QUERY_BULK);
 

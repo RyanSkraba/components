@@ -18,41 +18,28 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 
-public class SalesforceGetDeletedUpdatedProperties extends ComponentProperties implements SalesforceProvideConnectionProperties {
+public class SalesforceGetDeletedUpdatedProperties extends SalesforceConnectionModuleProperties {
 
-    public Property startDate = newDate("startDate");
+    public Property startDate = newDate("startDate").setRequired();
 
-    public Property endDate = newDate("endDate");
-
-    //
-    // Collections
-    //
-    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection");
-
-    public SalesforceModuleProperties module = new SalesforceModuleProperties("module");
+    public Property endDate = newDate("endDate").setRequired();
 
     public SalesforceGetDeletedUpdatedProperties(String name) {
         super(name);
     }
 
-    @Override
     public void setupProperties() {
         super.setupProperties();
-        module.connection = connection;
+        startDate.setDefaultValue("");
+        endDate.setDefaultValue("");
     }
 
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form mainForm = new Form(this, Form.MAIN);
-        mainForm.addRow(connection.getForm(Form.REFERENCE));
-        mainForm.addRow(module.getForm(Form.REFERENCE));
+        Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(startDate);
         mainForm.addRow(endDate);
     }
 
-    @Override
-    public SalesforceConnectionProperties getConnectionProperties() {
-        return connection;
-    }
 }

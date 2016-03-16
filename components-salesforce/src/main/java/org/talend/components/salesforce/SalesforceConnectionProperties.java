@@ -89,11 +89,18 @@ public class SalesforceConnectionProperties extends ComponentProperties implemen
     }
 
     @Override
-    public void setupLayout() {
-        super.setupLayout();
+    public void setupProperties() {
+        super.setupProperties();
 
         loginType.setValue(LOGIN_BASIC);
-        endpoint.setValue("\""+URL+"\"");
+        endpoint.setDefaultValue(URL);
+        timeout.setDefaultValue("60000");
+
+    }
+
+    @Override
+    public void setupLayout() {
+        super.setupLayout();
 
         Form wizardForm = new Form(this, FORM_WIZARD);
         wizardForm.addRow(name);
