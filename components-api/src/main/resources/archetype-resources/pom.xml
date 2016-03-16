@@ -5,13 +5,16 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.4.0.BUILD-SNAPSHOT</version>
+        <version>0.5.0-SNAPSHOT</version>
     </parent>
 
     <name>Components - ${componentName}</name>
     <groupId>${groupId}</groupId>
     <artifactId>${artifactId}</artifactId>
     <version>${version}</version>
+    <properties>
+        <components.api.version>0.5.0-SNAPSHOT</components.api.version>
+    </properties>
     <packaging>bundle</packaging>
     <dependencies>
 
@@ -19,21 +22,21 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.4.0.BUILD-SNAPSHOT</version>
+            <version>${components.api.version}</version>
         </dependency>
 
         <!-- Shared component properties such as Use/Password or Schema -->
         <dependency>
           <groupId>org.talend.components</groupId>
           <artifactId>components-common</artifactId>
-          <version>0.4.0.BUILD-SNAPSHOT</version>
+          <version>${components.api.version}</version>
         </dependency>
         
         <!-- Jar containing Test utils methods -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.4.0.BUILD-SNAPSHOT</version>
+            <version>${components.api.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
