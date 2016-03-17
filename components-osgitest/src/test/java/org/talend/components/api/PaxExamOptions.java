@@ -23,6 +23,13 @@ import org.ops4j.pax.exam.options.libraries.JUnitBundlesOption;
  */
 public class PaxExamOptions {
 
+    /**
+     * 
+     */
+    private static final String DAIKON_VERSION = "0.5.0-SNAPSHOT";
+
+    private static final String COMPONENTS_VERSION = "0.5.0-SNAPSHOT";
+
     private static final String APACHE_KARAF_AID = "apache-karaf";
 
     private static final String ORG_APACHE_KARAF_GID = "org.apache.karaf";
@@ -43,22 +50,24 @@ public class PaxExamOptions {
                 mavenBundle().groupId("org.apache.commons").artifactId("commons-compress"), //
 
         mavenBundle().groupId("org.apache.avro").artifactId("avro").version("1.8.0"), //
-                mavenBundle().groupId("org.talend.daikon").artifactId("daikon").classifier("bundle")
-                        .version("0.5.0-SNAPSHOT"),
+                mavenBundle().groupId("org.talend.daikon").artifactId("daikon").classifier("bundle").version(DAIKON_VERSION),
                 // //
-                mavenBundle().groupId("org.talend.daikon").artifactId("daikon").classifier("tests")
-                        .version("0.5.0-SNAPSHOT").noStart(),
+                mavenBundle().groupId("org.talend.daikon").artifactId("daikon").classifier("tests").version(DAIKON_VERSION)
+                        .noStart(),
                 mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("bundle")
-                        .version("0.5.0-SNAPSHOT"), //
+                        .version(COMPONENTS_VERSION), //
                 mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("tests")
-                        .version("0.5.0-SNAPSHOT").noStart(),
+                        .version(COMPONENTS_VERSION).noStart(),
                 mavenBundle().groupId("org.talend.components").artifactId("components-common").classifier("bundle")
-                        .version("0.5.0-SNAPSHOT"),
+                        .version(COMPONENTS_VERSION),
                 mavenBundle().groupId("org.talend.components").artifactId("components-common").classifier("tests")
-                        .version("0.5.0-SNAPSHOT").noStart(),
-                mavenBundle().groupId("org.talend.components").artifactId("components-common-oauth").classifier("bundle"),
-                mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("bundle"),
-                mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("tests").noStart(),
+                        .version(COMPONENTS_VERSION).noStart(),
+                mavenBundle().groupId("org.talend.components").artifactId("components-common-oauth").classifier("bundle")
+                        .version(COMPONENTS_VERSION),
+                mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("bundle")
+                        .version(COMPONENTS_VERSION),
+                mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("tests")
+                        .version(COMPONENTS_VERSION).noStart(),
                 mavenBundle("org.apache.servicemix.bundles", "org.apache.servicemix.bundles.hamcrest", "1.3_1"), //
                 // this is copied from junitBundles() to remove the default pax-exam hamcrest bundle that does
                 // not contains all the nice hamcrest Matchers
