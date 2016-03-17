@@ -30,11 +30,11 @@ public class RuntimeHelperTest {
 
         Schema resolved = RuntimeHelper.resolveSchema(null, new SourceOrSink() {
             @Override
-            public void initialize(RuntimeContainer adaptor, ComponentProperties properties) {
+            public void initialize(RuntimeContainer container, ComponentProperties properties) {
             }
 
             @Override
-            public ValidationResult validate(RuntimeContainer adaptor) {
+            public ValidationResult validate(RuntimeContainer container) {
                 return null;
             }
 
@@ -44,17 +44,17 @@ public class RuntimeHelperTest {
             }
 
             @Override
-            public Schema getSchema(RuntimeContainer adaptor, String schemaName) throws IOException {
+            public Schema getSchema(RuntimeContainer container, String schemaName) throws IOException {
                 return null;
             }
 
             @Override
-            public Schema getSchemaFromProperties(RuntimeContainer adaptor) throws IOException {
+            public Schema getSchemaFromProperties(RuntimeContainer container) throws IOException {
                 return null;
             }
 
             @Override
-            public Schema getPossibleSchemaFromProperties(RuntimeContainer adaptor) throws IOException {
+            public Schema getPossibleSchemaFromProperties(RuntimeContainer container) throws IOException {
                 Schema runtimeSchema = SchemaBuilder.record("design").fields()
                         .name("f1").type().stringType().noDefault()
                         .name("r1").type().stringType().noDefault()

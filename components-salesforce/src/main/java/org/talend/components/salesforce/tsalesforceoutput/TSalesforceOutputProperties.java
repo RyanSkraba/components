@@ -144,7 +144,7 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
         mainForm.addRow(outputAction);
         mainForm.addColumn(upsertKeyColumn);
 
-        Form advancedForm = new Form(this, Form.ADVANCED);
+        Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(extendInsert);
         advancedForm.addRow(ceaseForError);
         advancedForm.addRow(ignoreNull);

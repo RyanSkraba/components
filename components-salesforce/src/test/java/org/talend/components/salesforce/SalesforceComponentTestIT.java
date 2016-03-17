@@ -12,8 +12,14 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,12 +33,15 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.common.oauth.OauthProperties;
+import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
@@ -183,8 +192,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         }
         assertEquals(1, count);
         assertEquals("Create SalesforceNew Connection", wizardDef.getMenuItemName());
-        ComponentWizard wiz = getComponentService().getComponentWizard(
-                SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, "nodeSalesforce");
+        ComponentWizard wiz = getComponentService().getComponentWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
+                "nodeSalesforce");
         assertNotNull(wiz);
         assertEquals("nodeSalesforce", wiz.getRepositoryLocation());
         SalesforceConnectionWizard swiz = (SalesforceConnectionWizard) wiz;
@@ -202,8 +211,9 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connFormWizard.getProperties();
 
         Form af = connProps.getForm(Form.ADVANCED);
-        assertTrue(((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() + " should be == to "
-                + af, ((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() == af);
+        assertTrue(
+                ((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() + " should be == to " + af,
+                ((PresentationItem) connFormWizard.getWidget("advanced").getContent()).getFormtoShow() == af);
 
         Object image = getComponentService().getWizardPngImage(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
                 WizardImageType.TREE_ICON_16X16);
@@ -224,8 +234,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         // check name i18n
         NamedThing nameProp = connFormWizard.getWidget("name").getContent(); //$NON-NLS-1$
         assertEquals("Name", nameProp.getDisplayName());
-        connProps = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(),
-                connFormWizard, "testConnection", connProps);
+        connProps = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), connFormWizard,
+                "testConnection", connProps);
         assertTrue(connFormWizard.isAllowForward());
 
         Form modForm = forms.get(1);
@@ -276,14 +286,14 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
     @Test
     public void testModuleWizard() throws Throwable {
-        ComponentWizard wiz = getComponentService().getComponentWizard(
-                SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, "nodeSalesforce");
+        ComponentWizard wiz = getComponentService().getComponentWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
+                "nodeSalesforce");
         List<Form> forms = wiz.getForms();
         Form connFormWizard = forms.get(0);
         SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) connFormWizard.getProperties();
 
-        ComponentWizard[] subWizards = getComponentService().getComponentWizardsForProperties(connProps, "location").toArray(
-                new ComponentWizard[3]);
+        ComponentWizard[] subWizards = getComponentService().getComponentWizardsForProperties(connProps, "location")
+                .toArray(new ComponentWizard[3]);
         Arrays.sort(subWizards, new Comparator<ComponentWizard>() {
 
             @Override
@@ -362,8 +372,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
     private SalesforceConnectionProperties setupOAuthProps(SalesforceConnectionProperties props) throws Throwable {
         if (props == null) {
-            props = (SalesforceConnectionProperties) getComponentService().getComponentProperties(
-                    TSalesforceConnectionDefinition.COMPONENT_NAME);
+            props = (SalesforceConnectionProperties) getComponentService()
+                    .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
         }
         props.loginType.setValue(SalesforceConnectionProperties.LOGIN_OAUTH);
         Form mainForm = props.getForm(Form.MAIN);
@@ -401,12 +411,12 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
     @Test
     public void testModuleNames() throws Throwable {
-        TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService().getComponentProperties(
-                TSalesforceInputDefinition.COMPONENT_NAME);
+        TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
+                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection, !ADD_QUOTES);
         ComponentTestUtils.checkSerialize(props, errorCollector);
 
-        assertEquals(2, props.getForms().size());
+        assertEquals(3, props.getForms().size());
         Form f = props.module.getForm(Form.REFERENCE);
         assertTrue(f.getWidget("moduleName").isCallBeforeActivate());
         // The Form is bound to a Properties object that created it. The Forms might not always be associated with the
@@ -423,8 +433,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
     @Test
     public void testSchema() throws Throwable {
-        TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService().getComponentProperties(
-                TSalesforceInputDefinition.COMPONENT_NAME);
+        TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
+                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection, !ADD_QUOTES);
 
         Form f = props.module.getForm(Form.REFERENCE);
@@ -445,8 +455,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
     @Test
     public void testOutputActionType() throws Throwable {
         ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
-        TSalesforceOutputProperties outputProps = (TSalesforceOutputProperties) getComponentService().getComponentProperties(
-                TSalesforceOutputDefinition.COMPONENT_NAME);
+        TSalesforceOutputProperties outputProps = (TSalesforceOutputProperties) getComponentService()
+                .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
         setupProps(outputProps.connection, !ADD_QUOTES);
 
         outputProps.outputAction.setValue(TSalesforceOutputProperties.ACTION_DELETE);
@@ -464,104 +474,77 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         }
     }
 
-    // @Test
-    // public void testInputConnectionRef() throws Throwable {
-    // ComponentDefinition definition =
-    // getComponentService().getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
-    // TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
-    // .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
-    // setupProps(props.connection, !ADD_QUOTES);
-    // SalesforceRuntime runtime = createRuntime(definition);
-    // runtime.setComponentService(getComponentService());
-    // runtime.connect(props.connection);
-    //
-    // // Referenced properties simulating salesforce connect component
-    // SalesforceConnectionProperties cProps = (SalesforceConnectionProperties) getComponentService()
-    // .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
-    // setupProps(cProps, !ADD_QUOTES);
-    // cProps.userPassword.password.setValue("xxx");
-    //
-    // String compId = "comp1";
-    //
-    // TestRepository repo = new TestRepository(null);
-    // repo.properties = cProps;
-    // repo.componentIdToCheck = compId;
-    // getComponentService().setRepository(repo);
-    //
-    // // Use the connection props of the salesforce connect component
-    // props.connection.referencedComponentId.setValue(compId);
-    // checkAndAfter(props.connection.getForm(Form.REFERENCE), "referencedComponentId", props.connection);
-    // try {
-    // runtime.connect(props.connection);
-    // fail("Expected exception");
-    // } catch (Exception ex) {
-    // System.out.println("Got expected: " + ex.getMessage());
-    // }
-    //
-    // // Back to using the connection props of the salesforce input component
-    // props.connection.referencedComponentId.setValue(null);
-    // runtime.connect(props.connection);
-    // }
-    //
-    // @Test
-    // public void testUseExistConnection() throws Throwable {
-    // // Connection component create a connection instance and shared in glbalMap
-    // ComponentDefinition connDefinition = getComponentService()
-    // .getComponentDefinition(TSalesforceConnectionDefinition.COMPONENT_NAME);
-    // SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) getComponentService()
-    // .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
-    // setupProps(connProps, !ADD_QUOTES);
-    // SalesforceRuntime connRuntime = createRuntime(connDefinition);
-    // final Map<String, Object> globalMap = new HashMap<String, Object>();
-    // final String currentComponentName = TSalesforceConnectionDefinition.COMPONENT_NAME + "_1";
-    // ComponentRuntimeContainer connContainer = new TestRuntimeContainer() {
-    //
-    // @Override
-    // public java.util.Map<String, Object> getGlobalMap() {
-    // return globalMap;
-    // }
-    //
-    // @Override
-    // public String getCurrentComponentName() {
-    // return currentComponentName;
-    // }
-    // };
-    // connRuntime.setContainer(connContainer);
-    // connRuntime.setComponentService(getComponentService());
-    // connProps.referencedComponentId.setValue(null);
-    // connRuntime.inputBegin(connProps);
-    // assertNotNull(connRuntime.connection);
-    // // Input component get connection instance from globalMap
-    // ComponentDefinition inputDefinition = getComponentService()
-    // .getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
-    // TSalesforceInputProperties inProps = (TSalesforceInputProperties) getComponentService()
-    // .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
-    // inProps.connection.referencedComponentId.setValue(currentComponentName);
-    // setupProps(inProps.connection, !ADD_QUOTES);
-    // SalesforceRuntime inputRuntime = createRuntime(inputDefinition);
-    // ComponentRuntimeContainer inputContainer = new TestRuntimeContainer() {
-    //
-    // @Override
-    // public java.util.Map<String, Object> getGlobalMap() {
-    // return globalMap;
-    // }
-    //
-    // @Override
-    // public String getCurrentComponentName() {
-    // return "tSalesforceInputNew_1";
-    // }
-    // };
-    // inputRuntime.setContainer(inputContainer);
-    // inputRuntime.setComponentService(getComponentService());
-    // try {
-    // inputRuntime.connect(inProps.connection);
-    // assertNotNull(inputRuntime.connection);
-    // assertEquals(connRuntime.connection, inputRuntime.connection);
-    // } catch (Exception ex) {
-    // fail("Get shared connection failed.");
-    // System.out.println("Exception: " + ex.getMessage());
-    // }
-    // }
+    @Test
+    public void testInputConnectionRef() throws Throwable {
+        ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
+        TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
+                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
+        setupProps(props.connection, !ADD_QUOTES);
+
+        SalesforceSourceOrSink salesforceSourceOrSink = new SalesforceSourceOrSink();
+        salesforceSourceOrSink.initialize(null, props);
+        assertEquals(ValidationResult.Result.OK, salesforceSourceOrSink.validate(null).getStatus());
+
+        // Referenced properties simulating salesforce connect component
+        SalesforceConnectionProperties cProps = (SalesforceConnectionProperties) getComponentService()
+                .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
+        setupProps(cProps, !ADD_QUOTES);
+        cProps.userPassword.password.setValue("xxx");
+
+        String compId = "comp1";
+        // Use the connection props of the salesforce connect component
+        props.connection.referencedComponent.referenceType
+                .setValue(ComponentReferenceProperties.ReferenceType.COMPONENT_INSTANCE);
+        props.connection.referencedComponent.componentInstanceId.setValue(compId);
+        props.connection.referencedComponent.componentProperties = cProps;
+        checkAndAfter(props.connection.getForm(Form.REFERENCE), "referencedComponent", props.connection);
+
+        salesforceSourceOrSink = new SalesforceSourceOrSink();
+        salesforceSourceOrSink.initialize(null, props);
+        salesforceSourceOrSink.validate(null);
+        assertEquals(ValidationResult.Result.ERROR, salesforceSourceOrSink.validate(null).getStatus());
+
+        // Back to using the connection props of the salesforce input component
+        props.connection.referencedComponent.referenceType.setValue(ComponentReferenceProperties.ReferenceType.THIS_COMPONENT);
+        props.connection.referencedComponent.componentInstanceId.setValue(null);
+        props.connection.referencedComponent.componentProperties = null;
+
+        salesforceSourceOrSink = new SalesforceSourceOrSink();
+        salesforceSourceOrSink.initialize(null, props);
+        salesforceSourceOrSink.validate(null);
+        assertEquals(ValidationResult.Result.OK, salesforceSourceOrSink.validate(null).getStatus());
+    }
+
+    @Test
+    public void testUseExistingConnection() throws Throwable {
+        SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) getComponentService()
+                .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
+        setupProps(connProps, !ADD_QUOTES);
+
+        final String currentComponentName = TSalesforceConnectionDefinition.COMPONENT_NAME + "_1";
+        RuntimeContainer connContainer = new DefaultComponentRuntimeContainerImpl() {
+
+            @Override
+            public String getCurrentComponentId() {
+                return currentComponentName;
+            }
+        };
+
+        SalesforceSourceOrSink salesforceSourceOrSink = new SalesforceSourceOrSink();
+        salesforceSourceOrSink.initialize(connContainer, connProps);
+        assertEquals(ValidationResult.Result.OK, salesforceSourceOrSink.validate(connContainer).getStatus());
+
+        // Input component get connection from the tSalesforceConnection
+        ComponentDefinition inputDefinition = getComponentService()
+                .getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
+        TSalesforceInputProperties inProps = (TSalesforceInputProperties) getComponentService()
+                .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
+        inProps.connection.referencedComponent.componentInstanceId.setValue(currentComponentName);
+
+        SalesforceSourceOrSink salesforceInputSourceOrSink = new SalesforceSourceOrSink();
+        salesforceInputSourceOrSink.initialize(connContainer, inProps);
+        assertEquals(ValidationResult.Result.OK, salesforceInputSourceOrSink.validate(connContainer).getStatus());
+    }
 
     @Test
     public void generateJavaNestedCompPropClassNames() {

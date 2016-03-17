@@ -12,17 +12,28 @@
 // ============================================================================
 package org.talend.components.api.container;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import org.apache.avro.Schema;
 
 /**
  * An implementation of a runtime container for testing purposes.
  */
 public class DefaultComponentRuntimeContainerImpl implements RuntimeContainer {
 
+    private Map<String, Object> map = new HashMap();
+
+    @Override
+    public Object getComponentData(String componentId, String key) {
+        return map.get(componentId + key);
+    }
+
+    @Override
+    public void setComponentData(String componentId, String key, Object data) {
+        map.put(componentId + key, data);
+    }
+
+    @Override
+    public String getCurrentComponentId() {
+        return null;
+    }
 }

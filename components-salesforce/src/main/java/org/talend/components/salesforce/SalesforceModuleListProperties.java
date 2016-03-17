@@ -70,7 +70,7 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
     }
 
     public void beforeFormPresentMain() throws Exception {
-        moduleNames = SalesforceSourceOrSink.getSchemaNames(this);
+        moduleNames = SalesforceSourceOrSink.getSchemaNames(null, this);
         moduleName.setPossibleValues(moduleNames);
         getForm(Form.MAIN).setAllowBack(true);
         getForm(Form.MAIN).setAllowFinish(true);
@@ -91,7 +91,7 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
             SalesforceModuleProperties modProps = new SalesforceModuleProperties(nl.getName());
             modProps.connection = connectionProps;
             modProps.init();
-            Schema schema = SalesforceSourceOrSink.getSchema(this, nl.getName());
+            Schema schema = SalesforceSourceOrSink.getSchema(null, this, nl.getName());
             modProps.moduleName.setValue(nl.getName());
             modProps.schema.schema.setValue(schema);
             repo.storeProperties(modProps, nl.getName(), connRepLocation, "schema.schema");
