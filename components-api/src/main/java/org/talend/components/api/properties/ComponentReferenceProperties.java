@@ -12,9 +12,11 @@
 // ============================================================================
 package org.talend.components.api.properties;
 
+import static org.talend.daikon.properties.Property.Flags.DESIGN_TIME_ONLY;
 import static org.talend.daikon.properties.PropertyFactory.newProperty;
 
 import java.lang.reflect.Field;
+import java.util.EnumSet;
 
 import org.talend.daikon.properties.Property;
 
@@ -41,7 +43,7 @@ public class ComponentReferenceProperties extends ComponentProperties {
     //
     public Property referenceType = (Property) newProperty("referenceType").setEnumClass(ReferenceType.class); //$NON-NLS-1$
 
-    public Property componentType = newProperty("componentType"); //$NON-NLS-1$
+    public Property componentType = newProperty("componentType").setFlags(EnumSet.of(DESIGN_TIME_ONLY)); //$NON-NLS-1$
 
     public Property componentInstanceId = newProperty("componentInstanceId"); //$NON-NLS-1$
 

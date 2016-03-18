@@ -165,7 +165,6 @@ public class SalesforceConnectionProperties extends ComponentProperties
                     form.getWidget(OAUTH).setVisible(true);
                     form.getWidget(USERPASSWORD).setVisible(false);
                 } else if (LOGIN_BASIC.equals(loginType.getValue())) {
-                    ;
                     form.getWidget(OAUTH).setVisible(false);
                     form.getWidget(USERPASSWORD).setVisible(true);
                 } else {
@@ -174,7 +173,6 @@ public class SalesforceConnectionProperties extends ComponentProperties
             }
         }
 
-        getForm(Form.REFERENCE).getWidget(ComponentReferenceProperties.class).setVisible(!useOtherConnection);
         if (form.getName().equals(Form.ADVANCED)) {
             form.setVisible(!useOtherConnection);
         }
