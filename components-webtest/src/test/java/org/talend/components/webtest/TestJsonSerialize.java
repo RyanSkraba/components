@@ -42,10 +42,6 @@ public class TestJsonSerialize {
         TSalesforceInputProperties tsip = (TSalesforceInputProperties) new TSalesforceInputProperties(null).init();
         tsip.connection.loginType.setValue(SalesforceConnectionProperties.LOGIN_BASIC);
         tsip.connection.userPassword.userId.setValue("foooo");
-        StringWriter jsonJacksonStringWriter = new StringWriter();
-        JsonGenerator jacksonGenerator = jacksonBuilder.build().getFactory().createGenerator(jsonJacksonStringWriter);
-        jacksonGenerator.writeObject(tsip);
-        System.out.println("jackson:" + FileUtils.byteCountToDisplaySize(jsonJacksonStringWriter.toString().getBytes().length));
         // jsonio
         String jsonioString = tsip.toSerialized();
         System.out.println("jsonio:" + FileUtils.byteCountToDisplaySize(jsonioString.getBytes().length));
