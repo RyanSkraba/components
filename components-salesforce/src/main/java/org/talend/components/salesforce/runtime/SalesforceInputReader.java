@@ -15,15 +15,18 @@ package org.talend.components.salesforce.runtime;
 import com.sforce.soap.partner.QueryResult;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
+import com.sforce.ws.bind.XmlObject;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.component.runtime.RuntimeHelper;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
@@ -53,7 +56,27 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
     private Schema getSchema() throws IOException {
         if (null == querySchema) {
             querySchema = new Schema.Parser().parse(properties.module.schema.schema.getStringValue());
-            querySchema = RuntimeHelper.resolveSchema(adaptor, getCurrentSource(), querySchema);
+            if (querySchema.getFields().isEmpty()) {
+                querySchema = getCurrentSource().getSchema(adaptor, properties.module.moduleName.getStringValue());
+                if (properties.manualQuery.getBooleanValue()) {
+                    SObject currentSObject = getCurrentSObject();
+                    Iterator<XmlObject> children = currentSObject.getChildren();
+                    List<String> columnsName = new ArrayList<>();
+                    while (children.hasNext()) {
+                        columnsName.add(children.next().getName().getLocalPart());
+                    }
+
+                    List<Schema.Field> copyFieldList = new ArrayList<>();
+                    for (Schema.Field se : querySchema.getFields()) {
+                        if (columnsName.contains(se.name())) {
+                            copyFieldList.add(new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal()));
+                        }
+                    }
+                    querySchema = Schema.createRecord(querySchema.getName(), querySchema.getDoc(), querySchema.getNamespace(),
+                            false);
+                    querySchema.setFields(copyFieldList);
+                }
+            }
         }
         return querySchema;
     }

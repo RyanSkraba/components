@@ -18,7 +18,6 @@ import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
-import org.talend.components.api.component.runtime.RuntimeHelper;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
@@ -85,8 +84,12 @@ final class SalesforceWriter implements Writer<WriterResult> {
     public void open(String uId) throws IOException {
         this.uId = uId;
         connection = sink.connect();
-        schema = RuntimeHelper.resolveSchema(adaptor, sink,
-                new Schema.Parser().parse(sprops.module.schema.schema.getStringValue()));
+        if (null == schema) {
+            schema = new Schema.Parser().parse(sprops.module.schema.schema.getStringValue());
+            if (schema.getFields().isEmpty()) {
+                schema = getWriteOperation().getSink().getSchema(adaptor, sprops.module.moduleName.getStringValue());
+            }
+        }
         upsertKeyColumn = sprops.upsertKeyColumn.getStringValue();
     }
 

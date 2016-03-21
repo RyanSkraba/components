@@ -32,22 +32,4 @@ public interface SourceOrSink extends Serializable {
      */
     public Schema getSchema(RuntimeContainer adaptor, String schemaName) throws IOException;
 
-    /**
-     * Return design schema
-     *
-     * @param adaptor
-     * @return
-     * @throws IOException
-     */
-    public Schema getSchemaFromProperties(RuntimeContainer adaptor) throws IOException;
-
-    /**
-     * Return possible schema
-     *
-     * @param adaptor
-     * @return
-     * @throws IOException
-     */
-    public Schema getPossibleSchemaFromProperties(RuntimeContainer adaptor) throws IOException;
-
 }

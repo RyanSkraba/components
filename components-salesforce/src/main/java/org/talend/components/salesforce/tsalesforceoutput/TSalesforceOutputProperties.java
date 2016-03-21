@@ -12,15 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
-import static org.talend.daikon.properties.presentation.Widget.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.properties.ComponentPropertyFactory;
+import org.talend.components.api.properties.HasSchemaProperty;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceModuleProperties;
@@ -30,7 +25,14 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 
-public class TSalesforceOutputProperties extends SalesforceConnectionModuleProperties {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.widget;
+
+public class TSalesforceOutputProperties extends SalesforceConnectionModuleProperties implements HasSchemaProperty {
 
     public static final String ACTION_INSERT = "INSERT";
 
@@ -186,6 +188,16 @@ public class TSalesforceOutputProperties extends SalesforceConnectionModulePrope
             }
         }
 
+    }
+
+    @Override
+    public List<Schema> getSchemas() {
+        return Arrays.asList(new Schema[]{new Schema.Parser().parse(module.schema.schema.getStringValue())});
+    }
+
+    @Override
+    public void setSchemas(List<Schema> schemas) {
+        module.schema.schema.setValue(schemas.get(0));
     }
 
 }
