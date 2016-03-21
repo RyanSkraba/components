@@ -101,7 +101,7 @@ public abstract class UnshardedInputSource<T> implements BoundedSource {
      * By default, no validation is performed.
      */
     @Override
-    public ValidationResult validate(RuntimeContainer adaptor) {
+    public ValidationResult validate(RuntimeContainer container) {
         return new ValidationResult();
     }
 
@@ -117,7 +117,7 @@ public abstract class UnshardedInputSource<T> implements BoundedSource {
      * By default, no schemas can be fetched.
      */
     @Override
-    public Schema getSchema(RuntimeContainer adaptor, String schemaName) throws IOException {
+    public Schema getSchema(RuntimeContainer container, String schemaName) throws IOException {
         return null;
     }
 

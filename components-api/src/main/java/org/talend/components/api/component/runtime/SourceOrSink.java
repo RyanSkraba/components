@@ -15,12 +15,12 @@ public interface SourceOrSink extends Serializable {
     /**
      * Initialize based on the specified properties.
      */
-    public void initialize(RuntimeContainer adaptor, ComponentProperties properties);
+    public void initialize(RuntimeContainer container, ComponentProperties properties);
 
     /**
      * Checks that this source is valid, before it can be used in a pipeline.
      */
-    public ValidationResult validate(RuntimeContainer adaptor);
+    public ValidationResult validate(RuntimeContainer container);
 
     /**
      * Get the list of schema names available for this {@code Source}.
@@ -30,6 +30,6 @@ public interface SourceOrSink extends Serializable {
     /**
      * Return the schema associated with the specified schema name for this {@code Source}
      */
-    public Schema getSchema(RuntimeContainer adaptor, String schemaName) throws IOException;
+    public Schema getSchema(RuntimeContainer container, String schemaName) throws IOException;
 
 }

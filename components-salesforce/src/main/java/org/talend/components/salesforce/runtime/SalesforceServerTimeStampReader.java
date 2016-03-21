@@ -27,14 +27,14 @@ public class SalesforceServerTimeStampReader extends AbstractBoundedReader<Calen
 
     private transient Calendar result;
 
-    public SalesforceServerTimeStampReader(RuntimeContainer adaptor, SalesforceSource source,
+    public SalesforceServerTimeStampReader(RuntimeContainer container, SalesforceSource source,
             TSalesforceGetServerTimestampProperties props) {
-        super(source);
+        super(container, source);
     }
 
     @Override
     public boolean start() throws IOException {
-        PartnerConnection connection = ((SalesforceSource) getCurrentSource()).connect();
+        PartnerConnection connection = ((SalesforceSource) getCurrentSource()).connect(container);
         try {
             result = connection.getServerTimestamp().getTimestamp();
             return result != null;

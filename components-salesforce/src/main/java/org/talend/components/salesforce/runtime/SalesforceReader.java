@@ -17,18 +17,20 @@ import java.io.IOException;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 
 import com.sforce.soap.partner.PartnerConnection;
+import org.talend.components.api.container.RuntimeContainer;
 
 public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
 
     private transient PartnerConnection connection;
 
-    public SalesforceReader(SalesforceSource source) {
-        super(source);
+
+    public SalesforceReader(RuntimeContainer container, SalesforceSource source) {
+        super(container, source);
     }
 
     protected PartnerConnection getConnection() throws IOException {
         if (connection == null) {
-            connection = ((SalesforceSource) getCurrentSource()).connect();
+            connection = ((SalesforceSource) getCurrentSource()).connect(container);
         }
         return connection;
     }

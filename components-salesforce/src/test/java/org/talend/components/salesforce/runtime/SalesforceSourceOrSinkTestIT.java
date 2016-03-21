@@ -39,7 +39,7 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
 
     @Test
     public void testValidate() {
-        // check validate is OK with proper creadentials
+        // check validate is OK with proper credentials
         SalesforceConnectionProperties props = setupProps(null, !ADD_QUOTES);
         SalesforceSourceOrSink salesforceSourceOrSink = new SalesforceSourceOrSink();
         salesforceSourceOrSink.initialize(null, props);
@@ -66,14 +66,14 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
     @Test
     public void testGetSchemaNames() throws IOException {
         SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
-        List<NamedThing> schemaNames = SalesforceSourceOrSink.getSchemaNames(scp);
+        List<NamedThing> schemaNames = SalesforceSourceOrSink.getSchemaNames(null, scp);
         assertTrue(schemaNames.size() > 50);
     }
 
     @Test
     public void testGetSchema() throws IOException {
         SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
-        Schema schema = SalesforceSourceOrSink.getSchema(scp, EXISTING_MODULE_NAME);
+        Schema schema = SalesforceSourceOrSink.getSchema(null, scp, EXISTING_MODULE_NAME);
         assertNotNull(schema);
         assertThat(schema.getFields(), hasSize(greaterThan(10)));
         // assertTrue(schema.getRoot().getChildren().size() > 10);
@@ -83,7 +83,7 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
     public void testGetSchemaFail() throws IOException {
         SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
         try {
-            Schema schema = SalesforceSourceOrSink.getSchema(scp, "module that does not exist");
+            Schema schema = SalesforceSourceOrSink.getSchema(null, scp, "module that does not exist");
             fail("Should have throw an exception when not finding the module");
         } catch (IOException ce) {
             assertTrue(ce.getMessage().contains("does not exist"));

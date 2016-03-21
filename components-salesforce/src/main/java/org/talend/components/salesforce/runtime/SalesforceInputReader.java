@@ -33,8 +33,6 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
 
     private static final Logger LOG = LoggerFactory.getLogger(SalesforceInputReader.class);
 
-    protected RuntimeContainer adaptor;
-
     protected TSalesforceInputProperties properties;
 
     private transient QueryResult inputResult;
@@ -47,17 +45,16 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
 
     private transient SObjectAdapterFactory factory;
 
-    public SalesforceInputReader(RuntimeContainer adaptor, SalesforceSource source, TSalesforceInputProperties props) {
-        super(source);
+    public SalesforceInputReader(RuntimeContainer container, SalesforceSource source, TSalesforceInputProperties props) {
+        super(container, source);
         properties = props;
-        this.adaptor = adaptor;
     }
 
     private Schema getSchema() throws IOException {
         if (null == querySchema) {
             querySchema = new Schema.Parser().parse(properties.module.schema.schema.getStringValue());
             if (querySchema.getFields().isEmpty()) {
-                querySchema = getCurrentSource().getSchema(adaptor, properties.module.moduleName.getStringValue());
+                querySchema = getCurrentSource().getSchema(container, properties.module.moduleName.getStringValue());
                 if (properties.manualQuery.getBooleanValue()) {
                     SObject currentSObject = getCurrentSObject();
                     Iterator<XmlObject> children = currentSObject.getChildren();

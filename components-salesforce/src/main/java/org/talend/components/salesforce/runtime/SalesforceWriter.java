@@ -41,7 +41,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
 
     private SalesforceSink sink;
 
-    private RuntimeContainer adaptor;
+    private RuntimeContainer container;
 
     private TSalesforceOutputProperties sprops;
 
@@ -65,9 +65,9 @@ final class SalesforceWriter implements Writer<WriterResult> {
 
     private transient Schema schema;
 
-    public SalesforceWriter(SalesforceWriteOperation salesforceWriteOperation, RuntimeContainer adaptor) {
+    public SalesforceWriter(SalesforceWriteOperation salesforceWriteOperation, RuntimeContainer container) {
         this.salesforceWriteOperation = salesforceWriteOperation;
-        this.adaptor = adaptor;
+        this.container = container;
         sink = (SalesforceSink) salesforceWriteOperation.getSink();
         sprops = sink.getSalesforceOutputProperties();
         commitLevel = 1;
@@ -83,6 +83,9 @@ final class SalesforceWriter implements Writer<WriterResult> {
     @Override
     public void open(String uId) throws IOException {
         this.uId = uId;
+        connection = sink.connect(container);
+        schema = RuntimeHelper.resolveSchema(container, sink,
+                new Schema.Parser().parse(sprops.module.schema.schema.getStringValue()));
         connection = sink.connect();
         if (null == schema) {
             schema = new Schema.Parser().parse(sprops.module.schema.schema.getStringValue());
@@ -163,7 +166,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
                 break;
             // case DATE:
             // case DATETIME:
-            // valueToAdd = adaptor.formatDate((Date) value, se.getPattern());
+            // valueToAdd = container.formatDate((Date) value, se.getPattern());
             // break;
             default:
                 valueToAdd = value;
