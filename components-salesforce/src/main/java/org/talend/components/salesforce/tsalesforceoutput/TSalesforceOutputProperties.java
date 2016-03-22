@@ -47,8 +47,8 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
     @Override
     public void setupProperties() {
         super.setupProperties();
-        commitLevel.setDefaultValue("200");
-        ceaseForError.setDefaultValue("true");
+        commitLevel.setDefaultValue(200);
+        ceaseForError.setDefaultValue(true);
     }
 
     @Override

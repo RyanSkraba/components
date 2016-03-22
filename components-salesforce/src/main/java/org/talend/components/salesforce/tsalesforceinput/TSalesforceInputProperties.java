@@ -57,7 +57,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         returns = ComponentPropertyFactory.newReturnsProperty();
         ComponentPropertyFactory.newReturnProperty(returns, Type.INT, "NB_LINE");
 
-        batchSize.setDefaultValue("250");
+        batchSize.setDefaultValue(250);
         queryMode.setDefaultValue(QUERY_QUERY);
         normalizeDelimiter.setDefaultValue(";");
         columnNameDelimiter.setDefaultValue("_");

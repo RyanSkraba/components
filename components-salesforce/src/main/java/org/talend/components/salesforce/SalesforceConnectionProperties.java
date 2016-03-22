@@ -100,7 +100,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
         loginType.setValue(LOGIN_BASIC);
         endpoint.setDefaultValue(URL);
-        timeout.setDefaultValue("60000");
+        timeout.setDefaultValue(60000);
 
     }
 

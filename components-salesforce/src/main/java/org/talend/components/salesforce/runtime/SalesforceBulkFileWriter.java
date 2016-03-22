@@ -97,7 +97,7 @@ final class SalesforceBulkFileWriter implements Writer<WriterResult> {
 
         schema = new Schema.Parser().parse(sprops.schema.schema.getStringValue());
 
-        File file = new File(sprops.fileName.getStringValue());
+        File file = new File(sprops.bulkFilePath.getStringValue());
         this.rawWriter = new BufferedWriter(new OutputStreamWriter(
                 new java.io.FileOutputStream(file, sprops.append.getBooleanValue()), "UTF-8"));
         this.pw = new PrintWriter(this.rawWriter);

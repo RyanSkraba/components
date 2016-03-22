@@ -27,7 +27,7 @@ import org.talend.daikon.properties.presentation.Widget;
 
 public class TSalesforceOutputBulkProperties extends ComponentProperties {
 
-    public Property fileName = newProperty("fileName"); //$NON-NLS-1$
+    public Property bulkFilePath = newProperty("bulkFilePath"); //$NON-NLS-1$
 
     public Property append = newProperty(Type.BOOLEAN, "append"); //$NON-NLS-1$
 
@@ -57,7 +57,7 @@ public class TSalesforceOutputBulkProperties extends ComponentProperties {
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(schema.getForm(Form.REFERENCE));
-        mainForm.addRow(fileName);
+        mainForm.addRow(bulkFilePath);
         mainForm.addRow(append);
         mainForm.addRow(ignoreNull);
 

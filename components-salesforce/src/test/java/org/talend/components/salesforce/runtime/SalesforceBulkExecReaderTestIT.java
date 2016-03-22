@@ -65,7 +65,7 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
 
         // Execute the bulk action
         TSalesforceBulkExecProperties bulkExecProperties = createAccountSalesforceBulkExecProperties();
-        bulkExecProperties.bulkFilePath.setValue(outputBulkProperties.fileName.getStringValue());
+        bulkExecProperties.bulkFilePath.setValue(outputBulkProperties.bulkFilePath.getStringValue());
 
         try {
             executeBulkInsert(bulkExecProperties,random,count*2);
@@ -126,7 +126,7 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
         TSalesforceOutputBulkProperties props = (TSalesforceOutputBulkProperties) new TSalesforceOutputBulkProperties("foo").init();
         String filePath = this.getClass().getResource("").getPath() + "/test_outputbulk_1.csv";
         System.out.println("Bulk file path: "+filePath);
-        props.fileName.setValue(filePath);
+        props.bulkFilePath.setValue(filePath);
         props.schema.schema.setValue(getMakeRowSchema(false));
 
         ComponentTestUtils.checkSerialize(props, errorCollector);
@@ -155,7 +155,7 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
     }
 
     protected static void delete(TSalesforceOutputBulkProperties outputBulkProperties) {
-        File file = new File(outputBulkProperties.fileName.getStringValue());
+        File file = new File(outputBulkProperties.bulkFilePath.getStringValue());
 
         assertTrue(file.exists());
         assertTrue(file.delete());
