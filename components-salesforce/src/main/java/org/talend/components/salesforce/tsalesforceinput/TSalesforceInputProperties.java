@@ -13,20 +13,15 @@
 package org.talend.components.salesforce.tsalesforceinput;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.avro.Schema;
 import org.talend.components.api.properties.ComponentPropertyFactory;
-import org.talend.components.api.properties.HasSchemaProperty;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.Property.Type;
 import org.talend.daikon.properties.presentation.Form;
 
-import java.util.Arrays;
-import java.util.List;
-
 import static org.talend.daikon.properties.PropertyFactory.newProperty;
 
-public class TSalesforceInputProperties extends SalesforceConnectionModuleProperties implements HasSchemaProperty {
+public class TSalesforceInputProperties extends SalesforceConnectionModuleProperties {
 
     public static final String QUERY_QUERY = "Query";
 
@@ -103,13 +98,4 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         }
     }
 
-    @Override
-    public List<Schema> getSchemas() {
-        return Arrays.asList(new Schema[]{new Schema.Parser().parse(module.schema.schema.getStringValue())});
-    }
-
-    @Override
-    public void setSchemas(List<Schema> schemas) {
-        module.schema.schema.setValue(schemas.get(0));
-    }
 }

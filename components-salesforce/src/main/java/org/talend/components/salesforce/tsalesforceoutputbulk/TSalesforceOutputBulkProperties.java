@@ -12,12 +12,11 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutputbulk;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
-import static org.talend.daikon.properties.presentation.Widget.*;
-
+import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector.ConnectorType;
 import org.talend.components.api.component.StudioConstants;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.HasSchemaProperty;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.Property;
@@ -25,7 +24,13 @@ import org.talend.daikon.properties.Property.Type;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 
-public class TSalesforceOutputBulkProperties extends ComponentProperties {
+import java.util.Arrays;
+import java.util.List;
+
+import static org.talend.daikon.properties.PropertyFactory.newProperty;
+import static org.talend.daikon.properties.presentation.Widget.widget;
+
+public class TSalesforceOutputBulkProperties extends ComponentProperties implements HasSchemaProperty {
 
     public Property fileName = newProperty("fileName"); //$NON-NLS-1$
 
@@ -64,6 +69,16 @@ public class TSalesforceOutputBulkProperties extends ComponentProperties {
         Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(widget(upsertRelation).setWidgetType(Widget.WidgetType.TABLE));
 
+    }
+
+    @Override
+    public List<Schema> getSchemas() {
+        return Arrays.asList(new Schema[]{new Schema.Parser().parse(schema.schema.getStringValue())});
+    }
+
+    @Override
+    public void setSchemas(List<Schema> schemas) {
+        schema.schema.setValue(schemas.get(0));
     }
 
 }
