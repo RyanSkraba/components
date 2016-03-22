@@ -56,7 +56,7 @@ public class SalesforceSink extends SalesforceSourceOrSink implements Sink {
      *
      * @return the properties
      */
-    public ComponentProperties getSalesforceOutputProperties() {
+    public ComponentProperties getComponentProperties() {
         return (ComponentProperties) properties;
     }
 

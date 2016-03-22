@@ -48,7 +48,7 @@ public final class SalesforceWriteOperation implements WriteOperation<WriterResu
 
     @Override
     public Writer<WriterResult> createWriter(RuntimeContainer adaptor) {
-        ComponentProperties componentProperties = ssink.getSalesforceOutputProperties();
+        ComponentProperties componentProperties = ssink.getComponentProperties();
         if(componentProperties instanceof TSalesforceOutputBulkProperties){
             return new SalesforceBulkFileWriter(this, adaptor);
         }else{

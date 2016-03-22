@@ -384,6 +384,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
     public <T> BoundedReader<T> createSalesforceInputReaderFromModule(String moduleName) {
         TSalesforceInputProperties tsip = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
         SalesforceConnectionProperties conProps = setupProps(tsip.connection, !ADD_QUOTES);
+        tsip.batchSize.setValue(200);
         tsip.module.moduleName.setValue(moduleName);
         return createBoundedReader(tsip);
     }

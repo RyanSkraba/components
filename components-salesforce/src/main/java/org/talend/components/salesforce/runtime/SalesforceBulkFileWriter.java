@@ -84,7 +84,7 @@ final class SalesforceBulkFileWriter implements Writer<WriterResult> {
         this.salesforceWriteOperation = salesforceWriteOperation;
         this.adaptor = adaptor;
         sink = (SalesforceSink) salesforceWriteOperation.getSink();
-        sprops = (TSalesforceOutputBulkProperties)(sink.getSalesforceOutputProperties());
+        sprops = (TSalesforceOutputBulkProperties)(sink.getComponentProperties());
 
     }
 

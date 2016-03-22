@@ -79,6 +79,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
     protected  TSalesforceInputProperties createTSalesforceInputProperties(boolean isBulkQury) throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
         props.connection.timeout.setValue(60000);
+        props.batchSize.setValue(100);
         if (isBulkQury) {
             props.queryMode.setValue(TSalesforceInputProperties.QUERY_BULK);
             props.connection.bulkConnection.setValue(true);
