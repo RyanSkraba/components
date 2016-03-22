@@ -49,6 +49,9 @@ public class SalesforceConnectionModuleProperties extends ComponentProperties im
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(connection.getForm(Form.REFERENCE));
         mainForm.addRow(module.getForm(Form.REFERENCE));
+
+        Form advancedForm = new Form(this, Form.ADVANCED);
+        advancedForm.addRow(connection.getForm(Form.ADVANCED));
     }
 
     @Override

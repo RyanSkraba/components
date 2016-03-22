@@ -1,5 +1,7 @@
 package org.talend.components.api.component.runtime;
 
+import org.talend.components.api.container.RuntimeContainer;
+
 import java.io.IOException;
 import java.time.Instant;
 import java.util.NoSuchElementException;
@@ -11,8 +13,11 @@ public abstract class AbstractBoundedReader<T> implements BoundedReader<T> {
 
     private final BoundedSource source;
 
-    protected AbstractBoundedReader(BoundedSource source) {
+    protected RuntimeContainer container;
+
+    protected AbstractBoundedReader(RuntimeContainer container, BoundedSource source) {
         this.source = source;
+        this.container = container;
     }
 
     @Override

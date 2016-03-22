@@ -5,12 +5,12 @@
     <parent>
         <artifactId>components-api</artifactId>
         <groupId>org.talend.components</groupId>
-        <version>0.4.0.BUILD-SNAPSHOT</version>
+        <version>0.5.0-SNAPSHOT</version>
         <relativePath>../components-api/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>components-adaptor-di</artifactId>
+    <artifactId>components-container-di</artifactId>
 
 
 </project>

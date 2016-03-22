@@ -27,9 +27,9 @@ public abstract class SalesforceGetDeletedUpdatedReader<ResultT, T> extends Sale
 
     protected transient ResultT result;
 
-    public SalesforceGetDeletedUpdatedReader(RuntimeContainer adaptor, SalesforceSource source,
+    public SalesforceGetDeletedUpdatedReader(RuntimeContainer container, SalesforceSource source,
             SalesforceGetDeletedUpdatedProperties props) {
-        super(source);
+        super(container, source);
         this.props = props;
         module = props.module.moduleName.getStringValue();
     }

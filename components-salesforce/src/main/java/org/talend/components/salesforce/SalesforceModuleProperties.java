@@ -68,7 +68,7 @@ public class SalesforceModuleProperties extends ComponentProperties implements S
 
     public ValidationResult beforeModuleName() throws Exception {
         try {
-            List<NamedThing> moduleNames = SalesforceSourceOrSink.getSchemaNames(connection);
+            List<NamedThing> moduleNames = SalesforceSourceOrSink.getSchemaNames(null, connection);
             moduleName.setPossibleValues(moduleNames);
         } catch (ComponentException ex) {
             return ex.getValidationResult();
@@ -78,7 +78,7 @@ public class SalesforceModuleProperties extends ComponentProperties implements S
 
     public ValidationResult afterModuleName() throws Exception {
         try {
-            schema.schema.setValue(SalesforceSourceOrSink.getSchema(connection, moduleName.getStringValue()));
+            schema.schema.setValue(SalesforceSourceOrSink.getSchema(null, connection, moduleName.getStringValue()));
         } catch (ComponentException ex) {
             return ex.getValidationResult();
         }

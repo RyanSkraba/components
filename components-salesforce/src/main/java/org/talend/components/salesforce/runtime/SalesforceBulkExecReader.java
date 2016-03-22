@@ -59,14 +59,14 @@ final class SalesforceBulkExecReader extends SalesforceReader {
     private Schema schema;
 
 
-    public SalesforceBulkExecReader(RuntimeContainer adaptor, SalesforceSource source, TSalesforceBulkExecProperties props) {
-        super( source);
+    public SalesforceBulkExecReader(RuntimeContainer container, SalesforceSource source, TSalesforceBulkExecProperties props) {
+        super(container, source);
         sprops = props;
     }
 
     protected BulkConnection getBulkConnection() throws IOException {
         if (bulkConnection == null) {
-            bulkConnection = ((SalesforceSource) getCurrentSource()).connect().bulkConnection;
+            bulkConnection = ((SalesforceSource) getCurrentSource()).connect(container).bulkConnection;
         }
         return bulkConnection;
     }

@@ -12,12 +12,12 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import com.sforce.async.AsyncApiException;
-import com.sforce.async.BulkConnection;
-import com.sforce.soap.partner.*;
-import com.sforce.ws.ConnectionException;
-import com.sforce.ws.ConnectorConfig;
-import com.sforce.ws.SessionRenewer;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import org.apache.avro.Schema;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -38,13 +38,19 @@ import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.ValidationResult;
 
-import javax.xml.namespace.QName;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.SocketAddress;
+import com.sforce.async.AsyncApiException;
+import com.sforce.async.BulkConnection;
+import com.sforce.soap.partner.DescribeGlobalResult;
+import com.sforce.soap.partner.DescribeGlobalSObjectResult;
+import com.sforce.soap.partner.DescribeSObjectResult;
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.SessionHeader_element;
+import com.sforce.ws.ConnectionException;
+import com.sforce.ws.ConnectorConfig;
+import com.sforce.ws.SessionRenewer;
 
 public class SalesforceSourceOrSink implements SourceOrSink {
 
@@ -54,16 +60,18 @@ public class SalesforceSourceOrSink implements SourceOrSink {
 
     protected ComponentProperties properties;
 
+    protected static final String KEY_CONNECTION = "Connection";
+
     @Override
-    public void initialize(RuntimeContainer adaptor, ComponentProperties properties) {
+    public void initialize(RuntimeContainer container, ComponentProperties properties) {
         this.properties = properties;
     }
 
     @Override
-    public ValidationResult validate(RuntimeContainer adaptor) {
+    public ValidationResult validate(RuntimeContainer container) {
         ValidationResult vr = new ValidationResult();
         try {
-            connect();
+            connect(container);
         } catch (IOException ex) {
             return exceptionToValidationResult(ex);
         }
@@ -135,9 +143,25 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         BulkConnection bulkConnection;
     }
 
-    protected ConnectionHolder connect() throws IOException {
-        final SalesforceConnectionProperties connProps = ((SalesforceProvideConnectionProperties)properties).getConnectionProperties();
+    protected ConnectionHolder connect(RuntimeContainer container) throws IOException {
+
         final ConnectionHolder ch = new ConnectionHolder();
+        SalesforceConnectionProperties connProps = ((SalesforceProvideConnectionProperties)properties).getConnectionProperties();
+        String refComponentId = connProps.getReferencedComponentId();
+        // Using another component's connection
+        if (refComponentId != null) {
+            // In a runtime container
+            if (container != null) {
+                PartnerConnection conn = (PartnerConnection) container.getComponentData(refComponentId, KEY_CONNECTION);
+                if (conn != null) {
+                    ch.connection = conn;
+                    return ch;
+                }
+                throw new IOException("Referenced component: " + refComponentId + " not connected");
+            }
+            // Design time
+            connProps = connProps.getReferencedConnectionProperties();
+        }
 
         // FIXME add back reffed connection
 
@@ -196,26 +220,30 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             if(connProps.bulkConnection.getBooleanValue()){
                 ch.bulkConnection = connectBulk(ch.connection.getConfig());
             }
+            if (container != null) {
+                container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION, ch.connection);
+            }
             return ch;
         } catch (ConnectionException e) {
             throw new IOException(e);
         }
     }
 
-    public static List<NamedThing> getSchemaNames(SalesforceProvideConnectionProperties properties) throws IOException {
+    public static List<NamedThing> getSchemaNames(RuntimeContainer container, SalesforceProvideConnectionProperties properties)
+            throws IOException {
         SalesforceSourceOrSink ss = new SalesforceSourceOrSink();
         ss.initialize(null, (ComponentProperties) properties);
         try {
-            PartnerConnection connection = ss.connect().connection;
-            return ss.getSchemaNames(connection);
+            PartnerConnection connection = ss.connect(container).connection;
+            return ss.getSchemaNames(container);
         } catch (Exception ex) {
             throw new ComponentException(exceptionToValidationResult(ex));
         }
     }
 
     @Override
-    public List<NamedThing> getSchemaNames(RuntimeContainer adaptor) throws IOException {
-        return getSchemaNames(connect().connection);
+    public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
+        return getSchemaNames(connect(container).connection);
     }
 
     protected List<NamedThing> getSchemaNames(PartnerConnection connection) throws IOException {
@@ -234,12 +262,13 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         return returnList;
     }
 
-    public static Schema getSchema(SalesforceProvideConnectionProperties properties, String module) throws IOException {
+    public static Schema getSchema(RuntimeContainer container, SalesforceProvideConnectionProperties properties, String module)
+            throws IOException {
         SalesforceSourceOrSink ss = new SalesforceSourceOrSink();
         ss.initialize(null, (ComponentProperties) properties);
         PartnerConnection connection = null;
         try {
-            connection = ss.connect().connection;
+            connection = ss.connect(container).connection;
         } catch (IOException ex) {
             throw new ComponentException(exceptionToValidationResult(ex));
         }
@@ -247,19 +276,19 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     }
 
     @Override
-    public Schema getSchema(RuntimeContainer adaptor, String schemaName) throws IOException {
-        return getSchema(connect().connection, schemaName);
+    public Schema getSchema(RuntimeContainer container, String schemaName) throws IOException {
+        return getSchema(connect(container).connection, schemaName);
     }
 
     /**
      * get Schema from the init properties, but is it really a good place to hold this code?
      *
-     * @param adaptor
+     * @param container
      * @return
      * @throws IOException
      */
     @Override
-    public Schema getSchemaFromProperties(RuntimeContainer adaptor) throws IOException {
+    public Schema getSchemaFromProperties(RuntimeContainer container) throws IOException {
         String schemaString = null;
 
         if (properties instanceof TSalesforceInputProperties) {
@@ -278,13 +307,14 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     }
 
     @Override
-    public Schema getPossibleSchemaFromProperties(RuntimeContainer adaptor) throws IOException {
-        if (!(properties instanceof TSalesforceInputProperties) || !((TSalesforceInputProperties) properties).manualQuery.getBooleanValue()) {
+    public Schema getPossibleSchemaFromProperties(RuntimeContainer container) throws IOException {
+        if (!(properties instanceof TSalesforceInputProperties)
+                || !((TSalesforceInputProperties) properties).manualQuery.getBooleanValue()) {
             String moduleName = null;
             if (properties instanceof TSalesforceInputProperties) {
                 moduleName = ((TSalesforceInputProperties) properties).module.moduleName.getStringValue();
             } else if (properties instanceof TSalesforceGetServerTimestampProperties) {
-                //FIXME throw exception for this component
+                // FIXME throw exception for this component
             } else if (properties instanceof TSalesforceGetDeletedProperties) {
                 moduleName = ((TSalesforceGetDeletedProperties) properties).module.moduleName.getStringValue();
             } else if (properties instanceof TSalesforceGetUpdatedProperties) {
@@ -292,9 +322,9 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             } else if (properties instanceof TSalesforceOutputProperties) {
                 moduleName = ((TSalesforceOutputProperties) properties).module.moduleName.getStringValue();
             }
-            return getSchema(connect().connection, moduleName);
-        } else {
-            // TODO for custom query, need Reader!
+            return getSchema(connect(container).connection, moduleName);
+        } else {// for custom query, need Reader!
+
         }
         return null;
     }
@@ -302,7 +332,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     protected Schema getSchema(PartnerConnection connection, String module) throws IOException {
         try {
             DescribeSObjectResult[] describeSObjectResults = new DescribeSObjectResult[0];
-            describeSObjectResults = connection.describeSObjects(new String[]{module});
+            describeSObjectResults = connection.describeSObjects(new String[] { module });
             return SalesforceAvroRegistry.get().inferSchema(describeSObjectResults[0]);
         } catch (ConnectionException e) {
             throw new IOException(e);

@@ -33,8 +33,8 @@ public class SalesforceSink extends SalesforceSourceOrSink implements Sink {
     }
 
     @Override
-    public ValidationResult validate(RuntimeContainer adaptor) {
-        ValidationResult validate = super.validate(adaptor);
+    public ValidationResult validate(RuntimeContainer container) {
+        ValidationResult validate = super.validate(container);
         // also check that the properties is the right type
         if (validate.getStatus() != Result.ERROR) {
             if (!(properties instanceof SalesforceOutputProperties)) {

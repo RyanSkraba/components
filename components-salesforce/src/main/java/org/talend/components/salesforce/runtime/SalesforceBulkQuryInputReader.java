@@ -50,15 +50,15 @@ public class SalesforceBulkQuryInputReader extends SalesforceReader<IndexedRecor
 
     protected BulkResult currentRecord;
 
-    public SalesforceBulkQuryInputReader(RuntimeContainer adaptor, SalesforceSource source, TSalesforceInputProperties props) {
-        super(source);
+    public SalesforceBulkQuryInputReader(RuntimeContainer container, SalesforceSource source, TSalesforceInputProperties props) {
+        super(container, source);
         properties = props;
         this.adaptor = adaptor;
     }
 
     protected BulkConnection getBulkConnection() throws IOException {
         if (bulkConnection == null) {
-            bulkConnection = ((SalesforceSource) getCurrentSource()).connect().bulkConnection;
+            bulkConnection = ((SalesforceSource) getCurrentSource()).connect(container).bulkConnection;
         }
         return bulkConnection;
     }

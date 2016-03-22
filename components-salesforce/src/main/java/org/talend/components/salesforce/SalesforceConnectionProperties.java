@@ -12,10 +12,15 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
-import static org.talend.daikon.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.PropertyFactory.newBoolean;
+import static org.talend.daikon.properties.PropertyFactory.newEnum;
+import static org.talend.daikon.properties.PropertyFactory.newInteger;
+import static org.talend.daikon.properties.PropertyFactory.newString;
+import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentReferenceProperties;
+import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
 import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
@@ -27,7 +32,8 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.presentation.Widget.WidgetType;
 
-public class SalesforceConnectionProperties extends ComponentProperties implements SalesforceProvideConnectionProperties {
+public class SalesforceConnectionProperties extends ComponentProperties
+        implements SalesforceProvideConnectionProperties, ComponentReferencePropertiesEnclosing {
 
     public static final String URL = "https://www.salesforce.com/services/Soap/u/34.0";
 
@@ -43,8 +49,6 @@ public class SalesforceConnectionProperties extends ComponentProperties implemen
 
     // Only for the wizard use
     public Property name = (Property) newString("name").setRequired();
-
-    public Property referencedComponentId = newEnum("referencedComponentId");
 
     public static final String LOGIN_BASIC = "Basic";
 
@@ -83,6 +87,8 @@ public class SalesforceConnectionProperties extends ComponentProperties implemen
     public SalesforceUserPasswordProperties userPassword = new SalesforceUserPasswordProperties(USERPASSWORD);
 
     public ProxyProperties proxy = new ProxyProperties("proxy");
+
+    public ComponentReferenceProperties referencedComponent = new ComponentReferenceProperties("referencedComponent", this);
 
     public SalesforceConnectionProperties(String name) {
         super(name);
@@ -127,9 +133,10 @@ public class SalesforceConnectionProperties extends ComponentProperties implemen
         advancedForm.addRow(proxy.getForm(Form.MAIN));
         advanced.setFormtoShow(advancedForm);
 
+        // A form for a reference to a connection, used in a tSalesforceInput for example
         Form refForm = new Form(this, Form.REFERENCE);
-        Widget compListWidget = widget(referencedComponentId).setWidgetType(WidgetType.COMPONENT_REFERENCE);
-        compListWidget.setReferencedComponentName(TSalesforceConnectionDefinition.COMPONENT_NAME);
+        Widget compListWidget = widget(referencedComponent).setWidgetType(WidgetType.COMPONENT_REFERENCE);
+        referencedComponent.componentType.setValue(TSalesforceConnectionDefinition.COMPONENT_NAME);
         refForm.addRow(compListWidget);
         refForm.addRow(mainForm);
     }
@@ -139,7 +146,8 @@ public class SalesforceConnectionProperties extends ComponentProperties implemen
         refreshLayout(getForm(FORM_WIZARD));
     }
 
-    public void afterReferencedComponentId() {
+    public void afterReferencedComponent() {
+        refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(Form.REFERENCE));
         refreshLayout(getForm(Form.ADVANCED));
     }
@@ -157,25 +165,47 @@ public class SalesforceConnectionProperties extends ComponentProperties implemen
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
+
+        String refComponentIdValue = getReferencedComponentId();
+        boolean useOtherConnection = refComponentIdValue != null
+                && refComponentIdValue.startsWith(TSalesforceConnectionDefinition.COMPONENT_NAME);
         if (form.getName().equals(Form.MAIN) || form.getName().equals(FORM_WIZARD)) {
-            if (LOGIN_OAUTH.equals(loginType.getValue())) {
-                form.getWidget(OAUTH).setVisible(true);
-                form.getWidget(USERPASSWORD).setVisible(false);
-            } else if (LOGIN_BASIC.equals(loginType.getValue())) {
+            if (useOtherConnection) {
+                form.getWidget(loginType.getName()).setVisible(false);
                 form.getWidget(OAUTH).setVisible(false);
-                form.getWidget(USERPASSWORD).setVisible(true);
+                form.getWidget(USERPASSWORD).setVisible(false);
             } else {
-                throw new RuntimeException("Enum value should be handled :" + loginType.getValue());
+                form.getWidget(loginType.getName()).setVisible(true);
+                if (LOGIN_OAUTH.equals(loginType.getValue())) {
+                    form.getWidget(OAUTH).setVisible(true);
+                    form.getWidget(USERPASSWORD).setVisible(false);
+                } else if (LOGIN_BASIC.equals(loginType.getValue())) {
+                    form.getWidget(OAUTH).setVisible(false);
+                    form.getWidget(USERPASSWORD).setVisible(true);
+                } else {
+                    throw new RuntimeException("Enum value should be handled :" + loginType.getValue());
+                }
             }
         }
 
-        boolean useOtherConnection = referencedComponentId != null;
-        getForm(Form.REFERENCE).getWidget(SalesforceConnectionProperties.class).setVisible(!useOtherConnection);
-        // FIXME - what about the advanced form?
+        if (form.getName().equals(Form.ADVANCED)) {
+            form.setVisible(!useOtherConnection);
+        }
     }
 
     @Override
     public SalesforceConnectionProperties getConnectionProperties() {
         return this;
+    }
+
+    public String getReferencedComponentId() {
+        return referencedComponent.componentInstanceId.getStringValue();
+    }
+
+    public SalesforceConnectionProperties getReferencedConnectionProperties() {
+        SalesforceConnectionProperties refProps = (SalesforceConnectionProperties) referencedComponent.componentProperties;
+        if (refProps != null)
+            return refProps;
+        return null;
     }
 }
