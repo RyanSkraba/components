@@ -13,7 +13,6 @@
 package org.talend.components.salesforce;
 
 import org.apache.avro.Schema;
-import org.talend.components.api.properties.HasSchemaProperty;
 import org.talend.components.api.properties.IOComponentProperties;
 import org.talend.daikon.properties.presentation.Form;
 
@@ -23,7 +22,7 @@ import java.util.List;
 /**
  * Properties common to input and output Salesforce components.
  */
-public class SalesforceConnectionModuleProperties extends IOComponentProperties implements SalesforceProvideConnectionProperties, HasSchemaProperty {
+public class SalesforceConnectionModuleProperties extends IOComponentProperties implements SalesforceProvideConnectionProperties {
 
     // Collections
     //

@@ -27,6 +27,7 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.HasSchemaProperty;
+import org.talend.components.api.properties.IOComponentProperties;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
@@ -54,28 +55,29 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     @Override
     public void initialize(RuntimeContainer container, ComponentProperties properties) {
         this.properties = (SalesforceProvideConnectionProperties) properties;
-        if (properties instanceof HasSchemaProperty) {
-            List<Schema> schemas = ((HasSchemaProperty) properties).getSchemas();
-            Schema schema = schemas.get(0);
-            if (schema.getFields().isEmpty()) {
-                String moduleName = null;
-                if (properties instanceof SalesforceConnectionModuleProperties) {
-                    moduleName = ((SalesforceConnectionModuleProperties) properties).module.moduleName.getStringValue();
-                }
-                try {
-                    schema = getSchema(container, moduleName);
-                    ((HasSchemaProperty) properties).setSchemas(Arrays.asList(new Schema[]{schema}));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     @Override
     public ValidationResult validate(RuntimeContainer container) {
         ValidationResult vr = new ValidationResult();
         try {
+            if (properties instanceof IOComponentProperties) {
+                List<Schema> schemas = ((HasSchemaProperty) properties).getSchemas();
+                Schema schema = schemas.get(0);
+                if (schema == null || schema.getFields().isEmpty()) {
+                    if (((IOComponentProperties) properties).supportEmptySchema()) {
+                        String moduleName = null;
+                        if (properties instanceof SalesforceConnectionModuleProperties) {
+                            moduleName = ((SalesforceConnectionModuleProperties) properties).module.moduleName.getStringValue();
+                        }
+                        schema = getSchema(container, moduleName);
+                        ((HasSchemaProperty) properties).setSchemas(Arrays.asList(new Schema[]{schema}));
+                        return vr;
+                    } else {
+                        return new ValidationResult().setStatus(ValidationResult.Result.ERROR).setMessage("No schema defined and this source or sink don't support to empty schema");
+                    }
+                }
+            }
             connect(container);
         } catch (IOException ex) {
             return exceptionToValidationResult(ex);

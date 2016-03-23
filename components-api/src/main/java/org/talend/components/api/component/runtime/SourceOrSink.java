@@ -18,7 +18,7 @@ public interface SourceOrSink extends Serializable {
     public void initialize(RuntimeContainer container, ComponentProperties properties);
 
     /**
-     * Checks that this source is valid, before it can be used in a pipeline.
+     * Checks that this source or sink is valid, before it can be used in a pipeline.
      */
     public ValidationResult validate(RuntimeContainer container);
 

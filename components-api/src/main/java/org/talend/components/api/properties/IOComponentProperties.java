@@ -1,6 +1,6 @@
 package org.talend.components.api.properties;
 
-public abstract class IOComponentProperties extends ComponentProperties {
+public abstract class IOComponentProperties extends ComponentProperties implements HasSchemaProperty {
     /**
      * named constructor to be used is these properties are nested in other properties. Do not subclass this method for
      * initialization, use {@link #init()} instead.
