@@ -27,9 +27,9 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputPropert
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-public class SalesforceBulkQuryInputReader extends SalesforceReader<IndexedRecord> {
+public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedRecord> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SalesforceBulkQuryInputReader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SalesforceBulkQueryInputReader.class);
 
     protected RuntimeContainer adaptor;
 
@@ -44,13 +44,13 @@ public class SalesforceBulkQuryInputReader extends SalesforceReader<IndexedRecor
 
     protected BulkConnection bulkConnection;
 
-    protected SalesforceBulkRuntime bulkUtil;
+    protected SalesforceBulkRuntime bulkRuntime;
 
     protected BulkResultSet bulkResultSet;
 
     protected BulkResult currentRecord;
 
-    public SalesforceBulkQuryInputReader(RuntimeContainer container, SalesforceSource source, TSalesforceInputProperties props) {
+    public SalesforceBulkQueryInputReader(RuntimeContainer container, SalesforceSource source, TSalesforceInputProperties props) {
         super(container, source);
         properties = props;
         this.adaptor = adaptor;
@@ -83,7 +83,7 @@ public class SalesforceBulkQuryInputReader extends SalesforceReader<IndexedRecor
     public boolean start() throws IOException {
         try {
             executeSalesforceBulkQuery();
-            bulkResultSet = bulkUtil.getQueryResultSet( bulkUtil.nextResultId());
+            bulkResultSet = bulkRuntime.getQueryResultSet( bulkRuntime.nextResultId());
             currentRecord = bulkResultSet.next();
             return currentRecord !=null;
         } catch (ConnectionException|AsyncApiException e) {
@@ -96,10 +96,10 @@ public class SalesforceBulkQuryInputReader extends SalesforceReader<IndexedRecor
     public boolean advance() throws IOException {
         currentRecord = bulkResultSet.next();
         if(currentRecord == null ){
-            String resultId = bulkUtil.nextResultId();
+            String resultId = bulkRuntime.nextResultId();
             if(resultId != null){
                 try {
-                    bulkResultSet = bulkUtil.getQueryResultSet(resultId);
+                    bulkResultSet = bulkRuntime.getQueryResultSet(resultId);
                     currentRecord = bulkResultSet.next();
                     return bulkResultSet.hasNext();
                 } catch (AsyncApiException | ConnectionException e) {
@@ -141,9 +141,9 @@ public class SalesforceBulkQuryInputReader extends SalesforceReader<IndexedRecor
             queryText = sb.toString();
         }
 
-        bulkUtil =new SalesforceBulkRuntime(getBulkConnection());
+        bulkRuntime =new SalesforceBulkRuntime(getBulkConnection());
         try {
-            bulkUtil.doBulkQuery(properties.module.moduleName.getStringValue(),queryText,30);
+            bulkRuntime.doBulkQuery(properties.module.moduleName.getStringValue(),queryText,30);
         } catch (AsyncApiException |InterruptedException | ConnectionException e) {
             throw new IOException(e);
         }

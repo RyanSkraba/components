@@ -30,7 +30,7 @@ final class SalesforceBulkExecReader extends SalesforceReader {
 
     private BulkConnection bulkConnection;
 
-    protected SalesforceBulkRuntime bulkUtil;
+    protected SalesforceBulkRuntime bulkRuntime;
 
     private int batchIndex;
 
@@ -45,10 +45,6 @@ final class SalesforceBulkExecReader extends SalesforceReader {
     private RuntimeContainer adaptor;
 
     private transient BulkResultAdapterFactory factory;
-
-//    private Map<String, SchemaElement> fieldMap;
-//
-//    private List<SchemaElement> fieldList;
 
     private TSalesforceBulkExecProperties sprops;
 
@@ -83,19 +79,19 @@ final class SalesforceBulkExecReader extends SalesforceReader {
     public boolean start() throws IOException {
         this.uId = uId;
 
-        bulkUtil = new SalesforceBulkRuntime(getBulkConnection());
+        bulkRuntime = new SalesforceBulkRuntime(getBulkConnection());
 
-        bulkUtil.setConcurrencyMode(sprops.bulkProperties.concurrencyMode.getStringValue());
-        bulkUtil.setAwaitTime(sprops.bulkProperties.waitTimeCheckBatchState.getIntValue());
+        bulkRuntime.setConcurrencyMode(sprops.bulkProperties.concurrencyMode.getStringValue());
+        bulkRuntime.setAwaitTime(sprops.bulkProperties.waitTimeCheckBatchState.getIntValue());
 
         try {
             // We only support CSV file for bulk output
-            bulkUtil.executeBulk(sprops.module.moduleName.getStringValue(), sprops.outputAction.getStringValue(),
+            bulkRuntime.executeBulk(sprops.module.moduleName.getStringValue(), sprops.outputAction.getStringValue(),
                     sprops.upsertKeyColumn.getStringValue(), "csv", sprops.bulkFilePath.getStringValue(),
                     sprops.bulkProperties.bytesToCommit.getIntValue(), sprops.bulkProperties.rowsToCommit.getIntValue());
-            if(bulkUtil.getBatchCount()>0){
+            if(bulkRuntime.getBatchCount()>0){
                 batchIndex = 0;
-                currentBatchResult = bulkUtil.getBatchLog(0);
+                currentBatchResult = bulkRuntime.getBatchLog(0);
                 resultIndex = 0;
                 return currentBatchResult.size()>0;
             }
@@ -112,11 +108,11 @@ final class SalesforceBulkExecReader extends SalesforceReader {
     @Override
     public boolean advance() throws IOException {
         if (++resultIndex >= currentBatchResult.size()) {
-            if(++batchIndex >= bulkUtil.getBatchCount()){
+            if(++batchIndex >= bulkRuntime.getBatchCount()){
                 return false;
             }else {
                 try {
-                    currentBatchResult = bulkUtil.getBatchLog(batchIndex);
+                    currentBatchResult = bulkRuntime.getBatchLog(batchIndex);
                     resultIndex = 0;
                     return currentBatchResult.size()>0;
                 } catch (AsyncApiException|ConnectionException e) {
@@ -140,7 +136,7 @@ final class SalesforceBulkExecReader extends SalesforceReader {
 
     @Override
     public void close() throws IOException {
-        bulkUtil.close();
+        bulkRuntime.close();
     }
 
     private BulkResultAdapterFactory getFactory() throws IOException {

@@ -58,13 +58,13 @@ public class SalesforceSourceOrSink implements SourceOrSink {
 
     protected static final String API_VERSION = "34.0";
 
-    protected ComponentProperties properties;
+    protected SalesforceProvideConnectionProperties  properties;
 
     protected static final String KEY_CONNECTION = "Connection";
 
     @Override
     public void initialize(RuntimeContainer container, ComponentProperties properties) {
-        this.properties = properties;
+        this.properties = (SalesforceProvideConnectionProperties )properties;
     }
 
     @Override
@@ -93,11 +93,11 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     }
 
     public SalesforceConnectionProperties getConnectionProperties() {
-        return ((SalesforceProvideConnectionProperties)properties).getConnectionProperties();
+        return properties.getConnectionProperties();
     }
 
     protected BulkConnection connectBulk(ConnectorConfig config) throws ComponentException {
-        final SalesforceConnectionProperties connProps = ((SalesforceProvideConnectionProperties)properties).getConnectionProperties();
+        final SalesforceConnectionProperties connProps = properties.getConnectionProperties();
         /*
          * When PartnerConnection is instantiated, a login is implicitly executed and, if successful, a valid session is
          * stored in the ConnectorConfig instance. Use this key to initialize a BulkConnection:
@@ -123,7 +123,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     }
 
     protected PartnerConnection doConnection(ConnectorConfig config) throws ConnectionException {
-        SalesforceConnectionProperties connProps = ((SalesforceProvideConnectionProperties)properties).getConnectionProperties();
+        SalesforceConnectionProperties connProps = properties.getConnectionProperties();
         if (SalesforceConnectionProperties.LOGIN_OAUTH.equals(connProps.loginType.getValue())) {
             SalesforceOAuthConnection oauthConnection = new SalesforceOAuthConnection(connProps.oauth,
                     SalesforceConnectionProperties.OAUTH_URL, API_VERSION);
@@ -146,7 +146,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     protected ConnectionHolder connect(RuntimeContainer container) throws IOException {
 
         final ConnectionHolder ch = new ConnectionHolder();
-        SalesforceConnectionProperties connProps = ((SalesforceProvideConnectionProperties)properties).getConnectionProperties();
+        SalesforceConnectionProperties connProps = properties.getConnectionProperties();
         String refComponentId = connProps.getReferencedComponentId();
         // Using another component's connection
         if (refComponentId != null) {
@@ -204,7 +204,9 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             config.setConnectionTimeout(connProps.timeout.getIntValue());
         }
         config.setCompression(connProps.needCompression.getBooleanValue());
-        //  config.setTraceMessage(connProps.httpTraceMessage.getBooleanValue());
+        if (false) {
+            config.setTraceMessage(true);
+        }
         config.setUseChunkedPost(connProps.httpChunked.getBooleanValue());
 
 
@@ -220,7 +222,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             if(connProps.bulkConnection.getBooleanValue()){
                 ch.bulkConnection = connectBulk(ch.connection.getConfig());
             }
-            if (container != null) {
+            if (container != null && refComponentId != null) {
                 container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION, ch.connection);
             }
             return ch;

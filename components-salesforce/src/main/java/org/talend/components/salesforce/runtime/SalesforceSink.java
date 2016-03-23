@@ -19,6 +19,7 @@ import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties;
+import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
@@ -56,8 +57,8 @@ public class SalesforceSink extends SalesforceSourceOrSink implements Sink {
      *
      * @return the properties
      */
-    public ComponentProperties getComponentProperties() {
-        return (ComponentProperties) properties;
+    public TSalesforceOutputProperties getSalesforceOutputProperties() {
+        return (TSalesforceOutputProperties ) properties;
     }
 
 }

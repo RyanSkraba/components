@@ -61,6 +61,7 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
 
         //  Test append
         outputBulkProperties.append.setValue(true);
+        outputBulkProperties.ignoreNull.setValue(true);
         generateBulkFile(outputBulkProperties, rows);
 
         // Execute the bulk action
@@ -109,10 +110,10 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
      */
     public void generateBulkFile(TSalesforceOutputBulkProperties outputBulkProperties, List<IndexedRecord> rows) throws Throwable {
 
-        SalesforceSink salesforceSink = new SalesforceSink();
-        salesforceSink.initialize(null, outputBulkProperties);
+        SalesforceBulkFileSink bfSink = new SalesforceBulkFileSink();
+        bfSink.initialize(null, outputBulkProperties);
 
-        SalesforceWriteOperation writeOperation = (SalesforceWriteOperation) salesforceSink.createWriteOperation();
+        SalesforceBulkFileWriteOperation writeOperation = (SalesforceBulkFileWriteOperation) bfSink.createWriteOperation();
         Writer<WriterResult> saleforceWriter = writeOperation.createWriter(null);
 
         WriterResult result = writeRows(saleforceWriter, rows);
@@ -138,7 +139,7 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
     */
     protected TSalesforceBulkExecProperties createAccountSalesforceBulkExecProperties() throws Throwable {
         TSalesforceBulkExecProperties props = (TSalesforceBulkExecProperties) new TSalesforceBulkExecProperties("foo").init();
-        props.connection.timeout.setValue(60000);
+        props.connection.timeout.setValue(120000);
         props.connection.bulkConnection.setValue("true");
         props.outputAction.setValue(SalesforceOutputProperties.OutputAction.INSERT);
         props.bulkProperties.bytesToCommit.setValue(10 * 1024 * 1024);
@@ -192,7 +193,8 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
                 .name("ShippingPostalCode").type().nullable().intType().noDefault() //
                 .name("BillingStreet").type().nullable().stringType().noDefault() //
                 .name("BillingState").type().nullable().stringType().noDefault() //
-                .name("BillingPostalCode").type().nullable().stringType().noDefault();
+                .name("BillingPostalCode").type().nullable().stringType().noDefault() //
+                .name("BillingCity").type().nullable().stringType().noDefault();
         if (isDynamic) {
             fa = fa.name("ShippingState").type().nullable().stringType().noDefault();
         }
