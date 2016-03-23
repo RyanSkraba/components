@@ -26,6 +26,8 @@ import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.common.ProxyProperties;
+import org.talend.components.common.runtime.ProxyPropertiesRuntimeHelper;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
 import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnection;
@@ -170,13 +172,8 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         config.setPassword(StringUtils.strip(connProps.userPassword.password.getStringValue(), "\"")
                 + StringUtils.strip(connProps.userPassword.securityKey.getStringValue(), "\""));
 
-        if(connProps.proxy.useProxy.getBooleanValue()){
-            java.util.Properties props = System.getProperties();
-            props.put("socksProxyHost",connProps.proxy.host.getStringValue());
-            props.put("socksProxyPort",connProps.proxy.port.getStringValue());
-            props.put("java.net.socks.username", connProps.proxy.userPassword.userId.getStringValue());
-            props.put("java.net.socks.password", connProps.proxy.userPassword.password.getStringValue());
-        }
+        ProxyPropertiesRuntimeHelper.setProxy(connProps.proxy, ProxyProperties.ProxyType.SOCKS);
+
         setProxy(config);
 
         // Notes on how to test this

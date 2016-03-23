@@ -143,10 +143,4 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    public void close() throws IOException {
-        // No resources to close.
-    }
-
 }

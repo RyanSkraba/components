@@ -15,9 +15,10 @@ import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 
-/*
-* Reuse the code in talend lib salesforceBulkAPI.jar
-* */
+/**
+ * This contains process a set of records by creating a job that contains one or more batches. The job specifies which
+ *  object is being processed and what type of action is being used (query, insert, upsert, update, or delete).
+ */
 
 public class SalesforceBulkRuntime {
 
@@ -41,8 +42,28 @@ public class SalesforceBulkRuntime {
 
     private BufferedReader br;
 
+    private JobInfo job;
+
+    private CSVReader baseFileReader;
+
+    private List<String> baseFileHeader;
+
+    private int baseFileHeaderSize;
+
+    private BulkConnection connection;
+
+    private ConcurrencyMode concurrencyMode = null;
+
+    private Iterator<String> queryResultIDs = null;
+
+    private long awaitTime = 10000L;
+
+    public SalesforceBulkRuntime(BulkConnection connection) {
+        this.connection = connection;
+    }
+
     private void setBulkOperation(String sObjectType, String operationStr, String externalIdFieldName, String contentTypeStr,
-            String bulkFileName, int maxBytes, int maxRows) {
+                                  String bulkFileName, int maxBytes, int maxRows) {
         this.sObjectType = sObjectType;
         if (SalesforceOutputProperties.ACTION_INSERT.equals(operationStr)) {
             operation = OperationEnum.insert;
@@ -69,22 +90,8 @@ public class SalesforceBulkRuntime {
         maxRowsPerBatch = (maxRows > sforceMaxRows) ? sforceMaxRows : maxRows;
     }
 
-    private BulkConnection connection;
-
-    public SalesforceBulkRuntime(BulkConnection connection) {
-        this.connection = connection;
-    }
-
-    private JobInfo job;
-
-    private CSVReader baseFileReader;
-
-    private List<String> baseFileHeader;
-
-    private int baseFileHeaderSize;
-
     public void executeBulk(String sObjectType, String operationStr, String externalIdFieldName, String contentTypeStr,
-            String bulkFileName, int maxBytes, int maxRows) throws AsyncApiException, ConnectionException, IOException {
+                            String bulkFileName, int maxBytes, int maxRows) throws AsyncApiException, ConnectionException, IOException {
         setBulkOperation(sObjectType, operationStr, externalIdFieldName, contentTypeStr, bulkFileName, maxBytes, maxRows);
         job = createJob();
         batchInfoList = createBatchesFromCSVFile();
@@ -97,19 +104,21 @@ public class SalesforceBulkRuntime {
         br = new BufferedReader(new InputStreamReader(
                 new FileInputStream(bulkFileName), FILE_ENCODING));
         baseFileReader = new CSVReader(br, ',');
-//        if ((baseFileHeader = baseFileReader.nextRecord()) {
-//            baseFileHeader = Arrays.asList(baseFileReader.getValues());
-//        }
         baseFileHeader = baseFileReader.nextRecord();
         baseFileHeaderSize = baseFileHeader.size();
     }
-
-    private ConcurrencyMode concurrencyMode = null;
 
     public void setConcurrencyMode(String mode) {
         concurrencyMode = ConcurrencyMode.valueOf(mode);
     }
 
+    /**
+     *  Create a new job using the Bulk API.
+     *
+     * @return The JobInfo for the new job.
+     * @throws AsyncApiException
+     * @throws ConnectionException
+     */
     private JobInfo createJob() throws AsyncApiException, ConnectionException {
         JobInfo job = new JobInfo();
         if (concurrencyMode != null) {
@@ -142,6 +151,15 @@ public class SalesforceBulkRuntime {
         }
     }
 
+    /**
+     * Create and upload batches using a CSV file.
+     * The file into the appropriate size batch files.
+     *
+     * @return
+     * @throws IOException
+     * @throws AsyncApiException
+     * @throws ConnectionException
+     */
     private List<BatchInfo> createBatchesFromCSVFile() throws IOException, AsyncApiException, ConnectionException {
         List<BatchInfo> batchInfos = new ArrayList<BatchInfo>();
         BufferedReader rdr = new BufferedReader(new InputStreamReader(new FileInputStream(bulkFileName), FILE_ENCODING));
@@ -208,6 +226,21 @@ public class SalesforceBulkRuntime {
         return batchInfos;
     }
 
+    /**
+     *  Create a batch by uploading the contents of the file.
+     *  This closes the output stream.
+     *
+     * @param tmpOut
+     * The output stream used to write the CSV data for a single batch.
+     * @param tmpFile
+     * The file associated with the above stream.
+     * @param batchInfos
+     * The batch info for the newly created batch is added to this list.
+     *
+     * @throws IOException
+     * @throws AsyncApiException
+     * @throws ConnectionException
+     */
     private void createBatch(FileOutputStream tmpOut, File tmpFile, List<BatchInfo> batchInfos) throws IOException,
             AsyncApiException, ConnectionException {
         tmpOut.flush();
@@ -222,6 +255,12 @@ public class SalesforceBulkRuntime {
         }
     }
 
+    /**
+     *  Close the job
+     *
+     * @throws AsyncApiException
+     * @throws ConnectionException
+     */
     private void closeJob() throws AsyncApiException, ConnectionException {
         JobInfo closeJob = new JobInfo();
         closeJob.setId(job.getId());
@@ -229,12 +268,16 @@ public class SalesforceBulkRuntime {
         updateJob(closeJob);
     }
 
-    private long awaitTime = 10000L;
-
     public void setAwaitTime(long awaitTime) {
         this.awaitTime = awaitTime;
     }
 
+    /**
+     * Wait for a job to complete by polling the Bulk API.
+     *
+     * @throws AsyncApiException
+     * @throws ConnectionException
+     */
     private void awaitCompletion() throws AsyncApiException, ConnectionException {
         long sleepTime = 0L;
         Set<String> incomplete = new HashSet<String>();
@@ -257,6 +300,12 @@ public class SalesforceBulkRuntime {
         }
     }
 
+    /**
+     * Get result from the reader
+     *
+     * @return
+     * @throws IOException
+     */
     private BulkResult getBaseFileRow() throws IOException {
         BulkResult dataInfo = new BulkResult();
         List<String> row = null;
@@ -268,6 +317,15 @@ public class SalesforceBulkRuntime {
         return dataInfo;
     }
 
+    /**
+     *  Gets the results of the operation and checks for errors.
+     *
+     * @param batchNum
+     * @return
+     * @throws AsyncApiException
+     * @throws IOException
+     * @throws ConnectionException
+     */
     public List<BulkResult> getBatchLog(int batchNum) throws AsyncApiException, IOException, ConnectionException {
         // batchInfoList was populated when batches were created and submitted
         List<BulkResult> resultInfoList = new ArrayList<BulkResult>();
@@ -285,15 +343,6 @@ public class SalesforceBulkRuntime {
                 resultInfo.setValue(resultHeader.get(i), row.get(i));
             }
             resultInfoList.add(resultInfo);
-            // boolean success = Boolean.valueOf(resultInfo.get("Success"));
-            // boolean created = Boolean.valueOf(resultInfo.get("Created"));
-            // String id = resultInfo.get("Id");
-            // String error = resultInfo.get("Error");
-            // if (success && created) {
-            // System.out.println("Created row with id " + id);
-            // } else if (!success) {
-            // System.out.println("Failed with error: " + error);
-            // }
         }
 
         return resultInfoList;
@@ -302,8 +351,6 @@ public class SalesforceBulkRuntime {
     public int getBatchCount() {
         return batchInfoList.size();
     }
-
-    private Iterator<String> queryResultIDs = null;
 
     public void doBulkQuery(String moduleName, String queryStatement, int secToWait) throws AsyncApiException,
             InterruptedException, ConnectionException {
@@ -337,13 +384,8 @@ public class SalesforceBulkRuntime {
             }
         }
         batchInfoList.add(info);
-        // For TDI-27909
         closeJob();
     }
-
-//    public Set<String> getQueryResultIDs() {
-//        return queryResultIDs;
-//    }
 
     public InputStream getQueryResultStream(String resultId) throws AsyncApiException, IOException, ConnectionException {
         return getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId);
@@ -353,7 +395,6 @@ public class SalesforceBulkRuntime {
         // batchInfoList was populated when batches were created and submitted
         List<Map<String, String>> resultInfoList = new ArrayList<Map<String, String>>();
         Map<String, String> resultInfo;
-        // fix for TDI-26533
         baseFileReader = new CSVReader(new BufferedReader(new InputStreamReader(
                 getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId), FILE_ENCODING)), ',');
 
@@ -362,25 +403,14 @@ public class SalesforceBulkRuntime {
         List<String> row = null;
         while ((row =baseFileReader.nextRecord())!=null) {
             resultInfo = new HashMap<String, String>();
-            // resultInfo.putAll(getBaseFileRow());
             for (int i = 0; i < baseFileHeaderSize; i++) {
                 resultInfo.put(baseFileHeader.get(i), row.get(i));
             }
             resultInfoList.add(resultInfo);
-            // boolean success = Boolean.valueOf(resultInfo.get("Success"));
-            // boolean created = Boolean.valueOf(resultInfo.get("Created"));
-            // String id = resultInfo.get("Id");
-            // String error = resultInfo.get("Error");
-            // if (success && created) {
-            // System.out.println("Created row with id " + id);
-            // } else if (!success) {
-            // System.out.println("Failed with error: " + error);
-            // }
         }
-//        closeFileRead();
         return resultInfoList;
     }
-    
+
     public BulkResultSet getQueryResultSet(String resultId) throws AsyncApiException, IOException, ConnectionException {
         baseFileReader = new CSVReader(new BufferedReader(new InputStreamReader(
                 getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId), FILE_ENCODING)), ',');
@@ -389,13 +419,6 @@ public class SalesforceBulkRuntime {
         baseFileHeaderSize = baseFileHeader.size();
         return new BulkResultSet(baseFileReader ,baseFileHeader);
     }
-
-    // for TDI-26832
-//    public void closeFileRead() throws IOException {
-//        if (baseFileReader != null) {
-//            baseFileReader.;
-//        }
-//    }
 
     protected JobInfo createJob(JobInfo job) throws AsyncApiException, ConnectionException {
         try {

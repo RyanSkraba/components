@@ -17,6 +17,7 @@ import com.sforce.async.BulkConnection;
 import com.sforce.ws.ConnectionException;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.talend.components.api.component.runtime.RuntimeHelper;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResult;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
@@ -38,21 +39,11 @@ final class SalesforceBulkExecReader extends SalesforceReader {
 
     private int resultIndex;
 
-    private String uId;
-
-    private SalesforceSink sink;
-
-    private RuntimeContainer adaptor;
-
     private transient BulkResultAdapterFactory factory;
 
     private TSalesforceBulkExecProperties sprops;
 
-    private int dataCount;
-
-    public static String ID_COLUMN="Id";
-
-    private Schema schema;
+    private Schema querySchema;
 
 
     public SalesforceBulkExecReader(RuntimeContainer container, SalesforceSource source, TSalesforceBulkExecProperties props) {
@@ -68,16 +59,15 @@ final class SalesforceBulkExecReader extends SalesforceReader {
     }
 
     private Schema getSchema() throws IOException {
-        if (null == schema) {
-            schema = new Schema.Parser().parse(sprops.module.schema.schema.getStringValue());
-            //  querySchema = RuntimeHelper.resolveSchema(adaptor, getCurrentSource(), querySchema);
+        if (null == querySchema) {
+            querySchema = new Schema.Parser().parse(sprops.module.schema.schema.getStringValue());
+//            querySchema = RuntimeHelper.resolveSchema(container, getCurrentSource(), querySchema);
         }
-        return schema;
+        return querySchema;
     }
 
     @Override
     public boolean start() throws IOException {
-        this.uId = uId;
 
         bulkRuntime = new SalesforceBulkRuntime(getBulkConnection());
 

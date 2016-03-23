@@ -19,6 +19,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.component.runtime.RuntimeHelper;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResultSet;
 import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResult;
@@ -31,16 +32,13 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
 
     private static final Logger LOG = LoggerFactory.getLogger(SalesforceBulkQueryInputReader.class);
 
-    protected RuntimeContainer adaptor;
+    protected RuntimeContainer container;
 
     protected TSalesforceInputProperties properties;
-
 
     private transient Schema querySchema;
 
     private transient BulkResultAdapterFactory factory;
-
-    protected boolean isBulkQuery;
 
     protected BulkConnection bulkConnection;
 
@@ -53,7 +51,7 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
     public SalesforceBulkQueryInputReader(RuntimeContainer container, SalesforceSource source, TSalesforceInputProperties props) {
         super(container, source);
         properties = props;
-        this.adaptor = adaptor;
+        this.container = container;
     }
 
     protected BulkConnection getBulkConnection() throws IOException {
@@ -66,7 +64,7 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
     private Schema getSchema() throws IOException {
         if (null == querySchema) {
             querySchema = new Schema.Parser().parse(properties.module.schema.schema.getStringValue());
-            //  querySchema = RuntimeHelper.resolveSchema(adaptor, getCurrentSource(), querySchema);
+//            querySchema = RuntimeHelper.resolveSchema(container, getCurrentSource(), querySchema);
         }
         return querySchema;
     }
@@ -157,10 +155,4 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    public void close() throws IOException {
-        // No resources to close.
-    }
-
 }

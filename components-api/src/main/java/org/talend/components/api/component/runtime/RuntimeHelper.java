@@ -49,11 +49,13 @@ public class RuntimeHelper {
                 copyFieldList.size()) : Collections.<Schema.Field>emptyList();
 
         List<Schema.Field> filteredDynamicFields = new ArrayList<>();
-        for (Schema.Field se : runtimeSchema.getFields()) {
-            if (fieldMap.containsKey(se.name())) {
-                continue;
+        if(runtimeSchema != null){
+            for (Schema.Field se : runtimeSchema.getFields()) {
+                if (fieldMap.containsKey(se.name())) {
+                    continue;
+                }
+                filteredDynamicFields.add(se);
             }
-            filteredDynamicFields.add(se);
         }
 
         List<Schema.Field> copyFilteredDynamicFields = new ArrayList<>();

@@ -21,6 +21,13 @@ import org.talend.daikon.properties.presentation.Form;
 
 public class ProxyProperties extends ComponentProperties {
 
+    public enum ProxyType {
+        HTTP,
+        HTTPS,
+        SOCKS,
+        FTP
+    };
+
     public Property useProxy = (Property) newProperty(Type.BOOLEAN, "useProxy").setRequired(true); //$NON-NLS-1$
 
     private static final String HOST = "host";
