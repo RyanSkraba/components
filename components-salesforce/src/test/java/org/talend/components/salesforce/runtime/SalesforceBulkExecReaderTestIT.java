@@ -172,7 +172,7 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
         inputProps.connection = props.connection;
         inputProps.module = props.module;
         inputProps.batchSize.setValue(200);
-        inputProps.queryMode.setValue(TSalesforceInputProperties.QUERY_BULK);
+        inputProps.queryMode.setValue(TSalesforceInputProperties.QUERY_QUERY);
 
         inputProps.manualQuery.setValue(true);
         inputProps.query.setValue("select Id,Name,ShippingStreet,ShippingPostalCode,BillingStreet,BillingState,BillingPostalCode from Account");

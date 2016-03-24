@@ -32,14 +32,6 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
 
     private static final Logger LOG = LoggerFactory.getLogger(SalesforceBulkQueryInputReader.class);
 
-    protected RuntimeContainer container;
-
-    protected TSalesforceInputProperties properties;
-
-    private transient Schema querySchema;
-
-    private transient BulkResultAdapterFactory factory;
-
     protected BulkConnection bulkConnection;
 
     protected SalesforceBulkRuntime bulkRuntime;
@@ -61,20 +53,13 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
         return bulkConnection;
     }
 
-    private Schema getSchema() throws IOException {
+    @Override
+    protected Schema getSchema() throws IOException {
         if (null == querySchema) {
             querySchema = new Schema.Parser().parse(properties.module.schema.schema.getStringValue());
 //            querySchema = RuntimeHelper.resolveSchema(container, getCurrentSource(), querySchema);
         }
         return querySchema;
-    }
-
-    private BulkResultAdapterFactory getFactory() throws IOException {
-        if (null == factory) {
-            factory = new BulkResultAdapterFactory();
-            factory.setSchema(getSchema());
-        }
-        return factory;
     }
 
     @Override
@@ -116,32 +101,10 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
 
     // FIXME some duplicate code
     protected void executeSalesforceBulkQuery() throws IOException, ConnectionException {
-        String queryText;
-        if (properties.manualQuery.getBooleanValue()) {
-            queryText = properties.query.getStringValue();
-        } else {
-            StringBuilder sb = new StringBuilder();
-            sb.append("select "); //$NON-NLS-1$
-            int count = 0;
-            for (Schema.Field se : getSchema().getFields()) {
-                if (count++ > 0) {
-                    sb.append(", "); //$NON-NLS-1$
-                }
-                sb.append(se.name());
-            }
-            sb.append(" from "); //$NON-NLS-1$
-            sb.append(properties.module.moduleName.getStringValue());
-            String condition = properties.condition.getStringValue();
-            if(condition!=null && condition.trim().length()>0){
-                sb.append(" where ");
-                sb.append(condition);
-            }
-            queryText = sb.toString();
-        }
-
+        String queryText = getQueryString((TSalesforceInputProperties)properties);
         bulkRuntime =new SalesforceBulkRuntime((SalesforceSource) getCurrentSource(),container);
         try {
-            bulkRuntime.doBulkQuery(properties.module.moduleName.getStringValue(),queryText,30);
+            bulkRuntime.doBulkQuery(properties.module.moduleName.getStringValue(), queryText, 30);
         } catch (AsyncApiException |InterruptedException | ConnectionException e) {
             throw new IOException(e);
         }
@@ -150,7 +113,7 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
     @Override
     public IndexedRecord getCurrent() {
         try {
-            return getFactory().convertToAvro(getCurrentRecord());
+            return ((BulkResultAdapterFactory)getFactory()).convertToAvro(getCurrentRecord());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

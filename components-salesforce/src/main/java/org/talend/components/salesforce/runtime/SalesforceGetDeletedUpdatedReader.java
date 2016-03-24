@@ -21,8 +21,6 @@ import com.sforce.ws.ConnectionException;
 
 public abstract class SalesforceGetDeletedUpdatedReader<ResultT, T> extends SalesforceReader<T> {
 
-    protected SalesforceGetDeletedUpdatedProperties props;
-
     protected String module;
 
     protected transient ResultT result;
@@ -30,7 +28,7 @@ public abstract class SalesforceGetDeletedUpdatedReader<ResultT, T> extends Sale
     public SalesforceGetDeletedUpdatedReader(RuntimeContainer container, SalesforceSource source,
             SalesforceGetDeletedUpdatedProperties props) {
         super(container, source);
-        this.props = props;
+        this.properties = props;
         module = props.module.moduleName.getStringValue();
     }
 

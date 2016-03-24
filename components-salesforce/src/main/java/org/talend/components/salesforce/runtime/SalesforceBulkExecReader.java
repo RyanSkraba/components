@@ -37,21 +37,15 @@ final class SalesforceBulkExecReader extends SalesforceReader {
 
     private int resultIndex;
 
-    private transient BulkResultAdapterFactory factory;
-
-    private TSalesforceBulkExecProperties sprops;
-
-    private Schema querySchema;
-
-
     public SalesforceBulkExecReader(RuntimeContainer container, SalesforceSource source, TSalesforceBulkExecProperties props) {
         super(container, source);
-        sprops = props;
+        properties = props;
     }
 
-    private Schema getSchema() throws IOException {
+    @Override
+    protected Schema getSchema() throws IOException {
         if (null == querySchema) {
-            querySchema = new Schema.Parser().parse(sprops.module.schema.schema.getStringValue());
+            querySchema = new Schema.Parser().parse(properties.module.schema.schema.getStringValue());
 //            querySchema = RuntimeHelper.resolveSchema(container, getCurrentSource(), querySchema);
         }
         return querySchema;
@@ -60,8 +54,8 @@ final class SalesforceBulkExecReader extends SalesforceReader {
     @Override
     public boolean start() throws IOException {
 
+        TSalesforceBulkExecProperties sprops = (TSalesforceBulkExecProperties)properties;
         bulkRuntime = new SalesforceBulkRuntime((SalesforceSource) getCurrentSource(),container);
-
         bulkRuntime.setConcurrencyMode(sprops.bulkProperties.concurrencyMode.getStringValue());
         bulkRuntime.setAwaitTime(sprops.bulkProperties.waitTimeCheckBatchState.getIntValue());
 
@@ -108,7 +102,7 @@ final class SalesforceBulkExecReader extends SalesforceReader {
     public IndexedRecord getCurrent() {
         // TODO need change after component REJECT line can be work.
         try {
-            return getFactory().convertToAvro(currentBatchResult.get(resultIndex));
+            return ((BulkResultAdapterFactory)getFactory()).convertToAvro(currentBatchResult.get(resultIndex));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -117,13 +111,5 @@ final class SalesforceBulkExecReader extends SalesforceReader {
     @Override
     public void close() throws IOException {
         bulkRuntime.close();
-    }
-
-    private BulkResultAdapterFactory getFactory() throws IOException {
-        if (null == factory) {
-            factory = new BulkResultAdapterFactory();
-            factory.setSchema(getSchema());
-        }
-        return factory;
     }
 }
