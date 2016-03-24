@@ -14,9 +14,6 @@ import org.talend.daikon.properties.ValidationResult;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Created by Talend on 2016-03-22.
- */
 public class BulkFileSink implements Sink {
 
     /** Default serial version UID. */

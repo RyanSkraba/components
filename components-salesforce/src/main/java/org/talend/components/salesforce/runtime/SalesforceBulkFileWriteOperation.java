@@ -7,9 +7,6 @@ import org.talend.components.common.runtime.BulkFileSink;
 import org.talend.components.common.runtime.BulkFileWriteOperation;
 import org.talend.components.common.runtime.BulkFileWriter;
 
-/**
- * Created by Talend on 2016-03-22.
- */
 public class SalesforceBulkFileWriteOperation extends BulkFileWriteOperation {
     public SalesforceBulkFileWriteOperation(BulkFileSink fileSink) {
         super(fileSink);

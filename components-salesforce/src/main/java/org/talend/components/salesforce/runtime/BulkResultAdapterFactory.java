@@ -7,9 +7,7 @@ import org.talend.daikon.avro.AvroConverter;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResult;
 
-/**
- *
- */
+
 public class BulkResultAdapterFactory implements IndexedRecordAdapterFactory<BulkResult, IndexedRecord> {
 
     private Schema schema;

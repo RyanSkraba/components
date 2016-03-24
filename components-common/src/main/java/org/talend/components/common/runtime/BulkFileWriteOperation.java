@@ -6,9 +6,6 @@ import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
 
-/**
- * Created by Talend on 2016-03-22.
- */
 public class BulkFileWriteOperation implements WriteOperation<WriterResult> {
 
     /** Default serial version UID. */

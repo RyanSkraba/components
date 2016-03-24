@@ -6,12 +6,9 @@ import org.talend.daikon.properties.presentation.Form;
 
 import static org.talend.daikon.properties.PropertyFactory.newProperty;
 
-/**
- *
- */
 public class BulkFileProperties extends ComponentProperties {
 
-    public Property bulkFilePath = newProperty("bulkFilePath");
+    public Property bulkFilePath = newProperty("bulkFilePath").setRequired();
 
     public Property append = newProperty(Property.Type.BOOLEAN, "append");
 
