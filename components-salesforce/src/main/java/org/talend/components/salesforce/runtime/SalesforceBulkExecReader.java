@@ -29,8 +29,6 @@ import java.util.Map;
 final class SalesforceBulkExecReader extends SalesforceReader {
 
 
-    private BulkConnection bulkConnection;
-
     protected SalesforceBulkRuntime bulkRuntime;
 
     private int batchIndex;
@@ -51,13 +49,6 @@ final class SalesforceBulkExecReader extends SalesforceReader {
         sprops = props;
     }
 
-    protected BulkConnection getBulkConnection() throws IOException {
-        if (bulkConnection == null) {
-            bulkConnection = ((SalesforceSource) getCurrentSource()).connect(container).bulkConnection;
-        }
-        return bulkConnection;
-    }
-
     private Schema getSchema() throws IOException {
         if (null == querySchema) {
             querySchema = new Schema.Parser().parse(sprops.module.schema.schema.getStringValue());
@@ -69,7 +60,7 @@ final class SalesforceBulkExecReader extends SalesforceReader {
     @Override
     public boolean start() throws IOException {
 
-        bulkRuntime = new SalesforceBulkRuntime(getBulkConnection());
+        bulkRuntime = new SalesforceBulkRuntime((SalesforceSource) getCurrentSource(),container);
 
         bulkRuntime.setConcurrencyMode(sprops.bulkProperties.concurrencyMode.getStringValue());
         bulkRuntime.setAwaitTime(sprops.bulkProperties.waitTimeCheckBatchState.getIntValue());
@@ -122,7 +113,6 @@ final class SalesforceBulkExecReader extends SalesforceReader {
             throw new RuntimeException(e);
         }
     }
-
 
     @Override
     public void close() throws IOException {

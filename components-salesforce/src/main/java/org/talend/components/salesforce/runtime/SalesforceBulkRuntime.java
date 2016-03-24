@@ -11,8 +11,8 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 import com.sforce.async.*;
-import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 
 /**
@@ -50,7 +50,7 @@ public class SalesforceBulkRuntime {
 
     private int baseFileHeaderSize;
 
-    private BulkConnection connection;
+    private BulkConnection bulkConnection;
 
     private ConcurrencyMode concurrencyMode = null;
 
@@ -58,8 +58,11 @@ public class SalesforceBulkRuntime {
 
     private long awaitTime = 10000L;
 
-    public SalesforceBulkRuntime(BulkConnection connection) {
-        this.connection = connection;
+    private SalesforceSource sfSource;
+
+    public SalesforceBulkRuntime(SalesforceSource sfSource, RuntimeContainer container) throws IOException {
+        this.sfSource = sfSource;
+        this.bulkConnection = sfSource.connect(container).bulkConnection;
     }
 
     private void setBulkOperation(String sObjectType, String operationStr, String externalIdFieldName, String contentTypeStr,
@@ -422,24 +425,24 @@ public class SalesforceBulkRuntime {
 
     protected JobInfo createJob(JobInfo job) throws AsyncApiException, ConnectionException {
         try {
-            return connection.createJob(job);
+            return bulkConnection.createJob(job);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                renewSession();
+                sfSource.renewSession(bulkConnection.getConfig());
                 return createJob(job);
             }
             throw sfException;
         }
     }
 
-    protected BatchInfo createBatchFromStream(JobInfo job, FileInputStream inputStream) throws AsyncApiException,
+    protected BatchInfo createBatchFromStream(JobInfo job, InputStream input) throws AsyncApiException,
             ConnectionException {
         try {
-            return connection.createBatchFromStream(job, inputStream);
+            return bulkConnection.createBatchFromStream(job, input);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                renewSession();
-                return createBatchFromStream(job, inputStream);
+                sfSource.renewSession(bulkConnection.getConfig());
+                return createBatchFromStream(job, input);
             }
             throw sfException;
         }
@@ -447,10 +450,10 @@ public class SalesforceBulkRuntime {
 
     protected JobInfo updateJob(JobInfo job) throws AsyncApiException, ConnectionException {
         try {
-            return connection.updateJob(job);
+            return bulkConnection.updateJob(job);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                renewSession();
+                sfSource.renewSession(bulkConnection.getConfig());
                 return updateJob(job);
             }
             throw sfException;
@@ -459,10 +462,10 @@ public class SalesforceBulkRuntime {
 
     protected BatchInfoList getBatchInfoList(String jobID) throws AsyncApiException, ConnectionException {
         try {
-            return connection.getBatchInfoList(jobID);
+            return bulkConnection.getBatchInfoList(jobID);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                renewSession();
+                sfSource.renewSession(bulkConnection.getConfig());
                 return getBatchInfoList(jobID);
             }
             throw sfException;
@@ -471,10 +474,10 @@ public class SalesforceBulkRuntime {
 
     protected InputStream getBatchResultStream(String jobID, String batchID) throws AsyncApiException, ConnectionException {
         try {
-            return connection.getBatchResultStream(jobID, batchID);
+            return bulkConnection.getBatchResultStream(jobID, batchID);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                renewSession();
+                sfSource.renewSession(bulkConnection.getConfig());
                 return getBatchResultStream(jobID, batchID);
             }
             throw sfException;
@@ -483,24 +486,11 @@ public class SalesforceBulkRuntime {
 
     protected JobInfo getJobStatus(String jobID) throws AsyncApiException, ConnectionException {
         try {
-            return connection.getJobStatus(jobID);
+            return bulkConnection.getJobStatus(jobID);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                renewSession();
+                sfSource.renewSession(bulkConnection.getConfig());
                 return getJobStatus(jobID);
-            }
-            throw sfException;
-        }
-    }
-
-    protected BatchInfo createBatchFromStream(JobInfo job, ByteArrayInputStream byteArrayInputStream) throws AsyncApiException,
-            ConnectionException {
-        try {
-            return connection.createBatchFromStream(job, byteArrayInputStream);
-        } catch (AsyncApiException sfException) {
-            if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                renewSession();
-                return createBatchFromStream(job, byteArrayInputStream);
             }
             throw sfException;
         }
@@ -508,10 +498,10 @@ public class SalesforceBulkRuntime {
 
     protected BatchInfo getBatchInfo(String jobID, String batchID) throws AsyncApiException, ConnectionException {
         try {
-            return connection.getBatchInfo(jobID, batchID);
+            return bulkConnection.getBatchInfo(jobID, batchID);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                renewSession();
+                sfSource.renewSession(bulkConnection.getConfig());
                 return getBatchInfo(jobID, batchID);
             }
             throw sfException;
@@ -526,10 +516,10 @@ public class SalesforceBulkRuntime {
 
     protected QueryResultList getQueryResultList(String jobID, String batchID) throws AsyncApiException, ConnectionException {
         try {
-            return connection.getQueryResultList(jobID, batchID);
+            return bulkConnection.getQueryResultList(jobID, batchID);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                renewSession();
+                sfSource.renewSession(bulkConnection.getConfig());
                 return getQueryResultList(jobID, batchID);
             }
             throw sfException;
@@ -539,20 +529,15 @@ public class SalesforceBulkRuntime {
     protected InputStream getQueryResultStream(String jobID, String batchID, String resultID) throws AsyncApiException,
             ConnectionException {
         try {
-            return connection.getQueryResultStream(jobID, batchID, resultID);
+            return bulkConnection.getQueryResultStream(jobID, batchID, resultID);
         } catch (AsyncApiException sfException) {
             if (AsyncExceptionCode.InvalidSessionId.equals(sfException.getExceptionCode())) {
-                renewSession();
+                sfSource.renewSession(bulkConnection.getConfig());
                 return getQueryResultStream(jobID, batchID, resultID);
             }
             throw sfException;
         }
     }
-
-    private void renewSession() {
-        //  FIXME need to finish it.
-    }
-
 
     public String nextResultId(){
         String resultId = null;

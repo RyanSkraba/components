@@ -220,7 +220,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
                 ch.bulkConnection = connectBulk(ch.connection.getConfig());
             }
             if (container != null && refComponentId != null) {
-                container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION, ch.connection);
+                container.setComponentData(refComponentId, KEY_CONNECTION, ch.connection);
             }
             return ch;
         } catch (ConnectionException e) {
@@ -374,6 +374,11 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         }else{
             //No proxy.
         }
+    }
+
+    protected void renewSession(ConnectorConfig config) throws ConnectionException {
+        SessionRenewer renewer = config.getSessionRenewer();
+        renewer.renewSession(config);
     }
 
 }

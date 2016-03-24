@@ -139,7 +139,7 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
             queryText = sb.toString();
         }
 
-        bulkRuntime =new SalesforceBulkRuntime(getBulkConnection());
+        bulkRuntime =new SalesforceBulkRuntime((SalesforceSource) getCurrentSource(),container);
         try {
             bulkRuntime.doBulkQuery(properties.module.moduleName.getStringValue(),queryText,30);
         } catch (AsyncApiException |InterruptedException | ConnectionException e) {
