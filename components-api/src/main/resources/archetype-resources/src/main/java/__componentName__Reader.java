@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.component.runtime.util.UnshardedInputAdvancer;
@@ -17,7 +18,7 @@ import org.talend.components.api.component.runtime.util.UnshardedInputAdvancer;
 /**
  * Simple implementation of a reader.
  */
-public class ${componentName}Reader extends AbstractBoundedReader<String> implements UnshardedInputAdvancer<String> {
+public class ${componentName}Reader extends AbstractBoundedReader<String> {
 
     /** Default serial version UID. */
     private static final long serialVersionUID = 1L;
@@ -32,8 +33,8 @@ public class ${componentName}Reader extends AbstractBoundedReader<String> implem
 
     private transient String current;
 
-    public ${componentName}Reader(BoundedSource source, String filename) {
-        super(source);
+    public ${componentName}Reader(RuntimeContainer container, BoundedSource source, String filename) {
+        super(container, source);
         this.filename = filename;
     }
 

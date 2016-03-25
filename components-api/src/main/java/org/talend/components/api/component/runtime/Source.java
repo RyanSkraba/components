@@ -44,7 +44,7 @@ public interface Source extends SourceOrSink {
     /**
      * Returns a new {@link Reader} that reads from this source.
      */
-    public abstract Reader createReader(RuntimeContainer adaptor);
+    public abstract Reader createReader(RuntimeContainer container);
 
 
 
