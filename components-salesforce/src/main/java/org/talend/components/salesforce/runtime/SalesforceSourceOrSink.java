@@ -27,13 +27,13 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.HasSchemaProperty;
-import org.talend.components.api.properties.IOComponentProperties;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
 import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnection;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.properties.ValidationResult;
 
 import javax.xml.namespace.QName;
@@ -61,21 +61,17 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     public ValidationResult validate(RuntimeContainer container) {
         ValidationResult vr = new ValidationResult();
         try {
-            if (properties instanceof IOComponentProperties) {
+            if (properties instanceof HasSchemaProperty) {
                 List<Schema> schemas = ((HasSchemaProperty) properties).getSchemas();
                 Schema schema = schemas.get(0);
-                if (schema == null || schema.getFields().isEmpty()) {
-                    if (((IOComponentProperties) properties).supportEmptySchema()) {
-                        String moduleName = null;
-                        if (properties instanceof SalesforceConnectionModuleProperties) {
-                            moduleName = ((SalesforceConnectionModuleProperties) properties).module.moduleName.getStringValue();
-                        }
-                        schema = getSchema(container, moduleName);
-                        ((HasSchemaProperty) properties).setSchemas(Arrays.asList(new Schema[]{schema}));
-                        return vr;
-                    } else {
-                        return new ValidationResult().setStatus(ValidationResult.Result.ERROR).setMessage("No schema defined and this source or sink don't support to empty schema");
+                if (AvroUtils.isIncludeAllFields(schema)) {
+                    String moduleName = null;
+                    if (properties instanceof SalesforceConnectionModuleProperties) {
+                        moduleName = ((SalesforceConnectionModuleProperties) properties).module.moduleName.getStringValue();
                     }
+                    schema = getSchema(container, moduleName);
+                    ((HasSchemaProperty) properties).setSchemas(Arrays.asList(new Schema[]{schema}));
+                    return vr;
                 }
             }
             connect(container);

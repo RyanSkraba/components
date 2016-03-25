@@ -13,7 +13,8 @@
 package org.talend.components.salesforce;
 
 import org.apache.avro.Schema;
-import org.talend.components.api.properties.IOComponentProperties;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.HasSchemaProperty;
 import org.talend.daikon.properties.presentation.Form;
 
 import java.util.Arrays;
@@ -22,7 +23,7 @@ import java.util.List;
 /**
  * Properties common to input and output Salesforce components.
  */
-public class SalesforceConnectionModuleProperties extends IOComponentProperties implements SalesforceProvideConnectionProperties {
+public class SalesforceConnectionModuleProperties extends ComponentProperties implements SalesforceProvideConnectionProperties, HasSchemaProperty {
 
     // Collections
     //
@@ -32,11 +33,6 @@ public class SalesforceConnectionModuleProperties extends IOComponentProperties 
 
     public SalesforceConnectionModuleProperties(String name) {
         super(name);
-    }
-
-    @Override
-    public boolean supportEmptySchema() {
-        return true;
     }
 
     @Override
