@@ -48,6 +48,7 @@ import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputPrope
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
 import org.talend.components.salesforce.tsalesforcewavebulkexec.TSalesforceWaveBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcewaveoutputbulkexec.TSalesforceWaveOutputBulkExecDefinition;
+import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.PropertiesServiceTest;
@@ -163,6 +164,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
         Schema emptySchema = Schema.createRecord(module, null, null,
                 false);
         emptySchema.setFields(new ArrayList<Schema.Field>());
+        emptySchema = AvroUtils.setIncludeAllFields(emptySchema, true);
         moduleProps.schema.schema.setValue(emptySchema);
     }
 
