@@ -219,8 +219,8 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             if(connProps.bulkConnection.getBooleanValue()){
                 ch.bulkConnection = connectBulk(ch.connection.getConfig());
             }
-            if (container != null && refComponentId != null) {
-                container.setComponentData(refComponentId, KEY_CONNECTION, ch.connection);
+            if (container != null) {
+                container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION, ch.connection);
             }
             return ch;
         } catch (ConnectionException e) {
