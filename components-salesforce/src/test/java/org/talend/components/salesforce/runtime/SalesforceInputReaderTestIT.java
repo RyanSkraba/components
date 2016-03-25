@@ -12,11 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.util.List;
-
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
@@ -25,6 +20,12 @@ import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
+
+import java.io.IOException;
+import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
@@ -61,14 +62,17 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         runInputTest(true);
     }
 
-    protected void runInputTest(boolean isDynamic) throws Throwable {
+    protected void runInputTest(boolean emptySchema) throws Throwable {
         ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
         TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         setupProps(props.connection, !ADD_QUOTES);
 
-        setupModule(props.module, EXISTING_MODULE_NAME);
-
+        if (emptySchema) {
+            setupModuleWithEmptySchema(props.module, EXISTING_MODULE_NAME);
+        } else {
+            setupModule(props.module, EXISTING_MODULE_NAME);
+        }
         ComponentTestUtils.checkSerialize(props, errorCollector);
 
         String random = createNewRandom();

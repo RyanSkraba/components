@@ -12,15 +12,14 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceinput;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.Property.Type;
 import org.talend.daikon.properties.presentation.Form;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import static org.talend.daikon.properties.PropertyFactory.newProperty;
 
 public class TSalesforceInputProperties extends SalesforceConnectionModuleProperties {
 

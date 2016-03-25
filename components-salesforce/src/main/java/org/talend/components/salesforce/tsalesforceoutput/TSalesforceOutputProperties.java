@@ -12,12 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
-import static org.talend.daikon.properties.presentation.Widget.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.properties.ComponentPropertyFactory;
@@ -29,6 +23,12 @@ import org.talend.daikon.properties.Property.Type;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.widget;
 
 public class TSalesforceOutputProperties extends SalesforceConnectionModuleProperties {
 

@@ -12,13 +12,18 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
-
+import org.apache.avro.Schema;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.HasSchemaProperty;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 
-public class SalesforceGetDeletedUpdatedProperties extends ComponentProperties implements SalesforceProvideConnectionProperties {
+import java.util.Arrays;
+import java.util.List;
+
+import static org.talend.daikon.properties.PropertyFactory.newDate;
+
+public class SalesforceGetDeletedUpdatedProperties extends ComponentProperties implements SalesforceProvideConnectionProperties,HasSchemaProperty {
 
     public Property startDate = newDate("startDate");
 
@@ -54,5 +59,15 @@ public class SalesforceGetDeletedUpdatedProperties extends ComponentProperties i
     @Override
     public SalesforceConnectionProperties getConnectionProperties() {
         return connection;
+    }
+
+    @Override
+    public List<Schema> getSchemas() {
+        return Arrays.asList(new Schema[]{new Schema.Parser().parse(module.schema.schema.getStringValue())});
+    }
+
+    @Override
+    public void setSchemas(List<Schema> schemas) {
+        module.schema.schema.setValue(schemas.get(0));
     }
 }

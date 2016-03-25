@@ -12,14 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
+import com.sforce.async.AsyncApiException;
+import com.sforce.ws.ConnectionException;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
@@ -54,12 +48,18 @@ import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputPrope
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
 import org.talend.components.salesforce.tsalesforcewavebulkexec.TSalesforceWaveBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcewaveoutputbulkexec.TSalesforceWaveOutputBulkExecDefinition;
+import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.PropertiesServiceTest;
 
-import com.sforce.async.AsyncApiException;
-import com.sforce.ws.ConnectionException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.*;
 
 @SuppressWarnings("nls")
 public class SalesforceTestBase extends AbstractComponentTest {
@@ -154,6 +154,18 @@ public class SalesforceTestBase extends AbstractComponentTest {
                 "moduleName", moduleProps);
         moduleProps.moduleName.setValue(module);
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
+    }
+
+    protected void setupModuleWithEmptySchema(SalesforceModuleProperties moduleProps, String module) throws Throwable {
+        Form f = moduleProps.getForm(Form.REFERENCE);
+        moduleProps = (SalesforceModuleProperties) PropertiesServiceTest.checkAndBeforeActivate(getComponentService(), f,
+                "moduleName", moduleProps);
+        moduleProps.moduleName.setValue(module);
+        Schema emptySchema = Schema.createRecord(module, null, null,
+                false);
+        emptySchema.setFields(new ArrayList<Schema.Field>());
+        emptySchema = AvroUtils.setIncludeAllFields(emptySchema, true);
+        moduleProps.schema.schema.setValue(emptySchema);
     }
 
     public Schema getMakeRowSchema(boolean isDynamic) {
@@ -354,6 +366,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
     protected void doWriteRows(SalesforceConnectionModuleProperties props, List<IndexedRecord> outputRows) throws Exception {
         SalesforceSink salesforceSink = new SalesforceSink();
         salesforceSink.initialize(adaptor, props);
+        salesforceSink.validate(adaptor);
         SalesforceWriteOperation writeOperation = (SalesforceWriteOperation) salesforceSink.createWriteOperation();
         Writer<WriterResult> saleforceWriter = writeOperation.createWriter(adaptor);
         writeRows(saleforceWriter, outputRows);
@@ -361,7 +374,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
 
     // Returns the rows written (having been re-read so they have their Ids)
     protected List<IndexedRecord> writeRows(String random, SalesforceConnectionModuleProperties props,
-            List<IndexedRecord> outputRows) throws Exception {
+                                            List<IndexedRecord> outputRows) throws Exception {
         TSalesforceOutputProperties outputProps = new TSalesforceOutputProperties("output"); //$NON-NLS-1$
         outputProps.copyValuesFrom(props);
         outputProps.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
@@ -387,6 +400,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
     public <T> BoundedReader<T> createBoundedReader(ComponentProperties tsip) {
         SalesforceSource salesforceSource = new SalesforceSource();
         salesforceSource.initialize(null, tsip);
+        salesforceSource.validate(null);
         return salesforceSource.createReader(null);
     }
 

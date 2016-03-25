@@ -15,13 +15,17 @@ package org.talend.components.salesforce.tsalesforcegetservertimestamp;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.HasSchemaProperty;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
 import org.talend.daikon.properties.presentation.Form;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class TSalesforceGetServerTimestampProperties extends ComponentProperties
-        implements SalesforceProvideConnectionProperties {
+        implements SalesforceProvideConnectionProperties, HasSchemaProperty {
 
     //
     // Collections
@@ -55,4 +59,15 @@ public class TSalesforceGetServerTimestampProperties extends ComponentProperties
     public SalesforceConnectionProperties getConnectionProperties() {
         return connection;
     }
+
+    @Override
+    public List<Schema> getSchemas() {
+        return Arrays.asList(new Schema[]{new Schema.Parser().parse(schema.schema.getStringValue())});
+    }
+
+    @Override
+    public void setSchemas(List<Schema> schemas) {
+        schema.schema.setValue(schemas.get(0));
+    }
+
 }
