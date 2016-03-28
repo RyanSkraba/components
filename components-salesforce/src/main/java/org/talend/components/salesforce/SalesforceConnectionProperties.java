@@ -39,7 +39,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
     public static final String OAUTH_URL = "https://login.salesforce.com/services/oauth2";
 
-    public Property endpoint = (Property)newString("endpoint").setRequired().setDefaultValue(URL);
+    public Property endpoint = (Property)newString("endpoint").setRequired();
 
     public static final String FORM_WIZARD = "Wizard";
 
@@ -99,8 +99,8 @@ public class SalesforceConnectionProperties extends ComponentProperties
         super.setupProperties();
 
         loginType.setValue(LOGIN_BASIC);
-        endpoint.setDefaultValue(URL);
-        timeout.setDefaultValue(60000);
+        endpoint.setValue(URL);
+        timeout.setValue(60000);
 
     }
 

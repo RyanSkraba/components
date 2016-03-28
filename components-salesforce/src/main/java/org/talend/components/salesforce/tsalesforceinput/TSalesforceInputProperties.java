@@ -57,10 +57,10 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         returns = ComponentPropertyFactory.newReturnsProperty();
         ComponentPropertyFactory.newReturnProperty(returns, Type.INT, "NB_LINE");
 
-        batchSize.setDefaultValue(250);
-        queryMode.setDefaultValue(QUERY_QUERY);
-        normalizeDelimiter.setDefaultValue(";");
-        columnNameDelimiter.setDefaultValue("_");
+        batchSize.setValue(250);
+        queryMode.setValue(QUERY_QUERY);
+        normalizeDelimiter.setValue(";");
+        columnNameDelimiter.setValue("_");
 
         queryMode.setPossibleValues(QUERY_QUERY, QUERY_BULK);
 
@@ -76,7 +76,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         mainForm.addRow(query);
         mainForm.addRow(includeDeleted);
 
-        Form advancedForm = new Form(this, Form.ADVANCED);
+        Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(batchSize);
         advancedForm.addRow(normalizeDelimiter);
         advancedForm.addRow(columnNameDelimiter);

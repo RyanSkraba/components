@@ -107,7 +107,7 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
     public void setupProperties() {
         super.setupProperties();
 
-        outputAction.setDefaultValue(ACTION_INSERT);
+        outputAction.setValue(ACTION_INSERT);
 
         returns = ComponentPropertyFactory.newReturnsProperty();
         ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_LINE"); //$NON-NLS-1$

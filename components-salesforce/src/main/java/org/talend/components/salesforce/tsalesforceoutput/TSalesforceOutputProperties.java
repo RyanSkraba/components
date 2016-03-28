@@ -33,7 +33,7 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
 
     public Property retrieveInsertId = newBoolean("retrieveInsertId"); //$NON-NLS-1$
 
-    public Property commitLevel = newString("commitLevel"); //$NON-NLS-1$
+    public Property commitLevel = newInteger("commitLevel"); //$NON-NLS-1$
 
     // FIXME - should be file
     public Property logFileName = newString("logFileName"); //$NON-NLS-1$
@@ -46,8 +46,8 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
     @Override
     public void setupProperties() {
         super.setupProperties();
-        commitLevel.setDefaultValue(200);
-        ceaseForError.setDefaultValue(true);
+        commitLevel.setValue(200);
+        ceaseForError.setValue(true);
     }
 
     @Override
