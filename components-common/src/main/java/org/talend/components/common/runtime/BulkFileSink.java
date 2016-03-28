@@ -52,16 +52,6 @@ public class BulkFileSink implements Sink {
     }
 
     @Override
-    public Schema getSchemaFromProperties(RuntimeContainer container) throws IOException {
-        return null;
-    }
-
-    @Override
-    public Schema getPossibleSchemaFromProperties(RuntimeContainer container) throws IOException {
-        return new Schema.Parser().parse(properties.schema.schema.getStringValue());
-    }
-
-    @Override
     public WriteOperation<?> createWriteOperation() {
         return new BulkFileWriteOperation(this);
     }

@@ -13,11 +13,8 @@
 package org.talend.components.salesforce.runtime;
 
 import com.sforce.async.AsyncApiException;
-import com.sforce.async.BulkConnection;
 import com.sforce.ws.ConnectionException;
-import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
-import org.talend.components.api.component.runtime.RuntimeHelper;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResult;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
@@ -40,15 +37,6 @@ final class SalesforceBulkExecReader extends SalesforceReader {
     public SalesforceBulkExecReader(RuntimeContainer container, SalesforceSource source, TSalesforceBulkExecProperties props) {
         super(container, source);
         properties = props;
-    }
-
-    @Override
-    protected Schema getSchema() throws IOException {
-        if (null == querySchema) {
-            querySchema = new Schema.Parser().parse(properties.module.schema.schema.getStringValue());
-//            querySchema = RuntimeHelper.resolveSchema(container, getCurrentSource(), querySchema);
-        }
-        return querySchema;
     }
 
     @Override

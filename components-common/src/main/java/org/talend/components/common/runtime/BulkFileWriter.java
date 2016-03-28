@@ -57,8 +57,7 @@ public class BulkFileWriter implements Writer<WriterResult> {
         csvWriter = new CsvWriter(new OutputStreamWriter(
                 new java.io.FileOutputStream(file, isAppend), charset),separator);
 
-        Schema schema = RuntimeHelper.resolveSchema(adaptor, sink,
-                new Schema.Parser().parse(bulkProperties.schema.schema.getStringValue()));
+        Schema schema = new Schema.Parser().parse(bulkProperties.schema.schema.getStringValue());
 
         if(!isAppend){
             csvWriter.writeRecord(getHeaders(schema));

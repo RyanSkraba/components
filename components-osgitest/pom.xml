@@ -71,6 +71,15 @@
         <dependency>
             <groupId>org.talend.daikon</groupId>
             <artifactId>daikon</artifactId>
+			<version>${daikon.version}</version>
+			<classifier>bundle</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.daikon</groupId>
+            <artifactId>daikon</artifactId>
+			<version>${daikon.version}</version>
+			<classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
 		<dependency>

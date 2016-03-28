@@ -19,7 +19,6 @@ import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 
 import com.sforce.soap.partner.PartnerConnection;
-import org.talend.components.api.component.runtime.RuntimeHelper;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
@@ -70,7 +69,6 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
     protected Schema getSchema() throws IOException {
         if (null == querySchema) {
             querySchema = new Schema.Parser().parse(properties.module.schema.schema.getStringValue());
-            querySchema = RuntimeHelper.resolveSchema(container, getCurrentSource(), querySchema);
         }
         return querySchema;
     }

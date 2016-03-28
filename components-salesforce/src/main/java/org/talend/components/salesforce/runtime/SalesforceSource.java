@@ -12,9 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedReader;
@@ -25,6 +22,9 @@ import org.talend.components.salesforce.tsalesforcegetdeleted.TSalesforceGetDele
 import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
 import org.talend.components.salesforce.tsalesforcegetupdated.TSalesforceGetUpdatedProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SalesforceSource extends SalesforceSourceOrSink implements BoundedSource {
 

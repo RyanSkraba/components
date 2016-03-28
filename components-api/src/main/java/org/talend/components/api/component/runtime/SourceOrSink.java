@@ -18,7 +18,7 @@ public interface SourceOrSink extends Serializable {
     public void initialize(RuntimeContainer container, ComponentProperties properties);
 
     /**
-     * Checks that this source is valid, before it can be used in a pipeline.
+     * Checks that this source or sink is valid, before it can be used in a pipeline.
      */
     public ValidationResult validate(RuntimeContainer container);
 
@@ -31,23 +31,5 @@ public interface SourceOrSink extends Serializable {
      * Return the schema associated with the specified schema name for this {@code Source}
      */
     public Schema getSchema(RuntimeContainer container, String schemaName) throws IOException;
-
-    /**
-     * Return design schema
-     *
-     * @param container
-     * @return
-     * @throws IOException
-     */
-    public Schema getSchemaFromProperties(RuntimeContainer container) throws IOException;
-
-    /**
-     * Return possible schema
-     *
-     * @param container
-     * @return
-     * @throws IOException
-     */
-    public Schema getPossibleSchemaFromProperties(RuntimeContainer container) throws IOException;
 
 }

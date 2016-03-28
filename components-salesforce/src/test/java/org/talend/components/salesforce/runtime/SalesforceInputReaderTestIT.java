@@ -29,6 +29,12 @@ import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
+import java.io.IOException;
+import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
     @Test
@@ -76,7 +82,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         runInputTest(true, true);
     }
 
-    protected  TSalesforceInputProperties createTSalesforceInputProperties(boolean isBulkQury) throws Throwable {
+    protected  TSalesforceInputProperties createTSalesforceInputProperties(boolean emptySchema, boolean isBulkQury) throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
         props.connection.timeout.setValue(60000);
         props.batchSize.setValue(100);
@@ -91,10 +97,13 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
             props.module.moduleName.setValue(EXISTING_MODULE_NAME);
             props.module.schema.schema.setValue(getMakeRowSchema(false));
 
-
         } else {
             setupProps(props.connection, !ADD_QUOTES);
-            setupModule(props.module, EXISTING_MODULE_NAME);
+            if (emptySchema) {
+                setupModuleWithEmptySchema(props.module, EXISTING_MODULE_NAME);
+            } else {
+                setupModule(props.module, EXISTING_MODULE_NAME);
+            }
         }
 
         ComponentTestUtils.checkSerialize(props, errorCollector);
@@ -103,9 +112,9 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
     }
 
 
-    protected void runInputTest(boolean isDynamic, boolean isBulkQury) throws Throwable {
+    protected void runInputTest(boolean emptySchema, boolean isBulkQury) throws Throwable {
 
-        TSalesforceInputProperties props = createTSalesforceInputProperties(isBulkQury);
+        TSalesforceInputProperties props = createTSalesforceInputProperties(emptySchema, isBulkQury);
         String random = createNewRandom();
         int count = 10;
         // store rows in SF to retrieve them afterward to test the input.

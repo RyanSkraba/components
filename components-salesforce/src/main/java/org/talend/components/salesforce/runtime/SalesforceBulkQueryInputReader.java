@@ -15,14 +15,12 @@ package org.talend.components.salesforce.runtime;
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.BulkConnection;
 import com.sforce.ws.ConnectionException;
-import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.component.runtime.RuntimeHelper;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResultSet;
 import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResult;
+import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResultSet;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
 import java.io.IOException;
@@ -51,15 +49,6 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
             bulkConnection = ((SalesforceSource) getCurrentSource()).connect(container).bulkConnection;
         }
         return bulkConnection;
-    }
-
-    @Override
-    protected Schema getSchema() throws IOException {
-        if (null == querySchema) {
-            querySchema = new Schema.Parser().parse(properties.module.schema.schema.getStringValue());
-//            querySchema = RuntimeHelper.resolveSchema(container, getCurrentSource(), querySchema);
-        }
-        return querySchema;
     }
 
     @Override

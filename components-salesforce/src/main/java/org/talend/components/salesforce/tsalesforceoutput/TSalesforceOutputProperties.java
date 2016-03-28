@@ -22,7 +22,6 @@ import org.talend.daikon.properties.presentation.Form;
 
 public class TSalesforceOutputProperties extends SalesforceOutputProperties {
 
-
     //
     // Advanced
     //
