@@ -28,12 +28,6 @@ public class SalesforceGetDeletedUpdatedProperties extends SalesforceConnectionM
         super(name);
     }
 
-    public void setupProperties() {
-        super.setupProperties();
-        startDate.setValue("");
-        endDate.setValue("");
-    }
-
     @Override
     public void setupLayout() {
         super.setupLayout();
