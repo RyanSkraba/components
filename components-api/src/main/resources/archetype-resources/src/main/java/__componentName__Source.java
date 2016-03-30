@@ -30,10 +30,8 @@ import org.talend.daikon.properties.ValidationResult;
  * run in a single JVM (whether on a cluster or locally), so:
  *
  * <ul>
- * <li>the simplified logic for reading is found in the {@link ${componentName}UnshardedInput},
+ * <li>the simplified logic for reading is found in the {@link ${componentName}Reader},
  *     and</li>
- * <li>adapted to the full Source specification via a helper
- *     {@link UnshardedInputSource}.</li>
  * </ul>
  */
 public class ${componentName}Source implements BoundedSource {
