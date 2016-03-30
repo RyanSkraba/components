@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
-import org.talend.components.api.component.runtime.util.UnshardedInputAdvancer;
 
 /**
  * Simple implementation of a reader.
