@@ -1,28 +1,24 @@
 package org.talend.components.salesforce.runtime;
 
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import org.apache.avro.LogicalTypes;
-import org.apache.avro.LogicalTypes.Decimal;
+import com.sforce.soap.partner.DescribeSObjectResult;
+import com.sforce.soap.partner.Field;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
 import org.talend.daikon.avro.AvroConverter;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.SchemaConstants;
+import org.talend.daikon.avro.util.AvroTypes;
 import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.java8.SerializableFunction;
-import org.talend.daikon.talend6.Talend6SchemaConstants;
 
-import com.sforce.soap.partner.DescribeSObjectResult;
-import com.sforce.soap.partner.Field;
-import com.sforce.soap.partner.sobject.SObject;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
- * 
+ *
  */
 public class SalesforceAvroRegistry extends AvroRegistry {
 
@@ -81,7 +77,7 @@ public class SalesforceAvroRegistry extends AvroRegistry {
     /**
      * Infers an Avro schema for the given DescribeSObjectResult. This can be an expensive operation so the schema
      * should be cached where possible. This is always an {@link Schema.Type#RECORD}.
-     * 
+     *
      * @param in the DescribeSObjectResult to analyse.
      * @return the schema for data given from the object.
      */
@@ -103,7 +99,7 @@ public class SalesforceAvroRegistry extends AvroRegistry {
      * Infers an Avro schema for the given Salesforce Field. This can be an expensive operation so the schema should be
      * cached where possible. The return type will be the Avro Schema that can contain the field data without loss of
      * precision.
-     * 
+     *
      * @param field the Field to analyse.
      * @return the schema for data that the field describes.
      */
@@ -119,31 +115,29 @@ public class SalesforceAvroRegistry extends AvroRegistry {
 
         Schema base;
         switch (field.getType()) {
-        case _boolean:
-            base = Schema.create(Schema.Type.BOOLEAN);
-            break;
-        case _double:
-            base = Schema.create(Schema.Type.DOUBLE);
-            break;
-        case _int:
-            base = Schema.create(Schema.Type.INT);
-            break;
-        case currency:
-            // The decimal Avro logical type is wrapped on a BYTES implementation.
-            Decimal d = LogicalTypes.decimal(field.getPrecision(), field.getScale());
-            base = d.addToSchema(Schema.create(Schema.Type.BYTES));
-            break;
-        case date:
-            base = Schema.create(Schema.Type.LONG);
-            base.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd"); //$NON-NLS-1$
-            break;
-        case datetime:
-            base = Schema.create(Schema.Type.LONG);
-            base.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'"); //$NON-NLS-1$
-            break;
-        default:
-            base = Schema.create(Schema.Type.STRING);
-            break;
+            case _boolean:
+                base = AvroTypes._boolean();
+                break;
+            case _double:
+                base = AvroTypes._double();
+                break;
+            case _int:
+                base = AvroTypes._int();
+                break;
+            case currency:
+                base = AvroTypes._decimal();
+                break;
+            case date:
+                base = AvroTypes._date();
+                base.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd"); //$NON-NLS-1$
+                break;
+            case datetime:
+                base = AvroTypes._date();
+                base.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'"); //$NON-NLS-1$
+                break;
+            default:
+                base = AvroTypes._string();
+                break;
         }
 
         // Add some Talend6 custom properties to the schema.
@@ -173,38 +167,25 @@ public class SalesforceAvroRegistry extends AvroRegistry {
     /**
      * A helper method to convert the String representation of a datum in the Salesforce system to the Avro type that
      * matches the Schema generated for it.
-     * 
+     *
      * @param f
      * @return
      */
     public AvroConverter<String, ?> getConverterFromString(org.apache.avro.Schema.Field f) {
         Schema fieldSchema = AvroUtils.unwrapIfNullable(f.schema());
-
-        switch (fieldSchema.getType()) {
-        case BOOLEAN:
-            return new StringToBooleanConverter(fieldSchema);
-        case BYTES:
-            // The BYTES type returns a BigDecimal for the decimal logical type.
-            return new StringToDecimalConverter(fieldSchema);
-        case DOUBLE:
-            return new StringToDoubleConverter(fieldSchema);
-        case INT:
-            return new StringToIntegerConverter(fieldSchema);
-        case LONG:
-            return new StringToDateConverter(fieldSchema);
-        case STRING:
-            // The AvroRegistry provides a pass-through class for Strings.
+        //FIXME use avro type to decide the converter is not correct if the user change the avro type, Date to String for instance
+        if(AvroTypes.isSameType(fieldSchema, AvroTypes._boolean())){
+            return new StringToBooleanConverter(f);
+        }else if(AvroTypes.isSameType(fieldSchema, AvroTypes._decimal())){
+            return new StringToDecimalConverter(f);
+        }else if(AvroTypes.isSameType(fieldSchema, AvroTypes._double())) {
+            return new StringToDoubleConverter(f);
+        }else if(AvroTypes.isSameType(fieldSchema, AvroTypes._int())) {
+            return new StringToIntegerConverter(f);
+        }else if(AvroTypes.isSameType(fieldSchema, AvroTypes._date())) {
+            return new StringToDateConverter(f);
+        }else if(AvroTypes.isSameType(fieldSchema, AvroTypes._string())) {
             return super.getConverter(String.class);
-        case ARRAY:
-        case ENUM:
-        case FIXED:
-        case FLOAT:
-        case MAP:
-        case RECORD:
-        case NULL:
-        case UNION:
-        default:
-            // These types are not generated for Salesforce objects.
         }
         throw new UnsupportedOperationException("The type " + fieldSchema.getType() + " is not supported."); //$NON-NLS-1$ //$NON-NLS-2$
     }
@@ -213,15 +194,15 @@ public class SalesforceAvroRegistry extends AvroRegistry {
 
     public static abstract class AsStringConverter<T> implements AvroConverter<String, T> {
 
-        private final Schema schema;
+        private final Schema.Field field;
 
-        AsStringConverter(Schema schema) {
-            this.schema = schema;
+        AsStringConverter(Schema.Field field) {
+            this.field = field;
         }
 
         @Override
         public Schema getSchema() {
-            return schema;
+            return field.schema();
         }
 
         @Override
@@ -237,8 +218,8 @@ public class SalesforceAvroRegistry extends AvroRegistry {
 
     public static class StringToBooleanConverter extends AsStringConverter<Boolean> {
 
-        StringToBooleanConverter(Schema schema) {
-            super(schema);
+        StringToBooleanConverter(Schema.Field field) {
+            super(field);
         }
 
         @Override
@@ -249,8 +230,8 @@ public class SalesforceAvroRegistry extends AvroRegistry {
 
     public static class StringToDecimalConverter extends AsStringConverter<BigDecimal> {
 
-        StringToDecimalConverter(Schema schema) {
-            super(schema);
+        StringToDecimalConverter(Schema.Field field) {
+            super(field);
         }
 
         @Override
@@ -261,8 +242,8 @@ public class SalesforceAvroRegistry extends AvroRegistry {
 
     public static class StringToDoubleConverter extends AsStringConverter<Double> {
 
-        StringToDoubleConverter(Schema schema) {
-            super(schema);
+        StringToDoubleConverter(Schema.Field field) {
+            super(field);
         }
 
         @Override
@@ -275,9 +256,9 @@ public class SalesforceAvroRegistry extends AvroRegistry {
 
         private final SimpleDateFormat format;
 
-        StringToDateConverter(Schema schema) {
-            super(schema);
-            String pattern = schema.getProp(Talend6SchemaConstants.TALEND6_COLUMN_PATTERN);
+        StringToDateConverter(Schema.Field field) {
+            super(field);
+            String pattern = field.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
             // TODO: null handling
             format = new SimpleDateFormat(pattern);
         }
@@ -302,8 +283,8 @@ public class SalesforceAvroRegistry extends AvroRegistry {
 
     public static class StringToIntegerConverter extends AsStringConverter<Integer> {
 
-        StringToIntegerConverter(Schema schema) {
-            super(schema);
+        StringToIntegerConverter(Schema.Field field) {
+            super(field);
         }
 
         @Override
