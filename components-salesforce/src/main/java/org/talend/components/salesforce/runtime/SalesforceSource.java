@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforcegetdeleted.TSalesforceGetDeletedProperties;
 import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
 import org.talend.components.salesforce.tsalesforcegetupdated.TSalesforceGetUpdatedProperties;
@@ -53,13 +54,20 @@ public class SalesforceSource extends SalesforceSourceOrSink implements BoundedS
     @Override
     public BoundedReader createReader(RuntimeContainer adaptor) {
         if (properties instanceof TSalesforceInputProperties) {
-            return new SalesforceInputReader(adaptor, this, (TSalesforceInputProperties) properties);
+            TSalesforceInputProperties sfInProperties = (TSalesforceInputProperties) properties;
+            if(TSalesforceInputProperties.QUERY_BULK.equals(sfInProperties.queryMode.getStringValue())){
+                return new SalesforceBulkQueryInputReader(adaptor, this, sfInProperties);
+            }else{
+                return new SalesforceInputReader(adaptor, this, sfInProperties);
+            }
         } else if (properties instanceof TSalesforceGetServerTimestampProperties) {
             return new SalesforceServerTimeStampReader(adaptor, this, (TSalesforceGetServerTimestampProperties) properties);
         } else if (properties instanceof TSalesforceGetDeletedProperties) {
             return new SalesforceGetDeletedReader(adaptor, this, (TSalesforceGetDeletedProperties) properties);
         } else if (properties instanceof TSalesforceGetUpdatedProperties) {
             return new SalesforceGetUpdatedReader(adaptor, this, (TSalesforceGetUpdatedProperties) properties);
+        }else if (properties instanceof TSalesforceBulkExecProperties) {
+            return new SalesforceBulkExecReader(adaptor, this, (TSalesforceBulkExecProperties) properties);
         }
         return null;
     }

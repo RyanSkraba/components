@@ -27,6 +27,8 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.HasSchemaProperty;
+import org.talend.components.common.ProxyProperties;
+import org.talend.components.common.runtime.ProxyPropertiesRuntimeHelper;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
@@ -38,6 +40,9 @@ import org.talend.daikon.properties.ValidationResult;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -48,13 +53,13 @@ public class SalesforceSourceOrSink implements SourceOrSink {
 
     protected static final String API_VERSION = "34.0";
 
-    protected SalesforceProvideConnectionProperties properties;
+    protected SalesforceProvideConnectionProperties  properties;
 
     protected static final String KEY_CONNECTION = "Connection";
 
     @Override
     public void initialize(RuntimeContainer container, ComponentProperties properties) {
-        this.properties = (SalesforceProvideConnectionProperties) properties;
+        this.properties = (SalesforceProvideConnectionProperties )properties;
     }
 
     @Override
@@ -100,6 +105,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     }
 
     protected BulkConnection connectBulk(ConnectorConfig config) throws ComponentException {
+        final SalesforceConnectionProperties connProps = properties.getConnectionProperties();
         /*
          * When PartnerConnection is instantiated, a login is implicitly executed and, if successful, a valid session is
          * stored in the ConnectorConfig instance. Use this key to initialize a BulkConnection:
@@ -114,8 +120,9 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         String restEndpoint = soapEndpoint.substring(0, soapEndpoint.indexOf("Soap/")) + "async/" + API_VERSION;
         bulkConfig.setRestEndpoint(restEndpoint);
         // This should only be false when doing debugging.
-        bulkConfig.setCompression(true);
-        bulkConfig.setTraceMessage(false);
+        bulkConfig.setCompression(connProps.needCompression.getBooleanValue());
+        bulkConfig.setTraceMessage(connProps.httpTraceMessage.getBooleanValue());
+
         try {
             return new BulkConnection(bulkConfig);
         } catch (AsyncApiException e) {
@@ -140,9 +147,13 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     class ConnectionHolder {
 
         PartnerConnection connection;
+
+        BulkConnection bulkConnection;
     }
 
-    protected PartnerConnection connect(RuntimeContainer container) throws IOException {
+    protected ConnectionHolder connect(RuntimeContainer container) throws IOException {
+
+        final ConnectionHolder ch = new ConnectionHolder();
         SalesforceConnectionProperties connProps = properties.getConnectionProperties();
         String refComponentId = connProps.getReferencedComponentId();
         // Using another component's connection
@@ -150,20 +161,26 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             // In a runtime container
             if (container != null) {
                 PartnerConnection conn = (PartnerConnection) container.getComponentData(refComponentId, KEY_CONNECTION);
-                if (conn != null)
-                    return conn;
+                if (conn != null) {
+                    ch.connection = conn;
+                    return ch;
+                }
                 throw new IOException("Referenced component: " + refComponentId + " not connected");
             }
             // Design time
             connProps = connProps.getReferencedConnectionProperties();
         }
 
-        final ConnectionHolder ch = new ConnectionHolder();
+        // FIXME add back reffed connection
 
         ConnectorConfig config = new ConnectorConfig();
         config.setUsername(StringUtils.strip(connProps.userPassword.userId.getStringValue(), "\""));
         config.setPassword(StringUtils.strip(connProps.userPassword.password.getStringValue(), "\"")
                 + StringUtils.strip(connProps.userPassword.securityKey.getStringValue(), "\""));
+
+        ProxyPropertiesRuntimeHelper.setProxy(connProps.proxy, ProxyProperties.ProxyType.SOCKS);
+
+        setProxy(config);
 
         // Notes on how to test this
         // http://thysmichels.com/2014/02/15/salesforce-wsc-partner-connection-session-renew-when-session-timeout/
@@ -193,13 +210,25 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         if (false) {
             config.setTraceMessage(true);
         }
+        config.setUseChunkedPost(connProps.httpChunked.getBooleanValue());
+
 
         try {
             ch.connection = doConnection(config);
+            if(ch.connection!=null){
+                String clientId = connProps.clientId.getStringValue();
+                if(clientId!=null){
+                    // Need the test.
+                    ch.connection.setCallOptions(clientId,null);
+                }
+            }
+            if(connProps.bulkConnection.getBooleanValue()){
+                ch.bulkConnection = connectBulk(ch.connection.getConfig());
+            }
             if (container != null) {
                 container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION, ch.connection);
             }
-            return ch.connection;
+            return ch;
         } catch (ConnectionException e) {
             throw new IOException(e);
         }
@@ -210,8 +239,8 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         SalesforceSourceOrSink ss = new SalesforceSourceOrSink();
         ss.initialize(null, (ComponentProperties) properties);
         try {
-            PartnerConnection connection = ss.connect(container);
-            return ss.getSchemaNames(connection);
+            PartnerConnection connection = ss.connect(container).connection;
+            return ss.getSchemaNames(container);
         } catch (Exception ex) {
             throw new ComponentException(exceptionToValidationResult(ex));
         }
@@ -219,7 +248,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
 
     @Override
     public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
-        return getSchemaNames(connect(container));
+        return getSchemaNames(connect(container).connection);
     }
 
     protected List<NamedThing> getSchemaNames(PartnerConnection connection) throws IOException {
@@ -244,7 +273,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         ss.initialize(null, (ComponentProperties) properties);
         PartnerConnection connection = null;
         try {
-            connection = ss.connect(container);
+            connection = ss.connect(container).connection;
         } catch (IOException ex) {
             throw new ComponentException(exceptionToValidationResult(ex));
         }
@@ -253,9 +282,8 @@ public class SalesforceSourceOrSink implements SourceOrSink {
 
     @Override
     public Schema getSchema(RuntimeContainer container, String schemaName) throws IOException {
-        return getSchema(connect(container), schemaName);
+        return getSchema(connect(container).connection, schemaName);
     }
-
 
     protected Schema getSchema(PartnerConnection connection, String module) throws IOException {
         try {
@@ -266,4 +294,48 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             throw new IOException(e);
         }
     }
+
+    private void setProxy(ConnectorConfig config){
+        String proxyHost =null;
+        String proxyPort =null;
+        String proxyUser = null;
+        String proxyPwd = null;
+        Proxy.Type proxyType= Proxy.Type.HTTP;
+        if(System.getProperty("https.proxyHost")!=null){
+            proxyHost = System.getProperty("https.proxyHost");
+            proxyPort = System.getProperty("https.proxyPort");
+            proxyUser = System.getProperty("https.proxyUser");
+            proxyPwd = System.getProperty("https.proxyPassword");
+        }else if(System.getProperty("http.proxyHost")!=null){
+            proxyHost = System.getProperty("http.proxyHost");
+            proxyPort = System.getProperty("http.proxyPort");
+            proxyUser = System.getProperty("http.proxyUser");
+            proxyPwd = System.getProperty("http.proxyPassword");
+        }else if( System.getProperty("socksProxyHost")!=null){
+            proxyHost = System.getProperty("socksProxyHost");
+            proxyPort = System.getProperty("socksProxyPort");
+            proxyUser = System.getProperty("java.net.socks.username");
+            proxyPwd = System.getProperty("java.net.socks.password");
+            proxyType = Proxy.Type.SOCKS;
+        }
+
+        if(proxyHost!=null){
+            SocketAddress addr = new InetSocketAddress(proxyHost, Integer.parseInt(proxyPort));
+            config.setProxy(new Proxy(proxyType,addr));
+            if(proxyUser!=null && proxyUser.length() > 0){
+                config.setProxyUsername(proxyUser);
+            }
+            if(proxyPwd!=null && proxyPwd.length() > 0){
+                config.setProxyPassword(proxyPwd);
+            }
+        }else{
+            //No proxy.
+        }
+    }
+
+    protected void renewSession(ConnectorConfig config) throws ConnectionException {
+        SessionRenewer renewer = config.getSessionRenewer();
+        renewer.renewSession(config);
+    }
+
 }

@@ -416,7 +416,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         setupProps(props.connection, !ADD_QUOTES);
         ComponentTestUtils.checkSerialize(props, errorCollector);
 
-        assertEquals(3, props.getForms().size());
+        assertEquals(2, props.getForms().size());
         Form f = props.module.getForm(Form.REFERENCE);
         assertTrue(f.getWidget("moduleName").isCallBeforeActivate());
         // The Form is bound to a Properties object that created it. The Forms might not always be associated with the

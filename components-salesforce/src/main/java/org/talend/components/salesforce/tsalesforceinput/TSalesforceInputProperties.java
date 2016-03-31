@@ -12,14 +12,15 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceinput;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import static org.talend.daikon.properties.PropertyFactory.*;
+
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.Property.Type;
 import org.talend.daikon.properties.presentation.Form;
 
-import static org.talend.daikon.properties.PropertyFactory.newProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TSalesforceInputProperties extends SalesforceConnectionModuleProperties {
 
@@ -55,8 +56,11 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         super.setupProperties();
         returns = ComponentPropertyFactory.newReturnsProperty();
         ComponentPropertyFactory.newReturnProperty(returns, Type.INT, "NB_LINE");
-        // FIXME - should use default value
-        batchSize.setValue(100);
+
+        batchSize.setValue(250);
+        queryMode.setValue(QUERY_QUERY);
+        normalizeDelimiter.setValue(";");
+        columnNameDelimiter.setValue("_");
 
         queryMode.setPossibleValues(QUERY_QUERY, QUERY_BULK);
 
@@ -72,7 +76,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         mainForm.addRow(query);
         mainForm.addRow(includeDeleted);
 
-        Form advancedForm = new Form(this, Form.ADVANCED);
+        Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(batchSize);
         advancedForm.addRow(normalizeDelimiter);
         advancedForm.addRow(columnNameDelimiter);

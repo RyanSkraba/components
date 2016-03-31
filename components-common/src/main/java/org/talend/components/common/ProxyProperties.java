@@ -21,11 +21,22 @@ import org.talend.daikon.properties.presentation.Form;
 
 public class ProxyProperties extends ComponentProperties {
 
+    public enum ProxyType {
+        HTTP,
+        HTTPS,
+        SOCKS,
+        FTP
+    };
+
     public Property useProxy = (Property) newProperty(Type.BOOLEAN, "useProxy").setRequired(true); //$NON-NLS-1$
 
     private static final String HOST = "host";
 
     public Property host = (Property) newProperty(HOST).setRequired(true);
+
+    private static final String PORT = "port";
+
+    public Property port = (Property) newInteger(PORT).setRequired(true);
 
     private static final String USERPASSWORD = "userPassword";
 
@@ -41,6 +52,7 @@ public class ProxyProperties extends ComponentProperties {
         Form form = Form.create(this, Form.MAIN, "Proxy Parameters");
         form.addRow(useProxy);
         form.addRow(host);
+        form.addRow(port);
         form.addRow(userPassword.getForm(Form.MAIN));
     }
 
@@ -52,13 +64,10 @@ public class ProxyProperties extends ComponentProperties {
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN)) {
-            if (useProxy.getBooleanValue()) {
-                form.getWidget(HOST).setVisible(true);
-                form.getWidget(USERPASSWORD).setVisible(true);
-            } else {
-                form.getWidget(HOST).setVisible(false);
-                form.getWidget(USERPASSWORD).setVisible(false);
-            }
+            boolean isUseProxy = useProxy.getBooleanValue();
+            form.getWidget(HOST).setVisible(isUseProxy);
+            form.getWidget(PORT).setVisible(isUseProxy);
+            form.getWidget(USERPASSWORD).setVisible(isUseProxy);
         }
     }
 

@@ -12,39 +12,21 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutputbulk;
 
-import org.apache.avro.Schema;
+import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.*;
+
 import org.talend.components.api.component.Connector.ConnectorType;
 import org.talend.components.api.component.StudioConstants;
-import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.HasSchemaProperty;
-import org.talend.components.common.SchemaProperties;
+import org.talend.components.common.BulkFileProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.Property;
-import org.talend.daikon.properties.Property.Type;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 
-import java.util.Arrays;
-import java.util.List;
+public class TSalesforceOutputBulkProperties extends BulkFileProperties {
 
-import static org.talend.daikon.properties.PropertyFactory.newProperty;
-import static org.talend.daikon.properties.presentation.Widget.widget;
-
-public class TSalesforceOutputBulkProperties extends ComponentProperties implements HasSchemaProperty {
-
-    public Property fileName = newProperty("fileName"); //$NON-NLS-1$
-
-    public Property append = newProperty(Type.BOOLEAN, "append"); //$NON-NLS-1$
-
-    public Property ignoreNull = newProperty(Type.BOOLEAN, "ignoreNull"); //$NON-NLS-1$
-
+    public Property ignoreNull = newProperty(Property.Type.BOOLEAN, "ignoreNull");
     public Property upsertRelation = (Property) newProperty("upsertRelation").setOccurMaxTimes(-1); //$NON-NLS-1$
-
-    //
-    // Collections
-    //
-
-    public SchemaProperties schema = new SchemaProperties("schema");
 
     public TSalesforceOutputBulkProperties(String name) {
         super(name);
@@ -60,25 +42,16 @@ public class TSalesforceOutputBulkProperties extends ComponentProperties impleme
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form mainForm = new Form(this, Form.MAIN);
-        mainForm.addRow(schema.getForm(Form.REFERENCE));
-        mainForm.addRow(fileName);
-        mainForm.addRow(append);
+
+        Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(ignoreNull);
+
+        Form refForm = new Form(this, Form.REFERENCE);
+        refForm.addRow(append);
+        refForm.addRow(ignoreNull);
 
         Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(widget(upsertRelation).setWidgetType(Widget.WidgetType.TABLE));
-
-    }
-
-    @Override
-    public List<Schema> getSchemas() {
-        return Arrays.asList(new Schema[]{new Schema.Parser().parse(schema.schema.getStringValue())});
-    }
-
-    @Override
-    public void setSchemas(List<Schema> schemas) {
-        schema.schema.setValue(schemas.get(0));
     }
 
 }

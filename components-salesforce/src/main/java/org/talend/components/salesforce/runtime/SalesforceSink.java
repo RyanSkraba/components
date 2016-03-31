@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
@@ -36,9 +38,9 @@ public class SalesforceSink extends SalesforceSourceOrSink implements Sink {
         ValidationResult validate = super.validate(container);
         // also check that the properties is the right type
         if (validate.getStatus() != Result.ERROR) {
-            if (!(properties instanceof TSalesforceOutputProperties)) {
-                return new ValidationResult().setStatus(Result.ERROR).setMessage(
-                        "properties should be of type :" + TSalesforceOutputProperties.class.getCanonicalName());
+            if (!(properties instanceof SalesforceOutputProperties)) {
+                return new ValidationResult().setStatus(Result.ERROR)
+                        .setMessage("properties should be of type :" + SalesforceOutputProperties.class.getCanonicalName());
             } // else this is the right type
         } // else already an ERROR olready
         return validate;
@@ -56,7 +58,7 @@ public class SalesforceSink extends SalesforceSourceOrSink implements Sink {
      * @return the properties
      */
     public TSalesforceOutputProperties getSalesforceOutputProperties() {
-        return (TSalesforceOutputProperties) properties;
+        return (TSalesforceOutputProperties ) properties;
     }
 
 }

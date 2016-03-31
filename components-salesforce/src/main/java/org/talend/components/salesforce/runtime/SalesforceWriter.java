@@ -83,7 +83,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
     @Override
     public void open(String uId) throws IOException {
         this.uId = uId;
-        connection = sink.connect(container);
+        connection = sink.connect(container).connection;
         if (null == schema) {
             schema = new Schema.Parser().parse(sprops.module.schema.schema.getStringValue());
         }

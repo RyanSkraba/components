@@ -18,6 +18,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>net.sourceforge.javacsv</groupId>
+            <artifactId>javacsv</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
             <version>0.5.0-SNAPSHOT</version>
@@ -44,6 +49,7 @@
             <artifactId>daikon-spring</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
     <build>
         <plugins>
@@ -97,7 +103,7 @@
                             <classifier>bundle</classifier>
                             <instructions>
                                 <Bundle-SymbolicName>org.talend.components.common</Bundle-SymbolicName>
-                                <Import-Package>org.talend*,org.apache.avro*</Import-Package>
+                                <Import-Package>org.talend*,org.slf4j*,org.apache.avro*</Import-Package>
                                 <Service-Component>*</Service-Component>
                                 <Embed-Dependency>!components*,*;scope=compile|runtime;artifactId=avro;inline=false</Embed-Dependency>
 <!--                                 <Embed-Dependency> -->
