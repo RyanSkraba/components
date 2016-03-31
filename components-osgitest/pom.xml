@@ -39,6 +39,13 @@
 			<classifier>bundle</classifier>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>components-common-oauth</artifactId>
+            <version>${project.version}</version>
+            <classifier>bundle</classifier>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>components-common</artifactId>
