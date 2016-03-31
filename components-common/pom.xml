@@ -103,7 +103,7 @@
                             <classifier>bundle</classifier>
                             <instructions>
                                 <Bundle-SymbolicName>org.talend.components.common</Bundle-SymbolicName>
-                                <Import-Package>org.talend*,org.apache.avro*</Import-Package>
+                                <Import-Package>org.talend*,org.slf4j*,org.apache.avro*</Import-Package>
                                 <Service-Component>*</Service-Component>
                                 <Embed-Dependency>!components*,*;scope=compile|runtime;artifactId=avro;inline=false</Embed-Dependency>
 <!--                                 <Embed-Dependency> -->
