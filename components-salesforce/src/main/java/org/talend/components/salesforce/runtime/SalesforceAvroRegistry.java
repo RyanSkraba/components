@@ -3,8 +3,6 @@ package org.talend.components.salesforce.runtime;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
 import org.apache.avro.Schema;
-import org.apache.avro.SchemaBuilder;
-import org.apache.avro.SchemaBuilder.FieldAssembler;
 import org.talend.daikon.avro.AvroConverter;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.SchemaConstants;
@@ -15,7 +13,9 @@ import org.talend.daikon.java8.SerializableFunction;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -82,17 +82,44 @@ public class SalesforceAvroRegistry extends AvroRegistry {
      * @return the schema for data given from the object.
      */
     private Schema inferSchemaDescribeSObjectResult(DescribeSObjectResult in) {
-        FieldAssembler<Schema> builder = SchemaBuilder.builder().record(in.getName()).fields();
+        List<Schema.Field> fields = new ArrayList<>();
         for (Field field : in.getFields()) {
-            Schema fieldSchema = inferSchema(field);
-            String fieldDefault = field.getDefaultValueFormula();
-            if (null == fieldDefault) {
-                builder = builder.name(field.getName()).type(fieldSchema).noDefault();
+
+            Schema.Field avroField = new Schema.Field(field.getName(), inferSchema(field), null, field.getDefaultValueFormula());
+            // Add some Talend6 custom properties to the schema.
+            if (AvroTypes.isSameType(avroField.schema(), AvroTypes._string())) {
+                if (field.getLength() != 0) {
+                    avroField.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, field.getLength());
+                }
+                if (field.getPrecision() != 0) {
+                    avroField.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, field.getPrecision());
+                }
             } else {
-                builder = builder.name(field.getName()).type(fieldSchema).withDefault(fieldDefault);
+                if (field.getPrecision() != 0) {
+                    avroField.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, field.getPrecision());
+                }
+                if (field.getScale() != 0) {
+                    avroField.addProp(SchemaConstants.TALEND_COLUMN_SCALE, field.getScale());
+                }
             }
+            // pattern will be removed when we have db type for salesforce
+            switch (field.getType()){
+                case date:
+                    avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd");
+                    break;
+                case datetime:
+                    avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'");
+                    break;
+                default:
+                    break;
+            }
+            if(avroField.defaultVal() != null){
+                //FIXME really needed as Schema.Field has ability to store default value
+                avroField.addProp(SchemaConstants.TALEND_COLUMN_DEFAULT, avroField.defaultVal());
+            }
+            fields.add(avroField);
         }
-        return builder.endRecord();
+        return Schema.createRecord(in.getName(), null, null, false, fields);
     }
 
     /**
@@ -112,7 +139,6 @@ public class SalesforceAvroRegistry extends AvroRegistry {
 
         // Note: default values are at the field level, not attached to the field.
         // However, these properties are saved in the schema with Talend6SchemaConstants if present.
-
         Schema base;
         switch (field.getType()) {
             case _boolean:
@@ -129,39 +155,17 @@ public class SalesforceAvroRegistry extends AvroRegistry {
                 break;
             case date:
                 base = AvroTypes._date();
-                base.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd"); //$NON-NLS-1$
                 break;
             case datetime:
                 base = AvroTypes._date();
-                base.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'"); //$NON-NLS-1$
                 break;
             default:
                 base = AvroTypes._string();
                 break;
         }
+        base = field.getNillable() ? AvroUtils.wrapAsNullable(base) : base;
 
-        // Add some Talend6 custom properties to the schema.
-        if (base.getType() == Schema.Type.STRING) {
-            if (field.getLength() != 0) {
-                base.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, field.getLength());
-            }
-            if (field.getPrecision() != 0) {
-                base.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, field.getPrecision());
-            }
-        } else {
-            if (field.getPrecision() != 0) {
-                base.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, field.getPrecision());
-            }
-            if (field.getScale() != 0) {
-                base.addProp(SchemaConstants.TALEND_COLUMN_SCALE, field.getScale());
-            }
-        }
-        if (field.getDefaultValueFormula() != null) {
-            base.addProp(SchemaConstants.TALEND_COLUMN_DEFAULT, field.getDefaultValueFormula());
-        }
-
-        // Optionally union with Schema.Type.NULL
-        return field.getNillable() ? SchemaBuilder.builder().nullable().type(base) : base;
+        return base;
     }
 
     /**
