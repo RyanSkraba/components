@@ -1,18 +1,19 @@
 package org.talend.components.salesforce.runtime;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.talend.daikon.avro.SchemaConstants.*;
-
-import org.apache.avro.LogicalType;
-import org.apache.avro.LogicalTypes;
-import org.apache.avro.Schema;
-import org.junit.Test;
-import org.talend.daikon.avro.util.AvroUtils;
-
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
 import com.sforce.soap.partner.FieldType;
+import org.apache.avro.Schema;
+import org.junit.Test;
+import org.talend.daikon.avro.SchemaConstants;
+import org.talend.daikon.avro.util.AvroUtils;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
+import static org.talend.daikon.avro.SchemaConstants.TALEND_COLUMN_DEFAULT;
 
 /**
  * Unit tests for the {@link SalesforceAvroRegistry}.
@@ -97,10 +98,12 @@ public class SalesforceAvroRegistryTest {
         f.setType(FieldType.date);
         s = sRegistry.inferSchema(f);
         assertThat(s.getType(), is(Schema.Type.LONG));
+        assertThat(s.getProp(SchemaConstants.JAVA_CLASS_FLAG), is(Date.class.getCanonicalName()));
 
         f.setType(FieldType.datetime);
         s = sRegistry.inferSchema(f);
         assertThat(s.getType(), is(Schema.Type.LONG));
+        assertThat(s.getProp(SchemaConstants.JAVA_CLASS_FLAG), is(Date.class.getCanonicalName()));
 
         f.setType(FieldType._double);
         s = sRegistry.inferSchema(f);
@@ -110,7 +113,8 @@ public class SalesforceAvroRegistryTest {
         f.setPrecision(8);
         f.setScale(5);
         s = sRegistry.inferSchema(f);
-        assertThat(s.getType(), is(Schema.Type.BYTES));
-        assertThat(s.getLogicalType(), is((LogicalType) LogicalTypes.decimal(8, 5)));
+        assertThat(s.getType(), is(Schema.Type.STRING));
+        assertThat(s.getProp(SchemaConstants.JAVA_CLASS_FLAG), is(BigDecimal.class.getCanonicalName()));
+//        assertThat(s.getLogicalType(), is((LogicalType) LogicalTypes.decimal(8, 5)));
     }
 }
