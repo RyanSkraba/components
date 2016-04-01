@@ -62,6 +62,7 @@
                                 <Bundle-SymbolicName>${package}.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                                 <Include-Resource>{maven-resources},META-INF/maven/${groupId}/${artifactId}/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
+                                <Service-Component>*</Service-Component>                                
                             </instructions>
                         </configuration>
                     </execution>
