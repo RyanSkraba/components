@@ -3,7 +3,12 @@
 #set( $symbol_escape = '\' )
 package ${package};
 
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.avro.Schema;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.HasSchemaProperty;
 import org.talend.components.common.SchemaProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.PropertyFactory;
@@ -29,7 +34,7 @@ import org.talend.daikon.properties.presentation.Form;
  * <li>{code schema}, an embedded property referring to a Schema.</li>
  * </ol>
  */
-public class ${componentName}Properties extends ComponentProperties {
+public class ${componentName}Properties extends ComponentProperties implements HasSchemaProperty {
 
     public Property filename = PropertyFactory.newString("filename"); //$NON-NLS-1$
     public SchemaProperties schema = new SchemaProperties("schema"); //$NON-NLS-1$
@@ -46,4 +51,14 @@ public class ${componentName}Properties extends ComponentProperties {
         form.addRow(filename);
     }
 
+    @Override
+    public List<Schema> getSchemas() {
+        return Collections.singletonList(new Schema.Parser().parse(schema.schema.getStringValue()));
+    }
+
+    @Override
+    public void setSchemas(List<Schema> schemas) {
+        // nothing to be set here.
+    }    
+    
 }
