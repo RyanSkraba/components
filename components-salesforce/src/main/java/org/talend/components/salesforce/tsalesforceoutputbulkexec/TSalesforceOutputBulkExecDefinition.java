@@ -61,12 +61,12 @@ public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition im
     }
 
     @Override
-    public ComponentDefinition getInputComponentDefinitionClass() {
+    public ComponentDefinition getInputComponentDefinition() {
         return new TSalesforceOutputBulkDefinition();
     }
 
     @Override
-    public ComponentDefinition getOutputComponentDefinitionClass() {
+    public ComponentDefinition getOutputComponentDefinition() {
         return new TSalesforceBulkExecDefinition();
     }
 }

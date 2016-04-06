@@ -9,12 +9,12 @@ public interface VirtualComponentDefinition {
      *  Return the input component definition of current virtual component.
      *
      */
-    public ComponentDefinition getInputComponentDefinitionClass();
+    public ComponentDefinition getInputComponentDefinition();
     /**
      *  Return the output component definition of current virtual component.
      *
      */
-    public ComponentDefinition getOutputComponentDefinitionClass();
+    public ComponentDefinition getOutputComponentDefinition();
 
 
 }
