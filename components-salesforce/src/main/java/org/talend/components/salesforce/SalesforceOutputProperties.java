@@ -15,8 +15,9 @@ package org.talend.components.salesforce;
 import static org.talend.daikon.properties.PropertyFactory.*;
 import static org.talend.daikon.properties.presentation.Widget.*;
 
-
 import org.apache.avro.SchemaBuilder;
+import org.talend.components.api.component.StudioConstants;
+import org.talend.components.api.component.Connector.ConnectorType;
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.SchemaProperties;
 import org.talend.daikon.properties.Property;
@@ -120,6 +121,8 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
                 .name("errorMessage").type().stringType().noDefault()
                 .endRecord();
         schemaReject.schema.setValue(s);
+        schemaFlow.schema.setTaggedValue(StudioConstants.CONNECTOR_TYPE_SCHEMA_KEY, ConnectorType.MAIN);
+        schemaReject.schema.setTaggedValue(StudioConstants.CONNECTOR_TYPE_SCHEMA_KEY, ConnectorType.REJECT);
 
         setupUpsertRelation(upsertRelation, !POLY);
 
