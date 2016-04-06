@@ -29,6 +29,7 @@ import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecD
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkProperties;
+import org.talend.components.salesforce.tsalesforceoutputbulkexec.TSalesforceOutputBulkExecProperties;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,18 +56,18 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
 
         List<IndexedRecord> rows = makeRows(random,count,false);
 
+        TSalesforceOutputBulkExecProperties outputBulkExecProperties = createAccountSalesforceOutputBulkExecProperties();
+
         //  Prepare the bulk file
-        TSalesforceOutputBulkProperties outputBulkProperties = createAccountSalesforceoutputProperties();
+        TSalesforceOutputBulkProperties outputBulkProperties = (TSalesforceOutputBulkProperties) outputBulkExecProperties.getInputComponentProperties();
         generateBulkFile(outputBulkProperties, rows);
 
         //  Test append
         outputBulkProperties.append.setValue(true);
-        outputBulkProperties.ignoreNull.setValue(true);
         generateBulkFile(outputBulkProperties, rows);
 
         // Execute the bulk action
-        TSalesforceBulkExecProperties bulkExecProperties = createAccountSalesforceBulkExecProperties();
-        bulkExecProperties.bulkFilePath.setValue(outputBulkProperties.bulkFilePath.getStringValue());
+        TSalesforceBulkExecProperties bulkExecProperties = (TSalesforceBulkExecProperties) outputBulkExecProperties.getOutputComponentProperties();
 
         try {
             executeBulkInsert(bulkExecProperties,random,count*2);
@@ -121,27 +122,17 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
     }
 
     /**
-     *  The configuration of tSalesforceOutputBulk
+     *  The configuration of tSalesforceOutputBulkExec
      */
-    protected TSalesforceOutputBulkProperties createAccountSalesforceoutputProperties() throws Exception {
-        TSalesforceOutputBulkProperties props = (TSalesforceOutputBulkProperties) new TSalesforceOutputBulkProperties("foo").init();
-        String filePath = this.getClass().getResource("").getPath() + "/test_outputbulk_1.csv";
-        System.out.println("Bulk file path: "+filePath);
-        props.bulkFilePath.setValue(filePath);
-        props.schema.schema.setValue(getMakeRowSchema(false));
+    protected TSalesforceOutputBulkExecProperties createAccountSalesforceOutputBulkExecProperties() throws Throwable {
+        TSalesforceOutputBulkExecProperties props = (TSalesforceOutputBulkExecProperties) new TSalesforceOutputBulkExecProperties("foo").init();
 
-        ComponentTestUtils.checkSerialize(props, errorCollector);
-        return props;
-    }
-
-    /**
-    *   The configuration of tSalesforceBulkExec
-    */
-    protected TSalesforceBulkExecProperties createAccountSalesforceBulkExecProperties() throws Throwable {
-        TSalesforceBulkExecProperties props = (TSalesforceBulkExecProperties) new TSalesforceBulkExecProperties("foo").init();
         props.connection.timeout.setValue(120000);
         props.connection.bulkConnection.setValue("true");
         props.outputAction.setValue(SalesforceOutputProperties.OutputAction.INSERT);
+        String bulkFilePath = this.getClass().getResource("").getPath() + "/test_outputbulk_1.csv";
+        System.out.println("Bulk file path: "+bulkFilePath);
+        props.bulkFilePath.setValue(bulkFilePath);
         props.bulkProperties.bytesToCommit.setValue(10 * 1024 * 1024);
         props.bulkProperties.rowsToCommit.setValue(10000);
         props.bulkProperties.concurrencyMode.setValue(SalesforceBulkProperties.CONCURRENCY_PARALLEL);
