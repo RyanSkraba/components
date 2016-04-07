@@ -40,7 +40,7 @@ public class ${componentName}Test {
         componentService = null;
     }
 
-    // default implementation for pure java test. Shall be overriden of Spring or OSGI tests
+    // default implementation for pure java test. 
     public ComponentService getComponentService() {
         if (componentService == null) {
             SimpleComponentRegistry testComponentRegistry = new SimpleComponentRegistry();
@@ -120,21 +120,6 @@ public class ${componentName}Test {
                 fail("wrong exception caught :" + stack.toString());
             }
         }
-    }
-
-    @Test
-    public void testAlli18n() {
-        ComponentTestUtils.checkAllI18N(new ${componentName}Properties(null).init(), errorCollector);
-    }
-
-    @Test
-    public void testAllImagePath() {
-        ComponentTestUtils.testAllImages(getComponentService());
-    }
-
-    @Test
-    public void testAllRuntimes() {
-        ComponentTestUtils.testAllRuntimeAvaialble(getComponentService());
     }
 
 }

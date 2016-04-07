@@ -82,7 +82,11 @@
 				<artifactId>spring-aspects</artifactId>
 				<version>${spring.version}</version>
 			</dependency>
-
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter</artifactId>
+				<version>1.2.5.RELEASE</version>
+			</dependency>
 			<dependency>
 				<groupId>com.wordnik</groupId>
 				<artifactId>swagger-annotations</artifactId>
@@ -171,67 +175,44 @@
 			</plugins>
 		</pluginManagement>
 		<plugins>
-            <plugin>
-                <!-- used for generating the dependencies.properties file located in 
-                    the META-INF -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.10</version>
-                <executions>
-                    <execution>
-                        <id>generate-depends-file</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>list</goal>
-                        </goals>
-                        <configuration>
-                            <outputFile>target/classes/META-INF/maven/dependencies.txt</outputFile>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.4</version>
-                <executions>
-                    <execution>
-                        <phase>process-resources</phase>
-                        <configuration>
-                            <tasks>
-                                <echo file="target/classes/META-INF/maven/dependencies.txt"
-                                    message="${groupId}:${artifactId}:jar:${version}:runtime"
-                                    append="true" encoding="UTF-8"/>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-		
-<!-- 			<plugin> -->
-<!-- 				used for generating the dependencies.properties file located in --> 
-<!-- 					the META-INF -->
-<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
-<!-- 				<artifactId>maven-dependency-plugin</artifactId> -->
-<!-- 				<version>2.10</version> -->
-<!-- 				<groupId>org.apache.servicemix.tooling</groupId> -->
-<!-- 				<artifactId>depends-maven-plugin</artifactId> -->
-<!-- 				<version>1.3</version> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<id>generate-depends-file</id> -->
-<!-- 						<phase>generate-resources</phase> -->
-<!-- 						<goals> -->
-<!-- 							<goal>list</goal> -->
-<!-- 						</goals> -->
-<!-- 						<configuration> -->
-<!-- 							<outputFile>META-INF/maven/${groupId}/${artifactId}/dependencies.txt</outputFile> -->
-<!-- 						</configuration> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
-<!-- 			</plugin> -->
+			<plugin>
+				<!-- used for generating the dependencies.properties file located in 
+					the META-INF -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.10</version>
+				<executions>
+					<execution>
+						<id>generate-depends-file</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>list</goal>
+						</goals>
+						<configuration>
+							<outputFile>target/classes/META-INF/maven/dependencies.txt</outputFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<phase>process-resources</phase>
+						<configuration>
+							<tasks>
+								<echo file="target/classes/META-INF/maven/dependencies.txt"
+									message="${groupId}:${artifactId}:jar:${version}:runtime"
+									append="true" encoding="UTF-8" />
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
