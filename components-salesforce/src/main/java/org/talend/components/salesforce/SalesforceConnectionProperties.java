@@ -111,7 +111,6 @@ public class SalesforceConnectionProperties extends ComponentProperties
         Form wizardForm = new Form(this, FORM_WIZARD);
         wizardForm.addRow(name);
         wizardForm.addRow(widget(loginType).setDeemphasize(true));
-        wizardForm.addRow(endpoint);
         wizardForm.addRow(oauth.getForm(Form.MAIN));
         wizardForm.addRow(userPassword.getForm(Form.MAIN));
         wizardForm.addRow(widget(advanced).setWidgetType(WidgetType.BUTTON));
@@ -119,11 +118,11 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(loginType);
-        mainForm.addRow(endpoint);
         mainForm.addRow(oauth.getForm(Form.MAIN));
         mainForm.addRow(userPassword.getForm(Form.MAIN));
 
         Form advancedForm = new Form(this, Form.ADVANCED);
+        advancedForm.addRow(endpoint);
         advancedForm.addRow(bulkConnection);
         advancedForm.addRow(needCompression);
         advancedForm.addRow(httpTraceMessage);
