@@ -5,6 +5,8 @@ package org.talend.components.api.container;
  */
 public interface RuntimeContainer {
 
+    public static final String DATA_KEY_EXECUTION_RESULT = "executionResult";
+
     /**
      * Return a data value applicable for a component with the given key and component Id. This is used
      * for communication between components with a container.
