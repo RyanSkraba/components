@@ -20,6 +20,7 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.Connector.ConnectorType;
 import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
+import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;

@@ -13,6 +13,7 @@
 package org.talend.components.api.component;
 
 import org.talend.components.api.TopLevelDefinition;
+import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.properties.ComponentProperties;
 
 /**

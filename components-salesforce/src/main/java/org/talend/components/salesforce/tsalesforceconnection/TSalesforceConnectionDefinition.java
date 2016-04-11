@@ -16,17 +16,20 @@ import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.Connector.ConnectorType;
+import org.talend.components.api.component.EndpointComponentDefinition;
 import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
+import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 
 import aQute.bnd.annotation.component.Component;
+import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceConnectionDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TSalesforceConnectionDefinition extends SalesforceDefinition {
+public class TSalesforceConnectionDefinition extends SalesforceDefinition implements EndpointComponentDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceConnectionNew"; //$NON-NLS-1$
 
@@ -40,5 +43,10 @@ public class TSalesforceConnectionDefinition extends SalesforceDefinition {
     @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return SalesforceConnectionProperties.class;
+    }
+
+    @Override
+    public SourceOrSink getRuntime() {
+        return new SalesforceSourceOrSink();
     }
 }
