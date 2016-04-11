@@ -16,6 +16,7 @@ import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.Connector.ConnectorType;
+import org.talend.components.api.component.EndpointComponentDefinition;
 import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
 import org.talend.components.api.component.runtime.SourceOrSink;
@@ -28,7 +29,7 @@ import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceConnectionDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TSalesforceConnectionDefinition extends SalesforceDefinition {
+public class TSalesforceConnectionDefinition extends SalesforceDefinition implements EndpointComponentDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceConnectionNew"; //$NON-NLS-1$
 

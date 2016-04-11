@@ -50,12 +50,6 @@ public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition im
     }
 
     @Override
-    public SourceOrSink getRuntime() {
-        // Virtual - no runtime
-        return null;
-    }
-
-    @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return TSalesforceOutputBulkExecProperties.class;
     }

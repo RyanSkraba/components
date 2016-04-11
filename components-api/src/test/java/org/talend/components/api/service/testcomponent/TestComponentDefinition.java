@@ -56,11 +56,6 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     }
 
     @Override
-    public SourceOrSink getRuntime() {
-        return null;
-    }
-
-    @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return TestComponentProperties.class;
     }

@@ -92,14 +92,6 @@ public interface ComponentDefinition extends TopLevelDefinition {
     public String getPartitioning();
 
     /**
-     * Returns the {@link SourceOrSink} if this is a runnable component but not either input or output (a connection for
-     * example).
-     * 
-     * @return
-     */
-    public SourceOrSink getRuntime();
-
-    /**
      * is used for computing the dependencies by finding the pom.xml and dependencies.properties in the META-INF/ folder
      * 
      * @return the maven Group Id of the component familly
