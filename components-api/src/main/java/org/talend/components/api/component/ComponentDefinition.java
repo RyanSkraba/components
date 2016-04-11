@@ -13,6 +13,7 @@
 package org.talend.components.api.component;
 
 import org.talend.components.api.TopLevelDefinition;
+import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.properties.ComponentProperties;
 
 /**
@@ -89,6 +90,14 @@ public interface ComponentDefinition extends TopLevelDefinition {
 
     // FIXME - An ENUM perhaps?
     public String getPartitioning();
+
+    /**
+     * Returns the {@link SourceOrSink} if this is a runnable component but not either input or output (a connection for
+     * example).
+     * 
+     * @return
+     */
+    public SourceOrSink getRuntime();
 
     /**
      * is used for computing the dependencies by finding the pom.xml and dependencies.properties in the META-INF/ folder
