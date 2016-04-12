@@ -17,8 +17,10 @@ import static org.talend.daikon.properties.PropertyFactory.newProperty;
 
 import java.lang.reflect.Field;
 import java.util.EnumSet;
+import java.util.List;
 
 import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.presentation.Form;
 
 /**
  * A reference to another component. This could be in one of the following states:
@@ -26,6 +28,9 @@ import org.talend.daikon.properties.Property;
  * <li>Reference a single instance of a given component type in the enclosing scope, e.g. Job</li>
  * <li>Reference to a particular instance of a component. In this case, the {@link #componentProperties} will be
  * populated by the {@link org.talend.daikon.properties.presentation.Widget}.</li>
+ *
+ * IMPORTANT - when using {@code ComponentReferenceProperties} the property name in the enclosingProperties
+ * must be {@code referencedComponent}.
  *
  * The {@link org.talend.daikon.properties.presentation.Widget.WidgetType#COMPONENT_REFERENCE} uses this class as its
  * properties and the Widget will populate these values.
@@ -64,9 +69,17 @@ public class ComponentReferenceProperties extends ComponentProperties {
         this.enclosingProperties = enclosing;
     }
 
+    // IMPORTANT - this is the name of the property in the enclosingProperties that uses this ComponentReferenceProperties
     public void afterReferencedComponent() {
         if (enclosingProperties != null)
             enclosingProperties.afterReferencedComponent();
+    }
+
+    @Override
+    public List<Form> getForms() {
+        if (enclosingProperties != null)
+            return ((ComponentProperties)enclosingProperties).getForms();
+        return super.getForms();
     }
 
     @Override

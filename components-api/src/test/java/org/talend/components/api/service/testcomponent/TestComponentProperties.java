@@ -21,6 +21,8 @@ import java.util.EnumSet;
 import java.util.List;
 
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentReferenceProperties;
+import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
 import org.talend.daikon.properties.PresentationItem;
@@ -34,7 +36,7 @@ import org.talend.daikon.properties.presentation.Widget.WidgetType;
 import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.properties.Property.Type;
 
-public class TestComponentProperties extends ComponentProperties {
+public class TestComponentProperties extends ComponentProperties implements ComponentReferencePropertiesEnclosing {
 
     public static final String USER_ID_PROP_NAME = "userId"; //$NON-NLS-1$
 
@@ -74,6 +76,8 @@ public class TestComponentProperties extends ComponentProperties {
 
     public InheritedComponentProperties nestedProp3 = new InheritedComponentProperties("nestedProp3");
 
+    public ComponentReferenceProperties referencedComponent = new ComponentReferenceProperties("referencedComponent", this);
+
     public static final String TESTCOMPONENT = "TestComponent";
 
     public TestComponentProperties(String name) {
@@ -99,6 +103,11 @@ public class TestComponentProperties extends ComponentProperties {
 
     public ValidationResult afterInteger() {
         return new ValidationResult().setStatus(Result.WARNING);
+    }
+
+    public void afterReferencedComponent() {
+        refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(Form.REFERENCE));
     }
 
     @Override
@@ -128,6 +137,12 @@ public class TestComponentProperties extends ComponentProperties {
         form.addRow(date);
         form.addRow(dateTime);
         form.addRow(nestedProps.getForm(Form.MAIN));
+
+        Form refForm = new Form(this, Form.REFERENCE);
+        Widget compListWidget = widget(referencedComponent).setWidgetType(WidgetType.COMPONENT_REFERENCE);
+        referencedComponent.componentType.setValue("refComp");
+        refForm.addRow(compListWidget);
+        refForm.addRow(mainForm);
     }
 
     @Override

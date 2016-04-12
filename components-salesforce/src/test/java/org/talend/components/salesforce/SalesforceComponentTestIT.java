@@ -508,6 +508,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         props.connection.referencedComponent.referenceType.setValue(ComponentReferenceProperties.ReferenceType.THIS_COMPONENT);
         props.connection.referencedComponent.componentInstanceId.setValue(null);
         props.connection.referencedComponent.componentProperties = null;
+        // Check that the null referenced component works.
+        checkAndAfter(props.connection.getForm(Form.REFERENCE), "referencedComponent", props.connection);
 
         salesforceSourceOrSink = new SalesforceSourceOrSink();
         salesforceSourceOrSink.initialize(null, props);
