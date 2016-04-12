@@ -46,6 +46,11 @@ public class TSalesforceConnectionDefinition extends SalesforceDefinition implem
     }
 
     @Override
+    public boolean isStartable() {
+        return true;
+    }
+
+    @Override
     public SourceOrSink getRuntime() {
         return new SalesforceSourceOrSink();
     }
