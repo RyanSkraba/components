@@ -31,7 +31,7 @@ import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
         + TSalesforceConnectionDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceConnectionDefinition extends SalesforceDefinition implements EndpointComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tSalesforceConnectionNew"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tSalesforceConnection"; //$NON-NLS-1$
 
     public TSalesforceConnectionDefinition() {
         super(COMPONENT_NAME);

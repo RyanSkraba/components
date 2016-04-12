@@ -22,15 +22,15 @@ import org.talend.components.api.component.Trigger.TriggerType;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
+import org.talend.components.salesforce.runtime.SalesforceSink;
 
 import aQute.bnd.annotation.component.Component;
-import org.talend.components.salesforce.runtime.SalesforceSink;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceWaveOutputBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceWaveOutputBulkExecDefinition extends SalesforceDefinition implements OutputComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tSalesforceWaveOutputBulkExecNew"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tSalesforceWaveOutputBulkExec"; //$NON-NLS-1$
 
     public TSalesforceWaveOutputBulkExecDefinition() {
         super(COMPONENT_NAME);

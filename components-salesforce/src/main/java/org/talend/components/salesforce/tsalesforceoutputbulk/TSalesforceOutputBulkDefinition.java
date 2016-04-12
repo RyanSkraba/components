@@ -31,7 +31,7 @@ import aQute.bnd.annotation.component.Component;
         + TSalesforceOutputBulkDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceOutputBulkDefinition extends SalesforceDefinition implements OutputComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tSalesforceOutputBulkNew"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tSalesforceOutputBulk"; //$NON-NLS-1$
 
     public TSalesforceOutputBulkDefinition() {
         super(COMPONENT_NAME);

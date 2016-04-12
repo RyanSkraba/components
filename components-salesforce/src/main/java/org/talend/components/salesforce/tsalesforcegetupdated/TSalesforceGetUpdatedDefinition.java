@@ -30,7 +30,7 @@ import aQute.bnd.annotation.component.Component;
         + TSalesforceGetUpdatedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceGetUpdatedDefinition extends SalesforceDefinition implements InputComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tSalesforceGetUpdatedNew"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tSalesforceGetUpdated"; //$NON-NLS-1$
 
     public TSalesforceGetUpdatedDefinition() {
         super(COMPONENT_NAME);

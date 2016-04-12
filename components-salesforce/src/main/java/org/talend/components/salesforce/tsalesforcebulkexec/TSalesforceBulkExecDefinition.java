@@ -30,7 +30,7 @@ import org.talend.components.salesforce.runtime.SalesforceSource;
         + TSalesforceBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceBulkExecDefinition extends SalesforceDefinition implements InputComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tSalesforceBulkExecNew"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tSalesforceBulkExec"; //$NON-NLS-1$
 
     public TSalesforceBulkExecDefinition() {
         super(COMPONENT_NAME);

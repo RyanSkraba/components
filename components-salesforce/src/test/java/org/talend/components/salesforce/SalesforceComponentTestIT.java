@@ -168,7 +168,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
     @Test
     public void testFamily() {
-        ComponentDefinition cd = getComponentService().getComponentDefinition("tSalesforceConnectionNew");
+        ComponentDefinition cd = getComponentService().getComponentDefinition("tSalesforceConnection");
         assertEquals(2, cd.getFamilies().length);
         assertEquals("Business/Salesforce", cd.getFamilies()[0]);
         assertEquals("Cloud/Salesforce", cd.getFamilies()[1]);
@@ -191,7 +191,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
             }
         }
         assertEquals(1, count);
-        assertEquals("Create SalesforceNew Connection", wizardDef.getMenuItemName());
+        assertEquals("Create Salesforce Connection", wizardDef.getMenuItemName());
         ComponentWizard wiz = getComponentService().getComponentWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
                 "nodeSalesforce");
         assertNotNull(wiz);
@@ -310,11 +310,11 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         assertTrue(connProps == ((SalesforceModuleListProperties) subWizards[2].getForms().get(0).getProperties())
                 .getConnectionProps());
         assertFalse(subWizards[1].getDefinition().isTopLevel());
-        assertEquals("Edit SalesforceNew Connection", subWizards[1].getDefinition().getMenuItemName());
+        assertEquals("Edit Salesforce Connection", subWizards[1].getDefinition().getMenuItemName());
         assertTrue(subWizards[0].getDefinition().isTopLevel());
-        assertEquals("Create SalesforceNew Connection", subWizards[0].getDefinition().getMenuItemName());
+        assertEquals("Create Salesforce Connection", subWizards[0].getDefinition().getMenuItemName());
         assertFalse(subWizards[2].getDefinition().isTopLevel());
-        assertEquals("Add SalesforceNew Modules", subWizards[2].getDefinition().getMenuItemName());
+        assertEquals("Add Salesforce Modules", subWizards[2].getDefinition().getMenuItemName());
     }
 
     @Test

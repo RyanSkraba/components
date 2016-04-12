@@ -38,7 +38,7 @@ public abstract class SalesforceDefinition extends AbstractComponentDefinition {
     public String getPngImagePath(ComponentImageType imageType) {
         switch (imageType) {
         case PALLETE_ICON_32X32:
-            return componentName.replace("New", "") + "_icon32.png"; //$NON-NLS-1$
+            return componentName + "_icon32.png"; //$NON-NLS-1$
         }
         return null;
     }
