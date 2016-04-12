@@ -16,6 +16,12 @@
         <components.api.version>0.5.0-SNAPSHOT</components.api.version>
     </properties>
     <packaging>bundle</packaging>
+    <repositories>
+        <repository>
+            <id>snapshots</id>
+            <url>http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
+        </repository>
+    </repositories>
     <dependencies>
 
         <!-- APIs for all Components -->
@@ -51,9 +57,7 @@
             <artifactId>spring-boot-starter</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
