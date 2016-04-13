@@ -37,12 +37,9 @@ public class SalesforceServerTimeStampReaderTestIT extends SalesforceTestBase {
             // TODO we need to make sure about the server and local time zone are the same.
             Calendar now = Calendar.getInstance();
             Calendar date = (Calendar) row;
-            long nowMillis = now.getTimeInMillis();
-            long dateMillis = date.getTimeInMillis();
-            System.out.println("now: " + nowMillis);
-            System.out.println(dateMillis);
-            long delta = nowMillis - dateMillis;
-            assertTrue(Math.abs(delta) < 50000);
+            assertEquals(now.get(Calendar.YEAR), date.get(Calendar.YEAR));
+            assertEquals(now.get(Calendar.MONTH), date.get(Calendar.MONTH));
+            assertEquals(now.get(Calendar.DATE), date.get(Calendar.DATE));
 
         } finally {
             bounderReader.close();
