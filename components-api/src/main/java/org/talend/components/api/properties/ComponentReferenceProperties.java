@@ -12,15 +12,16 @@
 // ============================================================================
 package org.talend.components.api.properties;
 
-import static org.talend.daikon.properties.Property.Flags.DESIGN_TIME_ONLY;
-import static org.talend.daikon.properties.PropertyFactory.newProperty;
+import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.presentation.Form;
 
 import java.lang.reflect.Field;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.talend.daikon.properties.Property;
-import org.talend.daikon.properties.presentation.Form;
+import static org.talend.daikon.properties.Property.Flags.DESIGN_TIME_ONLY;
+import static org.talend.daikon.properties.PropertyFactory.newEnum;
+import static org.talend.daikon.properties.PropertyFactory.newProperty;
 
 /**
  * A reference to another component. This could be in one of the following states:
@@ -46,7 +47,7 @@ public class ComponentReferenceProperties extends ComponentProperties {
     //
     // Properties
     //
-    public Property referenceType = (Property) newProperty("referenceType").setEnumClass(ReferenceType.class); //$NON-NLS-1$
+    public Property referenceType = newEnum("referenceType").setEnumClass(ReferenceType.class); //$NON-NLS-1$
 
     public Property componentType = newProperty("componentType").setFlags(EnumSet.of(DESIGN_TIME_ONLY)); //$NON-NLS-1$
 
