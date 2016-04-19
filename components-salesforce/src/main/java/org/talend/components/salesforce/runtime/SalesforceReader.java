@@ -49,14 +49,14 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
     protected IndexedRecordAdapterFactory<?, IndexedRecord> getFactory() throws IOException {
         if (null == factory) {
             boolean useBulkFactory = false;
-            if(properties instanceof TSalesforceBulkExecProperties){
+            if (properties instanceof TSalesforceBulkExecProperties) {
                 useBulkFactory = true;
-            }else if(properties instanceof TSalesforceInputProperties){
-                if(TSalesforceInputProperties.QUERY_BULK.equals(((TSalesforceInputProperties)properties).queryMode.getStringValue())){
+            } else if (properties instanceof TSalesforceInputProperties) {
+                if (TSalesforceInputProperties.QUERY_BULK.equals(((TSalesforceInputProperties) properties).queryMode.getStringValue())) {
                     useBulkFactory = true;
                 }
             }
-            if(useBulkFactory){
+            if (useBulkFactory) {
                 factory = new BulkResultAdapterFactory();
             } else {
                 factory = new SObjectAdapterFactory();
@@ -73,29 +73,31 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
         return querySchema;
     }
 
-    protected String getQueryString(TSalesforceInputProperties inProperties) throws IOException {
-        String queryText = "";
-        if (inProperties.manualQuery.getBooleanValue()) {
-            queryText = inProperties.query.getStringValue();
-        } else {
-            StringBuilder sb = new StringBuilder();
-            sb.append("select "); //$NON-NLS-1$
-            int count = 0;
-            for (Schema.Field se : getSchema().getFields()) {
-                if (count++ > 0) {
-                    sb.append(", "); //$NON-NLS-1$
-                }
-                sb.append(se.name());
+    protected String getQueryString(SalesforceConnectionModuleProperties properties) throws IOException {
+        String condition = null;
+        if(properties instanceof TSalesforceInputProperties){
+            TSalesforceInputProperties inProperties = (TSalesforceInputProperties)properties;
+            if (inProperties.manualQuery.getBooleanValue()) {
+                return inProperties.query.getStringValue();
+            } else {
+                condition = inProperties.condition.getStringValue();
             }
-            sb.append(" from "); //$NON-NLS-1$
-            sb.append(inProperties.module.moduleName.getStringValue());
-            String condition = inProperties.condition.getStringValue();
-            if(condition!=null && condition.trim().length()>0){
-                sb.append(" where ");
-                sb.append(condition);
-            }
-            queryText = sb.toString();
         }
-        return queryText;
+        StringBuilder sb = new StringBuilder();
+        sb.append("select "); //$NON-NLS-1$
+        int count = 0;
+        for (Schema.Field se : getSchema().getFields()) {
+            if (count++ > 0) {
+                sb.append(", "); //$NON-NLS-1$
+            }
+            sb.append(se.name());
+        }
+        sb.append(" from "); //$NON-NLS-1$
+        sb.append(properties.module.moduleName.getStringValue());
+        if (condition != null && condition.trim().length() > 0) {
+            sb.append(" where ");
+            sb.append(condition);
+        }
+        return sb.toString();
     }
 }
