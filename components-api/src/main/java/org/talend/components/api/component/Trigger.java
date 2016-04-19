@@ -21,15 +21,10 @@ package org.talend.components.api.component;
  */
 public class Trigger extends AbstractComponentConnection {
 
-    // FIXME - are the RUN_IF, COMPONENT_OK, COMPONENT_ERROR always present?
-
     public enum TriggerType {
         ITERATE,
         SUBJOB_OK,
-        SUBJOB_ERROR,
-        COMPONENT_OK,
-        COMPONENT_ERROR,
-        RUN_IF
+        SUBJOB_ERROR
     }
 
     protected TriggerType type;

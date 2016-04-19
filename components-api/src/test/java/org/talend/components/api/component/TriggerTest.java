@@ -20,17 +20,12 @@ import java.util.List;
 import org.junit.Test;
 import org.talend.components.api.component.Trigger.TriggerType;
 
-/**
- * created by pbailly on 4 Dec 2015 Detailled comment
- *
- */
 public class TriggerTest {
 
     @Test
     public void testTriggerType() {
-        assertEquals(6, TriggerType.values().length);
-        List<TriggerType> types = Arrays.asList(TriggerType.ITERATE, TriggerType.SUBJOB_OK, TriggerType.SUBJOB_ERROR,
-                TriggerType.COMPONENT_OK, TriggerType.COMPONENT_ERROR, TriggerType.RUN_IF);
+        assertEquals(3, TriggerType.values().length);
+        List<TriggerType> types = Arrays.asList(TriggerType.ITERATE, TriggerType.SUBJOB_OK, TriggerType.SUBJOB_ERROR);
         assertEquals(types, Arrays.asList(TriggerType.values()));
     }
 
@@ -41,8 +36,8 @@ public class TriggerTest {
         assertEquals(5, Trigger.getMaxInput());
         assertEquals(6, Trigger.getMaxOutput());
 
-        Trigger.setType(TriggerType.RUN_IF);
-        assertEquals(TriggerType.RUN_IF, Trigger.getType());
+        Trigger.setType(TriggerType.SUBJOB_ERROR);
+        assertEquals(TriggerType.SUBJOB_ERROR, Trigger.getType());
         Trigger.setMaxInput(7);
         assertEquals(7, Trigger.getMaxInput());
         Trigger.setMaxOutput(8);
