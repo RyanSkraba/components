@@ -25,7 +25,7 @@ public interface SourceOrSink extends Serializable {
     /**
      * Get the list of schema names available for this {@code Source} or an empty List if none.
      */
-    public List<NamedThing> getSchemaNames(RuntimeContainer adaptor) throws IOException;
+    public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException;
 
     /**
      * Return the schema associated with the specified schema name for this {@code Source}, or null if none.
