@@ -13,13 +13,13 @@
 package org.talend.components.api.component;
 
 import org.talend.components.api.TopLevelDefinition;
-import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.properties.ComponentProperties;
 
 /**
- * Component definition service.
+ * Defines a component.
  * <p/>
- * An instance of this class handles the setup of the properties associated with a components.
+ * A class implementing this interface is the definition of a component. Instances are registered with the
+ * {@link org.talend.components.api.service.ComponentService} to allow components to be discovered.
  */
 
 public interface ComponentDefinition extends TopLevelDefinition {
@@ -27,43 +27,42 @@ public interface ComponentDefinition extends TopLevelDefinition {
     /**
      * Returns an array of paths that represent the categories of the component.
      */
-    public String[] getFamilies();
+    String[] getFamilies();
 
     /**
-     * create the ComponentProperties and initialize it's properties and ui layout
+     * Create and initialize a suitable {@link ComponentProperties} which configures an instance of this component.
      */
-    public ComponentProperties createProperties();
+    ComponentProperties createProperties();
 
     /**
-     * FIXME - is this really necessary?
-     * create the ComponentProperties and initialize it's properties only and not the UI Layout not usefull for runtime
+     * FIXME - is this really necessary? create the ComponentProperties and initialize it's properties only and not the
+     * UI Layout not usefull for runtime
      */
-    public ComponentProperties createRuntimeProperties();
+    ComponentProperties createRuntimeProperties();
 
     /**
      * Returns the types of {@link Connector} objects supported by this component.
      *
      * A connector is a link between two components that transmit data.
      */
-    public Connector[] getConnectors();
+    Connector[] getConnectors();
 
     /**
      * Returns the types of {@link Trigger} objects supported by this component.
      *
      * A trigger is a link between two components that schedule the different subjobs.
      */
-    public Trigger[] getTriggers();
+    Trigger[] getTriggers();
 
     /**
      * Returns true if this {@code ComponentDefinition} will work with the specified list of {@link ComponentProperties}
-     * .
      */
-    public boolean supportsProperties(ComponentProperties... properties);
+    boolean supportsProperties(ComponentProperties... properties);
 
     /**
-     * This shall be a path relative to the current Component definition, ideally is should just be the name of the png
-     * image if placed in the same resource folder that the current class. This icon will be computed with the following
-     * code
+     * A path relative to the current Component definition, ideally is should just be the name of the png image if
+     * placed in the same resource folder as the implementing class. The
+     * {@link org.talend.components.api.service.ComponentService} will compute the icon with the following code:
      * 
      * <pre>
      * {@code
@@ -73,37 +72,37 @@ public interface ComponentDefinition extends TopLevelDefinition {
      * 
      * @see {@link java.lang.Class#getResourceAsStream(String)}
      * @param imageType the type of image requested
-     * @return the path to the png resource or null if the type is not handled.
+     * @return the path to the png resource or null if an image is not required.
      */
-    public String getPngImagePath(ComponentImageType imageType);
+    String getPngImagePath(ComponentImageType imageType);
 
     //
     // FIXME - DI flags - do we need all of these?
     //
 
-    public boolean isSchemaAutoPropagate();
+    boolean isSchemaAutoPropagate();
 
-    public boolean isDataAutoPropagate();
+    boolean isDataAutoPropagate();
 
-    public boolean isConditionalInputs();
+    boolean isConditionalInputs();
 
-    public boolean isStartable();
+    boolean isStartable();
 
     // FIXME - An ENUM perhaps?
-    public String getPartitioning();
+    String getPartitioning();
 
     /**
-     * is used for computing the dependencies by finding the pom.xml and dependencies.properties in the META-INF/ folder
+     * Used for computing the dependencies by finding the pom.xml and dependencies.properties in the META-INF/ folder
      * 
-     * @return the maven Group Id of the component familly
+     * @return the maven Group Id of the component family
      */
-    public String getMavenGroupId();
+    String getMavenGroupId();
 
     /**
-     * is used for computing the dependencies by finding the pom.xml and dependencies.properties in the META-INF/ folder
+     * Used for computing the dependencies by finding the pom.xml and dependencies.properties in the META-INF/ folder
      * 
-     * @return the maven Artifact Id of the component familly
+     * @return the maven Artifact Id of the component family
      */
-    public String getMavenArtifactId();
+    String getMavenArtifactId();
 
 }

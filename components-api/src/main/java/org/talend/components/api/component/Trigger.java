@@ -13,11 +13,8 @@
 package org.talend.components.api.component;
 
 /**
- * A trigger links two components together by a logical relationship. If the input component fulfill the condition, the
- * output component will be executed. They can use the context of the input component but will not transmit data to the
- * output component.
- *
- * Trigger connections are used to define the different subjobs of a job.
+ * A trigger links two components together by a logical relationship. If the input component fulfills a condition, the
+ * output component will be executed.
  */
 public class Trigger extends AbstractComponentConnection {
 

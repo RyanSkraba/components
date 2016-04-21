@@ -16,10 +16,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-/**
- * created by pbailly on 4 Dec 2015 Detailled comment
- *
- */
 public class ComponentImageTypeTest {
 
     @Test
