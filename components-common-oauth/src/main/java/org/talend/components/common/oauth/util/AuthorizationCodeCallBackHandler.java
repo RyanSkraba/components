@@ -23,10 +23,6 @@ import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
-/**
- * created by bchen on Sep 11, 2015 Detailled comment
- *
- */
 public class AuthorizationCodeCallBackHandler extends AbstractHandler {
 
     String code;

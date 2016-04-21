@@ -43,11 +43,6 @@ import java.util.NoSuchElementException;
  * {@link #splitAtFraction} may be called concurrently with {@link #advance} or {@link #start}. It is critical that
  * their interaction is implemented in a thread-safe way, otherwise data loss is possible.
  *
- * <p>
- * Sources which support dynamic work rebalancing should use {@link com.google.cloud.dataflow.sdk.io.range.RangeTracker}
- * to manage the (source-specific) range of positions that is being split. If your source supports dynamic work
- * rebalancing, please use that class to implement it if possible; if not possible, please contact the team at
- * <i>dataflow-feedback@google.com</i>.
  */
 public interface BoundedReader<T> extends Reader<T> {
 

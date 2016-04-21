@@ -35,6 +35,7 @@ public interface ComponentDefinition extends TopLevelDefinition {
     public ComponentProperties createProperties();
 
     /**
+     * FIXME - is this really necessary?
      * create the ComponentProperties and initialize it's properties only and not the UI Layout not usefull for runtime
      */
     public ComponentProperties createRuntimeProperties();
