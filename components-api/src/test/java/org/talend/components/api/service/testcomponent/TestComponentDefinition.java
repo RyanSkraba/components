@@ -33,6 +33,7 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     public static final String COMPONENT_NAME = "TestComponent"; //$NON-NLS-1$
 
     public TestComponentDefinition() {
+        super(COMPONENT_NAME);
         setConnectors(new Connector(ConnectorType.FLOW, 0, 0));
         setTriggers(new Trigger(TriggerType.ITERATE, 1, 0), new Trigger(TriggerType.SUBJOB_OK, 1, 0),
                 new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
@@ -43,11 +44,6 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     @Override
     public String[] getFamilies() {
         return new String[] { "level1/level2", "newlevel1/newlevel2" };
-    }
-
-    @Override
-    public String getName() {
-        return COMPONENT_NAME;
     }
 
     @Override
