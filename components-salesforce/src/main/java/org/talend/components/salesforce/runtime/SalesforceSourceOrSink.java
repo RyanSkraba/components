@@ -53,13 +53,13 @@ public class SalesforceSourceOrSink implements SourceOrSink {
 
     protected static final String API_VERSION = "34.0";
 
-    protected SalesforceProvideConnectionProperties  properties;
+    protected SalesforceProvideConnectionProperties properties;
 
     protected static final String KEY_CONNECTION = "Connection";
 
     @Override
     public void initialize(RuntimeContainer container, ComponentProperties properties) {
-        this.properties = (SalesforceProvideConnectionProperties )properties;
+        this.properties = (SalesforceProvideConnectionProperties) properties;
     }
 
     @Override
@@ -132,12 +132,13 @@ public class SalesforceSourceOrSink implements SourceOrSink {
 
     protected PartnerConnection doConnection(ConnectorConfig config) throws ConnectionException {
         SalesforceConnectionProperties connProps = properties.getConnectionProperties();
+        String endpoint = connProps.endpoint.getStringValue();
         if (SalesforceConnectionProperties.LOGIN_OAUTH.equals(connProps.loginType.getValue())) {
             SalesforceOAuthConnection oauthConnection = new SalesforceOAuthConnection(connProps.oauth,
-                    SalesforceConnectionProperties.OAUTH_URL, API_VERSION);
+                    endpoint, API_VERSION);
             oauthConnection.login(config);
         } else {
-            config.setAuthEndpoint(SalesforceConnectionProperties.URL);
+            config.setAuthEndpoint(endpoint);
         }
         PartnerConnection connection;
         connection = new PartnerConnection(config);
@@ -175,8 +176,12 @@ public class SalesforceSourceOrSink implements SourceOrSink {
 
         ConnectorConfig config = new ConnectorConfig();
         config.setUsername(StringUtils.strip(connProps.userPassword.userId.getStringValue(), "\""));
-        config.setPassword(StringUtils.strip(connProps.userPassword.password.getStringValue(), "\"")
-                + StringUtils.strip(connProps.userPassword.securityKey.getStringValue(), "\""));
+        String password = StringUtils.strip(connProps.userPassword.password.getStringValue(), "\"");
+        String securityKey = StringUtils.strip(connProps.userPassword.securityKey.getStringValue(), "\"");
+        if (!StringUtils.isEmpty(securityKey)) {
+            password = password + securityKey;
+        }
+        config.setPassword(password);
 
         ProxyPropertiesRuntimeHelper.setProxy(connProps.proxy, ProxyProperties.ProxyType.SOCKS);
 
@@ -215,14 +220,14 @@ public class SalesforceSourceOrSink implements SourceOrSink {
 
         try {
             ch.connection = doConnection(config);
-            if(ch.connection!=null){
+            if (ch.connection != null) {
                 String clientId = connProps.clientId.getStringValue();
-                if(clientId!=null){
+                if (clientId != null) {
                     // Need the test.
-                    ch.connection.setCallOptions(clientId,null);
+                    ch.connection.setCallOptions(clientId, null);
                 }
             }
-            if(connProps.bulkConnection.getBooleanValue()){
+            if (connProps.bulkConnection.getBooleanValue()) {
                 ch.bulkConnection = connectBulk(ch.connection.getConfig());
             }
             if (container != null) {
@@ -295,23 +300,23 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         }
     }
 
-    private void setProxy(ConnectorConfig config){
-        String proxyHost =null;
-        String proxyPort =null;
+    private void setProxy(ConnectorConfig config) {
+        String proxyHost = null;
+        String proxyPort = null;
         String proxyUser = null;
         String proxyPwd = null;
-        Proxy.Type proxyType= Proxy.Type.HTTP;
-        if(System.getProperty("https.proxyHost")!=null){
+        Proxy.Type proxyType = Proxy.Type.HTTP;
+        if (System.getProperty("https.proxyHost") != null) {
             proxyHost = System.getProperty("https.proxyHost");
             proxyPort = System.getProperty("https.proxyPort");
             proxyUser = System.getProperty("https.proxyUser");
             proxyPwd = System.getProperty("https.proxyPassword");
-        }else if(System.getProperty("http.proxyHost")!=null){
+        } else if (System.getProperty("http.proxyHost") != null) {
             proxyHost = System.getProperty("http.proxyHost");
             proxyPort = System.getProperty("http.proxyPort");
             proxyUser = System.getProperty("http.proxyUser");
             proxyPwd = System.getProperty("http.proxyPassword");
-        }else if( System.getProperty("socksProxyHost")!=null){
+        } else if (System.getProperty("socksProxyHost") != null) {
             proxyHost = System.getProperty("socksProxyHost");
             proxyPort = System.getProperty("socksProxyPort");
             proxyUser = System.getProperty("java.net.socks.username");
@@ -319,16 +324,16 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             proxyType = Proxy.Type.SOCKS;
         }
 
-        if(proxyHost!=null){
+        if (proxyHost != null) {
             SocketAddress addr = new InetSocketAddress(proxyHost, Integer.parseInt(proxyPort));
-            config.setProxy(new Proxy(proxyType,addr));
-            if(proxyUser!=null && proxyUser.length() > 0){
+            config.setProxy(new Proxy(proxyType, addr));
+            if (proxyUser != null && proxyUser.length() > 0) {
                 config.setProxyUsername(proxyUser);
             }
-            if(proxyPwd!=null && proxyPwd.length() > 0){
+            if (proxyPwd != null && proxyPwd.length() > 0) {
                 config.setProxyPassword(proxyPwd);
             }
-        }else{
+        } else {
             //No proxy.
         }
     }
