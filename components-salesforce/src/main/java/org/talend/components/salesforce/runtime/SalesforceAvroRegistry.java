@@ -1,7 +1,12 @@
 package org.talend.components.salesforce.runtime;
 
-import com.sforce.soap.partner.DescribeSObjectResult;
-import com.sforce.soap.partner.Field;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.avro.Schema;
 import org.talend.daikon.avro.AvroConverter;
 import org.talend.daikon.avro.AvroRegistry;
@@ -10,12 +15,8 @@ import org.talend.daikon.avro.util.AvroTypes;
 import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.java8.SerializableFunction;
 
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.sforce.soap.partner.DescribeSObjectResult;
+import com.sforce.soap.partner.Field;
 
 /**
  *
@@ -89,33 +90,33 @@ public class SalesforceAvroRegistry extends AvroRegistry {
             // Add some Talend6 custom properties to the schema.
             if (AvroTypes.isSameType(avroField.schema(), AvroTypes._string())) {
                 if (field.getLength() != 0) {
-                    avroField.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, field.getLength());
+                    avroField.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, String.valueOf(field.getLength()));
                 }
                 if (field.getPrecision() != 0) {
-                    avroField.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, field.getPrecision());
+                    avroField.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, String.valueOf(field.getPrecision()));
                 }
             } else {
                 if (field.getPrecision() != 0) {
-                    avroField.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, field.getPrecision());
+                    avroField.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, String.valueOf(field.getPrecision()));
                 }
                 if (field.getScale() != 0) {
-                    avroField.addProp(SchemaConstants.TALEND_COLUMN_SCALE, field.getScale());
+                    avroField.addProp(SchemaConstants.TALEND_COLUMN_SCALE, String.valueOf(field.getScale()));
                 }
             }
             // pattern will be removed when we have db type for salesforce
-            switch (field.getType()){
-                case date:
-                    avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd");
-                    break;
-                case datetime:
-                    avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'");
-                    break;
-                default:
-                    break;
+            switch (field.getType()) {
+            case date:
+                avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd");
+                break;
+            case datetime:
+                avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'");
+                break;
+            default:
+                break;
             }
-            if(avroField.defaultVal() != null){
-                //FIXME really needed as Schema.Field has ability to store default value
-                avroField.addProp(SchemaConstants.TALEND_COLUMN_DEFAULT, avroField.defaultVal());
+            if (avroField.defaultVal() != null) {
+                // FIXME really needed as Schema.Field has ability to store default value
+                avroField.addProp(SchemaConstants.TALEND_COLUMN_DEFAULT, String.valueOf(avroField.defaultVal()));
             }
             fields.add(avroField);
         }
@@ -141,27 +142,27 @@ public class SalesforceAvroRegistry extends AvroRegistry {
         // However, these properties are saved in the schema with Talend6SchemaConstants if present.
         Schema base;
         switch (field.getType()) {
-            case _boolean:
-                base = AvroTypes._boolean();
-                break;
-            case _double:
-                base = AvroTypes._double();
-                break;
-            case _int:
-                base = AvroTypes._int();
-                break;
-            case currency:
-                base = AvroTypes._decimal();
-                break;
-            case date:
-                base = AvroTypes._date();
-                break;
-            case datetime:
-                base = AvroTypes._date();
-                break;
-            default:
-                base = AvroTypes._string();
-                break;
+        case _boolean:
+            base = AvroTypes._boolean();
+            break;
+        case _double:
+            base = AvroTypes._double();
+            break;
+        case _int:
+            base = AvroTypes._int();
+            break;
+        case currency:
+            base = AvroTypes._decimal();
+            break;
+        case date:
+            base = AvroTypes._date();
+            break;
+        case datetime:
+            base = AvroTypes._date();
+            break;
+        default:
+            base = AvroTypes._string();
+            break;
         }
         base = field.getNillable() ? AvroUtils.wrapAsNullable(base) : base;
 
@@ -177,18 +178,19 @@ public class SalesforceAvroRegistry extends AvroRegistry {
      */
     public AvroConverter<String, ?> getConverterFromString(org.apache.avro.Schema.Field f) {
         Schema fieldSchema = AvroUtils.unwrapIfNullable(f.schema());
-        //FIXME use avro type to decide the converter is not correct if the user change the avro type, Date to String for instance
-        if(AvroTypes.isSameType(fieldSchema, AvroTypes._boolean())){
+        // FIXME use avro type to decide the converter is not correct if the user change the avro type, Date to String
+        // for instance
+        if (AvroTypes.isSameType(fieldSchema, AvroTypes._boolean())) {
             return new StringToBooleanConverter(f);
-        }else if(AvroTypes.isSameType(fieldSchema, AvroTypes._decimal())){
+        } else if (AvroTypes.isSameType(fieldSchema, AvroTypes._decimal())) {
             return new StringToDecimalConverter(f);
-        }else if(AvroTypes.isSameType(fieldSchema, AvroTypes._double())) {
+        } else if (AvroTypes.isSameType(fieldSchema, AvroTypes._double())) {
             return new StringToDoubleConverter(f);
-        }else if(AvroTypes.isSameType(fieldSchema, AvroTypes._int())) {
+        } else if (AvroTypes.isSameType(fieldSchema, AvroTypes._int())) {
             return new StringToIntegerConverter(f);
-        }else if(AvroTypes.isSameType(fieldSchema, AvroTypes._date())) {
+        } else if (AvroTypes.isSameType(fieldSchema, AvroTypes._date())) {
             return new StringToDateConverter(f);
-        }else if(AvroTypes.isSameType(fieldSchema, AvroTypes._string())) {
+        } else if (AvroTypes.isSameType(fieldSchema, AvroTypes._string())) {
             return super.getConverter(String.class);
         }
         throw new UnsupportedOperationException("The type " + fieldSchema.getType() + " is not supported."); //$NON-NLS-1$ //$NON-NLS-2$

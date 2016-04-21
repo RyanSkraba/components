@@ -14,7 +14,7 @@
 package org.talend.components.api.component.runtime;
 
 /**
- * A {@code Sink} represents a resource that can be written to using the {@link Write} transform.
+ * A {@code Sink} represents a resource that can be written to.
  *
  * <p>
  * A parallel write to a {@code Sink} consists of three phases:
@@ -25,23 +25,16 @@ package org.talend.components.api.component.runtime;
  * </ol>
  *
  * <p>
- * The {@link Write} transform can be used in a Dataflow pipeline to perform this write. Specifically, a Write transform
- * can be applied to a {@link PCollection} {@code p} by:
- *
- * <p>
- * {@code p.apply(Write.to(new MySink()));}
- *
- * <p>
- * Implementing a {@link Sink} and the corresponding write operations requires extending three abstract classes:
+ * Implementing a {@link Sink} and the corresponding write operations requires implementing these interfaces:
  *
  * <ul>
  * <li>{@link Sink}: an immutable logical description of the location/resource to write to. Depending on the type of
  * sink, it may contain fields such as the path to an output directory on a filesystem, a database table name, etc.
  * Implementors of {@link Sink} must implement two methods: {@link Sink#validate} and {@link Sink#createWriteOperation}.
  * {@link Sink#validate Validate} is called by the Write transform at pipeline creation, and should validate that the
- * Sink can be written to. The createWriteOperation method is also called at pipeline creation, and should return a
- * WriteOperation object that defines how to write to the Sink. Note that implementations of Sink must be serializable
- * and Sinks must be immutable.
+ * {@code Sink} can be written to. The createWriteOperation method is also called at pipeline creation, and should
+ * return a WriteOperation object that defines how to write to the {@code Sink}. Note that implementations of
+ * {@code Sink} must be serializable and {@code Sink}s must be immutable. See also {@link SourceOrSink}.
  *
  * <li>{@link WriteOperation}: The WriteOperation implements the <i>initialization</i> and <i>finalization</i> phases of
  * a write. Implementors of {@link WriteOperation} must implement corresponding {@link WriteOperation#initialize} and

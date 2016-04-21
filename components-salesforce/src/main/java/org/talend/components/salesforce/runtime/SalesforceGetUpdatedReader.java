@@ -13,30 +13,39 @@
 package org.talend.components.salesforce.runtime;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.NoSuchElementException;
 
+import com.sforce.soap.partner.DeletedRecord;
+import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.SalesforceGetDeletedUpdatedProperties;
 
 import com.sforce.soap.partner.GetUpdatedResult;
 import com.sforce.ws.ConnectionException;
 
-public class SalesforceGetUpdatedReader extends SalesforceGetDeletedUpdatedReader<GetUpdatedResult, Object> {
+public class SalesforceGetUpdatedReader extends SalesforceGetDeletedUpdatedReader<GetUpdatedResult> {
 
     public SalesforceGetUpdatedReader(RuntimeContainer adaptor, SalesforceSource source,
-            SalesforceGetDeletedUpdatedProperties props) {
+                                      SalesforceGetDeletedUpdatedProperties props) {
         super(adaptor, source, props);
     }
 
     @Override
-    protected GetUpdatedResult getResult() throws IOException, ConnectionException {
-        SalesforceGetDeletedUpdatedProperties props = (SalesforceGetDeletedUpdatedProperties)properties;
-        return getConnection().getUpdated(module, props.startDate.getCalendarValue(), props.endDate.getCalendarValue());
+    protected List<String> getRecordIds(GetUpdatedResult result) {
+        List<String> ids = new ArrayList<>();
+        if (result != null) {
+            ids = Arrays.asList(result.getIds());
+        }
+        return ids;
     }
 
     @Override
-    public Object getCurrent() throws NoSuchElementException {
-        // TODO: Update to use an Avro-izable object.
-        return result;
+    protected GetUpdatedResult getResult() throws IOException, ConnectionException {
+        SalesforceGetDeletedUpdatedProperties props = (SalesforceGetDeletedUpdatedProperties) properties;
+        return getConnection().getUpdated(module, props.startDate.getCalendarValue(), props.endDate.getCalendarValue());
     }
+
 }

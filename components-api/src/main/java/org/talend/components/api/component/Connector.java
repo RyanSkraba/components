@@ -13,9 +13,8 @@
 package org.talend.components.api.component;
 
 /**
- * A connector links two components together. It allows its input component to transmit data to its output component.
+ * A connector links two components together providing a path for data transmission.
  *
- * The two components of a connector will be part of the same subjob.
  */
 public class Connector extends AbstractComponentConnection {
 

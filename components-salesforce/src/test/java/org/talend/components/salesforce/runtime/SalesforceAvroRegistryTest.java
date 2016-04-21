@@ -1,21 +1,25 @@
 package org.talend.components.salesforce.runtime;
 
-import com.sforce.soap.partner.DescribeSObjectResult;
-import com.sforce.soap.partner.Field;
-import com.sforce.soap.partner.FieldType;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.talend.daikon.avro.SchemaConstants.TALEND_COLUMN_DEFAULT;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
 import org.apache.avro.Schema;
 import org.junit.Test;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.util.AvroTypes;
 import org.talend.daikon.avro.util.AvroUtils;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.talend.daikon.avro.SchemaConstants.TALEND_COLUMN_DEFAULT;
+import com.sforce.soap.partner.DescribeSObjectResult;
+import com.sforce.soap.partner.Field;
+import com.sforce.soap.partner.FieldType;
 
 /**
  * Unit tests for the {@link SalesforceAvroRegistry}.
@@ -47,15 +51,27 @@ public class SalesforceAvroRegistryTest {
             dateField.setName("date");
             dateField.setType(FieldType.date);
 
+            Field stringWithLengthField = new Field();
+            stringWithLengthField.setName("string_with_length");
+            stringWithLengthField.setType(FieldType.string);
+            stringWithLengthField.setLength(20);
+
+            Field numberWithScaleAndPrecisionField = new Field();
+            numberWithScaleAndPrecisionField.setName("number_with_scale_and_precision");
+            numberWithScaleAndPrecisionField.setType(FieldType._double);
+            numberWithScaleAndPrecisionField.setPrecision(10);
+            numberWithScaleAndPrecisionField.setScale(2);
+
             DescribeSObjectResult dsor = new DescribeSObjectResult();
             dsor.setName("MySObjectRecord");
-            dsor.setFields(new Field[] { booleanField, defaultField, dateField });
+            dsor.setFields(new Field[] { booleanField, defaultField, dateField, stringWithLengthField,
+                    numberWithScaleAndPrecisionField });
             s = sRegistry.inferSchema(dsor);
         }
 
         assertThat(s.getType(), is(Schema.Type.RECORD));
         assertThat(s.getName(), is("MySObjectRecord"));
-        assertThat(s.getFields(), hasSize(3));
+        assertThat(s.getFields(), hasSize(5));
         assertThat(s.getObjectProps().keySet(), empty());
 
         // Check out the field.
@@ -67,15 +83,28 @@ public class SalesforceAvroRegistryTest {
         f = s.getField("def");
         assertThat(f.name(), is("def"));
         assertThat(f.schema().getType(), is(Schema.Type.BOOLEAN));
-        assertThat(f.getObjectProps().keySet(),containsInAnyOrder(TALEND_COLUMN_DEFAULT));
+        assertThat(f.getObjectProps().keySet(), containsInAnyOrder(TALEND_COLUMN_DEFAULT));
         assertThat(f.getProp(TALEND_COLUMN_DEFAULT), is(Boolean.TRUE.toString()));
 
         f = s.getField("date");
         assertThat(f.name(), is("date"));
         assertTrue(AvroTypes.isSameType(f.schema(), AvroTypes._date()));
-        assertThat(f.getObjectProps().keySet(),containsInAnyOrder(SchemaConstants.TALEND_COLUMN_PATTERN));
+        assertThat(f.getObjectProps().keySet(), containsInAnyOrder(SchemaConstants.TALEND_COLUMN_PATTERN));
         assertThat(f.getProp(SchemaConstants.TALEND_COLUMN_PATTERN), is("yyyy-MM-dd"));
 
+        f = s.getField("string_with_length");
+        assertThat(f.name(), is("string_with_length"));
+        assertTrue(AvroTypes.isSameType(f.schema(), AvroTypes._string()));
+        assertThat(f.getObjectProps().keySet(), containsInAnyOrder(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
+        assertThat(f.getProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH), is("20"));
+
+        f = s.getField("number_with_scale_and_precision");
+        assertThat(f.name(), is("number_with_scale_and_precision"));
+        assertTrue(AvroTypes.isSameType(f.schema(), AvroTypes._double()));
+        assertThat(f.getObjectProps().keySet(),
+                containsInAnyOrder(SchemaConstants.TALEND_COLUMN_SCALE, SchemaConstants.TALEND_COLUMN_PRECISION));
+        assertThat(f.getProp(SchemaConstants.TALEND_COLUMN_PRECISION), is("10"));
+        assertThat(f.getProp(SchemaConstants.TALEND_COLUMN_SCALE), is("2"));
     }
 
     /**
@@ -128,6 +157,6 @@ public class SalesforceAvroRegistryTest {
         s = sRegistry.inferSchema(f);
         assertThat(s.getType(), is(Schema.Type.STRING));
         assertThat(s.getProp(SchemaConstants.JAVA_CLASS_FLAG), is(BigDecimal.class.getCanonicalName()));
-//        assertThat(s.getLogicalType(), is((LogicalType) LogicalTypes.decimal(8, 5)));
+        // assertThat(s.getLogicalType(), is((LogicalType) LogicalTypes.decimal(8, 5)));
     }
 }

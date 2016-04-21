@@ -15,7 +15,7 @@ package org.talend.components.api.component;
 public class StudioConstants {
 
     /**
-     * key associated with schema proerties to specify the associated {@link Connector.ConnectorType} with the given
+     * Key associated with schema proerties to specify the associated {@link Connector.ConnectorType} with the given
      * schema.
      */
     public static final String CONNECTOR_TYPE_SCHEMA_KEY = "ConnectionType"; //$NON-NLS-1$

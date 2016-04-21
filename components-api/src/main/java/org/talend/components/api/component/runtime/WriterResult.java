@@ -14,6 +14,12 @@ package org.talend.components.api.component.runtime;
 
 import java.io.Serializable;
 
+import org.talend.components.api.container.RuntimeContainer;
+
+/**
+ * A suggested implementation of the result of a series of writes which is returned by {@link Writer#close()} and
+ * consumed by {@link WriteOperation#finalize(Iterable, RuntimeContainer)}.
+ */
 public class WriterResult implements Serializable {
 
     private static final long serialVersionUID = 8670579213592463768L;
@@ -22,11 +28,6 @@ public class WriterResult implements Serializable {
 
     private int dataCount;
 
-    /**
-     * Getter for uId.
-     * 
-     * @return the uId
-     */
     public String getuId() {
         return this.uId;
     }
@@ -35,18 +36,12 @@ public class WriterResult implements Serializable {
      * create a writer result for a single writer.
      * 
      * @param uId unique Id provided when calling {@link Writer#open(String)}
-     * @param dataCount
      */
     public WriterResult(String uId, int dataCount) {
         this.uId = uId;
         this.dataCount = dataCount;
     }
 
-    /**
-     * Getter for dataCount.
-     * 
-     * @return the dataCount
-     */
     public int getDataCount() {
         return dataCount;
     }

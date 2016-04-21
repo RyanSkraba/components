@@ -55,8 +55,6 @@ import java.util.NoSuchElementException;
  *   }
  * </pre>
  *
- * <p>Note: this interface is a work-in-progress and may change.
- *
  * <p>All {@code Reader} functions except {@link #getCurrentSource} do not need to be thread-safe;
  * they may only be accessed by a single thread at once. However, {@link #getCurrentSource} needs
  * to be thread-safe, and other functions should assume that its returned value can change

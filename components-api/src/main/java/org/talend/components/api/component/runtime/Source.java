@@ -16,27 +16,10 @@ package org.talend.components.api.component.runtime;
 import org.talend.components.api.container.RuntimeContainer;
 
 /**
- * Base class for defining input formats and creating a {@code Source} for reading the input.
+ * Base interface for defining containing input properties and creating a {@link Reader} for reading the input.
  *
  * <p>
- * This class is not intended to be subclassed directly. Instead, to define a bounded source (a source which produces a
- * finite amount of input), subclass {@link BoundedSource}; to define an unbounded source, subclass
- * {@link UnboundedSource}.
- *
- * <p>
- * A {@code Source} passed to a {@code Read} transform must be {@code Serializable}. This allows the {@code Source}
- * instance created in this "main program" to be sent (in serialized form) to remote worker machines and reconstituted
- * for each batch of elements of the input {@code PCollection} being processed or for each source splitting operation. A
- * {@code Source} can have instance variable state, and non-transient instance variable state will be serialized in the
- * main program and then deserialized on remote worker machines.
- *
- * <p>
- * {@code Source} classes MUST be effectively immutable. The only acceptable use of mutable fields is to cache the
- * results of expensive operations, and such fields MUST be marked {@code transient}.
- *
- * <p>
- * {@code Source} objects should override {@link Object#toString}, as it will be used in important error and debugging
- * messages.
+ * See {@link SourceOrSink}.
  *
  */
 public interface Source extends SourceOrSink {
@@ -45,7 +28,5 @@ public interface Source extends SourceOrSink {
      * Returns a new {@link Reader} that reads from this source.
      */
     public abstract Reader createReader(RuntimeContainer container);
-
-
 
 }
