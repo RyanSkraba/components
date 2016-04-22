@@ -1,10 +1,10 @@
 package org.talend.components.api.component.runtime;
 
-import org.talend.components.api.container.RuntimeContainer;
-
 import java.io.IOException;
-import java.time.Instant;
 import java.util.NoSuchElementException;
+
+import org.joda.time.Instant;
+import org.talend.components.api.container.RuntimeContainer;
 
 /**
  * Basic implementation of {@link BoundedReader}, useful for those readers that don't require sharding.

@@ -289,11 +289,16 @@ public class ComponentServiceImpl extends PropertiesServiceImpl<ComponentPropert
     private Set<String> parseDependencies(InputStream depStream) throws IOException {
         Set<String> mvnUris = new HashSet<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(depStream, "UTF-8"));
-        reader.lines().filter(s -> StringUtils.countMatches(s, ":") > 3).//
-                filter(s -> !s.endsWith("test")).//
-                forEach(s -> mvnUris.add(parseMvnUri(s)));
-
-        ;
+        // java 8 version
+        // reader.lines().filter(line -> StringUtils.countMatches(line, ":") > 3).//
+        // filter(line -> !line.endsWith("test")).//
+        // forEach(line -> mvnUris.add(parseMvnUri(line)));
+        while (reader.ready()) {
+            String line = reader.readLine();
+            if ((StringUtils.countMatches(line, ":") > 3) && !line.endsWith("test")) {
+                mvnUris.add(parseMvnUri(line));
+            } // else not an expected dependencies so ignor it.
+        }
         return mvnUris;
     }
 

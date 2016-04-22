@@ -14,7 +14,6 @@ package org.talend.components.api.component;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,10 +24,26 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.exception.TalendRuntimeException;
 
 public abstract class AbstractComponentDefinition extends AbstractTopLevelDefinition implements ComponentDefinition {
+    
+    /**
+     * Component name.
+     * It is used to define component name, which will be displayed in Studio Palette
+     * Also it is used by bnd library to create OSGi bundle
+     */
+    private String componentName;
 
     private Connector[] connectors;
 
     private Trigger[] triggers;
+    
+    /**
+     * Constructor sets component name
+     * 
+     * @param componentName component name
+     */
+    public AbstractComponentDefinition(String componentName) {
+        this.componentName = componentName;
+    }
 
     public void setConnectors(Connector... conns) {
         this.connectors = conns;
@@ -38,6 +53,28 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
         this.triggers = conns;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @return component name
+     */
+    @Override
+    public String getName() {
+        return componentName;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getPngImagePath(ComponentImageType imageType) {
+        switch (imageType) {
+        case PALLETE_ICON_32X32:
+            return componentName + "_icon32.png";
+        }
+        return null;
+    }
+    
     @Override
     public String[] getFamilies() {
         // Subclass me
