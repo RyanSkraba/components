@@ -14,7 +14,10 @@ package org.talend.components.salesforce;
 
 import static org.talend.daikon.properties.PropertyFactory.*;
 
-import org.talend.components.api.properties.ComponentProperties;
+import java.util.Collections;
+import java.util.Set;
+
+import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 
@@ -34,6 +37,15 @@ public class SalesforceGetDeletedUpdatedProperties extends SalesforceConnectionM
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(startDate);
         mainForm.addRow(endDate);
+    }
+
+    @Override
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        if (isOutputConnection) {
+            return Collections.singleton(MAIN_CONNECTOR);
+        } else {
+            return Collections.EMPTY_SET;
+        }
     }
 
 }

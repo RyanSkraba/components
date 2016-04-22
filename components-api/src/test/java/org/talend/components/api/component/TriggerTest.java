@@ -35,12 +35,5 @@ public class TriggerTest {
         assertEquals(TriggerType.SUBJOB_OK, Trigger.getType());
         assertEquals(5, Trigger.getMaxInput());
         assertEquals(6, Trigger.getMaxOutput());
-
-        Trigger.setType(TriggerType.SUBJOB_ERROR);
-        assertEquals(TriggerType.SUBJOB_ERROR, Trigger.getType());
-        Trigger.setMaxInput(7);
-        assertEquals(7, Trigger.getMaxInput());
-        Trigger.setMaxOutput(8);
-        assertEquals(8, Trigger.getMaxOutput());
     }
 }

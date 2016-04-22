@@ -27,37 +27,30 @@ public interface ComponentDefinition extends TopLevelDefinition {
     /**
      * Returns an array of paths that represent the categories of the component.
      */
-    String[] getFamilies();
+    public String[] getFamilies();
 
     /**
      * Create and initialize a suitable {@link ComponentProperties} which configures an instance of this component.
      */
-    ComponentProperties createProperties();
+    public ComponentProperties createProperties();
 
     /**
      * FIXME - is this really necessary? create the ComponentProperties and initialize it's properties only and not the
      * UI Layout not usefull for runtime
      */
-    ComponentProperties createRuntimeProperties();
-
-    /**
-     * Returns the types of {@link Connector} objects supported by this component.
-     *
-     * A connector is a link between two components that transmit data.
-     */
-    Connector[] getConnectors();
+    public ComponentProperties createRuntimeProperties();
 
     /**
      * Returns the types of {@link Trigger} objects supported by this component.
      *
      * A trigger is a link between two components that schedule the different subjobs.
      */
-    Trigger[] getTriggers();
+    public Trigger[] getTriggers();
 
     /**
      * Returns true if this {@code ComponentDefinition} will work with the specified list of {@link ComponentProperties}
      */
-    boolean supportsProperties(ComponentProperties... properties);
+    public boolean supportsProperties(ComponentProperties... properties);
 
     /**
      * A path relative to the current Component definition, ideally is should just be the name of the png image if
@@ -74,35 +67,35 @@ public interface ComponentDefinition extends TopLevelDefinition {
      * @param imageType the type of image requested
      * @return the path to the png resource or null if an image is not required.
      */
-    String getPngImagePath(ComponentImageType imageType);
+    public String getPngImagePath(ComponentImageType imageType);
 
     //
     // FIXME - DI flags - do we need all of these?
     //
 
-    boolean isSchemaAutoPropagate();
+    public boolean isSchemaAutoPropagate();
 
-    boolean isDataAutoPropagate();
+    public boolean isDataAutoPropagate();
 
-    boolean isConditionalInputs();
+    public boolean isConditionalInputs();
 
-    boolean isStartable();
+    public boolean isStartable();
 
     // FIXME - An ENUM perhaps?
-    String getPartitioning();
+    public String getPartitioning();
 
     /**
      * Used for computing the dependencies by finding the pom.xml and dependencies.properties in the META-INF/ folder
      * 
      * @return the maven Group Id of the component family
      */
-    String getMavenGroupId();
+    public String getMavenGroupId();
 
     /**
      * Used for computing the dependencies by finding the pom.xml and dependencies.properties in the META-INF/ folder
      * 
      * @return the maven Artifact Id of the component family
      */
-    String getMavenArtifactId();
+    public String getMavenArtifactId();
 
 }

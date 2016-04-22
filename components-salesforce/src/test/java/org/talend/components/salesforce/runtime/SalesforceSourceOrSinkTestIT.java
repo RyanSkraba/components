@@ -17,9 +17,11 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.junit.Test;
+import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceTestBase;
@@ -58,7 +60,15 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
         assertEquals(scp, salesforceSourceOrSink.getConnectionProperties());
 
         // using SalesforceConnectionProperties
-        SalesforceConnectionModuleProperties scmp = new SalesforceConnectionModuleProperties(null);
+        SalesforceConnectionModuleProperties scmp = new SalesforceConnectionModuleProperties(null) {
+
+            @Override
+            protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+                // TODO Auto-generated method stub
+                return null;
+            }
+
+        };
         salesforceSourceOrSink.initialize(null, scmp);
         assertEquals(scmp.connection, salesforceSourceOrSink.getConnectionProperties());
     }

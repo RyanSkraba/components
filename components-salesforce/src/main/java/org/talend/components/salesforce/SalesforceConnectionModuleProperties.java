@@ -13,23 +13,24 @@
 package org.talend.components.salesforce;
 
 import org.apache.avro.Schema;
-import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.HasSchemaProperty;
+import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.daikon.properties.presentation.Form;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Properties common to input and output Salesforce components.
  */
-public class SalesforceConnectionModuleProperties extends ComponentProperties implements SalesforceProvideConnectionProperties, HasSchemaProperty {
+public abstract class SalesforceConnectionModuleProperties extends FixedConnectorsComponentProperties
+        implements SalesforceProvideConnectionProperties {
 
     // Collections
     //
     public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection"); //$NON-NLS-1$
 
     public SalesforceModuleProperties module;
+
+    protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "module.main");
 
     public SalesforceConnectionModuleProperties(String name) {
         super(name);
@@ -44,7 +45,7 @@ public class SalesforceConnectionModuleProperties extends ComponentProperties im
     }
 
     public Schema getSchema() {
-        return (Schema) module.schema.schema.getValue();
+        return (Schema) module.main.schema.getValue();
     }
 
     @Override
@@ -63,13 +64,4 @@ public class SalesforceConnectionModuleProperties extends ComponentProperties im
         return connection;
     }
 
-    @Override
-    public List<Schema> getSchemas() {
-        return Arrays.asList(new Schema[]{new Schema.Parser().parse(module.schema.schema.getStringValue())});
-    }
-
-    @Override
-    public void setSchemas(List<Schema> schemas) {
-        module.schema.schema.setValue(schemas.get(0));
-    }
 }

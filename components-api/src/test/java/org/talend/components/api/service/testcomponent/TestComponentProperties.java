@@ -18,8 +18,13 @@ import static org.talend.daikon.properties.presentation.Widget.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.avro.Schema;
+import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
@@ -28,13 +33,13 @@ import org.talend.components.api.service.testcomponent.nestedprop.inherited.Inhe
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.Property.Type;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.presentation.Widget.WidgetType;
 import org.talend.daikon.properties.service.Repository;
-import org.talend.daikon.properties.Property.Type;
 
 public class TestComponentProperties extends ComponentProperties implements ComponentReferencePropertiesEnclosing {
 
@@ -44,11 +49,13 @@ public class TestComponentProperties extends ComponentProperties implements Comp
 
     public Form restoreForm;
 
+    public Property mainOutput = newSchema("mainOutput");
+
     public PresentationItem testPI = new PresentationItem("testPI", "testPI display name");
 
-    public Property userId = (Property) newProperty(USER_ID_PROP_NAME).setRequired(true);
+    public Property userId = newProperty(USER_ID_PROP_NAME).setRequired(true);
 
-    public Property password = ((Property) newProperty("password").setRequired(true))
+    public Property password = newProperty("password").setRequired(true)
             .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
     public Property nameList = newProperty("nameList");
@@ -105,6 +112,7 @@ public class TestComponentProperties extends ComponentProperties implements Comp
         return new ValidationResult().setStatus(Result.WARNING);
     }
 
+    @Override
     public void afterReferencedComponent() {
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(Form.REFERENCE));
@@ -153,6 +161,27 @@ public class TestComponentProperties extends ComponentProperties implements Comp
                 form.getWidget("date").setVisible(false);
             }
         }
+    }
+
+    @Override
+    public Schema getSchema(Connector connector, boolean isOutputConnection) {
+        if (connector instanceof PropertyPathConnector) {
+            Property property = getValuedProperty(((PropertyPathConnector) connector).getPropertyPath());
+            return property.getType() == Type.SCHEMA ? (Schema) property.getValue() : null;
+        } else {// not a connector handled by this class
+            return null;
+        }
+    }
+
+    @Override
+    public Set<Connector> getAvailableConnectors(Set<? extends Connector> existingConnections, boolean isOutput) {
+        HashSet<Connector> filteredConnectors = new HashSet<>(getAllConnectors());
+        filteredConnectors.removeAll(existingConnections);
+        return filteredConnectors;
+    }
+
+    public Set<? extends Connector> getAllConnectors() {
+        return Collections.singleton(new PropertyPathConnector(Connector.MAIN_NAME, "mainOutput"));
     }
 
 }

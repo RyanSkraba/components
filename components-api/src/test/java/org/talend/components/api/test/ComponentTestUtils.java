@@ -145,4 +145,31 @@ public class ComponentTestUtils {
         }
     }
 
+    // public static void checkFixedSchemaSetDefinitionSchemaPathAreOk(ComponentService componentService,
+    // ErrorCollector errorCollector) {
+    // Set<ComponentDefinition> allComponents = componentService.getAllComponents();
+    // for (ComponentDefinition cd : allComponents) {
+    // if (cd instanceof AbstractFixedSchemaSetComponentDefinition) {
+    // AbstractFixedSchemaSetComponentDefinition afsd = (AbstractFixedSchemaSetComponentDefinition) cd;
+    // ComponentProperties properties = afsd.createProperties();
+    // try {
+    // Set<String> outputConnections = afsd.getOutputConnections(properties);
+    // String[] outputSchemasPaths = afsd.getOutputSchemasPaths();
+    // if (outputSchemasPaths != null && outputConnections != null) {
+    // errorCollector.checkThat(
+    // cd.getName() + "should not have an SchemaProperties instance related to each schema path :"
+    // + ArrayUtils.toString(outputSchemasPaths),
+    // outputConnections.size(), equalTo(outputSchemasPaths.length));
+    // } else {
+    // errorCollector.checkThat(cd.getName() + "should not have an connector if not path is specified."
+    // + ArrayUtils.toString(outputSchemasPaths), outputConnections.size(), equalTo(0));
+    // }
+    // } catch (Exception e) {
+    // errorCollector.addError(new Exception(
+    // "Failed to compute output connections for class " + cd.getClass().getCanonicalName(), e));
+    // }
+    // }
+    // }
+    // }
+
 }

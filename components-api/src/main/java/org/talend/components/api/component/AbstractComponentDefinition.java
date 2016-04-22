@@ -32,8 +32,6 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
      */
     private String componentName;
 
-    private Connector[] connectors;
-
     private Trigger[] triggers;
     
     /**
@@ -43,10 +41,6 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
      */
     public AbstractComponentDefinition(String componentName) {
         this.componentName = componentName;
-    }
-
-    public void setConnectors(Connector... conns) {
-        this.connectors = conns;
     }
 
     public void setTriggers(Trigger... conns) {
@@ -78,12 +72,7 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
     @Override
     public String[] getFamilies() {
         // Subclass me
-        return new String[]{};
-    }
-
-    @Override
-    public Connector[] getConnectors() {
-        return connectors;
+        return new String[] {};
     }
 
     @Override
@@ -111,7 +100,7 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
                 return null;// TODO throw an exception
             } // else keep going
             Constructor<?> c = propertyClass.getConstructor(String.class);
-            compProp = (ComponentProperties) c.newInstance(new Object[]{"root"});
+            compProp = (ComponentProperties) c.newInstance(new Object[] { "root" });
         } catch (Exception e) {
             TalendRuntimeException.unexpectedException(e);
         }
@@ -157,8 +146,9 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
 
     @Override
     public boolean isStartable() {
-        if (this instanceof InputComponentDefinition)
+        if (this instanceof InputComponentDefinition) {
             return true;
+        }
         return false;
     }
 
@@ -196,9 +186,8 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
         return (Class<? extends ComponentProperties>[]) Array.newInstance(Class.class, 0);
     }
 
-
     public Class<? extends ComponentProperties>[] concatPropertiesClasses(Class<? extends ComponentProperties>[] first,
-                                                                          Class<? extends ComponentProperties>[] second) {
+            Class<? extends ComponentProperties>[] second) {
         Class<? extends ComponentProperties>[] result = Arrays.copyOf(first, first.length + second.length);
         System.arraycopy(second, 0, result, first.length, second.length);
         return result;

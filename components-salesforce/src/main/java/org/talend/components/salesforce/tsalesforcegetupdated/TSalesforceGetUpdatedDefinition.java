@@ -14,8 +14,6 @@ package org.talend.components.salesforce.tsalesforcegetupdated;
 
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.Connector;
-import org.talend.components.api.component.Connector.ConnectorType;
 import org.talend.components.api.component.InputComponentDefinition;
 import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
@@ -35,7 +33,6 @@ public class TSalesforceGetUpdatedDefinition extends SalesforceDefinition implem
     public TSalesforceGetUpdatedDefinition() {
         super(COMPONENT_NAME);
 
-        setConnectors(new Connector(ConnectorType.FLOW, 0, 1));
         setTriggers(new Trigger(TriggerType.SUBJOB_OK, 1, 0), new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
     }
 
@@ -53,4 +50,5 @@ public class TSalesforceGetUpdatedDefinition extends SalesforceDefinition implem
     public Source getRuntime() {
         return new SalesforceSource();
     }
+
 }

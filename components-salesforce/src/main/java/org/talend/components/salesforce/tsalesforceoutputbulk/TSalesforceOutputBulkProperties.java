@@ -15,8 +15,6 @@ package org.talend.components.salesforce.tsalesforceoutputbulk;
 import static org.talend.daikon.properties.PropertyFactory.*;
 import static org.talend.daikon.properties.presentation.Widget.*;
 
-import org.talend.components.api.component.Connector.ConnectorType;
-import org.talend.components.api.component.StudioConstants;
 import org.talend.components.common.BulkFileProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.Property;
@@ -26,7 +24,8 @@ import org.talend.daikon.properties.presentation.Widget;
 public class TSalesforceOutputBulkProperties extends BulkFileProperties {
 
     public Property ignoreNull = newProperty(Property.Type.BOOLEAN, "ignoreNull");
-    public Property upsertRelation = (Property) newProperty("upsertRelation").setOccurMaxTimes(-1); //$NON-NLS-1$
+
+    public Property upsertRelation = newProperty("upsertRelation").setOccurMaxTimes(-1); //$NON-NLS-1$
 
     public TSalesforceOutputBulkProperties(String name) {
         super(name);
@@ -36,7 +35,7 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
     public void setupProperties() {
         super.setupProperties();
         TSalesforceOutputProperties.setupUpsertRelation(upsertRelation, TSalesforceOutputProperties.POLY);
-        schema.schema.setTaggedValue(StudioConstants.CONNECTOR_TYPE_SCHEMA_KEY, ConnectorType.FLOW);
+        // schema.schema.setTaggedValue(StudioConstants.CONNECTOR_TYPE_SCHEMA_KEY, ConnectorType.FLOW);
     }
 
     @Override

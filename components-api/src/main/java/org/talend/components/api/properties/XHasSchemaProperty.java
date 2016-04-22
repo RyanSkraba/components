@@ -4,7 +4,7 @@ import org.apache.avro.Schema;
 
 import java.util.List;
 
-public interface HasSchemaProperty {
+public interface XHasSchemaProperty {
 
     public List<Schema> getSchemas();
 

@@ -16,8 +16,10 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.avro.Schema;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
+import org.talend.components.api.component.Connector;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.wizard.ComponentWizard;
@@ -147,5 +149,30 @@ public interface ComponentService extends PropertiesService<ComponentProperties>
      * Mvn+Protocol</a>
      */
     Set<String> getMavenUriDependencies(String componentName);
+
+    /**
+     * get the schema associated with a given named connection for a componentProperties
+     * 
+     * @param componentProperties the Properties to get the schema for a given connector name
+     * @param connector token used to identify the connection.
+     * @param isOuput true is the connection is an output connection, false if it is an input connection
+     * @return the schema associated with a given connector token of input or ouput connectors, may be null if schema is
+     * associated with the connector. This should never be the case for output connections but may be null for input
+     * connections because the component does not need to have any input schema and can handle any data type.
+     * @exception ComponentException thrown if the connection name does not exists for the given component.
+     */
+    Schema getSchema(ComponentProperties componentProperties, Connector connector, boolean isOuput);
+
+    /**
+     * get the schema associated with a given named connector for a componentProperties
+     * 
+     * @param componentProperties the Properties to get the connectors from
+     * @param connectedConnetor list of connectors already setup. This shall be managed by the client.
+     * @param isOuput true is the requested connections are output connections, false if the request is on input
+     * connections
+     * @return the set of availalble connectors, may be empty.
+     */
+    Set<? extends Connector> getAvailableConnectors(ComponentProperties componentProperties,
+            Set<? extends Connector> connectedConnetor, boolean isOuput);
 
 }

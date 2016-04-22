@@ -38,7 +38,6 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
     // FIXME - should be file
     public Property logFileName = newString("logFileName"); //$NON-NLS-1$
 
-
     public TSalesforceOutputProperties(String name) {
         super(name);
     }
@@ -77,15 +76,16 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
 
         if (form.getName().equals(Form.ADVANCED)) {
             Schema s = SchemaBuilder.record("Main").fields().endRecord();
-            schemaFlow.schema.setValue(s);
+            module.main.schema.setValue(s);
             if (!extendInsert.getBooleanValue() && retrieveInsertId.getBooleanValue()
                     && ACTION_INSERT.equals(outputAction.getValue())) {
-                s = SchemaBuilder.record("Main").fields().name("salesforce_id").type().
-                        stringType().noDefault().endRecord();
+                s = SchemaBuilder.record("Main").fields().name("salesforce_id").type().stringType().noDefault().endRecord();
             }
             form.getWidget("commitLevel").setVisible(extendInsert.getBooleanValue());
-            form.getWidget("retrieveInsertId").setVisible(extendInsert.getBooleanValue() && ACTION_INSERT.equals(outputAction.getValue()));
-            form.getWidget("ignoreNull").setVisible(ACTION_UPDATE.equals(outputAction.getValue())||ACTION_UPSERT.equals(outputAction.getValue()));
+            form.getWidget("retrieveInsertId")
+                    .setVisible(extendInsert.getBooleanValue() && ACTION_INSERT.equals(outputAction.getValue()));
+            form.getWidget("ignoreNull")
+                    .setVisible(ACTION_UPDATE.equals(outputAction.getValue()) || ACTION_UPSERT.equals(outputAction.getValue()));
 
         }
     }

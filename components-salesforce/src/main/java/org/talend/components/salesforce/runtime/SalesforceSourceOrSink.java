@@ -12,12 +12,15 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import com.sforce.async.AsyncApiException;
-import com.sforce.async.BulkConnection;
-import com.sforce.soap.partner.*;
-import com.sforce.ws.ConnectionException;
-import com.sforce.ws.ConnectorConfig;
-import com.sforce.ws.SessionRenewer;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import org.apache.avro.Schema;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -26,26 +29,25 @@ import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.HasSchemaProperty;
 import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.runtime.ProxyPropertiesRuntimeHelper;
-import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
 import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnection;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
-import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.properties.ValidationResult;
 
-import javax.xml.namespace.QName;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.SocketAddress;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.sforce.async.AsyncApiException;
+import com.sforce.async.BulkConnection;
+import com.sforce.soap.partner.DescribeGlobalResult;
+import com.sforce.soap.partner.DescribeGlobalSObjectResult;
+import com.sforce.soap.partner.DescribeSObjectResult;
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.SessionHeader_element;
+import com.sforce.ws.ConnectionException;
+import com.sforce.ws.ConnectorConfig;
+import com.sforce.ws.SessionRenewer;
 
 public class SalesforceSourceOrSink implements SourceOrSink {
 
@@ -66,19 +68,6 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     public ValidationResult validate(RuntimeContainer container) {
         ValidationResult vr = new ValidationResult();
         try {
-            if (properties instanceof HasSchemaProperty) {
-                List<Schema> schemas = ((HasSchemaProperty) properties).getSchemas();
-                Schema schema = schemas.get(0);
-                if (AvroUtils.isIncludeAllFields(schema)) {
-                    String moduleName = null;
-                    if (properties instanceof SalesforceConnectionModuleProperties) {
-                        moduleName = ((SalesforceConnectionModuleProperties) properties).module.moduleName.getStringValue();
-                    }
-                    schema = getSchema(container, moduleName);
-                    ((HasSchemaProperty) properties).setSchemas(Arrays.asList(new Schema[]{schema}));
-                    return vr;
-                }
-            }
             connect(container);
         } catch (IOException ex) {
             return exceptionToValidationResult(ex);
@@ -134,8 +123,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         SalesforceConnectionProperties connProps = properties.getConnectionProperties();
         String endpoint = connProps.endpoint.getStringValue();
         if (SalesforceConnectionProperties.LOGIN_OAUTH.equals(connProps.loginType.getValue())) {
-            SalesforceOAuthConnection oauthConnection = new SalesforceOAuthConnection(connProps.oauth,
-                    endpoint, API_VERSION);
+            SalesforceOAuthConnection oauthConnection = new SalesforceOAuthConnection(connProps.oauth, endpoint, API_VERSION);
             oauthConnection.login(config);
         } else {
             config.setAuthEndpoint(endpoint);
@@ -217,7 +205,6 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         }
         config.setUseChunkedPost(connProps.httpChunked.getBooleanValue());
 
-
         try {
             ch.connection = doConnection(config);
             if (ch.connection != null) {
@@ -293,7 +280,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     protected Schema getSchema(PartnerConnection connection, String module) throws IOException {
         try {
             DescribeSObjectResult[] describeSObjectResults = new DescribeSObjectResult[0];
-            describeSObjectResults = connection.describeSObjects(new String[]{module});
+            describeSObjectResults = connection.describeSObjects(new String[] { module });
             return SalesforceAvroRegistry.get().inferSchema(describeSObjectResults[0]);
         } catch (ConnectionException e) {
             throw new IOException(e);
@@ -334,7 +321,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
                 config.setProxyPassword(proxyPwd);
             }
         } else {
-            //No proxy.
+            // No proxy.
         }
     }
 

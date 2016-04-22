@@ -26,6 +26,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.avro.Schema;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
+import org.talend.components.api.component.Connector;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
@@ -336,6 +338,17 @@ public class ComponentServiceSpring implements ComponentService {
     public String storeProperties(ComponentProperties properties, String name, String repositoryLocation,
             String schemaPropertyName) {
         return componentServiceDelegate.storeProperties(properties, name, repositoryLocation, schemaPropertyName);
+    }
+
+    @Override
+    public Schema getSchema(ComponentProperties componentProperties, Connector connector, boolean isOuput) {
+        return componentServiceDelegate.getSchema(componentProperties, connector, isOuput);
+    }
+
+    @Override
+    public Set<? extends Connector> getAvailableConnectors(ComponentProperties componentProperties,
+            Set<? extends Connector> connectedConnetor, boolean isOuput) {
+        return componentServiceDelegate.getAvailableConnectors(componentProperties, connectedConnetor, isOuput);
     }
 
 }

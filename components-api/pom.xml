@@ -4,13 +4,13 @@
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
-		<version>0.6.0-SNAPSHOT</version>
+		<version>0.7.0-SNAPSHOT</version>
 		<relativePath>../components-parent/pom.xml</relativePath>
 	</parent>
 
 	<name>Component API</name>
 	<artifactId>components-api</artifactId>
-	<version>0.6.0-SNAPSHOT</version>
+	<version>0.7.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
 	<properties>
@@ -234,6 +234,7 @@
                         </goals>
                         <configuration>
                             <classifier>bundle</classifier>
+                            <unpackBundle>true</unpackBundle>
                             <instructions>
                                 <Bundle-SymbolicName>org.talend.components.api</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
@@ -250,6 +251,7 @@
                             </instructions>
                         </configuration>
                     </execution>
+                    
 				</executions>
 			</plugin>
 		</plugins>

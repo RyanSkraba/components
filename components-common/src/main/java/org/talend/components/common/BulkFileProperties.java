@@ -1,17 +1,16 @@
 package org.talend.components.common;
 
-import org.apache.avro.Schema;
-import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.HasSchemaProperty;
+import static org.talend.daikon.properties.PropertyFactory.*;
+
+import java.util.Collections;
+import java.util.Set;
+
+import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static org.talend.daikon.properties.PropertyFactory.newProperty;
-
-public class BulkFileProperties extends ComponentProperties implements HasSchemaProperty {
+public class BulkFileProperties extends FixedConnectorsComponentProperties {
 
     public Property bulkFilePath = newProperty("bulkFilePath").setRequired();
 
@@ -32,13 +31,9 @@ public class BulkFileProperties extends ComponentProperties implements HasSchema
         mainForm.addRow(append);
 
     }
-    @Override
-    public List<Schema> getSchemas() {
-        return Arrays.asList(new Schema[]{new Schema.Parser().parse(schema.schema.getStringValue())});
-    }
 
     @Override
-    public void setSchemas(List<Schema> schemas) {
-        schema.schema.setValue(schemas.get(0));
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        return Collections.singleton(new PropertyPathConnector(Connector.MAIN_NAME, "schema"));
     }
 }
