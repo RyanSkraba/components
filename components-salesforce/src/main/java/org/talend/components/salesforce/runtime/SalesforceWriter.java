@@ -27,6 +27,7 @@ import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.DataRejectException;
+import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 import org.talend.daikon.avro.util.AvroUtils;
@@ -69,6 +70,10 @@ final class SalesforceWriter implements Writer<WriterResult> {
 
     private int dataCount;
 
+    private int successCount;
+
+    private int rejectCount;
+
     private transient IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory;
 
     private transient Schema schema;
@@ -104,6 +109,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
     @SuppressWarnings("unchecked")
     @Override
     public void write(Object datum) throws IOException {
+        dataCount++;
         // Ignore empty rows.
         if (null == datum) {
             return;
@@ -131,18 +137,18 @@ final class SalesforceWriter implements Writer<WriterResult> {
             }
 
             switch (TSalesforceOutputProperties.OutputAction.valueOf(sprops.outputAction.getStringValue())) {
-            case INSERT:
-                insert(so);
-                break;
-            case UPDATE:
-                update(so);
-                break;
-            case UPSERT:
-                upsert(so);
-                break;
-            case DELETE:
-                // See below
-                throw new RuntimeException("Impossible");
+                case INSERT:
+                    insert(so);
+                    break;
+                case UPDATE:
+                    update(so);
+                    break;
+                case UPSERT:
+                    upsert(so);
+                    break;
+                case DELETE:
+                    // See below
+                    throw new RuntimeException("Impossible");
             }
         } else { // DELETE
             String id = getIdValue(input);
@@ -150,7 +156,6 @@ final class SalesforceWriter implements Writer<WriterResult> {
                 delete(id);
             }
         }
-        dataCount++;
     }
 
     protected String getIdValue(IndexedRecord input) {
@@ -166,16 +171,16 @@ final class SalesforceWriter implements Writer<WriterResult> {
         Object valueToAdd = null;
         // Convert stuff here
         switch (expected.schema().getType()) {
-        case BYTES:
-            valueToAdd = Charset.defaultCharset().decode(ByteBuffer.wrap((byte[]) value)).toString();
-            break;
-        // case DATE:
-        // case DATETIME:
-        // valueToAdd = container.formatDate((Date) value, se.getPattern());
-        // break;
-        default:
-            valueToAdd = value;
-            break;
+            case BYTES:
+                valueToAdd = Charset.defaultCharset().decode(ByteBuffer.wrap((byte[]) value)).toString();
+                break;
+            // case DATE:
+            // case DATETIME:
+            // valueToAdd = container.formatDate((Date) value, se.getPattern());
+            // break;
+            default:
+                valueToAdd = value;
+                break;
         }
         sObject.setField(expected.name(), valueToAdd);
     }
@@ -280,14 +285,16 @@ final class SalesforceWriter implements Writer<WriterResult> {
     protected void handleResults(boolean success, Error[] resultErrors, String[] changedItemKeys, int batchIdx)
             throws IOException {
         //StringBuilder errors = new StringBuilder("");
-    	
-    	Map<String,String> resultMessage = new HashMap<String, String>();
-    	
+
+        Map<String, String> resultMessage = new HashMap<String, String>();
+
         if (success) {
+            successCount++;
             // TODO: send back the ID
         } else {
-        	//TODO now we use batch mode for commit the data to salesforce, but the batch size is 1 at any time, so the code is ok now, but we need fix it.
-        	for (Error error : resultErrors) {
+            //TODO now we use batch mode for commit the data to salesforce, but the batch size is 1 at any time, so the code is ok now, but we need fix it.
+            rejectCount++;
+            for (Error error : resultErrors) {
                 if (error.getStatusCode() != null) {
                     resultMessage.put("errorCode", error.getStatusCode().toString());
                 }
@@ -304,21 +311,21 @@ final class SalesforceWriter implements Writer<WriterResult> {
                 }
                 resultMessage.put("errorMessage", error.getMessage());
             }
-        	
-        	throw new DataRejectException(resultMessage);
-        	
+
+            throw new DataRejectException(resultMessage);
+
             /*
             errors = SalesforceRuntime.addLog(resultErrors,
             	batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx] : "Batch index out of bounds", null);
             */
         }
-        
+
         /*
         if (exceptionForErrors && errors.toString().length() > 0) {
             throw new IOException(errors.toString());
         }
         */
-        
+
     }
 
     protected DeleteResult[] delete(String id) throws IOException {
@@ -360,6 +367,11 @@ final class SalesforceWriter implements Writer<WriterResult> {
         logout();
         // this should be computed according to the result of the write I guess but I don't know yet how exceptions are
         // handled by Beam.
+        if (container != null) {
+            container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_LINE, dataCount);
+            container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_SUCCESS, successCount);
+            container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_REJECT, rejectCount);
+        }
         return new WriterResult(uId, dataCount);
     }
 

@@ -33,6 +33,10 @@ import org.talend.daikon.properties.presentation.Widget;
 
 public class SalesforceOutputProperties extends SalesforceConnectionModuleProperties {
 
+    public static final String NB_SUCCESS = "NB_SUCCESS";
+
+    public static final String NB_REJECT = "NB_REJECT";
+
     public static final String ACTION_INSERT = "INSERT";
 
     public static final String ACTION_UPDATE = "UPDATE";
@@ -107,9 +111,9 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         outputAction.setValue(ACTION_INSERT);
 
         returns = ComponentPropertyFactory.newReturnsProperty();
-        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_LINE"); //$NON-NLS-1$
-        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_SUCCESS"); //$NON-NLS-1$
-        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_REJECT"); //$NON-NLS-1$
+        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, NB_LINE); //$NON-NLS-1$
+        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, NB_SUCCESS); //$NON-NLS-1$
+        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, NB_REJECT); //$NON-NLS-1$
 
         setupRejectSchema();
 

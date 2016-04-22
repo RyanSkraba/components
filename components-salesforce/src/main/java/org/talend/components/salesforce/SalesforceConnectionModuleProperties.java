@@ -26,6 +26,8 @@ public abstract class SalesforceConnectionModuleProperties extends FixedConnecto
 
     // Collections
     //
+    public static final String NB_LINE = "NB_LINE";
+
     public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection"); //$NON-NLS-1$
 
     public SalesforceModuleProperties module;

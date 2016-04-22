@@ -81,6 +81,7 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
                 return false;
             }
         }
+        dataCount++;
         return true;
     }
 

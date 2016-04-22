@@ -22,17 +22,19 @@ import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.BulkFileProperties;
 import org.talend.components.common.runtime.BulkFileWriter;
+import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkProperties;
+
+import java.io.IOException;
 
 /**
  * Prepare Data Files for bulk execution
  */
 final class SalesforceBulkFileWriter extends BulkFileWriter {
 
-	public SalesforceBulkFileWriter(WriteOperation<WriterResult> writeOperation, BulkFileProperties bulkProperties,
-			RuntimeContainer adaptor) {
-		super(writeOperation, bulkProperties, adaptor);
-	}
+    public SalesforceBulkFileWriter(WriteOperation<WriterResult> writeOperation, BulkFileProperties bulkProperties, RuntimeContainer container) {
+        super(writeOperation, bulkProperties, container);
+    }
 
 	@Override
 	public String[] getHeaders(Schema schema) {
@@ -71,30 +73,38 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
             headers.add(header);
         }
         return headers.toArray(new String[headers.size()]);
-	}
-	
-	private int getIndex(List<String> columnNames, String columnName) {
-		if(columnNames == null) {
-			return -1;
-		}
-		return columnNames.indexOf(columnName);
-	}
+    }
 
-	@Override
-	public List<String> getValues(Object datum) {
-		IndexedRecord input = getFactory(datum).convertToAvro(datum);
-		List<String> values = new ArrayList<String>();
-		for (Schema.Field f : input.getSchema().getFields()) {
-			if (input.get(f.pos()) == null) {
-				if (((TSalesforceOutputBulkProperties) bulkProperties).ignoreNull.getBooleanValue()) {
-					values.add("");
-				} else {
-					values.add("#N/A");
-				}
-			} else {
-				values.add(String.valueOf(input.get(f.pos())));
-			}
-		}
-		return values;
-	}
+    private int getIndex(List<String> columnNames, String columnName) {
+        if (columnNames == null) {
+            return -1;
+        }
+        return columnNames.indexOf(columnName);
+    }
+
+    @Override
+    public List<String> getValues(Object datum) {
+        IndexedRecord input = getFactory(datum).convertToAvro(datum);
+        List<String> values = new ArrayList<String>();
+        for (Schema.Field f : input.getSchema().getFields()) {
+            if (input.get(f.pos()) == null) {
+                if (((TSalesforceOutputBulkProperties) bulkProperties).ignoreNull.getBooleanValue()) {
+                    values.add("");
+                } else {
+                    values.add("#N/A");
+                }
+            } else {
+                values.add(String.valueOf(input.get(f.pos())));
+            }
+        }
+        return values;
+    }
+
+    @Override
+    public WriterResult close() throws IOException {
+        if (container != null) {
+            container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_LINE, dataCount);
+        }
+        return super.close();
+    }
 }

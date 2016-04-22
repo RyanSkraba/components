@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class BulkFileWriter implements Writer<WriterResult> {
 
-    private RuntimeContainer adaptor;
+    protected RuntimeContainer container;
 
     private WriteOperation<WriterResult> writeOperation;
 
@@ -40,11 +40,11 @@ public class BulkFileWriter implements Writer<WriterResult> {
 
     private transient IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory;
 
-    private int dataCount;
+    protected int dataCount;
 
-    public BulkFileWriter(WriteOperation<WriterResult> writeOperation, BulkFileProperties bulkProperties, RuntimeContainer adaptor) {
+    public BulkFileWriter(WriteOperation<WriterResult> writeOperation, BulkFileProperties bulkProperties, RuntimeContainer container) {
         this.writeOperation = writeOperation;
-        this.adaptor = adaptor;
+        this.container = container;
         this.sink = writeOperation.getSink();
         this.bulkProperties = bulkProperties;
         this.isAppend = bulkProperties.append.getBooleanValue();

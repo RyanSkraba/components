@@ -16,7 +16,9 @@ import com.sforce.async.AsyncApiException;
 import com.sforce.ws.ConnectionException;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResult;
+import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 
 import java.io.IOException;
@@ -34,6 +36,10 @@ final class SalesforceBulkExecReader extends SalesforceReader {
 
     private int resultIndex;
 
+    private int successCount;
+
+    private int rejectCount;
+
     public SalesforceBulkExecReader(RuntimeContainer container, SalesforceSource source, TSalesforceBulkExecProperties props) {
         super(container, source);
         properties = props;
@@ -42,8 +48,8 @@ final class SalesforceBulkExecReader extends SalesforceReader {
     @Override
     public boolean start() throws IOException {
 
-        TSalesforceBulkExecProperties sprops = (TSalesforceBulkExecProperties)properties;
-        bulkRuntime = new SalesforceBulkRuntime((SalesforceSource) getCurrentSource(),container);
+        TSalesforceBulkExecProperties sprops = (TSalesforceBulkExecProperties) properties;
+        bulkRuntime = new SalesforceBulkRuntime((SalesforceSource) getCurrentSource(), container);
         bulkRuntime.setConcurrencyMode(sprops.bulkProperties.concurrencyMode.getStringValue());
         bulkRuntime.setAwaitTime(sprops.bulkProperties.waitTimeCheckBatchState.getIntValue());
 
@@ -52,11 +58,15 @@ final class SalesforceBulkExecReader extends SalesforceReader {
             bulkRuntime.executeBulk(sprops.module.moduleName.getStringValue(), sprops.outputAction.getStringValue(),
                     sprops.upsertKeyColumn.getStringValue(), "csv", sprops.bulkFilePath.getStringValue(),
                     sprops.bulkProperties.bytesToCommit.getIntValue(), sprops.bulkProperties.rowsToCommit.getIntValue());
-            if(bulkRuntime.getBatchCount()>0){
+            if (bulkRuntime.getBatchCount() > 0) {
                 batchIndex = 0;
                 currentBatchResult = bulkRuntime.getBatchLog(0);
                 resultIndex = 0;
-                return currentBatchResult.size()>0;
+                boolean startable = currentBatchResult.size() > 0;
+                if (startable) {
+                    countData();
+                }
+                return startable;
             }
             return false;
         } catch (AsyncApiException | ConnectionException e) {
@@ -71,18 +81,23 @@ final class SalesforceBulkExecReader extends SalesforceReader {
     @Override
     public boolean advance() throws IOException {
         if (++resultIndex >= currentBatchResult.size()) {
-            if(++batchIndex >= bulkRuntime.getBatchCount()){
+            if (++batchIndex >= bulkRuntime.getBatchCount()) {
                 return false;
-            }else {
+            } else {
                 try {
                     currentBatchResult = bulkRuntime.getBatchLog(batchIndex);
                     resultIndex = 0;
-                    return currentBatchResult.size()>0;
-                } catch (AsyncApiException|ConnectionException e) {
+                    boolean isAdvanced = currentBatchResult.size() > 0;
+                    if (isAdvanced) {
+                        countData();
+                    }
+                    return isAdvanced;
+                } catch (AsyncApiException | ConnectionException e) {
                     throw new IOException(e);
                 }
             }
         }
+        countData();
         return true;
     }
 
@@ -90,7 +105,7 @@ final class SalesforceBulkExecReader extends SalesforceReader {
     public IndexedRecord getCurrent() {
         // TODO need change after component REJECT line can be work.
         try {
-            return ((BulkResultAdapterFactory)getFactory()).convertToAvro(currentBatchResult.get(resultIndex));
+            return ((BulkResultAdapterFactory) getFactory()).convertToAvro(currentBatchResult.get(resultIndex));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -98,6 +113,22 @@ final class SalesforceBulkExecReader extends SalesforceReader {
 
     @Override
     public void close() throws IOException {
+        if (container != null) {
+            String currentComponent = container.getCurrentComponentId().replace("_" + TSalesforceBulkExecDefinition.COMPONENT_NAME, "");
+            container.setComponentData(currentComponent, SalesforceOutputProperties.NB_LINE, dataCount);
+            container.setComponentData(currentComponent, SalesforceOutputProperties.NB_SUCCESS, successCount);
+            container.setComponentData(currentComponent, SalesforceOutputProperties.NB_REJECT, rejectCount);
+        }
         bulkRuntime.close();
+    }
+
+    protected void countData() {
+        dataCount++;
+        BulkResult result = currentBatchResult.get(resultIndex);
+        if ("true".equalsIgnoreCase(String.valueOf(result.getValue("Success")))) {
+            successCount++;
+        } else {
+            rejectCount++;
+        }
     }
 }
