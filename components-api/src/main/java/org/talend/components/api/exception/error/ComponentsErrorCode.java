@@ -23,10 +23,12 @@ import org.talend.daikon.exception.error.ErrorCode;
  * Error codes related to the Component from the component designer perspectve
  */
 public enum ComponentsErrorCode implements ErrorCode {
-                                                      /** used when a component schema has a wrong type */
+    /** used when a component schema has a wrong type */
     SCHEMA_TYPE_MISMATCH(HttpServletResponse.SC_BAD_REQUEST, "component", "expected", "current"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                                                      /** used when a component axpect a schema and none is set */
-    SCHEMA_MISSING(HttpServletResponse.SC_BAD_REQUEST, "component") //$NON-NLS-1$
+    /** used when a component axpect a schema and none is set */
+    SCHEMA_MISSING(HttpServletResponse.SC_BAD_REQUEST, "component"), //$NON-NLS-1$
+    /** thrown when a schema is requested and the connector is wrong */
+    WRONG_CONNECTOR(HttpServletResponse.SC_BAD_REQUEST, "properties") //$NON-NLS-1$
     ;
 
     private DefaultErrorCode errorCodeDelegate;

@@ -18,8 +18,11 @@ import java.util.Set;
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.api.exception.ComponentException;
+import org.talend.components.api.exception.error.ComponentsErrorCode;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.NamedThing;
+import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.Property.Type;
 import org.talend.daikon.properties.PropertyFactory;
@@ -56,7 +59,10 @@ public abstract class FixedConnectorsComponentProperties extends ComponentProper
                     schemaProp = (Property) property;
                 }
                 return (schemaProp != null && schemaProp.getType() == Type.SCHEMA) ? (Schema) schemaProp.getValue() : null;
-            } // else // wrong type or path not found so return null
+            } else {// else path not found so throw exception
+                throw new ComponentException(ComponentsErrorCode.WRONG_CONNECTOR,
+                        ExceptionContext.build().put("properties", this.getClass().getCanonicalName()));
+            }
         } // not a connector handled by this class
         return null;
     }
@@ -91,4 +97,22 @@ public abstract class FixedConnectorsComponentProperties extends ComponentProper
         return diff;
     }
 
+    @Override
+    public void setConnectedSchema(Connector connector, Schema schema, boolean isOutputConnection) {
+        if (connector instanceof PropertyPathConnector) {
+            NamedThing property = getProperty(((PropertyPathConnector) connector).getPropertyPath());
+            if (property != null) {
+                Property schemaProp = null;
+                if (property instanceof SchemaProperties) {
+                    SchemaProperties schemaProperties = (SchemaProperties) property;
+                    schemaProperties.schema.setValue(schema);
+                } else if (property instanceof Property) {
+                    ((Property) property).setValue(schema);
+                }
+            } else {// else path not found so throw exception
+                throw new ComponentException(ComponentsErrorCode.WRONG_CONNECTOR,
+                        ExceptionContext.build().put("properties", this.getClass().getCanonicalName()));
+            }
+        } // not a connector handled by this class
+    }
 }

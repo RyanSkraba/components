@@ -351,4 +351,9 @@ public class ComponentServiceSpring implements ComponentService {
         return componentServiceDelegate.getAvailableConnectors(componentProperties, connectedConnetor, isOuput);
     }
 
+    @Override
+    public void setSchema(ComponentProperties componentProperties, Connector connector, Schema schema, boolean isOuput) {
+        componentServiceDelegate.setSchema(componentProperties, connector, schema, isOuput);
+    }
+
 }

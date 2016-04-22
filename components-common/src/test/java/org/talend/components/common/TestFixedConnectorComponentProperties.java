@@ -20,11 +20,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
@@ -33,7 +35,7 @@ import org.talend.components.api.test.SimpleComponentRegistry;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.PropertyFactory;
 
-public class TestFixedSchemaComponentProperties {
+public class TestFixedConnectorComponentProperties {
 
     static public class TestProperties extends FixedConnectorsComponentProperties {
 
@@ -92,8 +94,12 @@ public class TestFixedSchemaComponentProperties {
         assertNotNull(schema);
         schema = properties.getSchema(TestProperties.REJECT_CONNECTOR, true);
         assertNotNull(schema);
-        schema = properties.getSchema(new PropertyPathConnector(Connector.MAIN_NAME, "foo"), true); //$NON-NLS-1$
-        assertNull(schema);
+    }
+
+    @Test(expected = ComponentException.class)
+    public void testGetSchemaException() {
+        TestProperties properties = (TestProperties) getComponentService().getComponentProperties("foo"); //$NON-NLS-1$
+        properties.getSchema(new PropertyPathConnector(Connector.MAIN_NAME, "foo"), true); //$NON-NLS-1$
     }
 
     @Test
@@ -110,6 +116,23 @@ public class TestFixedSchemaComponentProperties {
                 true);
         assertThat(availableConnections, hasSize(1));
         assertTrue(availableConnections.contains(TestProperties.REJECT_CONNECTOR));
+    }
+
+    @Test
+    public void testSetSchema() {
+        ComponentProperties properties = getComponentService().getComponentProperties("foo"); //$NON-NLS-1$
+        Schema aSchema = SchemaBuilder.builder().record("foo").fields().endRecord(); //$NON-NLS-1$
+        Schema schema = properties.getSchema(TestProperties.MAIN_CONNECTOR, true);
+        assertNotEquals(aSchema, schema);
+        properties.setConnectedSchema(TestProperties.MAIN_CONNECTOR, aSchema, true);
+        schema = properties.getSchema(TestProperties.MAIN_CONNECTOR, true);
+        assertEquals(aSchema, schema);
+    }
+
+    @Test(expected = ComponentException.class)
+    public void testSetSchemaException() {
+        TestProperties properties = (TestProperties) getComponentService().getComponentProperties("foo"); //$NON-NLS-1$
+        properties.setConnectedSchema(new PropertyPathConnector(Connector.MAIN_NAME, "foo"), null, true); //$NON-NLS-1$
     }
 
 }

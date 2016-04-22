@@ -156,12 +156,23 @@ public interface ComponentService extends PropertiesService<ComponentProperties>
      * @param componentProperties the Properties to get the schema for a given connector name
      * @param connector token used to identify the connection.
      * @param isOuput true is the connection is an output connection, false if it is an input connection
+     * @return the schema associated with a given connector token of input or ouput connectors, may be null.
+     * @exception ComponentException thrown if the connector is not recognized for the given component.
+     */
+    Schema getSchema(ComponentProperties componentProperties, Connector connector, boolean isOuput);
+
+    /**
+     * set the schema associated with a given named connection for a componentProperties
+     * 
+     * @param componentProperties the Properties to get the schema for a given connector name
+     * @param connector token used to identify the connection.
+     * @param schema schema to be set for the given connector
+     * @param isOuput true is the connection is an output connection, false if it is an input connection
      * @return the schema associated with a given connector token of input or ouput connectors, may be null if schema is
      * associated with the connector. This should never be the case for output connections but may be null for input
      * connections because the component does not need to have any input schema and can handle any data type.
-     * @exception ComponentException thrown if the connection name does not exists for the given component.
      */
-    Schema getSchema(ComponentProperties componentProperties, Connector connector, boolean isOuput);
+    void setSchema(ComponentProperties componentProperties, Connector connector, Schema schema, boolean isOuput);
 
     /**
      * get the schema associated with a given named connector for a componentProperties

@@ -477,4 +477,9 @@ public class ComponentServiceImpl extends PropertiesServiceImpl<ComponentPropert
         return componentProperties.getAvailableConnectors(connectedConnetor, isOuput);
     }
 
+    @Override
+    public void setSchema(ComponentProperties componentProperties, Connector connector, Schema schema, boolean isOuput) {
+        componentProperties.setConnectedSchema(connector, schema, isOuput);
+    }
+
 }

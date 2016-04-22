@@ -77,4 +77,17 @@ public abstract class ComponentProperties extends Properties {
             boolean isOutputConnection) {
         return null;
     }
+
+    /**
+     * set the schema related to the connector with the schema at the other end of the connection.
+     * 
+     * @param connector used to identify which schema to set.
+     * @param schema schema to set.
+     * @param isOutputConnection wether the connector is an output connector.
+     * 
+     */
+    public void setConnectedSchema(Connector connector, Schema schema, boolean isOutputConnection) {
+        // do nothing by default.
+
+    }
 }

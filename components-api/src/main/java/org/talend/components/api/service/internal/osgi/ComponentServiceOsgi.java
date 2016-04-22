@@ -252,4 +252,10 @@ public class ComponentServiceOsgi implements ComponentService {
             Set<? extends Connector> connectedConnetor, boolean isOuput) {
         return componentServiceDelegate.getAvailableConnectors(componentProperties, connectedConnetor, isOuput);
     }
+
+    @Override
+    public void setSchema(ComponentProperties componentProperties, Connector connector, Schema schema, boolean isOuput) {
+        componentServiceDelegate.setSchema(componentProperties, connector, schema, isOuput);
+    }
+
 }
