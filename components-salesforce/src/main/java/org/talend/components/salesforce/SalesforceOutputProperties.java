@@ -99,7 +99,9 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         ur.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
         ur.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
         if (poly) {
-            ur.addChild(newProperty(Property.Type.BOOLEAN, "polymorphic")); //$NON-NLS-1$
+        	Property property = newProperty(Property.Type.BOOLEAN, "polymorphic");
+        	property.setValue(false);
+            ur.addChild(property); //$NON-NLS-1$
         }
         ur.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
     }

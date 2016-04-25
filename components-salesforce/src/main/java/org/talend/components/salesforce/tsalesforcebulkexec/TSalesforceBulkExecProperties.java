@@ -12,12 +12,11 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcebulkexec;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
-import static org.talend.daikon.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.PropertyFactory.newProperty;
+import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import org.talend.components.salesforce.SalesforceBulkProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties;
-import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 
@@ -39,6 +38,13 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
 
         Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(widget(bulkProperties.getForm(Form.MAIN).setName("bulkProperties")));
+    }
+    
+    @Override
+    public void setupProperties() {
+        super.setupProperties();
+        
+        connection.bulkConnection.setValue(true);
     }
 
 }
