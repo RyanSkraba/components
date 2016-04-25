@@ -20,7 +20,7 @@ import org.talend.daikon.avro.IndexedRecordAdapterFactory;
  */
 public class IssueAdapterFactory implements IndexedRecordAdapterFactory<String, IssueIndexedRecord>{
     
-    Schema schema;
+    Schema schema;   
 
     @Override
     public Class<String> getDatumClass() {
