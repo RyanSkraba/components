@@ -45,5 +45,10 @@ public abstract class JiraDefinition extends AbstractComponentDefinition {
     public String getMavenArtifactId() {
         return "components-jira";
     }
+    
+    @Override
+    public String[] getFamilies() {
+        return new String[] { "Business/Jira" };
+    }
 
 }
