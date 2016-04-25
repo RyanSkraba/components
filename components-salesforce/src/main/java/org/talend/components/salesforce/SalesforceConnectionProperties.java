@@ -101,6 +101,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
         loginType.setValue(LOGIN_BASIC);
         endpoint.setValue(URL);
         timeout.setValue(60000);
+        httpChunked.setValue(true);
 
     }
 
