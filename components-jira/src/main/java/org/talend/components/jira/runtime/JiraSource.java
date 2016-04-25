@@ -13,9 +13,12 @@
 package org.talend.components.jira.runtime;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field.Order;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.container.RuntimeContainer;
@@ -28,6 +31,8 @@ import org.talend.daikon.properties.ValidationResult;
  * Jira source implementation
  */
 public class JiraSource implements Source{
+    
+    private static final long serialVersionUID = 1L;
     
     /**
      * Jira component properties
@@ -50,24 +55,30 @@ public class JiraSource implements Source{
     /**
      * What should I validate here?
      * validate connection to Jira here
+     * TODO implement it
      * 
      */
     @Override
     public ValidationResult validate(RuntimeContainer container) {
-        // TODO Auto-generated method stub
-        return null;
+        return ValidationResult.OK;
     }
 
+    /**
+     * TODO implement it
+     */
     @Override
     public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
-        // TODO Auto-generated method stub
-        return null;
+        List<NamedThing> schemaNames = new ArrayList<>();
+        return schemaNames;
     }
 
+    /**
+     * TODO implement it
+     */
     @Override
     public Schema getSchema(RuntimeContainer container, String schemaName) throws IOException {
-        // TODO Auto-generated method stub
-        return null;
+        Schema.Field jsonField = new Schema.Field("json", Schema.create(Schema.Type.STRING), null, null, Order.ASCENDING);
+        return Schema.createRecord("issue", null, null, false, Collections.singletonList(jsonField));
     }
 
     @Override
