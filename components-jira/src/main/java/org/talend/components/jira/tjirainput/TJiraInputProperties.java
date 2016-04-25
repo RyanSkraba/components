@@ -39,12 +39,12 @@ public class TJiraInputProperties extends ComponentProperties implements HasSche
     /**
      * Jira issue resource value
      */
-    private static final String ISSUE = "issue";
+    public static final String ISSUE = "issue";
     
     /**
      * Jira project resource value
      */
-    private static final String PROJECT = "project";
+    public static final String PROJECT = "project";
     
     /**
      * Basic http authorization type

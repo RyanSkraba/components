@@ -83,8 +83,22 @@ public class JiraSource implements Source{
 
     @Override
     public Reader createReader(RuntimeContainer container) {
-        // TODO Auto-generated method stub
-        return null;
+        String url = properties.hostUrl.getStringValue();
+        String resource = properties.resource.getStringValue();
+        switch (resource) {
+        case TJiraInputProperties.ISSUE: {
+            resource = "rest/api/2/issue/TP-6";
+            break;
+        }
+        case TJiraInputProperties.PROJECT: {
+            resource = "rest/api/2/project/10000";
+            break;
+        }
+        default: {
+            resource = "rest/api/2/issue/TP-6";
+        }
+        }
+        return new JiraReader(this, url, resource);
     }
 
 }
