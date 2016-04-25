@@ -12,9 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutputbulk;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
-import static org.talend.daikon.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.PropertyFactory.newProperty;
+import static org.talend.daikon.properties.presentation.Widget.widget;
 
+import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.BulkFileProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.Property;
@@ -34,6 +35,10 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
     @Override
     public void setupProperties() {
         super.setupProperties();
+        
+        returns = ComponentPropertyFactory.newReturnsProperty();
+        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_LINE"); //$NON-NLS-1$
+        
         TSalesforceOutputProperties.setupUpsertRelation(upsertRelation, TSalesforceOutputProperties.POLY);
         // schema.schema.setTaggedValue(StudioConstants.CONNECTOR_TYPE_SCHEMA_KEY, ConnectorType.FLOW);
     }

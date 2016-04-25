@@ -109,6 +109,15 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         }
         ur.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
     }
+    
+    protected void setupUpsertRelation(Property ur) {
+        // They might have been set previously in some inheritance cases
+        ur.setChildren(new ArrayList<Property>());
+        ur.addChild(newProperty("columnName")); //$NON-NLS-1$
+        ur.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
+        ur.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
+        ur.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
+    }
 
     @Override
     public void setupProperties() {
@@ -138,7 +147,7 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
                 .type().stringType().noDefault().endRecord();
         schemaReject.schema.setValue(s);
 
-        setupUpsertRelation(upsertRelation, !POLY);
+        setupUpsertRelation(upsertRelation);
 
         module = new ModuleSubclass("module");
         module.connection = connection;
@@ -172,8 +181,8 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
             Form advForm = getForm(Form.ADVANCED);
             if (advForm != null) {
                 boolean isUpsert = ACTION_UPSERT.equals(outputAction.getValue());
-                form.getWidget("upsertKeyColumn").setVisible(isUpsert);
-                advForm.getWidget("upsertRelation").setVisible(isUpsert);
+                form.getWidget(upsertKeyColumn.getName()).setVisible(isUpsert);
+                advForm.getWidget(upsertRelation.getName()).setVisible(isUpsert);
             }
         }
     }

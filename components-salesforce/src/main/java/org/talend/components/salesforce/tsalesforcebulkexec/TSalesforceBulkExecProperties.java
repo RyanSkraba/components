@@ -15,6 +15,8 @@ package org.talend.components.salesforce.tsalesforcebulkexec;
 import static org.talend.daikon.properties.PropertyFactory.newProperty;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 
+import java.util.ArrayList;
+
 import org.talend.components.salesforce.SalesforceBulkProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.daikon.properties.Property;
@@ -29,6 +31,20 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
     public TSalesforceBulkExecProperties(String name) {
         super(name);
     }
+    
+    protected void setupUpsertRelation(Property ur) {
+        // They might have been set previously in some inheritance cases
+        ur.setChildren(new ArrayList<Property>());
+        ur.addChild(newProperty("columnName")); //$NON-NLS-1$
+        ur.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
+        ur.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
+        
+    	Property property = newProperty(Property.Type.BOOLEAN, "polymorphic");
+    	property.setValue(false);
+        ur.addChild(property); //$NON-NLS-1$
+        
+        ur.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
+    }
 
     @Override
     public void setupLayout() {
@@ -41,10 +57,22 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
     }
     
     @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+        
+        if(Form.ADVANCED.equals(form.getName())) {
+        	form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setVisible(false);
+        	form.getChildForm(connection.getName()).getWidget(connection.httpChunked.getName()).setVisible(false);
+        	form.getWidget(upsertRelation.getName()).setVisible(false);
+        }
+    }
+    
+    @Override
     public void setupProperties() {
         super.setupProperties();
         
         connection.bulkConnection.setValue(true);
+        connection.httpChunked.setValue(false);
     }
 
 }

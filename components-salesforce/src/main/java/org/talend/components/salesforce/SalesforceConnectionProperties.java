@@ -151,6 +151,10 @@ public class SalesforceConnectionProperties extends ComponentProperties
         refreshLayout(getForm(Form.REFERENCE));
         refreshLayout(getForm(Form.ADVANCED));
     }
+    
+    public void afterBulkConnection() {
+    	refreshLayout(getForm(Form.ADVANCED));
+    }
 
     public ValidationResult validateTestConnection() throws Exception {
         ValidationResult vr = SalesforceSourceOrSink.validateConnection(this);
@@ -189,7 +193,14 @@ public class SalesforceConnectionProperties extends ComponentProperties
         }
 
         if (form.getName().equals(Form.ADVANCED)) {
-            form.setVisible(!useOtherConnection);
+        	if(useOtherConnection) {
+        		form.setVisible(false);
+        	} else {
+        		form.setVisible(true);
+        		
+        		boolean bulkMode = bulkConnection.getBooleanValue();
+        		form.getWidget(httpChunked.getName()).setVisible(!bulkMode);
+        	}
         }
     }
 
