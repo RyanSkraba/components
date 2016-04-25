@@ -122,6 +122,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     protected PartnerConnection doConnection(ConnectorConfig config) throws ConnectionException {
         SalesforceConnectionProperties connProps = properties.getConnectionProperties();
         String endpoint = connProps.endpoint.getStringValue();
+        endpoint = StringUtils.strip(endpoint, "\"");
         if (SalesforceConnectionProperties.LOGIN_OAUTH.equals(connProps.loginType.getValue())) {
             SalesforceOAuthConnection oauthConnection = new SalesforceOAuthConnection(connProps.oauth, endpoint, API_VERSION);
             oauthConnection.login(config);
