@@ -26,28 +26,29 @@ public class TSplunkEventCollectorWriteOperation implements WriteOperation<Write
 
     private static final long serialVersionUID = 939083892871460237L;
 
+    private final TSplunkEventCollectorSink sink;
+    
+    public TSplunkEventCollectorWriteOperation(TSplunkEventCollectorSink sink) {
+        this.sink = sink;
+    }
+    
     @Override
-    public Writer<WriterResult> createWriter(RuntimeContainer arg0) {
-        // TODO Auto-generated method stub
-        return null;
+    public void initialize(RuntimeContainer adaptor) {
     }
 
     @Override
-    public void finalize(Iterable<WriterResult> arg0, RuntimeContainer arg1) {
-        // TODO Auto-generated method stub
+    public void finalize(Iterable<WriterResult> writerResults, RuntimeContainer adaptor) {
+        //Nothing to be done here.
+    }
 
+    @Override
+    public Writer<WriterResult> createWriter(RuntimeContainer adaptor) {
+        return new TSplunkEventCollectorWriter(this, sink.getServerUrl(), sink.getToken(), sink.getEventsBatchSize(), adaptor);
     }
 
     @Override
     public Sink getSink() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void initialize(RuntimeContainer arg0) {
-        // TODO Auto-generated method stub
-
+        return sink;
     }
 
 }

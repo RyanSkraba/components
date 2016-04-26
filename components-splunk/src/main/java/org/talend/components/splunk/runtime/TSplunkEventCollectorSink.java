@@ -13,15 +13,20 @@
 package org.talend.components.splunk.runtime;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.avro.Schema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.splunk.TSplunkEventCollectorProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
 
 
 /**
@@ -34,34 +39,59 @@ public class TSplunkEventCollectorSink implements Sink {
      */
     private static final long serialVersionUID = -2587927325500427743L;
 
+    private transient static final Logger LOGGER = LoggerFactory.getLogger(TSplunkEventCollectorSink.class);
+    
+    private String serverUrl;
+    private String token;
+    private int eventsBatchSize;
+
     @Override
-    public Schema getSchema(RuntimeContainer arg0, String arg1) throws IOException {
-        // TODO Auto-generated method stub
-        return null;
+    public void initialize(RuntimeContainer container, ComponentProperties properties) {
+        TSplunkEventCollectorProperties props = (TSplunkEventCollectorProperties) properties;
+        this.serverUrl = props.fullUrl.getStringValue();
+        this.token = props.token.getStringValue();
+        this.eventsBatchSize = props.getBatchSize();
     }
 
     @Override
-    public List<NamedThing> getSchemaNames(RuntimeContainer arg0) throws IOException {
-        // TODO Auto-generated method stub
-        return null;
+    public ValidationResult validate(RuntimeContainer container) {
+        ValidationResult result = new ValidationResult();
+        if(serverUrl == null || serverUrl.trim().isEmpty()) {
+            LOGGER.debug("Server URL is empty.");
+            result.setStatus(Result.ERROR).setMessage("Server URL cannot be empty.");
+        }
+        if(token == null || token.trim().isEmpty()) {
+            LOGGER.debug("Splunk Authorization Token is empty.");
+            result.setStatus(Result.ERROR).setMessage("Token cannot be empty.");
+        }
+        return ValidationResult.OK;
     }
 
     @Override
-    public void initialize(RuntimeContainer arg0, ComponentProperties arg1) {
-        // TODO Auto-generated method stub
-
+    public List<NamedThing> getSchemaNames(RuntimeContainer adaptor) throws IOException {
+        return Collections.EMPTY_LIST;
     }
 
     @Override
-    public ValidationResult validate(RuntimeContainer arg0) {
-        // TODO Auto-generated method stub
+    public Schema getSchema(RuntimeContainer container, String schemaName) throws IOException {
         return null;
     }
 
     @Override
     public WriteOperation<?> createWriteOperation() {
-        // TODO Auto-generated method stub
-        return null;
+        return new TSplunkEventCollectorWriteOperation(this);
+    }
+    
+    public String getServerUrl() {
+        return serverUrl;
+    }
+    
+    public String getToken() {
+        return token;
+    }
+    
+    public int getEventsBatchSize() {
+        return eventsBatchSize;
     }
 
 }
