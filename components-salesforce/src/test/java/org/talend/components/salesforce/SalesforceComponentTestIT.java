@@ -612,4 +612,37 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
             }
         }
    }
+    
+    @Test
+    public void testSchemaSerialized2() throws Throwable {
+        ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
+        TSalesforceOutputProperties outputProps = (TSalesforceOutputProperties) getComponentService()
+                .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
+        
+        Schema reject = SchemaBuilder.record("Reject")
+                .fields().name("A")
+                .type().stringType().noDefault().name("B").type().stringType().noDefault().endRecord();
+        
+        Schema main = SchemaBuilder.record("Main")
+                .fields().name("C")
+                .type().stringType().noDefault().name("D").type().stringType().noDefault().endRecord();
+        
+        outputProps.setValue("module.main.schema", main);
+        outputProps.setValue("schemaReject.schema", reject);
+
+        Schema main2 = (Schema)outputProps.getValuedProperty("module.main.schema").getValue();
+        Schema reject2 = (Schema)outputProps.getValuedProperty("schemaReject.schema").getValue();
+        assertEquals(main.toString(), main2.toString());
+        assertEquals(reject.toString(), reject2.toString());
+
+        String serialized = outputProps.toSerialized();
+        
+        TSalesforceOutputProperties afterSerialized = ComponentProperties.fromSerialized(serialized, TSalesforceOutputProperties.class).properties;
+        
+        
+        main2 = (Schema)afterSerialized.getValuedProperty("module.main.schema").getValue();
+        reject2 = (Schema)afterSerialized.getValuedProperty("schemaReject.schema").getValue();
+        assertEquals(main.toString(), main2.toString());
+        assertEquals(reject.toString(), reject2.toString());
+   }
 }
