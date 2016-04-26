@@ -1,12 +1,13 @@
 package org.talend.components.splunk;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 import org.apache.avro.Schema;
-import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentPropertyFactory;
-import org.talend.components.api.properties.HasSchemaProperty;
+import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.PropertyFactory;
@@ -32,7 +33,7 @@ import org.talend.daikon.properties.presentation.Form;
  * <li>{code schema}, an embedded property referring to a Schema.</li>
  * </ol>
  */
-public class TSplunkEventCollectorProperties extends ComponentProperties implements HasSchemaProperty {
+public class TSplunkEventCollectorProperties extends FixedConnectorsComponentProperties {
 
     public static String RESPONSE_CODE_NAME = "RESPONSE_CODE";
     public static String ERROR_MESSAGE_NAME = "ERROR_MESSAGE";
@@ -44,6 +45,7 @@ public class TSplunkEventCollectorProperties extends ComponentProperties impleme
     public Property extendedOutput = PropertyFactory.newBoolean("extendedOutput");
     public Property RESPONSE_CODE;
     public Property ERROR_MESSAGE;
+    protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
     public TSplunkEventCollectorProperties(String name) {
         super(name);
@@ -84,14 +86,16 @@ public class TSplunkEventCollectorProperties extends ComponentProperties impleme
         getForm(Form.ADVANCED).getWidget(eventsBatchSize.getName()).setVisible(extendedOutput.getBooleanValue());
     }
     
-    @Override
-    public List<Schema> getSchemas() {
-        return Collections.singletonList(new Schema.Parser().parse(schema.schema.getStringValue()));
+    public Schema getSchema() {
+        return (Schema)schema.schema.getValue();
     }
 
     @Override
-    public void setSchemas(List<Schema> schemas) {
-        this.schema.schema.setValue(schemas.get(0));
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputComponent) {
+        if(isOutputComponent) {
+            return Collections.singleton(MAIN_CONNECTOR);
+        }
+        return Collections.emptySet();
     }
     
 }
