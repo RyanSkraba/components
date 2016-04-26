@@ -105,10 +105,10 @@ public class TJiraInputProperties extends ComponentProperties implements HasSche
     public void setupLayout() {
         super.setupLayout();
         Form form = Form.create(this, Form.MAIN, "Jira Input");
+        form.addRow(schema.getForm(Form.REFERENCE));
         form.addRow(hostUrl);
         form.addRow(resource);
         form.addRow(authorizationType);
-        form.addRow(schema);
     }
 
 }

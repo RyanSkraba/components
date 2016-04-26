@@ -35,21 +35,21 @@ import aQute.bnd.annotation.component.Component;
 public class TJiraInputDefinition extends JiraDefinition implements InputComponentDefinition {
 
     /**
+     * Jira input component name
+     */
+    public static final String COMPONENT_NAME = "tJIRAInput";
+    
+    /**
      * Constructor sets component name
      * 
      * @param componentName component name
      */
-    public TJiraInputDefinition(String componentName) {
-        super(componentName);
+    public TJiraInputDefinition() {
+        super(COMPONENT_NAME);
         setConnectors(new Connector(ConnectorType.FLOW, 0, 1));
         setTriggers(new Trigger(TriggerType.ITERATE, 1, 1), new Trigger(TriggerType.SUBJOB_OK, 1, 0),
                 new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
     }
-
-    /**
-     * Jira input component name
-     */
-    public static final String COMPONENT_NAME = "tJIRAInput";
 
     @Override
     public Source getRuntime() {
