@@ -4,14 +4,19 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
+import org.apache.avro.SchemaBuilder.FieldAssembler;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
+import org.talend.components.splunk.objects.SplunkJSONEventField;
+import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 /**
  * The ComponentProperties subclass provided by a component stores the 
@@ -70,9 +75,23 @@ public class TSplunkEventCollectorProperties extends FixedConnectorsComponentPro
     public void setupProperties() {
         super.setupProperties();
         
+        setupDefaultSchema();
+        
         returns = ComponentPropertyFactory.newReturnsProperty();
         RESPONSE_CODE = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, RESPONSE_CODE_NAME); //$NON-NLS-1$
         ERROR_MESSAGE = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.STRING, ERROR_MESSAGE_NAME); //$NON-NLS-1$
+    }
+
+    private void setupDefaultSchema() {
+        AvroRegistry avroReg = new AvroRegistry();
+        FieldAssembler<Schema> record = SchemaBuilder.record("Main").fields();
+        for(SplunkJSONEventField metadataField : SplunkJSONEventField.getMetadataFields()) {
+            record.name(metadataField.getName())
+            .prop(Talend6SchemaConstants.TALEND6_COLUMN_IS_NULLABLE, "true")
+            .type(avroReg.getConverter(metadataField.getDataType()).getSchema()).noDefault();
+        }
+        Schema defaultSchema = record.endRecord();
+        schema.schema.setValue(defaultSchema);
     }
 
     public int getBatchSize() {
