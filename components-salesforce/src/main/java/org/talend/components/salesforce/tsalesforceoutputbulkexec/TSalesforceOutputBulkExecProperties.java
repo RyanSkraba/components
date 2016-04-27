@@ -47,13 +47,20 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
     public ComponentProperties getInputComponentProperties() {
         outputBulkProperties.schema.schema.setValue(module.main.schema.getValue());
         outputBulkProperties.bulkFilePath.setValue(bulkFilePath.getValue());
+        outputBulkProperties.upsertRelation.setValue(upsertRelation.getValue());
         return outputBulkProperties;
     }
 
+    private static final String ADD_QUOTES = "ADD_QUOTES";
+    
     @Override
     public ComponentProperties getOutputComponentProperties() {
         TSalesforceBulkExecProperties bulkExecProperties = new TSalesforceBulkExecProperties("bulkExecProperties");
         bulkExecProperties.copyValuesFrom(this);
+        
+        bulkExecProperties.connection.referencedComponent.componentInstanceId.setTaggedValue(ADD_QUOTES, true);
+        bulkExecProperties.module.connection.referencedComponent.componentInstanceId.setTaggedValue(ADD_QUOTES, true);
+        
         return bulkExecProperties;
     }
 }
