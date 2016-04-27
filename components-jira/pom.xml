@@ -53,6 +53,7 @@
 		</dependency>
 		
 		<!-- spring jar for integration tests -->
+		
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
@@ -62,6 +63,16 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
 			<scope>test</scope>
+			<exclusions>
+      			<exclusion> 
+        			<groupId>ch.qos.logback</groupId>
+        			<artifactId>logback-classic</artifactId>
+      			</exclusion>
+      			<exclusion> 
+        			<groupId>org.slf4j</groupId>
+        			<artifactId>log4j-over-slf4j</artifactId>
+      			</exclusion>
+    		</exclusions> 
 		</dependency>
 		
 		<!-- component specific dependencies -->
