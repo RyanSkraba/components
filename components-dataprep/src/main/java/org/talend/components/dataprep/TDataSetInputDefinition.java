@@ -49,6 +49,6 @@ public class TDataSetInputDefinition extends AbstractComponentDefinition impleme
 
     @Override
     public Source getRuntime() {
-        return new TDataSetSource();
+        return new TDataSetInputSource();
     }
 }

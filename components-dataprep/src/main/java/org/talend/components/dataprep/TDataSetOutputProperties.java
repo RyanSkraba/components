@@ -26,14 +26,14 @@ import java.util.Set;
  *     properties to the user.</li>
  * </ol>
  * 
- * The DataSetOutputProperties has two properties:
+ * The TDataSetOutputProperties has two properties:
  * <ol>
  * <li>{code dataSetName}, a simple property which is a String containing the
  *     file path that this component will read.</li>
  * <li>{code schema}, an embedded property referring to a Schema.</li>
  * </ol>
  */
-public class DataSetOutputProperties extends FixedConnectorsComponentProperties {
+public class TDataSetOutputProperties extends FixedConnectorsComponentProperties {
 
     public Property dataSetName = PropertyFactory.newString("dataSetName");
     public Property login = PropertyFactory.newString("login");
@@ -43,7 +43,7 @@ public class DataSetOutputProperties extends FixedConnectorsComponentProperties 
     public SchemaProperties schema = new SchemaProperties("schema");
     protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
-    public DataSetOutputProperties(String name) {
+    public TDataSetOutputProperties(String name) {
         super(name);
     }
 

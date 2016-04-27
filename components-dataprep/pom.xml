@@ -57,6 +57,11 @@
             <artifactId>spring-boot-starter</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>fluent-hc</artifactId>
+            <version>4.2.6</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

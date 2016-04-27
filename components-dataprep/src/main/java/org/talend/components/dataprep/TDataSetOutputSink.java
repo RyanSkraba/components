@@ -1,9 +1,5 @@
 package org.talend.components.dataprep;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
@@ -12,10 +8,14 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Created by stavytskyi on 4/19/16.
  */
-public class DataSetOutputSink implements Sink {
+public class TDataSetOutputSink implements Sink {
 
     DataSetOutputProperties properties;
 
@@ -37,6 +37,7 @@ public class DataSetOutputSink implements Sink {
     @Override
     public ValidationResult validate(RuntimeContainer runtimeContainer) {
         //TODO: Validate all input data
+
         return ValidationResult.OK;
     }
 

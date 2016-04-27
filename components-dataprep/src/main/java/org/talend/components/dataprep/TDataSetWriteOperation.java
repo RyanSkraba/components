@@ -9,14 +9,14 @@ import org.talend.components.api.container.RuntimeContainer;
 /**
  * Created by stavytskyi on 4/19/16.
  */
-public class DataSetWriteOperation implements WriteOperation<WriterResult> {
+public class TDataSetWriteOperation implements WriteOperation<WriterResult> {
 
     private String url;
     private String dataSetName;
     private String mode;
     private Sink sink;
 
-    public DataSetWriteOperation(Sink sink) {
+    public TDataSetWriteOperation(Sink sink) {
         this.sink = sink;
     }
 
@@ -40,17 +40,17 @@ public class DataSetWriteOperation implements WriteOperation<WriterResult> {
         return sink;
     }
 
-    public DataSetWriteOperation setUrl(String url) {
+    public TDataSetWriteOperation setUrl(String url) {
         this.url = url;
         return this;
     }
 
-    public DataSetWriteOperation setDataSetName (String dataSetName){
+    public TDataSetWriteOperation setDataSetName (String dataSetName){
         this.dataSetName = dataSetName;
         return this;
     }
 
-    public DataSetWriteOperation setMode(String mode) {
+    public TDataSetWriteOperation setMode(String mode) {
         this.mode = mode;
         return this;
     }

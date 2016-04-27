@@ -9,7 +9,7 @@ import org.talend.components.api.component.runtime.WriterResult;
 /**
  * Created by stavytskyi on 4/19/16.
  */
-public class DataSetOutputWriter implements Writer<WriterResult> {
+public class TDataSetOutputWriter implements Writer<WriterResult> {
 
 
     @Override

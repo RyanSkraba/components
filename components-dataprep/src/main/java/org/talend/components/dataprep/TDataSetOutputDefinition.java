@@ -9,17 +9,17 @@ import org.talend.components.api.properties.ComponentProperties;
 import aQute.bnd.annotation.component.Component;
 
 /**
- * The DataSetOutputDefinition acts as an entry point for all of services that
+ * The TDataSetOutputDefinition acts as an entry point for all of services that
  * a component provides to integrate with the Studio (at design-time) and other 
  * components (at run-time).
  */
-@Component(name = Constants.COMPONENT_BEAN_PREFIX + DataSetOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class DataSetOutputDefinition extends AbstractComponentDefinition implements OutputComponentDefinition {
+@Component(name = Constants.COMPONENT_BEAN_PREFIX + TDataSetOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+public class TDataSetOutputDefinition extends AbstractComponentDefinition implements OutputComponentDefinition {
 
     public static final String COMPONENT_NAME = "tDataSetOutput"; //$NON-NLS-1$
 
 
-    public DataSetOutputDefinition() {
+    public TDataSetOutputDefinition() {
         super(COMPONENT_NAME);
         setTriggers(new Trigger(TriggerType.ITERATE, 1, 1), new Trigger(TriggerType.SUBJOB_OK, 1, 0),
                 new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
@@ -52,6 +52,6 @@ public class DataSetOutputDefinition extends AbstractComponentDefinition impleme
 
     @Override
     public Sink getRuntime() {
-        return new DataSetOutputSink();
+        return new TDataSetOutputSink();
     }
 }
