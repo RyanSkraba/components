@@ -13,6 +13,7 @@
 package org.talend.components.splunk.objects;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,7 +22,7 @@ import java.util.List;
 public enum SplunkJSONEventField {
 
     EVENT("event", Object.class),
-    TIME("time", Double.class),
+    TIME("time", Date.class),
     SOURCE("source", String.class),
     SOURCE_TYPE("sourcetype", String.class),
     HOST("host", String.class),

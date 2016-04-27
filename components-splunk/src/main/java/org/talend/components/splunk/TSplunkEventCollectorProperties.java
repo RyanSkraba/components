@@ -43,9 +43,9 @@ public class TSplunkEventCollectorProperties extends FixedConnectorsComponentPro
     public static String RESPONSE_CODE_NAME = "RESPONSE_CODE";
     public static String ERROR_MESSAGE_NAME = "ERROR_MESSAGE";
 
-    public Property fullUrl = PropertyFactory.newString("fullUrl"); //$NON-NLS-1$
+    public Property fullUrl = PropertyFactory.newString("fullUrl", ""); //$NON-NLS-1$
     public SchemaProperties schema = new SchemaProperties("schema"); //$NON-NLS-1$
-    public Property token = PropertyFactory.newString("token");
+    public Property token = PropertyFactory.newString("token", "");
     public Property eventsBatchSize = PropertyFactory.newInteger("eventsBatchSize");
     public Property extendedOutput = PropertyFactory.newBoolean("extendedOutput");
     public Property RESPONSE_CODE;

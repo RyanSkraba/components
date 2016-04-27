@@ -46,9 +46,10 @@ import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
 
     private transient static final Logger LOGGER = LoggerFactory.getLogger(TSplunkEventCollectorWriter.class);
+    private static final String servicesSuffix = "services/collector";
     
     private TSplunkEventCollectorWriteOperation writeOperation;
-    private String serverUrl;
+    private String fullRequestUrl;
     private String token;
     private String uid;
     private int eventsBatchSize;
@@ -66,7 +67,7 @@ public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
     public TSplunkEventCollectorWriter(TSplunkEventCollectorWriteOperation writeOperation, String serverUrl, String token, int eventsBatchSize,
                                         RuntimeContainer container) {
         this.writeOperation = writeOperation;
-        this.serverUrl = serverUrl;
+        this.fullRequestUrl = serverUrl.endsWith("/") ? (serverUrl + servicesSuffix) : (serverUrl + "/" + servicesSuffix); 
         this.token = token;
         this.eventsBatchSize = eventsBatchSize;
         this.container = container;
@@ -131,7 +132,7 @@ public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
     }
     
     public HttpPost createRequest(List<SplunkJSONEvent> events) throws UnsupportedEncodingException {
-        HttpPost request = new HttpPost(serverUrl + "/services/collector");
+        HttpPost request = new HttpPost(fullRequestUrl);
         request.addHeader("Authorization", "Splunk " + token);
         StringBuffer requestString = new StringBuffer();
         for(SplunkJSONEvent event : events) {
