@@ -90,20 +90,6 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
 
     public static final boolean POLY = true;
 
-    public static void setupUpsertRelation(Property ur, boolean poly) {
-        // They might have been set previously in some inheritance cases
-        ur.setChildren(new ArrayList<Property>());
-        ur.addChild(newProperty("columnName")); //$NON-NLS-1$
-        ur.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
-        ur.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
-        if (poly) {
-            Property property = newProperty(Property.Type.BOOLEAN, "polymorphic");
-            property.setValue(false);
-            ur.addChild(property); //$NON-NLS-1$
-        }
-        ur.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
-    }
-
     public void beforeUpsertKeyColumn() {
         upsertKeyColumn.setPossibleValues(getFieldNames(module.main.schema));
     }

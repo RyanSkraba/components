@@ -47,7 +47,7 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
     public ComponentProperties getInputComponentProperties() {
         outputBulkProperties.schema.schema.setValue(module.main.schema.getValue());
         outputBulkProperties.bulkFilePath.setValue(bulkFilePath.getValue());
-        outputBulkProperties.upsertRelation.setValue(upsertRelation.getValue());
+        outputBulkProperties.upsertRelation.setValue(upsertRelation.getStoredValue());
         return outputBulkProperties;
     }
 
