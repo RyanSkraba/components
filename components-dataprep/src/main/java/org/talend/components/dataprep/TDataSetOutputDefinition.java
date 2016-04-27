@@ -47,7 +47,7 @@ public class TDataSetOutputDefinition extends AbstractComponentDefinition implem
 
     @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
-        return DataSetOutputProperties.class;
+        return TDataSetOutputProperties.class;
     }
 
     @Override

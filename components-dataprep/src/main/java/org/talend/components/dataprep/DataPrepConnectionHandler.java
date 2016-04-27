@@ -16,10 +16,12 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.ContentType;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -89,6 +91,13 @@ public class DataPrepConnectionHandler {
         DataSet dataSet = objectMapper.readValue(current.getEntity().getContent(), DataSet.class);
         logout();
         return dataSet.getRecords();
+    }
+
+    void create(String data) throws IOException {
+        Request request = Request.Post(url+"/api/datasets?name=" + dataSetName);// + "&folderPath="+folderPath);
+        request.addHeader(authorisationHeader);
+        request.bodyString(data ,ContentType.create(ContentType.TEXT_PLAIN.getMimeType(), StandardCharsets.UTF_8));
+        request.execute();
     }
 
 

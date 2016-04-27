@@ -17,27 +17,26 @@ import java.util.List;
  */
 public class TDataSetOutputSink implements Sink {
 
-    DataSetOutputProperties properties;
+    TDataSetOutputProperties properties;
 
     @Override
     public WriteOperation<?> createWriteOperation() {
+        DataPrepConnectionHandler connectionHandler = null;
         if (properties.mode.getStringValue().equals("create"))
-        return new DataSetWriteOperation(this)
-                .setUrl(properties.url.getStringValue())
-                .setDataSetName(properties.dataSetName.getStringValue())
-                .setMode(properties.mode.getStringValue());
-        return null;
+            connectionHandler = new DataPrepConnectionHandler(properties.url.getStringValue(),
+                    properties.login.getStringValue(), properties.pass.getStringValue(),
+                    "create", properties.dataSetName.getStringValue());
+        return new TDataSetWriteOperation(this, connectionHandler);
     }
 
     @Override
     public void initialize(RuntimeContainer runtimeContainer, ComponentProperties componentProperties) {
-        this.properties = (DataSetOutputProperties) componentProperties;
+        this.properties = (TDataSetOutputProperties) componentProperties;
     }
 
     @Override
     public ValidationResult validate(RuntimeContainer runtimeContainer) {
         //TODO: Validate all input data
-
         return ValidationResult.OK;
     }
 
