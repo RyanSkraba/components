@@ -53,6 +53,12 @@
             <version>1.1.1</version>
         </dependency>
         
+        <dependency>
+        	<groupId>org.apache.httpcomponents</groupId>
+        	<artifactId>httpclient</artifactId>
+        	<version>4.2.6</version>
+       	</dependency>
+        
         <!-- spring jar for integration tests -->
         <dependency>
             <groupId>org.springframework</groupId>
