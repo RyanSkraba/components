@@ -51,10 +51,24 @@ public class JiraReader implements Reader<IndexedRecord>{
      */
     private String jsonResult;
     
+    /**
+     * Jira user name
+     * TODO should be obtained from properties
+     */
+    private static final String USER = "ivan";
+
+    /**
+     * Jira user's password
+     * TODO should be obtained from properties
+     */
+    private static final String PASSWORD = "12345";
+    
     public JiraReader(JiraSource source, String url, String resource) {
         this.source = source;
-        this.resource = resource;
-        rest = new Rest(url);
+//        this.resource = resource;
+        this.resource = "issue/TP-6";
+        rest = new Rest("http://localhost:8080/rest/api/2/");
+        rest.setCredentials(USER, PASSWORD);
     }
 
     /**
@@ -65,7 +79,7 @@ public class JiraReader implements Reader<IndexedRecord>{
      */
     @Override
     public boolean start() throws IOException {
-        String jsonResult = rest.get(resource);
+        jsonResult = rest.get(resource);
         if(jsonResult != null && !jsonResult.isEmpty()) {
             return true;
         }
