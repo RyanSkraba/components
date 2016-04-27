@@ -81,13 +81,7 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         @Override
         public ValidationResult afterModuleName() throws Exception {
             ValidationResult validationResult = super.afterModuleName();
-            String sJson = main.schema.getStringValue();
-            Schema s = new Schema.Parser().parse(sJson);
-            List<String> fieldNames = new ArrayList<>();
-            for (Schema.Field f : s.getFields()) {
-                fieldNames.add(f.name());
-            }
-            // FIXME - we probably only want the names, not the Schema.Field
+            List<String> fieldNames = getFieldNames(main.schema);
             upsertKeyColumn.setPossibleValues(fieldNames);
             upsertRelation.getChild("columnName").setPossibleValues(fieldNames);
             return validationResult;
@@ -103,13 +97,21 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         ur.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
         ur.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
         if (poly) {
-        	Property property = newProperty(Property.Type.BOOLEAN, "polymorphic");
-        	property.setValue(false);
+            Property property = newProperty(Property.Type.BOOLEAN, "polymorphic");
+            property.setValue(false);
             ur.addChild(property); //$NON-NLS-1$
         }
         ur.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
     }
-    
+
+    public void beforeUpsertKeyColumn() {
+        upsertKeyColumn.setPossibleValues(getFieldNames(module.main.schema));
+    }
+
+    public void beforeUpsertRelation() {
+        upsertRelation.getChild("columnName").setPossibleValues(getFieldNames(module.main.schema));
+    }
+
     protected void setupUpsertRelation(Property ur) {
         // They might have been set previously in some inheritance cases
         ur.setChildren(new ArrayList<Property>());
@@ -131,7 +133,7 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_REJECT"); //$NON-NLS-1$
 
         Schema s = SchemaBuilder.record("Reject")
-        // record set as read only for talend schema
+                // record set as read only for talend schema
                 .prop(Talend6SchemaConstants.TALEND6_IS_READ_ONLY, "true")//$NON-NLS-1$
                 .fields().name("errorCode") //$NON-NLS-1$  //$NON-NLS-2$
                 .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
@@ -164,8 +166,8 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(widget(upsertRelation).setWidgetType(Widget.WidgetType.TABLE));
         advancedForm.addRow(widget(schemaReject.getForm(Form.REFERENCE).setName("SchemaReject").setTitle("Schema Reject")));// TODO
-                                                                                                                            // check
-                                                                                                                            // I18N
+        // check
+        // I18N
     }
 
     public void afterOutputAction() {
@@ -197,6 +199,16 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         } else {
             return Collections.EMPTY_SET;
         }
+    }
+
+    protected List<String> getFieldNames(Property schema) {
+        String sJson = schema.getStringValue();
+        Schema s = new Schema.Parser().parse(sJson);
+        List<String> fieldNames = new ArrayList<>();
+        for (Schema.Field f : s.getFields()) {
+            fieldNames.add(f.name());
+        }
+        return fieldNames;
     }
 
 }
