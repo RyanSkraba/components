@@ -19,6 +19,7 @@ import org.apache.avro.Schema;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.HasSchemaProperty;
 import org.talend.components.common.SchemaProperties;
+import org.talend.components.common.UserPasswordProperties;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.PropertyFactory;
@@ -57,6 +58,11 @@ public class TJiraInputProperties extends ComponentProperties implements HasSche
     private static final String OAUTH = "OAuth";
     
     /**
+     * UserPassword properties name
+     */
+    private static final String USERPASSWORD = "userPassword";
+    
+    /**
      * URL of Jira instance
      */
     public Property hostUrl = PropertyFactory.newString("hostUrl");
@@ -69,10 +75,20 @@ public class TJiraInputProperties extends ComponentProperties implements HasSche
     public Property resource = PropertyFactory.newEnum("resource", ISSUE, PROJECT);
     
     /**
+     * Jira Query language request property
+     */
+    public Property jql = PropertyFactory.newString("jql");
+    
+    /**
      * Type of http authorization.
      * TODO maybe move it to Connection properties class and maybe in components-common
      */
     public Property authorizationType = PropertyFactory.newEnum("authorizationType", BASIC, OAUTH);
+    
+    /**
+     * User id and password properties for Basic Authorization
+     */
+    public UserPasswordProperties userPassword = new UserPasswordProperties(USERPASSWORD);
     
     /**
      * Schema property to define required fields of Jira resource
@@ -99,6 +115,7 @@ public class TJiraInputProperties extends ComponentProperties implements HasSche
         hostUrl.setValue("\"https://localhost:8080/\"");
         resource.setValue(ISSUE);
         authorizationType.setValue(BASIC);
+        jql.setValue("\"\"");
     }
     
     @Override
@@ -108,7 +125,26 @@ public class TJiraInputProperties extends ComponentProperties implements HasSche
         form.addRow(schema.getForm(Form.REFERENCE));
         form.addRow(hostUrl);
         form.addRow(resource);
+        form.addRow(jql);
         form.addRow(authorizationType);
+        form.addRow(userPassword.getForm(Form.MAIN));
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+        
+        if (form.getName().equals(Form.MAIN)) {
+            if(OAUTH.equals(authorizationType.getStringValue())) {
+                form.getWidget(USERPASSWORD).setVisible(false);
+            }
+            if(PROJECT.equals(resource.getStringValue())) {
+                form.getWidget(jql.getName()).setVisible(false);
+            }
+        }
     }
 
 }
