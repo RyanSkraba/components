@@ -128,7 +128,6 @@
 							</instructions>
 						</configuration>
 					</execution>
-					<!--
 					<execution>
 						<id>test-bundle</id>
 						<phase>package</phase>
@@ -151,7 +150,6 @@
 							</instructions>
 						</configuration>
 					</execution>
-					-->
 					<execution>
 						<id>osgi-bundle</id>
 						<phase>package</phase>

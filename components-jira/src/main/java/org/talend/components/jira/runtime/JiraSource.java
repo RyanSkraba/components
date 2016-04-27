@@ -30,16 +30,20 @@ import org.talend.daikon.properties.ValidationResult;
 /**
  * Jira source implementation
  */
-public class JiraSource implements Source{
-    
+public class JiraSource implements Source {
+
     private static final long serialVersionUID = 1L;
-    
+
+    /**
+     * Jira REST API version. It is a part of REST URL
+     */
+    private static final String REST_VERSION = "rest/api/2/";
+
     /**
      * Jira component properties
      */
     private TJiraInputProperties properties;
 
-    
     /**
      * Stores component properties in this object
      * 
@@ -48,14 +52,12 @@ public class JiraSource implements Source{
      */
     @Override
     public void initialize(RuntimeContainer container, ComponentProperties properties) {
-        //FIXME could it throw cast exception?
+        // FIXME could it throw cast exception?
         this.properties = (TJiraInputProperties) properties;
     }
 
     /**
-     * What should I validate here?
-     * validate connection to Jira here
-     * TODO implement it
+     * What should I validate here? validate connection to Jira here TODO implement it
      * 
      */
     @Override
@@ -84,21 +86,31 @@ public class JiraSource implements Source{
     @Override
     public Reader createReader(RuntimeContainer container) {
         String url = properties.hostUrl.getStringValue();
-        String resource = properties.resource.getStringValue();
-        switch (resource) {
+        String resourceType = properties.resource.getStringValue();
+        String userId = properties.userPassword.userId.getStringValue();
+        String password = properties.userPassword.password.getStringValue();
+        String jqlQuery = properties.jql.getStringValue();
+
+        // builds resource URL and parameters
+        StringBuilder resourceBuilder = new StringBuilder(REST_VERSION);
+
+        switch (resourceType) {
         case TJiraInputProperties.ISSUE: {
-            resource = "rest/api/2/issue/TP-6";
+            resourceBuilder.append("search");
+            resourceBuilder.append("?");
+            resourceBuilder.append("jql=");
+            resourceBuilder.append(jqlQuery);
             break;
         }
         case TJiraInputProperties.PROJECT: {
-            resource = "rest/api/2/project/10000";
+            resourceBuilder.append("project");
+            // TODO Add project id /{projectIdOrKey}
             break;
         }
-        default: {
-            resource = "rest/api/2/issue/TP-6";
         }
-        }
-        return new JiraReader(this, url, resource);
+        String resource = resourceBuilder.toString();
+
+        return new JiraReader(this, url, resource, userId, password);
     }
 
 }

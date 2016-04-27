@@ -27,48 +27,47 @@ import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 /**
  * Jira reader implementation
  */
-public class JiraReader implements Reader<IndexedRecord>{
-    
-    private JiraSource source;
-    
+public class JiraReader implements Reader<IndexedRecord> {
+
     /**
-     * Apache Http components library wrapper, which provides REST methods 
+     * {@link Source} instance, which had created this {@link Reader}
+     */
+    private JiraSource source;
+
+    /**
+     * Apache Http components library wrapper, which provides connection methods
      */
     private Rest rest;
-    
+
     /**
      * Issue adaptor factory
      */
-    private transient IndexedRecordAdapterFactory<String, IssueIndexedRecord> factory; 
-    
+    private IndexedRecordAdapterFactory<String, IssueIndexedRecord> factory;
+
     /**
      * Jira resource to get
      */
     private String resource;
-    
+
     /**
      * JSON string, which represents result obtained from Jira server
      */
     private String jsonResult;
-    
-    /**
-     * Jira user name
-     * TODO should be obtained from properties
-     */
-    private static final String USER = "ivan";
 
     /**
-     * Jira user's password
-     * TODO should be obtained from properties
+     * Constructor sets required properties for http connection
+     * 
+     * @param source instance of {@link Source}, which had created this {@link Reader}
+     * @param url url of Jira instance
+     * @param resource REST resource to communicate
+     * @param user Basic authorization user id
+     * @param password Basic authorizatiion password
      */
-    private static final String PASSWORD = "12345";
-    
-    public JiraReader(JiraSource source, String url, String resource) {
+    public JiraReader(JiraSource source, String url, String resource, String user, String password) {
         this.source = source;
-//        this.resource = resource;
-        this.resource = "issue/TP-6";
-        rest = new Rest("http://localhost:8080/rest/api/2/");
-        rest.setCredentials(USER, PASSWORD);
+        this.resource = resource;
+        rest = new Rest(url);
+        rest.setCredentials(user, password);
     }
 
     /**
@@ -80,7 +79,7 @@ public class JiraReader implements Reader<IndexedRecord>{
     @Override
     public boolean start() throws IOException {
         jsonResult = rest.get(resource);
-        if(jsonResult != null && !jsonResult.isEmpty()) {
+        if (jsonResult != null && !jsonResult.isEmpty()) {
             return true;
         }
         return false;
@@ -116,18 +115,23 @@ public class JiraReader implements Reader<IndexedRecord>{
         // nothing to do
     }
 
+    /**
+     * Returns {@link Source} instance
+     * 
+     * @return {@link Source} instance, which had created this {@link Reader}
+     */
     @Override
     public Source getCurrentSource() {
         return source;
     }
-    
+
     /**
      * Returns an instance of {@link IndexedRecordAdapterFactory}
      * 
      * @return {@link IssueAdapterFactory}
      */
     private IndexedRecordAdapterFactory<String, IssueIndexedRecord> getFactory() {
-        if(factory == null) {
+        if (factory == null) {
             factory = new IssueAdapterFactory();
         }
         return factory;
