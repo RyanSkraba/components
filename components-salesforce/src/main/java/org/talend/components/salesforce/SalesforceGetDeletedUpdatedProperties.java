@@ -40,6 +40,15 @@ public class SalesforceGetDeletedUpdatedProperties extends SalesforceConnectionM
     }
 
     @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+        if (form.getName().equals(Form.ADVANCED)) {
+            form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setVisible(false);
+            form.getChildForm(connection.getName()).getWidget(connection.httpTraceMessage.getName()).setVisible(false);
+        }
+    }
+
+    @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
         if (isOutputConnection) {
             return Collections.singleton(MAIN_CONNECTOR);
