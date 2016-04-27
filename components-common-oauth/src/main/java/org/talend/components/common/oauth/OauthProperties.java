@@ -19,11 +19,14 @@ import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.Property.Type;
 import org.talend.daikon.properties.presentation.Form;
 
+import java.util.EnumSet;
+
 public class OauthProperties extends ComponentProperties {
 
     public Property clientId = (Property) newProperty("clientId").setRequired(true); //$NON-NLS-1$
 
-    public Property clientSecret = (Property) newProperty("clientSecret").setRequired(true); //$NON-NLS-1$
+    public Property clientSecret = (Property) newProperty("clientSecret").setRequired(true)
+            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
     public Property callbackHost = (Property) newProperty("callbackHost").setRequired(true); //$NON-NLS-1$
 
