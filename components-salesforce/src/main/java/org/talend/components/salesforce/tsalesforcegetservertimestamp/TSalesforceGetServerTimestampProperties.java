@@ -25,7 +25,9 @@ import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
 import org.talend.daikon.avro.SchemaConstants;
+import org.talend.daikon.avro.util.AvroTypes;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComponentProperties
         implements SalesforceProvideConnectionProperties {
@@ -45,9 +47,13 @@ public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComp
     @Override
     public void setupProperties() {
         super.setupProperties();
-        Schema date = LogicalTypes.timestampMillis().addToSchema(Schema.create(Schema.Type.LONG));
-        date.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'");
-        Schema s = SchemaBuilder.record("Root").fields().name("ServerTimeStamp").type(date).noDefault().endRecord();
+        Schema s = SchemaBuilder.record("Main")
+                .prop(Talend6SchemaConstants.TALEND6_IS_READ_ONLY, "true")//$NON-NLS-1$
+                .fields().name("ServerTimeStamp")
+                .prop(Talend6SchemaConstants.TALEND6_COLUMN_TALEND_TYPE, "id_Date")//$NON-NLS-1$
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'")
+                .prop(Talend6SchemaConstants.TALEND6_COLUMN_LENGTH, "20")//$NON-NLS-1$
+                .type(AvroTypes._date()).noDefault().endRecord();
         schema.schema.setValue(s);
     }
 
