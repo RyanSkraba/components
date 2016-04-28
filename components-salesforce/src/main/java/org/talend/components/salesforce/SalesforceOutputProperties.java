@@ -118,22 +118,7 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_SUCCESS"); //$NON-NLS-1$
         ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_REJECT"); //$NON-NLS-1$
 
-        Schema s = SchemaBuilder.record("Reject")
-                // record set as read only for talend schema
-                .prop(Talend6SchemaConstants.TALEND6_IS_READ_ONLY, "true")//$NON-NLS-1$
-                .fields().name("errorCode") //$NON-NLS-1$  //$NON-NLS-2$
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
-                // column set as non-read-only, to let the user edit the field if needed
-                .prop(Talend6SchemaConstants.TALEND6_IS_READ_ONLY, "false")//$NON-NLS-1$
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_TALEND_TYPE, "id_String")//$NON-NLS-1$
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_LENGTH, "255")//$NON-NLS-1$
-                .type().intType().noDefault().name("errorMessage")//$NON-NLS-1$
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
-                .prop(Talend6SchemaConstants.TALEND6_IS_READ_ONLY, "false")//$NON-NLS-1$
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_TALEND_TYPE, "id_String")//$NON-NLS-1$
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_LENGTH, "255")//$NON-NLS-1$
-                .type().stringType().noDefault().endRecord();
-        schemaReject.schema.setValue(s);
+        setupRejectSchema();
 
         setupUpsertRelation(upsertRelation);
 
@@ -188,13 +173,16 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
     }
 
     protected List<String> getFieldNames(Property schema) {
-        String sJson = schema.getStringValue();
-        Schema s = new Schema.Parser().parse(sJson);
+        Schema s = (Schema) schema.getValue();
         List<String> fieldNames = new ArrayList<>();
         for (Schema.Field f : s.getFields()) {
             fieldNames.add(f.name());
         }
         return fieldNames;
+    }
+
+    protected void setupRejectSchema() {
+        // left empty for subclass to override
     }
 
 }

@@ -100,4 +100,29 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
         }
     }
 
+    @Override
+    protected void setupRejectSchema() {
+        Schema s = SchemaBuilder.record("Reject")
+                // record set as read only for talend schema
+                .prop(Talend6SchemaConstants.TALEND6_IS_READ_ONLY, "true")//$NON-NLS-1$
+                .fields().name("errorCode") //$NON-NLS-1$  //$NON-NLS-2$
+                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
+                // column set as non-read-only, to let the user edit the field if needed
+                .prop(Talend6SchemaConstants.TALEND6_IS_READ_ONLY, "false")//$NON-NLS-1$
+                .prop(Talend6SchemaConstants.TALEND6_COLUMN_TALEND_TYPE, "id_String")//$NON-NLS-1$
+                .prop(Talend6SchemaConstants.TALEND6_COLUMN_LENGTH, "255")//$NON-NLS-1$
+                .type().intType().noDefault().name("errorFields")//$NON-NLS-1$
+                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
+                .prop(Talend6SchemaConstants.TALEND6_IS_READ_ONLY, "false")//$NON-NLS-1$
+                .prop(Talend6SchemaConstants.TALEND6_COLUMN_TALEND_TYPE, "id_String")//$NON-NLS-1$
+                .prop(Talend6SchemaConstants.TALEND6_COLUMN_LENGTH, "255")//$NON-NLS-1$
+                .type().stringType().noDefault().name("errorMessage")//$NON-NLS-1$
+                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
+                .prop(Talend6SchemaConstants.TALEND6_IS_READ_ONLY, "false")//$NON-NLS-1$
+                .prop(Talend6SchemaConstants.TALEND6_COLUMN_TALEND_TYPE, "id_String")//$NON-NLS-1$
+                .prop(Talend6SchemaConstants.TALEND6_COLUMN_LENGTH, "255")//$NON-NLS-1$
+                .type().stringType().noDefault().endRecord();
+        schemaReject.schema.setValue(s);
+    }
+
 }
