@@ -39,48 +39,53 @@ import org.talend.components.splunk.objects.SplunkJSONEventBuilder;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 
-
-/**
- * created by dmytro.chmyga on Apr 25, 2016
- */
 public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
 
     private transient static final Logger LOGGER = LoggerFactory.getLogger(TSplunkEventCollectorWriter.class);
+
     private static final String servicesSuffix = "services/collector";
-    
+
     private TSplunkEventCollectorWriteOperation writeOperation;
+
     private String fullRequestUrl;
+
     private String token;
+
     private String uid;
+
     private int eventsBatchSize;
+
     private TSplunkEventCollectorConnection splunkConnection;
+
     private IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory;
+
     private int dataCount;
-    
+
     private int lastErrorCode;
+
     private String lastErrorMessage;
-    
+
     private final RuntimeContainer container;
-    
+
     private List<SplunkJSONEvent> splunkObjectsForBulk;
-    
-    public TSplunkEventCollectorWriter(TSplunkEventCollectorWriteOperation writeOperation, String serverUrl, String token, int eventsBatchSize,
-                                        RuntimeContainer container) {
+
+    public TSplunkEventCollectorWriter(TSplunkEventCollectorWriteOperation writeOperation, String serverUrl, String token,
+            int eventsBatchSize, RuntimeContainer container) {
         this.writeOperation = writeOperation;
-        this.fullRequestUrl = serverUrl.endsWith("/") ? (serverUrl + servicesSuffix) : (serverUrl + "/" + servicesSuffix); 
+        this.fullRequestUrl = serverUrl.endsWith("/") ? (serverUrl + servicesSuffix) : (serverUrl + "/" + servicesSuffix);
         this.token = token;
         this.eventsBatchSize = eventsBatchSize;
         this.container = container;
     }
-    
+
     @Override
     public void open(String uId) throws IOException {
         this.uid = uId;
-        if(splunkConnection == null) {
+        if (splunkConnection == null) {
             splunkConnection = new TSplunkEventCollectorConnection();
             splunkConnection.connect();
         }
-        if(splunkObjectsForBulk == null) {
+        if (splunkObjectsForBulk == null) {
             splunkObjectsForBulk = new ArrayList<>();
         }
     }
@@ -91,9 +96,9 @@ public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
             return;
         } // else handle the data.
         IndexedRecord input = getFactory(datum).convertToAvro(datum);
-        
+
         SplunkJSONEvent event = SplunkJSONEventBuilder.createEvent();
-        
+
         for (Schema.Field f : input.getSchema().getFields()) {
             if (input.get(f.pos()) != null) {
                 SplunkJSONEventBuilder.setField(event, f.name(), input.get(f.pos()), true);
@@ -102,40 +107,40 @@ public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
         LOGGER.debug("Added event to bulk queue." + String.valueOf(event));
         splunkObjectsForBulk.add(event);
         LOGGER.debug("Events bulk queue size " + splunkObjectsForBulk.size());
-        if(splunkObjectsForBulk.size() >= eventsBatchSize) {
+        if (splunkObjectsForBulk.size() >= eventsBatchSize) {
             doSend();
         }
     }
-    
+
     private void doSend() throws IOException {
-        if(splunkObjectsForBulk.isEmpty()) {
+        if (splunkObjectsForBulk.isEmpty()) {
             return;
         }
         HttpPost request = createRequest(splunkObjectsForBulk);
-        
+
         HttpResponse response = splunkConnection.sendRequest(request);
-        
+
         String jsonResponseString = EntityUtils.toString(response.getEntity());
         JSONParser jsonParser = new JSONParser();
         try {
             JSONObject json = (JSONObject) jsonParser.parse(jsonResponseString);
             dataCount += splunkObjectsForBulk.size();
-            LOGGER.debug("Response String:/r/n" + String.valueOf(json)); 
-            lastErrorCode = ((Long)json.get("code")).intValue();
-            lastErrorMessage = (String)json.get("text");
+            LOGGER.debug("Response String:/r/n" + String.valueOf(json));
+            lastErrorCode = ((Long) json.get("code")).intValue();
+            lastErrorMessage = (String) json.get("text");
         } catch (ParseException e) {
             e.printStackTrace();
         } finally {
             splunkObjectsForBulk.clear();
         }
-        
+
     }
-    
+
     public HttpPost createRequest(List<SplunkJSONEvent> events) throws UnsupportedEncodingException {
         HttpPost request = new HttpPost(fullRequestUrl);
         request.addHeader("Authorization", "Splunk " + token);
         StringBuffer requestString = new StringBuffer();
-        for(SplunkJSONEvent event : events) {
+        for (SplunkJSONEvent event : events) {
             requestString.append(event.toString());
         }
         request.setEntity(new StringEntity(requestString.toString()));
@@ -155,8 +160,10 @@ public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
         LOGGER.debug("Closing.");
         LOGGER.debug("Sending " + splunkObjectsForBulk.size() + " elements left in queue.");
         doSend();
-        container.setComponentData(container.getCurrentComponentId(), "_" + TSplunkEventCollectorProperties.RESPONSE_CODE_NAME, lastErrorCode);
-        container.setComponentData(container.getCurrentComponentId(), "_" + TSplunkEventCollectorProperties.ERROR_MESSAGE_NAME, lastErrorMessage);
+        container.setComponentData(container.getCurrentComponentId(), "_" + TSplunkEventCollectorProperties.RESPONSE_CODE_NAME,
+                lastErrorCode);
+        container.setComponentData(container.getCurrentComponentId(), "_" + TSplunkEventCollectorProperties.ERROR_MESSAGE_NAME,
+                lastErrorMessage);
         splunkConnection.close();
         splunkConnection = null;
         splunkObjectsForBulk.clear();

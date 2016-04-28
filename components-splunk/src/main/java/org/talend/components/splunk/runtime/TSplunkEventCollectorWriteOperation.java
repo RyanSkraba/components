@@ -18,27 +18,23 @@ import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
 
-
-/**
- * created by dmytro.chmyga on Apr 25, 2016
- */
 public class TSplunkEventCollectorWriteOperation implements WriteOperation<WriterResult> {
 
     private static final long serialVersionUID = 939083892871460237L;
 
     private final TSplunkEventCollectorSink sink;
-    
+
     public TSplunkEventCollectorWriteOperation(TSplunkEventCollectorSink sink) {
         this.sink = sink;
     }
-    
+
     @Override
     public void initialize(RuntimeContainer adaptor) {
     }
 
     @Override
     public void finalize(Iterable<WriterResult> writerResults, RuntimeContainer adaptor) {
-        //Nothing to be done here.
+        // Nothing to be done here.
     }
 
     @Override

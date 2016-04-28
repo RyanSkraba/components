@@ -28,10 +28,6 @@ import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
-
-/**
- * created by dmytro.chmyga on Apr 25, 2016
- */
 public class TSplunkEventCollectorSink implements Sink {
 
     /**
@@ -40,9 +36,11 @@ public class TSplunkEventCollectorSink implements Sink {
     private static final long serialVersionUID = -2587927325500427743L;
 
     private transient static final Logger LOGGER = LoggerFactory.getLogger(TSplunkEventCollectorSink.class);
-    
+
     private String serverUrl;
+
     private String token;
+
     private int eventsBatchSize;
 
     @Override
@@ -56,11 +54,11 @@ public class TSplunkEventCollectorSink implements Sink {
     @Override
     public ValidationResult validate(RuntimeContainer container) {
         ValidationResult result = new ValidationResult();
-        if(serverUrl == null || serverUrl.trim().isEmpty()) {
+        if (serverUrl == null || serverUrl.trim().isEmpty()) {
             LOGGER.debug("Server URL is empty.");
             result.setStatus(Result.ERROR).setMessage("Server URL cannot be empty.");
         }
-        if(token == null || token.trim().isEmpty()) {
+        if (token == null || token.trim().isEmpty()) {
             LOGGER.debug("Splunk Authorization Token is empty.");
             result.setStatus(Result.ERROR).setMessage("Token cannot be empty.");
         }
@@ -81,15 +79,15 @@ public class TSplunkEventCollectorSink implements Sink {
     public WriteOperation<?> createWriteOperation() {
         return new TSplunkEventCollectorWriteOperation(this);
     }
-    
+
     public String getServerUrl() {
         return serverUrl;
     }
-    
+
     public String getToken() {
         return token;
     }
-    
+
     public int getEventsBatchSize() {
         return eventsBatchSize;
     }

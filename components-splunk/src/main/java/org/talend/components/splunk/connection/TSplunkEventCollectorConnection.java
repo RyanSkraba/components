@@ -24,25 +24,24 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * created by dmytro.chmyga on Apr 26, 2016
- */
 public class TSplunkEventCollectorConnection {
 
     private transient static final Logger LOGGER = LoggerFactory.getLogger(TSplunkEventCollectorConnection.class);
+
     private HttpClient client = null;
-    
+
     /**
      * create http client to be used for connection with Splunk server
      */
     public void connect() {
-        if(client == null) {
+        if (client == null) {
             client = new DefaultHttpClient();
         }
     }
-    
+
     /**
-     * Send a post request to splunk server, including event to be logged, in JSON String. 
+     * Send a post request to splunk server, including event to be logged, in JSON String.
+     * 
      * @param schema to be used. Possible values are http, https
      * @param uri server uri(hostname or ip-address)
      * @param portNumber which is listened by Splunk server http event collector
@@ -51,18 +50,20 @@ public class TSplunkEventCollectorConnection {
      * @throws ClientProtocolException
      * @throws IOException
      */
-    public HttpResponse sendRequest(String schema, String uri, int portNumber, HttpPost request) throws ClientProtocolException, IOException {
+    public HttpResponse sendRequest(String schema, String uri, int portNumber, HttpPost request)
+            throws ClientProtocolException, IOException {
         HttpHost target = new HttpHost(uri, portNumber, schema);
         LOGGER.debug("Sending POST request to " + schema + "://" + uri + ":" + portNumber);
         LOGGER.debug("Available headers:");
-        for(Header header : request.getAllHeaders()) {
+        for (Header header : request.getAllHeaders()) {
             LOGGER.debug(header.getName() + ": " + header.getValue());
         }
         return client.execute(target, request);
     }
-    
+
     /**
      * Send a post request to splunk server, including event to be logged, in JSON String.
+     * 
      * @param request to be sent
      * @return response from the server
      * @throws ClientProtocolException
@@ -71,19 +72,19 @@ public class TSplunkEventCollectorConnection {
     public HttpResponse sendRequest(HttpPost request) throws ClientProtocolException, IOException {
         LOGGER.debug("Sending POST request to " + request.getURI());
         LOGGER.debug("Available headers:");
-        for(Header header : request.getAllHeaders()) {
+        for (Header header : request.getAllHeaders()) {
             LOGGER.debug(header.getName() + ": " + header.getValue());
         }
         return client.execute(request);
     }
-    
+
     /**
      * Close connection manager of http client.
      */
     public void close() {
-        if(client != null) {
+        if (client != null) {
             client = null;
         }
     }
-    
+
 }

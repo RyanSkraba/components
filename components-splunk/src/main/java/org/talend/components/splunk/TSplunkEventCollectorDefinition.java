@@ -14,15 +14,14 @@ import org.talend.components.splunk.runtime.TSplunkEventCollectorSink;
 import aQute.bnd.annotation.component.Component;
 
 /**
- * The tSplunkEventCollectorDefinition acts as an entry point for all of services that 
- * a component provides to integrate with the Studio (at design-time) and other 
- * components (at run-time).
+ * The tSplunkEventCollectorDefinition acts as an entry point for all of services that a component provides to integrate
+ * with the Studio (at design-time) and other components (at run-time).
  */
-@Component(name = Constants.COMPONENT_BEAN_PREFIX + TSplunkEventCollectorDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+@Component(name = Constants.COMPONENT_BEAN_PREFIX
+        + TSplunkEventCollectorDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSplunkEventCollectorDefinition extends AbstractComponentDefinition implements OutputComponentDefinition {
 
     public static final String COMPONENT_NAME = "tSplunkEventCollector"; //$NON-NLS-1$
-
 
     public TSplunkEventCollectorDefinition() {
         super(COMPONENT_NAME);
@@ -42,7 +41,7 @@ public class TSplunkEventCollectorDefinition extends AbstractComponentDefinition
     public String getMavenArtifactId() {
         return "components-splunk";
     }
-    
+
     @Override
     public String getName() {
         return COMPONENT_NAME;

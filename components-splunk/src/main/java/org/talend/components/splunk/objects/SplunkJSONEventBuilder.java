@@ -12,36 +12,32 @@
 // ============================================================================
 package org.talend.components.splunk.objects;
 
-import java.text.MessageFormat;
 import java.util.Date;
 
-/**
- * created by dmytro.chmyga on Apr 26, 2016
- */
 public class SplunkJSONEventBuilder {
 
     public static SplunkJSONEvent createEvent() {
         return new SplunkJSONEvent();
     }
-    
+
     public static SplunkJSONEvent setField(SplunkJSONEvent event, String fieldName, Object value, boolean possibleMetadataField) {
-        if(fieldName == null || value == null) {
+        if (fieldName == null || value == null) {
             return event;
         }
-        if(possibleMetadataField && SplunkJSONEventField.isMetadataField(fieldName)) {
+        if (possibleMetadataField && SplunkJSONEventField.isMetadataField(fieldName)) {
             event.put(fieldName, convertData(fieldName, value));
         } else {
             event.addEventObject(fieldName, value);
         }
         return event;
     }
-    
+
     private static Object convertData(String fieldName, Object value) {
-        if(SplunkJSONEventField.TIME.getName().equals(fieldName) && value instanceof Date) {
-            double newValue = ((Date)value).getTime() / 1000.0;
+        if (SplunkJSONEventField.TIME.getName().equals(fieldName) && value instanceof Date) {
+            double newValue = ((Date) value).getTime() / 1000.0;
             return String.format("%.3f", newValue);
         }
         return value;
     }
-    
+
 }

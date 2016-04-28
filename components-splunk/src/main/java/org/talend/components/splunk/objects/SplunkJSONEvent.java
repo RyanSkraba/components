@@ -16,13 +16,10 @@ import java.util.Map;
 
 import org.json.simple.JSONObject;
 
-/**
- * created by dmytro.chmyga on Apr 26, 2016
- */
 public class SplunkJSONEvent extends JSONObject {
 
     private static final long serialVersionUID = 3205801702373951474L;
-    
+
     public SplunkJSONEvent() {
     }
 
@@ -30,31 +27,31 @@ public class SplunkJSONEvent extends JSONObject {
         JSONObject jsonEventObject = new JSONObject(eventObjects);
         put(SplunkJSONEventField.EVENT, jsonEventObject);
     }
-    
+
     public void addEventObject(String key, Object object) {
-        if(key == null || object == null) {
+        if (key == null || object == null) {
             return;
         }
-        JSONObject jsonEventObject = (JSONObject)get(SplunkJSONEventField.EVENT.getName());
-        if(jsonEventObject == null) {
+        JSONObject jsonEventObject = (JSONObject) get(SplunkJSONEventField.EVENT.getName());
+        if (jsonEventObject == null) {
             jsonEventObject = new JSONObject();
             put(SplunkJSONEventField.EVENT, jsonEventObject);
         }
         jsonEventObject.put(key, object);
     }
-    
+
     public void put(String name, Object value) {
-        if(name == null || value == null) {
+        if (name == null || value == null) {
             return;
         }
         super.put(name, value);
     }
-    
+
     public void put(SplunkJSONEventField key, Object value) {
-        if(key == null || value == null) {
+        if (key == null || value == null) {
             return;
         }
         super.put(key.getName(), value);
     }
-    
+
 }
