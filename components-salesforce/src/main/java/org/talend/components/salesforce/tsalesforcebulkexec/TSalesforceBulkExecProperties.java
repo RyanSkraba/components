@@ -23,6 +23,7 @@ import org.talend.components.salesforce.SalesforceBulkProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
@@ -53,7 +54,7 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
     public void setupLayout() {
         super.setupLayout();
         Form mainForm = getForm(Form.MAIN);
-        mainForm.addRow(bulkFilePath);
+        mainForm.addRow(widget(bulkFilePath).setWidgetType(Widget.WidgetType.FILE));
 
         Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(widget(bulkProperties.getForm(Form.MAIN).setName("bulkProperties")));

@@ -18,8 +18,11 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.Property.Type;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 
 import java.util.EnumSet;
+
+import static org.talend.daikon.properties.presentation.Widget.widget;
 
 public class OauthProperties extends ComponentProperties {
 
@@ -46,6 +49,6 @@ public class OauthProperties extends ComponentProperties {
         form.addColumn(clientSecret);
         form.addRow(callbackHost);
         form.addColumn(callbackPort);
-        form.addRow(tokenFile);
+        form.addRow(widget(tokenFile).setWidgetType(Widget.WidgetType.FILE));
     }
 }

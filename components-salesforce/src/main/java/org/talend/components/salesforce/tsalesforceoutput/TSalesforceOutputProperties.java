@@ -17,9 +17,11 @@ import org.apache.avro.SchemaBuilder;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.widget;
 
 public class TSalesforceOutputProperties extends SalesforceOutputProperties {
 
@@ -59,7 +61,7 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
         advancedForm.addRow(ignoreNull);
         advancedForm.addRow(retrieveInsertId);
         advancedForm.addRow(commitLevel);
-        advancedForm.addRow(logFileName);
+        advancedForm.addRow(widget(logFileName).setWidgetType(Widget.WidgetType.FILE));
     }
 
     public void afterExtendInsert() {
