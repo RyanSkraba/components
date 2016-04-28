@@ -91,6 +91,11 @@ public class TJiraInputProperties extends ComponentProperties implements HasSche
     public UserPasswordProperties userPassword = new UserPasswordProperties(USERPASSWORD);
     
     /**
+     * Batch size property, which specifies how many Jira entities should be requested per request
+     */
+    public Property batchSize = PropertyFactory.newInteger("batchSize");
+    
+    /**
      * Schema property to define required fields of Jira resource
      */
     public SchemaProperties schema = new SchemaProperties("schema");
@@ -116,18 +121,22 @@ public class TJiraInputProperties extends ComponentProperties implements HasSche
         resource.setValue(ISSUE);
         authorizationType.setValue(BASIC);
         jql.setValue("\"\"");
+        batchSize.setValue(50);
     }
     
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form form = Form.create(this, Form.MAIN, "Jira Input");
-        form.addRow(schema.getForm(Form.REFERENCE));
-        form.addRow(hostUrl);
-        form.addRow(authorizationType);
-        form.addRow(userPassword.getForm(Form.MAIN));
-        form.addRow(resource);
-        form.addRow(jql);
+        Form mainForm = Form.create(this, Form.MAIN, "Jira main form");
+        mainForm.addRow(schema.getForm(Form.REFERENCE));
+        mainForm.addRow(hostUrl);
+        mainForm.addRow(authorizationType);
+        mainForm.addRow(userPassword.getForm(Form.MAIN));
+        mainForm.addRow(resource);
+        mainForm.addRow(jql);
+        
+        Form advancedForm = Form.create(this, Form.ADVANCED, "Jira advanced form");
+        advancedForm.addRow(batchSize);
     }
     
     /**
