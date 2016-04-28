@@ -124,10 +124,24 @@ public class TJiraInputProperties extends ComponentProperties implements HasSche
         Form form = Form.create(this, Form.MAIN, "Jira Input");
         form.addRow(schema.getForm(Form.REFERENCE));
         form.addRow(hostUrl);
-        form.addRow(resource);
-        form.addRow(jql);
         form.addRow(authorizationType);
         form.addRow(userPassword.getForm(Form.MAIN));
+        form.addRow(resource);
+        form.addRow(jql);
+    }
+    
+    /**
+     * Refreshes form layout after authorization type is changed
+     */
+    public void afterAuthorizationType() {
+        refreshLayout(getForm(Form.MAIN));
+    }
+    
+    /**
+     * Refreshes form layout after resource is changed
+     */
+    public void afterResource() {
+        refreshLayout(getForm(Form.MAIN));
     }
     
     /**
@@ -136,13 +150,33 @@ public class TJiraInputProperties extends ComponentProperties implements HasSche
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        
+
         if (form.getName().equals(Form.MAIN)) {
-            if(OAUTH.equals(authorizationType.getStringValue())) {
-                form.getWidget(USERPASSWORD).setVisible(false);
+
+            // refresh after authorization type changed
+            String authTypeValue = authorizationType.getStringValue();
+            switch (authTypeValue) {
+            case BASIC: {
+                form.getWidget(USERPASSWORD).setVisible(true);
+                break;
             }
-            if(PROJECT.equals(resource.getStringValue())) {
+            case OAUTH: {
+                form.getWidget(USERPASSWORD).setVisible(false);
+                break;
+            }
+            }
+
+            // refresh after resource changed
+            String resourceValue = resource.getStringValue();
+            switch (resourceValue) {
+            case PROJECT: {
                 form.getWidget(jql.getName()).setVisible(false);
+                break;
+            }
+            case ISSUE: {
+                form.getWidget(jql.getName()).setVisible(true);
+                break;
+            }
             }
         }
     }
