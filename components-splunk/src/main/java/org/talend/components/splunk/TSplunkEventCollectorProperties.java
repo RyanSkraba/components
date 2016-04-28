@@ -13,10 +13,11 @@ import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.splunk.objects.SplunkJSONEventField;
 import org.talend.daikon.avro.AvroRegistry;
+import org.talend.daikon.avro.SchemaConstants;
+import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.presentation.Form;
-import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 /**
  * The ComponentProperties subclass provided by a component stores the 
@@ -86,9 +87,10 @@ public class TSplunkEventCollectorProperties extends FixedConnectorsComponentPro
         AvroRegistry avroReg = new AvroRegistry();
         FieldAssembler<Schema> record = SchemaBuilder.record("Main").fields();
         for(SplunkJSONEventField metadataField : SplunkJSONEventField.getMetadataFields()) {
+            Schema base = avroReg.getConverter(metadataField.getDataType()).getSchema();
             record.name(metadataField.getName())
-            .prop(Talend6SchemaConstants.TALEND6_COLUMN_IS_NULLABLE, "true")
-            .type(avroReg.getConverter(metadataField.getDataType()).getSchema()).noDefault();
+            .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "dd-MM-yyyy")
+            .type(AvroUtils.wrapAsNullable(base)).noDefault();
         }
         Schema defaultSchema = record.endRecord();
         schema.schema.setValue(defaultSchema);
