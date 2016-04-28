@@ -53,6 +53,11 @@ public class JiraReader implements Reader<IndexedRecord> {
      * JSON string, which represents result obtained from Jira server
      */
     private String jsonResult;
+    
+    /**
+     * Number of Jira entities, which should be retrieved per request
+     */
+    private int batchSize;
 
     /**
      * Constructor sets required properties for http connection
@@ -62,10 +67,12 @@ public class JiraReader implements Reader<IndexedRecord> {
      * @param resource REST resource to communicate
      * @param user Basic authorization user id
      * @param password Basic authorizatiion password
+     * @param batchSize number of Jira entities per request
      */
-    public JiraReader(JiraSource source, String url, String resource, String user, String password) {
+    public JiraReader(JiraSource source, String url, String resource, String user, String password, int batchSize) {
         this.source = source;
         this.resource = resource;
+        this.batchSize = batchSize;
         rest = new Rest(url);
         rest.setCredentials(user, password);
     }

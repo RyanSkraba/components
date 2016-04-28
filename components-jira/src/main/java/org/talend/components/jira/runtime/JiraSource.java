@@ -90,6 +90,7 @@ public class JiraSource implements Source {
         String userId = properties.userPassword.userId.getStringValue();
         String password = properties.userPassword.password.getStringValue();
         String jqlQuery = properties.jql.getStringValue();
+        int batchSize = properties.batchSize.getIntValue();
 
         // builds resource URL and parameters
         StringBuilder resourceBuilder = new StringBuilder(REST_VERSION);
@@ -110,7 +111,7 @@ public class JiraSource implements Source {
         }
         String resource = resourceBuilder.toString();
 
-        return new JiraReader(this, url, resource, userId, password);
+        return new JiraReader(this, url, resource, userId, password, batchSize);
     }
 
 }
