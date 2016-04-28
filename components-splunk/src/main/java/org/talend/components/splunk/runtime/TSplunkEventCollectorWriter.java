@@ -38,6 +38,8 @@ import org.talend.components.splunk.objects.SplunkJSONEvent;
 import org.talend.components.splunk.objects.SplunkJSONEventBuilder;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
 
@@ -68,6 +70,8 @@ public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
     private final RuntimeContainer container;
 
     private List<SplunkJSONEvent> splunkObjectsForBulk;
+
+    private I18nMessages messageFormatter;
 
     public TSplunkEventCollectorWriter(TSplunkEventCollectorWriteOperation writeOperation, String serverUrl, String token,
             int eventsBatchSize, RuntimeContainer container) {
@@ -121,19 +125,30 @@ public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
         HttpResponse response = splunkConnection.sendRequest(request);
 
         String jsonResponseString = EntityUtils.toString(response.getEntity());
-        JSONParser jsonParser = new JSONParser();
         try {
+            handleResponse(jsonResponseString);
+        } finally {
+            splunkObjectsForBulk.clear();
+        }
+    }
+
+    private void handleResponse(String jsonResponseString) throws IOException {
+        if (jsonResponseString == null || jsonResponseString.trim().isEmpty()) {
+            throw new IOException(getMessage("error.emptyResponse"));
+        }
+        try {
+            JSONParser jsonParser = new JSONParser();
             JSONObject json = (JSONObject) jsonParser.parse(jsonResponseString);
             dataCount += splunkObjectsForBulk.size();
             LOGGER.debug("Response String:/r/n" + String.valueOf(json));
             lastErrorCode = ((Long) json.get("code")).intValue();
             lastErrorMessage = (String) json.get("text");
+            if (lastErrorCode != 0) {
+                throw new IOException(getMessage("error.codeMessage", lastErrorCode, lastErrorMessage));
+            }
         } catch (ParseException e) {
-            e.printStackTrace();
-        } finally {
-            splunkObjectsForBulk.clear();
+            LOGGER.error(e.getMessage());
         }
-
     }
 
     public HttpPost createRequest(List<SplunkJSONEvent> events) throws UnsupportedEncodingException {
@@ -175,6 +190,13 @@ public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
     @Override
     public WriteOperation<WriterResult> getWriteOperation() {
         return writeOperation;
+    }
+
+    private String getMessage(String key, Object... arguments) {
+        if (messageFormatter == null) {
+            messageFormatter = GlobalI18N.getI18nMessageProvider().getI18nMessages(this.getClass());
+        }
+        return messageFormatter.getMessage(key, arguments);
     }
 
 }

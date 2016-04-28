@@ -25,6 +25,8 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.splunk.TSplunkEventCollectorProperties;
 import org.talend.daikon.NamedThing;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
@@ -43,6 +45,8 @@ public class TSplunkEventCollectorSink implements Sink {
 
     private int eventsBatchSize;
 
+    private I18nMessages messageFormatter;
+
     @Override
     public void initialize(RuntimeContainer container, ComponentProperties properties) {
         TSplunkEventCollectorProperties props = (TSplunkEventCollectorProperties) properties;
@@ -53,14 +57,13 @@ public class TSplunkEventCollectorSink implements Sink {
 
     @Override
     public ValidationResult validate(RuntimeContainer container) {
-        ValidationResult result = new ValidationResult();
         if (serverUrl == null || serverUrl.trim().isEmpty()) {
             LOGGER.debug("Server URL is empty.");
-            result.setStatus(Result.ERROR).setMessage("Server URL cannot be empty.");
+            return new ValidationResult().setStatus(Result.ERROR).setMessage(getMessage("message.serverUrlCannotBeEmpty"));
         }
         if (token == null || token.trim().isEmpty()) {
             LOGGER.debug("Splunk Authorization Token is empty.");
-            result.setStatus(Result.ERROR).setMessage("Token cannot be empty.");
+            return new ValidationResult().setStatus(Result.ERROR).setMessage(getMessage("message.tokenCannotBeEmpty"));
         }
         return ValidationResult.OK;
     }
@@ -90,6 +93,13 @@ public class TSplunkEventCollectorSink implements Sink {
 
     public int getEventsBatchSize() {
         return eventsBatchSize;
+    }
+
+    private String getMessage(String key, Object... arguments) {
+        if (messageFormatter == null) {
+            messageFormatter = GlobalI18N.getI18nMessageProvider().getI18nMessages(this.getClass());
+        }
+        return messageFormatter.getMessage(key, arguments);
     }
 
 }
