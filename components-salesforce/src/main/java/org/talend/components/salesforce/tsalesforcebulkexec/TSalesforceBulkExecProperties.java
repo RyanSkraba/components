@@ -21,6 +21,7 @@ import org.talend.components.salesforce.SalesforceBulkProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 
 public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
 
@@ -32,20 +33,6 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
         super(name);
     }
     
-    protected void setupUpsertRelation(Property ur) {
-        // They might have been set previously in some inheritance cases
-        ur.setChildren(new ArrayList<Property>());
-        ur.addChild(newProperty("columnName")); //$NON-NLS-1$
-        ur.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
-        ur.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
-        
-    	Property property = newProperty(Property.Type.BOOLEAN, "polymorphic");
-    	property.setValue(false);
-        ur.addChild(property); //$NON-NLS-1$
-        
-        ur.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
-    }
-
     @Override
     public void setupLayout() {
         super.setupLayout();
@@ -54,6 +41,7 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
 
         Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(widget(bulkProperties.getForm(Form.MAIN).setName("bulkProperties")));
+        advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.WidgetType.TABLE));
     }
     
     @Override
@@ -63,7 +51,7 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
         if(Form.ADVANCED.equals(form.getName())) {
         	form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setVisible(false);
         	form.getChildForm(connection.getName()).getWidget(connection.httpChunked.getName()).setVisible(false);
-        	form.getWidget(upsertRelation.getName()).setVisible(false);
+        	form.getWidget(upsertRelationTable.getName()).setVisible(false);
         }
     }
     
@@ -73,6 +61,7 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
         
         connection.bulkConnection.setValue(true);
         connection.httpChunked.setValue(false);
+        upsertRelationTable.setUsePolymorphic(true);
     }
 
 }

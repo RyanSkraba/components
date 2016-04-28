@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.BulkFileProperties;
+import org.talend.components.salesforce.UpsertRelationTable;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
@@ -28,7 +29,7 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
 
     public Property ignoreNull = newProperty(Property.Type.BOOLEAN, "ignoreNull");
 
-    public Property upsertRelation = newProperty("upsertRelation").setOccurMaxTimes(Property.INFINITE); //$NON-NLS-1$
+    public UpsertRelationTable upsertRelationTable = new UpsertRelationTable("upsertRelationTable");
 
     public TSalesforceOutputBulkProperties(String name) {
         super(name);
@@ -39,23 +40,8 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
         super.setupProperties();
         
         returns = ComponentPropertyFactory.newReturnsProperty();
-        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_LINE"); //$NON-NLS-1$
-        
-        setupUpsertRelation(upsertRelation, TSalesforceOutputProperties.POLY);
-        // schema.schema.setTaggedValue(StudioConstants.CONNECTOR_TYPE_SCHEMA_KEY, ConnectorType.FLOW);
-    }
-    
-    private void setupUpsertRelation(Property ur, boolean poly) {
-        ur.setChildren(new ArrayList<Property>());
-        ur.addChild(newProperty("columnName")); //$NON-NLS-1$
-        ur.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
-        ur.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
-        if (poly) {
-            Property property = newProperty(Property.Type.BOOLEAN, "polymorphic");
-            property.setValue(false);
-            ur.addChild(property); //$NON-NLS-1$
-        }
-        ur.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
+        upsertRelationTable.setUsePolymorphic(true);
+        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_LINE"); //$NON-NLS-1$        
     }
 
     @Override
@@ -70,7 +56,7 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
         refForm.addRow(ignoreNull);
 
         Form advancedForm = new Form(this, Form.ADVANCED);
-        advancedForm.addRow(widget(upsertRelation).setWidgetType(Widget.WidgetType.TABLE));
+        advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.WidgetType.TABLE));
     }
 
 }
