@@ -101,7 +101,7 @@ public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
         }
         LOGGER.debug("Added event to bulk queue." + String.valueOf(event));
         splunkObjectsForBulk.add(event);
-        LOGGER.debug("Events bulk queue size " + splunkObjectsForBulk);
+        LOGGER.debug("Events bulk queue size " + splunkObjectsForBulk.size());
         if(splunkObjectsForBulk.size() >= eventsBatchSize) {
             doSend();
         }
@@ -152,6 +152,8 @@ public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
 
     @Override
     public WriterResult close() throws IOException {
+        LOGGER.debug("Closing.");
+        LOGGER.debug("Sending " + splunkObjectsForBulk.size() + " elements left in queue.");
         doSend();
         container.setComponentData(container.getCurrentComponentId(), "_" + TSplunkEventCollectorProperties.RESPONSE_CODE_NAME, lastErrorCode);
         container.setComponentData(container.getCurrentComponentId(), "_" + TSplunkEventCollectorProperties.ERROR_MESSAGE_NAME, lastErrorMessage);
@@ -159,6 +161,7 @@ public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
         splunkConnection = null;
         splunkObjectsForBulk.clear();
         splunkObjectsForBulk = null;
+        LOGGER.debug("Closed.");
         return new WriterResult(uid, dataCount);
     }
 

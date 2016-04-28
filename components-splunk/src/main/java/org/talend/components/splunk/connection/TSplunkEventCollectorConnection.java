@@ -14,18 +14,22 @@ package org.talend.components.splunk.connection;
 
 import java.io.IOException;
 
+import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * created by dmytro.chmyga on Apr 26, 2016
  */
 public class TSplunkEventCollectorConnection {
 
+    private transient static final Logger LOGGER = LoggerFactory.getLogger(TSplunkEventCollectorConnection.class);
     private HttpClient client = null;
     
     /**
@@ -33,10 +37,7 @@ public class TSplunkEventCollectorConnection {
      */
     public void connect() {
         if(client == null) {
-            try {
-                client = new DefaultHttpClient();
-            } catch (Exception e) { 
-            }
+            client = new DefaultHttpClient();
         }
     }
     
@@ -52,6 +53,11 @@ public class TSplunkEventCollectorConnection {
      */
     public HttpResponse sendRequest(String schema, String uri, int portNumber, HttpPost request) throws ClientProtocolException, IOException {
         HttpHost target = new HttpHost(uri, portNumber, schema);
+        LOGGER.debug("Sending POST request to " + schema + "://" + uri + ":" + portNumber);
+        LOGGER.debug("Available headers:");
+        for(Header header : request.getAllHeaders()) {
+            LOGGER.debug(header.getName() + ": " + header.getValue());
+        }
         return client.execute(target, request);
     }
     
@@ -63,6 +69,11 @@ public class TSplunkEventCollectorConnection {
      * @throws IOException
      */
     public HttpResponse sendRequest(HttpPost request) throws ClientProtocolException, IOException {
+        LOGGER.debug("Sending POST request to " + request.getURI());
+        LOGGER.debug("Available headers:");
+        for(Header header : request.getAllHeaders()) {
+            LOGGER.debug(header.getName() + ": " + header.getValue());
+        }
         return client.execute(request);
     }
     
