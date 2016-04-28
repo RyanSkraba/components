@@ -22,6 +22,7 @@
 		<module>components-webtest</module>
 		<module>components-osgitest</module>
 		<module>components-proptester</module>
+		<module>components-splunk</module>
 	</modules>
 	<profiles>
 		<profile>
