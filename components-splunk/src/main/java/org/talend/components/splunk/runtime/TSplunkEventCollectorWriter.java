@@ -147,7 +147,7 @@ public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
                 throw new IOException(getMessage("error.codeMessage", lastErrorCode, lastErrorMessage));
             }
         } catch (ParseException e) {
-            LOGGER.error(e.getMessage());
+            throw new IOException(getMessage("error.responseParseException", e.getMessage()));
         }
     }
 
