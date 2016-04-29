@@ -18,6 +18,7 @@ import java.util.Set;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
+import org.apache.avro.SchemaBuilder.FieldBuilder;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentPropertyFactory;
@@ -91,8 +92,11 @@ public class TSplunkEventCollectorProperties extends FixedConnectorsComponentPro
         FieldAssembler<Schema> record = SchemaBuilder.record("Main").fields();
         for (SplunkJSONEventField metadataField : SplunkJSONEventField.getMetadataFields()) {
             Schema base = avroReg.getConverter(metadataField.getDataType()).getSchema();
-            record.name(metadataField.getName()).prop(SchemaConstants.TALEND_COLUMN_PATTERN, "dd-MM-yyyy")
-                    .type(AvroUtils.wrapAsNullable(base)).noDefault();
+            FieldBuilder<Schema> fieldBuilder = record.name(metadataField.getName());
+            if (metadataField.getName().equals(SplunkJSONEventField.TIME.getName())) {
+                fieldBuilder.prop(SchemaConstants.TALEND_COLUMN_PATTERN, "dd-MM-yyyy");
+            }
+            fieldBuilder.type(AvroUtils.wrapAsNullable(base)).noDefault();
         }
         Schema defaultSchema = record.endRecord();
         schema.schema.setValue(defaultSchema);
