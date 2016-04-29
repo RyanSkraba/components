@@ -26,16 +26,16 @@ import static org.talend.daikon.properties.presentation.Widget.widget;
 
 public class OauthProperties extends ComponentProperties {
 
-    public Property clientId = (Property) newProperty("clientId").setRequired(true); //$NON-NLS-1$
+    public Property clientId = newProperty("clientId").setRequired(true); //$NON-NLS-1$
 
-    public Property clientSecret = (Property) newProperty("clientSecret").setRequired(true)
-            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
+    public Property clientSecret = newProperty("clientSecret").setRequired(true)
+            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));; //$NON-NLS-1$
 
-    public Property callbackHost = (Property) newProperty("callbackHost").setRequired(true); //$NON-NLS-1$
+    public Property callbackHost = newProperty("callbackHost").setRequired(true); //$NON-NLS-1$
 
-    public Property callbackPort = (Property) newProperty(Type.INT, "callbackPort").setRequired(true); //$NON-NLS-1$
+    public Property callbackPort = newProperty(Type.INT, "callbackPort").setRequired(true); //$NON-NLS-1$
 
-    public Property tokenFile = (Property) newProperty("tokenFile").setRequired(true); //$NON-NLS-1$
+    public Property tokenFile = newProperty("tokenFile").setRequired(true); //$NON-NLS-1$
 
     public OauthProperties(String name) {
         super(name);
@@ -44,7 +44,7 @@ public class OauthProperties extends ComponentProperties {
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form form = Form.create(this, Form.MAIN, "OAuth Parameters");
+        Form form = Form.create(this, Form.MAIN);
         form.addRow(clientId);
         form.addColumn(clientSecret);
         form.addRow(callbackHost);

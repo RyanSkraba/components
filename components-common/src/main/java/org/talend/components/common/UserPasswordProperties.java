@@ -24,9 +24,9 @@ import org.talend.daikon.properties.presentation.Widget.WidgetType;
 
 public class UserPasswordProperties extends ComponentProperties {
 
-    public Property userId = (Property) newProperty("userId").setRequired(true); //$NON-NLS-1$
+    public Property userId = newProperty("userId").setRequired(true); //$NON-NLS-1$
 
-    public Property password = ((Property) newProperty("password").setRequired(true))
+    public Property password = newProperty("password").setRequired(true)
             .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
     public UserPasswordProperties(String name) {
@@ -36,7 +36,7 @@ public class UserPasswordProperties extends ComponentProperties {
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form form = Form.create(this, Form.MAIN, "User Password");
+        Form form = Form.create(this, Form.MAIN);
         form.addRow(userId);
         form.addRow(widget(password).setWidgetType(WidgetType.HIDDEN_TEXT));
     }

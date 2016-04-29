@@ -128,7 +128,7 @@ public class TestComponentProperties extends ComponentProperties implements Comp
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form form = Form.create(this, Form.MAIN, "Test Component");
+        Form form = Form.create(this, Form.MAIN);
         mainForm = form;
         form.addRow(userId);
         form.addRow(widget(password).setWidgetType(WidgetType.HIDDEN_TEXT));
@@ -136,7 +136,7 @@ public class TestComponentProperties extends ComponentProperties implements Comp
         form.addRow(widget(nameList).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
         form.addRow(widget(nameListRef).setWidgetType(Widget.WidgetType.NAME_SELECTION_REFERENCE));
 
-        form = Form.create(this, "restoreTest", "Restore Test");
+        form = Form.create(this, "restoreTest");
         restoreForm = form;
         form.addRow(userId);
         form.addRow(nameList);
