@@ -139,13 +139,13 @@ public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
         try {
             JSONParser jsonParser = new JSONParser();
             JSONObject json = (JSONObject) jsonParser.parse(jsonResponseString);
-            dataCount += splunkObjectsForBulk.size();
             LOGGER.debug("Response String:/r/n" + String.valueOf(json));
             lastErrorCode = ((Long) json.get("code")).intValue();
             lastErrorMessage = (String) json.get("text");
             if (lastErrorCode != 0) {
                 throw new IOException(getMessage("error.codeMessage", lastErrorCode, lastErrorMessage));
             }
+            dataCount += splunkObjectsForBulk.size();
         } catch (ParseException e) {
             throw new IOException(getMessage("error.responseParseException", e.getMessage()));
         }
