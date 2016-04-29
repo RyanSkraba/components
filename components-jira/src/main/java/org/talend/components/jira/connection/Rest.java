@@ -13,17 +13,24 @@
 package org.talend.components.jira.connection;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.Header;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.message.BasicHeader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Apache Http components library wrapper. It uses Basic authentification by default
@@ -31,6 +38,8 @@ import org.apache.http.message.BasicHeader;
  * @author ivan.honchar
  */
 public class Rest {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(Rest.class);
 
     /**
      * A list of common headers
@@ -38,9 +47,9 @@ public class Rest {
     private List<Header> headers;
 
     /**
-     * Common URL to REST API location
+     * Schema, host and port of REST API location
      */
-    private String url;
+    private String hostPort;
 
     /**
      * Http authorization type. It is used to set Http Authorization header
@@ -60,13 +69,13 @@ public class Rest {
     }
 
     /**
-     * Constructor sets URL to REST API location and default content type
+     * Constructor sets schema(http or https), host(google.com) and port number(8080) using one hostPort parameter
      * 
-     * @param url URL
+     * @param hostPort URL
      */
-    public Rest(String url) {
+    public Rest(String hostPort) {
         headers = new LinkedList<Header>();
-        this.url = url;
+        this.hostPort = hostPort;
         contentType = ContentType.create("application/json", StandardCharsets.UTF_8);
     }
 
@@ -75,15 +84,37 @@ public class Rest {
      * 
      * @param resource REST API resource. E. g. issue/{issueId}
      * @return response result
-     * @throws ClientProtocolException
      * @throws IOException
      */
-    public String get(String resource) throws ClientProtocolException, IOException {
-        Request get = Request.Get(url + resource);
-        for (Header header : headers) {
-            get.addHeader(header);
+    @SuppressWarnings("unchecked")
+    public String get(String resource) throws IOException {
+        return get(resource, Collections.EMPTY_MAP);
+    }
+    
+    /**
+     * Executes Http Get request
+     * 
+     * @param resource REST API resource. E. g. issue/{issueId}
+     * @param parameters http query parameters
+     * @return response result
+     * @throws IOException
+     */
+    public String get(String resource, Map<String, String> parameters) throws IOException {
+        try {
+            URIBuilder builder = new URIBuilder(hostPort + resource);
+            for (Map.Entry<String, String> entry : parameters.entrySet()) {
+                builder.addParameter(entry.getKey(), entry.getValue());
+            }
+            URI uri = builder.build();
+            Request get = Request.Get(uri);
+            for (Header header : headers) {
+                get.addHeader(header);
+            }
+            return get.execute().returnContent().asString();
+        } catch (URISyntaxException e) {
+            LOG.debug("Wrong URI. {}", e.getMessage());
         }
-        return get.execute().returnContent().asString();
+        return null;
     }
 
     /**
@@ -95,7 +126,7 @@ public class Rest {
      * @throws ClientProtocolException
      */
     public int delete(String resource) throws ClientProtocolException, IOException {
-        Request delete = Request.Delete(url + resource);
+        Request delete = Request.Delete(hostPort + resource);
         for (Header header : headers) {
             delete.addHeader(header);
         }
@@ -112,13 +143,13 @@ public class Rest {
      * @throws IOException
      */
     public String post(String resource, String body) throws ClientProtocolException, IOException {
-        Request post = Request.Post(url + resource).bodyString(body, contentType);
+        Request post = Request.Post(hostPort + resource).bodyString(body, contentType);
         for (Header header : headers) {
             post.addHeader(header);
         }
         Content content = post.execute().returnContent();
-        if(content != null) {
-        	return content.asString();
+        if (content != null) {
+            return content.asString();
         }
         return "204 no content";
     }
@@ -133,7 +164,7 @@ public class Rest {
      * @throws IOException
      */
     public int put(String resource, String body) throws ClientProtocolException, IOException {
-        Request put = Request.Put(url + resource).bodyString(body, contentType);
+        Request put = Request.Put(hostPort + resource).bodyString(body, contentType);
         for (Header header : headers) {
             put.addHeader(header);
         }
@@ -155,7 +186,7 @@ public class Rest {
     }
 
     public Rest setUrl(String url) {
-        this.url = url;
+        this.hostPort = url;
         return this;
     }
 

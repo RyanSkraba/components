@@ -65,7 +65,7 @@ public class TJiraInputProperties extends ComponentProperties implements HasSche
     /**
      * URL of Jira instance
      */
-    public Property hostUrl = PropertyFactory.newString("hostUrl");
+    public Property host = PropertyFactory.newString("host");
     
     /**
      * Jira resource. This may be issue, project etc.
@@ -93,7 +93,7 @@ public class TJiraInputProperties extends ComponentProperties implements HasSche
     /**
      * Batch size property, which specifies how many Jira entities should be requested per request
      */
-    public Property batchSize = PropertyFactory.newInteger("batchSize");
+    public Property batchSize = PropertyFactory.newString("batchSize");
     
     /**
      * Schema property to define required fields of Jira resource
@@ -117,25 +117,25 @@ public class TJiraInputProperties extends ComponentProperties implements HasSche
     @Override
     public void setupProperties() {
         super.setupProperties();
-        hostUrl.setValue("\"https://localhost:8080/\"");
+        host.setValue("\"https://localhost:8080/\"");
         resource.setValue(ISSUE);
         authorizationType.setValue(BASIC);
         jql.setValue("\"\"");
-        batchSize.setValue(50);
+        batchSize.setValue("50");
     }
     
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form mainForm = Form.create(this, Form.MAIN, "Jira main form");
+        Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(schema.getForm(Form.REFERENCE));
-        mainForm.addRow(hostUrl);
+        mainForm.addRow(host);
         mainForm.addRow(authorizationType);
         mainForm.addRow(userPassword.getForm(Form.MAIN));
         mainForm.addRow(resource);
         mainForm.addRow(jql);
-        
-        Form advancedForm = Form.create(this, Form.ADVANCED, "Jira advanced form");
+
+        Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(batchSize);
     }
     

@@ -15,7 +15,9 @@ package org.talend.components.jira.runtime;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field.Order;
@@ -37,7 +39,7 @@ public class JiraSource implements Source {
     /**
      * Jira REST API version. It is a part of REST URL
      */
-    private static final String REST_VERSION = "rest/api/2/";
+    private static final String REST_VERSION = "/rest/api/2/";
 
     /**
      * Jira component properties
@@ -83,35 +85,66 @@ public class JiraSource implements Source {
         return Schema.createRecord("issue", null, null, false, Collections.singletonList(jsonField));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Reader createReader(RuntimeContainer container) {
-        String url = properties.hostUrl.getStringValue();
-        String resourceType = properties.resource.getStringValue();
+        String hostPort = properties.host.getStringValue();
         String userId = properties.userPassword.userId.getStringValue();
         String password = properties.userPassword.password.getStringValue();
-        String jqlQuery = properties.jql.getStringValue();
-        int batchSize = properties.batchSize.getIntValue();
-
-        // builds resource URL and parameters
-        StringBuilder resourceBuilder = new StringBuilder(REST_VERSION);
-
+        String resourcePath = getResourcePath();
+        Map<String, String> sharedParameters = getSharedParameters();
+        return new JiraReader(this, hostPort, resourcePath, userId, password, sharedParameters);
+    }
+    
+    /**
+     * Builds and returns resource path
+     * 
+     * @return resource path
+     */
+    String getResourcePath() {
+        String resourceType = properties.resource.getStringValue();
+        String resourcePath = null;
         switch (resourceType) {
         case TJiraInputProperties.ISSUE: {
-            resourceBuilder.append("search");
-            resourceBuilder.append("?");
-            resourceBuilder.append("jql=");
-            resourceBuilder.append(jqlQuery);
+            resourcePath = REST_VERSION + "search";
             break;
         }
         case TJiraInputProperties.PROJECT: {
-            resourceBuilder.append("project");
+            resourcePath = REST_VERSION + "project";
             // TODO Add project id /{projectIdOrKey}
             break;
         }
+        default: {
+            resourcePath = REST_VERSION + "search";
+            break;
         }
-        String resource = resourceBuilder.toString();
+        }
+        return resourcePath;
+    }
 
-        return new JiraReader(this, url, resource, userId, password, batchSize);
+    /**
+     * Creates and returns map with shared http query parameters
+     * 
+     * @return shared http parametes
+     */
+    Map<String, String> getSharedParameters() {
+        Map<String, String> sharedParameters = new HashMap<>();
+
+        String jqlValue = properties.jql.getStringValue();
+        if (jqlValue != null && !jqlValue.isEmpty()) {
+            String jqlKey = "jql";
+            sharedParameters.put(jqlKey, jqlValue);
+        }
+
+        String maxResultsValue = properties.batchSize.getStringValue();
+        if (maxResultsValue != null && !maxResultsValue.isEmpty()) {
+            String maxResultsKey = "maxResults";
+            sharedParameters.put(maxResultsKey, maxResultsValue);
+        }
+
+        return Collections.unmodifiableMap(sharedParameters);
     }
 
 }

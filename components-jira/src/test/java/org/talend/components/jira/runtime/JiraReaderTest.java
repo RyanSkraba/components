@@ -12,14 +12,18 @@
 // ============================================================================
 package org.talend.components.jira.runtime;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.Reader;
+import org.talend.components.jira.testutils.Utils;
 
 /**
  * Unit-tests for {@link JiraReader}
@@ -39,18 +43,36 @@ public class JiraReaderTest {
     /**
      * Checks {@link JiraReader#start()} returns true in case of correct properties passed
      * 
-     * @throws IOException in case of exception
+     * @throws IOException in case of any exception
      */
     @Ignore
     @Test
     public void startTest() throws IOException {
-
         String testUrl = "http://localhost:8080/";
         String testResource = "rest/api/2/issue/TP-1";
-        Reader<IndexedRecord> jiraReader = new JiraReader(null, testUrl, testResource, USER, PASS);
+        Reader<IndexedRecord> jiraReader = new JiraReader(null, testUrl, testResource, USER, PASS, Collections.EMPTY_MAP);
 
         boolean started = jiraReader.start();
+        jiraReader.close();
+
         assertTrue(started);
+    }
+
+    /**
+     * Checks {@link JiraReader#getEntities(String)} returns correct number of entities
+     * 
+     * @throws Exception in case of any exception
+     */
+    @Test
+    public void getEntitiesTest() throws Exception {
+        JiraReader jiraReader = new JiraReader(null, null, null, null, null, null);
+        String jsonFile = "src/test/resources/org/talend/components/jira/runtime/entities.json";
+        String testJson = Utils.readFile(jsonFile);
+
+        List<String> strs = jiraReader.getEntities(testJson);
+        jiraReader.close();
+
+        assertEquals(3, strs.size());
     }
 
 }

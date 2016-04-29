@@ -13,6 +13,9 @@
 package org.talend.components.jira.runtime;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.apache.avro.generic.IndexedRecord;
@@ -52,28 +55,40 @@ public class JiraReader implements Reader<IndexedRecord> {
     /**
      * JSON string, which represents result obtained from Jira server
      */
-    private String jsonResult;
-    
+    private String inputResult;
+
     /**
-     * Number of Jira entities, which should be retrieved per request
+     * A list of Jira entities in a form of JSON String obtained from Jira server
      */
-    private int batchSize;
+    private List<String> entities;
+
+    /**
+     * Index of current Jira entity
+     */
+    private int entityIndex = 0;
+
+    /**
+     * Stores http query parameters which are shared between requests
+     */
+    private Map<String, String> sharedParameters;
 
     /**
      * Constructor sets required properties for http connection
      * 
      * @param source instance of {@link Source}, which had created this {@link Reader}
-     * @param url url of Jira instance
+     * @param hostPort url of Jira instance
      * @param resource REST resource to communicate
      * @param user Basic authorization user id
      * @param password Basic authorizatiion password
-     * @param batchSize number of Jira entities per request
+     * @param sharedParameters map with http parameter which are shared between requests. It could include maxResult
+     * parameter
      */
-    public JiraReader(JiraSource source, String url, String resource, String user, String password, int batchSize) {
+    public JiraReader(JiraSource source, String hostPort, String resource, String user, String password,
+            Map<String, String> sharedParameters) {
         this.source = source;
         this.resource = resource;
-        this.batchSize = batchSize;
-        rest = new Rest(url);
+        this.sharedParameters = sharedParameters;
+        rest = new Rest(hostPort);
         rest.setCredentials(user, password);
     }
 
@@ -85,11 +100,13 @@ public class JiraReader implements Reader<IndexedRecord> {
      */
     @Override
     public boolean start() throws IOException {
-        jsonResult = rest.get(resource);
-        if (jsonResult != null && !jsonResult.isEmpty()) {
-            return true;
+        inputResult = rest.get(resource, sharedParameters);
+        if (inputResult == null || inputResult.isEmpty()) {
+            return false;
         }
-        return false;
+
+        entities = getEntities(inputResult);
+        return true;
     }
 
     /**
@@ -97,12 +114,14 @@ public class JiraReader implements Reader<IndexedRecord> {
      */
     @Override
     public boolean advance() throws IOException {
-        return false;
+        entityIndex++;
+        return entityIndex <= entities.size();
     }
 
     @Override
     public IndexedRecord getCurrent() throws NoSuchElementException {
-        return getFactory().convertToAvro(jsonResult);
+        String entity = entities.get(entityIndex);
+        return getFactory().convertToAvro(entity);
     }
 
     /**
@@ -144,4 +163,73 @@ public class JiraReader implements Reader<IndexedRecord> {
         return factory;
     }
 
+    /**
+     * Splits JSON string to separate Jira entities
+     * 
+     * @param inputResult whole response JSON string
+     * @return a list of JSON strings, which describes Jira entities
+     */
+    List<String> getEntities(String inputResult) {
+
+        inputResult = inputResult.substring(inputResult.indexOf("issues"));
+        JsonParser parser = new JsonParser();
+        return parser.getEntities(inputResult);
+    }
+
+    /**
+     * Weird code to divide big JSON string into list of entities
+     */
+    private class JsonParser {
+
+        List<String> getEntities(String inputResult) {
+
+            List<String> entities = new LinkedList<String>();
+            State currentState = State.READ_JSON_ARRAY;
+            StringBuilder entityBuilder = null;
+            int parenthesisState = 0;
+
+            for (char c : inputResult.toCharArray()) {
+
+                switch (c) {
+                case '{': {
+                    if (currentState == State.READ_JSON_ARRAY) {
+                        currentState = State.READ_JSON_OBJECT;
+                        entityBuilder = new StringBuilder();
+                    }
+                    parenthesisState++;
+                    entityBuilder.append(c);
+                    break;
+                }
+                case '}': {
+                    entityBuilder.append(c);
+                    parenthesisState--;
+                    if (parenthesisState == 0) {
+                        currentState = State.READ_JSON_ARRAY;
+                        entities.add(entityBuilder.toString());
+                    }
+                    break;
+                }
+                default: {
+                    if (currentState == State.READ_JSON_OBJECT) {
+                        entityBuilder.append(c);
+                    }
+                }
+                }
+            }
+            return entities;
+        }
+
+        public String getMaxResult(String inputResult) {
+            return null;
+        }
+
+    }
+
+    /**
+     * JSON Parser state
+     */
+    private enum State {
+        READ_JSON_OBJECT,
+        READ_JSON_ARRAY,
+    }
 }
