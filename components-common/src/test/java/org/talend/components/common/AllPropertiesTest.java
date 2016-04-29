@@ -12,9 +12,12 @@
 // ============================================================================
 package org.talend.components.common;
 
+import java.util.Set;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.test.ComponentTestUtils;
 
 public class AllPropertiesTest {
@@ -24,6 +27,15 @@ public class AllPropertiesTest {
 
     @Test
     public void testAlli18n() {
+        ComponentTestUtils.checkAllI18N(new BulkFileProperties(null).init(), errorCollector);
+        ComponentTestUtils.checkAllI18N(new FixedConnectorsComponentProperties(null) {
+
+            @Override
+            protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+                // TODO Auto-generated method stub
+                return null;
+            }
+        }.init(), errorCollector);
         ComponentTestUtils.checkAllI18N(new ProxyProperties(null).init(), errorCollector);
         ComponentTestUtils.checkAllI18N(new SchemaProperties(null).init(), errorCollector);
         ComponentTestUtils.checkAllI18N(new UserPasswordProperties(null).init(), errorCollector);
