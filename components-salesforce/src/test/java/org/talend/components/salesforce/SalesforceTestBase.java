@@ -12,8 +12,14 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import com.sforce.async.AsyncApiException;
-import com.sforce.ws.ConnectionException;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
@@ -54,13 +60,8 @@ import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.PropertiesServiceTest;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.*;
+import com.sforce.async.AsyncApiException;
+import com.sforce.ws.ConnectionException;
 
 @SuppressWarnings("nls")
 public class SalesforceTestBase extends AbstractComponentTest {
@@ -165,7 +166,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
         Schema emptySchema = Schema.createRecord(module, null, null, false);
         emptySchema.setFields(new ArrayList<Schema.Field>());
         emptySchema = AvroUtils.setIncludeAllFields(emptySchema, true);
-        moduleProps.schema.schema.setValue(emptySchema);
+        moduleProps.main.schema.setValue(emptySchema);
     }
 
     public Schema getMakeRowSchema(boolean isDynamic) {
@@ -228,7 +229,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
                 iBillingStreet = rowSchema.getField("BillingStreet").pos();
                 iBillingState = rowSchema.getField("BillingState").pos();
                 iShippingStreet = rowSchema.getField("ShippingStreet").pos();
-                if(rowSchema.getField("ShippingState")!=null){
+                if (rowSchema.getField("ShippingState") != null) {
                     iShippingState = rowSchema.getField("ShippingState").pos();
                 }
             }
@@ -244,7 +245,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
                 continue;
             }
             checkCount++;
-            if(rowSchema.getField("ShippingState")!=null){
+            if (rowSchema.getField("ShippingState") != null) {
                 assertEquals("CA", row.get(iShippingState));
             }
             assertEquals("TestName", row.get(iName));
@@ -400,8 +401,8 @@ public class SalesforceTestBase extends AbstractComponentTest {
         SalesforceConnectionProperties conProps = setupProps(tsip.connection, !ADD_QUOTES);
         tsip.batchSize.setValue(200);
         tsip.module.moduleName.setValue(moduleName);
-        tsip.module.schema.schema.setValue(SchemaBuilder.builder().record("test")
-                .prop(SchemaConstants.INCLUDE_ALL_FIELDS, "true").fields().endRecord());
+        tsip.module.main.schema.setValue(
+                SchemaBuilder.builder().record("test").prop(SchemaConstants.INCLUDE_ALL_FIELDS, "true").fields().endRecord());
         return createBoundedReader(tsip);
     }
 

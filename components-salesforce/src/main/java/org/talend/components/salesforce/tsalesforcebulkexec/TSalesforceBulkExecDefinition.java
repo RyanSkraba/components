@@ -15,8 +15,6 @@ package org.talend.components.salesforce.tsalesforcebulkexec;
 import aQute.bnd.annotation.component.Component;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.Connector;
-import org.talend.components.api.component.Connector.ConnectorType;
 import org.talend.components.api.component.InputComponentDefinition;
 import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
@@ -34,9 +32,7 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition implemen
 
     public TSalesforceBulkExecDefinition() {
         super(COMPONENT_NAME);
-
-        setConnectors(new Connector(ConnectorType.FLOW, 0, 0), new Connector(ConnectorType.MAIN, 0, 1),
-                new Connector(ConnectorType.REJECT, 0, 1));
+        // no input connector this is an starting component
         setTriggers(new Trigger(TriggerType.SUBJOB_OK, 1, 0), new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
     }
 
@@ -61,4 +57,5 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition implemen
     public Source getRuntime() {
         return new SalesforceSource();
     }
+
 }

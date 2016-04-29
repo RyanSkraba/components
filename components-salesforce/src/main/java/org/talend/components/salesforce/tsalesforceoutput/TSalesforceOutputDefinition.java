@@ -12,11 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
-import aQute.bnd.annotation.component.Component;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.Connector;
-import org.talend.components.api.component.Connector.ConnectorType;
 import org.talend.components.api.component.OutputComponentDefinition;
 import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
@@ -25,6 +22,8 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.runtime.SalesforceSink;
+
+import aQute.bnd.annotation.component.Component;
 
 /**
  * Component that can connect to a salesforce system and put some data into it.
@@ -39,8 +38,6 @@ public class TSalesforceOutputDefinition extends SalesforceDefinition implements
     public TSalesforceOutputDefinition() {
         super(COMPONENT_NAME);
 
-        setConnectors(new Connector(ConnectorType.FLOW, 1, 0), new Connector(ConnectorType.MAIN, 0, 1),
-                new Connector(ConnectorType.REJECT, 0, 1));
         setTriggers(new Trigger(TriggerType.SUBJOB_OK, 1, 0), new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
     }
 
@@ -68,11 +65,12 @@ public class TSalesforceOutputDefinition extends SalesforceDefinition implements
     @Override
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return concatPropertiesClasses(super.getNestedCompatibleComponentPropertiesClass(),
-                new Class[]{SalesforceModuleProperties.class});
+                new Class[] { SalesforceModuleProperties.class });
     }
 
     @Override
     public Sink getRuntime() {
         return new SalesforceSink();
     }
+
 }

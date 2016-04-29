@@ -14,6 +14,10 @@ package org.talend.components.salesforce.tsalesforceinput;
 
 import static org.talend.daikon.properties.PropertyFactory.*;
 
+import java.util.Collections;
+import java.util.Set;
+
+import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.daikon.properties.Property;
@@ -99,6 +103,20 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
             form.getWidget(query.getName()).setVisible(manualQuery.getBooleanValue());
             form.getWidget(condition.getName()).setVisible(!manualQuery.getBooleanValue());
+            Form advancedForm = getForm(Form.ADVANCED);
+            connection.bulkConnection.setValue(!queryMode.getValue().equals(QUERY_QUERY));
+            if (advancedForm != null) {
+                advancedForm.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setVisible(false);
+            }
+        }
+    }
+
+    @Override
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        if (isOutputConnection) {
+            return Collections.singleton(MAIN_CONNECTOR);
+        } else {
+            return Collections.EMPTY_SET;
         }
     }
 

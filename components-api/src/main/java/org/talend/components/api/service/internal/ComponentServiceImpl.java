@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.avro.Schema;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuilderFactory;
@@ -62,6 +63,7 @@ import org.talend.components.api.Constants;
 import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
+import org.talend.components.api.component.Connector;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.error.ComponentsApiErrorCode;
 import org.talend.components.api.properties.ComponentProperties;
@@ -462,6 +464,22 @@ public class ComponentServiceImpl extends PropertiesServiceImpl<ComponentPropert
             props.putAll(dominant);
         }
         return props;
+    }
+
+    @Override
+    public Schema getSchema(ComponentProperties cp, Connector connector, boolean isOutputConnection) {
+        return cp.getSchema(connector, isOutputConnection);
+    }
+
+    @Override
+    public Set<? extends Connector> getAvailableConnectors(ComponentProperties componentProperties,
+            Set<? extends Connector> connectedConnetor, boolean isOuput) {
+        return componentProperties.getAvailableConnectors(connectedConnetor, isOuput);
+    }
+
+    @Override
+    public void setSchema(ComponentProperties componentProperties, Connector connector, Schema schema, boolean isOuput) {
+        componentProperties.setConnectedSchema(connector, schema, isOuput);
     }
 
 }

@@ -102,30 +102,43 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         setupProps(props.connection, !SalesforceTestBase.ADD_QUOTES);
 
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
+        props.module.main.schema.setValue(getMakeRowSchema(isDynamic));
+        ;
 
         props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
-        props.afterOutputAction();
 
         Writer<WriterResult> saleforceWriter = createSalesforceOutputWriter(props);
 
         String random = createNewRandom();
         List<IndexedRecord> outputRows = makeRows(random, 10, isDynamic);
         List<IndexedRecord> inputRows = null;
+        Exception firstException = null;
         try {
             WriterResult writeResult = writeRows(saleforceWriter, outputRows);
             assertEquals(outputRows.size(), writeResult.getDataCount());
-            inputRows = readRows(props);
+            // create a new props for reading the data, the schema may be altered in the original output props
+            TSalesforceOutputProperties readprops = createAccountSalesforceoutputProperties();
+            setupProps(readprops.connection, !SalesforceTestBase.ADD_QUOTES);
+            readprops.module.moduleName.setValue(EXISTING_MODULE_NAME);
+            readprops.module.afterModuleName();// to update the schema.
+            inputRows = readRows(readprops);
             List<IndexedRecord> allReadTestRows = filterAllTestRows(random, inputRows);
             assertNotEquals(0, allReadTestRows.size());
             assertEquals(outputRows.size(), allReadTestRows.size());
+        } catch (Exception e) {
+            firstException = e;
         } finally {
-            if (inputRows == null) {
+            if (firstException == null) {
+                if (inputRows == null) {
+                    inputRows = readRows(props);
+                }
+                List<IndexedRecord> allReadTestRows = filterAllTestRows(random, inputRows);
+                deleteRows(allReadTestRows, props);
                 inputRows = readRows(props);
+                assertEquals(0, filterAllTestRows(random, inputRows).size());
+            } else {
+                throw firstException;
             }
-            List<IndexedRecord> allReadTestRows = filterAllTestRows(random, inputRows);
-            deleteRows(allReadTestRows, props);
-            inputRows = readRows(props);
-            assertEquals(0, filterAllTestRows(random, inputRows).size());
         }
     }
 

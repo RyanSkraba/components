@@ -12,13 +12,11 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.PropertyFactory.newEnum;
-import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.*;
 
 import java.util.List;
 
-import org.talend.components.api.component.Connector.ConnectorType;
-import org.talend.components.api.component.StudioConstants;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.SchemaProperties;
@@ -38,7 +36,7 @@ public class SalesforceModuleProperties extends ComponentProperties implements S
     //
     public Property moduleName = newEnum("moduleName"); //$NON-NLS-1$
 
-    public SchemaProperties schema = new SchemaProperties("schema");
+    public SchemaProperties main = new SchemaProperties("main");
 
     public SalesforceModuleProperties(String name) {
         super(name);
@@ -47,7 +45,6 @@ public class SalesforceModuleProperties extends ComponentProperties implements S
     @Override
     public void setupProperties() {
         super.setupProperties();
-        schema.schema.setTaggedValue(StudioConstants.CONNECTOR_TYPE_SCHEMA_KEY, ConnectorType.FLOW);
     }
 
     @Override
@@ -60,7 +57,7 @@ public class SalesforceModuleProperties extends ComponentProperties implements S
         Form moduleRefForm = new Form(this, Form.REFERENCE);
         moduleRefForm.addRow(widget(moduleName).setWidgetType(Widget.WidgetType.NAME_SELECTION_REFERENCE));
 
-        moduleRefForm.addRow(schema.getForm(Form.REFERENCE));
+        moduleRefForm.addRow(main.getForm(Form.REFERENCE));
         refreshLayout(moduleRefForm);
     }
 
@@ -78,7 +75,7 @@ public class SalesforceModuleProperties extends ComponentProperties implements S
 
     public ValidationResult afterModuleName() throws Exception {
         try {
-            schema.schema.setValue(SalesforceSourceOrSink.getSchema(null, connection, moduleName.getStringValue()));
+            main.schema.setValue(SalesforceSourceOrSink.getSchema(null, connection, moduleName.getStringValue()));
         } catch (ComponentException ex) {
             return ex.getValidationResult();
         }

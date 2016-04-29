@@ -12,20 +12,23 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcegetservertimestamp;
 
+import java.util.Collections;
+import java.util.Set;
+
+import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
-import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.HasSchemaProperty;
+import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
 
-import java.util.Arrays;
-import java.util.List;
-
-public class TSalesforceGetServerTimestampProperties extends ComponentProperties
-        implements SalesforceProvideConnectionProperties, HasSchemaProperty {
+public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComponentProperties
+        implements SalesforceProvideConnectionProperties {
 
     //
     // Collections
@@ -42,8 +45,9 @@ public class TSalesforceGetServerTimestampProperties extends ComponentProperties
     @Override
     public void setupProperties() {
         super.setupProperties();
-        // FIXME - need to specify the date type
-        Schema s = SchemaBuilder.record("Root").fields().name("ServerTimeStamp").type().stringType().noDefault().endRecord();
+        Schema date = LogicalTypes.timestampMillis().addToSchema(Schema.create(Schema.Type.LONG));
+        date.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'");
+        Schema s = SchemaBuilder.record("Root").fields().name("ServerTimeStamp").type(date).noDefault().endRecord();
         schema.schema.setValue(s);
     }
 
@@ -53,6 +57,18 @@ public class TSalesforceGetServerTimestampProperties extends ComponentProperties
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(connection.getForm(Form.REFERENCE));
         mainForm.addRow(schema.getForm(Form.REFERENCE));
+
+        Form advancedForm = new Form(this, Form.ADVANCED);
+        advancedForm.addRow(connection.getForm(Form.ADVANCED));
+    }
+
+    @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+        if (form.getName().equals(Form.ADVANCED)) {
+            form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setVisible(false);
+            form.getChildForm(connection.getName()).getWidget(connection.httpTraceMessage.getName()).setVisible(false);
+        }
     }
 
     @Override
@@ -61,13 +77,12 @@ public class TSalesforceGetServerTimestampProperties extends ComponentProperties
     }
 
     @Override
-    public List<Schema> getSchemas() {
-        return Arrays.asList(new Schema[]{new Schema.Parser().parse(schema.schema.getStringValue())});
-    }
-
-    @Override
-    public void setSchemas(List<Schema> schemas) {
-        schema.schema.setValue(schemas.get(0));
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        if (isOutputConnection) {
+            return Collections.singleton(new PropertyPathConnector(Connector.MAIN_NAME, "schema"));
+        } else {
+            return Collections.EMPTY_SET;
+        }
     }
 
 }

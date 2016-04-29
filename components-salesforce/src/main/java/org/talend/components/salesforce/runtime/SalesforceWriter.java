@@ -12,10 +12,12 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import com.sforce.soap.partner.*;
-import com.sforce.soap.partner.Error;
-import com.sforce.soap.partner.sobject.SObject;
-import com.sforce.ws.ConnectionException;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.WriteOperation;
@@ -24,12 +26,15 @@ import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
+import org.talend.daikon.avro.util.AvroUtils;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
+import com.sforce.soap.partner.DeleteResult;
+import com.sforce.soap.partner.Error;
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.SaveResult;
+import com.sforce.soap.partner.UpsertResult;
+import com.sforce.soap.partner.sobject.SObject;
+import com.sforce.ws.ConnectionException;
 
 final class SalesforceWriter implements Writer<WriterResult> {
 
@@ -85,7 +90,10 @@ final class SalesforceWriter implements Writer<WriterResult> {
         this.uId = uId;
         connection = sink.connect(container).connection;
         if (null == schema) {
-            schema = new Schema.Parser().parse(sprops.module.schema.schema.getStringValue());
+            schema = (Schema) sprops.module.main.schema.getValue();
+            if (AvroUtils.isIncludeAllFields(schema)) {
+                schema = sink.getSchema(connection, sprops.module.moduleName.getStringValue());
+            } // else schema is fully specified
         }
         upsertKeyColumn = sprops.upsertKeyColumn.getStringValue();
     }
@@ -120,18 +128,18 @@ final class SalesforceWriter implements Writer<WriterResult> {
             }
 
             switch (TSalesforceOutputProperties.OutputAction.valueOf(sprops.outputAction.getStringValue())) {
-                case INSERT:
-                    insert(so);
-                    break;
-                case UPDATE:
-                    update(so);
-                    break;
-                case UPSERT:
-                    upsert(so);
-                    break;
-                case DELETE:
-                    // See below
-                    throw new RuntimeException("Impossible");
+            case INSERT:
+                insert(so);
+                break;
+            case UPDATE:
+                update(so);
+                break;
+            case UPSERT:
+                upsert(so);
+                break;
+            case DELETE:
+                // See below
+                throw new RuntimeException("Impossible");
             }
         } else { // DELETE
             String id = getIdValue(input);
@@ -155,16 +163,16 @@ final class SalesforceWriter implements Writer<WriterResult> {
         Object valueToAdd = null;
         // Convert stuff here
         switch (expected.schema().getType()) {
-            case BYTES:
-                valueToAdd = Charset.defaultCharset().decode(ByteBuffer.wrap((byte[]) value)).toString();
-                break;
-            // case DATE:
-            // case DATETIME:
-            // valueToAdd = container.formatDate((Date) value, se.getPattern());
-            // break;
-            default:
-                valueToAdd = value;
-                break;
+        case BYTES:
+            valueToAdd = Charset.defaultCharset().decode(ByteBuffer.wrap((byte[]) value)).toString();
+            break;
+        // case DATE:
+        // case DATETIME:
+        // valueToAdd = container.formatDate((Date) value, se.getPattern());
+        // break;
+        default:
+            valueToAdd = value;
+            break;
         }
         sObject.setField(expected.name(), valueToAdd);
     }
@@ -272,8 +280,8 @@ final class SalesforceWriter implements Writer<WriterResult> {
         if (success) {
             // TODO: send back the ID
         } else {
-            errors = SalesforceRuntime.addLog(resultErrors, batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx]
-                    : "Batch index out of bounds", null);
+            errors = SalesforceRuntime.addLog(resultErrors,
+                    batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx] : "Batch index out of bounds", null);
         }
         if (exceptionForErrors && errors.toString().length() > 0) {
             throw new IOException(errors.toString());

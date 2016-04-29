@@ -12,31 +12,35 @@
 // ============================================================================
 package org.talend.components.api.component;
 
+import org.apache.avro.Schema;
+import org.talend.daikon.NamedThing;
+
 /**
- * A connector links two components together providing a path for data transmission.
- *
+ * A connector is a token used by a component to define the avaialble inputs and outputs it has. It shall be used to
+ * retreive the schema {@link Schema} associated with a connector if any. WARNING: this interface should not be
+ * implemented by clients of the APIs, only the components will provide an implementations for it.
  */
-public class Connector extends AbstractComponentConnection {
+public interface Connector extends NamedThing {
 
-    public enum ConnectorType {
-        FLOW,
-        MAIN,
-        REJECT
-    }
+    /*
+     * prefix used in I18N messages.properties file to be placed before any key related to connectors
+     **/
+    String I18N_PREFIX = "connector."; //$NON-NLS-1$
 
-    protected ConnectorType type;
+    /**
+     * constant use to create connector with unique MAIN name
+     */
+    String MAIN_NAME = "MAIN"; //$NON-NLS-1$
 
-    public Connector(ConnectorType type, int maxInput, int maxOutput) {
-        super(maxInput, maxOutput);
-        this.type = type;
-    }
+    /**
+     * constant use to create connector with unique REJECT name
+     */
+    String REJECT_NAME = "REJECT"; //$NON-NLS-1$
 
-    public ConnectorType getType() {
-        return type;
-    }
-
-    public void setType(ConnectorType type) {
-        this.type = type;
-    }
+    /**
+     * This method shall return a unique name for a given set of connectors so that the client can unically identify it.
+     */
+    @Override
+    String getName();
 
 }

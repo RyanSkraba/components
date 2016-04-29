@@ -34,7 +34,7 @@ public class SchemaPropertiesTest {
 
         assertEquals("schema", schemaProperties.schema.getName());
         assertNotNull(schemaProperties.schema.getValue());
-        assertThat(schemaProperties.schema.getValue(), instanceOf(String.class));
+        assertThat(schemaProperties.schema.getValue(), instanceOf(Schema.class));
 
         // check the automatic getLayer
         assertEquals(2, schemaProperties.getForms().size());

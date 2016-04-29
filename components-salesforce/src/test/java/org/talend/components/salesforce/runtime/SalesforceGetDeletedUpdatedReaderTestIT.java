@@ -12,13 +12,20 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import com.sforce.soap.partner.GetUpdatedResult;
-import com.sforce.ws.ConnectionException;
+import static org.junit.Assert.*;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Test;
+import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
@@ -29,14 +36,8 @@ import org.talend.components.salesforce.tsalesforcegetdeleted.TSalesforceGetDele
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.avro.util.AvroTypes;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import com.sforce.soap.partner.GetUpdatedResult;
+import com.sforce.ws.ConnectionException;
 
 public class SalesforceGetDeletedUpdatedReaderTestIT extends SalesforceTestBase {
 
@@ -52,7 +53,9 @@ public class SalesforceGetDeletedUpdatedReaderTestIT extends SalesforceTestBase 
 
     @Test
     public void testGetQueryStringList() throws Throwable {
-        SalesforceGetUpdatedReader updatedReader = new SalesforceGetUpdatedReader(null, null, createSalesforceGetDeletedUpdatedProperties(false)) {
+        SalesforceGetUpdatedReader updatedReader = new SalesforceGetUpdatedReader(null, null,
+                createSalesforceGetDeletedUpdatedProperties(false)) {
+
             @Override
             protected GetUpdatedResult getResult() throws IOException, ConnectionException {
                 GetUpdatedResult result = new GetUpdatedResult();
@@ -72,15 +75,17 @@ public class SalesforceGetDeletedUpdatedReaderTestIT extends SalesforceTestBase 
         assertEquals(3, queryStrings.size());
     }
 
-    protected SalesforceGetDeletedUpdatedProperties createSalesforceGetDeletedUpdatedProperties(boolean emptySchema) throws Throwable {
-        SalesforceGetDeletedUpdatedProperties props = (SalesforceGetDeletedUpdatedProperties) new SalesforceGetDeletedUpdatedProperties("foo").init(); //$NON-NLS-1$
+    protected SalesforceGetDeletedUpdatedProperties createSalesforceGetDeletedUpdatedProperties(boolean emptySchema)
+            throws Throwable {
+        SalesforceGetDeletedUpdatedProperties props = (SalesforceGetDeletedUpdatedProperties) new SalesforceGetDeletedUpdatedProperties(
+                "foo").init(); //$NON-NLS-1$
         props.connection.timeout.setValue(120000);
         setupProps(props.connection, !ADD_QUOTES);
         if (emptySchema) {
             setupModuleWithEmptySchema(props.module, EXISTING_MODULE_NAME);
         } else {
             props.module.moduleName.setValue(EXISTING_MODULE_NAME);
-            props.module.schema.schema.setValue(getMakeRowSchema(false));
+            props.module.main.schema.setValue(getMakeRowSchema(false));
         }
 
         ComponentTestUtils.checkSerialize(props, errorCollector);
@@ -88,11 +93,17 @@ public class SalesforceGetDeletedUpdatedReaderTestIT extends SalesforceTestBase 
         return props;
     }
 
-
     protected void runGetDeletedTest(boolean emptySchema) throws Throwable {
 
         SalesforceGetDeletedUpdatedProperties sgduProperties = createSalesforceGetDeletedUpdatedProperties(emptySchema);
-        SalesforceConnectionModuleProperties connProperties = new SalesforceConnectionModuleProperties("foo");
+        SalesforceConnectionModuleProperties connProperties = new SalesforceConnectionModuleProperties("foo") {
+
+            @Override
+            protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+                // TODO Auto-generated method stub
+                return null;
+            }
+        };
         connProperties.copyValuesFrom(sgduProperties);
         SalesforceServerTimeStampReaderTestIT timeStampReaderTestIT = new SalesforceServerTimeStampReaderTestIT();
         Calendar startDate = timeStampReaderTestIT.getServerTimestamp();
@@ -101,13 +112,15 @@ public class SalesforceGetDeletedUpdatedReaderTestIT extends SalesforceTestBase 
         int count = 10;
         // Prepare test data
         List<IndexedRecord> outputRowsInsert = makeRows(randomInsert, count, emptySchema);
-        outputRowsInsert = writeRows(randomInsert, connProperties, outputRowsInsert, SalesforceOutputProperties.OutputAction.INSERT);
+        outputRowsInsert = writeRows(randomInsert, connProperties, outputRowsInsert,
+                SalesforceOutputProperties.OutputAction.INSERT);
         checkRows(randomInsert, outputRowsInsert, count);
 
         // Generate updated record
         String randomUpdate = String.valueOf(Integer.parseInt(randomInsert) + 100);
         List<IndexedRecord> outputRowsUpdate = makeUpdateRows(randomUpdate, emptySchema, outputRowsInsert);
-        outputRowsUpdate = writeRows(randomUpdate, connProperties, outputRowsUpdate, SalesforceOutputProperties.OutputAction.UPDATE);
+        outputRowsUpdate = writeRows(randomUpdate, connProperties, outputRowsUpdate,
+                SalesforceOutputProperties.OutputAction.UPDATE);
         checkRows(randomUpdate, outputRowsUpdate, count);
         try {
             List<IndexedRecord> rows = readRows(connProperties);
@@ -117,28 +130,29 @@ public class SalesforceGetDeletedUpdatedReaderTestIT extends SalesforceTestBase 
         }
         Calendar endDate = timeStampReaderTestIT.getServerTimestamp();
 
-//        Long ms = 60000 - (endDate.getTimeInMillis() - startDate.getTimeInMillis());
-//        System.out.println(ms);
-//        if (ms > 0) {
-//            endDate.setTimeInMillis(startDate.getTimeInMillis()+120000);
-//        }
+        // Long ms = 60000 - (endDate.getTimeInMillis() - startDate.getTimeInMillis());
+        // System.out.println(ms);
+        // if (ms > 0) {
+        // endDate.setTimeInMillis(startDate.getTimeInMillis()+120000);
+        // }
         endDate.setTimeInMillis(endDate.getTimeInMillis() + 180000);
         System.out.println(endDate.getTimeInMillis() - startDate.getTimeInMillis());
         sgduProperties.startDate.setValue(startDate);
         sgduProperties.endDate.setValue(endDate);
 
         // Test get deleted records
-        TSalesforceGetDeletedProperties sgdProperties = (TSalesforceGetDeletedProperties) new TSalesforceGetDeletedProperties("foo");
+        TSalesforceGetDeletedProperties sgdProperties = new TSalesforceGetDeletedProperties("foo");
         sgdProperties.copyValuesFrom(sgduProperties);
         List<IndexedRecord> deletedRows = readDeletedUpdatedRows(sgdProperties);
         checkRows(randomUpdate, deletedRows, count);
 
         // Test get updated records (Can't be test here)
-        //  (Can't be test here)
-        //  TSalesforceGetUpdatedProperties sguProperties = (TSalesforceGetUpdatedProperties)new TSalesforceGetUpdatedProperties("foo").init();
-        //  sgdProperties.copyValuesFrom(connProperties);
-        //  List<IndexedRecord> updatedRows = readRows(sgdProperties);
-        //  checkRows(randomUpdate, updatedRows, count);
+        // (Can't be test here)
+        // TSalesforceGetUpdatedProperties sguProperties = (TSalesforceGetUpdatedProperties)new
+        // TSalesforceGetUpdatedProperties("foo").init();
+        // sgdProperties.copyValuesFrom(connProperties);
+        // List<IndexedRecord> updatedRows = readRows(sgdProperties);
+        // checkRows(randomUpdate, updatedRows, count);
 
     }
 
@@ -159,9 +173,8 @@ public class SalesforceGetDeletedUpdatedReaderTestIT extends SalesforceTestBase 
         return fa.endRecord();
     }
 
-
     protected List<IndexedRecord> writeRows(String random, SalesforceConnectionModuleProperties props,
-                                            List<IndexedRecord> outputRows, TSalesforceOutputProperties.OutputAction action) throws Exception {
+            List<IndexedRecord> outputRows, TSalesforceOutputProperties.OutputAction action) throws Exception {
         TSalesforceOutputProperties outputProps = new TSalesforceOutputProperties("output"); //$NON-NLS-1$
         outputProps.copyValuesFrom(props);
         outputProps.outputAction.setValue(action);

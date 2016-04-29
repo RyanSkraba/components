@@ -12,14 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,6 +34,7 @@ import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
+import org.talend.components.common.CommonTestUtils;
 import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
@@ -130,7 +125,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
             this.repoLocation = repoLocation;
             this.schemaPropertyName = schemaPropertyName;
             if (schemaPropertyName != null) {
-                this.schema = new Schema.Parser().parse(props.getValuedProperty(schemaPropertyName).getStringValue());
+                this.schema = (Schema) props.getValuedProperty(schemaPropertyName).getValue();
             }
         }
 
@@ -278,7 +273,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
                 SalesforceModuleProperties storedModule = (SalesforceModuleProperties) rp.props;
                 assertEquals(selected.get(i - 1).getName(), storedModule.moduleName.getValue());
                 assertTrue(rp.schema.getFields().size() > 10);
-                assertThat(storedModule.schema.schema.getStringValue(), is(rp.schema.toString()));
+                assertThat(storedModule.main.schema.getStringValue(), is(rp.schema.toString()));
             }
             i++;
         }
@@ -443,7 +438,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
                 "moduleName", moduleProps);
         moduleProps.moduleName.setValue("Account");
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
-        Schema schema = new Schema.Parser().parse(moduleProps.schema.schema.getStringValue());
+        Schema schema = new Schema.Parser().parse(moduleProps.main.schema.getStringValue());
         System.out.println(schema);
         for (Schema.Field child : schema.getFields()) {
             System.out.println(child.name());
@@ -572,4 +567,10 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
     public void testAllRuntime() {
         ComponentTestUtils.testAllRuntimeAvaialble(getComponentService());
     }
+
+    @Test
+    public void checkConnectorsSchema() {
+        CommonTestUtils.checkAllSchemaPathAreSchemaTypes(getComponentService(), errorCollector);
+    }
+
 }

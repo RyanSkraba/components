@@ -12,10 +12,13 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import com.sforce.soap.partner.QueryResult;
-import com.sforce.soap.partner.sobject.SObject;
-import com.sforce.ws.ConnectionException;
-import com.sforce.ws.bind.XmlObject;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
@@ -23,8 +26,10 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
-import java.io.IOException;
-import java.util.*;
+import com.sforce.soap.partner.QueryResult;
+import com.sforce.soap.partner.sobject.SObject;
+import com.sforce.ws.ConnectionException;
+import com.sforce.ws.bind.XmlObject;
 
 public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
 
@@ -43,9 +48,9 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
 
     @Override
     protected Schema getSchema() throws IOException {
-        TSalesforceInputProperties inProperties = (TSalesforceInputProperties)properties;
-        if (null == querySchema) {
-            querySchema = new Schema.Parser().parse(inProperties.module.schema.schema.getStringValue());
+        TSalesforceInputProperties inProperties = (TSalesforceInputProperties) properties;
+        if (querySchema == null) {
+            querySchema = super.getSchema();
             if (inProperties.manualQuery.getBooleanValue()) {
                 SObject currentSObject = getCurrentSObject();
                 Iterator<XmlObject> children = currentSObject.getChildren();
@@ -115,7 +120,7 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
     }
 
     protected QueryResult executeSalesforceQuery() throws IOException, ConnectionException {
-        TSalesforceInputProperties inProperties = (TSalesforceInputProperties)properties;
+        TSalesforceInputProperties inProperties = (TSalesforceInputProperties) properties;
         getConnection().setQueryOptions(inProperties.batchSize.getIntValue());
         return getConnection().query(getQueryString(inProperties));
     }
@@ -123,7 +128,7 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
     @Override
     public IndexedRecord getCurrent() {
         try {
-            return ((SObjectAdapterFactory)getFactory()).convertToAvro(getCurrentSObject());
+            return ((SObjectAdapterFactory) getFactory()).convertToAvro(getCurrentSObject());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

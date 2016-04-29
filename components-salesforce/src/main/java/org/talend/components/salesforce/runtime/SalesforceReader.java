@@ -17,13 +17,15 @@ import java.io.IOException;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
-
-import com.sforce.soap.partner.PartnerConnection;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
+import org.talend.daikon.avro.util.AvroUtils;
+
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.PartnerConnection;
 
 public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
 
@@ -52,7 +54,8 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
             if (properties instanceof TSalesforceBulkExecProperties) {
                 useBulkFactory = true;
             } else if (properties instanceof TSalesforceInputProperties) {
-                if (TSalesforceInputProperties.QUERY_BULK.equals(((TSalesforceInputProperties) properties).queryMode.getStringValue())) {
+                if (TSalesforceInputProperties.QUERY_BULK
+                        .equals(((TSalesforceInputProperties) properties).queryMode.getStringValue())) {
                     useBulkFactory = true;
                 }
             }
@@ -67,16 +70,23 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
     }
 
     protected Schema getSchema() throws IOException {
-        if (null == querySchema) {
-            querySchema = new Schema.Parser().parse(properties.module.schema.schema.getStringValue());
+        if (querySchema == null) {
+            querySchema = (Schema) properties.module.main.schema.getValue();
+            if (AvroUtils.isIncludeAllFields(querySchema)) {
+                String moduleName = null;
+                if (properties instanceof SalesforceConnectionModuleProperties) {
+                    moduleName = properties.module.moduleName.getStringValue();
+                }
+                querySchema = ((SalesforceSourceOrSink) getCurrentSource()).getSchema(container, moduleName);
+            }
         }
         return querySchema;
     }
 
     protected String getQueryString(SalesforceConnectionModuleProperties properties) throws IOException {
         String condition = null;
-        if(properties instanceof TSalesforceInputProperties){
-            TSalesforceInputProperties inProperties = (TSalesforceInputProperties)properties;
+        if (properties instanceof TSalesforceInputProperties) {
+            TSalesforceInputProperties inProperties = (TSalesforceInputProperties) properties;
             if (inProperties.manualQuery.getBooleanValue()) {
                 return inProperties.query.getStringValue();
             } else {

@@ -39,7 +39,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
     public static final String OAUTH_URL = "https://login.salesforce.com/services/oauth2";
 
-    public Property endpoint = (Property)newString("endpoint").setRequired();
+    public Property endpoint = (Property) newString("endpoint").setRequired();
 
     public static final String FORM_WIZARD = "Wizard";
 
@@ -101,6 +101,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
         loginType.setValue(LOGIN_BASIC);
         endpoint.setValue(URL);
         timeout.setValue(60000);
+        httpChunked.setValue(true);
 
     }
 
@@ -151,6 +152,10 @@ public class SalesforceConnectionProperties extends ComponentProperties
         refreshLayout(getForm(Form.ADVANCED));
     }
 
+    public void afterBulkConnection() {
+        refreshLayout(getForm(Form.ADVANCED));
+    }
+
     public ValidationResult validateTestConnection() throws Exception {
         ValidationResult vr = SalesforceSourceOrSink.validateConnection(this);
         if (vr.getStatus() == ValidationResult.Result.OK) {
@@ -188,7 +193,15 @@ public class SalesforceConnectionProperties extends ComponentProperties
         }
 
         if (form.getName().equals(Form.ADVANCED)) {
-            form.setVisible(!useOtherConnection);
+            if (useOtherConnection) {
+                form.setVisible(false);
+            } else {
+                form.setVisible(true);
+
+                boolean bulkMode = bulkConnection.getBooleanValue();
+                form.getWidget(httpChunked.getName()).setVisible(!bulkMode);
+                form.getWidget(httpTraceMessage.getName()).setVisible(bulkMode);
+            }
         }
     }
 

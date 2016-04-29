@@ -15,6 +15,8 @@ package org.talend.components.salesforce.runtime;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.io.IOException;
+import java.util.List;
 import java.util.List;
 
 import org.apache.avro.Schema;
@@ -22,18 +24,10 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.salesforce.SalesforceTestBase;
-import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
-
-import java.io.IOException;
-import java.util.List;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
@@ -76,13 +70,14 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         runInputTest(false, true);
     }
 
-    @Ignore ("Bulk query doesn't support")
+    @Ignore("Bulk query doesn't support")
     @Test
     public void testInputBulkQueryDynamic() throws Throwable {
         runInputTest(true, true);
     }
 
-    protected  TSalesforceInputProperties createTSalesforceInputProperties(boolean emptySchema, boolean isBulkQury) throws Throwable {
+    protected TSalesforceInputProperties createTSalesforceInputProperties(boolean emptySchema, boolean isBulkQury)
+            throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
         props.connection.timeout.setValue(60000);
         props.batchSize.setValue(100);
@@ -90,12 +85,13 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
             props.queryMode.setValue(TSalesforceInputProperties.QUERY_BULK);
             props.connection.bulkConnection.setValue(true);
             props.manualQuery.setValue(true);
-            props.query.setValue("select Id,Name,ShippingStreet,ShippingPostalCode,BillingStreet,BillingState,BillingPostalCode from Account");
+            props.query.setValue(
+                    "select Id,Name,ShippingStreet,ShippingPostalCode,BillingStreet,BillingState,BillingPostalCode from Account");
 
             setupProps(props.connection, !ADD_QUOTES);
 
             props.module.moduleName.setValue(EXISTING_MODULE_NAME);
-            props.module.schema.schema.setValue(getMakeRowSchema(false));
+            props.module.main.schema.setValue(getMakeRowSchema(false));
 
         } else {
             setupProps(props.connection, !ADD_QUOTES);
@@ -110,7 +106,6 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
         return props;
     }
-
 
     protected void runInputTest(boolean emptySchema, boolean isBulkQury) throws Throwable {
 

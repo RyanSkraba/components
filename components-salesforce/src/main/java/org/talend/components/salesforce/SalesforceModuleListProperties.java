@@ -39,7 +39,7 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
     //
     // Properties
     //
-    public Property moduleName = (Property) newString("moduleName").setOccurMaxTimes(Property.INFINITE); //$NON-NLS-1$
+    public Property moduleName = newString("moduleName").setOccurMaxTimes(Property.INFINITE); //$NON-NLS-1$
 
     public SalesforceModuleListProperties(String name) {
         super(name);
@@ -58,7 +58,7 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form moduleForm = Form.create(this, Form.MAIN, "Salesforce Modules");
+        Form moduleForm = Form.create(this, Form.MAIN);
         // Since this is a repeating property it has a list of values
         moduleForm.addRow(widget(moduleName).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
         refreshLayout(moduleForm);
@@ -93,8 +93,8 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
             modProps.init();
             Schema schema = SalesforceSourceOrSink.getSchema(null, this, nl.getName());
             modProps.moduleName.setValue(nl.getName());
-            modProps.schema.schema.setValue(schema);
-            repo.storeProperties(modProps, nl.getName(), connRepLocation, "schema.schema");
+            modProps.main.schema.setValue(schema);
+            repo.storeProperties(modProps, nl.getName(), connRepLocation, "main.schema");
         }
         return ValidationResult.OK;
     }
