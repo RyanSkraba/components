@@ -13,6 +13,7 @@
 package org.talend.components.jira.runtime;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,8 @@ import java.util.NoSuchElementException;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.joda.time.Instant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.jira.avro.IssueAdapterFactory;
@@ -27,10 +30,19 @@ import org.talend.components.jira.avro.IssueIndexedRecord;
 import org.talend.components.jira.connection.Rest;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+
 /**
  * Jira reader implementation
  */
 public class JiraReader implements Reader<IndexedRecord> {
+    
+    /**
+     * Specifies some integer value is undefined
+     */
+    private static final int UNDEFINED = -1;
 
     /**
      * {@link Source} instance, which had created this {@link Reader}
@@ -66,6 +78,22 @@ public class JiraReader implements Reader<IndexedRecord> {
      * Index of current Jira entity
      */
     private int entityIndex = 0;
+    
+    /**
+     * Jira paging http parameter, which defines page size 
+     * (number of entities per request)
+     */
+    private int maxResults = 50;
+    
+    /**
+     * Jira paging http parameter, which defines from which entity to start
+     */
+    private int startAt = 0;
+    
+    /**
+     * Jira paging parameter, which defines total number of entities
+     */
+    private int total = UNDEFINED;
 
     /**
      * Stores http query parameters which are shared between requests
@@ -90,6 +118,11 @@ public class JiraReader implements Reader<IndexedRecord> {
         this.sharedParameters = sharedParameters;
         rest = new Rest(hostPort);
         rest.setCredentials(user, password);
+        
+        String maxRelultValue = sharedParameters.get("maxResults");
+        if (maxRelultValue != null) {
+            maxResults = Integer.parseInt(maxRelultValue);
+        }
     }
 
     /**
@@ -100,11 +133,9 @@ public class JiraReader implements Reader<IndexedRecord> {
      */
     @Override
     public boolean start() throws IOException {
-        inputResult = rest.get(resource, sharedParameters);
-        if (inputResult == null || inputResult.isEmpty()) {
+        if (!queryNextPage()) {
             return false;
         }
-
         entities = getEntities(inputResult);
         return true;
     }
@@ -115,7 +146,18 @@ public class JiraReader implements Reader<IndexedRecord> {
     @Override
     public boolean advance() throws IOException {
         entityIndex++;
-        return entityIndex <= entities.size();
+
+        if (entityIndex < entities.size()) {
+            return true;
+        }
+        if (!queryNextPage()) {
+            return false;
+        }
+
+        entities = getEntities(inputResult);
+        entityIndex = 0;
+
+        return true;
     }
 
     @Override
@@ -164,6 +206,41 @@ public class JiraReader implements Reader<IndexedRecord> {
     }
 
     /**
+     * 
+     * 
+     * @return next response result
+     * @throws IOException in case of exception during http connection
+     */
+    private boolean queryNextPage() throws IOException {
+        
+        // check next pages availability
+        if (total != UNDEFINED && startAt >= total) {
+            return false;
+        }
+        
+        // generate parameters
+        Map<String, String> parameters = new HashMap<>(sharedParameters);
+        parameters.put("startAt", Integer.toString(startAt));
+        
+        // make request
+        inputResult = rest.get(resource, parameters);
+        
+        // readTotal
+        if (total == UNDEFINED) {
+            total = new IssueParser().getTotal(inputResult);
+        }
+        
+        // iterate startAt
+        startAt = startAt + maxResults;
+        
+        if (inputResult == null || inputResult.isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
      * Splits JSON string to separate Jira entities
      * 
      * @param inputResult whole response JSON string
@@ -172,14 +249,16 @@ public class JiraReader implements Reader<IndexedRecord> {
     List<String> getEntities(String inputResult) {
 
         inputResult = inputResult.substring(inputResult.indexOf("issues"));
-        JsonParser parser = new JsonParser();
+        IssueParser parser = new IssueParser();
         return parser.getEntities(inputResult);
     }
 
     /**
      * Weird code to divide big JSON string into list of entities
      */
-    private class JsonParser {
+    public class IssueParser {
+
+        private final Logger LOG = LoggerFactory.getLogger(IssueParser.class);
 
         List<String> getEntities(String inputResult) {
 
@@ -219,8 +298,26 @@ public class JiraReader implements Reader<IndexedRecord> {
             return entities;
         }
 
-        public String getMaxResult(String inputResult) {
-            return null;
+        int getTotal(String inputResult) {
+            JsonFactory factory = new JsonFactory();
+            try {
+                JsonParser parser = factory.createParser(inputResult);
+
+                // rewind until meet total field
+                String currentField = parser.nextFieldName();
+                do {
+                    currentField = parser.nextFieldName();
+                } while (!"total".equals(currentField));
+
+                // get total value
+                parser.nextValue();
+                String value = parser.getText();
+
+                return Integer.parseInt(value);
+            } catch (IOException e) {
+                LOG.debug("Exception during JSON parsing. {}", e.getMessage());
+            }
+            return UNDEFINED;
         }
 
     }
