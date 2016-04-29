@@ -14,11 +14,12 @@ package org.talend.components.dataprep;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -26,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 public class DataPrepConnectionHandler {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TDataSetInputDefinition.class);
 
     private final String url;
 
@@ -49,16 +52,26 @@ public class DataPrepConnectionHandler {
         this.dataSetName = dataSetName;
     }
 
-    HttpResponse connect() throws ClientProtocolException, IOException{
+    HttpResponse connect() {
         Request request = Request.Post(url+"/login?username="+login+"&password="+pass);
-        HttpResponse response = request.execute().returnResponse();
+        HttpResponse response = null;
+        try {
+            response = request.execute().returnResponse();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         authorisationHeader = response.getFirstHeader("Authorization");
         return response;
     }
 
-    HttpResponse logout() throws ClientProtocolException, IOException{
+    HttpResponse logout(){
         Request request = Request.Post(url+"/logout").addHeader(authorisationHeader);
-        return request.execute().returnResponse();
+        try {
+            return request.execute().returnResponse();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private int returnStatusCode(HttpResponse response) {
@@ -68,37 +81,74 @@ public class DataPrepConnectionHandler {
     boolean validate() {
         int statusLogin = 0;
         int statusLogout = 0;
-        try {
-            statusLogin = returnStatusCode(connect());
-            statusLogout = returnStatusCode(logout());
-        } catch (IOException e) {
-                e.printStackTrace();
-        }
+        statusLogin = returnStatusCode(connect());
+        statusLogout = returnStatusCode(logout());
         if (statusLogin == STATUS_OK && statusLogout == STATUS_OK)
             return true;
         else
             return false;
     }
 
-    List<Map<String,String>> readDataSet() throws IOException {
-        connect();
+    List<Map<String,String>> readDataSet() {
         Request request = Request.Get(url+ "/api/datasets/" + dataSetName + "?metadata=false").
                 addHeader(authorisationHeader);
-        HttpResponse current = request.execute().returnResponse();
+        HttpResponse current = null;
+        try {
+            current = request.execute().returnResponse();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            logout();
+        }
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES,
                 false);
-        DataSet dataSet = objectMapper.readValue(current.getEntity().getContent(), DataSet.class);
-        logout();
+        SourceDataSet dataSet = null;
+        try {
+            dataSet = objectMapper.readValue(current.getEntity().getContent(), SourceDataSet.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return dataSet.getRecords();
     }
 
-    void create(String data) throws IOException {
-        Request request = Request.Post(url+"/api/datasets?name=" + dataSetName);// + "&folderPath="+folderPath);
+    void create(String data) {
+        int index = dataSetName.lastIndexOf("/");
+        String setName = dataSetName.substring(index);
+        String folderName = dataSetName.substring(0,index);
+
+        Request request = Request.Post(url+"/api/datasets?name=" + setName + "&folderPath="+folderName);
         request.addHeader(authorisationHeader);
         request.bodyString(data ,ContentType.create(ContentType.TEXT_PLAIN.getMimeType(), StandardCharsets.UTF_8));
-        request.execute();
+        try {
+            request.execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
+    List<Column> readSourceSchema() {
+        Request request = Request.Get(url +"/api/datasets/"+ dataSetName + "/metadata");
+        request.addHeader(authorisationHeader);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
+        String test = null;
+        try {
+            test = request.execute().returnContent().asString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            logout();
+        }
+//        System.out.println(test);
+        MetaData metaData = null;
+        try {
+            metaData = objectMapper.readValue(test, MetaData.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return metaData.getColumns();
+    }
 
 }

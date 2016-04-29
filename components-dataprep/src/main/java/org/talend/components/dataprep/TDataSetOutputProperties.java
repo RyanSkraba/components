@@ -67,7 +67,7 @@ public class TDataSetOutputProperties extends FixedConnectorsComponentProperties
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form form = Form.create(this, Form.MAIN, "DataSet Output");
+        Form form = new Form(this, Form.MAIN);
         form.addRow(schema.getForm(Form.REFERENCE));
         form.addRow(url);
         form.addRow(login);

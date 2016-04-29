@@ -39,6 +39,8 @@ public class TDataSetInputReader extends AbstractBoundedReader<IndexedRecord> {
 
     private List<Map<String,String>> records;
 
+    private List<Column> sourceSchema;
+
     private Iterator<Map<String,String>> iterator;
 
     private Schema schema;
@@ -54,6 +56,8 @@ public class TDataSetInputReader extends AbstractBoundedReader<IndexedRecord> {
 
     @Override
     public boolean start() throws IOException {
+        connectionHandler.connect();
+        sourceSchema = connectionHandler.readSourceSchema();
         records = connectionHandler.readDataSet();
         iterator = records.iterator();
         return !records.isEmpty();
@@ -67,10 +71,10 @@ public class TDataSetInputReader extends AbstractBoundedReader<IndexedRecord> {
     @Override
     public IndexedRecord getCurrent() throws NoSuchElementException {
         Map<String,String> recordMap = iterator.next();
-        String[] record = new String[recordMap.size()];
+        DataPrepField[] record = new DataPrepField[sourceSchema.size()];
         int i = 0;
-        for (Map.Entry<String,String> entry: recordMap.entrySet()) {
-            record[i] = entry.getValue();
+        for (Column column: sourceSchema) {
+            record[i] = new DataPrepField(column.getName(), column.getType(), recordMap.get(column.getId()));
             i++;
         }
         try {
@@ -82,6 +86,9 @@ public class TDataSetInputReader extends AbstractBoundedReader<IndexedRecord> {
 
     @Override
     public void close() throws IOException {
+        sourceSchema = null;
+        records = null;
+        connectionHandler.logout();
     }
 
     private IndexedRecordAdapterFactory<?, IndexedRecord> getFactory() throws IOException {

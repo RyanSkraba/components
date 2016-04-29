@@ -46,7 +46,7 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
     }
 
     @Override
-    public void write(Object datum) throws IOException {
+    public void write(Object datum) {
         if (datum == null) {
             return;
         } // else handle the data.
@@ -79,12 +79,8 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
     @Override
     public WriterResult close() {
         System.out.println(data.toString());
-        try {
-            connectionHandler.create(data.toString());
-            connectionHandler.logout();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        connectionHandler.create(data.toString());
+        connectionHandler.logout();
         return new WriterResult(uId, counter);
     }
 

@@ -14,9 +14,10 @@ package org.talend.components.dataprep;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.talend.daikon.avro.AvroConverter;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 
-public class DataPrepAdaptorFactory implements IndexedRecordAdapterFactory<String[],IndexedRecord> {
+public class DataPrepAdaptorFactory implements IndexedRecordAdapterFactory<DataPrepField[],IndexedRecord> {
     private Schema schema;
 
     @Override
@@ -25,27 +26,18 @@ public class DataPrepAdaptorFactory implements IndexedRecordAdapterFactory<Strin
     }
 
     @Override
-    public Class<String[]> getDatumClass() {
-        return String[].class;
+    public Class<DataPrepField[]> getDatumClass() {
+        return DataPrepField[].class;
     }
 
     @Override
-    public String[] convertToDatum(IndexedRecord indexedRecord) {
-        int size = ((DataPrepIndexedRecord)indexedRecord).getSize();
-        String[] datum = new String[size];
-        for (int i = 0; i < ((DataPrepIndexedRecord)indexedRecord).getSize(); i++) {
-            datum[i] = (String) indexedRecord.get(i);
-        }
-        return null;
+    public DataPrepField[] convertToDatum(IndexedRecord indexedRecord) {
+        throw new UnmodifiableAdapterException();
     }
 
     @Override
-    public IndexedRecord convertToAvro(String[] dataPrepDataSetRecord) {
-        IndexedRecord indexRecord = new DataPrepIndexedRecord(dataPrepDataSetRecord.length);
-        for (int i = 0; i < dataPrepDataSetRecord.length - 1; i++) {
-            indexRecord.put(i, dataPrepDataSetRecord[i]);
-        }
-        return indexRecord;
+    public IndexedRecord convertToAvro(DataPrepField[] dataPrepDataSetRecord) {
+        return new DataPrepIndexedRecord(dataPrepDataSetRecord);
     }
 
     @Override
@@ -54,27 +46,38 @@ public class DataPrepAdaptorFactory implements IndexedRecordAdapterFactory<Strin
     }
 
     private class DataPrepIndexedRecord implements IndexedRecord {
-        private String[] data;
-        private int size;
-//        private Schema schema;
+        private DataPrepField[] dataPrepFields;
+        private AvroConverter[] fieldConverter;
+        private String[] names;
 
-        DataPrepIndexedRecord(int size) {
-            this.size = size;
-            this.data = new String[size];
+        DataPrepIndexedRecord(DataPrepField[] dataPrepFields) {
+            this.dataPrepFields = dataPrepFields;
         }
 
         @Override
         public void put(int i, Object v) {
-            data[i] = (String) v;
+            throw new UnmodifiableAdapterException();
         }
 
         @Override
         public Object get(int i) {
-            return data[i];
-        }
+            if (names == null) {
+                names = new String[getSchema().getFields().size()];
+                fieldConverter = new AvroConverter[names.length];
+                for (int j = 0; j < names.length; j++) {
+                    Schema.Field f = getSchema().getFields().get(j);
+                    names[j] = f.name();
+                    fieldConverter[j] = DataPrepAvroRegistry.getDataPrepInstance().getConverterFromString(f);
+                }
+            }
+            Object value = null;
+            for (DataPrepField field: dataPrepFields) {
 
-        public int getSize() {
-            return size;
+                    if (field.getColumnName().equals(names[i])) {
+                        value = fieldConverter[i].convertToAvro(field.getContent());
+                    }
+            }
+            return value;
         }
 
         public Schema getSchema() {

@@ -15,19 +15,17 @@ package org.talend.components.dataprep;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
-import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DataSet {
-//    String metadata;
+public class MetaData {
+    List<Column> columns;
 
-    private List<Map<String, String>> records;
-
-    public List<Map<String, String>> getRecords() {
-        return records;
+    public List<Column> getColumns() {
+        return columns;
     }
 
-    public void setRecords(List<Map<String, String>> records) {
-        this.records = records;
+    public void setColumns(List<Column> columns) {
+        this.columns = columns;
     }
+
 }

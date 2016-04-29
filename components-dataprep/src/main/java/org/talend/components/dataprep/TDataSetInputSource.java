@@ -68,10 +68,11 @@ public class TDataSetInputSource implements BoundedSource {
     }
 
     public ValidationResult validate(RuntimeContainer container) {
-        if (getConnectionHandler().validate())
-            return ValidationResult.OK;
-        else
-            return new ValidationResult().setStatus(ValidationResult.Result.ERROR);
+//        if (getConnectionHandler().validate())
+//            return ValidationResult.OK;
+//        else
+//            return new ValidationResult().setStatus(ValidationResult.Result.ERROR);
+        return ValidationResult.OK;
     }
 
     public Schema getSchema(RuntimeContainer container, String schemaName) throws IOException {
