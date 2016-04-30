@@ -89,16 +89,16 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         assertEquals(SalesforceConnectionProperties.LOGIN_BASIC, loginType.getValue());
         Form mainForm = props.getForm(Form.MAIN);
         assertEquals("Salesforce Connection Settings", mainForm.getTitle());
-        assertTrue(mainForm.getWidget(SalesforceUserPasswordProperties.class).isVisible());
-        assertFalse(mainForm.getWidget(OauthProperties.class).isVisible());
+        assertFalse(mainForm.getWidget(SalesforceUserPasswordProperties.class).isHidden());
+        assertTrue(mainForm.getWidget(OauthProperties.class).isHidden());
 
         loginType.setValue(SalesforceConnectionProperties.LOGIN_OAUTH);
         props = checkAndAfter(mainForm, "loginType", props);
         mainForm = props.getForm(Form.MAIN);
         assertTrue(mainForm.isRefreshUI());
 
-        assertFalse(mainForm.getWidget(SalesforceUserPasswordProperties.class).isVisible());
-        assertTrue(mainForm.getWidget(OauthProperties.class).isVisible());
+        assertTrue(mainForm.getWidget(SalesforceUserPasswordProperties.class).isHidden());
+        assertFalse(mainForm.getWidget(OauthProperties.class).isHidden());
     }
 
     @Test
