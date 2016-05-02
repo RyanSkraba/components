@@ -22,10 +22,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.Connector;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
@@ -87,16 +89,16 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         assertEquals(SalesforceConnectionProperties.LOGIN_BASIC, loginType.getValue());
         Form mainForm = props.getForm(Form.MAIN);
         assertEquals("Salesforce Connection Settings", mainForm.getTitle());
-        assertTrue(mainForm.getWidget(SalesforceUserPasswordProperties.class).isVisible());
-        assertFalse(mainForm.getWidget(OauthProperties.class).isVisible());
+        assertFalse(mainForm.getWidget(SalesforceUserPasswordProperties.class).isHidden());
+        assertTrue(mainForm.getWidget(OauthProperties.class).isHidden());
 
         loginType.setValue(SalesforceConnectionProperties.LOGIN_OAUTH);
         props = checkAndAfter(mainForm, "loginType", props);
         mainForm = props.getForm(Form.MAIN);
         assertTrue(mainForm.isRefreshUI());
 
-        assertFalse(mainForm.getWidget(SalesforceUserPasswordProperties.class).isVisible());
-        assertTrue(mainForm.getWidget(OauthProperties.class).isVisible());
+        assertTrue(mainForm.getWidget(SalesforceUserPasswordProperties.class).isHidden());
+        assertFalse(mainForm.getWidget(OauthProperties.class).isHidden());
     }
 
     @Test
@@ -573,4 +575,74 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         CommonTestUtils.checkAllSchemaPathAreSchemaTypes(getComponentService(), errorCollector);
     }
 
+    @Test
+    public void testSchemaSerialized() throws Throwable {
+        ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
+        TSalesforceOutputProperties outputProps = (TSalesforceOutputProperties) getComponentService()
+                .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
+        
+        Schema reject = SchemaBuilder.record("Reject")
+                .fields().name("A")
+                .type().stringType().noDefault().name("B").type().stringType().noDefault().endRecord();
+        
+        Schema main = SchemaBuilder.record("Main")
+                .fields().name("C")
+                .type().stringType().noDefault().name("D").type().stringType().noDefault().endRecord();
+        
+        assertEquals(2, outputProps.getAvailableConnectors(null, true).size());
+        for (Connector connector : outputProps.getAvailableConnectors(null, true)) {
+            if (connector.getName().equals(Connector.MAIN_NAME)) {
+                outputProps.setConnectedSchema(connector, main, true);
+            } else {
+                outputProps.setConnectedSchema(connector, reject, true);
+            }
+        }
+        
+        String serialized = outputProps.toSerialized();
+        
+        TSalesforceOutputProperties afterSerialized = ComponentProperties.fromSerialized(serialized, TSalesforceOutputProperties.class).properties;
+        assertEquals(2, afterSerialized.getAvailableConnectors(null, true).size());
+        for (Connector connector : afterSerialized.getAvailableConnectors(null, true)) {
+            if (connector.getName().equals(Connector.MAIN_NAME)) {
+                Schema main2 = afterSerialized.getSchema(connector, true);
+                assertEquals(main.toString(), main2.toString());
+            } else {
+                Schema reject2 = afterSerialized.getSchema(connector, true);
+                assertEquals(reject.toString(), reject2.toString());
+            }
+        }
+   }
+    
+    @Test
+    public void testSchemaSerialized2() throws Throwable {
+        ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
+        TSalesforceOutputProperties outputProps = (TSalesforceOutputProperties) getComponentService()
+                .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
+        
+        Schema reject = SchemaBuilder.record("Reject")
+                .fields().name("A")
+                .type().stringType().noDefault().name("B").type().stringType().noDefault().endRecord();
+        
+        Schema main = SchemaBuilder.record("Main")
+                .fields().name("C")
+                .type().stringType().noDefault().name("D").type().stringType().noDefault().endRecord();
+        
+        outputProps.setValue("module.main.schema", main);
+        outputProps.setValue("schemaReject.schema", reject);
+
+        Schema main2 = (Schema)outputProps.getValuedProperty("module.main.schema").getValue();
+        Schema reject2 = (Schema)outputProps.getValuedProperty("schemaReject.schema").getValue();
+        assertEquals(main.toString(), main2.toString());
+        assertEquals(reject.toString(), reject2.toString());
+
+        String serialized = outputProps.toSerialized();
+        
+        TSalesforceOutputProperties afterSerialized = ComponentProperties.fromSerialized(serialized, TSalesforceOutputProperties.class).properties;
+        
+        
+        main2 = (Schema)afterSerialized.getValuedProperty("module.main.schema").getValue();
+        reject2 = (Schema)afterSerialized.getValuedProperty("schemaReject.schema").getValue();
+        assertEquals(main.toString(), main2.toString());
+        assertEquals(reject.toString(), reject2.toString());
+   }
 }

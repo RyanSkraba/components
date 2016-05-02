@@ -61,9 +61,9 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
         super.refreshLayout(form);
         
         if(Form.ADVANCED.equals(form.getName())) {
-        	form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setVisible(false);
-        	form.getChildForm(connection.getName()).getWidget(connection.httpChunked.getName()).setVisible(false);
-        	form.getWidget(upsertRelation.getName()).setVisible(false);
+        	form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
+        	form.getChildForm(connection.getName()).getWidget(connection.httpChunked.getName()).setHidden(true);
+        	form.getWidget(upsertRelation.getName()).setHidden(true);
         }
     }
     

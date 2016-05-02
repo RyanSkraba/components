@@ -39,7 +39,7 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
         
         if(Form.ADVANCED.equals(form.getName())) {
         	boolean isUpsert = ACTION_UPSERT.equals(outputAction.getValue());
-        	form.getWidget(upsertRelation.getName()).setVisible(isUpsert);
+        	form.getWidget(upsertRelation.getName()).setHidden(!isUpsert);
         }
     }
 

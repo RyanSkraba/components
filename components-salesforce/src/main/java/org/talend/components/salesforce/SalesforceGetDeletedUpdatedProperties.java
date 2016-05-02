@@ -43,8 +43,8 @@ public class SalesforceGetDeletedUpdatedProperties extends SalesforceConnectionM
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals(Form.ADVANCED)) {
-            form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setVisible(false);
-            form.getChildForm(connection.getName()).getWidget(connection.httpTraceMessage.getName()).setVisible(false);
+            form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
+            form.getChildForm(connection.getName()).getWidget(connection.httpTraceMessage.getName()).setHidden(true);
         }
     }
 

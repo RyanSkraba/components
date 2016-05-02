@@ -169,8 +169,8 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
             Form advForm = getForm(Form.ADVANCED);
             if (advForm != null) {
                 boolean isUpsert = ACTION_UPSERT.equals(outputAction.getValue());
-                form.getWidget(upsertKeyColumn.getName()).setVisible(isUpsert);
-                advForm.getWidget(upsertRelation.getName()).setVisible(isUpsert);
+                form.getWidget(upsertKeyColumn.getName()).setHidden(!isUpsert);
+                advForm.getWidget(upsertRelation.getName()).setHidden(!isUpsert);
             }
         }
     }
