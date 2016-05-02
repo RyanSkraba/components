@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutputbulk;
 
-import static org.talend.daikon.properties.PropertyFactory.newProperty;
-import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ import org.talend.daikon.properties.presentation.Widget;
 
 public class TSalesforceOutputBulkProperties extends BulkFileProperties {
 
-    public Property ignoreNull = newProperty(Property.Type.BOOLEAN, "ignoreNull");
+    public Property<Boolean> ignoreNull = newBoolean("ignoreNull");
 
     public UpsertRelationTable upsertRelationTable = new UpsertRelationTable("upsertRelationTable");
 
@@ -39,12 +39,12 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
     @Override
     public void setupProperties() {
         super.setupProperties();
-        
+
         returns = ComponentPropertyFactory.newReturnsProperty();
         upsertRelationTable.setUsePolymorphic(true);
-        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_LINE"); //$NON-NLS-1$        
+        ComponentPropertyFactory.newReturnProperty(returns, newInteger("NB_LINE")); //$NON-NLS-1$
     }
-    
+
     public void beforeUpsertRelationTable() {
         upsertRelationTable.columnName.setPossibleValues(getFieldNames(schema.schema));
     }
@@ -63,7 +63,7 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
         Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.WidgetType.TABLE));
     }
-    
+
     protected List<String> getFieldNames(Property schema) {
         String sJson = schema.getStringValue();
         Schema s = new Schema.Parser().parse(sJson);

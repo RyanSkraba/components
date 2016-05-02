@@ -15,7 +15,6 @@ package org.talend.components.webtest;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.io.StringWriter;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
@@ -28,8 +27,6 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = TestApplication.class)
 public class TestJsonSerialize {
@@ -40,7 +37,7 @@ public class TestJsonSerialize {
     @Test
     public void TestSerializationSizes() throws IOException {
         TSalesforceInputProperties tsip = (TSalesforceInputProperties) new TSalesforceInputProperties(null).init();
-        tsip.connection.loginType.setValue(SalesforceConnectionProperties.LOGIN_BASIC);
+        tsip.connection.loginType.setValue(SalesforceConnectionProperties.LoginType.BASIC);
         tsip.connection.userPassword.userId.setValue("foooo");
         // jsonio
         String jsonioString = tsip.toSerialized();

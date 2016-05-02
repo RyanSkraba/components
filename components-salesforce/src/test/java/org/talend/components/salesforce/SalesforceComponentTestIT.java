@@ -81,17 +81,17 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
         props = new TSalesforceConnectionDefinition().createProperties();
         ComponentTestUtils.checkSerialize(props, errorCollector);
-        Property loginType = (Property) props.getProperty("loginType");
+        Property<?> loginType = (Property<?>) props.getProperty("loginType");
         System.out.println(loginType.getPossibleValues());
-        assertEquals("Basic", loginType.getPossibleValues().get(0).toString());
-        assertEquals("OAuth", loginType.getPossibleValues().get(1).toString());
-        assertEquals(SalesforceConnectionProperties.LOGIN_BASIC, loginType.getValue());
+        assertEquals(SalesforceConnectionProperties.LoginType.BASIC, loginType.getPossibleValues().get(0));
+        assertEquals(SalesforceConnectionProperties.LoginType.OAUTH, loginType.getPossibleValues().get(1));
+        assertEquals(SalesforceConnectionProperties.LoginType.BASIC, loginType.getValue());
         Form mainForm = props.getForm(Form.MAIN);
         assertEquals("Salesforce Connection Settings", mainForm.getTitle());
         assertFalse(mainForm.getWidget(SalesforceUserPasswordProperties.class).isHidden());
         assertTrue(mainForm.getWidget(OauthProperties.class).isHidden());
 
-        loginType.setValue(SalesforceConnectionProperties.LOGIN_OAUTH);
+        loginType.setValue(SalesforceConnectionProperties.LoginType.OAUTH);
         props = checkAndAfter(mainForm, "loginType", props);
         mainForm = props.getForm(Form.MAIN);
         assertTrue(mainForm.isRefreshUI());
@@ -104,7 +104,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
     public void testInputProps() throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputDefinition().createProperties();
         assertEquals(2, props.queryMode.getPossibleValues().size());
-        Property returns = (Property) props.getProperty(ComponentProperties.RETURNS);
+        Property<String> returns = (Property<String>) props.getProperty(ComponentProperties.RETURNS);
         assertEquals("NB_LINE", returns.getChildren().get(0).getName());
     }
 
@@ -252,7 +252,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         List<NamedThing> all = (List<NamedThing>) mlProps.moduleName.getValue();
         assertNull(all);
         // TCOMP-9 Change the module list to use getPossibleValues() for SalesforceModuleListProperties
-        List<NamedThing> possibleValues = (List<NamedThing>) mlProps.moduleName.getPossibleValues();
+        List<NamedThing> possibleValues = mlProps.moduleName.getPossibleValues();
         assertTrue(possibleValues.size() > 50);
         List<NamedThing> selected = new ArrayList<>();
         selected.add(possibleValues.get(0));
@@ -317,8 +317,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
     public void testLogin() throws Throwable {
         SalesforceConnectionProperties props = setupProps(null, !ADD_QUOTES);
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
-        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f,
-                "testConnection", props);
+        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f, "testConnection",
+                props);
         System.out.println(props.getValidationResult());
         assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
     }
@@ -327,8 +327,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
     public void testLoginWithQuotes() throws Throwable {
         SalesforceConnectionProperties props = setupProps(null, ADD_QUOTES);
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
-        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f,
-                "testConnection", props);
+        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f, "testConnection",
+                props);
         System.out.println(props.getValidationResult());
         assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
     }
@@ -338,8 +338,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         SalesforceConnectionProperties props = setupProps(null, !ADD_QUOTES);
         props.userPassword.userId.setValue("blah");
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
-        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f,
-                "testConnection", props);
+        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f, "testConnection",
+                props);
         System.out.println(props.getValidationResult());
         assertEquals(ValidationResult.Result.ERROR, props.getValidationResult().getStatus());
     }
@@ -349,8 +349,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         SalesforceConnectionProperties props = setupProps(null, !ADD_QUOTES);
         props.bulkConnection.setValue(true);
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
-        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f,
-                "testConnection", props);
+        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f, "testConnection",
+                props);
         assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
         System.out.println(props.getValidationResult());
     }
@@ -360,8 +360,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         SalesforceConnectionProperties props = setupProps(null, ADD_QUOTES);
         props.bulkConnection.setValue(true);
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
-        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f,
-                "testConnection", props);
+        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f, "testConnection",
+                props);
         assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
         System.out.println(props.getValidationResult());
     }
@@ -371,7 +371,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
             props = (SalesforceConnectionProperties) getComponentService()
                     .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
         }
-        props.loginType.setValue(SalesforceConnectionProperties.LOGIN_OAUTH);
+        props.loginType.setValue(SalesforceConnectionProperties.LoginType.OAUTH);
         Form mainForm = props.getForm(Form.MAIN);
         props = (SalesforceConnectionProperties) checkAndAfter(mainForm, "loginType", props);
         props.oauth.clientId.setValue("3MVG9Y6d_Btp4xp6ParHznfCCUh0d9fU3LYcvd_hCXz3G3Owp4KvaDhNuEOrXJTBd09JMoPdZeDtNYxXZM4X2");
@@ -387,8 +387,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
     public void testOAuthLogin() throws Throwable {
         SalesforceConnectionProperties props = setupOAuthProps(null);
         Form f = props.getForm(Form.MAIN);
-        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f,
-                "testConnection", props);
+        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f, "testConnection",
+                props);
         assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
         System.out.println(props.getValidationResult());
     }
@@ -399,8 +399,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         SalesforceConnectionProperties props = setupOAuthProps(null);
         props.bulkConnection.setValue(true);
         Form f = props.getForm(Form.MAIN);
-        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f,
-                "testConnection", props);
+        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f, "testConnection",
+                props);
         assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
         System.out.println(props.getValidationResult());
     }
@@ -579,15 +579,13 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
         TSalesforceOutputProperties outputProps = (TSalesforceOutputProperties) getComponentService()
                 .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
-        
-        Schema reject = SchemaBuilder.record("Reject")
-                .fields().name("A")
-                .type().stringType().noDefault().name("B").type().stringType().noDefault().endRecord();
-        
-        Schema main = SchemaBuilder.record("Main")
-                .fields().name("C")
-                .type().stringType().noDefault().name("D").type().stringType().noDefault().endRecord();
-        
+
+        Schema reject = SchemaBuilder.record("Reject").fields().name("A").type().stringType().noDefault().name("B").type()
+                .stringType().noDefault().endRecord();
+
+        Schema main = SchemaBuilder.record("Main").fields().name("C").type().stringType().noDefault().name("D").type()
+                .stringType().noDefault().endRecord();
+
         assertEquals(2, outputProps.getAvailableConnectors(null, true).size());
         for (Connector connector : outputProps.getAvailableConnectors(null, true)) {
             if (connector.getName().equals(Connector.MAIN_NAME)) {
@@ -596,10 +594,11 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
                 outputProps.setConnectedSchema(connector, reject, true);
             }
         }
-        
+
         String serialized = outputProps.toSerialized();
-        
-        TSalesforceOutputProperties afterSerialized = ComponentProperties.fromSerialized(serialized, TSalesforceOutputProperties.class).properties;
+
+        TSalesforceOutputProperties afterSerialized = ComponentProperties.fromSerialized(serialized,
+                TSalesforceOutputProperties.class).properties;
         assertEquals(2, afterSerialized.getAvailableConnectors(null, true).size());
         for (Connector connector : afterSerialized.getAvailableConnectors(null, true)) {
             if (connector.getName().equals(Connector.MAIN_NAME)) {
@@ -610,38 +609,36 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
                 assertEquals(reject.toString(), reject2.toString());
             }
         }
-   }
-    
+    }
+
     @Test
     public void testSchemaSerialized2() throws Throwable {
         ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
         TSalesforceOutputProperties outputProps = (TSalesforceOutputProperties) getComponentService()
                 .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
-        
-        Schema reject = SchemaBuilder.record("Reject")
-                .fields().name("A")
-                .type().stringType().noDefault().name("B").type().stringType().noDefault().endRecord();
-        
-        Schema main = SchemaBuilder.record("Main")
-                .fields().name("C")
-                .type().stringType().noDefault().name("D").type().stringType().noDefault().endRecord();
-        
+
+        Schema reject = SchemaBuilder.record("Reject").fields().name("A").type().stringType().noDefault().name("B").type()
+                .stringType().noDefault().endRecord();
+
+        Schema main = SchemaBuilder.record("Main").fields().name("C").type().stringType().noDefault().name("D").type()
+                .stringType().noDefault().endRecord();
+
         outputProps.setValue("module.main.schema", main);
         outputProps.setValue("schemaReject.schema", reject);
 
-        Schema main2 = (Schema)outputProps.getValuedProperty("module.main.schema").getValue();
-        Schema reject2 = (Schema)outputProps.getValuedProperty("schemaReject.schema").getValue();
+        Schema main2 = (Schema) outputProps.getValuedProperty("module.main.schema").getValue();
+        Schema reject2 = (Schema) outputProps.getValuedProperty("schemaReject.schema").getValue();
         assertEquals(main.toString(), main2.toString());
         assertEquals(reject.toString(), reject2.toString());
 
         String serialized = outputProps.toSerialized();
-        
-        TSalesforceOutputProperties afterSerialized = ComponentProperties.fromSerialized(serialized, TSalesforceOutputProperties.class).properties;
-        
-        
-        main2 = (Schema)afterSerialized.getValuedProperty("module.main.schema").getValue();
-        reject2 = (Schema)afterSerialized.getValuedProperty("schemaReject.schema").getValue();
+
+        TSalesforceOutputProperties afterSerialized = ComponentProperties.fromSerialized(serialized,
+                TSalesforceOutputProperties.class).properties;
+
+        main2 = (Schema) afterSerialized.getValuedProperty("module.main.schema").getValue();
+        reject2 = (Schema) afterSerialized.getValuedProperty("schemaReject.schema").getValue();
         assertEquals(main.toString(), main2.toString());
         assertEquals(reject.toString(), reject2.toString());
-   }
+    }
 }

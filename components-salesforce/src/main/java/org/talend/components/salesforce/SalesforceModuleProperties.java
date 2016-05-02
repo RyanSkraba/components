@@ -34,7 +34,7 @@ public class SalesforceModuleProperties extends ComponentProperties implements S
     //
     // Properties
     //
-    public Property moduleName = newEnum("moduleName"); //$NON-NLS-1$
+    public Property<String> moduleName = newString("moduleName"); //$NON-NLS-1$
 
     public ISchemaListener schemaListener;
     

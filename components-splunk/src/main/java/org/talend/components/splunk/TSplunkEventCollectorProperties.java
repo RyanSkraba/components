@@ -41,19 +41,19 @@ public class TSplunkEventCollectorProperties extends FixedConnectorsComponentPro
 
     public static String ERROR_MESSAGE_NAME = "ERROR_MESSAGE";
 
-    public Property fullUrl = PropertyFactory.newString("fullUrl", ""); //$NON-NLS-1$
+    public Property<String> fullUrl = PropertyFactory.newString("fullUrl", ""); //$NON-NLS-1$
 
     public SchemaProperties schema = new SchemaProperties("schema"); //$NON-NLS-1$
 
-    public Property token = PropertyFactory.newString("token", "");
+    public Property<String> token = PropertyFactory.newString("token", "");
 
-    public Property eventsBatchSize = PropertyFactory.newInteger("eventsBatchSize");
+    public Property<Integer> eventsBatchSize = PropertyFactory.newInteger("eventsBatchSize");
 
-    public Property extendedOutput = PropertyFactory.newBoolean("extendedOutput");
+    public Property<Boolean> extendedOutput = PropertyFactory.newBoolean("extendedOutput");
 
-    public Property RESPONSE_CODE;
+    public Property<Integer> RESPONSE_CODE;
 
-    public Property ERROR_MESSAGE;
+    public Property<String> ERROR_MESSAGE;
 
     protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
@@ -83,8 +83,8 @@ public class TSplunkEventCollectorProperties extends FixedConnectorsComponentPro
         setupDefaultSchema();
 
         returns = ComponentPropertyFactory.newReturnsProperty();
-        RESPONSE_CODE = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, RESPONSE_CODE_NAME); // $NON-NLS-1$
-        ERROR_MESSAGE = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.STRING, ERROR_MESSAGE_NAME); // $NON-NLS-1$
+        RESPONSE_CODE = ComponentPropertyFactory.newReturnProperty(returns, PropertyFactory.newInteger(RESPONSE_CODE_NAME)); // $NON-NLS-1$
+        ERROR_MESSAGE = ComponentPropertyFactory.newReturnProperty(returns, PropertyFactory.newString(ERROR_MESSAGE_NAME)); // $NON-NLS-1$
     }
 
     private void setupDefaultSchema() {
@@ -103,18 +103,18 @@ public class TSplunkEventCollectorProperties extends FixedConnectorsComponentPro
     }
 
     public int getBatchSize() {
-        if (extendedOutput.getBooleanValue()) {
-            return eventsBatchSize.getIntValue();
+        if (extendedOutput.getValue()) {
+            return eventsBatchSize.getValue();
         }
         return 1;
     }
 
     public void afterExtendedOutput() {
-        getForm(Form.ADVANCED).getWidget(eventsBatchSize.getName()).setHidden(!extendedOutput.getBooleanValue());
+        getForm(Form.ADVANCED).getWidget(eventsBatchSize.getName()).setHidden(!extendedOutput.getValue());
     }
 
     public Schema getSchema() {
-        return (Schema) schema.schema.getValue();
+        return schema.schema.getValue();
     }
 
     @Override

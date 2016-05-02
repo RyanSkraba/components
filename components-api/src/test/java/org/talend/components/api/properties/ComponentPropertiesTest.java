@@ -16,22 +16,24 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.PropertyFactory;
 
 public class ComponentPropertiesTest {
 
     @Test
     public void testSetReturnsProperty() {
-        Property element = ComponentPropertyFactory.newReturnsProperty();
+        Property<String> element = ComponentPropertyFactory.newReturnsProperty();
         assertEquals("returns", element.getName());
-        assertEquals(Property.Type.STRING, element.getType());
+        assertEquals(String.class, element.getTypeLiteral().getType());
     }
 
     @Test
     public void testNewReturnProperty() throws IllegalAccessException {
-        Property element = ComponentPropertyFactory.newReturnsProperty();
-        Property returnProperty = ComponentPropertyFactory.newReturnProperty(element, Property.Type.BOOLEAN, "childName");
+        Property<String> element = ComponentPropertyFactory.newReturnsProperty();
+        Property<Boolean> returnProperty = ComponentPropertyFactory.newReturnProperty(element,
+                PropertyFactory.newBoolean("childName"));
         assertEquals("childName", returnProperty.getName());
-        assertEquals(Property.Type.BOOLEAN, returnProperty.getType());
+        assertEquals(Boolean.class, returnProperty.getTypeLiteral().getType());
         assertEquals(returnProperty, element.getChild("childName"));
     }
 

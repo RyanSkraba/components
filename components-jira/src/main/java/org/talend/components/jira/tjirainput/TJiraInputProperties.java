@@ -12,13 +12,14 @@
 // ============================================================================
 package org.talend.components.jira.tjirainput;
 
-import static org.talend.daikon.avro.SchemaConstants.TALEND_IS_LOCKED;
+import static org.talend.daikon.avro.SchemaConstants.*;
 
 import java.util.Collections;
 import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field.Order;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentPropertyFactory;
@@ -32,87 +33,87 @@ import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.presentation.Form;
 
 /**
- * {@link Properties} for Jira input component.
- * They consists of following properties:
- * Jira hostUrl
- * Jira resource
- * schema
+ * {@link Properties} for Jira input component. They consists of following properties: Jira hostUrl Jira resource schema
  * authorization type
  * 
  * created by ivan.honchar on Apr 22, 2016
  */
 public class TJiraInputProperties extends FixedConnectorsComponentProperties {
-    
-    /**
-     * Jira issue resource value
-     */
-    public static final String ISSUE = "issue";
-    
-    /**
-     * Jira project resource value
-     */
-    public static final String PROJECT = "project";
-    
-    /**
-     * Basic http authorization type
-     */
-    private static final String BASIC = "Basic";
 
-    /**
-     * OAuth http authorization type
-     */
-    private static final String OAUTH = "OAuth";
-    
+    public enum JiraResource {
+        /**
+         * Jira issue resource value
+         */
+        ISSUE,
+        /**
+         * Jira project resource value
+         */
+        PROJECT;
+    }
+
+    public enum ConnectionType {
+        /**
+         * Basic http authorization type
+         */
+        BASIC,
+        /**
+         * OAuth http authorization type
+         */
+        OAUTH;
+    }
+
     /**
      * UserPassword properties name
      */
     private static final String USERPASSWORD = "userPassword";
-    
+
     /**
      * URL of Jira instance
      */
-    public Property host = PropertyFactory.newString("host");
-    
+    public Property<String> host = PropertyFactory.newString("host");
+
     /**
-     * Jira resource. This may be issue, project etc.
-     * TODO clarify, which resources to support. Find solution to support variable set of resources.
-     * maybe Property.Type.String
+     * Jira resource. This may be issue, project etc. TODO clarify, which resources to support. Find solution to support
+     * variable set of resources. maybe Property.Type.String
      */
-    public Property resource = PropertyFactory.newEnum("resource", ISSUE, PROJECT);
-    
+    public Property<JiraResource> resource = PropertyFactory.newProperty(new TypeLiteral<JiraResource>() {
+        // empty on purpose
+    }, "resource");
+
     /**
      * Jira Query language request property
      */
-    public Property jql = PropertyFactory.newString("jql");
-    
+    public Property<String> jql = PropertyFactory.newString("jql");
+
     /**
-     * Type of http authorization.
-     * TODO maybe move it to Connection properties class and maybe in components-common
+     * Type of http authorization. TODO maybe move it to Connection properties class and maybe in components-common
      */
-    public Property authorizationType = PropertyFactory.newEnum("authorizationType", BASIC, OAUTH);
-    
+    public Property<ConnectionType> authorizationType = PropertyFactory.newProperty(new TypeLiteral<ConnectionType>() {
+        // empty on purpose
+    }, "authorizationType");
+
     /**
      * User id and password properties for Basic Authorization
      */
     public UserPasswordProperties userPassword = new UserPasswordProperties(USERPASSWORD);
-    
+
     /**
      * Batch size property, which specifies how many Jira entities should be requested per request
      */
-    public Property batchSize = PropertyFactory.newString("batchSize");
-    
+    public Property<String> batchSize = PropertyFactory.newString("batchSize");
+
     /**
      * Return property, which denotes number of Jira entities obtained
      */
-    public Property numberOfRecords;
-    
+    public Property<Integer> numberOfRecords;
+
     /**
      * Schema property to define required fields of Jira resource
      */
     public SchemaProperties schema = new SchemaProperties("schema");
-    
+
     protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
-    
+
     public TJiraInputProperties(String name) {
         super(name);
     }
@@ -123,21 +124,21 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
      * @return schema
      */
     public Schema getSchema() {
-        return (Schema) schema.schema.getValue();
+        return schema.schema.getValue();
     }
-    
+
     @Override
     public void setupProperties() {
         super.setupProperties();
         setupSchema();
         host.setValue("\"https://localhost:8080/\"");
-        resource.setValue(ISSUE);
-        authorizationType.setValue(BASIC);
+        resource.setValue(JiraResource.ISSUE);
+        authorizationType.setValue(ConnectionType.BASIC);
         jql.setValue("\"\"");
         batchSize.setValue("50");
-        
+
         returns = ComponentPropertyFactory.newReturnsProperty();
-        numberOfRecords = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "numberOfRecords");
+        numberOfRecords = ComponentPropertyFactory.newReturnProperty(returns, PropertyFactory.newInteger("numberOfRecords"));
     }
 
     @Override
@@ -154,21 +155,21 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
         Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(batchSize);
     }
-    
+
     /**
      * Refreshes form layout after authorization type is changed
      */
     public void afterAuthorizationType() {
         refreshLayout(getForm(Form.MAIN));
     }
-    
+
     /**
      * Refreshes form layout after resource is changed
      */
     public void afterResource() {
         refreshLayout(getForm(Form.MAIN));
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -179,7 +180,7 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
         if (form.getName().equals(Form.MAIN)) {
 
             // refresh after authorization type changed
-            String authTypeValue = authorizationType.getStringValue();
+            ConnectionType authTypeValue = authorizationType.getValue();
             switch (authTypeValue) {
             case BASIC: {
                 form.getWidget(USERPASSWORD).setHidden(false);
@@ -192,7 +193,7 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
             }
 
             // refresh after resource changed
-            String resourceValue = resource.getStringValue();
+            JiraResource resourceValue = resource.getValue();
             switch (resourceValue) {
             case PROJECT: {
                 form.getWidget(jql.getName()).setHidden(true);
@@ -205,7 +206,7 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
             }
         }
     }
-    
+
     /**
      * Sets initial value of schema property
      */
@@ -222,7 +223,7 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
 
         schema.schema.setValue(initialSchema);
     }
-    
+
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputComponent) {
         if (isOutputComponent) {

@@ -94,8 +94,8 @@ public class SalesforceOAuthConnection {
                 oauthClient = new OauthClient.AuthorizationCodeBuilder(new URL(url + "/token"), //$NON-NLS-1$
                         oauth.clientId.getStringValue(), oauth.clientSecret.getStringValue())
                                 .setAuthorizationLocation(new URL(url + "/authorize")) //$NON-NLS-1$
-                                .setCallbackURL(new URL("https://" + oauth.callbackHost.getStringValue() + ":"
-                                        + oauth.callbackPort.getIntValue()))
+                                .setCallbackURL(new URL(
+                                        "https://" + oauth.callbackHost.getStringValue() + ":" + oauth.callbackPort.getValue()))
                                 .setResponseType("code").build();
                 token = oauthClient.getToken(SalesforceOAuthAccessTokenResponse.class);
                 session_id = token.getAccessToken();

@@ -54,8 +54,8 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
             if (properties instanceof TSalesforceBulkExecProperties) {
                 useBulkFactory = true;
             } else if (properties instanceof TSalesforceInputProperties) {
-                if (TSalesforceInputProperties.QUERY_BULK
-                        .equals(((TSalesforceInputProperties) properties).queryMode.getStringValue())) {
+                if (TSalesforceInputProperties.QueryMode.BULK
+                        .equals(((TSalesforceInputProperties) properties).queryMode.getValue())) {
                     useBulkFactory = true;
                 }
             }
@@ -71,7 +71,7 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
 
     protected Schema getSchema() throws IOException {
         if (querySchema == null) {
-            querySchema = (Schema) properties.module.main.schema.getValue();
+            querySchema = properties.module.main.schema.getValue();
             if (AvroUtils.isIncludeAllFields(querySchema)) {
                 String moduleName = null;
                 if (properties instanceof SalesforceConnectionModuleProperties) {
@@ -87,7 +87,7 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
         String condition = null;
         if (properties instanceof TSalesforceInputProperties) {
             TSalesforceInputProperties inProperties = (TSalesforceInputProperties) properties;
-            if (inProperties.manualQuery.getBooleanValue()) {
+            if (inProperties.manualQuery.getValue()) {
                 return inProperties.query.getStringValue();
             } else {
                 condition = inProperties.condition.getStringValue();

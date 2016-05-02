@@ -51,7 +51,7 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
         TSalesforceInputProperties inProperties = (TSalesforceInputProperties) properties;
         if (querySchema == null) {
             querySchema = super.getSchema();
-            if (inProperties.manualQuery.getBooleanValue()) {
+            if (inProperties.manualQuery.getValue()) {
                 SObject currentSObject = getCurrentSObject();
                 Iterator<XmlObject> children = currentSObject.getChildren();
                 List<String> columnsName = new ArrayList<>();
@@ -121,8 +121,8 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
 
     protected QueryResult executeSalesforceQuery() throws IOException, ConnectionException {
         TSalesforceInputProperties inProperties = (TSalesforceInputProperties) properties;
-        getConnection().setQueryOptions(inProperties.batchSize.getIntValue());
-        if(inProperties.includeDeleted.getBooleanValue()){
+        getConnection().setQueryOptions(inProperties.batchSize.getValue());
+        if(inProperties.includeDeleted.getValue()){
             return getConnection().queryAll(getQueryString(inProperties));
         }else {
             return getConnection().query(getQueryString(inProperties));

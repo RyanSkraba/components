@@ -134,7 +134,7 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
                 "foo").init();
 
         props.connection.timeout.setValue(120000);
-        props.connection.bulkConnection.setValue("true");
+        props.connection.bulkConnection.setValue(true);
         props.outputAction.setValue(SalesforceOutputProperties.OutputAction.INSERT);
         String bulkFilePath = this.getClass().getResource("").getPath() + "/test_outputbulk_1.csv";
         System.out.println("Bulk file path: " + bulkFilePath);
@@ -169,7 +169,7 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
         inputProps.connection = props.connection;
         inputProps.module = props.module;
         inputProps.batchSize.setValue(200);
-        inputProps.queryMode.setValue(TSalesforceInputProperties.QUERY_BULK);
+        inputProps.queryMode.setValue(TSalesforceInputProperties.QueryMode.BULK);
 
         inputProps.manualQuery.setValue(true);
         inputProps.query.setValue(

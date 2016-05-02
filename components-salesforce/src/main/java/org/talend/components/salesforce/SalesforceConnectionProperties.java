@@ -12,12 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.PropertyFactory.newBoolean;
-import static org.talend.daikon.properties.PropertyFactory.newEnum;
-import static org.talend.daikon.properties.PropertyFactory.newInteger;
-import static org.talend.daikon.properties.PropertyFactory.newString;
-import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.*;
 
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
@@ -39,7 +37,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
     public static final String OAUTH_URL = "https://login.salesforce.com/services/oauth2";
 
-    public Property endpoint = (Property) newString("endpoint").setRequired();
+    public Property<String> endpoint = newString("endpoint").setRequired();
 
     public static final String FORM_WIZARD = "Wizard";
 
@@ -48,25 +46,28 @@ public class SalesforceConnectionProperties extends ComponentProperties
     //
 
     // Only for the wizard use
-    public Property name = (Property) newString("name").setRequired();
+    public Property<String> name = newString("name").setRequired();
 
-    public static final String LOGIN_BASIC = "Basic";
+    public enum LoginType {
+        BASIC,
+        OAUTH;
 
-    public static final String LOGIN_OAUTH = "OAuth";
+    }
 
-    public Property loginType = (Property) newEnum("loginType", LOGIN_BASIC, LOGIN_OAUTH).setRequired();
+    public Property<LoginType> loginType = newEnum("loginType", new TypeLiteral<LoginType>() {// empty on purpose
+    }).setRequired();
 
-    public Property bulkConnection = newBoolean("bulkConnection"); //$NON-NLS-1$
+    public Property<Boolean> bulkConnection = newBoolean("bulkConnection"); //$NON-NLS-1$
 
-    public Property needCompression = newBoolean("needCompression"); //$NON-NLS-1$
+    public Property<Boolean> needCompression = newBoolean("needCompression"); //$NON-NLS-1$
 
-    public Property timeout = newInteger("timeout"); //$NON-NLS-1$
+    public Property<Integer> timeout = newInteger("timeout"); //$NON-NLS-1$
 
-    public Property httpTraceMessage = newBoolean("httpTraceMessage"); //$NON-NLS-1$
+    public Property<Boolean> httpTraceMessage = newBoolean("httpTraceMessage"); //$NON-NLS-1$
 
-    public Property httpChunked = newBoolean("httpChunked"); //$NON-NLS-1$
+    public Property<Boolean> httpChunked = newBoolean("httpChunked"); //$NON-NLS-1$
 
-    public Property clientId = newString("clientId"); //$NON-NLS-1$
+    public Property<String> clientId = newString("clientId"); //$NON-NLS-1$
 
     //
     // Presentation items
@@ -98,7 +99,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
     public void setupProperties() {
         super.setupProperties();
 
-        loginType.setValue(LOGIN_BASIC);
+        loginType.setValue(LoginType.BASIC);
         endpoint.setValue(URL);
         timeout.setValue(60000);
         httpChunked.setValue(true);
@@ -146,6 +147,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
         refreshLayout(getForm(FORM_WIZARD));
     }
 
+    @Override
     public void afterReferencedComponent() {
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(Form.REFERENCE));
@@ -180,13 +182,17 @@ public class SalesforceConnectionProperties extends ComponentProperties
                 form.getWidget(USERPASSWORD).setHidden(true);
             } else {
                 form.getWidget(loginType.getName()).setHidden(false);
-                if (LOGIN_OAUTH.equals(loginType.getValue())) {
-                    form.getWidget(OAUTH).setHidden(false);
-                    form.getWidget(USERPASSWORD).setHidden(true);
-                } else if (LOGIN_BASIC.equals(loginType.getValue())) {
+                switch (loginType.getValue()) {
+                case BASIC:
                     form.getWidget(OAUTH).setHidden(true);
                     form.getWidget(USERPASSWORD).setHidden(false);
-                } else {
+                    break;
+                case OAUTH:
+                    form.getWidget(OAUTH).setHidden(false);
+                    form.getWidget(USERPASSWORD).setHidden(true);
+                    break;
+
+                default:
                     throw new RuntimeException("Enum value should be handled :" + loginType.getValue());
                 }
             }
@@ -198,7 +204,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
             } else {
                 form.setHidden(false);
 
-                boolean bulkMode = bulkConnection.getBooleanValue();
+                boolean bulkMode = bulkConnection.getValue();
                 form.getWidget(httpChunked.getName()).setHidden(bulkMode);
                 form.getWidget(httpTraceMessage.getName()).setHidden(!bulkMode);
             }
@@ -216,8 +222,9 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
     public SalesforceConnectionProperties getReferencedConnectionProperties() {
         SalesforceConnectionProperties refProps = (SalesforceConnectionProperties) referencedComponent.componentProperties;
-        if (refProps != null)
+        if (refProps != null) {
             return refProps;
+        }
         return null;
     }
 }

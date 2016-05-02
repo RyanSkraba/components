@@ -16,12 +16,12 @@ import static org.talend.daikon.properties.PropertyFactory.*;
 import static org.talend.daikon.properties.presentation.Widget.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentPropertyFactory;
@@ -48,15 +48,17 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         DELETE
     }
 
-    public Property outputAction = newEnum("outputAction", ACTION_INSERT, ACTION_UPDATE, ACTION_UPSERT, ACTION_DELETE); // $NON-NLS-1$
+    public Property<OutputAction> outputAction = newEnum("outputAction", new TypeLiteral<OutputAction>() {// empty on
+                                                                                                          // purpose
+    }); // $NON-NLS-1$
 
-    public Property upsertKeyColumn = newString("upsertKeyColumn"); //$NON-NLS-1$
+    public Property<String> upsertKeyColumn = newString("upsertKeyColumn"); //$NON-NLS-1$
 
     //
     // Advanced
     //
     public UpsertRelationTable upsertRelationTable = new UpsertRelationTable("upsertRelationTable");
-    
+
     //
     // Collections
     //
@@ -107,9 +109,9 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         outputAction.setValue(ACTION_INSERT);
 
         returns = ComponentPropertyFactory.newReturnsProperty();
-        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_LINE"); //$NON-NLS-1$
-        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_SUCCESS"); //$NON-NLS-1$
-        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_REJECT"); //$NON-NLS-1$
+        ComponentPropertyFactory.newReturnProperty(returns, newInteger("NB_LINE")); //$NON-NLS-1$
+        ComponentPropertyFactory.newReturnProperty(returns, newInteger("NB_SUCCESS")); //$NON-NLS-1$
+        ComponentPropertyFactory.newReturnProperty(returns, newInteger("NB_REJECT")); //$NON-NLS-1$
 
         setupRejectSchema();
 

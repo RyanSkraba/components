@@ -21,9 +21,8 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import com.sforce.ws.wsdl.Part;
 import org.apache.avro.Schema;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.SourceOrSink;
@@ -110,8 +109,8 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         String restEndpoint = soapEndpoint.substring(0, soapEndpoint.indexOf("Soap/")) + "async/" + API_VERSION;
         bulkConfig.setRestEndpoint(restEndpoint);
         // This should only be false when doing debugging.
-        bulkConfig.setCompression(connProps.needCompression.getBooleanValue());
-        bulkConfig.setTraceMessage(connProps.httpTraceMessage.getBooleanValue());
+        bulkConfig.setCompression(connProps.needCompression.getValue());
+        bulkConfig.setTraceMessage(connProps.httpTraceMessage.getValue());
 
         try {
             return new BulkConnection(bulkConfig);
@@ -124,7 +123,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         SalesforceConnectionProperties connProps = properties.getConnectionProperties();
         String endpoint = connProps.endpoint.getStringValue();
         endpoint = StringUtils.strip(endpoint, "\"");
-        if (SalesforceConnectionProperties.LOGIN_OAUTH.equals(connProps.loginType.getValue())) {
+        if (SalesforceConnectionProperties.LoginType.OAUTH.equals(connProps.loginType.getValue())) {
             SalesforceOAuthConnection oauthConnection = new SalesforceOAuthConnection(connProps.oauth, endpoint, API_VERSION);
             oauthConnection.login(config);
         } else {
@@ -203,14 +202,14 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             }
         });
 
-        if (connProps.timeout.getIntValue() > 0) {
-            config.setConnectionTimeout(connProps.timeout.getIntValue());
+        if (connProps.timeout.getValue() > 0) {
+            config.setConnectionTimeout(connProps.timeout.getValue());
         }
-        config.setCompression(connProps.needCompression.getBooleanValue());
+        config.setCompression(connProps.needCompression.getValue());
         if (false) {
             config.setTraceMessage(true);
         }
-        config.setUseChunkedPost(connProps.httpChunked.getBooleanValue());
+        config.setUseChunkedPost(connProps.httpChunked.getValue());
 
         try {
             ch.connection = doConnection(config);
@@ -221,7 +220,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
                     ch.connection.setCallOptions(clientId, null);
                 }
             }
-            if (connProps.bulkConnection.getBooleanValue()) {
+            if (connProps.bulkConnection.getValue()) {
                 ch.bulkConnection = connectBulk(ch.connection.getConfig());
                 sharedConn = ch.bulkConnection;
             } else {
@@ -290,7 +289,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     protected Schema getSchema(PartnerConnection connection, String module) throws IOException {
         try {
             DescribeSObjectResult[] describeSObjectResults = new DescribeSObjectResult[0];
-            describeSObjectResults = connection.describeSObjects(new String[]{module});
+            describeSObjectResults = connection.describeSObjects(new String[] { module });
             return SalesforceAvroRegistry.get().inferSchema(describeSObjectResults[0]);
         } catch (ConnectionException e) {
             throw new IOException(e);

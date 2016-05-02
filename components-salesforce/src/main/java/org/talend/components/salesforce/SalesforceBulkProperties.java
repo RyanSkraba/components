@@ -14,23 +14,32 @@ package org.talend.components.salesforce;
 
 import static org.talend.daikon.properties.PropertyFactory.*;
 
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 
 public class SalesforceBulkProperties extends ComponentProperties {
 
+    enum Concurrency {
+        PARALLEL,
+        SERIAL;
+    }
+
     public static final String CONCURRENCY_PARALLEL = "Parallel";
 
     public static final String CONCURRENCY_SERIAL = "Serial";
 
-    public Property concurrencyMode = newEnum("concurrencyMode", CONCURRENCY_PARALLEL, CONCURRENCY_SERIAL);
+    public Property<Concurrency> concurrencyMode = newEnum("concurrencyMode", new TypeLiteral<Concurrency>() {// empty
+                                                                                                              // on
+                                                                                                              // purpose
+    });
 
-    public Property bytesToCommit = newInteger("bytesToCommit", "10485760");
+    public Property<Integer> bytesToCommit = newInteger("bytesToCommit", "10485760");
 
-    public Property rowsToCommit = newInteger("rowsToCommit", "10000");
+    public Property<Integer> rowsToCommit = newInteger("rowsToCommit", "10000");
 
-    public Property waitTimeCheckBatchState = newInteger("waitTimeCheckBatchState");
+    public Property<Integer> waitTimeCheckBatchState = newInteger("waitTimeCheckBatchState");
 
     public SalesforceBulkProperties(String name) {
         super(name);

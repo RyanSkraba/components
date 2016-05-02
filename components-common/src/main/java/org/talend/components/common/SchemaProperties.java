@@ -39,7 +39,7 @@ public class SchemaProperties extends ComponentProperties {
     //
     // Properties
     //
-    public Property schema = PropertyFactory.newSchema("schema"); //$NON-NLS-1$
+    public Property<Schema> schema = PropertyFactory.newSchema("schema"); //$NON-NLS-1$
 
     @Override
     public void setupProperties() {

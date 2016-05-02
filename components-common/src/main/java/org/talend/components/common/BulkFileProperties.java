@@ -14,9 +14,9 @@ import org.talend.daikon.properties.presentation.Widget;
 
 public class BulkFileProperties extends FixedConnectorsComponentProperties {
 
-    public Property bulkFilePath = newProperty("bulkFilePath").setRequired();
+    public Property<String> bulkFilePath = newProperty("bulkFilePath").setRequired();
 
-    public Property append = newProperty(Property.Type.BOOLEAN, "append");
+    public Property<Boolean> append = newBoolean("append");
 
     public SchemaProperties schema = new SchemaProperties("schema");
 

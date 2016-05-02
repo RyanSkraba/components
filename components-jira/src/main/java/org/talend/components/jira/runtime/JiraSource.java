@@ -25,6 +25,7 @@ import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jira.tjirainput.TJiraInputProperties;
+import org.talend.components.jira.tjirainput.TJiraInputProperties.JiraResource;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 
@@ -95,24 +96,24 @@ public class JiraSource implements Source {
         String password = properties.userPassword.password.getStringValue();
         String resourcePath = getResourcePath();
         Map<String, String> sharedParameters = getSharedParameters();
-        Schema dataSchema = (Schema) properties.schema.schema.getValue();
+        Schema dataSchema = properties.schema.schema.getValue();
         return new JiraReader(this, hostPort, resourcePath, userId, password, sharedParameters, dataSchema, container);
     }
-    
+
     /**
      * Builds and returns resource path
      * 
      * @return resource path
      */
     String getResourcePath() {
-        String resourceType = properties.resource.getStringValue();
+        JiraResource resourceType = properties.resource.getValue();
         String resourcePath = null;
         switch (resourceType) {
-        case TJiraInputProperties.ISSUE: {
+        case ISSUE: {
             resourcePath = REST_VERSION + "search";
             break;
         }
-        case TJiraInputProperties.PROJECT: {
+        case PROJECT: {
             resourcePath = REST_VERSION + "project";
             // TODO Add project id /{projectIdOrKey}
             break;

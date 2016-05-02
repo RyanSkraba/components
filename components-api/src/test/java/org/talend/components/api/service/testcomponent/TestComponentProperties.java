@@ -17,6 +17,7 @@ import static org.talend.daikon.properties.presentation.Widget.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -33,7 +34,6 @@ import org.talend.components.api.service.testcomponent.nestedprop.inherited.Inhe
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.Property;
-import org.talend.daikon.properties.Property.Type;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
@@ -49,31 +49,31 @@ public class TestComponentProperties extends ComponentProperties implements Comp
 
     public Form restoreForm;
 
-    public Property mainOutput = newSchema("mainOutput");
+    public Property<Schema> mainOutput = newSchema("mainOutput");
 
     public PresentationItem testPI = new PresentationItem("testPI", "testPI display name");
 
-    public Property userId = newProperty(USER_ID_PROP_NAME).setRequired(true);
+    public Property<String> userId = newProperty(USER_ID_PROP_NAME).setRequired(true);
 
-    public Property password = newProperty("password").setRequired(true)
+    public Property<String> password = newProperty("password").setRequired(true)
             .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
-    public Property nameList = newProperty("nameList");
+    public Property<String> nameList = newProperty("nameList");
 
-    public Property nameListRef = newProperty("nameListRef");
+    public Property<String> nameListRef = newProperty("nameListRef");
 
-    public Property integer = newProperty(Type.INT, "integer");
+    public Property<Integer> integer = newInteger("integer");
 
-    public Property decimal = newProperty(Type.INT, "decimal");
+    public Property<Integer> decimal = newInteger("decimal");
 
-    public Property date = newProperty(Type.DATE, "date");
+    public Property<Date> date = newDate("date");
 
-    public Property dateTime = newProperty(Type.DATETIME, "dateTime");
+    public Property<Date> dateTime = newDate("dateTime");
 
     // Used in testing refreshLayout
-    public Property suppressDate = newProperty(Type.BOOLEAN, "suppressDate");
+    public Property<Boolean> suppressDate = newBoolean("suppressDate");
 
-    public Property initLater = null;
+    public Property<String> initLater = null;
 
     public NestedComponentProperties nestedInitLater = null;
 
@@ -157,7 +157,7 @@ public class TestComponentProperties extends ComponentProperties implements Comp
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals("restoreTest")) {
-            if (suppressDate.getBooleanValue()) {
+            if (suppressDate.getValue()) {
                 form.getWidget("date").setHidden(true);
             }
         }
@@ -166,8 +166,9 @@ public class TestComponentProperties extends ComponentProperties implements Comp
     @Override
     public Schema getSchema(Connector connector, boolean isOutputConnection) {
         if (connector instanceof PropertyPathConnector) {
-            Property property = getValuedProperty(((PropertyPathConnector) connector).getPropertyPath());
-            return property.getType() == Type.SCHEMA ? (Schema) property.getValue() : null;
+            Property<?> property = getValuedProperty(((PropertyPathConnector) connector).getPropertyPath());
+            return Schema.class.isAssignableFrom(((Class<?>) property.getTypeLiteral().getType())) ? (Schema) property.getValue()
+                    : null;
         } else {// not a connector handled by this class
             return null;
         }

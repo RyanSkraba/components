@@ -27,7 +27,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.avro.Schema;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuilderFactory;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
@@ -297,7 +297,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl<ComponentPropert
         // forEach(line -> mvnUris.add(parseMvnUri(line)));
         while (reader.ready()) {
             String line = reader.readLine();
-            if ((StringUtils.countMatches(line, ":") > 3) && !line.endsWith("test")) {
+            if ((org.apache.commons.lang3.StringUtils.countMatches(line, ":") > 3) && !line.endsWith("test")) {
                 mvnUris.add(parseMvnUri(line));
             } // else not an expected dependencies so ignor it.
         }

@@ -27,14 +27,14 @@ import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
 
-    public Property bulkFilePath = newProperty("bulkFilePath");
+    public Property<String> bulkFilePath = newProperty("bulkFilePath");
 
     public SalesforceBulkProperties bulkProperties = new SalesforceBulkProperties("bulkProperties");
 
     public TSalesforceBulkExecProperties(String name) {
         super(name);
     }
-    
+
     @Override
     public void setupLayout() {
         super.setupLayout();
@@ -45,22 +45,22 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
         advancedForm.addRow(widget(bulkProperties.getForm(Form.MAIN).setName("bulkProperties")));
         advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.WidgetType.TABLE));
     }
-    
+
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        
-        if(Form.ADVANCED.equals(form.getName())) {
-        	form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
-        	form.getChildForm(connection.getName()).getWidget(connection.httpChunked.getName()).setHidden(true);
-        	form.getWidget(upsertRelationTable.getName()).setHidden(true);
+
+        if (Form.ADVANCED.equals(form.getName())) {
+            form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
+            form.getChildForm(connection.getName()).getWidget(connection.httpChunked.getName()).setHidden(true);
+            form.getWidget(upsertRelationTable.getName()).setHidden(true);
         }
     }
-    
+
     @Override
     public void setupProperties() {
         super.setupProperties();
-        
+
         connection.bulkConnection.setValue(true);
         connection.httpChunked.setValue(false);
         upsertRelationTable.setUsePolymorphic(true);
