@@ -50,7 +50,6 @@ import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
-import org.talend.daikon.properties.service.PropertiesServiceTest;
 import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
 
@@ -231,7 +230,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         // check name i18n
         NamedThing nameProp = connFormWizard.getWidget("name").getContent(); //$NON-NLS-1$
         assertEquals("Name", nameProp.getDisplayName());
-        connProps = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), connFormWizard,
+        connProps = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), connFormWizard,
                 "testConnection", connProps);
         assertTrue(connFormWizard.isAllowForward());
 
@@ -318,7 +317,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
     public void testLogin() throws Throwable {
         SalesforceConnectionProperties props = setupProps(null, !ADD_QUOTES);
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
-        props = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), f,
+        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f,
                 "testConnection", props);
         System.out.println(props.getValidationResult());
         assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
@@ -328,7 +327,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
     public void testLoginWithQuotes() throws Throwable {
         SalesforceConnectionProperties props = setupProps(null, ADD_QUOTES);
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
-        props = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), f,
+        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f,
                 "testConnection", props);
         System.out.println(props.getValidationResult());
         assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
@@ -339,7 +338,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         SalesforceConnectionProperties props = setupProps(null, !ADD_QUOTES);
         props.userPassword.userId.setValue("blah");
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
-        props = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), f,
+        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f,
                 "testConnection", props);
         System.out.println(props.getValidationResult());
         assertEquals(ValidationResult.Result.ERROR, props.getValidationResult().getStatus());
@@ -350,7 +349,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         SalesforceConnectionProperties props = setupProps(null, !ADD_QUOTES);
         props.bulkConnection.setValue(true);
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
-        props = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), f,
+        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f,
                 "testConnection", props);
         assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
         System.out.println(props.getValidationResult());
@@ -361,7 +360,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         SalesforceConnectionProperties props = setupProps(null, ADD_QUOTES);
         props.bulkConnection.setValue(true);
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
-        props = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), f,
+        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f,
                 "testConnection", props);
         assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
         System.out.println(props.getValidationResult());
@@ -388,7 +387,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
     public void testOAuthLogin() throws Throwable {
         SalesforceConnectionProperties props = setupOAuthProps(null);
         Form f = props.getForm(Form.MAIN);
-        props = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), f,
+        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f,
                 "testConnection", props);
         assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
         System.out.println(props.getValidationResult());
@@ -400,7 +399,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         SalesforceConnectionProperties props = setupOAuthProps(null);
         props.bulkConnection.setValue(true);
         Form f = props.getForm(Form.MAIN);
-        props = (SalesforceConnectionProperties) PropertiesServiceTest.checkAndValidate(getComponentService(), f,
+        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f,
                 "testConnection", props);
         assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
         System.out.println(props.getValidationResult());
@@ -420,7 +419,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         // properties object
         // they came from.
         ComponentProperties moduleProps = (ComponentProperties) f.getProperties();
-        moduleProps = (ComponentProperties) PropertiesServiceTest.checkAndBeforeActivate(getComponentService(), f, "moduleName",
+        moduleProps = (ComponentProperties) PropertiesTestUtils.checkAndBeforeActivate(getComponentService(), f, "moduleName",
                 moduleProps);
         Property prop = (Property) f.getWidget("moduleName").getContent();
         assertTrue(prop.getPossibleValues().size() > 100);
@@ -436,7 +435,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
         Form f = props.module.getForm(Form.REFERENCE);
         SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
-        moduleProps = (SalesforceModuleProperties) PropertiesServiceTest.checkAndBeforeActivate(getComponentService(), f,
+        moduleProps = (SalesforceModuleProperties) PropertiesTestUtils.checkAndBeforeActivate(getComponentService(), f,
                 "moduleName", moduleProps);
         moduleProps.moduleName.setValue("Account");
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
