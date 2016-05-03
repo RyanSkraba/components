@@ -110,7 +110,7 @@ public class TSplunkEventCollectorProperties extends FixedConnectorsComponentPro
     }
 
     public void afterExtendedOutput() {
-        getForm(Form.ADVANCED).getWidget(eventsBatchSize.getName()).setVisible(extendedOutput.getBooleanValue());
+        getForm(Form.ADVANCED).getWidget(eventsBatchSize.getName()).setHidden(!extendedOutput.getBooleanValue());
     }
 
     public Schema getSchema() {

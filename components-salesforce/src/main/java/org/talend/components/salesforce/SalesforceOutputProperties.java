@@ -60,7 +60,11 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
     //
     // Collections
     //
+    protected transient PropertyPathConnector FLOW_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schemaFlow");
+
     protected transient PropertyPathConnector REJECT_CONNECTOR = new PropertyPathConnector(Connector.REJECT_NAME, "schemaReject");
+
+    public SchemaProperties schemaFlow = new SchemaProperties("schemaFlow"); //$NON-NLS-1$
 
     public SchemaProperties schemaReject = new SchemaProperties("schemaReject"); //$NON-NLS-1$
 
@@ -134,7 +138,6 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
 
         Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(widget(upsertRelation).setWidgetType(Widget.WidgetType.TABLE));
-        advancedForm.addRow(widget(schemaReject.getForm(Form.REFERENCE).setName("SchemaReject").setTitle("Schema Reject")));// TODO
         // check
         // I18N
     }
@@ -160,14 +163,14 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        HashSet<PropertyPathConnector> connectors = new HashSet<>();
         if (isOutputConnection) {
-            HashSet<PropertyPathConnector> ouputConnectors = new HashSet<>();
-            ouputConnectors.add(MAIN_CONNECTOR);
-            ouputConnectors.add(REJECT_CONNECTOR);
-            return ouputConnectors;
+            connectors.add(FLOW_CONNECTOR);
+            connectors.add(REJECT_CONNECTOR);
         } else {
-            return Collections.EMPTY_SET;
+            connectors.add(MAIN_CONNECTOR);
         }
+        return connectors;
     }
 
     protected List<String> getFieldNames(Property schema) {

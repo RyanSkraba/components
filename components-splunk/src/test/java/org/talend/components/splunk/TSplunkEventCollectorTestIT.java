@@ -1,8 +1,6 @@
 package org.talend.components.splunk;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,14 +56,14 @@ public class TSplunkEventCollectorTestIT extends TSplunkEventCollectorTestBase {
         Property extendedOutput = (Property) props.getProperty("extendedOutput");
         assertEquals(true, extendedOutput.getValue());
         Form advForm = props.getForm(Form.ADVANCED);
-        assertTrue(advForm.getWidget("eventsBatchSize").isVisible());
+        assertFalse(advForm.getWidget("eventsBatchSize").isHidden());
 
         extendedOutput.setValue(false);
         props = checkAndAfter(advForm, "extendedOutput", props);
         advForm = props.getForm(Form.ADVANCED);
         assertTrue(advForm.isRefreshUI());
 
-        assertFalse(advForm.getWidget("eventsBatchSize").isVisible());
+        assertTrue(advForm.getWidget("eventsBatchSize").isHidden());
     }
 
     @Test

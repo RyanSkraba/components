@@ -12,17 +12,22 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
+import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.widget;
+
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.SchemaBuilder.FieldAssembler;
+import org.apache.avro.SchemaBuilder.FieldBuilder;
+import org.apache.avro.SchemaBuilder.RecordBuilder;
+import org.talend.components.salesforce.ISchemaListener;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.talend6.Talend6SchemaConstants;
-
-import static org.talend.daikon.properties.PropertyFactory.*;
-import static org.talend.daikon.properties.presentation.Widget.widget;
 
 public class TSalesforceOutputProperties extends SalesforceOutputProperties {
 
@@ -50,6 +55,64 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
     public void setupProperties() {
         super.setupProperties();
         upsertKeyColumn.setType(Property.Type.ENUM);
+
+        module.setSchemaListener(new ISchemaListener() {
+
+            @Override
+            public void afterSchema() {
+                updateOutputSchemas();
+                beforeUpsertKeyColumn();
+                beforeUpsertRelation();
+            }
+        });
+    }
+
+    private void updateOutputSchemas() {
+        // get the main schema (input one)
+        Schema inputSchema = (Schema) module.main.schema.getValue();
+        if (!extendInsert.getBooleanValue() && retrieveInsertId.getBooleanValue()
+                && ACTION_INSERT.equals(outputAction.getValue())) {
+
+            Schema mainOutputSchema = createRecordBuilderFromSchema(inputSchema, "output").name("salesforce_id")
+                        .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
+                        .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
+                        .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
+                        .type().stringType().noDefault().endRecord();
+
+            schemaFlow.schema.setValue(mainOutputSchema);
+        } else {
+            schemaFlow.schema.setValue(inputSchema);
+        }
+
+        Schema rejectSchema = createRecordBuilderFromSchema(inputSchema, "rejectOutput").name("errorCode") //$NON-NLS-1$  //$NON-NLS-2$
+                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
+                // column set as non-read-only, to let the user edit the field if needed
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
+                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
+                .type().stringType().noDefault().name("errorFields")//$NON-NLS-1$
+                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
+                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
+                .type().stringType().noDefault().name("errorMessage")//$NON-NLS-1$
+                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
+                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
+                .type().stringType().noDefault().endRecord();
+
+        schemaReject.schema.setValue(rejectSchema);
+    }
+    
+    private FieldAssembler<Schema> createRecordBuilderFromSchema(Schema inputSchema, String newSchemaName) {
+        RecordBuilder<Schema> recordBuilder = SchemaBuilder.record(newSchemaName);
+        FieldAssembler<Schema> fieldAssembler = recordBuilder.fields();
+        for (Field field : inputSchema.getFields()) {
+            FieldBuilder<Schema> fieldBuilder = fieldAssembler.name(field.name());
+            for (String propName : field.getObjectProps().keySet()) {
+                fieldBuilder.prop(propName, field.getObjectProps().get(propName).toString());
+            }
+            fieldAssembler = fieldBuilder.type().stringType().noDefault();
+        }
+        return fieldAssembler;
     }
 
     @Override
@@ -67,10 +130,12 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
 
     public void afterExtendInsert() {
         refreshLayout(getForm(Form.ADVANCED));
+        updateOutputSchemas();
     }
 
     public void afterRetrieveInsertId() {
         refreshLayout(getForm(Form.ADVANCED));
+        updateOutputSchemas();
     }
 
     @Override
@@ -81,47 +146,12 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
 
             form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
             form.getChildForm(connection.getName()).getWidget(connection.httpTraceMessage.getName()).setHidden(true);
-
-            if (!extendInsert.getBooleanValue() && retrieveInsertId.getBooleanValue()
-                    && ACTION_INSERT.equals(outputAction.getValue())) {
-                Schema s = SchemaBuilder.record("Main")
-                        .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//$NON-NLS-1$
-                        .fields().name("salesforce_id")
-                        .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
-                        .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
-                        .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
-                        .type().stringType().noDefault().endRecord();
-                module.main.schema.setValue(s);
-            }
             form.getWidget("commitLevel").setHidden(!extendInsert.getBooleanValue());
-            form.getWidget("retrieveInsertId")
-                    .setHidden(extendInsert.getBooleanValue() && ACTION_INSERT.equals(outputAction.getValue()));
-            form.getWidget("ignoreNull")
-                    .setHidden(!ACTION_UPDATE.equals(outputAction.getValue()) || ACTION_UPSERT.equals(outputAction.getValue()));
-
+            form.getWidget("retrieveInsertId").setHidden(
+                    extendInsert.getBooleanValue() && ACTION_INSERT.equals(outputAction.getValue()));
+            form.getWidget("ignoreNull").setHidden(
+                    !ACTION_UPDATE.equals(outputAction.getValue()) || ACTION_UPSERT.equals(outputAction.getValue()));
         }
-    }
-
-    @Override
-    protected void setupRejectSchema() {
-        Schema s = SchemaBuilder.record("Reject")
-                // record set as read only for talend schema
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//$NON-NLS-1$
-                .fields().name("errorCode") //$NON-NLS-1$  //$NON-NLS-2$
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
-                // column set as non-read-only, to let the user edit the field if needed
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
-                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
-                .type().stringType().noDefault().name("errorFields")//$NON-NLS-1$
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
-                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
-                .type().stringType().noDefault().name("errorMessage")//$NON-NLS-1$
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
-                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
-                .type().stringType().noDefault().endRecord();
-        schemaReject.schema.setValue(s);
     }
 
 }
