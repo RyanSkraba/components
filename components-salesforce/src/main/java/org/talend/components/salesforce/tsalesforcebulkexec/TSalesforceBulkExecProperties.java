@@ -21,6 +21,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.talend.components.salesforce.SalesforceBulkProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
@@ -83,12 +84,11 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
     protected void setupRejectSchema() {
         Schema s = SchemaBuilder.record("Reject")
                 // record set as read only for talend schema
-                .prop(Talend6SchemaConstants.TALEND6_IS_READ_ONLY, "true")//$NON-NLS-1$
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//$NON-NLS-1$
                 .fields().name("error")//$NON-NLS-1$
                 .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
-                .prop(Talend6SchemaConstants.TALEND6_IS_READ_ONLY, "false")//$NON-NLS-1$
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_TALEND_TYPE, "id_String")//$NON-NLS-1$
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_LENGTH, "255")//$NON-NLS-1$
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
+                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
                 .type().stringType().noDefault().endRecord();
         schemaReject.schema.setValue(s);
     }

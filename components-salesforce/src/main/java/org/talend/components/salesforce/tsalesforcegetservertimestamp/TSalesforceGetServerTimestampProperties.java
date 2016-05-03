@@ -48,11 +48,9 @@ public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComp
     public void setupProperties() {
         super.setupProperties();
         Schema s = SchemaBuilder.record("Main")
-                .prop(Talend6SchemaConstants.TALEND6_IS_READ_ONLY, "true")//$NON-NLS-1$
                 .fields().name("ServerTimeStamp")
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_TALEND_TYPE, "id_Date")//$NON-NLS-1$
                 .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'")
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_LENGTH, "20")//$NON-NLS-1$
+                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "20")//$NON-NLS-1$
                 .type(AvroTypes._date()).noDefault().endRecord();
         schema.schema.setValue(s);
     }
