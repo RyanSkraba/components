@@ -36,6 +36,8 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
 
 	@Override
 	public String[] getHeaders(Schema schema) {
+		TSalesforceOutputBulkProperties salesforceBulkProperties = (TSalesforceOutputBulkProperties)bulkProperties;
+		
 		List<String> headers = new ArrayList<String>();
 		StringBuilder sbuilder = new StringBuilder();
         for(Schema.Field f :schema.getFields()){
@@ -47,14 +49,14 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
         		header = sbuilder.append(ref_module_name).append(":").append(ref_field_name).append(".").append(f.name()).toString();
         		sbuilder.setLength(0);
         	} else {
-        		int index = getIndex(header);
+        		int index = getIndex((List<String>)salesforceBulkProperties.upsertRelationTable.columnName.getValue(), header);
             	if(index > -1) {
-            		List<Boolean> polymorphics = null;//TODO
-            		List<String> lookupFieldModuleNames = null;//TODO
-            		List<String> lookupFieldNames = null;//TODO
-            		List<String> externalIdFromLookupFields = null;//TODO
+            		List<String> polymorphics = (List<String>)salesforceBulkProperties.upsertRelationTable.polymorphic.getValue();
+            		List<String> lookupFieldModuleNames = (List<String>)salesforceBulkProperties.upsertRelationTable.lookupFieldModuleName.getValue();
+            		List<String> lookupFieldNames = (List<String>)salesforceBulkProperties.upsertRelationTable.lookupFieldName.getValue();
+            		List<String> externalIdFromLookupFields = (List<String>)salesforceBulkProperties.upsertRelationTable.lookupFieldExternalIdName.getValue();
             		
-            		if(polymorphics.get(index)) {
+            		if("true".equals(polymorphics.get(index))) {
             			sbuilder.append(lookupFieldModuleNames.get(index)).append(":");
             		}
             		sbuilder.append(lookupFieldNames.get(index)).append(".").append(externalIdFromLookupFields.get(index));
@@ -68,8 +70,7 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
         return headers.toArray(new String[headers.size()]);
 	}
 	
-	private int getIndex(String columnName) {
-		List<String> columnNames = null;//TODO
+	private int getIndex(List<String> columnNames, String columnName) {
 		if(columnNames == null) {
 			return -1;
 		}

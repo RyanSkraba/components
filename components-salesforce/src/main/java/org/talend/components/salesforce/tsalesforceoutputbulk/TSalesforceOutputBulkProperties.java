@@ -16,11 +16,12 @@ import static org.talend.daikon.properties.PropertyFactory.newProperty;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.avro.Schema;
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.BulkFileProperties;
 import org.talend.components.salesforce.UpsertRelationTable;
-import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
@@ -43,6 +44,10 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
         upsertRelationTable.setUsePolymorphic(true);
         ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_LINE"); //$NON-NLS-1$        
     }
+    
+    public void beforeUpsertRelationTable() {
+        upsertRelationTable.columnName.setPossibleValues(getFieldNames(schema.schema));
+    }
 
     @Override
     public void setupLayout() {
@@ -57,6 +62,16 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
 
         Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.WidgetType.TABLE));
+    }
+    
+    protected List<String> getFieldNames(Property schema) {
+        String sJson = schema.getStringValue();
+        Schema s = new Schema.Parser().parse(sJson);
+        List<String> fieldNames = new ArrayList<>();
+        for (Schema.Field f : s.getFields()) {
+            fieldNames.add(f.name());
+        }
+        return fieldNames;
     }
 
 }
