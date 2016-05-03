@@ -68,7 +68,13 @@ public class TDataSetInputSource implements BoundedSource {
     }
 
     public ValidationResult validate(RuntimeContainer container) {
-        if (getConnectionHandler().validate())
+        boolean validate;
+        try {
+            validate = getConnectionHandler().validate();
+        } catch (IOException e) {
+            validate = false;
+        }
+        if (validate)
             return ValidationResult.OK;
         else
             return new ValidationResult().setStatus(ValidationResult.Result.ERROR);

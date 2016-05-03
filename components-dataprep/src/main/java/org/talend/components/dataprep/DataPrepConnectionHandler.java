@@ -52,33 +52,23 @@ public class DataPrepConnectionHandler {
         this.dataSetName = dataSetName;
     }
 
-    HttpResponse connect() {
+    HttpResponse connect() throws IOException {
         Request request = Request.Post(url+"/login?username="+login+"&password="+pass);
-        HttpResponse response = null;
-        try {
-            response = request.execute().returnResponse();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        HttpResponse response = request.execute().returnResponse();
         authorisationHeader = response.getFirstHeader("Authorization");
         return response;
     }
 
-    HttpResponse logout(){
+    HttpResponse logout() throws IOException {
         Request request = Request.Post(url+"/logout").addHeader(authorisationHeader);
-        try {
-            return request.execute().returnResponse();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return request.execute().returnResponse();
     }
 
     private int returnStatusCode(HttpResponse response) {
         return response.getStatusLine().getStatusCode();
     }
 
-    boolean validate() {
+    boolean validate() throws IOException {
         int statusLogin = 0;
         int statusLogout = 0;
         statusLogin = returnStatusCode(connect());
@@ -89,30 +79,23 @@ public class DataPrepConnectionHandler {
             return false;
     }
 
-    List<Map<String,String>> readDataSet() {
+    List<Map<String,String>> readDataSet() throws IOException {
         Request request = Request.Get(url+ "/api/datasets/" + dataSetName + "?metadata=false").
                 addHeader(authorisationHeader);
         HttpResponse current = null;
         try {
             current = request.execute().returnResponse();
-        } catch (IOException e) {
-            e.printStackTrace();
         } finally {
             logout();
         }
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES,
                 false);
-        SourceDataSet dataSet = null;
-        try {
-            dataSet = objectMapper.readValue(current.getEntity().getContent(), SourceDataSet.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SourceDataSet dataSet = objectMapper.readValue(current.getEntity().getContent(), SourceDataSet.class);
         return dataSet.getRecords();
     }
 
-    void create(String data) {
+    void create(String data) throws IOException {
         int index = dataSetName.lastIndexOf("/");
         String setName = dataSetName.substring(index);
         String folderName = dataSetName.substring(0,index);
@@ -120,14 +103,10 @@ public class DataPrepConnectionHandler {
         Request request = Request.Post(url+"/api/datasets?name=" + setName + "&folderPath="+folderName);
         request.addHeader(authorisationHeader);
         request.bodyString(data ,ContentType.create(ContentType.TEXT_PLAIN.getMimeType(), StandardCharsets.UTF_8));
-        try {
-            request.execute();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        request.execute();
     }
 
-    List<Column> readSourceSchema() {
+    List<Column> readSourceSchema() throws IOException {
         Request request = Request.Get(url +"/api/datasets/"+ dataSetName + "/metadata");
         request.addHeader(authorisationHeader);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -136,17 +115,10 @@ public class DataPrepConnectionHandler {
         String test = null;
         try {
             test = request.execute().returnContent().asString();
-        } catch (IOException e) {
-            e.printStackTrace();
         } finally {
             logout();
         }
-        MetaData metaData = null;
-        try {
-            metaData = objectMapper.readValue(test, MetaData.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        MetaData metaData = objectMapper.readValue(test, MetaData.class);
         return metaData.getColumns();
     }
 

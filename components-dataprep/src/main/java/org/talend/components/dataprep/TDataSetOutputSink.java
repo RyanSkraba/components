@@ -48,7 +48,13 @@ public class TDataSetOutputSink implements Sink {
         DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(properties.url.getStringValue(),
                 properties.login.getStringValue(), properties.pass.getStringValue(),
                 "read", properties.dataSetName.getStringValue());
-        if (connectionHandler.validate())
+        boolean validate;
+        try {
+            validate = connectionHandler.validate();
+        } catch (IOException e) {
+            validate = false;
+        }
+        if (validate)
             return ValidationResult.OK;
         else
             return new ValidationResult().setStatus(ValidationResult.Result.ERROR);

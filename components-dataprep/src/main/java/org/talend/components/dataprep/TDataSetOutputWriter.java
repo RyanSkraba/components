@@ -39,7 +39,7 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
                          DataPrepConnectionHandler connectionHandler, int limit) {
         this.writeOperation = writeOperation;
         this.connectionHandler = connectionHandler;
-        this.limit = limit++;
+        this.limit = limit;
     }
 
     @Override
@@ -50,7 +50,7 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
 
     @Override
     public void write(Object datum) {
-        if (datum == null) {
+        if (datum == null || counter >= limit) {
             return;
         } // else handle the data.
         IndexedRecord input = getFactory(datum).convertToAvro(datum);
@@ -64,7 +64,6 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
                 row.append(String.valueOf(f.name()));
             }
             row.append("\n");
-            counter++;
             firstRow = false;
         }
         for (Schema.Field f : input.getSchema().getFields()) {
@@ -73,17 +72,15 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
                     row.append(",");
                 }
                 row.append(String.valueOf(input.get(f.pos())));
-                counter++;
             }
         }
-        if (counter <= limit) {
-            data.append(row);
-            data.append("\n");
-        }
+        data.append(row);
+        data.append("\n");
+        counter++;
     }
 
     @Override
-    public WriterResult close() {
+    public WriterResult close() throws IOException {
         connectionHandler.create(data.toString());
         connectionHandler.logout();
         return new WriterResult(uId, counter);
