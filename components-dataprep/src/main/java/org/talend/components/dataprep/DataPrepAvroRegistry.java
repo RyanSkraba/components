@@ -22,7 +22,7 @@ public class DataPrepAvroRegistry extends AvroRegistry {
 
     private DataPrepAvroRegistry() {
 
-        // Ensure that we know how to get Schemas for these Salesforce objects.
+        // Ensure that we know how to get Schemas for these DataPrep objects.
         registerSchemaInferrer(DataPrepField[].class, new SerializableFunction<DataPrepField[], Schema>() {
 
             /** Default serial version UID. */
@@ -62,7 +62,7 @@ public class DataPrepAvroRegistry extends AvroRegistry {
     }
 
     /**
-     * Infers an Avro schema for the given DescribeSObjectResult. This can be an expensive operation so the schema
+     * Infers an Avro schema for the given DataPrep row. This can be an expensive operation so the schema
      * should be cached where possible. This is always an {@link Schema.Type#RECORD}.
      *
      * @param in the DescribeSObjectResult to analyse.
@@ -78,15 +78,13 @@ public class DataPrepAvroRegistry extends AvroRegistry {
                 case "date":
                     avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd");
                     break;
-//                case datetime:
-//                    avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'");
-//                    break;
+                //TODO add right handling Date type
                 default:
                     break;
             }
             fields.add(avroField);
         }
-        return Schema.createRecord("Null", null, null, false, fields); //What name should I put here?
+        return Schema.createRecord("Null", null, null, false, fields);
     }
 
     /**
@@ -106,16 +104,9 @@ public class DataPrepAvroRegistry extends AvroRegistry {
             case "double":
                 base = AvroTypes._double();
                 break;
-//            case "numeric":
-//                break;
-//            case "any":
-//                break;
             case "integer":
                 base = AvroTypes._int();
                 break;
-//            case "date":
-//                base = AvroTypes._date();
-//                break;
             case "float":
                 base = AvroTypes._float();
                 break;
@@ -123,17 +114,18 @@ public class DataPrepAvroRegistry extends AvroRegistry {
                 base = AvroTypes._string();
                 break;
         }
-//        base = field.getNillable() ? AvroUtils.wrapAsNullable(base) : base;
+
+        //TODO add handling for numeric, any and date.
 
         return base;
     }
 
     /**
-     * A helper method to convert the String representation of a datum in the Salesforce system to the Avro type that
+     * A helper method to convert the String representation of a datum in the DataPrep system to the Avro type that
      * matches the Schema generated for it.
      *
-     * @param f
-     * @return
+     * @param f is field in Avro Schema.
+     * @return converter for a given type.
      */
     public AvroConverter<String, ?> getConverterFromString(org.apache.avro.Schema.Field f) {
         Schema fieldSchema = AvroUtils.unwrapIfNullable(f.schema());
