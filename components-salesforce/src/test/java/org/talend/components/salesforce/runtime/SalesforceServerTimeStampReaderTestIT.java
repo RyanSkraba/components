@@ -43,7 +43,9 @@ public class SalesforceServerTimeStampReaderTestIT extends SalesforceTestBase {
             assertFalse(bounderReader.advance());
             Object row = bounderReader.getCurrent();
             assertNotNull(row);
-            return (Calendar) row;
+            Calendar ms = Calendar.getInstance();
+            ms.setTimeInMillis((Long)row);
+            return ms;
         } finally {
             bounderReader.close();
         }
