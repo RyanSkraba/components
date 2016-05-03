@@ -53,7 +53,7 @@ public class JiraReaderTest {
     public void startTest() throws IOException {
         String testUrl = "http://localhost:8080/";
         String testResource = "rest/api/2/issue/TP-1";
-        Reader<IndexedRecord> jiraReader = new JiraReader(null, testUrl, testResource, USER, PASS, Collections.EMPTY_MAP);
+        Reader<IndexedRecord> jiraReader = new JiraReader(null, testUrl, testResource, USER, PASS, Collections.EMPTY_MAP, null);
 
         boolean started = jiraReader.start();
         jiraReader.close();
@@ -76,7 +76,7 @@ public class JiraReaderTest {
         parameters.put("jql", "project=TP");
         parameters.put("maxResults", "10");
         
-        Reader<IndexedRecord> jiraReader = new JiraReader(null, testUrl, testResource, USER, PASS, parameters);
+        Reader<IndexedRecord> jiraReader = new JiraReader(null, testUrl, testResource, USER, PASS, parameters, null);
 
         for (boolean hasNext = jiraReader.start(); hasNext; hasNext = jiraReader.advance()) {
             System.out.println(jiraReader.getCurrent().get(0));
@@ -92,7 +92,7 @@ public class JiraReaderTest {
      */
     @Test
     public void getEntitiesTest() throws Exception {
-        JiraReader jiraReader = new JiraReader(null, null, null, null, null, Collections.EMPTY_MAP);
+        JiraReader jiraReader = new JiraReader(null, null, null, null, null, Collections.EMPTY_MAP, null);
         String jsonFile = "src/test/resources/org/talend/components/jira/runtime/entities.json";
         String testJson = Utils.readFile(jsonFile);
 

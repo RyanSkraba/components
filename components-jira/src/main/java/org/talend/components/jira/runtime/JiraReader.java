@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.joda.time.Instant;
 import org.slf4j.Logger;
@@ -32,7 +33,6 @@ import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * Jira reader implementation
@@ -99,6 +99,11 @@ public class JiraReader implements Reader<IndexedRecord> {
      * Stores http query parameters which are shared between requests
      */
     private Map<String, String> sharedParameters;
+    
+    /**
+     * Data schema
+     */
+    private Schema schema;
 
     /**
      * Constructor sets required properties for http connection
@@ -109,13 +114,15 @@ public class JiraReader implements Reader<IndexedRecord> {
      * @param user Basic authorization user id
      * @param password Basic authorizatiion password
      * @param sharedParameters map with http parameter which are shared between requests. It could include maxResult
+     * @param Schema data schema
      * parameter
      */
     public JiraReader(JiraSource source, String hostPort, String resource, String user, String password,
-            Map<String, String> sharedParameters) {
+            Map<String, String> sharedParameters, Schema schema) {
         this.source = source;
         this.resource = resource;
         this.sharedParameters = sharedParameters;
+        this.schema = schema;
         rest = new Rest(hostPort);
         rest.setCredentials(user, password);
         
@@ -201,6 +208,7 @@ public class JiraReader implements Reader<IndexedRecord> {
     private IndexedRecordAdapterFactory<String, IssueIndexedRecord> getFactory() {
         if (factory == null) {
             factory = new IssueAdapterFactory();
+            factory.setSchema(schema);
         }
         return factory;
     }

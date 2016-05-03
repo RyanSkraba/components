@@ -12,38 +12,55 @@
 // ============================================================================
 package org.talend.components.jira.avro;
 
-import java.util.Collections;
-
 import org.apache.avro.Schema;
-import org.apache.avro.Schema.Field.Order;
 import org.apache.avro.generic.IndexedRecord;
 
 /**
- * created by ivan.honchar on Apr 25, 2016
+ * Jira {@link IndexedRecord}
  */
 public class IssueIndexedRecord implements IndexedRecord{
+    
+    /**
+     * Avro schema of this {@link IndexedRecord}
+     */
+    private Schema schema;
     
     /**
      * Jira JSON string
      */
     private String jsonString;
     
-    public IssueIndexedRecord(String json) {
+    /**
+     * Constructor sets JSON data and schema of this record
+     * 
+     * @param json JSON data
+     * @param schema schema of this record
+     */
+    public IssueIndexedRecord(String json, Schema schema) {
         this.jsonString = json;
-    }
-
-    @Override
-    public Schema getSchema() {
-        Schema.Field jsonField = new Schema.Field("json", Schema.create(Schema.Type.STRING), null, null, Order.ASCENDING);
-        return Schema.createRecord("issue", null, null, false, Collections.singletonList(jsonField));
+        this.schema = schema;
     }
 
     /**
-     * TODO implement it correctly
+     * Returns schema of this {@link IndexedRecord}
+     * 
+     * @return schema of this {@link IndexedRecord}
      */
     @Override
-    public void put(int i, Object json) {
-        if(i != 0) {
+    public Schema getSchema() {
+        return schema;
+    }
+
+    /**
+     * Puts JSON data to this record in the 1st column.
+     * Index parameter value could be only 0
+     * 
+     * @param index index of column to put field value
+     * @param json data
+     */
+    @Override
+    public void put(int index, Object json) {
+        if(index != 0) {
             throw new IndexOutOfBoundsException("index argument should be 0");
         }
         if(json instanceof String )
@@ -53,11 +70,15 @@ public class IssueIndexedRecord implements IndexedRecord{
     }
 
     /**
-     * TODO implement it correctly
+     * Returns field value of specified by index parameter column
+     * Index parameter value could be only 0
+     * 
+     * @param index index of column to get field from
+     * @return field value
      */
     @Override
-    public Object get(int i) {
-        if(i != 0) {
+    public Object get(int index) {
+        if(index != 0) {
             throw new IndexOutOfBoundsException("index argument should be 0");
         }
         return jsonString;

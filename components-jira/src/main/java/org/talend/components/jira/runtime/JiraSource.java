@@ -13,14 +13,13 @@
 package org.talend.components.jira.runtime;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.avro.Schema;
-import org.apache.avro.Schema.Field.Order;
+import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.container.RuntimeContainer;
@@ -59,8 +58,7 @@ public class JiraSource implements Source {
     }
 
     /**
-     * What should I validate here? validate connection to Jira here TODO implement it
-     * 
+     * TODO implement it
      */
     @Override
     public ValidationResult validate(RuntimeContainer container) {
@@ -68,34 +66,37 @@ public class JiraSource implements Source {
     }
 
     /**
-     * TODO implement it
+     * {@inheritDoc}
+     * 
+     * Component doesn't retrieve schemas from {@link Source}. Static schema is used in UI.
      */
     @Override
     public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
-        List<NamedThing> schemaNames = new ArrayList<>();
-        return schemaNames;
+        return null;
     }
 
     /**
-     * TODO implement it
+     * {@inheritDoc}
+     * 
+     * Component doesn't retrieve schemas from {@link Source}. Static schema is used in UI
      */
     @Override
     public Schema getSchema(RuntimeContainer container, String schemaName) throws IOException {
-        Schema.Field jsonField = new Schema.Field("json", Schema.create(Schema.Type.STRING), null, null, Order.ASCENDING);
-        return Schema.createRecord("issue", null, null, false, Collections.singletonList(jsonField));
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Reader createReader(RuntimeContainer container) {
+    public Reader<IndexedRecord> createReader(RuntimeContainer container) {
         String hostPort = properties.host.getStringValue();
         String userId = properties.userPassword.userId.getStringValue();
         String password = properties.userPassword.password.getStringValue();
         String resourcePath = getResourcePath();
         Map<String, String> sharedParameters = getSharedParameters();
-        return new JiraReader(this, hostPort, resourcePath, userId, password, sharedParameters);
+        Schema dataSchema = (Schema) properties.schema.schema.getValue();
+        return new JiraReader(this, hostPort, resourcePath, userId, password, sharedParameters, dataSchema);
     }
     
     /**

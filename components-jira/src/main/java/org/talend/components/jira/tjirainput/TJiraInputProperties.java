@@ -16,10 +16,12 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field.Order;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.HasSchemaProperty;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.common.UserPasswordProperties;
+import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.PropertyFactory;
@@ -117,13 +119,14 @@ public class TJiraInputProperties extends ComponentProperties implements HasSche
     @Override
     public void setupProperties() {
         super.setupProperties();
+        setupSchema();
         host.setValue("\"https://localhost:8080/\"");
         resource.setValue(ISSUE);
         authorizationType.setValue(BASIC);
         jql.setValue("\"\"");
         batchSize.setValue("50");
     }
-    
+
     @Override
     public void setupLayout() {
         super.setupLayout();
@@ -188,6 +191,22 @@ public class TJiraInputProperties extends ComponentProperties implements HasSche
             }
             }
         }
+    }
+    
+    /**
+     * Sets initial value of schema property
+     */
+    void setupSchema() {
+
+        // get Schema for String class
+        AvroRegistry registry = new AvroRegistry();
+        Schema stringSchema = registry.getConverter(String.class).getSchema();
+
+        // create Schema for JSON
+        Schema.Field jsonField = new Schema.Field("json", stringSchema, null, null, Order.ASCENDING);
+        Schema initialSchema = Schema.createRecord("jira", null, null, false, Collections.singletonList(jsonField));
+
+        schema.schema.setValue(initialSchema);
     }
 
 }
