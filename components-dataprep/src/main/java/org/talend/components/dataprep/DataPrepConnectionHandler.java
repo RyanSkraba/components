@@ -141,7 +141,6 @@ public class DataPrepConnectionHandler {
         } finally {
             logout();
         }
-//        System.out.println(test);
         MetaData metaData = null;
         try {
             metaData = objectMapper.readValue(test, MetaData.class);

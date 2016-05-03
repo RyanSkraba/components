@@ -32,11 +32,14 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
     private DataPrepConnectionHandler connectionHandler;
     private boolean firstRow = true;
     private WriteOperation<WriterResult> writeOperation;
+    private int limit;
 
 
-    TDataSetOutputWriter(WriteOperation<WriterResult> writeOperation, DataPrepConnectionHandler connectionHandler) {
+    TDataSetOutputWriter(WriteOperation<WriterResult> writeOperation,
+                         DataPrepConnectionHandler connectionHandler, int limit) {
         this.writeOperation = writeOperation;
         this.connectionHandler = connectionHandler;
+        this.limit = limit++;
     }
 
     @Override
@@ -61,6 +64,7 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
                 row.append(String.valueOf(f.name()));
             }
             row.append("\n");
+            counter++;
             firstRow = false;
         }
         for (Schema.Field f : input.getSchema().getFields()) {
@@ -69,16 +73,17 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
                     row.append(",");
                 }
                 row.append(String.valueOf(input.get(f.pos())));
+                counter++;
             }
         }
-        data.append(row);
-        data.append("\n");
-        counter++;
+        if (counter <= limit) {
+            data.append(row);
+            data.append("\n");
+        }
     }
 
     @Override
     public WriterResult close() {
-        System.out.println(data.toString());
         connectionHandler.create(data.toString());
         connectionHandler.logout();
         return new WriterResult(uId, counter);

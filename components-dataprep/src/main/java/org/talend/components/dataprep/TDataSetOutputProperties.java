@@ -54,6 +54,7 @@ public class TDataSetOutputProperties extends FixedConnectorsComponentProperties
     public Property mode = PropertyFactory.newEnum("mode", "create", "update", "create&update");
     public SchemaProperties schema = new SchemaProperties("schema");
     protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
+    public Property limit = PropertyFactory.newString("limit", "100");
 
     public TDataSetOutputProperties(String name) {
         super(name);
@@ -74,6 +75,7 @@ public class TDataSetOutputProperties extends FixedConnectorsComponentProperties
         form.addRow(Widget.widget(pass).setWidgetType(Widget.WidgetType.HIDDEN_TEXT));
         form.addRow(mode);
         form.addRow(dataSetName);
+        form.addRow(limit);
     }
 
     public Schema getSchema() {

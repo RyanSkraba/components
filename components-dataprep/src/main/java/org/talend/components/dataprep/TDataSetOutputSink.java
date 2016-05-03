@@ -35,7 +35,7 @@ public class TDataSetOutputSink implements Sink {
             connectionHandler = new DataPrepConnectionHandler(properties.url.getStringValue(),
                     properties.login.getStringValue(), properties.pass.getStringValue(),
                     "create", properties.dataSetName.getStringValue());
-        return new TDataSetWriteOperation(this, connectionHandler);
+        return new TDataSetWriteOperation(this, connectionHandler, properties.limit.getIntValue());
     }
 
     @Override
