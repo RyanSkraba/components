@@ -15,6 +15,8 @@ package org.talend.components.common;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.avro.Schema;
 import org.junit.Test;
 import org.talend.daikon.properties.presentation.Form;
@@ -56,6 +58,19 @@ public class SchemaPropertiesTest {
         // add element
         Schema schema = new Schema.Parser().parse(schemaProperties.schema.getStringValue());
         assertThat(schema, not(nullValue()));
+    }
+
+    @Test
+    public void testAfterSchemaLikeListener() {
+        final AtomicBoolean afterSchemaCalled = new AtomicBoolean();
+        SchemaProperties schemaProperties = (SchemaProperties) new SchemaProperties("testSchema") {
+
+            public void afterSchema() {
+                afterSchemaCalled.set(true);
+            }
+        }.init();
+        assertFalse(afterSchemaCalled.get());
+
     }
 
 }
