@@ -171,11 +171,11 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
             String authTypeValue = authorizationType.getStringValue();
             switch (authTypeValue) {
             case BASIC: {
-                form.getWidget(USERPASSWORD).setVisible(true);
+                form.getWidget(USERPASSWORD).setHidden(false);
                 break;
             }
             case OAUTH: {
-                form.getWidget(USERPASSWORD).setVisible(false);
+                form.getWidget(USERPASSWORD).setHidden(true);
                 break;
             }
             }
@@ -184,11 +184,11 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
             String resourceValue = resource.getStringValue();
             switch (resourceValue) {
             case PROJECT: {
-                form.getWidget(jql.getName()).setVisible(false);
+                form.getWidget(jql.getName()).setHidden(true);
                 break;
             }
             case ISSUE: {
-                form.getWidget(jql.getName()).setVisible(true);
+                form.getWidget(jql.getName()).setHidden(false);
                 break;
             }
             }
