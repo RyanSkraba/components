@@ -1,6 +1,6 @@
 package org.talend.components.common;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.PropertyFactory.newProperty;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import java.util.Collections;
@@ -36,6 +36,13 @@ public class BulkFileProperties extends FixedConnectorsComponentProperties {
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
-        return Collections.singleton(new PropertyPathConnector(Connector.MAIN_NAME, "schema"));
+        /* the method affect the runtime also, so do it like this one, TODO fix it
+    	if (isOutputConnection) {
+        	return Collections.emptySet();
+        } else {
+        */
+        	return Collections.singleton(new PropertyPathConnector(Connector.MAIN_NAME, "schema"));
+        
+        //}
     }
 }
