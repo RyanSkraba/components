@@ -65,9 +65,9 @@ public class ProxyProperties extends ComponentProperties {
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN)) {
             boolean isUseProxy = useProxy.getBooleanValue();
-            form.getWidget(HOST).setVisible(isUseProxy);
-            form.getWidget(PORT).setVisible(isUseProxy);
-            form.getWidget(USERPASSWORD).setVisible(isUseProxy);
+            form.getWidget(HOST).setHidden(!isUseProxy);
+            form.getWidget(PORT).setHidden(!isUseProxy);
+            form.getWidget(USERPASSWORD).setHidden(!isUseProxy);
         }
     }
 
