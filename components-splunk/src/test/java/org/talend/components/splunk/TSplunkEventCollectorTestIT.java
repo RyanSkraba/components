@@ -1,9 +1,14 @@
 package org.talend.components.splunk;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
@@ -11,17 +16,26 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.test.SpringApp;
+import org.talend.components.splunk.objects.SplunkJSONEventField;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
-public class TSplunkEventCollectorTestIT extends TSplunkEventCollectorTestBase {
+public class TSplunkEventCollectorTestIT {
 
     @Rule
     public ErrorCollector errorCollector = new ErrorCollector();
+
+    @Inject
+    private ComponentService componentService;
+
+    public ComponentService getComponentService() {
+        return componentService;
+    }
 
     @Test
     public void testGetProps() {
@@ -58,14 +72,30 @@ public class TSplunkEventCollectorTestIT extends TSplunkEventCollectorTestBase {
         Property extendedOutput = (Property) props.getProperty("extendedOutput");
         assertEquals(true, extendedOutput.getValue());
         Form advForm = props.getForm(Form.ADVANCED);
-        assertTrue(advForm.getWidget("eventsBatchSize").isVisible());
+        assertFalse(advForm.getWidget("eventsBatchSize").isHidden());
 
         extendedOutput.setValue(false);
         props = checkAndAfter(advForm, "extendedOutput", props);
         advForm = props.getForm(Form.ADVANCED);
         assertTrue(advForm.isRefreshUI());
 
-        assertFalse(advForm.getWidget("eventsBatchSize").isVisible());
+        assertTrue(advForm.getWidget("eventsBatchSize").isHidden());
+    }
+
+    @Test
+    public void testDefaultSchema() {
+        TSplunkEventCollectorProperties props = (TSplunkEventCollectorProperties) new TSplunkEventCollectorDefinition()
+                .createProperties();
+        Schema s = props.getSchema();
+        List<Field> fields = s.getFields();
+        List<SplunkJSONEventField> schemaEventFields = new ArrayList<>();
+        for (Field f : fields) {
+            schemaEventFields.add(SplunkJSONEventField.getByName(f.name()));
+        }
+        assertTrue("Default schema is wrong.", schemaEventFields.size() == SplunkJSONEventField.getMetadataFields().size());
+
+        assertTrue("Default schema doesn't contain all metadata fields.",
+                schemaEventFields.containsAll(SplunkJSONEventField.getMetadataFields()));
     }
 
     @Test
@@ -87,6 +117,11 @@ public class TSplunkEventCollectorTestIT extends TSplunkEventCollectorTestBase {
     @Test
     public void testAllRuntimes() {
         ComponentTestUtils.testAllRuntimeAvaialble(getComponentService());
+    }
+
+    protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props) throws Throwable {
+        assertTrue(form.getWidget(propName).isCallAfter());
+        return getComponentService().afterProperty(propName, props);
     }
 
 }

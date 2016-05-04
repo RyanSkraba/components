@@ -36,7 +36,15 @@ public class SalesforceModuleProperties extends ComponentProperties implements S
     //
     public Property moduleName = newEnum("moduleName"); //$NON-NLS-1$
 
-    public SchemaProperties main = new SchemaProperties("main");
+    public ISchemaListener schemaListener;
+    
+    public SchemaProperties main = new SchemaProperties("main") {
+        public void afterSchema() {
+            if (schemaListener != null) {
+                schemaListener.afterSchema();
+            }
+        }
+    };
 
     public SalesforceModuleProperties(String name) {
         super(name);
@@ -59,6 +67,10 @@ public class SalesforceModuleProperties extends ComponentProperties implements S
 
         moduleRefForm.addRow(main.getForm(Form.REFERENCE));
         refreshLayout(moduleRefForm);
+    }
+    
+    public void setSchemaListener(ISchemaListener schemaListener) {
+        this.schemaListener = schemaListener;
     }
 
     // consider beforeActivate and beforeRender (change after to afterActivate)l

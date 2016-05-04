@@ -158,7 +158,7 @@ public class TestComponentProperties extends ComponentProperties implements Comp
         super.refreshLayout(form);
         if (form.getName().equals("restoreTest")) {
             if (suppressDate.getBooleanValue()) {
-                form.getWidget("date").setVisible(false);
+                form.getWidget("date").setHidden(true);
             }
         }
     }

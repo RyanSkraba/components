@@ -25,7 +25,9 @@ import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
 import org.talend.daikon.avro.SchemaConstants;
+import org.talend.daikon.avro.util.AvroTypes;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComponentProperties
         implements SalesforceProvideConnectionProperties {
@@ -45,9 +47,11 @@ public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComp
     @Override
     public void setupProperties() {
         super.setupProperties();
-        Schema date = LogicalTypes.timestampMillis().addToSchema(Schema.create(Schema.Type.LONG));
-        date.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'");
-        Schema s = SchemaBuilder.record("Root").fields().name("ServerTimeStamp").type(date).noDefault().endRecord();
+        Schema s = SchemaBuilder.record("Main")
+                .fields().name("ServerTimeStamp")
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'")
+                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "20")//$NON-NLS-1$
+                .type(AvroTypes._date()).noDefault().endRecord();
         schema.schema.setValue(s);
     }
 
@@ -66,8 +70,8 @@ public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComp
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals(Form.ADVANCED)) {
-            form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setVisible(false);
-            form.getChildForm(connection.getName()).getWidget(connection.httpTraceMessage.getName()).setVisible(false);
+            form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
+            form.getChildForm(connection.getName()).getWidget(connection.httpTraceMessage.getName()).setHidden(true);
         }
     }
 

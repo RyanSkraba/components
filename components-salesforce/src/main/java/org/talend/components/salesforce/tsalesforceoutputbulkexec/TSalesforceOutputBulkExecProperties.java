@@ -12,11 +12,15 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutputbulkexec;
 
+import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.VirtualComponentProperties;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkProperties;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProperties implements VirtualComponentProperties {
 
@@ -25,6 +29,24 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
     }
 
     public TSalesforceOutputBulkProperties outputBulkProperties = new TSalesforceOutputBulkProperties("outputBulkProperties");
+
+    @Override
+    public void setupProperties() {
+        super.setupProperties();
+
+        Schema s = SchemaBuilder.record("Main")
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//$NON-NLS-1$
+                .fields().name("salesforce_id")
+                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
+                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
+                .type().stringType().noDefault().name("salesforce_created")
+                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
+                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
+                .type().stringType().noDefault().endRecord();
+        module.main.schema.setValue(s);
+    }
 
     @Override
     public void setupLayout() {
@@ -39,7 +61,7 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
         
         if(Form.ADVANCED.equals(form.getName())) {
         	boolean isUpsert = ACTION_UPSERT.equals(outputAction.getValue());
-        	form.getWidget(upsertRelation.getName()).setVisible(isUpsert);
+        	form.getWidget(upsertRelation.getName()).setHidden(!isUpsert);
         }
     }
 

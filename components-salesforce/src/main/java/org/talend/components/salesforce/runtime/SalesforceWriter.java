@@ -16,7 +16,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -24,6 +26,7 @@ import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.DataRejectException;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 import org.talend.daikon.avro.util.AvroUtils;
@@ -276,16 +279,46 @@ final class SalesforceWriter implements Writer<WriterResult> {
 
     protected void handleResults(boolean success, Error[] resultErrors, String[] changedItemKeys, int batchIdx)
             throws IOException {
-        StringBuilder errors = new StringBuilder("");
+        //StringBuilder errors = new StringBuilder("");
+    	
+    	Map<String,String> resultMessage = new HashMap<String, String>();
+    	
         if (success) {
             // TODO: send back the ID
         } else {
+        	//TODO now we use batch mode for commit the data to salesforce, but the batch size is 1 at any time, so the code is ok now, but we need fix it.
+        	for (Error error : resultErrors) {
+                if (error.getStatusCode() != null) {
+                    resultMessage.put("errorCode", error.getStatusCode().toString());
+                }
+                if (error.getFields() != null) {
+                    StringBuffer fields = new StringBuffer();
+                    for (String field : error.getFields()) {
+                        fields.append(field);
+                        fields.append(",");
+                    }
+                    if (fields.length() > 0) {
+                        fields.deleteCharAt(fields.length() - 1);
+                    }
+                    resultMessage.put("errorFields", fields.toString());
+                }
+                resultMessage.put("errorMessage", error.getMessage());
+            }
+        	
+        	throw new DataRejectException(resultMessage);
+        	
+            /*
             errors = SalesforceRuntime.addLog(resultErrors,
-                    batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx] : "Batch index out of bounds", null);
+            	batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx] : "Batch index out of bounds", null);
+            */
         }
+        
+        /*
         if (exceptionForErrors && errors.toString().length() > 0) {
             throw new IOException(errors.toString());
         }
+        */
+        
     }
 
     protected DeleteResult[] delete(String id) throws IOException {

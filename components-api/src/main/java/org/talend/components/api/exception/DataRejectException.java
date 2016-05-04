@@ -10,13 +10,22 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.salesforce.tsalesforcewaveoutputbulkexec;
+package org.talend.components.api.exception;
 
-import org.talend.components.api.properties.ComponentProperties;
+import java.util.Map;
 
-public class TSalesforceWaveOutputBulkExecProperties extends ComponentProperties {
+public class DataRejectException extends RuntimeException {
 
-    public TSalesforceWaveOutputBulkExecProperties(String name) {
-        super(name);
+	private static final long serialVersionUID = -767063336424805519L;
+	
+	private Map<String,String> info;
+	
+	public DataRejectException(Map<String,String> info) {
+    	this.info = info;
     }
+	
+	public Map<String,String> getRejectInfo() {
+		return info;
+	}
+
 }

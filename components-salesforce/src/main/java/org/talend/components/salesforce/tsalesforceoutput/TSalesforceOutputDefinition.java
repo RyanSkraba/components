@@ -43,7 +43,7 @@ public class TSalesforceOutputDefinition extends SalesforceDefinition implements
 
     @Override
     public boolean isSchemaAutoPropagate() {
-        return true;
+        return false;
     }
 
     @Override
