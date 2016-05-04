@@ -13,10 +13,13 @@
 package org.talend.components.jira.tjirainput;
 
 import java.util.Collections;
+import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field.Order;
-import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.daikon.avro.AvroRegistry;
@@ -35,7 +38,7 @@ import org.talend.daikon.properties.presentation.Form;
  * 
  * created by ivan.honchar on Apr 22, 2016
  */
-public class TJiraInputProperties extends ComponentProperties {
+public class TJiraInputProperties extends FixedConnectorsComponentProperties {
     
     /**
      * Jira issue resource value
@@ -99,6 +102,8 @@ public class TJiraInputProperties extends ComponentProperties {
      * Schema property to define required fields of Jira resource
      */
     public SchemaProperties schema = new SchemaProperties("schema");
+    
+    protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
     
     public TJiraInputProperties(String name) {
         super(name);
@@ -204,6 +209,14 @@ public class TJiraInputProperties extends ComponentProperties {
         Schema initialSchema = Schema.createRecord("jira", null, null, false, Collections.singletonList(jsonField));
 
         schema.schema.setValue(initialSchema);
+    }
+    
+    @Override
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputComponent) {
+        if (isOutputComponent) {
+            return Collections.singleton(MAIN_CONNECTOR);
+        }
+        return Collections.emptySet();
     }
 
 }
