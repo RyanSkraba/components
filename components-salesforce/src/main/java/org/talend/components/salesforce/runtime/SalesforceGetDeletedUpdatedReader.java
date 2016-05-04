@@ -74,7 +74,7 @@ public abstract class SalesforceGetDeletedUpdatedReader<ResultT> extends Salesfo
         }
         if ((inputResult == null || inputResult.isDone()) && queryIndex < queryStringList.size()) {
             try {
-                inputResult = getConnection().query(queryStringList.get(queryIndex++));
+                inputResult = getConnection().queryAll(queryStringList.get(queryIndex++));
                 inputRecords = inputResult.getRecords();
                 inputRecordsIndex = 0;
                 return inputResult.getSize() > 0;
