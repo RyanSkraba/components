@@ -21,6 +21,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field.Order;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.common.UserPasswordProperties;
@@ -101,6 +102,11 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
     public Property batchSize = PropertyFactory.newString("batchSize");
     
     /**
+     * Return property, which denotes number of Jira entities obtained
+     */
+    public Property numberOfRecords;
+    
+    /**
      * Schema property to define required fields of Jira resource
      */
     public SchemaProperties schema = new SchemaProperties("schema");
@@ -129,6 +135,9 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
         authorizationType.setValue(BASIC);
         jql.setValue("\"\"");
         batchSize.setValue("50");
+        
+        returns = ComponentPropertyFactory.newReturnsProperty();
+        numberOfRecords = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "numberOfRecords");
     }
 
     @Override

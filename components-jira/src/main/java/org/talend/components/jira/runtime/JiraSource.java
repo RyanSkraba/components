@@ -96,7 +96,7 @@ public class JiraSource implements Source {
         String resourcePath = getResourcePath();
         Map<String, String> sharedParameters = getSharedParameters();
         Schema dataSchema = (Schema) properties.schema.schema.getValue();
-        return new JiraReader(this, hostPort, resourcePath, userId, password, sharedParameters, dataSchema);
+        return new JiraReader(this, hostPort, resourcePath, userId, password, sharedParameters, dataSchema, container);
     }
     
     /**

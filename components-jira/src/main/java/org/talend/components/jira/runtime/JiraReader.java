@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Source;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jira.avro.IssueAdapterFactory;
 import org.talend.components.jira.avro.IssueIndexedRecord;
 import org.talend.components.jira.connection.Rest;
@@ -80,6 +81,11 @@ public class JiraReader implements Reader<IndexedRecord> {
     private int entityIndex = 0;
     
     /**
+     * Number of Jira entities obtained
+     */
+    private int entityCounter = 0;
+    
+    /**
      * Jira paging http parameter, which defines page size 
      * (number of entities per request)
      */
@@ -104,6 +110,8 @@ public class JiraReader implements Reader<IndexedRecord> {
      * Data schema
      */
     private Schema schema;
+    
+    private final RuntimeContainer container;
 
     /**
      * Constructor sets required properties for http connection
@@ -118,11 +126,12 @@ public class JiraReader implements Reader<IndexedRecord> {
      * parameter
      */
     public JiraReader(JiraSource source, String hostPort, String resource, String user, String password,
-            Map<String, String> sharedParameters, Schema schema) {
+            Map<String, String> sharedParameters, Schema schema, RuntimeContainer container) {
         this.source = source;
         this.resource = resource;
         this.sharedParameters = sharedParameters;
         this.schema = schema;
+        this.container = container;
         rest = new Rest(hostPort);
         rest.setCredentials(user, password);
         
@@ -169,6 +178,7 @@ public class JiraReader implements Reader<IndexedRecord> {
 
     @Override
     public IndexedRecord getCurrent() throws NoSuchElementException {
+        entityCounter++;
         String entity = entities.get(entityIndex);
         return getFactory().convertToAvro(entity);
     }
@@ -187,7 +197,8 @@ public class JiraReader implements Reader<IndexedRecord> {
 
     @Override
     public void close() throws IOException {
-        // nothing to do
+        container.setComponentData(container.getCurrentComponentId(), "_numberOfRecords",
+                entityCounter);
     }
 
     /**
