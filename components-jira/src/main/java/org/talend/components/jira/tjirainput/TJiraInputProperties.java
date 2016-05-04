@@ -13,12 +13,10 @@
 package org.talend.components.jira.tjirainput;
 
 import java.util.Collections;
-import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field.Order;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.HasSchemaProperty;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.daikon.avro.AvroRegistry;
@@ -37,7 +35,7 @@ import org.talend.daikon.properties.presentation.Form;
  * 
  * created by ivan.honchar on Apr 22, 2016
  */
-public class TJiraInputProperties extends ComponentProperties implements HasSchemaProperty {
+public class TJiraInputProperties extends ComponentProperties {
     
     /**
      * Jira issue resource value
@@ -106,14 +104,13 @@ public class TJiraInputProperties extends ComponentProperties implements HasSche
         super(name);
     }
 
-    @Override
-    public List<Schema> getSchemas() {
-        return Collections.singletonList(new Schema.Parser().parse(schema.schema.getStringValue()));
-    }
-
-    @Override
-    public void setSchemas(List<Schema> schemas) {
-        // nothing to be set here.
+    /**
+     * Returns schema associated with this {@link Properties}
+     * 
+     * @return schema
+     */
+    public Schema getSchema() {
+        return (Schema) schema.schema.getValue();
     }
     
     @Override
