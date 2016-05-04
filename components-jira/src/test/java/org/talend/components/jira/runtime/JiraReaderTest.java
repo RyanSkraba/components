@@ -120,7 +120,7 @@ public class JiraReaderTest {
     public void getEntitiesTest() throws Exception {
         DefaultComponentRuntimeContainerImpl container = new DefaultComponentRuntimeContainerImpl();
         JiraReader jiraReader = new JiraReader(null, null, "/rest/api/2/search", null, null, Collections.EMPTY_MAP, null, container);
-        String jsonFile = "src/test/resources/org/talend/components/jira/runtime/entities.json";
+        String jsonFile = "src/test/resources/org/talend/components/jira/datum/entities.json";
         String testJson = Utils.readFile(jsonFile);
 
         List<String> strs = jiraReader.getEntities(testJson);
