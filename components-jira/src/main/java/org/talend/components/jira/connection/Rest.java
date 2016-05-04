@@ -151,7 +151,7 @@ public class Rest {
         if (content != null) {
             return content.asString();
         }
-        return "204 no content";
+        return null;
     }
 
     /**
