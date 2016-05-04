@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2015 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.salesforce.tsalesforcewavebulkexec;
+package org.talend.components.jira.tjirainput;
 
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
@@ -19,37 +19,41 @@ import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.salesforce.SalesforceDefinition;
-import org.talend.components.salesforce.runtime.SalesforceSource;
+import org.talend.components.jira.JiraDefinition;
+import org.talend.components.jira.runtime.JiraSource;
 
 import aQute.bnd.annotation.component.Component;
 
-@Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TSalesforceWaveBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TSalesforceWaveBulkExecDefinition extends SalesforceDefinition implements InputComponentDefinition {
+/**
+ * Jira input component definition
+ */
+@Component(name = Constants.COMPONENT_BEAN_PREFIX + TJiraInputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+public class TJiraInputDefinition extends JiraDefinition implements InputComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tSalesforceWaveBulkExec"; //$NON-NLS-1$
-
-    public TSalesforceWaveBulkExecDefinition() {
+    /**
+     * Jira input component name
+     */
+    public static final String COMPONENT_NAME = "tJIRAInput";
+    
+    /**
+     * Constructor sets component name
+     * 
+     * @param componentName component name
+     */
+    public TJiraInputDefinition() {
         super(COMPONENT_NAME);
-
-        setTriggers(new Trigger(TriggerType.ITERATE, 1, 0), new Trigger(TriggerType.SUBJOB_OK, 1, 0),
+        setTriggers(new Trigger(TriggerType.ITERATE, 1, 1), new Trigger(TriggerType.SUBJOB_OK, 1, 0),
                 new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
     }
 
     @Override
-    public String getPartitioning() {
-        return NONE;
+    public Source getRuntime() {
+        return new JiraSource();
     }
 
     @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
-        return TSalesforceWaveBulkExecProperties.class;
+        return TJiraInputProperties.class;
     }
-
-    @Override
-    public Source getRuntime() {
-        return new SalesforceSource();
-    }
-
+    
 }

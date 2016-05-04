@@ -4,13 +4,13 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.7.0-SNAPSHOT</version>
+        <version>0.8.0-SNAPSHOT</version>
         <relativePath>../components-parent/pom.xml</relativePath>
     </parent>
 
     <name>Components - OAuth</name>
     <artifactId>components-common-oauth</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
+    <version>0.8.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -29,13 +29,13 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.7.0-SNAPSHOT</version>
+            <version>0.8.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.7.0-SNAPSHOT</version>
+            <version>0.8.0-SNAPSHOT</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
@@ -72,9 +72,12 @@
                             <classifier>bundle</classifier>
                             <instructions>
                                 <Bundle-SymbolicName>org.talend.components.common-oauth</Bundle-SymbolicName>
-                                <Import-Package>org.talend*</Import-Package>
+                                <Import-Package>org.talend*,javax.servlet*,javax.net.ssl*</Import-Package>
                                 <Service-Component>*</Service-Component>
-                                <Embed-Dependency>!components*,*;scope=compile|runtime;inline=false</Embed-Dependency>
+                                <Embed-Transitive>true</Embed-Transitive><!-- We need to embed oauth.common this is why we set this to true -->
+                                <Embed-Dependency>artifactId=org.apache.oltu.oauth2*|jetty*;inline=false</Embed-Dependency>
+                                <Export-Package>org.talend.components.common.oauth*</Export-Package>
+                                <_exportcontents>org.apache.oltu.oauth2*</_exportcontents>
                             </instructions>
                         </configuration>
                     </execution>

@@ -122,7 +122,11 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
     protected QueryResult executeSalesforceQuery() throws IOException, ConnectionException {
         TSalesforceInputProperties inProperties = (TSalesforceInputProperties) properties;
         getConnection().setQueryOptions(inProperties.batchSize.getIntValue());
-        return getConnection().query(getQueryString(inProperties));
+        if(inProperties.includeDeleted.getBooleanValue()){
+            return getConnection().queryAll(getQueryString(inProperties));
+        }else {
+            return getConnection().query(getQueryString(inProperties));
+        }
     }
 
     @Override

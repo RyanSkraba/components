@@ -21,6 +21,7 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import com.sforce.ws.wsdl.Part;
 import org.apache.avro.Schema;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -146,13 +147,18 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         final ConnectionHolder ch = new ConnectionHolder();
         SalesforceConnectionProperties connProps = properties.getConnectionProperties();
         String refComponentId = connProps.getReferencedComponentId();
+        Object sharedConn = null;
         // Using another component's connection
         if (refComponentId != null) {
             // In a runtime container
             if (container != null) {
-                PartnerConnection conn = (PartnerConnection) container.getComponentData(refComponentId, KEY_CONNECTION);
-                if (conn != null) {
-                    ch.connection = conn;
+                sharedConn = container.getComponentData(refComponentId, KEY_CONNECTION);
+                if (sharedConn != null) {
+                    if (sharedConn instanceof PartnerConnection) {
+                        ch.connection = (PartnerConnection) sharedConn;
+                    } else if (sharedConn instanceof BulkConnection) {
+                        ch.bulkConnection = (BulkConnection) sharedConn;
+                    }
                     return ch;
                 }
                 throw new IOException("Referenced component: " + refComponentId + " not connected");
@@ -217,9 +223,12 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             }
             if (connProps.bulkConnection.getBooleanValue()) {
                 ch.bulkConnection = connectBulk(ch.connection.getConfig());
+                sharedConn = ch.bulkConnection;
+            } else {
+                sharedConn = ch.connection;
             }
             if (container != null) {
-                container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION, ch.connection);
+                container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION, sharedConn);
             }
             return ch;
         } catch (ConnectionException e) {
@@ -281,7 +290,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     protected Schema getSchema(PartnerConnection connection, String module) throws IOException {
         try {
             DescribeSObjectResult[] describeSObjectResults = new DescribeSObjectResult[0];
-            describeSObjectResults = connection.describeSObjects(new String[] { module });
+            describeSObjectResults = connection.describeSObjects(new String[]{module});
             return SalesforceAvroRegistry.get().inferSchema(describeSObjectResults[0]);
         } catch (ConnectionException e) {
             throw new IOException(e);

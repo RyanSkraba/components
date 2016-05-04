@@ -39,7 +39,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
     public static final String OAUTH_URL = "https://login.salesforce.com/services/oauth2";
 
-    public Property endpoint = (Property)newString("endpoint").setRequired();
+    public Property endpoint = (Property) newString("endpoint").setRequired();
 
     public static final String FORM_WIZARD = "Wizard";
 
@@ -151,9 +151,9 @@ public class SalesforceConnectionProperties extends ComponentProperties
         refreshLayout(getForm(Form.REFERENCE));
         refreshLayout(getForm(Form.ADVANCED));
     }
-    
+
     public void afterBulkConnection() {
-    	refreshLayout(getForm(Form.ADVANCED));
+        refreshLayout(getForm(Form.ADVANCED));
     }
 
     public ValidationResult validateTestConnection() throws Exception {
@@ -175,17 +175,17 @@ public class SalesforceConnectionProperties extends ComponentProperties
                 && refComponentIdValue.startsWith(TSalesforceConnectionDefinition.COMPONENT_NAME);
         if (form.getName().equals(Form.MAIN) || form.getName().equals(FORM_WIZARD)) {
             if (useOtherConnection) {
-                form.getWidget(loginType.getName()).setVisible(false);
-                form.getWidget(OAUTH).setVisible(false);
-                form.getWidget(USERPASSWORD).setVisible(false);
+                form.getWidget(loginType.getName()).setHidden(true);
+                form.getWidget(OAUTH).setHidden(true);
+                form.getWidget(USERPASSWORD).setHidden(true);
             } else {
-                form.getWidget(loginType.getName()).setVisible(true);
+                form.getWidget(loginType.getName()).setHidden(false);
                 if (LOGIN_OAUTH.equals(loginType.getValue())) {
-                    form.getWidget(OAUTH).setVisible(true);
-                    form.getWidget(USERPASSWORD).setVisible(false);
+                    form.getWidget(OAUTH).setHidden(false);
+                    form.getWidget(USERPASSWORD).setHidden(true);
                 } else if (LOGIN_BASIC.equals(loginType.getValue())) {
-                    form.getWidget(OAUTH).setVisible(false);
-                    form.getWidget(USERPASSWORD).setVisible(true);
+                    form.getWidget(OAUTH).setHidden(true);
+                    form.getWidget(USERPASSWORD).setHidden(false);
                 } else {
                     throw new RuntimeException("Enum value should be handled :" + loginType.getValue());
                 }
@@ -193,14 +193,15 @@ public class SalesforceConnectionProperties extends ComponentProperties
         }
 
         if (form.getName().equals(Form.ADVANCED)) {
-        	if(useOtherConnection) {
-        		form.setVisible(false);
-        	} else {
-        		form.setVisible(true);
-        		
-        		boolean bulkMode = bulkConnection.getBooleanValue();
-        		form.getWidget(httpChunked.getName()).setVisible(!bulkMode);
-        	}
+            if (useOtherConnection) {
+                form.setHidden(true);
+            } else {
+                form.setHidden(false);
+
+                boolean bulkMode = bulkConnection.getBooleanValue();
+                form.getWidget(httpChunked.getName()).setHidden(bulkMode);
+                form.getWidget(httpTraceMessage.getName()).setHidden(!bulkMode);
+            }
         }
     }
 

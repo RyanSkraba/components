@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2015 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -10,13 +10,15 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.salesforce.tsalesforcewavebulkexec;
+package org.talend.components.salesforce;
 
-import org.talend.components.api.properties.ComponentProperties;
 
-public class TSalesforceWaveBulkExecProperties extends ComponentProperties {
+/**
+ * created by nrousseau on May 2, 2016
+ * Detailled comment
+ *
+ */
+public interface ISchemaListener {
 
-    public TSalesforceWaveBulkExecProperties(String name) {
-        super(name);
-    }
+    public void afterSchema();
 }
