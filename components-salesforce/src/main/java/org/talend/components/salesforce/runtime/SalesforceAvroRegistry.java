@@ -103,6 +103,12 @@ public class SalesforceAvroRegistry extends AvroRegistry {
                     avroField.addProp(SchemaConstants.TALEND_COLUMN_SCALE, String.valueOf(field.getScale()));
                 }
             }
+            
+            if(field.getReferenceTo()!=null && field.getReferenceTo().length > 0){
+            	avroField.addProp(SalesforceSchemaConstants.REF_MODULE_NAME, field.getReferenceTo()[0]);
+            	avroField.addProp(SalesforceSchemaConstants.REF_FIELD_NAME, field.getRelationshipName());
+	    	}
+            
             // pattern will be removed when we have db type for salesforce
             switch (field.getType()) {
             case date:

@@ -62,7 +62,7 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
             public void afterSchema() {
                 updateOutputSchemas();
                 beforeUpsertKeyColumn();
-                beforeUpsertRelation();
+                beforeUpsertRelationTable();
             }
         });
     }

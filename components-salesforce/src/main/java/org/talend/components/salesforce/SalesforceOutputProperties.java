@@ -55,8 +55,8 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
     //
     // Advanced
     //
-    public Property upsertRelation = newProperty("upsertRelation").setOccurMaxTimes(Property.INFINITE); //$NON-NLS-1$
-
+    public UpsertRelationTable upsertRelationTable = new UpsertRelationTable("upsertRelationTable");
+    
     //
     // Collections
     //
@@ -85,7 +85,7 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
             ValidationResult validationResult = super.afterModuleName();
             List<String> fieldNames = getFieldNames(main.schema);
             upsertKeyColumn.setPossibleValues(fieldNames);
-            upsertRelation.getChild("columnName").setPossibleValues(fieldNames);
+            upsertRelationTable.columnName.setPossibleValues(fieldNames);
             return validationResult;
         }
     }
@@ -96,17 +96,8 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         upsertKeyColumn.setPossibleValues(getFieldNames(module.main.schema));
     }
 
-    public void beforeUpsertRelation() {
-        upsertRelation.getChild("columnName").setPossibleValues(getFieldNames(module.main.schema));
-    }
-
-    protected void setupUpsertRelation(Property ur) {
-        // They might have been set previously in some inheritance cases
-        ur.setChildren(new ArrayList<Property>());
-        ur.addChild(newProperty("columnName")); //$NON-NLS-1$
-        ur.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
-        ur.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
-        ur.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
+    public void beforeUpsertRelationTable() {
+        upsertRelationTable.columnName.setPossibleValues(getFieldNames(module.main.schema));
     }
 
     @Override
@@ -122,11 +113,10 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
 
         setupRejectSchema();
 
-        setupUpsertRelation(upsertRelation);
-
         module = new ModuleSubclass("module");
         module.connection = connection;
         module.setupProperties();
+        upsertRelationTable.setUsePolymorphic(false);
     }
 
     @Override
@@ -137,7 +127,7 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         mainForm.addColumn(upsertKeyColumn);
 
         Form advancedForm = getForm(Form.ADVANCED);
-        advancedForm.addRow(widget(upsertRelation).setWidgetType(Widget.WidgetType.TABLE));
+        advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.WidgetType.TABLE));
         // check
         // I18N
     }
@@ -156,7 +146,7 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
             if (advForm != null) {
                 boolean isUpsert = ACTION_UPSERT.equals(outputAction.getValue());
                 form.getWidget(upsertKeyColumn.getName()).setHidden(!isUpsert);
-                advForm.getWidget(upsertRelation.getName()).setHidden(!isUpsert);
+                advForm.getWidget(upsertRelationTable.getName()).setHidden(!isUpsert);
             }
         }
     }

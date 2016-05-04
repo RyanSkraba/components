@@ -61,7 +61,7 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
         
         if(Form.ADVANCED.equals(form.getName())) {
         	boolean isUpsert = ACTION_UPSERT.equals(outputAction.getValue());
-        	form.getWidget(upsertRelation.getName()).setHidden(!isUpsert);
+        	form.getWidget(upsertRelationTable.getName()).setHidden(!isUpsert);
         }
     }
 
@@ -69,7 +69,11 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
     public ComponentProperties getInputComponentProperties() {
         outputBulkProperties.schema.schema.setValue(module.main.schema.getValue());
         outputBulkProperties.bulkFilePath.setValue(bulkFilePath.getValue());
-        outputBulkProperties.upsertRelation.setValue(upsertRelation.getStoredValue());
+        outputBulkProperties.upsertRelationTable.columnName.setValue(upsertRelationTable.columnName.getStoredValue());
+        outputBulkProperties.upsertRelationTable.lookupFieldExternalIdName.setValue(upsertRelationTable.lookupFieldExternalIdName.getStoredValue());
+        outputBulkProperties.upsertRelationTable.lookupFieldName.setValue(upsertRelationTable.lookupFieldName.getStoredValue());
+        outputBulkProperties.upsertRelationTable.lookupFieldModuleName.setValue(upsertRelationTable.lookupFieldModuleName.getStoredValue());
+        outputBulkProperties.upsertRelationTable.polymorphic.setValue(upsertRelationTable.polymorphic.getStoredValue());
         return outputBulkProperties;
     }
 
