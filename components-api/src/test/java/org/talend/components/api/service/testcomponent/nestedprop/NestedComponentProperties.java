@@ -33,7 +33,7 @@ public class NestedComponentProperties extends ComponentProperties {
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form form = Form.create(this, Form.MAIN, "Nested Component");
+        Form form = Form.create(this, Form.MAIN);
         form.addRow(aGreatProperty);
         form.addRow(anotherProp);
     }

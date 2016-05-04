@@ -54,6 +54,7 @@ public class BulkFileWriter implements Writer<WriterResult> {
     public void open(String uId) throws IOException {
         this.uId = uId;
         File file = new File(bulkProperties.bulkFilePath.getStringValue());
+        file.getParentFile().mkdirs();
         csvWriter = new CsvWriter(new OutputStreamWriter(
                 new java.io.FileOutputStream(file, isAppend), charset),separator);
 

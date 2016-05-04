@@ -99,10 +99,15 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN)) {
             form.getWidget(includeDeleted.getName())
-                    .setVisible(queryMode.getValue() != null && queryMode.getValue().equals(QUERY_QUERY));
+                    .setHidden(!(queryMode.getValue() != null && queryMode.getValue().equals(QUERY_QUERY)));
 
-            form.getWidget(query.getName()).setVisible(manualQuery.getBooleanValue());
-            form.getWidget(condition.getName()).setVisible(!manualQuery.getBooleanValue());
+            form.getWidget(query.getName()).setHidden(!manualQuery.getBooleanValue());
+            form.getWidget(condition.getName()).setHidden(manualQuery.getBooleanValue());
+            Form advancedForm = getForm(Form.ADVANCED);
+            connection.bulkConnection.setValue(!queryMode.getValue().equals(QUERY_QUERY));
+            if (advancedForm != null) {
+                advancedForm.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
+            }
         }
     }
 

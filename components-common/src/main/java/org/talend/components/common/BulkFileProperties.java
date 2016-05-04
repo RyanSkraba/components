@@ -1,6 +1,7 @@
 package org.talend.components.common;
 
 import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import java.util.Collections;
 import java.util.Set;
@@ -9,6 +10,7 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 
 public class BulkFileProperties extends FixedConnectorsComponentProperties {
 
@@ -27,7 +29,7 @@ public class BulkFileProperties extends FixedConnectorsComponentProperties {
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(schema.getForm(Form.REFERENCE));
-        mainForm.addRow(bulkFilePath);
+        mainForm.addRow(widget(bulkFilePath).setWidgetType(Widget.WidgetType.FILE));
         mainForm.addRow(append);
 
     }

@@ -37,9 +37,16 @@ public class SalesforceBulkProperties extends ComponentProperties {
     }
 
     @Override
+    public void setupProperties() {
+        super.setupProperties();
+
+        waitTimeCheckBatchState.setValue(10000);
+    }
+
+    @Override
     public void setupLayout() {
         super.setupLayout();
-        Form mainForm = Form.create(this, Form.MAIN, "Salesforce Bulk Properties");
+        Form mainForm = Form.create(this, Form.MAIN);
         mainForm.addRow(concurrencyMode);
         mainForm.addRow(rowsToCommit);
         mainForm.addColumn(bytesToCommit);

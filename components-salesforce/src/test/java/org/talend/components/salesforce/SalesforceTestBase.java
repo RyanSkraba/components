@@ -52,13 +52,11 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputPropert
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
-import org.talend.components.salesforce.tsalesforcewavebulkexec.TSalesforceWaveBulkExecDefinition;
-import org.talend.components.salesforce.tsalesforcewaveoutputbulkexec.TSalesforceWaveOutputBulkExecDefinition;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
-import org.talend.daikon.properties.service.PropertiesServiceTest;
+import org.talend.daikon.properties.test.PropertiesTestUtils;
 
 import com.sforce.async.AsyncApiException;
 import com.sforce.ws.ConnectionException;
@@ -113,10 +111,6 @@ public class SalesforceTestBase extends AbstractComponentTest {
                     new TSalesforceGetUpdatedDefinition());
             testComponentRegistry.addComponent(TSalesforceOutputBulkDefinition.COMPONENT_NAME,
                     new TSalesforceOutputBulkDefinition());
-            testComponentRegistry.addComponent(TSalesforceWaveBulkExecDefinition.COMPONENT_NAME,
-                    new TSalesforceWaveBulkExecDefinition());
-            testComponentRegistry.addComponent(TSalesforceWaveOutputBulkExecDefinition.COMPONENT_NAME,
-                    new TSalesforceWaveOutputBulkExecDefinition());
             SalesforceConnectionWizardDefinition scwd = new SalesforceConnectionWizardDefinition();
             testComponentRegistry.addWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, scwd);
             testComponentRegistry.addWizard(SalesforceModuleWizardDefinition.COMPONENT_WIZARD_NAME,
@@ -152,7 +146,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
 
     protected void setupModule(SalesforceModuleProperties moduleProps, String module) throws Throwable {
         Form f = moduleProps.getForm(Form.REFERENCE);
-        moduleProps = (SalesforceModuleProperties) PropertiesServiceTest.checkAndBeforeActivate(getComponentService(), f,
+        moduleProps = (SalesforceModuleProperties) PropertiesTestUtils.checkAndBeforeActivate(getComponentService(), f,
                 "moduleName", moduleProps);
         moduleProps.moduleName.setValue(module);
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
@@ -160,7 +154,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
 
     protected void setupModuleWithEmptySchema(SalesforceModuleProperties moduleProps, String module) throws Throwable {
         Form f = moduleProps.getForm(Form.REFERENCE);
-        moduleProps = (SalesforceModuleProperties) PropertiesServiceTest.checkAndBeforeActivate(getComponentService(), f,
+        moduleProps = (SalesforceModuleProperties) PropertiesTestUtils.checkAndBeforeActivate(getComponentService(), f,
                 "moduleName", moduleProps);
         moduleProps.moduleName.setValue(module);
         Schema emptySchema = Schema.createRecord(module, null, null, false);

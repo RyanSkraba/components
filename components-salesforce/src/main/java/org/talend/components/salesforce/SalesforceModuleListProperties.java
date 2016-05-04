@@ -58,7 +58,7 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form moduleForm = Form.create(this, Form.MAIN, "Salesforce Modules");
+        Form moduleForm = Form.create(this, Form.MAIN);
         // Since this is a repeating property it has a list of values
         moduleForm.addRow(widget(moduleName).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
         refreshLayout(moduleForm);
