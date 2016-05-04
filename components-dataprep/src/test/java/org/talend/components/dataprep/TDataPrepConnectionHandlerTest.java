@@ -31,7 +31,7 @@ public class TDataPrepConnectionHandlerTest {
 
     @Test
     @Ignore
-    public void validate() {
+    public void validate() throws IOException {
         DataPrepConnectionHandler connectionHandler =
                 new DataPrepConnectionHandler("http://10.42.10.60:8888","maksym@dataprep.com","maksym",
                 "read", "sldfjsl");
