@@ -61,7 +61,7 @@ public class TDataSetInputSource implements BoundedSource {
     private DataPrepConnectionHandler getConnectionHandler() {
         if (connectionHandler == null) {
             connectionHandler = new DataPrepConnectionHandler(properties.url.getStringValue(), properties.login.getStringValue(),
-                    properties.pass.getStringValue(), "read", properties.dataSetName.getStringValue());
+                    properties.pass.getStringValue(), properties.dataSetName.getStringValue());
             return connectionHandler;
         } else
             return this.connectionHandler;

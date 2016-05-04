@@ -36,19 +36,16 @@ public class DataPrepConnectionHandler {
 
     private final String pass;
 
-    private final String mode;
-
     private final String dataSetName;
 
     private Header authorisationHeader;
 
     private static final int STATUS_OK = 200;
 
-    DataPrepConnectionHandler(String url, String login, String pass, String mode, String dataSetName) {
+    DataPrepConnectionHandler(String url, String login, String pass, String dataSetName) {
         this.url = url;
         this.login = login;
         this.pass = pass;
-        this.mode = mode;
         this.dataSetName = dataSetName;
     }
 

@@ -92,7 +92,7 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
         } else {
             DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(
                     removeQuotes(url.getStringValue()), removeQuotes(login.getStringValue()),
-                    removeQuotes(pass.getStringValue()), "read", removeQuotes(dataSetName.getStringValue()));
+                    removeQuotes(pass.getStringValue()), removeQuotes(dataSetName.getStringValue()));
             List<Column> columnList = null;
             connectionHandler.connect();
             columnList = connectionHandler.readSourceSchema();

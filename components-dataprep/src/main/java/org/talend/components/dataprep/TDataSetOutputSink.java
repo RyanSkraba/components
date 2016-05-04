@@ -34,7 +34,7 @@ public class TDataSetOutputSink implements Sink {
         if (properties.mode.getStringValue().equals("create"))
             connectionHandler = new DataPrepConnectionHandler(properties.url.getStringValue(),
                     properties.login.getStringValue(), properties.pass.getStringValue(),
-                    "create", properties.dataSetName.getStringValue());
+                    properties.dataSetName.getStringValue());
         return new TDataSetWriteOperation(this, connectionHandler, properties.limit.getIntValue());
     }
 
@@ -47,7 +47,7 @@ public class TDataSetOutputSink implements Sink {
     public ValidationResult validate(RuntimeContainer runtimeContainer) {
         DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(properties.url.getStringValue(),
                 properties.login.getStringValue(), properties.pass.getStringValue(),
-                "read", properties.dataSetName.getStringValue());
+                properties.dataSetName.getStringValue());
         boolean validate;
         try {
             validate = connectionHandler.validate();
