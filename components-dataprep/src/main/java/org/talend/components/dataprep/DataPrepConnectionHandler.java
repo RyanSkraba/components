@@ -55,13 +55,16 @@ public class DataPrepConnectionHandler {
     HttpResponse connect() throws IOException {
         Request request = Request.Post(url+"/login?username="+login+"&password="+pass);
         HttpResponse response = request.execute().returnResponse();
+        LOGGER.debug("Connect Response: " + response.toString());
         authorisationHeader = response.getFirstHeader("Authorization");
         return response;
     }
 
     HttpResponse logout() throws IOException {
         Request request = Request.Post(url+"/logout").addHeader(authorisationHeader);
-        return request.execute().returnResponse();
+        HttpResponse response = request.execute().returnResponse();
+        LOGGER.debug("Logout Response: "+ response.toString());
+        return response;
     }
 
     private int returnStatusCode(HttpResponse response) {
@@ -69,8 +72,8 @@ public class DataPrepConnectionHandler {
     }
 
     boolean validate() throws IOException {
-        int statusLogin = 0;
-        int statusLogout = 0;
+        int statusLogin;
+        int statusLogout;
         statusLogin = returnStatusCode(connect());
         statusLogout = returnStatusCode(logout());
         if (statusLogin == STATUS_OK && statusLogout == STATUS_OK)
@@ -88,6 +91,7 @@ public class DataPrepConnectionHandler {
         } finally {
             logout();
         }
+        LOGGER.debug("Read DataSet Response: "+ current.toString());
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES,
                 false);
@@ -99,11 +103,14 @@ public class DataPrepConnectionHandler {
         int index = dataSetName.lastIndexOf("/");
         String setName = dataSetName.substring(index);
         String folderName = dataSetName.substring(0,index);
+        LOGGER.debug("Folder Name: " + folderName+ "DataSet name: " + setName);
+        System.out.println("Folder Name: " + folderName+ " DataSet name: " + setName);
 
         Request request = Request.Post(url+"/api/datasets?name=" + setName + "&folderPath="+folderName);
         request.addHeader(authorisationHeader);
         request.bodyString(data ,ContentType.create(ContentType.TEXT_PLAIN.getMimeType(), StandardCharsets.UTF_8));
-        request.execute();
+        HttpResponse response = request.execute().returnResponse();
+        LOGGER.debug("Create request response: {}", response);
     }
 
     List<Column> readSourceSchema() throws IOException {
@@ -115,6 +122,7 @@ public class DataPrepConnectionHandler {
         String test = null;
         try {
             test = request.execute().returnContent().asString();
+            LOGGER.debug("Schema is: {}", test);
         } finally {
             logout();
         }

@@ -14,6 +14,8 @@ package org.talend.components.dataprep;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
@@ -24,7 +26,7 @@ import java.io.IOException;
 
 public class TDataSetOutputWriter implements Writer<WriterResult> {
 
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(TDataSetInputDefinition.class);
     private IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory;
     private StringBuilder data = new StringBuilder();
     private int counter = 0;
@@ -33,7 +35,6 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
     private boolean firstRow = true;
     private WriteOperation<WriterResult> writeOperation;
     private int limit;
-
 
     TDataSetOutputWriter(WriteOperation<WriterResult> writeOperation,
                          DataPrepConnectionHandler connectionHandler, int limit) {
@@ -50,9 +51,12 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
 
     @Override
     public void write(Object datum) {
-        if (datum == null || counter >= limit) {
+        if (datum == null || counter > limit) {
+            LOGGER.debug("Datum: {}", datum);
             return;
         } // else handle the data.
+
+        LOGGER.debug("Datum: {}", datum);
         IndexedRecord input = getFactory(datum).convertToAvro(datum);
 
         StringBuilder row = new StringBuilder();
@@ -64,6 +68,7 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
                 row.append(String.valueOf(f.name()));
             }
             row.append("\n");
+            LOGGER.debug("Column names: {}", row);
             firstRow = false;
         }
         for (Schema.Field f : input.getSchema().getFields()) {
@@ -76,11 +81,13 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
         }
         data.append(row);
         data.append("\n");
+        LOGGER.debug("Row data: {}", row);
         counter++;
     }
 
     @Override
     public WriterResult close() throws IOException {
+        LOGGER.debug("All data: {}", data);
         connectionHandler.create(data.toString());
         connectionHandler.logout();
         return new WriterResult(uId, counter);

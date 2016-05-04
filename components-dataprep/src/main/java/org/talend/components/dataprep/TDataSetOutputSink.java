@@ -54,6 +54,7 @@ public class TDataSetOutputSink implements Sink {
         } catch (IOException e) {
             validate = false;
         }
+        System.out.println("validate: "+ validate);
         if (validate)
             return ValidationResult.OK;
         else

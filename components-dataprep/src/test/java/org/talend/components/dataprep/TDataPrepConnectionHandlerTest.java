@@ -26,14 +26,14 @@ import static org.junit.Assert.assertTrue;
 public class TDataPrepConnectionHandlerTest {
 
     private static final String URL = "http://10.42.10.60:8888";
-    private static final String LOGIN = "maksym@dataprep.com"; //"maksym@dataprep.com";
-    private static final String PASS = "maksym"; //"maksym";
+    private static final String LOGIN = "maxime@dataprep.com"; //"maksym@dataprep.com";
+    private static final String PASS = "maxime"; //"maksym";
 
     @Test
     @Ignore
     public void validate() throws IOException {
         DataPrepConnectionHandler connectionHandler =
-                new DataPrepConnectionHandler("http://10.42.10.60:8888","maksym@dataprep.com","maksym",
+                new DataPrepConnectionHandler("http://10.42.10.60:8888","maxime@dataprep.com","maxime",
                 "read", "sldfjsl");
         assertTrue(connectionHandler.validate());
     }
@@ -77,4 +77,16 @@ public class TDataPrepConnectionHandlerTest {
         request.addHeader(httpHead);
         System.out.println(request.execute().returnContent().asString());
     }
+    @Test
+    public void createWithName() throws Exception {
+        String name = "fileName";
+        String folderPath = "/folderPath/";
+        String body = "col1, col2, col3\ntest1, test2, test3\ntest4, test5, test6";
+        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(
+                URL, LOGIN, PASS, "read", folderPath+name);
+        connectionHandler.connect();
+        connectionHandler.create(body);
+        connectionHandler.logout();
+    }
+
 }
