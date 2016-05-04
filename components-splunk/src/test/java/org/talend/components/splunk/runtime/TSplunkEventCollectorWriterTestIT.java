@@ -16,8 +16,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -25,19 +23,16 @@ import org.apache.avro.SchemaBuilder.FieldAssembler;
 import org.apache.avro.SchemaBuilder.FieldBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.WriterResult;
-import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.splunk.TSplunkEventCollectorDefinition;
 import org.talend.components.splunk.TSplunkEventCollectorProperties;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.util.AvroUtils;
 
 public class TSplunkEventCollectorWriterTestIT {
-
-    private final Map<String, Object> globalMap = new HashMap<>();
 
     private static final String URL = "http://127.0.0.1:8088";
 
@@ -47,15 +42,10 @@ public class TSplunkEventCollectorWriterTestIT {
 
     private final static String COMPONENT_ID = "Splunk_test";
 
-    @Before
-    public void initMap() {
-        globalMap.clear();
-    }
-
     @Ignore
     @Test
     public void testWritingOneRecord() throws IOException {
-        TestingRuntimeContainer container = new TestingRuntimeContainer(globalMap, COMPONENT_ID);
+        DefaultComponentRuntimeContainerImpl container = new TestingRuntimeContainer(COMPONENT_ID);
         TSplunkEventCollectorProperties props = (TSplunkEventCollectorProperties) new TSplunkEventCollectorDefinition()
                 .createProperties();
         // We will try to write one event at a time.
@@ -85,7 +75,7 @@ public class TSplunkEventCollectorWriterTestIT {
     @Ignore
     @Test
     public void testWritingFiveRecords() throws IOException {
-        TestingRuntimeContainer container = new TestingRuntimeContainer(globalMap, COMPONENT_ID);
+        TestingRuntimeContainer container = new TestingRuntimeContainer(COMPONENT_ID);
         TSplunkEventCollectorProperties props = (TSplunkEventCollectorProperties) new TSplunkEventCollectorDefinition()
                 .createProperties();
         // lets check if data will be written with batch size 100, but we have only 5 messages to send.
@@ -114,7 +104,7 @@ public class TSplunkEventCollectorWriterTestIT {
     @Ignore
     @Test
     public void testWritingOneRecordWithWrongToken() throws IOException {
-        TestingRuntimeContainer container = new TestingRuntimeContainer(globalMap, COMPONENT_ID);
+        TestingRuntimeContainer container = new TestingRuntimeContainer(COMPONENT_ID);
         TSplunkEventCollectorProperties props = (TSplunkEventCollectorProperties) new TSplunkEventCollectorDefinition()
                 .createProperties();
         // We will try to write one event at a time.
@@ -165,25 +155,12 @@ public class TSplunkEventCollectorWriterTestIT {
         return record;
     }
 
-    private static final class TestingRuntimeContainer implements RuntimeContainer {
-
-        private final Map<String, Object> map;
+    private static final class TestingRuntimeContainer extends DefaultComponentRuntimeContainerImpl {
 
         private final String currentComponentId;
 
-        public TestingRuntimeContainer(Map<String, Object> map, String componentId) {
-            this.map = map;
+        public TestingRuntimeContainer(String componentId) {
             this.currentComponentId = componentId;
-        }
-
-        @Override
-        public Object getComponentData(String componentId, String key) {
-            return map.get(componentId + key);
-        }
-
-        @Override
-        public void setComponentData(String componentId, String key, Object data) {
-            map.put(componentId + key, data);
         }
 
         @Override
