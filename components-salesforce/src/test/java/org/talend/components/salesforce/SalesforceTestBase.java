@@ -52,8 +52,6 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputPropert
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
-import org.talend.components.salesforce.tsalesforcewavebulkexec.TSalesforceWaveBulkExecDefinition;
-import org.talend.components.salesforce.tsalesforcewaveoutputbulkexec.TSalesforceWaveOutputBulkExecDefinition;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.properties.Property;
@@ -113,10 +111,6 @@ public class SalesforceTestBase extends AbstractComponentTest {
                     new TSalesforceGetUpdatedDefinition());
             testComponentRegistry.addComponent(TSalesforceOutputBulkDefinition.COMPONENT_NAME,
                     new TSalesforceOutputBulkDefinition());
-            testComponentRegistry.addComponent(TSalesforceWaveBulkExecDefinition.COMPONENT_NAME,
-                    new TSalesforceWaveBulkExecDefinition());
-            testComponentRegistry.addComponent(TSalesforceWaveOutputBulkExecDefinition.COMPONENT_NAME,
-                    new TSalesforceWaveOutputBulkExecDefinition());
             SalesforceConnectionWizardDefinition scwd = new SalesforceConnectionWizardDefinition();
             testComponentRegistry.addWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, scwd);
             testComponentRegistry.addWizard(SalesforceModuleWizardDefinition.COMPONENT_WIZARD_NAME,
