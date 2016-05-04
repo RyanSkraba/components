@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.jira.tjirainput;
 
+import static org.talend.daikon.avro.SchemaConstants.TALEND_IS_LOCKED;
+
 import java.util.Collections;
 import java.util.Set;
 
@@ -207,6 +209,7 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
         // create Schema for JSON
         Schema.Field jsonField = new Schema.Field("json", stringSchema, null, null, Order.ASCENDING);
         Schema initialSchema = Schema.createRecord("jira", null, null, false, Collections.singletonList(jsonField));
+        initialSchema.addProp(TALEND_IS_LOCKED, "true");
 
         schema.schema.setValue(initialSchema);
     }
