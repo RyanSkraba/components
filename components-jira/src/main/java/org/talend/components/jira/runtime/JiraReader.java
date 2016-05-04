@@ -246,7 +246,13 @@ public class JiraReader implements Reader<IndexedRecord> {
         
         // readTotal
         if (total == UNDEFINED) {
-            total = new IssueParser().getTotal(inputResult);
+            if (resource.endsWith("search")) {
+                total = new IssueParser().getTotal(inputResult);
+            }
+            // /rest/api/2/project doesn't support paging, so total is set to 0 to be less than startAt
+            if (resource.endsWith("project")) {
+                total = 0;
+            }
         }
         
         // iterate startAt
@@ -267,7 +273,9 @@ public class JiraReader implements Reader<IndexedRecord> {
      */
     List<String> getEntities(String inputResult) {
 
-        inputResult = inputResult.substring(inputResult.indexOf("issues"));
+        if (resource.endsWith("search")) {
+            inputResult = inputResult.substring(inputResult.indexOf("issues"));
+        }
         IssueParser parser = new IssueParser();
         return parser.getEntities(inputResult);
     }

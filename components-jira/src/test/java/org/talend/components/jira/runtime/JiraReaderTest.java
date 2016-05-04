@@ -86,6 +86,30 @@ public class JiraReaderTest {
         
         jiraReader.close();
     }
+    
+    
+    /**
+     * Checks paging implementation
+     * Requires real Jira instance, so it is ignored
+     * 
+     * @throws IOException in case of any exception
+     */
+    @Ignore
+    @Test
+    public void getProjectsTest() throws IOException {
+        String testUrl = "http://localhost:8080";
+        String testResource = "/rest/api/2/project";
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("maxResults", "10");
+        DefaultComponentRuntimeContainerImpl container = new DefaultComponentRuntimeContainerImpl();
+        Reader<IndexedRecord> jiraReader = new JiraReader(null, testUrl, testResource, USER, PASS, parameters, null, container);
+
+        for (boolean hasNext = jiraReader.start(); hasNext; hasNext = jiraReader.advance()) {
+            System.out.println(jiraReader.getCurrent().get(0));
+        }
+        
+        jiraReader.close();
+    }
 
     /**
      * Checks {@link JiraReader#getEntities(String)} returns correct number of entities
@@ -95,7 +119,7 @@ public class JiraReaderTest {
     @Test
     public void getEntitiesTest() throws Exception {
         DefaultComponentRuntimeContainerImpl container = new DefaultComponentRuntimeContainerImpl();
-        JiraReader jiraReader = new JiraReader(null, null, null, null, null, Collections.EMPTY_MAP, null, container);
+        JiraReader jiraReader = new JiraReader(null, null, "/rest/api/2/search", null, null, Collections.EMPTY_MAP, null, container);
         String jsonFile = "src/test/resources/org/talend/components/jira/runtime/entities.json";
         String testJson = Utils.readFile(jsonFile);
 
