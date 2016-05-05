@@ -69,6 +69,7 @@ public class SalesforceSource extends SalesforceSourceOrSink implements BoundedS
         } else if (properties instanceof TSalesforceGetUpdatedProperties) {
             return new SalesforceGetUpdatedReader(adaptor, this, (TSalesforceGetUpdatedProperties) properties);
         }else if (properties instanceof TSalesforceBulkExecProperties) {
+            ((TSalesforceBulkExecProperties) properties).connection.bulkConnection.setValue(true);
             return new SalesforceBulkExecReader(adaptor, this, (TSalesforceBulkExecProperties) properties);
         }
         return null;

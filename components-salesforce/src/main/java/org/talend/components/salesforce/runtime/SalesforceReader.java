@@ -37,6 +37,8 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
 
     protected SalesforceConnectionModuleProperties properties;
 
+    protected int dataCount;
+
     public SalesforceReader(RuntimeContainer container, SalesforceSource source) {
         super(container, source);
     }
@@ -109,5 +111,12 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
             sb.append(condition);
         }
         return sb.toString();
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (container != null) {
+            container.setComponentData(container.getCurrentComponentId(), TSalesforceInputProperties.NB_LINE, dataCount);
+        }
     }
 }
