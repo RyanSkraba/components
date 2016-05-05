@@ -118,8 +118,8 @@ public class TSplunkEventCollectorProperties extends FixedConnectorsComponentPro
     }
 
     @Override
-    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputComponent) {
-        if (isOutputComponent) {
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        if (!isOutputConnection) {
             return Collections.singleton(MAIN_CONNECTOR);
         }
         return Collections.emptySet();
