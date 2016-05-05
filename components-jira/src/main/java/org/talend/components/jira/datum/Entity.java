@@ -16,12 +16,29 @@ package org.talend.components.jira.datum;
  * Base class of Jira entities like Issue, Project, Search etc.
  * Each {@link Entity} represents separate Jira REST API resource
  */
-public interface Entity {
+public class Entity {
+    
+    /**
+     * JSON representation of this {@link Entity}
+     */
+    private String json;
+    
+    /**
+     * Constructor sets Entity JSON representation 
+     *
+     * @param json Entity JSON representation
+     */
+    public Entity(String json) {
+        this.json = json;
+    }
 
     /**
      * Returns JSON representation of this {@link Entity}
      * 
      * @return JSON representation of this {@link Entity}
      */
-    String getJson();
+    public String getJson() {
+        return json;
+    }
+    
 }

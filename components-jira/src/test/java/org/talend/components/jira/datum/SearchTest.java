@@ -26,7 +26,15 @@ import org.talend.components.jira.testutils.Utils;
  */
 public class SearchTest {
     
-    private static String json;
+    /**
+     * JSON, which contains total property
+     */
+    private static String paginationJson;
+    
+    /**
+     * JSON, which doesn't contain total property
+     */
+    private static String noPaginationJson;
     
     /**
      * Reads Search entity json from test file
@@ -35,7 +43,8 @@ public class SearchTest {
      */
     @BeforeClass
     public static void setUpClass() throws IOException {
-        json = Utils.readFile("src/test/resources/org/talend/components/jira/datum/entities.json");
+        paginationJson = Utils.readFile("src/test/resources/org/talend/components/jira/datum/entities.json");
+        noPaginationJson = Utils.readFile("src/test/resources/org/talend/components/jira/datum/noPagination.json");
     }
 
     /**
@@ -43,10 +52,10 @@ public class SearchTest {
      */
     @Test
     public void getJsonTest() {
-        Search search = new Search(json);
+        Search search = new Search(paginationJson);
         
         String actual = search.getJson();
-        assertEquals(json, actual);
+        assertEquals(paginationJson, actual);
     }
     
     /**
@@ -54,10 +63,21 @@ public class SearchTest {
      */
     @Test
     public void getTotalTest() {
-        Search search = new Search(json);
+        Search search = new Search(paginationJson);
         
         int actual = search.getTotal();
         assertEquals(37, actual);
+    }
+    
+    /**
+     * Check {@link Search#getTotal()} returns -1 value, when total property is not defined in JSON representation
+     */
+    @Test
+    public void getTotalUndefinedTest() {
+        Search search = new Search(noPaginationJson);
+        
+        int actual = search.getTotal();
+        assertEquals(-1, actual);
     }
     
     /**
@@ -65,7 +85,7 @@ public class SearchTest {
      */
     @Test
     public void getEntitiesTest() {
-        Search search = new Search(json);
+        Search search = new Search(paginationJson);
         
         List<Entity> entities = search.getEntities();
         assertEquals(3, entities.size());
