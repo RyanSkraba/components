@@ -105,7 +105,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputDefinition().createProperties();
         assertEquals(2, props.queryMode.getPossibleValues().size());
         Property returns = (Property) props.getProperty(ComponentProperties.RETURNS);
-        assertEquals("NB_LINE", returns.getChildren().get(0).getName());
+        assertEquals("NB_LINE", returns.getChildren().get(1).getName());
     }
 
     static class RepoProps {
