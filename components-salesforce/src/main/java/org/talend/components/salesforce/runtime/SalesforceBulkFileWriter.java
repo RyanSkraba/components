@@ -12,6 +12,9 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.WriteOperation;
@@ -20,9 +23,6 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.BulkFileProperties;
 import org.talend.components.common.runtime.BulkFileWriter;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkProperties;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Prepare Data Files for bulk execution
@@ -49,20 +49,23 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
         		header = sbuilder.append(ref_module_name).append(":").append(ref_field_name).append(".").append(f.name()).toString();
         		sbuilder.setLength(0);
         	} else {
-        		int index = getIndex((List<String>)salesforceBulkProperties.upsertRelationTable.columnName.getValue(), header);
-            	if(index > -1) {
-            		List<String> polymorphics = (List<String>)salesforceBulkProperties.upsertRelationTable.polymorphic.getValue();
-            		List<String> lookupFieldModuleNames = (List<String>)salesforceBulkProperties.upsertRelationTable.lookupFieldModuleName.getValue();
-            		List<String> lookupFieldNames = (List<String>)salesforceBulkProperties.upsertRelationTable.lookupFieldName.getValue();
-            		List<String> externalIdFromLookupFields = (List<String>)salesforceBulkProperties.upsertRelationTable.lookupFieldExternalIdName.getValue();
-            		
-            		if("true".equals(polymorphics.get(index))) {
-            			sbuilder.append(lookupFieldModuleNames.get(index)).append(":");
-            		}
-            		sbuilder.append(lookupFieldNames.get(index)).append(".").append(externalIdFromLookupFields.get(index));
-            		header = sbuilder.toString();
-            		sbuilder.setLength(0);
-            	}
+        		Object value = salesforceBulkProperties.upsertRelationTable.columnName.getValue();
+        		if(value!=null && value instanceof List) {
+	        		int index = getIndex((List<String>)value, header);
+	            	if(index > -1) {
+	            		List<String> polymorphics = (List<String>)salesforceBulkProperties.upsertRelationTable.polymorphic.getValue();
+	            		List<String> lookupFieldModuleNames = (List<String>)salesforceBulkProperties.upsertRelationTable.lookupFieldModuleName.getValue();
+	            		List<String> lookupFieldNames = (List<String>)salesforceBulkProperties.upsertRelationTable.lookupFieldName.getValue();
+	            		List<String> externalIdFromLookupFields = (List<String>)salesforceBulkProperties.upsertRelationTable.lookupFieldExternalIdName.getValue();
+	            		
+	            		if("true".equals(polymorphics.get(index))) {
+	            			sbuilder.append(lookupFieldModuleNames.get(index)).append(":");
+	            		}
+	            		sbuilder.append(lookupFieldNames.get(index)).append(".").append(externalIdFromLookupFields.get(index));
+	            		header = sbuilder.toString();
+	            		sbuilder.setLength(0);
+	            	}
+        		}
         	}
         	
             headers.add(header);
