@@ -36,6 +36,11 @@ public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition im
         setTriggers(new Trigger(TriggerType.ITERATE, 0, 0), new Trigger(TriggerType.SUBJOB_OK, 1, 0),
                 new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
     }
+    
+    @Override
+    public boolean isSchemaAutoPropagate() {
+        return false;
+    }
 
     @Override
     public boolean isConditionalInputs() {
