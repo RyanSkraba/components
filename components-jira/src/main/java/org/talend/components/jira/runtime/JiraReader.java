@@ -14,7 +14,6 @@ package org.talend.components.jira.runtime;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -22,18 +21,15 @@ import java.util.NoSuchElementException;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.joda.time.Instant;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jira.avro.IssueAdapterFactory;
 import org.talend.components.jira.avro.IssueIndexedRecord;
 import org.talend.components.jira.connection.Rest;
+import org.talend.components.jira.datum.Entity;
+import org.talend.components.jira.datum.Search;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
-
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
 
 /**
  * Jira reader implementation
@@ -71,9 +67,9 @@ public class JiraReader implements Reader<IndexedRecord> {
     private String inputResult;
 
     /**
-     * A list of Jira entities in a form of JSON String obtained from Jira server
+     * A list of Jira {@link Entity} obtained from Jira server
      */
-    private List<String> entities;
+    private List<Entity> entities;
 
     /**
      * Index of current Jira entity
@@ -152,7 +148,8 @@ public class JiraReader implements Reader<IndexedRecord> {
         if (!queryNextPage()) {
             return false;
         }
-        entities = getEntities(inputResult);
+        Search search = new Search(inputResult);
+        entities = search.getEntities();
         return true;
     }
 
@@ -169,8 +166,8 @@ public class JiraReader implements Reader<IndexedRecord> {
         if (!queryNextPage()) {
             return false;
         }
-
-        entities = getEntities(inputResult);
+        Search search = new Search(inputResult);
+        entities = search.getEntities();
         entityIndex = 0;
 
         return true;
@@ -179,8 +176,9 @@ public class JiraReader implements Reader<IndexedRecord> {
     @Override
     public IndexedRecord getCurrent() throws NoSuchElementException {
         entityCounter++;
-        String entity = entities.get(entityIndex);
-        return getFactory().convertToAvro(entity);
+        Entity entity = entities.get(entityIndex);
+        String json = entity.getJson();
+        return getFactory().convertToAvro(json);
     }
 
     /**
@@ -247,7 +245,8 @@ public class JiraReader implements Reader<IndexedRecord> {
         // readTotal
         if (total == UNDEFINED) {
             if (resource.endsWith("search")) {
-                total = new IssueParser().getTotal(inputResult);
+                Search search = new Search(inputResult);
+                total = search.getTotal();
             }
             // /rest/api/2/project doesn't support paging, so total is set to 0 to be less than startAt
             if (resource.endsWith("project")) {
@@ -265,95 +264,4 @@ public class JiraReader implements Reader<IndexedRecord> {
         }
     }
 
-    /**
-     * Splits JSON string to separate Jira entities
-     * 
-     * @param inputResult whole response JSON string
-     * @return a list of JSON strings, which describes Jira entities
-     */
-    List<String> getEntities(String inputResult) {
-
-        if (resource.endsWith("search")) {
-            inputResult = inputResult.substring(inputResult.indexOf("issues"));
-        }
-        IssueParser parser = new IssueParser();
-        return parser.getEntities(inputResult);
-    }
-
-    /**
-     * Weird code to divide big JSON string into list of entities
-     */
-    public class IssueParser {
-
-        private final Logger LOG = LoggerFactory.getLogger(IssueParser.class);
-
-        List<String> getEntities(String inputResult) {
-
-            List<String> entities = new LinkedList<String>();
-            State currentState = State.READ_JSON_ARRAY;
-            StringBuilder entityBuilder = null;
-            int parenthesisState = 0;
-
-            for (char c : inputResult.toCharArray()) {
-
-                switch (c) {
-                case '{': {
-                    if (currentState == State.READ_JSON_ARRAY) {
-                        currentState = State.READ_JSON_OBJECT;
-                        entityBuilder = new StringBuilder();
-                    }
-                    parenthesisState++;
-                    entityBuilder.append(c);
-                    break;
-                }
-                case '}': {
-                    entityBuilder.append(c);
-                    parenthesisState--;
-                    if (parenthesisState == 0) {
-                        currentState = State.READ_JSON_ARRAY;
-                        entities.add(entityBuilder.toString());
-                    }
-                    break;
-                }
-                default: {
-                    if (currentState == State.READ_JSON_OBJECT) {
-                        entityBuilder.append(c);
-                    }
-                }
-                }
-            }
-            return entities;
-        }
-
-        int getTotal(String inputResult) {
-            JsonFactory factory = new JsonFactory();
-            try {
-                JsonParser parser = factory.createParser(inputResult);
-
-                // rewind until meet total field
-                String currentField = parser.nextFieldName();
-                do {
-                    currentField = parser.nextFieldName();
-                } while (!"total".equals(currentField));
-
-                // get total value
-                parser.nextValue();
-                String value = parser.getText();
-
-                return Integer.parseInt(value);
-            } catch (IOException e) {
-                LOG.debug("Exception during JSON parsing. {}", e.getMessage());
-            }
-            return UNDEFINED;
-        }
-
-    }
-
-    /**
-     * JSON Parser state
-     */
-    private enum State {
-        READ_JSON_OBJECT,
-        READ_JSON_ARRAY,
-    }
 }

@@ -12,13 +12,11 @@
 // ============================================================================
 package org.talend.components.jira.runtime;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.avro.generic.IndexedRecord;
@@ -26,7 +24,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
-import org.talend.components.jira.testutils.Utils;
 
 /**
  * Unit-tests for {@link JiraReader}
@@ -109,24 +106,6 @@ public class JiraReaderTest {
         }
         
         jiraReader.close();
-    }
-
-    /**
-     * Checks {@link JiraReader#getEntities(String)} returns correct number of entities
-     * 
-     * @throws Exception in case of any exception
-     */
-    @Test
-    public void getEntitiesTest() throws Exception {
-        DefaultComponentRuntimeContainerImpl container = new DefaultComponentRuntimeContainerImpl();
-        JiraReader jiraReader = new JiraReader(null, null, "/rest/api/2/search", null, null, Collections.EMPTY_MAP, null, container);
-        String jsonFile = "src/test/resources/org/talend/components/jira/datum/entities.json";
-        String testJson = Utils.readFile(jsonFile);
-
-        List<String> strs = jiraReader.getEntities(testJson);
-        jiraReader.close();
-
-        assertEquals(3, strs.size());
     }
 
 }
