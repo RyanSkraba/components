@@ -15,7 +15,9 @@ package org.talend.components.salesforce;
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.FixedConnectorsComponentProperties;
+import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 
 /**
@@ -41,6 +43,9 @@ public abstract class SalesforceConnectionModuleProperties extends FixedConnecto
     @Override
     public void setupProperties() {
         super.setupProperties();
+        returns = ComponentPropertyFactory.newReturnsProperty();
+        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.STRING, "ERROR_MESSAGE"); //$NON-NLS-1$ 
+        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, NB_LINE);
         // Allow for subclassing
         module = new SalesforceModuleProperties("module");
         module.connection = connection;

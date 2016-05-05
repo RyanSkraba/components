@@ -110,8 +110,6 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
 
         outputAction.setValue(ACTION_INSERT);
 
-        returns = ComponentPropertyFactory.newReturnsProperty();
-        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, NB_LINE); //$NON-NLS-1$
         ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, NB_SUCCESS); //$NON-NLS-1$
         ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, NB_REJECT); //$NON-NLS-1$
 
