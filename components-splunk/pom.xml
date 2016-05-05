@@ -5,7 +5,8 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.8.0-SNAPSHOT</version>
+        <version>0.9.0-SNAPSHOT</version>
+        <relativePath>../components-parent/pom.xml</relativePath>        
     </parent>
 
     <name>Components - tSplunkEventCollector</name>
@@ -13,7 +14,7 @@
     <artifactId>components-splunk</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <properties>
-        <components.api.version>0.8.0-SNAPSHOT</components.api.version>
+        <components.api.version>0.9.0-SNAPSHOT</components.api.version>
     </properties>
     <packaging>bundle</packaging>
     <repositories>
