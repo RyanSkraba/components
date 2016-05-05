@@ -64,7 +64,7 @@ public class JiraReader implements Reader<IndexedRecord> {
     /**
      * JSON string, which represents result obtained from Jira server
      */
-    private String inputResult;
+    private String response;
 
     /**
      * A list of Jira {@link Entity} obtained from Jira server
@@ -77,23 +77,23 @@ public class JiraReader implements Reader<IndexedRecord> {
     private int entityIndex = 0;
     
     /**
-     * Number of Jira entities obtained
+     * Number of Jira entities read
      */
     private int entityCounter = 0;
     
     /**
-     * Jira paging http parameter, which defines page size 
+     * Jira pagination http parameter, which defines page size 
      * (number of entities per request)
      */
     private int maxResults = 50;
     
     /**
-     * Jira paging http parameter, which defines from which entity to start
+     * Jira pagination http parameter, which defines from which entity to start
      */
     private int startAt = 0;
     
     /**
-     * Jira paging parameter, which defines total number of entities
+     * Jira pagination parameter, which defines total number of entities
      */
     private int total = UNDEFINED;
 
@@ -103,11 +103,19 @@ public class JiraReader implements Reader<IndexedRecord> {
     private Map<String, String> sharedParameters;
     
     /**
-     * Data schema
+     * Runtime container
      */
-    private Schema schema;
-    
     private final RuntimeContainer container;
+    
+    /**
+     * Denotes this {@link Reader} was started
+     */
+    private boolean started;
+    
+    /**
+     * Denotes this {@link Reader} has more records
+     */
+    private boolean hasMoreRecords;
 
     /**
      * Constructor sets required properties for http connection
@@ -126,7 +134,6 @@ public class JiraReader implements Reader<IndexedRecord> {
         this.source = source;
         this.resource = resource;
         this.sharedParameters = sharedParameters;
-        this.schema = schema;
         this.container = container;
         rest = new Rest(hostPort);
         rest.setCredentials(user, password);
@@ -135,61 +142,77 @@ public class JiraReader implements Reader<IndexedRecord> {
         if (maxRelultValue != null) {
             maxResults = Integer.parseInt(maxRelultValue);
         }
+        
+        factory = new IssueAdapterFactory();
+        factory.setSchema(schema);
     }
 
     /**
-     * TODO implement it
-     * 
-     * @return
-     * @throws IOException
+     * {@inheritDoc}
+     * @throws IOException in case of exception during http connection 
      */
     @Override
     public boolean start() throws IOException {
-        if (!queryNextPage()) {
-            return false;
-        }
-        Search search = new Search(inputResult);
-        entities = search.getEntities();
-        return true;
+        started = true;
+        makeHttpRequest();
+        return hasMoreRecords;
     }
 
     /**
-     * TODO implement it
+     * {@inheritDoc}
+     * @throws IOException in case {@link JiraReader#start()} wasn't invoked or
+     * in case of exception during http connection
      */
     @Override
     public boolean advance() throws IOException {
+        if (!started) {
+            throw new IOException("Reader wasn't started");
+        }
         entityIndex++;
+        entityCounter++;
 
         if (entityIndex < entities.size()) {
             return true;
+        } else {
+            hasMoreRecords = false;
+            // try to get more
+            if (startAt < total) {
+                makeHttpRequest();
+            }
         }
-        if (!queryNextPage()) {
-            return false;
-        }
-        Search search = new Search(inputResult);
-        entities = search.getEntities();
-        entityIndex = 0;
-
-        return true;
-    }
-
-    @Override
-    public IndexedRecord getCurrent() throws NoSuchElementException {
-        entityCounter++;
-        Entity entity = entities.get(entityIndex);
-        String json = entity.getJson();
-        return getFactory().convertToAvro(json);
+        return hasMoreRecords;
     }
 
     /**
-     * TODO implement it (extend from BoundedReader)
-     * 
-     * @return
-     * @throws NoSuchElementException
+     * {@inheritDoc}
+     */
+    @Override
+    public IndexedRecord getCurrent() throws NoSuchElementException {
+        if (!started) {
+            throw new NoSuchElementException("Reader wasn't started");
+        }
+        if (!hasMoreRecords) {
+            throw new NoSuchElementException("No records available");
+        }
+        
+        Entity entity = entities.get(entityIndex);
+        String json = entity.getJson();
+        return factory.convertToAvro(json);
+    }
+
+    /**
+     * @return null
+     * @throws NoSuchElementException in case {@link JiraReader} wasn't started or 
+     * there is no more records available
      */
     @Override
     public Instant getCurrentTimestamp() throws NoSuchElementException {
-        // TODO Auto-generated method stub
+        if (!started) {
+            throw new NoSuchElementException("Reader wasn't started");
+        }
+        if (!hasMoreRecords) {
+            throw new NoSuchElementException("No records available");
+        }
         return null;
     }
 
@@ -210,57 +233,47 @@ public class JiraReader implements Reader<IndexedRecord> {
     }
 
     /**
-     * Returns an instance of {@link IndexedRecordAdapterFactory}
+     * Makes http request to the server and process its response
      * 
-     * @return {@link IssueAdapterFactory}
+     * @throws IOException in case of exception during http connection
      */
-    private IndexedRecordAdapterFactory<String, IssueIndexedRecord> getFactory() {
-        if (factory == null) {
-            factory = new IssueAdapterFactory();
-            factory.setSchema(schema);
-        }
-        return factory;
+    protected void makeHttpRequest() throws IOException {
+        Map<String, String> parameters = prepareParameters();
+        response = rest.get(resource, parameters);
+        processResponse();
     }
 
     /**
+     * Prepares and returns map with http parameters suitable for current REST API resource.
      * 
-     * 
-     * @return next response result
-     * @throws IOException in case of exception during http connection
+     * @return map with http parameters
      */
-    private boolean queryNextPage() throws IOException {
-        
-        // check next pages availability
-        if (total != UNDEFINED && startAt >= total) {
-            return false;
-        }
-        
-        // generate parameters
+    protected Map<String, String> prepareParameters() {
         Map<String, String> parameters = new HashMap<>(sharedParameters);
         parameters.put("startAt", Integer.toString(startAt));
-        
-        // make request
-        inputResult = rest.get(resource, parameters);
-        
-        // readTotal
-        if (total == UNDEFINED) {
-            if (resource.endsWith("search")) {
-                Search search = new Search(inputResult);
-                total = search.getTotal();
-            }
-            // /rest/api/2/project doesn't support paging, so total is set to 0 to be less than startAt
-            if (resource.endsWith("project")) {
-                total = 0;
-            }
+        return parameters;
+    }
+
+    /**
+     * Process response. Updates total and startAt value.
+     * Retrieves entities from response
+     */
+    protected void processResponse() {
+        Search search = new Search(response);
+        // FIXME
+        if (resource.endsWith("search")) {
+            total = search.getTotal();
         }
-        
-        // iterate startAt
+        // /rest/api/2/project doesn't support paging, so total is set to 0 to be less than startAt
+        if (resource.endsWith("project")) {
+            total = 0;
+        }
         startAt = startAt + maxResults;
-        
-        if (inputResult == null || inputResult.isEmpty()) {
-            return false;
-        } else {
-            return true;
+        entities = search.getEntities();
+        entityIndex = 0;
+        if (!entities.isEmpty()) {
+            hasMoreRecords = true;
+            entityCounter++;
         }
     }
 
