@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
@@ -18,7 +19,21 @@ public class BulkFileProperties extends FixedConnectorsComponentProperties {
 
     public Property append = newProperty(Property.Type.BOOLEAN, "append");
 
-    public SchemaProperties schema = new SchemaProperties("schema");
+    public ISchemaListener schemaListener;
+    
+    public SchemaProperties schema = new SchemaProperties("schema") {
+
+        public void afterSchema() {
+            if (schemaListener != null) {
+                schemaListener.afterSchema();
+            }
+        }
+    
+    };
+    
+    public void setSchemaListener(ISchemaListener schemaListener) {
+        this.schemaListener = schemaListener;
+    }
 
     public BulkFileProperties(String name) {
         super(name);

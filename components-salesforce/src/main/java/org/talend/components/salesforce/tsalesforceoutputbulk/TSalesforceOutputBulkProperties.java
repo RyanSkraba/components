@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.avro.Schema;
+import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.BulkFileProperties;
 import org.talend.components.salesforce.UpsertRelationTable;
@@ -43,7 +44,16 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
         returns = ComponentPropertyFactory.newReturnsProperty();
         upsertRelationTable.setUsePolymorphic(true);
         ComponentPropertyFactory.newReturnProperty(returns, Property.Type.STRING, "ERROR_MESSAGE"); //$NON-NLS-1$ 
-        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_LINE"); //$NON-NLS-1$        
+        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_LINE"); //$NON-NLS-1$
+        
+        this.setSchemaListener(new ISchemaListener() {
+
+            @Override
+            public void afterSchema() {
+            	beforeUpsertRelationTable();
+            }
+            
+        });
     }
     
     public void beforeUpsertRelationTable() {
