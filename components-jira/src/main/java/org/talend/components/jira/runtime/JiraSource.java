@@ -93,10 +93,27 @@ public class JiraSource implements Source {
         String hostPort = properties.host.getStringValue();
         String userId = properties.userPassword.userId.getStringValue();
         String password = properties.userPassword.password.getStringValue();
+        String resourceType = properties.resource.getStringValue();
         String resourcePath = getResourcePath();
         Map<String, String> sharedParameters = getSharedParameters();
         Schema dataSchema = (Schema) properties.schema.schema.getValue();
-        return new JiraReader(this, hostPort, resourcePath, userId, password, sharedParameters, dataSchema, container);
+       
+        JiraReader reader = null;
+        switch (resourceType) {
+        case TJiraInputProperties.ISSUE: {
+            reader =  new JiraSearchReader(this, hostPort, resourcePath, userId, password, sharedParameters, dataSchema, container);
+            break;
+        }
+        case TJiraInputProperties.PROJECT: {
+            reader = new JiraProjectReader(this, hostPort, resourcePath, userId, password, sharedParameters, dataSchema, container);
+            break;
+        }
+        default: {
+            reader = new JiraSearchReader(this, hostPort, resourcePath, userId, password, sharedParameters, dataSchema, container);
+            break;
+        }
+        }
+        return reader;
     }
     
     /**

@@ -52,7 +52,7 @@ public class JiraReaderTest {
         String testUrl = "http://localhost:8080/";
         String testResource = "rest/api/2/issue/TP-1";
         DefaultComponentRuntimeContainerImpl container = new DefaultComponentRuntimeContainerImpl();
-        Reader<IndexedRecord> jiraReader = new JiraReader(null, testUrl, testResource, USER, PASS, Collections.EMPTY_MAP, null, container);
+        Reader<IndexedRecord> jiraReader = new JiraSearchReader(null, testUrl, testResource, USER, PASS, Collections.EMPTY_MAP, null, container);
 
         boolean started = jiraReader.start();
         jiraReader.close();
@@ -75,7 +75,7 @@ public class JiraReaderTest {
         parameters.put("jql", "project=TP");
         parameters.put("maxResults", "10");
         DefaultComponentRuntimeContainerImpl container = new DefaultComponentRuntimeContainerImpl();
-        Reader<IndexedRecord> jiraReader = new JiraReader(null, testUrl, testResource, USER, PASS, parameters, null, container);
+        Reader<IndexedRecord> jiraReader = new JiraSearchReader(null, testUrl, testResource, USER, PASS, parameters, null, container);
 
         for (boolean hasNext = jiraReader.start(); hasNext; hasNext = jiraReader.advance()) {
             System.out.println(jiraReader.getCurrent().get(0));
@@ -99,7 +99,7 @@ public class JiraReaderTest {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("maxResults", "10");
         DefaultComponentRuntimeContainerImpl container = new DefaultComponentRuntimeContainerImpl();
-        Reader<IndexedRecord> jiraReader = new JiraReader(null, testUrl, testResource, USER, PASS, parameters, null, container);
+        Reader<IndexedRecord> jiraReader = new JiraProjectReader(null, testUrl, testResource, USER, PASS, parameters, null, container);
 
         for (boolean hasNext = jiraReader.start(); hasNext; hasNext = jiraReader.advance()) {
             System.out.println(jiraReader.getCurrent().get(0));

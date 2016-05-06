@@ -13,7 +13,6 @@
 package org.talend.components.jira.runtime;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -28,18 +27,12 @@ import org.talend.components.jira.avro.IssueAdapterFactory;
 import org.talend.components.jira.avro.IssueIndexedRecord;
 import org.talend.components.jira.connection.Rest;
 import org.talend.components.jira.datum.Entity;
-import org.talend.components.jira.datum.Search;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 
 /**
  * Jira reader implementation
  */
-public class JiraReader implements Reader<IndexedRecord> {
-    
-    /**
-     * Specifies some integer value is undefined
-     */
-    private static final int UNDEFINED = -1;
+public abstract class JiraReader implements Reader<IndexedRecord> {
 
     /**
      * {@link Source} instance, which had created this {@link Reader}
@@ -80,27 +73,11 @@ public class JiraReader implements Reader<IndexedRecord> {
      * Number of Jira entities read
      */
     private int entityCounter = 0;
-    
-    /**
-     * Jira pagination http parameter, which defines page size 
-     * (number of entities per request)
-     */
-    private int maxResults = 50;
-    
-    /**
-     * Jira pagination http parameter, which defines from which entity to start
-     */
-    private int startAt = 0;
-    
-    /**
-     * Jira pagination parameter, which defines total number of entities
-     */
-    private int total = UNDEFINED;
 
     /**
-     * Stores http query parameters which are shared between requests
+     * Stores http parameters which are shared between requests
      */
-    private Map<String, String> sharedParameters;
+    private final Map<String, String> sharedParameters;
     
     /**
      * Runtime container
@@ -126,8 +103,9 @@ public class JiraReader implements Reader<IndexedRecord> {
      * @param user Basic authorization user id
      * @param password Basic authorizatiion password
      * @param sharedParameters map with http parameter which are shared between requests. It could include maxResult
-     * @param Schema data schema
      * parameter
+     * @param Schema data schema
+     * @param container runtime container
      */
     public JiraReader(JiraSource source, String hostPort, String resource, String user, String password,
             Map<String, String> sharedParameters, Schema schema, RuntimeContainer container) {
@@ -137,11 +115,6 @@ public class JiraReader implements Reader<IndexedRecord> {
         this.container = container;
         rest = new Rest(hostPort);
         rest.setCredentials(user, password);
-        
-        String maxRelultValue = sharedParameters.get("maxResults");
-        if (maxRelultValue != null) {
-            maxResults = Integer.parseInt(maxRelultValue);
-        }
         
         factory = new IssueAdapterFactory();
         factory.setSchema(schema);
@@ -175,13 +148,17 @@ public class JiraReader implements Reader<IndexedRecord> {
             return true;
         } else {
             hasMoreRecords = false;
-            // try to get more
-            if (startAt < total) {
-                makeHttpRequest();
-            }
+            requestMoreRecords();
         }
         return hasMoreRecords;
     }
+    
+    /**
+     * Tries to get more records
+     * 
+     * @throws IOException in case of exception during http connection
+     */
+    protected abstract void requestMoreRecords() throws IOException;
 
     /**
      * {@inheritDoc}
@@ -240,41 +217,28 @@ public class JiraReader implements Reader<IndexedRecord> {
     protected void makeHttpRequest() throws IOException {
         Map<String, String> parameters = prepareParameters();
         response = rest.get(resource, parameters);
-        processResponse();
+        entities = processResponse(response);
+        if(!entities.isEmpty()) {
+            hasMoreRecords = true;
+            entityIndex = 0;
+            entityCounter++;
+        }
     }
 
     /**
      * Prepares and returns map with http parameters suitable for current REST API resource.
+     * Returns shared parameters by default
      * 
-     * @return map with http parameters
+     * @return map with shared parameters
      */
     protected Map<String, String> prepareParameters() {
-        Map<String, String> parameters = new HashMap<>(sharedParameters);
-        parameters.put("startAt", Integer.toString(startAt));
-        return parameters;
+        return sharedParameters;
     }
 
     /**
-     * Process response. Updates total and startAt value.
+     * Process response. Updates http parameters for next request if needed.
      * Retrieves entities from response
      */
-    protected void processResponse() {
-        Search search = new Search(response);
-        // FIXME
-        if (resource.endsWith("search")) {
-            total = search.getTotal();
-        }
-        // /rest/api/2/project doesn't support paging, so total is set to 0 to be less than startAt
-        if (resource.endsWith("project")) {
-            total = 0;
-        }
-        startAt = startAt + maxResults;
-        entities = search.getEntities();
-        entityIndex = 0;
-        if (!entities.isEmpty()) {
-            hasMoreRecords = true;
-            entityCounter++;
-        }
-    }
+    protected abstract List<Entity> processResponse(String response); 
 
 }
