@@ -16,15 +16,12 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 
 public class DataPrepConnectionHandler {
 
@@ -79,21 +76,15 @@ public class DataPrepConnectionHandler {
             return false;
     }
 
-    List<Map<String,String>> readDataSet() throws IOException {
+    DataPrepStreamMapper readDataSetIterator() throws IOException {
         Request request = Request.Get(url+ "/api/datasets/" + dataSetName + "?metadata=false").
                 addHeader(authorisationHeader);
-        HttpResponse current = null;
-        try {
-            current = request.execute().returnResponse();
-        } finally {
-            logout();
-        }
-        LOGGER.debug("Read DataSet Response: "+ current.toString());
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES,
-                false);
-        SourceDataSet dataSet = objectMapper.readValue(current.getEntity().getContent(), SourceDataSet.class);
-        return dataSet.getRecords();
+        HttpResponse current = request.execute().returnResponse();
+        DataPrepStreamMapper dataPrepStreamMapper = new DataPrepStreamMapper(current.getEntity().getContent());
+
+        LOGGER.debug("Read DataSet Response: {} ", current);
+
+        return dataPrepStreamMapper;
     }
 
     void create(String data) throws IOException {
@@ -113,18 +104,20 @@ public class DataPrepConnectionHandler {
     List<Column> readSourceSchema() throws IOException {
         Request request = Request.Get(url +"/api/datasets/"+ dataSetName + "/metadata");
         request.addHeader(authorisationHeader);
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES,
-                false);
-        String test = null;
+
+        DataPrepStreamMapper dataPrepStreamMapper = null;
+        MetaData metaData;
+
         try {
-            test = request.execute().returnContent().asString();
-            LOGGER.debug("Schema is: {}", test);
+            dataPrepStreamMapper = new DataPrepStreamMapper(request.execute().returnResponse().getEntity().getContent());
+            metaData = dataPrepStreamMapper.getMetaData();
         } finally {
+            if (dataPrepStreamMapper != null) {
+                dataPrepStreamMapper.close();
+            }
             logout();
         }
-        MetaData metaData = objectMapper.readValue(test, MetaData.class);
+
         return metaData.getColumns();
     }
-
 }

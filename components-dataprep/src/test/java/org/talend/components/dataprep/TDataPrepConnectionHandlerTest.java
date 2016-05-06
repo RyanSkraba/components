@@ -15,33 +15,42 @@ package org.talend.components.dataprep;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Map;
+import java.net.HttpURLConnection;
 
 import static org.junit.Assert.assertTrue;
+
 @Ignore
 public class TDataPrepConnectionHandlerTest {
 
     private static final String URL = "http://10.42.10.60:8888";
     private static final String LOGIN = "maxime@dataprep.com"; //"maksym@dataprep.com";
     private static final String PASS = "maxime"; //"maksym";
+    private String string;
 
     @Test
     @Ignore
     public void validate() throws IOException {
         DataPrepConnectionHandler connectionHandler =
-                new DataPrepConnectionHandler("http://10.42.10.60:8888","maxime@dataprep.com","maxime",
-                "read", "sldfjsl");
+                new DataPrepConnectionHandler("http://10.42.10.60:8888","maxime@dataprep.com","maxime", "sldfjsl");
         assertTrue(connectionHandler.validate());
     }
 
     @Test
     public void readSchema() throws IOException {
         DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(
-                URL, LOGIN, PASS, "read", "0d3df0df4a4aca0529ef5755bd03519adb115248");
+                URL, LOGIN, PASS, "0d3df0df4a4aca0529ef5755bd03519adb115248");
         System.out.println(connectionHandler.connect());
         for (Column column: connectionHandler.readSourceSchema()) {
             System.out.println(column);
@@ -49,18 +58,18 @@ public class TDataPrepConnectionHandlerTest {
         connectionHandler.logout();
     }
 
-    @Test
-    public void readDataSchema() throws IOException {
-        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(
-                URL, LOGIN, PASS, "read", "7291aa08-fed5-4267-83f5-ede7e7d66a72");
-        System.out.println(connectionHandler.connect());
-        for (Map<String,String> record: connectionHandler.readDataSet()) {
-            for (Map.Entry<String,String> field: record.entrySet())
-                System.out.println(field.getValue());
-            System.out.println("\n");
-        }
-        connectionHandler.logout();
-    }
+//    @Test
+//    public void readDataSchema() throws IOException {
+//        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(
+//                URL, LOGIN, PASS, "7291aa08-fed5-4267-83f5-ede7e7d66a72");
+//        System.out.println(connectionHandler.connect());
+//        for (Map<String,String> record: connectionHandler.readDataSet()) {
+//            for (Map.Entry<String,String> field: record.entrySet())
+//                System.out.println(field.getValue());
+//            System.out.println("\n");
+//        }
+//        connectionHandler.logout();
+//    }
 
     @Test
     public void logout() throws IOException {
@@ -70,7 +79,7 @@ public class TDataPrepConnectionHandlerTest {
     @Test
     public void schema() throws IOException {
         DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(
-                URL, LOGIN, PASS, "read", "db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
+                URL, LOGIN, PASS, "db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
         HttpResponse response = connectionHandler.connect();
         Header httpHead = response.getFirstHeader("Authorization");
         Request request = Request.Get(URL +"/api/datasets/"+ "db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e" + "/metadata");
@@ -83,10 +92,72 @@ public class TDataPrepConnectionHandlerTest {
         String folderPath = "/folderPath/";
         String body = "col1, col2, col3\ntest1, test2, test3\ntest4, test5, test6";
         DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(
-                URL, LOGIN, PASS, "read", folderPath+name);
+                URL, LOGIN, PASS, folderPath+name);
         connectionHandler.connect();
         connectionHandler.create(body);
         connectionHandler.logout();
+    }
+
+    @Test
+    public void readData() throws IOException {
+        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(
+                URL, LOGIN, PASS, "db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
+        HttpResponse response = connectionHandler.connect();
+        Header httpHead = response.getFirstHeader("Authorization");
+        Request request = Request.Get(URL+ "/api/datasets/" + "should be fixed" + "?metadata=false").
+                addHeader(httpHead);
+        HttpResponse current = null;
+        try {
+            current = request.execute().returnResponse();
+        } finally {
+            logout();
+        }
+        string = current.getEntity().toString();
+        System.out.println(string);
+    }
+
+    @Test
+    public void newRowHandling() throws IOException {
+        String inputData = string; //"records":[{"0000":"test1","0001":" test2","0002":" test3","tdpId":1},{"0000":"test4","0001":" test5","0002":" test6","tdpId":2}];
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
+        JsonParser jsonParser = new JsonFactory().
+                createJsonParser(new BufferedInputStream(new ByteArrayInputStream(inputData.getBytes())));
+        while (!jsonParser.isClosed() && jsonParser.getCurrentToken() != JsonToken.END_ARRAY) {
+            JsonToken token;
+            while ((token = jsonParser.nextToken()) != JsonToken.END_OBJECT) {
+                System.out.println(token);
+            }
+        }
+    }
+
+    @Test
+    public void sendDataWithStream() throws IOException {
+        java.net.URL url = new java.net.URL("http://52.31.50.21:80/api/datasets?name=" + "setName1" + "&folderPath="+"folderName");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "text/plain");
+        connection.setDoOutput(true);
+
+        String body = "col1, col2, col3\ntest1, test2, test3\ntest4, test5, test6";
+        DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+
+        for (int i = 0; i < 100000; i++) {
+            outputStream.writeBytes(body);
+            outputStream.flush();
+            System.out.println(i);
+        }
+        outputStream.close();
+
+        System.out.println(connection.getResponseCode());
+        System.out.println(connection.getResponseMessage());
+    }
+
+    @Test
+    public void sendDataWithStreamApache() throws IOException{
+//        WebClient.create(URL).path(path).accept(MediaType.APPLICATION_XML)
+//                .query(typeParam, type).query("_type", "xml").get(Products.class);
     }
 
 }

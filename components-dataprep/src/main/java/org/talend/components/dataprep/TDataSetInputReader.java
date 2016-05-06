@@ -22,7 +22,6 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -37,15 +36,13 @@ public class TDataSetInputReader extends AbstractBoundedReader<IndexedRecord> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TDataSetInputDefinition.class);
 
-    private List<Map<String,String>> records;
-
     private List<Column> sourceSchema;
-
-    private Iterator<Map<String,String>> iterator;
 
     private Schema schema;
 
     private DataPrepConnectionHandler connectionHandler;
+
+    private DataPrepStreamMapper dataPrepStreamMapper;
 
     public TDataSetInputReader(RuntimeContainer container, BoundedSource source,
                                DataPrepConnectionHandler connectionHandler, Schema schema) {
@@ -58,19 +55,20 @@ public class TDataSetInputReader extends AbstractBoundedReader<IndexedRecord> {
     public boolean start() throws IOException {
         connectionHandler.connect();
         sourceSchema = connectionHandler.readSourceSchema();
-        records = connectionHandler.readDataSet();
-        iterator = records.iterator();
-        return !records.isEmpty();
+        LOGGER.debug("Schema of data set : {}", sourceSchema);
+        dataPrepStreamMapper = connectionHandler.readDataSetIterator();
+        return dataPrepStreamMapper.initIterator();
     }
 
     @Override
     public boolean advance() throws IOException {
-        return iterator.hasNext();
+        return dataPrepStreamMapper.hasNextRecord();
     }
 
     @Override
     public IndexedRecord getCurrent() throws NoSuchElementException {
-        Map<String,String> recordMap = iterator.next();
+        Map<String,String> recordMap = dataPrepStreamMapper.nextRecord();
+        LOGGER.debug("Record from data set: {}", recordMap);
         DataPrepField[] record = new DataPrepField[sourceSchema.size()];
         int i = 0;
         for (Column column: sourceSchema) {
@@ -87,7 +85,7 @@ public class TDataSetInputReader extends AbstractBoundedReader<IndexedRecord> {
     @Override
     public void close() throws IOException {
         sourceSchema = null;
-        records = null;
+        dataPrepStreamMapper.close();
         connectionHandler.logout();
     }
 
