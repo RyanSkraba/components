@@ -18,10 +18,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Contains utility methods for tests
  */
 public class Utils {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
 
     /**
      * Read file content to String with default utf8 and returns it
@@ -30,7 +35,7 @@ public class Utils {
      * @return file contents
      * @throws IOException in case of exception
      */
-    public static String readFile(String path) throws IOException {
+    public static String readFile(String path) {
         return readFile(path, StandardCharsets.UTF_8);
     }
     
@@ -42,8 +47,13 @@ public class Utils {
      * @return file contents
      * @throws IOException in case of exception
      */
-    public static String readFile(String path, Charset encoding) throws IOException {
-        byte[] encoded = Files.readAllBytes(Paths.get(path));
+    public static String readFile(String path, Charset encoding) {
+        byte[] encoded = null;
+        try {
+            encoded = Files.readAllBytes(Paths.get(path));
+        } catch (IOException e) {
+            LOG.error("Exception during file read. {}", e.getMessage());
+        }
         return new String(encoded, encoding);
     }
 }

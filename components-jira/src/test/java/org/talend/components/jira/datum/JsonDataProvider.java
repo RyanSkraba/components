@@ -14,16 +14,12 @@ package org.talend.components.jira.datum;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.jira.testutils.Utils;
 
 /**
  * Provides different Json strings for Entities Unit-tests
  */
 public class JsonDataProvider {
-
-    private static final Logger LOG = LoggerFactory.getLogger(JsonDataProvider.class);
 
     /**
      * JSON, which contains total property
@@ -34,7 +30,7 @@ public class JsonDataProvider {
      * JSON, which doesn't contain total property
      */
     private static String noPaginationJson;
-    
+
     /**
      * JSON, which represents project JSON representation
      */
@@ -48,11 +44,7 @@ public class JsonDataProvider {
      */
     static String getPaginationJson() {
         if (paginationJson == null) {
-            try {
-                paginationJson = Utils.readFile("src/test/resources/org/talend/components/jira/datum/entities.json");
-            } catch (IOException e) {
-                LOG.error("Failed to read JSON from file. {}", e.getMessage());
-            }
+            paginationJson = Utils.readFile("src/test/resources/org/talend/components/jira/datum/entities.json");
         }
         return paginationJson;
     }
@@ -65,15 +57,11 @@ public class JsonDataProvider {
      */
     static String getNoPaginationJson() {
         if (noPaginationJson == null) {
-            try {
-                noPaginationJson = Utils.readFile("src/test/resources/org/talend/components/jira/datum/noPagination.json");
-            } catch (IOException e) {
-                LOG.error("Failed to read JSON from file. {}", e.getMessage());
-            }
+            noPaginationJson = Utils.readFile("src/test/resources/org/talend/components/jira/datum/noPagination.json");
         }
         return noPaginationJson;
     }
-    
+
     /**
      * Provides JSON string, which represents project JSON representation
      * 
@@ -82,11 +70,7 @@ public class JsonDataProvider {
      */
     static String getProjectJson() {
         if (projectJson == null) {
-            try {
-                projectJson = Utils.readFile("src/test/resources/org/talend/components/jira/datum/project.json");
-            } catch (IOException e) {
-                LOG.error("Failed to read JSON from file. {}", e.getMessage());
-            }
+            projectJson = Utils.readFile("src/test/resources/org/talend/components/jira/datum/project.json");
         }
         return projectJson;
     }
