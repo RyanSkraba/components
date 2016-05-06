@@ -103,6 +103,9 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
             Form advancedForm = getForm(Form.ADVANCED);
             connection.bulkConnection.setValue(!queryMode.getValue().equals(QUERY_QUERY));
             if (advancedForm != null) {
+                advancedForm.getWidget(normalizeDelimiter.getName()).setHidden(queryMode.getValue().equals(QUERY_BULK));
+                advancedForm.getWidget(columnNameDelimiter.getName()).setHidden(queryMode.getValue().equals(QUERY_BULK));
+                advancedForm.getWidget(batchSize.getName()).setHidden(queryMode.getValue().equals(QUERY_BULK));
                 advancedForm.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
             }
         }
