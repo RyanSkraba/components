@@ -12,11 +12,12 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
-import static org.talend.daikon.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.PropertyFactory.newEnum;
+import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import java.util.List;
 
+import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.SchemaProperties;
