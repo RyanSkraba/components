@@ -144,6 +144,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
     public void afterLoginType() {
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(FORM_WIZARD));
+        refreshLayout(getForm(Form.ADVANCED));
     }
 
     public void afterReferencedComponent() {
@@ -180,12 +181,19 @@ public class SalesforceConnectionProperties extends ComponentProperties
                 form.getWidget(USERPASSWORD).setHidden(true);
             } else {
                 form.getWidget(loginType.getName()).setHidden(false);
+                String endpointValue = endpoint.getStringValue();
                 if (LOGIN_OAUTH.equals(loginType.getValue())) {
                     form.getWidget(OAUTH).setHidden(false);
                     form.getWidget(USERPASSWORD).setHidden(true);
+                    if (endpointValue == null || endpointValue.contains(URL)) {
+                        endpoint.setValue(OAUTH_URL);
+                    }
                 } else if (LOGIN_BASIC.equals(loginType.getValue())) {
                     form.getWidget(OAUTH).setHidden(true);
                     form.getWidget(USERPASSWORD).setHidden(false);
+                    if (endpointValue == null || endpointValue.contains(OAUTH_URL)) {
+                        endpoint.setValue(URL);
+                    }
                 } else {
                     throw new RuntimeException("Enum value should be handled :" + loginType.getValue());
                 }

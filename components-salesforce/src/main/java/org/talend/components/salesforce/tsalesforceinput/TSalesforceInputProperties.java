@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.talend.components.api.component.PropertyPathConnector;
-import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.Property.Type;
@@ -58,8 +57,6 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
     @Override
     public void setupProperties() {
         super.setupProperties();
-        returns = ComponentPropertyFactory.newReturnsProperty();
-        ComponentPropertyFactory.newReturnProperty(returns, Type.INT, "NB_LINE");
 
         batchSize.setValue(250);
         queryMode.setValue(QUERY_QUERY);
@@ -106,6 +103,9 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
             Form advancedForm = getForm(Form.ADVANCED);
             connection.bulkConnection.setValue(!queryMode.getValue().equals(QUERY_QUERY));
             if (advancedForm != null) {
+                advancedForm.getWidget(normalizeDelimiter.getName()).setHidden(queryMode.getValue().equals(QUERY_BULK));
+                advancedForm.getWidget(columnNameDelimiter.getName()).setHidden(queryMode.getValue().equals(QUERY_BULK));
+                advancedForm.getWidget(batchSize.getName()).setHidden(queryMode.getValue().equals(QUERY_BULK));
                 advancedForm.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
             }
         }

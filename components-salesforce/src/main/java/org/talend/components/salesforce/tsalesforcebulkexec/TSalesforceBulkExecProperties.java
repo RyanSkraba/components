@@ -15,10 +15,18 @@ package org.talend.components.salesforce.tsalesforcebulkexec;
 import static org.talend.daikon.properties.PropertyFactory.newProperty;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.SchemaBuilder.FieldAssembler;
+import org.apache.avro.SchemaBuilder.FieldBuilder;
+import org.apache.avro.SchemaBuilder.RecordBuilder;
+import org.talend.components.api.component.ISchemaListener;
+import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.salesforce.SalesforceBulkProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.daikon.avro.SchemaConstants;
@@ -37,20 +45,6 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
         super(name);
     }
     
-    protected void setupUpsertRelation(Property ur) {
-        // They might have been set previously in some inheritance cases
-        ur.setChildren(new ArrayList<Property>());
-        ur.addChild(newProperty("columnName")); //$NON-NLS-1$
-        ur.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
-        ur.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
-        
-    	Property property = newProperty(Property.Type.BOOLEAN, "polymorphic");
-    	property.setValue(false);
-        ur.addChild(property); //$NON-NLS-1$
-        
-        ur.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
-    }
-
     @Override
     public void setupLayout() {
         super.setupLayout();
@@ -59,6 +53,7 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
 
         Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(widget(bulkProperties.getForm(Form.MAIN).setName("bulkProperties")));
+        advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.WidgetType.TABLE));
     }
     
     @Override
@@ -68,7 +63,7 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
         if(Form.ADVANCED.equals(form.getName())) {
         	form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
         	form.getChildForm(connection.getName()).getWidget(connection.httpChunked.getName()).setHidden(true);
-        	form.getWidget(upsertRelation.getName()).setHidden(true);
+        	form.getWidget(upsertRelationTable.getName()).setHidden(true);
         }
     }
     
@@ -78,19 +73,74 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
         
         connection.bulkConnection.setValue(true);
         connection.httpChunked.setValue(false);
+        upsertRelationTable.setUsePolymorphic(true);
+        
+        module.setSchemaListener(new ISchemaListener() {
+
+            @Override
+            public void afterSchema() {
+                updateOutputSchemas();
+                beforeUpsertKeyColumn();
+                beforeUpsertRelationTable();
+            }
+            
+        });
     }
 
+    private void updateOutputSchemas() {
+
+    	Schema inputSchema = (Schema) module.main.schema.getValue();
+        Schema mainOutputSchema = createRecordBuilderFromSchema(inputSchema, "output")
+        	.name("salesforce_id")
+    		.prop(SchemaConstants.TALEND_IS_LOCKED, "false")
+	        .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")
+	        .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")
+	        .type().stringType().noDefault()
+	        
+	        .name("salesforce_created")
+	        .prop(SchemaConstants.TALEND_IS_LOCKED, "false")
+	        .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")
+	        .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")
+	        .type().stringType().noDefault()
+	    .endRecord();
+
+        schemaFlow.schema.setValue(mainOutputSchema);
+        
+    	Schema rejectSchema = createRecordBuilderFromSchema(inputSchema, "rejectOutput")
+			.name("error")
+	        .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")
+	        .prop(SchemaConstants.TALEND_IS_LOCKED, "false")
+	        .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")
+	        .type().stringType().noDefault()
+	    .endRecord();
+
+        schemaReject.schema.setValue(rejectSchema);
+
+    }
+
+    private FieldAssembler<Schema> createRecordBuilderFromSchema(Schema inputSchema, String newSchemaName) {
+        RecordBuilder<Schema> recordBuilder = SchemaBuilder.record(newSchemaName);
+        FieldAssembler<Schema> fieldAssembler = recordBuilder.fields();
+        for (Field field : inputSchema.getFields()) {
+            FieldBuilder<Schema> fieldBuilder = fieldAssembler.name(field.name());
+            for (String propName : field.getObjectProps().keySet()) {
+                fieldBuilder.prop(propName, field.getObjectProps().get(propName).toString());
+            }
+            fieldAssembler = fieldBuilder.type().stringType().noDefault();
+        }
+        return fieldAssembler;
+    }
+    
     @Override
-    protected void setupRejectSchema() {
-        Schema s = SchemaBuilder.record("Reject")
-                // record set as read only for talend schema
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//$NON-NLS-1$
-                .fields().name("error")//$NON-NLS-1$
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
-                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
-                .type().stringType().noDefault().endRecord();
-        schemaReject.schema.setValue(s);
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        if (isOutputConnection) {
+        	HashSet<PropertyPathConnector> connectors = new HashSet<>();
+        	connectors.add(MAIN_CONNECTOR);//the can't use FLOW_CONNECTOR and so setValue in schemaFlow will not ok, TODO fix it
+        	connectors.add(REJECT_CONNECTOR);//setValue in schemaReject will not ok, TODO fix it
+            return connectors;
+        } else {
+            return Collections.emptySet();
+        }
     }
 
 }

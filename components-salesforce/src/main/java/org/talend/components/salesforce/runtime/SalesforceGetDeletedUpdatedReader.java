@@ -62,7 +62,11 @@ public abstract class SalesforceGetDeletedUpdatedReader<ResultT> extends Salesfo
         } catch (ConnectionException e) {
             throw new IOException(e);
         }
-        return inputRecords.length > 0;
+        boolean startable = inputRecords.length > 0;
+        if (startable) {
+            dataCount++;
+        }
+        return startable;
     }
 
     @Override
@@ -70,6 +74,7 @@ public abstract class SalesforceGetDeletedUpdatedReader<ResultT> extends Salesfo
         inputRecordsIndex++;
         // Fast return conditions.
         if (inputRecordsIndex < inputRecords.length) {
+            dataCount++;
             return true;
         }
         if ((inputResult == null || inputResult.isDone()) && queryIndex < queryStringList.size()) {
@@ -77,7 +82,11 @@ public abstract class SalesforceGetDeletedUpdatedReader<ResultT> extends Salesfo
                 inputResult = getConnection().queryAll(queryStringList.get(queryIndex++));
                 inputRecords = inputResult.getRecords();
                 inputRecordsIndex = 0;
-                return inputResult.getSize() > 0;
+                boolean isAdvanced = inputResult.getSize() > 0;
+                if (isAdvanced) {
+                    dataCount++;
+                }
+                return isAdvanced;
             } catch (ConnectionException e) {
                 throw new IOException(e);
             }

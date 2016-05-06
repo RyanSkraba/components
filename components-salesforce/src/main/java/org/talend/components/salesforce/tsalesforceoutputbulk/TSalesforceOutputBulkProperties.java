@@ -16,10 +16,13 @@ import static org.talend.daikon.properties.PropertyFactory.newProperty;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.avro.Schema;
+import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.BulkFileProperties;
-import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
+import org.talend.components.salesforce.UpsertRelationTable;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
@@ -28,7 +31,7 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
 
     public Property ignoreNull = newProperty(Property.Type.BOOLEAN, "ignoreNull");
 
-    public Property upsertRelation = newProperty("upsertRelation").setOccurMaxTimes(Property.INFINITE); //$NON-NLS-1$
+    public UpsertRelationTable upsertRelationTable = new UpsertRelationTable("upsertRelationTable");
 
     public TSalesforceOutputBulkProperties(String name) {
         super(name);
@@ -39,23 +42,22 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
         super.setupProperties();
         
         returns = ComponentPropertyFactory.newReturnsProperty();
+        upsertRelationTable.setUsePolymorphic(true);
+        ComponentPropertyFactory.newReturnProperty(returns, Property.Type.STRING, "ERROR_MESSAGE"); //$NON-NLS-1$ 
         ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "NB_LINE"); //$NON-NLS-1$
         
-        setupUpsertRelation(upsertRelation, TSalesforceOutputProperties.POLY);
-        // schema.schema.setTaggedValue(StudioConstants.CONNECTOR_TYPE_SCHEMA_KEY, ConnectorType.FLOW);
+        this.setSchemaListener(new ISchemaListener() {
+
+            @Override
+            public void afterSchema() {
+            	beforeUpsertRelationTable();
+            }
+            
+        });
     }
     
-    private void setupUpsertRelation(Property ur, boolean poly) {
-        ur.setChildren(new ArrayList<Property>());
-        ur.addChild(newProperty("columnName")); //$NON-NLS-1$
-        ur.addChild(newProperty("lookupFieldName")); //$NON-NLS-1$
-        ur.addChild(newProperty("lookupFieldModuleName")); //$NON-NLS-1$
-        if (poly) {
-            Property property = newProperty(Property.Type.BOOLEAN, "polymorphic");
-            property.setValue(false);
-            ur.addChild(property); //$NON-NLS-1$
-        }
-        ur.addChild(newProperty("lookupFieldExternalIdName")); //$NON-NLS-1$
+    public void beforeUpsertRelationTable() {
+        upsertRelationTable.columnName.setPossibleValues(getFieldNames(schema.schema));
     }
 
     @Override
@@ -70,7 +72,17 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
         refForm.addRow(ignoreNull);
 
         Form advancedForm = new Form(this, Form.ADVANCED);
-        advancedForm.addRow(widget(upsertRelation).setWidgetType(Widget.WidgetType.TABLE));
+        advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.WidgetType.TABLE));
+    }
+    
+    protected List<String> getFieldNames(Property schema) {
+        String sJson = schema.getStringValue();
+        Schema s = new Schema.Parser().parse(sJson);
+        List<String> fieldNames = new ArrayList<>();
+        for (Schema.Field f : s.getFields()) {
+            fieldNames.add(f.name());
+        }
+        return fieldNames;
     }
 
 }
