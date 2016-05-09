@@ -8,10 +8,6 @@
 	<artifactId>components</artifactId>
 	<packaging>pom</packaging>
 
-	<scm>
-		<connection>scm:git:https://github.com/Talend/components.git</connection>
-	</scm>
-
 	<name>Component Aggregator</name>
 	<modules>
 		<module>components-parent</module>
@@ -47,13 +43,6 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>versions-maven-plugin</artifactId>
 				<version>2.2</version>
-			</plugin>
-			<plugin>
-				<artifactId>maven-scm-plugin</artifactId>
-				<version>1.9.4</version>
-				<configuration>
-					<tag>${project.artifactId}-${project.version}</tag>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
