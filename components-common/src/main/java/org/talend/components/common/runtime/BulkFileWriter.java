@@ -8,6 +8,7 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.BulkFileProperties;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
+import org.talend.daikon.avro.util.AvroUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,23 +59,33 @@ public class BulkFileWriter implements Writer<WriterResult> {
         csvWriter = new CsvWriter(new OutputStreamWriter(
                 new java.io.FileOutputStream(file, isAppend), charset),separator);
 
-        Schema schema = new Schema.Parser().parse(bulkProperties.schema.schema.getStringValue());
-
-        if(!isAppend){
-            csvWriter.writeRecord(getHeaders(schema));
-        }
+        
 
     }
 
+    private boolean headerIsReady = false;
+    
     @Override
     public void write(Object datum) throws IOException {
         if (null == datum) {
             return;
-        }else {
-            List<String> values = getValues(datum);
-            csvWriter.writeRecord(values.toArray(new String[values.size()]));
-            dataCount++;
         }
+        
+    	if(!isAppend && !headerIsReady){
+    		Schema schema = new Schema.Parser().parse(bulkProperties.schema.schema.getStringValue());
+    		
+    		if (AvroUtils.isIncludeAllFields(schema) && (datum instanceof org.apache.avro.generic.GenericData.Record)) {
+    			org.apache.avro.generic.GenericData.Record record = (org.apache.avro.generic.GenericData.Record)datum;
+    			schema = record.getSchema();
+            }
+        	
+            csvWriter.writeRecord(getHeaders(schema));
+            headerIsReady = true;
+        }
+    	
+        List<String> values = getValues(datum);
+        csvWriter.writeRecord(values.toArray(new String[values.size()]));
+        dataCount++;
     }
 
     public void flush() throws IOException {
