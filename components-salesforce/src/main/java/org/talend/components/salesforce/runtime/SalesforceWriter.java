@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.sforce.ws.bind.XmlObject;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.WriteOperation;
@@ -125,13 +126,25 @@ final class SalesforceWriter implements Writer<WriterResult> {
         if (!TSalesforceOutputProperties.ACTION_DELETE.equals(sprops.outputAction.getValue())) {
             SObject so = new SObject();
             so.setType(sprops.module.moduleName.getStringValue());
-
+            Map<String, Map<String, String>> referenceFieldsMap = null;
+            boolean isUpsert = SalesforceOutputProperties.ACTION_UPSERT.equals(sprops.outputAction.getStringValue());
+            if (isUpsert) {
+                referenceFieldsMap = getReferenceFieldsMap();
+            }
             for (Schema.Field f : input.getSchema().getFields()) {
                 Object value = input.get(f.pos());
                 if (value != null) {
                     Schema.Field se = schema.getField(f.name());
                     if (se != null) {
-                        addSObjectField(so, f, se, value);
+                        if (isUpsert && referenceFieldsMap != null && referenceFieldsMap.get(se.name()) != null) {
+                            Map<String, String> relationMap = referenceFieldsMap.get(se.name());
+                            String lookupFieldName = relationMap.get("lookupFieldName");
+                            so.setField(lookupFieldName, null);
+                            so.getChild(lookupFieldName).setField("type", relationMap.get("lookupFieldModuleName"));
+                            addSObjectField(so.getChild(lookupFieldName), se.schema().getType(), relationMap.get("lookupFieldExternalIdName"), value);
+                        } else {
+                            addSObjectField(so, se.schema().getType(), se.name(), value);
+                        }
                     }
                 }
             }
@@ -167,10 +180,10 @@ final class SalesforceWriter implements Writer<WriterResult> {
         throw new RuntimeException(ID + " not found");
     }
 
-    protected void addSObjectField(SObject sObject, Schema.Field actual, Schema.Field expected, Object value) {
+    protected void addSObjectField(XmlObject xmlObject, Schema.Type expected, String fieldName, Object value) {
         Object valueToAdd = null;
         // Convert stuff here
-        switch (expected.schema().getType()) {
+        switch (expected) {
             case BYTES:
                 valueToAdd = Charset.defaultCharset().decode(ByteBuffer.wrap((byte[]) value)).toString();
                 break;
@@ -182,7 +195,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
                 valueToAdd = value;
                 break;
         }
-        sObject.setField(expected.name(), valueToAdd);
+        xmlObject.setField(fieldName, valueToAdd);
     }
 
     protected SaveResult[] insert(SObject sObject) throws IOException {
@@ -387,4 +400,25 @@ final class SalesforceWriter implements Writer<WriterResult> {
     public WriteOperation<WriterResult> getWriteOperation() {
         return salesforceWriteOperation;
     }
+
+    protected Map<String, Map<String, String>> getReferenceFieldsMap() {
+        Object value = sprops.upsertRelationTable.columnName.getValue();
+        Map<String, Map<String, String>> referenceFieldsMap = null;
+        if (value != null && value instanceof List) {
+            referenceFieldsMap = new HashMap<>();
+            List<String> columns = (List<String>) value;
+            List<String> lookupFieldModuleNames = (List<String>) sprops.upsertRelationTable.lookupFieldModuleName.getValue();
+            List<String> lookupFieldNames = (List<String>) sprops.upsertRelationTable.lookupFieldName.getValue();
+            List<String> externalIdFromLookupFields = (List<String>) sprops.upsertRelationTable.lookupFieldExternalIdName.getValue();
+            for (int index = 0; index < columns.size(); index++) {
+                Map<String, String> relationMap = new HashMap<>();
+                relationMap.put("lookupFieldModuleName", lookupFieldModuleNames.get(index));
+                relationMap.put("lookupFieldName", lookupFieldNames.get(index));
+                relationMap.put("lookupFieldExternalIdName", externalIdFromLookupFields.get(index));
+                referenceFieldsMap.put(columns.get(index), relationMap);
+            }
+        }
+        return referenceFieldsMap;
+    }
+
 }
