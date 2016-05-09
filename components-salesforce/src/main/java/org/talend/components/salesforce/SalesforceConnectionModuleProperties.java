@@ -23,8 +23,8 @@ import org.talend.daikon.properties.presentation.Form;
 /**
  * Properties common to input and output Salesforce components.
  */
-public abstract class SalesforceConnectionModuleProperties extends FixedConnectorsComponentProperties
-        implements SalesforceProvideConnectionProperties {
+public abstract class SalesforceConnectionModuleProperties extends FixedConnectorsComponentProperties implements
+        SalesforceProvideConnectionProperties {
 
     // Collections
     //
@@ -69,6 +69,19 @@ public abstract class SalesforceConnectionModuleProperties extends FixedConnecto
     @Override
     public SalesforceConnectionProperties getConnectionProperties() {
         return connection;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.talend.daikon.properties.Properties#refreshLayout(org.talend.daikon.properties.presentation.Form)
+     */
+    @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+        for (Form childForm: connection.getForms()) {
+            connection.refreshLayout(childForm);
+        }
     }
 
 }
