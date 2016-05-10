@@ -92,7 +92,6 @@ public class DataPrepConnectionHandler {
         String setName = dataSetName.substring(index);
         String folderName = dataSetName.substring(0,index);
         LOGGER.debug("Folder Name: " + folderName+ "DataSet name: " + setName);
-        System.out.println("Folder Name: " + folderName+ " DataSet name: " + setName);
 
         Request request = Request.Post(url+"/api/datasets?name=" + setName + "&folderPath="+folderName);
         request.addHeader(authorisationHeader);
