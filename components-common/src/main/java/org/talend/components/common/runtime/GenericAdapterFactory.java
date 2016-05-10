@@ -1,0 +1,79 @@
+package org.talend.components.common.runtime;
+
+import org.apache.avro.Schema;
+import org.apache.avro.generic.IndexedRecord;
+import org.talend.daikon.avro.AvroConverter;
+import org.talend.daikon.avro.IndexedRecordAdapterFactory;
+
+public class GenericAdapterFactory implements IndexedRecordAdapterFactory<IndexedRecord, IndexedRecord> {
+
+    private Schema schema;
+
+    private String names[];
+
+    /**
+     * The cached AvroConverter objects for the fields of this record.
+     */
+    @SuppressWarnings("rawtypes")
+    protected transient AvroConverter[] fieldConverter;
+
+    @Override
+    public Schema getSchema() {
+        return schema;
+    }
+
+    @Override
+    public void setSchema(Schema schema) {
+        this.schema = schema;
+    }
+
+    @Override
+    public Class<IndexedRecord> getDatumClass() {
+        return IndexedRecord.class;
+    }
+
+    @Override
+    public IndexedRecord convertToDatum(IndexedRecord value) {
+        throw new UnmodifiableAdapterException();
+    }
+
+    @Override
+    public IndexedRecord convertToAvro(IndexedRecord value) {
+        return new GenericIndexedRecord(value);
+    }
+
+    private class GenericIndexedRecord implements IndexedRecord {
+
+        private final IndexedRecord value;
+
+        public GenericIndexedRecord(IndexedRecord value) {
+            this.value = value;
+        }
+
+        @Override
+        public Schema getSchema() {
+            return GenericAdapterFactory.this.getSchema();
+        }
+
+        @Override
+        public void put(int i, Object v) {
+            throw new UnmodifiableAdapterException();
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public Object get(int i) {
+            // Lazy initialization of the cached converter objects.
+            if (names == null) {
+                names = new String[getSchema().getFields().size()];
+                fieldConverter = new AvroConverter[names.length];
+                for (int j = 0; j < names.length; j++) {
+                    Schema.Field f = getSchema().getFields().get(j);
+                    names[j] = f.name();
+                    fieldConverter[j] = GenericAvroRegistry.get().convertToString(f);
+                }
+            }
+            return fieldConverter[i].convertToDatum(value.get(getSchema().getField(names[i]).pos()));
+        }
+    }
+}
