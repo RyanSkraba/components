@@ -30,7 +30,7 @@ import org.talend.daikon.properties.service.Repository;
 
 public class SalesforceModuleListProperties extends ComponentProperties implements SalesforceProvideConnectionProperties {
 
-    private SalesforceConnectionProperties connectionProps;
+    public SalesforceConnectionProperties connectionProps;
 
     private String repositoryLocation;
 
