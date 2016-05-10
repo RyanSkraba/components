@@ -145,6 +145,7 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
         props.bulkProperties.waitTimeCheckBatchState.setValue(10000);
 
         props.module.main.schema.setValue(getMakeRowSchema(false));
+        props.schemaFlow.schema.setValue(getMakeRowSchema(false));
 
         setupProps(props.connection, !ADD_QUOTES);
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
