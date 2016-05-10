@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import org.apache.commons.codec.binary.Base64;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -191,6 +191,6 @@ public class Rest {
     }
 
     private String base64(String str) {
-        return Base64.getEncoder().encodeToString(str.getBytes());
+        return Base64.encodeBase64String(str.getBytes());
     }
 }
