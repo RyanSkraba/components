@@ -39,12 +39,12 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
 	@Override
 	public String[] getHeaders(Schema schema) {
 		TSalesforceOutputBulkProperties salesforceBulkProperties = (TSalesforceOutputBulkProperties)bulkProperties;
-		
+
 		List<String> headers = new ArrayList<String>();
 		StringBuilder sbuilder = new StringBuilder();
         for(Schema.Field f :schema.getFields()){
         	String header = f.name();
-        	
+
         	String ref_module_name = f.getProp(SalesforceSchemaConstants.REF_MODULE_NAME);
         	String ref_field_name = f.getProp(SalesforceSchemaConstants.REF_FIELD_NAME);
         	if(ref_module_name!=null) {
@@ -59,7 +59,7 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
 	            		List<String> lookupFieldModuleNames = (List<String>)salesforceBulkProperties.upsertRelationTable.lookupFieldModuleName.getValue();
 	            		List<String> lookupFieldNames = (List<String>)salesforceBulkProperties.upsertRelationTable.lookupFieldName.getValue();
 	            		List<String> externalIdFromLookupFields = (List<String>)salesforceBulkProperties.upsertRelationTable.lookupFieldExternalIdName.getValue();
-	            		
+
 	            		if("true".equals(polymorphics.get(index))) {
 	            			sbuilder.append(lookupFieldModuleNames.get(index)).append(":");
 	            		}
@@ -69,7 +69,7 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
 	            	}
         		}
         	}
-        	
+
             headers.add(header);
         }
         return headers.toArray(new String[headers.size()]);
@@ -83,8 +83,8 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
     }
 
     @Override
-    public List<String> getValues(Object datum) {
-        IndexedRecord input = getFactory(datum).convertToAvro(datum);
+    public List<String> getValues(Object datum){
+        IndexedRecord input = getFactory(datum).convertToAvro((IndexedRecord)datum);
         List<String> values = new ArrayList<String>();
         for (Schema.Field f : input.getSchema().getFields()) {
             if (input.get(f.pos()) == null) {
