@@ -40,11 +40,11 @@ public class ComponentPropertyFactory {
      * Adds a new return property.
      *
      * @param returns the {@link Property} returned by {@link #newReturnsProperty()}
-     * @param prop the property to be added to the returns property
+     * @param returnProp the property to be added to the returns property
      * @param name the name of the returns property
      * @return a {@link Property}
      */
-    public static <T> Property<T> newReturnProperty(Property<String> returns, Property<T> prop) {
+    public static <T> Property<T> newReturnProperty(Property<String> returns, Property<T> returnProp) {
         if (returns == null) {
             throw new TalendRuntimeException(CommonErrorCodes.UNEXPECTED_EXCEPTION, new NullPointerException());
         }
@@ -52,8 +52,8 @@ public class ComponentPropertyFactory {
             throw new ComponentException(ComponentsApiErrorCode.WRONG_RETURNS_TYPE_NAME,
                     ExceptionContext.build().put("name", returns.getName()));
         }
-        returns.addChild(prop);
-        return prop;
+        returns.addChild(returnProp);
+        return returnProp;
     }
 
 }

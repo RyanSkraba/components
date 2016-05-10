@@ -15,7 +15,6 @@ package org.talend.components.salesforce;
 import static org.talend.daikon.properties.PropertyFactory.*;
 import static org.talend.daikon.properties.presentation.Widget.*;
 
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
@@ -54,8 +53,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
     }
 
-    public Property<LoginType> loginType = newEnum("loginType", new TypeLiteral<LoginType>() {// empty on purpose
-    }).setRequired();
+    public Property<LoginType> loginType = newEnum("loginType", LoginType.class).setRequired();
 
     public Property<Boolean> bulkConnection = newBoolean("bulkConnection"); //$NON-NLS-1$
 

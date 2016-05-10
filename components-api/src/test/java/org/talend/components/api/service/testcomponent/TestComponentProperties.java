@@ -167,8 +167,8 @@ public class TestComponentProperties extends ComponentProperties implements Comp
     public Schema getSchema(Connector connector, boolean isOutputConnection) {
         if (connector instanceof PropertyPathConnector) {
             Property<?> property = getValuedProperty(((PropertyPathConnector) connector).getPropertyPath());
-            return Schema.class.isAssignableFrom(((Class<?>) property.getTypeLiteral().getType())) ? (Schema) property.getValue()
-                    : null;
+            Object value = property.getValue();
+            return value != null && Schema.class.isAssignableFrom(value.getClass()) ? (Schema) property.getValue() : null;
         } else {// not a connector handled by this class
             return null;
         }

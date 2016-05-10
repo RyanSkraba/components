@@ -38,6 +38,8 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.common.CommonTestUtils;
 import org.talend.components.common.oauth.OauthProperties;
+import org.talend.components.salesforce.SalesforceConnectionProperties.LoginType;
+import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
 import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
@@ -81,7 +83,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
         props = new TSalesforceConnectionDefinition().createProperties();
         ComponentTestUtils.checkSerialize(props, errorCollector);
-        Property<?> loginType = (Property<?>) props.getProperty("loginType");
+        Property<LoginType> loginType = (Property<LoginType>) props.getProperty("loginType");
         System.out.println(loginType.getPossibleValues());
         assertEquals(SalesforceConnectionProperties.LoginType.BASIC, loginType.getPossibleValues().get(0));
         assertEquals(SalesforceConnectionProperties.LoginType.OAUTH, loginType.getPossibleValues().get(1));
@@ -455,7 +457,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
                 .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
         setupProps(outputProps.connection, !ADD_QUOTES);
 
-        outputProps.outputAction.setValue(TSalesforceOutputProperties.ACTION_DELETE);
+        outputProps.outputAction.setValue(OutputAction.DELETE);
         setupModule(outputProps.module, "Account");
 
         ComponentTestUtils.checkSerialize(outputProps, errorCollector);
@@ -576,7 +578,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
     @Test
     public void testSchemaSerialized() throws Throwable {
-        ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
+        // ComponentDefinition definition =
+        // getComponentService().getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
         TSalesforceOutputProperties outputProps = (TSalesforceOutputProperties) getComponentService()
                 .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
 

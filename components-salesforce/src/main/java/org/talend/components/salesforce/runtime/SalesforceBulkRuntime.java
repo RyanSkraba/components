@@ -8,16 +8,37 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import com.sforce.async.*;
-import com.sforce.ws.ConnectionException;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.salesforce.SalesforceOutputProperties;
+import org.talend.components.salesforce.SalesforceBulkProperties.Concurrency;
+import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
+
+import com.sforce.async.AsyncApiException;
+import com.sforce.async.AsyncExceptionCode;
+import com.sforce.async.BatchInfo;
+import com.sforce.async.BatchInfoList;
+import com.sforce.async.BatchStateEnum;
+import com.sforce.async.BulkConnection;
+import com.sforce.async.CSVReader;
+import com.sforce.async.ConcurrencyMode;
+import com.sforce.async.ContentType;
+import com.sforce.async.JobInfo;
+import com.sforce.async.JobStateEnum;
+import com.sforce.async.OperationEnum;
+import com.sforce.async.QueryResultList;
+import com.sforce.ws.ConnectionException;
 
 /**
  * This contains process a set of records by creating a job that contains one or more batches. The job specifies which
- *  object is being processed and what type of action is being used (query, insert, upsert, update, or delete).
+ * object is being processed and what type of action is being used (query, insert, upsert, update, or delete).
  */
 
 public class SalesforceBulkRuntime {
@@ -65,19 +86,27 @@ public class SalesforceBulkRuntime {
         this.bulkConnection = sfSource.connect(container).bulkConnection;
     }
 
-    private void setBulkOperation(String sObjectType, String operationStr, String externalIdFieldName, String contentTypeStr,
-                                  String bulkFileName, int maxBytes, int maxRows) {
+    private void setBulkOperation(String sObjectType, OutputAction userOperation, String externalIdFieldName,
+            String contentTypeStr, String bulkFileName, int maxBytes, int maxRows) {
         this.sObjectType = sObjectType;
-        if (SalesforceOutputProperties.ACTION_INSERT.equals(operationStr)) {
+        switch (userOperation) {
+        case INSERT:
             operation = OperationEnum.insert;
-        } else if (SalesforceOutputProperties.ACTION_UPDATE.equals(operationStr)) {
+            break;
+        case UPDATE:
             operation = OperationEnum.update;
-        } else if (SalesforceOutputProperties.ACTION_UPSERT.equals(operationStr)) {
+            break;
+        case UPSERT:
             operation = OperationEnum.upsert;
-        } else if (SalesforceOutputProperties.ACTION_DELETE.equals(operationStr)) {
+            break;
+        case DELETE:
             operation = OperationEnum.delete;
-        }
+            break;
 
+        default:
+            operation = OperationEnum.insert;
+            break;
+        }
         this.externalIdFieldName = externalIdFieldName;
 
         if ("csv".equals(contentTypeStr)) {
@@ -93,9 +122,9 @@ public class SalesforceBulkRuntime {
         maxRowsPerBatch = (maxRows > sforceMaxRows) ? sforceMaxRows : maxRows;
     }
 
-    public void executeBulk(String sObjectType, String operationStr, String externalIdFieldName, String contentTypeStr,
-                            String bulkFileName, int maxBytes, int maxRows) throws AsyncApiException, ConnectionException, IOException {
-        setBulkOperation(sObjectType, operationStr, externalIdFieldName, contentTypeStr, bulkFileName, maxBytes, maxRows);
+    public void executeBulk(String sObjectType, OutputAction userOperation, String externalIdFieldName, String contentTypeStr,
+            String bulkFileName, int maxBytes, int maxRows) throws AsyncApiException, ConnectionException, IOException {
+        setBulkOperation(sObjectType, userOperation, externalIdFieldName, contentTypeStr, bulkFileName, maxBytes, maxRows);
         job = createJob();
         batchInfoList = createBatchesFromCSVFile();
         closeJob();
@@ -104,19 +133,28 @@ public class SalesforceBulkRuntime {
     }
 
     private void prepareLog() throws IOException {
-        br = new BufferedReader(new InputStreamReader(
-                new FileInputStream(bulkFileName), FILE_ENCODING));
+        br = new BufferedReader(new InputStreamReader(new FileInputStream(bulkFileName), FILE_ENCODING));
         baseFileReader = new CSVReader(br, ',');
         baseFileHeader = baseFileReader.nextRecord();
         baseFileHeaderSize = baseFileHeader.size();
     }
 
-    public void setConcurrencyMode(String mode) {
-        concurrencyMode = ConcurrencyMode.valueOf(mode);
+    public void setConcurrencyMode(Concurrency mode) {
+        switch (mode) {
+        case PARALLEL:
+            concurrencyMode = ConcurrencyMode.Parallel;
+            break;
+        case SERIAL:
+            concurrencyMode = ConcurrencyMode.Serial;
+            break;
+
+        default:
+            break;
+        }
     }
 
     /**
-     *  Create a new job using the Bulk API.
+     * Create a new job using the Bulk API.
      *
      * @return The JobInfo for the new job.
      * @throws AsyncApiException
@@ -155,8 +193,7 @@ public class SalesforceBulkRuntime {
     }
 
     /**
-     * Create and upload batches using a CSV file.
-     * The file into the appropriate size batch files.
+     * Create and upload batches using a CSV file. The file into the appropriate size batch files.
      *
      * @return
      * @throws IOException
@@ -230,22 +267,18 @@ public class SalesforceBulkRuntime {
     }
 
     /**
-     *  Create a batch by uploading the contents of the file.
-     *  This closes the output stream.
+     * Create a batch by uploading the contents of the file. This closes the output stream.
      *
-     * @param tmpOut
-     * The output stream used to write the CSV data for a single batch.
-     * @param tmpFile
-     * The file associated with the above stream.
-     * @param batchInfos
-     * The batch info for the newly created batch is added to this list.
+     * @param tmpOut The output stream used to write the CSV data for a single batch.
+     * @param tmpFile The file associated with the above stream.
+     * @param batchInfos The batch info for the newly created batch is added to this list.
      *
      * @throws IOException
      * @throws AsyncApiException
      * @throws ConnectionException
      */
-    private void createBatch(FileOutputStream tmpOut, File tmpFile, List<BatchInfo> batchInfos) throws IOException,
-            AsyncApiException, ConnectionException {
+    private void createBatch(FileOutputStream tmpOut, File tmpFile, List<BatchInfo> batchInfos)
+            throws IOException, AsyncApiException, ConnectionException {
         tmpOut.flush();
         tmpOut.close();
         FileInputStream tmpInputStream = new FileInputStream(tmpFile);
@@ -259,7 +292,7 @@ public class SalesforceBulkRuntime {
     }
 
     /**
-     *  Close the job
+     * Close the job
      *
      * @throws AsyncApiException
      * @throws ConnectionException
@@ -312,7 +345,7 @@ public class SalesforceBulkRuntime {
     private BulkResult getBaseFileRow() throws IOException {
         BulkResult dataInfo = new BulkResult();
         List<String> row = null;
-        if ((row = baseFileReader.nextRecord())!=null) {
+        if ((row = baseFileReader.nextRecord()) != null) {
             for (int i = 0; i < row.size(); i++) {
                 dataInfo.setValue(baseFileHeader.get(i), row.get(i));
             }
@@ -321,7 +354,7 @@ public class SalesforceBulkRuntime {
     }
 
     /**
-     *  Gets the results of the operation and checks for errors.
+     * Gets the results of the operation and checks for errors.
      *
      * @param batchNum
      * @return
@@ -355,8 +388,8 @@ public class SalesforceBulkRuntime {
         return batchInfoList.size();
     }
 
-    public void doBulkQuery(String moduleName, String queryStatement, int secToWait) throws AsyncApiException,
-            InterruptedException, ConnectionException {
+    public void doBulkQuery(String moduleName, String queryStatement, int secToWait)
+            throws AsyncApiException, InterruptedException, ConnectionException {
         job = new JobInfo();
         job.setObject(moduleName);
         job.setOperation(OperationEnum.query);
@@ -398,13 +431,14 @@ public class SalesforceBulkRuntime {
         // batchInfoList was populated when batches were created and submitted
         List<Map<String, String>> resultInfoList = new ArrayList<Map<String, String>>();
         Map<String, String> resultInfo;
-        baseFileReader = new CSVReader(new BufferedReader(new InputStreamReader(
-                getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId), FILE_ENCODING)), ',');
+        baseFileReader = new CSVReader(new BufferedReader(
+                new InputStreamReader(getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId), FILE_ENCODING)),
+                ',');
 
         baseFileHeader = baseFileReader.nextRecord();
         baseFileHeaderSize = baseFileHeader.size();
         List<String> row = null;
-        while ((row =baseFileReader.nextRecord())!=null) {
+        while ((row = baseFileReader.nextRecord()) != null) {
             resultInfo = new HashMap<String, String>();
             for (int i = 0; i < baseFileHeaderSize; i++) {
                 resultInfo.put(baseFileHeader.get(i), row.get(i));
@@ -415,12 +449,13 @@ public class SalesforceBulkRuntime {
     }
 
     public BulkResultSet getQueryResultSet(String resultId) throws AsyncApiException, IOException, ConnectionException {
-        baseFileReader = new CSVReader(new BufferedReader(new InputStreamReader(
-                getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId), FILE_ENCODING)), ',');
+        baseFileReader = new CSVReader(new BufferedReader(
+                new InputStreamReader(getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId), FILE_ENCODING)),
+                ',');
 
         baseFileHeader = baseFileReader.nextRecord();
         baseFileHeaderSize = baseFileHeader.size();
-        return new BulkResultSet(baseFileReader ,baseFileHeader);
+        return new BulkResultSet(baseFileReader, baseFileHeader);
     }
 
     protected JobInfo createJob(JobInfo job) throws AsyncApiException, ConnectionException {
@@ -435,8 +470,7 @@ public class SalesforceBulkRuntime {
         }
     }
 
-    protected BatchInfo createBatchFromStream(JobInfo job, InputStream input) throws AsyncApiException,
-            ConnectionException {
+    protected BatchInfo createBatchFromStream(JobInfo job, InputStream input) throws AsyncApiException, ConnectionException {
         try {
             return bulkConnection.createBatchFromStream(job, input);
         } catch (AsyncApiException sfException) {
@@ -509,7 +543,7 @@ public class SalesforceBulkRuntime {
     }
 
     public void close() throws IOException {
-        if(br!=null){
+        if (br != null) {
             br.close();
         }
     }
@@ -526,8 +560,8 @@ public class SalesforceBulkRuntime {
         }
     }
 
-    protected InputStream getQueryResultStream(String jobID, String batchID, String resultID) throws AsyncApiException,
-            ConnectionException {
+    protected InputStream getQueryResultStream(String jobID, String batchID, String resultID)
+            throws AsyncApiException, ConnectionException {
         try {
             return bulkConnection.getQueryResultStream(jobID, batchID, resultID);
         } catch (AsyncApiException sfException) {
@@ -539,9 +573,9 @@ public class SalesforceBulkRuntime {
         }
     }
 
-    public String nextResultId(){
+    public String nextResultId() {
         String resultId = null;
-        if(queryResultIDs!=null && queryResultIDs.hasNext()){
+        if (queryResultIDs != null && queryResultIDs.hasNext()) {
             resultId = queryResultIDs.next();
         }
         return resultId;
@@ -550,7 +584,9 @@ public class SalesforceBulkRuntime {
     class BulkResultSet {
 
         CSVReader reader;
+
         List<String> header;
+
         boolean hashNext = true;
 
         public BulkResultSet(CSVReader reader, List<String> header) {
@@ -569,35 +605,40 @@ public class SalesforceBulkRuntime {
                     result.setValue(header.get(i), row.get(i));
                 }
             }
-            if(result == null){
+            if (result == null) {
                 hashNext = false;
             }
             return result;
         }
 
-        public boolean hasNext(){
+        public boolean hasNext() {
             return hashNext;
         }
 
     }
 
-    class BulkResult{
-        Map<String,Object> values;
+    class BulkResult {
+
+        Map<String, Object> values;
+
         public BulkResult() {
-            values = new HashMap<String,Object>();
+            values = new HashMap<String, Object>();
         }
-        public void setValue(String field , Object vlaue){
-            values.put(field,vlaue);
+
+        public void setValue(String field, Object vlaue) {
+            values.put(field, vlaue);
         }
-        public Object getValue(String fieldName){
+
+        public Object getValue(String fieldName) {
             return values.get(fieldName);
         }
-        public void copyValues(BulkResult result){
-            if(result == null){
+
+        public void copyValues(BulkResult result) {
+            if (result == null) {
                 return;
-            }else{
-                for(String key:result.values.keySet()){
-                    values.put(key,result.values.get(key));
+            } else {
+                for (String key : result.values.keySet()) {
+                    values.put(key, result.values.get(key));
                 }
             }
         }

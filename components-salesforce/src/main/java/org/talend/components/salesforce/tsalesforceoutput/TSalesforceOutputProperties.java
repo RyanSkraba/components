@@ -71,7 +71,7 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
     private void updateOutputSchemas() {
         // get the main schema (input one)
         Schema inputSchema = module.main.schema.getValue();
-        if (!extendInsert.getValue() && retrieveInsertId.getValue() && ACTION_INSERT.equals(outputAction.getValue())) {
+        if (!extendInsert.getValue() && retrieveInsertId.getValue() && OutputAction.INSERT.equals(outputAction.getValue())) {
 
             Schema mainOutputSchema = createRecordBuilderFromSchema(inputSchema, "output").name("salesforce_id")
                     .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
@@ -148,9 +148,9 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
             form.getChildForm(connection.getName()).getWidget(connection.httpTraceMessage.getName()).setHidden(true);
             form.getWidget("commitLevel").setHidden(!extendInsert.getValue());
             form.getWidget("retrieveInsertId")
-                    .setHidden(extendInsert.getValue() && ACTION_INSERT.equals(outputAction.getValue()));
-            form.getWidget("ignoreNull")
-                    .setHidden(!ACTION_UPDATE.equals(outputAction.getValue()) || ACTION_UPSERT.equals(outputAction.getValue()));
+                    .setHidden(extendInsert.getValue() && OutputAction.INSERT.equals(outputAction.getValue()));
+            form.getWidget("ignoreNull").setHidden(
+                    !OutputAction.UPDATE.equals(outputAction.getValue()) || OutputAction.UPSERT.equals(outputAction.getValue()));
         }
     }
 

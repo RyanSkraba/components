@@ -28,7 +28,7 @@ import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.test.ComponentTestUtils;
-import org.talend.components.salesforce.SalesforceBulkProperties;
+import org.talend.components.salesforce.SalesforceBulkProperties.Concurrency;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.SalesforceTestBase;
@@ -141,7 +141,7 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
         props.bulkFilePath.setValue(bulkFilePath);
         props.bulkProperties.bytesToCommit.setValue(10 * 1024 * 1024);
         props.bulkProperties.rowsToCommit.setValue(10000);
-        props.bulkProperties.concurrencyMode.setValue(SalesforceBulkProperties.CONCURRENCY_PARALLEL);
+        props.bulkProperties.concurrencyMode.setValue(Concurrency.PARALLEL);
         props.bulkProperties.waitTimeCheckBatchState.setValue(10000);
 
         props.module.main.schema.setValue(getMakeRowSchema(false));
@@ -169,7 +169,7 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
         inputProps.connection = props.connection;
         inputProps.module = props.module;
         inputProps.batchSize.setValue(200);
-        inputProps.queryMode.setValue(TSalesforceInputProperties.QueryMode.BULK);
+        inputProps.queryMode.setValue(TSalesforceInputProperties.QueryMode.QUERY);
 
         inputProps.manualQuery.setValue(true);
         inputProps.query.setValue(

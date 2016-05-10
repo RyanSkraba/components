@@ -44,12 +44,12 @@ final class SalesforceBulkExecReader extends SalesforceReader {
 
         TSalesforceBulkExecProperties sprops = (TSalesforceBulkExecProperties) properties;
         bulkRuntime = new SalesforceBulkRuntime((SalesforceSource) getCurrentSource(), container);
-        bulkRuntime.setConcurrencyMode(sprops.bulkProperties.concurrencyMode.getStringValue());
+        bulkRuntime.setConcurrencyMode(sprops.bulkProperties.concurrencyMode.getValue());
         bulkRuntime.setAwaitTime(sprops.bulkProperties.waitTimeCheckBatchState.getValue());
 
         try {
             // We only support CSV file for bulk output
-            bulkRuntime.executeBulk(sprops.module.moduleName.getStringValue(), sprops.outputAction.getStringValue(),
+            bulkRuntime.executeBulk(sprops.module.moduleName.getStringValue(), sprops.outputAction.getValue(),
                     sprops.upsertKeyColumn.getStringValue(), "csv", sprops.bulkFilePath.getStringValue(),
                     sprops.bulkProperties.bytesToCommit.getValue(), sprops.bulkProperties.rowsToCommit.getValue());
             if (bulkRuntime.getBatchCount() > 0) {

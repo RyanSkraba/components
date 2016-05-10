@@ -17,7 +17,6 @@ import static org.talend.daikon.properties.PropertyFactory.*;
 import java.util.Collections;
 import java.util.Set;
 
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
@@ -33,8 +32,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         BULK;
     }
 
-    public Property<QueryMode> queryMode = newEnum("queryMode", new TypeLiteral<QueryMode>() {// empty on purpose
-    });
+    public Property<QueryMode> queryMode = newEnum("queryMode", QueryMode.class);
 
     public Property<String> condition = newProperty("condition"); //$NON-NLS-1$
 

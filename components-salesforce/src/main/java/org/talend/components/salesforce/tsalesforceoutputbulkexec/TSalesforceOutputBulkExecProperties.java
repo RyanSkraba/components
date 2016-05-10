@@ -34,10 +34,8 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
     public void setupProperties() {
         super.setupProperties();
 
-        Schema s = SchemaBuilder.record("Main")
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//$NON-NLS-1$
-                .fields().name("salesforce_id")
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
+        Schema s = SchemaBuilder.record("Main").prop(SchemaConstants.TALEND_IS_LOCKED, "true")//$NON-NLS-2$
+                .fields().name("salesforce_id").prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-2$
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
                 .type().stringType().noDefault().name("salesforce_created")
@@ -54,14 +52,14 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(outputBulkProperties.getForm(Form.REFERENCE));
     }
-    
+
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        
-        if(Form.ADVANCED.equals(form.getName())) {
-        	boolean isUpsert = ACTION_UPSERT.equals(outputAction.getValue());
-        	form.getWidget(upsertRelationTable.getName()).setHidden(!isUpsert);
+
+        if (Form.ADVANCED.equals(form.getName())) {
+            boolean isUpsert = OutputAction.UPSERT.equals(outputAction.getValue());
+            form.getWidget(upsertRelationTable.getName()).setHidden(!isUpsert);
         }
     }
 
@@ -69,24 +67,26 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
     public ComponentProperties getInputComponentProperties() {
         outputBulkProperties.schema.schema.setValue(module.main.schema.getValue());
         outputBulkProperties.bulkFilePath.setValue(bulkFilePath.getValue());
-        outputBulkProperties.upsertRelationTable.columnName.setValue(upsertRelationTable.columnName.getStoredValue());
-        outputBulkProperties.upsertRelationTable.lookupFieldExternalIdName.setValue(upsertRelationTable.lookupFieldExternalIdName.getStoredValue());
-        outputBulkProperties.upsertRelationTable.lookupFieldName.setValue(upsertRelationTable.lookupFieldName.getStoredValue());
-        outputBulkProperties.upsertRelationTable.lookupFieldModuleName.setValue(upsertRelationTable.lookupFieldModuleName.getStoredValue());
-        outputBulkProperties.upsertRelationTable.polymorphic.setValue(upsertRelationTable.polymorphic.getStoredValue());
+        outputBulkProperties.upsertRelationTable.columnName.setValue(upsertRelationTable.columnName.getValue());
+        outputBulkProperties.upsertRelationTable.lookupFieldExternalIdName
+                .setValue(upsertRelationTable.lookupFieldExternalIdName.getValue());
+        outputBulkProperties.upsertRelationTable.lookupFieldName.setValue(upsertRelationTable.lookupFieldName.getValue());
+        outputBulkProperties.upsertRelationTable.lookupFieldModuleName
+                .setValue(upsertRelationTable.lookupFieldModuleName.getValue());
+        outputBulkProperties.upsertRelationTable.polymorphic.setValue(upsertRelationTable.polymorphic.getValue());
         return outputBulkProperties;
     }
 
     private static final String ADD_QUOTES = "ADD_QUOTES";
-    
+
     @Override
     public ComponentProperties getOutputComponentProperties() {
         TSalesforceBulkExecProperties bulkExecProperties = new TSalesforceBulkExecProperties("bulkExecProperties");
         bulkExecProperties.copyValuesFrom(this);
-        
+
         bulkExecProperties.connection.referencedComponent.componentInstanceId.setTaggedValue(ADD_QUOTES, true);
         bulkExecProperties.module.connection.referencedComponent.componentInstanceId.setTaggedValue(ADD_QUOTES, true);
-        
+
         return bulkExecProperties;
     }
 }

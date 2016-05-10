@@ -24,7 +24,7 @@ public class ComponentPropertiesTest {
     public void testSetReturnsProperty() {
         Property<String> element = ComponentPropertyFactory.newReturnsProperty();
         assertEquals("returns", element.getName());
-        assertEquals(String.class, element.getTypeLiteral().getType());
+        assertEquals(String.class.toString(), element.getType());
     }
 
     @Test
@@ -33,7 +33,7 @@ public class ComponentPropertiesTest {
         Property<Boolean> returnProperty = ComponentPropertyFactory.newReturnProperty(element,
                 PropertyFactory.newBoolean("childName"));
         assertEquals("childName", returnProperty.getName());
-        assertEquals(Boolean.class, returnProperty.getTypeLiteral().getType());
+        assertEquals(Boolean.class.toString(), returnProperty.getType());
         assertEquals(returnProperty, element.getChild("childName"));
     }
 

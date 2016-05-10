@@ -38,6 +38,7 @@ import org.talend.components.api.service.AbstractComponentTest;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.SimpleComponentRegistry;
 import org.talend.components.api.test.SimpleComponentService;
+import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
 import org.talend.components.salesforce.runtime.SalesforceSink;
 import org.talend.components.salesforce.runtime.SalesforceSource;
 import org.talend.components.salesforce.runtime.SalesforceWriteOperation;
@@ -385,7 +386,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
     protected void deleteRows(List<IndexedRecord> rows, SalesforceConnectionModuleProperties props) throws Exception {
         TSalesforceOutputProperties deleteProperties = new TSalesforceOutputProperties("delete"); //$NON-NLS-1$
         deleteProperties.copyValuesFrom(props);
-        deleteProperties.outputAction.setValue(TSalesforceOutputProperties.ACTION_DELETE);
+        deleteProperties.outputAction.setValue(OutputAction.DELETE);
         System.out.println("deleting " + rows.size() + " rows");
         doWriteRows(deleteProperties, rows);
     }

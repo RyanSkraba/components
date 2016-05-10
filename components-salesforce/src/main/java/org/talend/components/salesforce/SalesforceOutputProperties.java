@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.avro.Schema;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentPropertyFactory;
@@ -33,14 +32,6 @@ import org.talend.daikon.properties.presentation.Widget;
 
 public class SalesforceOutputProperties extends SalesforceConnectionModuleProperties {
 
-    public static final String ACTION_INSERT = "INSERT";
-
-    public static final String ACTION_UPDATE = "UPDATE";
-
-    public static final String ACTION_UPSERT = "UPSERT";
-
-    public static final String ACTION_DELETE = "DELETE";
-
     public enum OutputAction {
         INSERT,
         UPDATE,
@@ -48,9 +39,7 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         DELETE
     }
 
-    public Property<OutputAction> outputAction = newEnum("outputAction", new TypeLiteral<OutputAction>() {// empty on
-                                                                                                          // purpose
-    }); // $NON-NLS-1$
+    public Property<OutputAction> outputAction = newEnum("outputAction", OutputAction.class); // $NON-NLS-1$
 
     public Property<String> upsertKeyColumn = newString("upsertKeyColumn"); //$NON-NLS-1$
 
@@ -106,7 +95,7 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
     public void setupProperties() {
         super.setupProperties();
 
-        outputAction.setValue(ACTION_INSERT);
+        outputAction.setValue(OutputAction.INSERT);
 
         returns = ComponentPropertyFactory.newReturnsProperty();
         ComponentPropertyFactory.newReturnProperty(returns, newInteger("NB_LINE")); //$NON-NLS-1$
@@ -146,7 +135,7 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         if (form.getName().equals(Form.MAIN)) {
             Form advForm = getForm(Form.ADVANCED);
             if (advForm != null) {
-                boolean isUpsert = ACTION_UPSERT.equals(outputAction.getValue());
+                boolean isUpsert = OutputAction.UPSERT.equals(outputAction.getValue());
                 form.getWidget(upsertKeyColumn.getName()).setHidden(!isUpsert);
                 advForm.getWidget(upsertRelationTable.getName()).setHidden(!isUpsert);
             }

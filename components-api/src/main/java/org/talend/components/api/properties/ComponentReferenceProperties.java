@@ -19,7 +19,6 @@ import java.lang.reflect.Field;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 
@@ -47,10 +46,7 @@ public class ComponentReferenceProperties extends ComponentProperties {
     //
     // Properties
     //
-    public Property<ReferenceType> referenceType = newEnum("referenceType", new TypeLiteral<ReferenceType>() {// empty
-                                                                                                              // on
-                                                                                                              // purpose
-    });
+    public Property<ReferenceType> referenceType = newEnum("referenceType", ReferenceType.class);
 
     public Property<String> componentType = newProperty("componentType").setFlags(EnumSet.of(DESIGN_TIME_ONLY)); //$NON-NLS-1$
 

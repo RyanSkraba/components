@@ -93,7 +93,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
         this.uId = uId;
         connection = sink.connect(container).connection;
         if (null == schema) {
-            schema = (Schema) sprops.module.main.schema.getValue();
+            schema = sprops.module.main.schema.getValue();
             if (AvroUtils.isIncludeAllFields(schema)) {
                 schema = sink.getSchema(connection, sprops.module.moduleName.getStringValue());
             } // else schema is fully specified
@@ -116,7 +116,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
         }
         IndexedRecord input = factory.convertToAvro(datum);
 
-        if (!TSalesforceOutputProperties.ACTION_DELETE.equals(sprops.outputAction.getValue())) {
+        if (!TSalesforceOutputProperties.OutputAction.DELETE.equals(sprops.outputAction.getValue())) {
             SObject so = new SObject();
             so.setType(sprops.module.moduleName.getStringValue());
 
@@ -279,15 +279,16 @@ final class SalesforceWriter implements Writer<WriterResult> {
 
     protected void handleResults(boolean success, Error[] resultErrors, String[] changedItemKeys, int batchIdx)
             throws IOException {
-        //StringBuilder errors = new StringBuilder("");
-    	
-    	Map<String,String> resultMessage = new HashMap<String, String>();
-    	
+        // StringBuilder errors = new StringBuilder("");
+
+        Map<String, String> resultMessage = new HashMap<String, String>();
+
         if (success) {
             // TODO: send back the ID
         } else {
-        	//TODO now we use batch mode for commit the data to salesforce, but the batch size is 1 at any time, so the code is ok now, but we need fix it.
-        	for (Error error : resultErrors) {
+            // TODO now we use batch mode for commit the data to salesforce, but the batch size is 1 at any time, so the
+            // code is ok now, but we need fix it.
+            for (Error error : resultErrors) {
                 if (error.getStatusCode() != null) {
                     resultMessage.put("errorCode", error.getStatusCode().toString());
                 }
@@ -304,21 +305,19 @@ final class SalesforceWriter implements Writer<WriterResult> {
                 }
                 resultMessage.put("errorMessage", error.getMessage());
             }
-        	
-        	throw new DataRejectException(resultMessage);
-        	
+
+            throw new DataRejectException(resultMessage);
+
             /*
-            errors = SalesforceRuntime.addLog(resultErrors,
-            	batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx] : "Batch index out of bounds", null);
-            */
+             * errors = SalesforceRuntime.addLog(resultErrors, batchIdx < changedItemKeys.length ?
+             * changedItemKeys[batchIdx] : "Batch index out of bounds", null);
+             */
         }
-        
+
         /*
-        if (exceptionForErrors && errors.toString().length() > 0) {
-            throw new IOException(errors.toString());
-        }
-        */
-        
+         * if (exceptionForErrors && errors.toString().length() > 0) { throw new IOException(errors.toString()); }
+         */
+
     }
 
     protected DeleteResult[] delete(String id) throws IOException {
