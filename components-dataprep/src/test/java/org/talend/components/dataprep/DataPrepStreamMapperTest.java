@@ -1,0 +1,39 @@
+package org.talend.components.dataprep;
+
+import org.junit.Test;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class DataPrepStreamMapperTest {
+    //datasetid=7fa267c6-87c8-4ba2-9b24-fe300bf2f163
+
+    @Test
+    public void metaDataMappingTest() throws IOException {
+        InputStream inputStream = DataPrepStreamMapperTest.class.getResourceAsStream("metadata.json");
+        DataPrepStreamMapper streamMapper = new DataPrepStreamMapper(inputStream);
+        MetaData metaData = streamMapper.getMetaData();
+        streamMapper.close();
+
+        assertNotNull(metaData.getColumns());
+        assertTrue("Columns quantity is 11", metaData.getColumns().size() == 11);
+    }
+
+    @Test
+    public void rowDataSetIteratorTest() throws IOException {
+        InputStream inputStream = DataPrepStreamMapperTest.class.getResourceAsStream("dataset.json");
+        DataPrepStreamMapper streamMapper = new DataPrepStreamMapper(inputStream);
+        streamMapper.initIterator();
+        assertTrue(streamMapper.hasNextRecord());
+        while (streamMapper.hasNextRecord()) {
+            Map<String, String> nextRecord = streamMapper.nextRecord();
+            assertNotNull(nextRecord);
+            assertTrue("10 columns should be in record", nextRecord.size() == 11);
+            }
+        streamMapper.close();
+    }
+}
