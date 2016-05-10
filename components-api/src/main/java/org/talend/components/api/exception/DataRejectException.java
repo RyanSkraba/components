@@ -18,13 +18,13 @@ public class DataRejectException extends RuntimeException {
 
 	private static final long serialVersionUID = -767063336424805519L;
 	
-	private Map<String,String> info;
+	private Map<String,Object> info;
 	
-	public DataRejectException(Map<String,String> info) {
+	public DataRejectException(Map<String,Object> info) {
     	this.info = info;
     }
 	
-	public Map<String,String> getRejectInfo() {
+	public Map<String,Object> getRejectInfo() {
 		return info;
 	}
 
