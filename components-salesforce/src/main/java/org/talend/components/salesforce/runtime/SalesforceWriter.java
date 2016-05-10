@@ -299,7 +299,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
             throws IOException {
         //StringBuilder errors = new StringBuilder("");
 
-        Map<String, String> resultMessage = new HashMap<String, String>();
+        Map<String, Object> resultMessage = new HashMap<String, Object>();
 
         if (success) {
             successCount++;

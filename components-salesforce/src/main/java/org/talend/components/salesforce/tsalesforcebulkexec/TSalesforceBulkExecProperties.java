@@ -135,8 +135,8 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
         if (isOutputConnection) {
         	HashSet<PropertyPathConnector> connectors = new HashSet<>();
-        	connectors.add(MAIN_CONNECTOR);//the can't use FLOW_CONNECTOR and so setValue in schemaFlow will not ok, TODO fix it
-        	connectors.add(REJECT_CONNECTOR);//setValue in schemaReject will not ok, TODO fix it
+        	connectors.add(FLOW_CONNECTOR);
+        	connectors.add(REJECT_CONNECTOR);
             return connectors;
         } else {
             return Collections.emptySet();

@@ -75,6 +75,8 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
         bulkExecProperties.connection.referencedComponent.componentInstanceId.setTaggedValue(ADD_QUOTES, true);
         bulkExecProperties.module.connection.referencedComponent.componentInstanceId.setTaggedValue(ADD_QUOTES, true);
         
+        //bulkExecProperties.module.main.schema.setValue(bulkExecProperties.schemaFlow.schema.getValue());
+        
         return bulkExecProperties;
     }
     
