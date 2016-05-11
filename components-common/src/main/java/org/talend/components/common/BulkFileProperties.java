@@ -51,13 +51,10 @@ public class BulkFileProperties extends FixedConnectorsComponentProperties {
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
-        /* the method affect the runtime also, so do it like this one, TODO fix it
     	if (isOutputConnection) {
         	return Collections.emptySet();
         } else {
-        */
         	return Collections.singleton(new PropertyPathConnector(Connector.MAIN_NAME, "schema"));
-        
-        //}
+        }
     }
 }
