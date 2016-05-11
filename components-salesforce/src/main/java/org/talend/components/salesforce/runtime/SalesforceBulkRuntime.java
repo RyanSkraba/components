@@ -343,7 +343,14 @@ public class SalesforceBulkRuntime {
             resultInfo = new BulkResult();
             resultInfo.copyValues(getBaseFileRow());
             for (int i = 0; i < resultCols; i++) {
-                resultInfo.setValue(resultHeader.get(i), row.get(i));
+            	String header = resultHeader.get(i);
+            	if("Created".equals(header)) {
+            		resultInfo.setValue("salesforce_created", row.get(i));
+            	} else if("Id".equals(header)) {
+            		resultInfo.setValue("salesforce_id", row.get(i));
+            	} else {
+            		resultInfo.setValue(header, row.get(i));
+            	}
             }
             resultInfoList.add(resultInfo);
         }
@@ -597,7 +604,11 @@ public class SalesforceBulkRuntime {
                 return;
             }else{
                 for(String key:result.values.keySet()){
-                    values.put(key,result.values.get(key));
+                	Object value = result.values.get(key);
+                	if("#N/A".equals(value)) {
+                		value = null;
+                	}
+                    values.put(key,value);
                 }
             }
         }

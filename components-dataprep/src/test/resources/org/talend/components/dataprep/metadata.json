@@ -1,0 +1,2289 @@
+{
+  "id": "7fa267c6-87c8-4ba2-9b24-fe300bf2f163",
+  "columns": [
+    {
+      "name": "id",
+      "headerSize": 0,
+      "type": "integer",
+      "quality": {
+        "mostFrequentSubType": null,
+        "empty": 0,
+        "invalid": 3,
+        "valid": 997,
+        "invalidValues": [
+          "958@018",
+          "A3873",
+          "16761X"
+        ]
+      },
+      "id": "0000",
+      "statistics": {
+        "count": 1000,
+        "valid": 997,
+        "invalid": 3,
+        "empty": 0,
+        "max": 999902,
+        "min": 10805,
+        "mean": 498955.7863590767,
+        "variance": 85295911954.03564,
+        "duplicateCount": 1,
+        "distinctCount": 999,
+        "frequencyTable": [
+          {
+            "data": "938974",
+            "occurrences": 2
+          },
+          {
+            "data": "63184",
+            "occurrences": 1
+          },
+          {
+            "data": "375117",
+            "occurrences": 1
+          },
+          {
+            "data": "183769",
+            "occurrences": 1
+          },
+          {
+            "data": "595658",
+            "occurrences": 1
+          },
+          {
+            "data": "481405",
+            "occurrences": 1
+          },
+          {
+            "data": "476052",
+            "occurrences": 1
+          },
+          {
+            "data": "32203",
+            "occurrences": 1
+          },
+          {
+            "data": "31599",
+            "occurrences": 1
+          },
+          {
+            "data": "934179",
+            "occurrences": 1
+          },
+          {
+            "data": "148995",
+            "occurrences": 1
+          },
+          {
+            "data": "638478",
+            "occurrences": 1
+          },
+          {
+            "data": "911056",
+            "occurrences": 1
+          },
+          {
+            "data": "32200",
+            "occurrences": 1
+          },
+          {
+            "data": "766792",
+            "occurrences": 1
+          }
+        ],
+        "patternFrequencyTable": [
+          {
+            "pattern": "999999",
+            "occurrences": 894
+          },
+          {
+            "pattern": "99999",
+            "occurrences": 103
+          },
+          {
+            "pattern": "999@999",
+            "occurrences": 1
+          },
+          {
+            "pattern": "99999A",
+            "occurrences": 1
+          },
+          {
+            "pattern": "A9999",
+            "occurrences": 1
+          }
+        ],
+        "quantiles": {
+          "median": 495235,
+          "lowerQuantile": 240153.5,
+          "upperQuantile": 752126.5
+        },
+        "histogram": {
+          "type": "number",
+          "items": [
+            {
+              "occurrences": 24,
+              "range": {
+                "min": -83885,
+                "max": 31599
+              }
+            },
+            {
+              "occurrences": 135,
+              "range": {
+                "min": 31599,
+                "max": 147083
+              }
+            },
+            {
+              "occurrences": 109,
+              "range": {
+                "min": 147083,
+                "max": 262567
+              }
+            },
+            {
+              "occurrences": 105,
+              "range": {
+                "min": 262567,
+                "max": 378051
+              }
+            },
+            {
+              "occurrences": 124,
+              "range": {
+                "min": 378051,
+                "max": 493535
+              }
+            },
+            {
+              "occurrences": 115,
+              "range": {
+                "min": 493535,
+                "max": 609019
+              }
+            },
+            {
+              "occurrences": 105,
+              "range": {
+                "min": 609019,
+                "max": 724503
+              }
+            },
+            {
+              "occurrences": 111,
+              "range": {
+                "min": 724503,
+                "max": 839987
+              }
+            },
+            {
+              "occurrences": 111,
+              "range": {
+                "min": 839987,
+                "max": 955471
+              }
+            },
+            {
+              "occurrences": 58,
+              "range": {
+                "min": 955471,
+                "max": 1070955
+              }
+            }
+          ]
+        },
+        "textLengthSummary": {
+          "minimalLength": "NaN",
+          "maximalLength": "NaN",
+          "averageLength": "NaN"
+        }
+      },
+      "domain": "",
+      "domainLabel": "",
+      "domainFrequency": 0,
+      "semanticDomains": [
+        {
+          "id": "FR_POSTAL_CODE",
+          "label": "FR Postal Code",
+          "frequency": 9
+        },
+        {
+          "id": "FR_CODE_COMMUNE_INSEE",
+          "label": "FR Insee Code",
+          "frequency": 9
+        },
+        {
+          "id": "DE_POSTAL_CODE",
+          "label": "DE Postal Code",
+          "frequency": 9
+        },
+        {
+          "id": "US_POSTAL_CODE",
+          "label": "US Postal Code",
+          "frequency": 9
+        }
+      ],
+      "domainForced": false,
+      "typeForced": false
+    },
+    {
+      "name": "Name",
+      "headerSize": 0,
+      "type": "string",
+      "quality": {
+        "mostFrequentSubType": null,
+        "empty": 20,
+        "invalid": 0,
+        "valid": 980,
+        "invalidValues": []
+      },
+      "id": "0001",
+      "statistics": {
+        "count": 1000,
+        "valid": 980,
+        "invalid": 0,
+        "empty": 20,
+        "max": "NaN",
+        "min": "NaN",
+        "mean": "NaN",
+        "variance": "NaN",
+        "duplicateCount": 748,
+        "distinctCount": 252,
+        "frequencyTable": [
+          {
+            "data": "",
+            "occurrences": 20
+          },
+          {
+            "data": "Anne",
+            "occurrences": 12
+          },
+          {
+            "data": "Melissa",
+            "occurrences": 11
+          },
+          {
+            "data": "Antonio",
+            "occurrences": 10
+          },
+          {
+            "data": "Amanda",
+            "occurrences": 9
+          },
+          {
+            "data": "Jerry",
+            "occurrences": 9
+          },
+          {
+            "data": "Carl",
+            "occurrences": 9
+          },
+          {
+            "data": "Judith",
+            "occurrences": 9
+          },
+          {
+            "data": "Louis",
+            "occurrences": 9
+          },
+          {
+            "data": "Rachel",
+            "occurrences": 9
+          },
+          {
+            "data": "Patrick",
+            "occurrences": 9
+          },
+          {
+            "data": "Wayne",
+            "occurrences": 8
+          },
+          {
+            "data": "Brenda",
+            "occurrences": 8
+          },
+          {
+            "data": "Andrea",
+            "occurrences": 8
+          },
+          {
+            "data": "Eric",
+            "occurrences": 8
+          }
+        ],
+        "patternFrequencyTable": [
+          {
+            "pattern": "Aaaaaa",
+            "occurrences": 241
+          },
+          {
+            "pattern": "Aaaaa",
+            "occurrences": 238
+          },
+          {
+            "pattern": "Aaaaaaa",
+            "occurrences": 168
+          },
+          {
+            "pattern": "Aaaa",
+            "occurrences": 150
+          },
+          {
+            "pattern": "Aaaaaaaa",
+            "occurrences": 58
+          },
+          {
+            "pattern": "Aaaaaaaaa",
+            "occurrences": 28
+          },
+          {
+            "pattern": "Aaa",
+            "occurrences": 21
+          },
+          {
+            "pattern": "",
+            "occurrences": 20
+          },
+          {
+            "pattern": "AAAAAA",
+            "occurrences": 16
+          },
+          {
+            "pattern": "AAAAA",
+            "occurrences": 12
+          },
+          {
+            "pattern": "AAAAAAA",
+            "occurrences": 11
+          },
+          {
+            "pattern": "Aaaaaaaaaa",
+            "occurrences": 8
+          },
+          {
+            "pattern": "AAAA",
+            "occurrences": 7
+          },
+          {
+            "pattern": "Aaaaaaaaaaa",
+            "occurrences": 6
+          },
+          {
+            "pattern": "Aaaaaa Aaaaaaa",
+            "occurrences": 2
+          }
+        ],
+        "quantiles": {
+          "median": "NaN",
+          "lowerQuantile": "NaN",
+          "upperQuantile": "NaN"
+        },
+        "histogram": null,
+        "textLengthSummary": {
+          "minimalLength": 0,
+          "maximalLength": 16,
+          "averageLength": 5.745
+        }
+      },
+      "domain": "FIRST_NAME",
+      "domainLabel": "First Name",
+      "domainFrequency": 95,
+      "semanticDomains": [
+        {
+          "id": "AIRPORT",
+          "label": "Airport",
+          "frequency": 16
+        },
+        {
+          "id": "CITY",
+          "label": "City",
+          "frequency": 15
+        },
+        {
+          "id": "MEASURE_UNIT",
+          "label": "Measure Unit",
+          "frequency": 1
+        },
+        {
+          "id": "AIRPORT_CODE",
+          "label": "Airport Code",
+          "frequency": 1
+        },
+        {
+          "id": "US_COUNTY",
+          "label": "US County",
+          "frequency": 10
+        },
+        {
+          "id": "FR_COMMUNE",
+          "label": "FR Commune",
+          "frequency": 5
+        },
+        {
+          "id": "FIRST_NAME",
+          "label": "First Name",
+          "frequency": 95
+        },
+        {
+          "id": "COMPANY",
+          "label": "Company",
+          "frequency": 7
+        }
+      ],
+      "domainForced": false,
+      "typeForced": false
+    },
+    {
+      "name": "last_name",
+      "headerSize": 0,
+      "type": "string",
+      "quality": {
+        "mostFrequentSubType": null,
+        "empty": 5,
+        "invalid": 409,
+        "valid": 586,
+        "invalidValues": [
+          "Fernandez",
+          "peters",
+          "HUGUES",
+          "Reyes",
+          "Black",
+          "Kelley",
+          "Reed",
+          "Morales",
+          "Gonzalez",
+          "Richards",
+          "Rivera",
+          "Simmons",
+          "Bryant",
+          "Carr",
+          "Hunter",
+          "FIELDS",
+          "Chapman",
+          "Berry",
+          "Flores",
+          "Watkins",
+          "Castillo",
+          "Bishop",
+          "Moreno",
+          "Nichols",
+          "Meyer",
+          "Wagner",
+          "Gilbert",
+          "Rose",
+          "Shaw",
+          "Ortiz",
+          "Peters",
+          "Cruz",
+          "Jacobs",
+          "Nguyen",
+          "Jordan",
+          "Cunningham",
+          "James",
+          "Fowler",
+          "Cox",
+          "Hicks",
+          "Kelly",
+          "Myers",
+          "Owens",
+          "Palmer",
+          "Freeman",
+          "Mccoy",
+          "Duncan",
+          "Mendoza",
+          "Martinez",
+          "Ferguson",
+          "Vasquez",
+          "Hernandez",
+          "Reid",
+          "Fuller",
+          "Watson",
+          "Romero",
+          "Chavez",
+          "Knight",
+          "Murphy",
+          "Frazier",
+          "Thompson",
+          "Gutierrez",
+          "Hansen",
+          "Torres",
+          "Weaver",
+          "Schmidt",
+          "Patterson",
+          "Kim",
+          "Dean",
+          "Fox",
+          "Arnold",
+          "Matthews",
+          "Collins",
+          "Fields",
+          "Garcia",
+          "Little",
+          "Gardner",
+          "Sims",
+          "Rodriguez",
+          "Burns",
+          "Diaz",
+          "Carpenter",
+          "Lopez",
+          "Gomez",
+          "Larson",
+          "Peterson",
+          "Kennedy",
+          "Burton",
+          "Ramos",
+          "Welch",
+          "Alvarez",
+          "Lynch",
+          "Robinson",
+          "Perez",
+          "West",
+          "Ramirez",
+          "Lawson",
+          "Ruiz",
+          "Ryan",
+          "Willis",
+          "Olson",
+          "Griffin",
+          "Sanchez"
+        ]
+      },
+      "id": "0002",
+      "statistics": {
+        "count": 1000,
+        "valid": 586,
+        "invalid": 409,
+        "empty": 5,
+        "max": "NaN",
+        "min": "NaN",
+        "mean": "NaN",
+        "variance": "NaN",
+        "duplicateCount": 748,
+        "distinctCount": 252,
+        "frequencyTable": [
+          {
+            "data": "Rice",
+            "occurrences": 10
+          },
+          {
+            "data": "Robertson",
+            "occurrences": 10
+          },
+          {
+            "data": "Stone",
+            "occurrences": 9
+          },
+          {
+            "data": "Ruiz",
+            "occurrences": 9
+          },
+          {
+            "data": "Cruz",
+            "occurrences": 9
+          },
+          {
+            "data": "Owens",
+            "occurrences": 9
+          },
+          {
+            "data": "Arnold",
+            "occurrences": 9
+          },
+          {
+            "data": "West",
+            "occurrences": 9
+          },
+          {
+            "data": "Mcdonald",
+            "occurrences": 8
+          },
+          {
+            "data": "Martin",
+            "occurrences": 8
+          },
+          {
+            "data": "Phillips",
+            "occurrences": 8
+          },
+          {
+            "data": "Perez",
+            "occurrences": 8
+          },
+          {
+            "data": "Howell",
+            "occurrences": 8
+          },
+          {
+            "data": "Cox",
+            "occurrences": 8
+          },
+          {
+            "data": "Garcia",
+            "occurrences": 8
+          }
+        ],
+        "patternFrequencyTable": [
+          {
+            "pattern": "Aaaaaa",
+            "occurrences": 293
+          },
+          {
+            "pattern": "Aaaaa",
+            "occurrences": 202
+          },
+          {
+            "pattern": "Aaaaaaa",
+            "occurrences": 161
+          },
+          {
+            "pattern": "Aaaa",
+            "occurrences": 138
+          },
+          {
+            "pattern": "Aaaaaaaa",
+            "occurrences": 127
+          },
+          {
+            "pattern": "Aaaaaaaaa",
+            "occurrences": 37
+          },
+          {
+            "pattern": "Aaa",
+            "occurrences": 19
+          },
+          {
+            "pattern": "Aaaaaaaaaa",
+            "occurrences": 13
+          },
+          {
+            "pattern": "",
+            "occurrences": 5
+          },
+          {
+            "pattern": "AAAAAA",
+            "occurrences": 2
+          },
+          {
+            "pattern": "aaaaaa",
+            "occurrences": 1
+          },
+          {
+            "pattern": " Aaaaaa",
+            "occurrences": 1
+          },
+          {
+            "pattern": " Aaaaaaa ",
+            "occurrences": 1
+          }
+        ],
+        "quantiles": {
+          "median": "NaN",
+          "lowerQuantile": "NaN",
+          "upperQuantile": "NaN"
+        },
+        "histogram": null,
+        "textLengthSummary": {
+          "minimalLength": 0,
+          "maximalLength": 10,
+          "averageLength": 6.017
+        }
+      },
+      "domain": "US_COUNTY",
+      "domainLabel": "US County",
+      "domainFrequency": 54.55,
+      "semanticDomains": [
+        {
+          "id": "CITY",
+          "label": "City",
+          "frequency": 36.36
+        },
+        {
+          "id": "AIRPORT",
+          "label": "Airport",
+          "frequency": 22.22
+        },
+        {
+          "id": "AIRPORT_CODE",
+          "label": "Airport Code",
+          "frequency": 1.01
+        },
+        {
+          "id": "MEASURE_UNIT",
+          "label": "Measure Unit",
+          "frequency": 1.01
+        },
+        {
+          "id": "US_COUNTY",
+          "label": "US County",
+          "frequency": 54.55
+        },
+        {
+          "id": "FR_COMMUNE",
+          "label": "FR Commune",
+          "frequency": 2.02
+        },
+        {
+          "id": "FIRST_NAME",
+          "label": "First Name",
+          "frequency": 38.38
+        },
+        {
+          "id": "COMPANY",
+          "label": "Company",
+          "frequency": 10.1
+        }
+      ],
+      "domainForced": false,
+      "typeForced": false
+    },
+    {
+      "name": "email",
+      "headerSize": 0,
+      "type": "string",
+      "quality": {
+        "mostFrequentSubType": null,
+        "empty": 20,
+        "invalid": 2,
+        "valid": 978,
+        "invalidValues": [
+          "kgarcia14@g",
+          "gbr!ownr@canalblog.com"
+        ]
+      },
+      "id": "0003",
+      "statistics": {
+        "count": 1000,
+        "valid": 978,
+        "invalid": 2,
+        "empty": 20,
+        "max": "NaN",
+        "min": "NaN",
+        "mean": "NaN",
+        "variance": "NaN",
+        "duplicateCount": 19,
+        "distinctCount": 981,
+        "frequencyTable": [
+          {
+            "data": "",
+            "occurrences": 20
+          },
+          {
+            "data": "rgrahambf@examiner.com",
+            "occurrences": 1
+          },
+          {
+            "data": "jcruzgn@amazon.co.uk",
+            "occurrences": 1
+          },
+          {
+            "data": "crosscm@twitpic.com",
+            "occurrences": 1
+          },
+          {
+            "data": "rray7e@dagondesign.com",
+            "occurrences": 1
+          },
+          {
+            "data": "rwesto5@360.cn",
+            "occurrences": 1
+          },
+          {
+            "data": "mgonzalesl7@wired.com",
+            "occurrences": 1
+          },
+          {
+            "data": "lbelldb@aboutads.info",
+            "occurrences": 1
+          },
+          {
+            "data": "bcook9b@jimdo.com",
+            "occurrences": 1
+          },
+          {
+            "data": "lgrahamlb@csmonitor.com",
+            "occurrences": 1
+          },
+          {
+            "data": "mhernandez4e@dion.ne.jp",
+            "occurrences": 1
+          },
+          {
+            "data": "phudson9l@wiley.com",
+            "occurrences": 1
+          },
+          {
+            "data": "aparkerkn@mit.edu",
+            "occurrences": 1
+          },
+          {
+            "data": "aadamsjq@free.fr",
+            "occurrences": 1
+          },
+          {
+            "data": "pjenkinspp@mapy.cz",
+            "occurrences": 1
+          }
+        ],
+        "patternFrequencyTable": [
+          {
+            "pattern": "",
+            "occurrences": 20
+          },
+          {
+            "pattern": "aaaaaaaaa@aaa.aaa",
+            "occurrences": 16
+          },
+          {
+            "pattern": "aaaaaaaaa@aaaaa.aaa",
+            "occurrences": 16
+          },
+          {
+            "pattern": "aaaaaaaaa@aaaaaa.aaa",
+            "occurrences": 14
+          },
+          {
+            "pattern": "aaaaaaaaaa@aaaaa.aaa",
+            "occurrences": 14
+          },
+          {
+            "pattern": "aaaaaaaaaa@aaaa.aaa",
+            "occurrences": 13
+          },
+          {
+            "pattern": "aaaaaaaaa@aaaaaaaa.aaa",
+            "occurrences": 12
+          },
+          {
+            "pattern": "aaaaaaaaa@aaaaaaa.aaa",
+            "occurrences": 12
+          },
+          {
+            "pattern": "aaaaaaa9a@aaaaa.aaa",
+            "occurrences": 12
+          },
+          {
+            "pattern": "aaaaaaaaaa@aaaaaa.aaa",
+            "occurrences": 11
+          },
+          {
+            "pattern": "aaaaaaaaa@aaaa.aaa",
+            "occurrences": 11
+          },
+          {
+            "pattern": "aaaaaaaa@aaaaaa.aaa",
+            "occurrences": 11
+          },
+          {
+            "pattern": "aaaaaaaa@aaaa.aaa",
+            "occurrences": 10
+          },
+          {
+            "pattern": "aaaaaaaa@aaaaaaa.aaa",
+            "occurrences": 10
+          },
+          {
+            "pattern": "aaaaaaaa@aaaaa.aaa",
+            "occurrences": 10
+          }
+        ],
+        "quantiles": {
+          "median": "NaN",
+          "lowerQuantile": "NaN",
+          "upperQuantile": "NaN"
+        },
+        "histogram": null,
+        "textLengthSummary": {
+          "minimalLength": 0,
+          "maximalLength": 33,
+          "averageLength": 20.172
+        }
+      },
+      "domain": "EMAIL",
+      "domainLabel": "Email",
+      "domainFrequency": 99,
+      "semanticDomains": [
+        {
+          "id": "EMAIL",
+          "label": "Email",
+          "frequency": 99
+        }
+      ],
+      "domainForced": false,
+      "typeForced": false
+    },
+    {
+      "name": "job_title",
+      "headerSize": 0,
+      "type": "string",
+      "quality": {
+        "mostFrequentSubType": null,
+        "empty": 21,
+        "invalid": 0,
+        "valid": 979,
+        "invalidValues": []
+      },
+      "id": "0004",
+      "statistics": {
+        "count": 1000,
+        "valid": 979,
+        "invalid": 0,
+        "empty": 21,
+        "max": "NaN",
+        "min": "NaN",
+        "mean": "NaN",
+        "variance": "NaN",
+        "duplicateCount": 878,
+        "distinctCount": 122,
+        "frequencyTable": [
+          {
+            "data": "",
+            "occurrences": 21
+          },
+          {
+            "data": "Occupational Therapist",
+            "occurrences": 17
+          },
+          {
+            "data": "Database Administrator",
+            "occurrences": 16
+          },
+          {
+            "data": "VP Marketing",
+            "occurrences": 15
+          },
+          {
+            "data": "Financial Advisor",
+            "occurrences": 15
+          },
+          {
+            "data": "Web Designer",
+            "occurrences": 14
+          },
+          {
+            "data": "Software Consultant",
+            "occurrences": 14
+          },
+          {
+            "data": "Human Resources Manager",
+            "occurrences": 14
+          },
+          {
+            "data": "Librarian",
+            "occurrences": 13
+          },
+          {
+            "data": "Senior Financial Analyst",
+            "occurrences": 13
+          },
+          {
+            "data": "Geological Engineer",
+            "occurrences": 13
+          },
+          {
+            "data": "Structural Engineer",
+            "occurrences": 13
+          },
+          {
+            "data": "VP Sales",
+            "occurrences": 13
+          },
+          {
+            "data": "VP Product Management",
+            "occurrences": 12
+          },
+          {
+            "data": "Environmental Tech",
+            "occurrences": 12
+          }
+        ],
+        "patternFrequencyTable": [
+          {
+            "pattern": "Aaaaaaaaa",
+            "occurrences": 51
+          },
+          {
+            "pattern": "Aaaaaaaaa Aaaaaaa",
+            "occurrences": 42
+          },
+          {
+            "pattern": "Aaaaaaaaaa Aaaaaaaa",
+            "occurrences": 37
+          },
+          {
+            "pattern": "Aaaaaa Aaaaaaaaa",
+            "occurrences": 29
+          },
+          {
+            "pattern": "Aaaaaaaaa Aaaaaaaaa",
+            "occurrences": 27
+          },
+          {
+            "pattern": "Aaaaaaa Aaaaaaaa",
+            "occurrences": 24
+          },
+          {
+            "pattern": "Aaaaaaaa Aaaaaaaaaa",
+            "occurrences": 22
+          },
+          {
+            "pattern": "",
+            "occurrences": 21
+          },
+          {
+            "pattern": "Aaaaaaaa Aaaaaaaa",
+            "occurrences": 21
+          },
+          {
+            "pattern": "Aaaaa Aaaaaaaaa",
+            "occurrences": 21
+          },
+          {
+            "pattern": "Aaaaaaaaaa",
+            "occurrences": 21
+          },
+          {
+            "pattern": "Aaaaaaa",
+            "occurrences": 19
+          },
+          {
+            "pattern": "Aaaaaaaaaaaa Aaaaaaaaa",
+            "occurrences": 17
+          },
+          {
+            "pattern": "Aaaaaaaa Aaaaaaaaaaaaa",
+            "occurrences": 16
+          },
+          {
+            "pattern": "AA Aaaaaaaaa",
+            "occurrences": 15
+          }
+        ],
+        "quantiles": {
+          "median": "NaN",
+          "lowerQuantile": "NaN",
+          "upperQuantile": "NaN"
+        },
+        "histogram": null,
+        "textLengthSummary": {
+          "minimalLength": 0,
+          "maximalLength": 36,
+          "averageLength": 17.3
+        }
+      },
+      "domain": "",
+      "domainLabel": "",
+      "domainFrequency": 0,
+      "semanticDomains": [
+        {
+          "id": "JOB_TITLE",
+          "label": "Job Title",
+          "frequency": 5.05
+        }
+      ],
+      "domainForced": false,
+      "typeForced": false
+    },
+    {
+      "name": "company",
+      "headerSize": 0,
+      "type": "string",
+      "quality": {
+        "mostFrequentSubType": null,
+        "empty": 21,
+        "invalid": 0,
+        "valid": 979,
+        "invalidValues": []
+      },
+      "id": "0005",
+      "statistics": {
+        "count": 1000,
+        "valid": 979,
+        "invalid": 0,
+        "empty": 21,
+        "max": "NaN",
+        "min": "NaN",
+        "mean": "NaN",
+        "variance": "NaN",
+        "duplicateCount": 645,
+        "distinctCount": 355,
+        "frequencyTable": [
+          {
+            "data": "",
+            "occurrences": 21
+          },
+          {
+            "data": "Leenti",
+            "occurrences": 8
+          },
+          {
+            "data": "Jaxbean",
+            "occurrences": 8
+          },
+          {
+            "data": "Skinder",
+            "occurrences": 7
+          },
+          {
+            "data": "Dynabox",
+            "occurrences": 7
+          },
+          {
+            "data": "Edgewire",
+            "occurrences": 7
+          },
+          {
+            "data": "Skipfire",
+            "occurrences": 7
+          },
+          {
+            "data": "Kazio",
+            "occurrences": 7
+          },
+          {
+            "data": "Youspan",
+            "occurrences": 7
+          },
+          {
+            "data": "Eamia",
+            "occurrences": 7
+          },
+          {
+            "data": "Skiba",
+            "occurrences": 6
+          },
+          {
+            "data": "Fliptune",
+            "occurrences": 6
+          },
+          {
+            "data": "Rhyloo",
+            "occurrences": 6
+          },
+          {
+            "data": "Dabtype",
+            "occurrences": 6
+          },
+          {
+            "data": "Realfire",
+            "occurrences": 6
+          }
+        ],
+        "patternFrequencyTable": [
+          {
+            "pattern": "Aaaaa",
+            "occurrences": 197
+          },
+          {
+            "pattern": "Aaaaaaa",
+            "occurrences": 182
+          },
+          {
+            "pattern": "Aaaaaa",
+            "occurrences": 173
+          },
+          {
+            "pattern": "Aaaaaaaa",
+            "occurrences": 162
+          },
+          {
+            "pattern": "Aaaa",
+            "occurrences": 78
+          },
+          {
+            "pattern": "Aaaaaaaaaa",
+            "occurrences": 56
+          },
+          {
+            "pattern": "Aaaaaaaaa",
+            "occurrences": 56
+          },
+          {
+            "pattern": "Aaaaaaaaaaaa",
+            "occurrences": 22
+          },
+          {
+            "pattern": "",
+            "occurrences": 21
+          },
+          {
+            "pattern": "Aaaaaaaaaaa",
+            "occurrences": 21
+          },
+          {
+            "pattern": "AaaaA",
+            "occurrences": 10
+          },
+          {
+            "pattern": "Aaa",
+            "occurrences": 9
+          },
+          {
+            "pattern": "Aaaaaaaaaaaaa",
+            "occurrences": 6
+          },
+          {
+            "pattern": "AaaaAA",
+            "occurrences": 4
+          },
+          {
+            "pattern": "AaaA",
+            "occurrences": 3
+          }
+        ],
+        "quantiles": {
+          "median": "NaN",
+          "lowerQuantile": "NaN",
+          "upperQuantile": "NaN"
+        },
+        "histogram": null,
+        "textLengthSummary": {
+          "minimalLength": 0,
+          "maximalLength": 13,
+          "averageLength": 6.655
+        }
+      },
+      "domain": "",
+      "domainLabel": "",
+      "domainFrequency": 0,
+      "semanticDomains": [
+        {
+          "id": "CITY",
+          "label": "City",
+          "frequency": 1.01
+        },
+        {
+          "id": "FIRST_NAME",
+          "label": "First Name",
+          "frequency": 1.01
+        }
+      ],
+      "domainForced": false,
+      "typeForced": false
+    },
+    {
+      "name": "city",
+      "headerSize": 0,
+      "type": "string",
+      "quality": {
+        "mostFrequentSubType": null,
+        "empty": 21,
+        "invalid": 0,
+        "valid": 979,
+        "invalidValues": []
+      },
+      "id": "0006",
+      "statistics": {
+        "count": 1000,
+        "valid": 979,
+        "invalid": 0,
+        "empty": 21,
+        "max": "NaN",
+        "min": "NaN",
+        "mean": "NaN",
+        "variance": "NaN",
+        "duplicateCount": 774,
+        "distinctCount": 226,
+        "frequencyTable": [
+          {
+            "data": "Overland Park",
+            "occurrences": 40
+          },
+          {
+            "data": "Las Cruces",
+            "occurrences": 35
+          },
+          {
+            "data": "Chicago",
+            "occurrences": 27
+          },
+          {
+            "data": "Kansas City",
+            "occurrences": 24
+          },
+          {
+            "data": "",
+            "occurrences": 21
+          },
+          {
+            "data": "Topeka",
+            "occurrences": 21
+          },
+          {
+            "data": "Detroit",
+            "occurrences": 21
+          },
+          {
+            "data": "San Diego",
+            "occurrences": 19
+          },
+          {
+            "data": "Las Vegas",
+            "occurrences": 18
+          },
+          {
+            "data": "Providence",
+            "occurrences": 16
+          },
+          {
+            "data": "Wichita",
+            "occurrences": 16
+          },
+          {
+            "data": "Henderson",
+            "occurrences": 13
+          },
+          {
+            "data": "Charlotte",
+            "occurrences": 13
+          },
+          {
+            "data": "Los Angeles",
+            "occurrences": 13
+          },
+          {
+            "data": "Cedar Rapid",
+            "occurrences": 13
+          }
+        ],
+        "patternFrequencyTable": [
+          {
+            "pattern": "Aaaaaaa",
+            "occurrences": 176
+          },
+          {
+            "pattern": "Aaaaaaaaaa",
+            "occurrences": 92
+          },
+          {
+            "pattern": "Aaaaaa",
+            "occurrences": 84
+          },
+          {
+            "pattern": "Aaaaa",
+            "occurrences": 79
+          },
+          {
+            "pattern": "Aaaaaaaa",
+            "occurrences": 75
+          },
+          {
+            "pattern": "Aaaaaaaaa",
+            "occurrences": 59
+          },
+          {
+            "pattern": "Aaa Aaaaaa",
+            "occurrences": 53
+          },
+          {
+            "pattern": "Aaaaaaaa Aaaa",
+            "occurrences": 43
+          },
+          {
+            "pattern": "Aaa Aaaaa",
+            "occurrences": 40
+          },
+          {
+            "pattern": "Aaaaaa Aaaa",
+            "occurrences": 29
+          },
+          {
+            "pattern": "Aaaa",
+            "occurrences": 28
+          },
+          {
+            "pattern": "Aaaaa Aaaaa",
+            "occurrences": 26
+          },
+          {
+            "pattern": "Aaaaa Aaaa",
+            "occurrences": 22
+          },
+          {
+            "pattern": "",
+            "occurrences": 21
+          },
+          {
+            "pattern": "Aaa Aaaaaaa",
+            "occurrences": 20
+          }
+        ],
+        "quantiles": {
+          "median": "NaN",
+          "lowerQuantile": "NaN",
+          "upperQuantile": "NaN"
+        },
+        "histogram": null,
+        "textLengthSummary": {
+          "minimalLength": 0,
+          "maximalLength": 22,
+          "averageLength": 8.6
+        }
+      },
+      "domain": "CITY",
+      "domainLabel": "City",
+      "domainFrequency": 80.81,
+      "semanticDomains": [
+        {
+          "id": "CITY",
+          "label": "City",
+          "frequency": 80.81
+        },
+        {
+          "id": "AIRPORT",
+          "label": "Airport",
+          "frequency": 57.58
+        },
+        {
+          "id": "ANIMAL",
+          "label": "Animal",
+          "frequency": 1.01
+        },
+        {
+          "id": "US_COUNTY",
+          "label": "US County",
+          "frequency": 28.28
+        },
+        {
+          "id": "FR_COMMUNE",
+          "label": "FR Commune",
+          "frequency": 1.01
+        },
+        {
+          "id": "FIRST_NAME",
+          "label": "First Name",
+          "frequency": 12.12
+        },
+        {
+          "id": "COMPANY",
+          "label": "Company",
+          "frequency": 1.01
+        }
+      ],
+      "domainForced": false,
+      "typeForced": false
+    },
+    {
+      "name": "state",
+      "headerSize": 0,
+      "type": "string",
+      "quality": {
+        "mostFrequentSubType": null,
+        "empty": 83,
+        "invalid": 7,
+        "valid": 910,
+        "invalidValues": [
+          "E",
+          "Texas",
+          "pi"
+        ]
+      },
+      "id": "0007",
+      "statistics": {
+        "count": 1000,
+        "valid": 910,
+        "invalid": 7,
+        "empty": 83,
+        "max": "NaN",
+        "min": "NaN",
+        "mean": "NaN",
+        "variance": "NaN",
+        "duplicateCount": 962,
+        "distinctCount": 38,
+        "frequencyTable": [
+          {
+            "data": "KS",
+            "occurrences": 101
+          },
+          {
+            "data": "",
+            "occurrences": 83
+          },
+          {
+            "data": "CA",
+            "occurrences": 79
+          },
+          {
+            "data": "MI",
+            "occurrences": 64
+          },
+          {
+            "data": "NM",
+            "occurrences": 52
+          },
+          {
+            "data": "FL",
+            "occurrences": 49
+          },
+          {
+            "data": "AZ",
+            "occurrences": 44
+          },
+          {
+            "data": "IA",
+            "occurrences": 43
+          },
+          {
+            "data": "NV",
+            "occurrences": 39
+          },
+          {
+            "data": "RI",
+            "occurrences": 37
+          },
+          {
+            "data": "WY",
+            "occurrences": 35
+          },
+          {
+            "data": "GA",
+            "occurrences": 32
+          },
+          {
+            "data": "OR",
+            "occurrences": 29
+          },
+          {
+            "data": "UT",
+            "occurrences": 27
+          },
+          {
+            "data": "ID",
+            "occurrences": 26
+          }
+        ],
+        "patternFrequencyTable": [
+          {
+            "pattern": "AA",
+            "occurrences": 910
+          },
+          {
+            "pattern": "",
+            "occurrences": 83
+          },
+          {
+            "pattern": "Aaaaa",
+            "occurrences": 5
+          },
+          {
+            "pattern": "aa",
+            "occurrences": 1
+          },
+          {
+            "pattern": "A",
+            "occurrences": 1
+          }
+        ],
+        "quantiles": {
+          "median": "NaN",
+          "lowerQuantile": "NaN",
+          "upperQuantile": "NaN"
+        },
+        "histogram": null,
+        "textLengthSummary": {
+          "minimalLength": 0,
+          "maximalLength": 5,
+          "averageLength": 1.848
+        }
+      },
+      "domain": "US_STATE_CODE",
+      "domainLabel": "US State Code",
+      "domainFrequency": 100,
+      "semanticDomains": [
+        {
+          "id": "US_STATE_CODE",
+          "label": "US State Code",
+          "frequency": 100
+        },
+        {
+          "id": "LANGUAGE_CODE_ISO2",
+          "label": "Language Code ISO2",
+          "frequency": 42.86
+        },
+        {
+          "id": "COUNTRY_CODE_ISO2",
+          "label": "Country Code ISO2",
+          "frequency": 35.71
+        },
+        {
+          "id": "CITY",
+          "label": "City",
+          "frequency": 1.02
+        },
+        {
+          "id": "COMPANY",
+          "label": "Company",
+          "frequency": 8.16
+        }
+      ],
+      "domainForced": false,
+      "typeForced": false
+    },
+    {
+      "name": "date",
+      "headerSize": 0,
+      "type": "date",
+      "quality": {
+        "mostFrequentSubType": null,
+        "empty": 2,
+        "invalid": 0,
+        "valid": 998,
+        "invalidValues": []
+      },
+      "id": "0008",
+      "statistics": {
+        "count": 1000,
+        "valid": 998,
+        "invalid": 0,
+        "empty": 2,
+        "max": "NaN",
+        "min": "NaN",
+        "mean": "NaN",
+        "variance": "NaN",
+        "duplicateCount": 660,
+        "distinctCount": 340,
+        "frequencyTable": [
+          {
+            "data": "01/01/2016 10:00:00",
+            "occurrences": 43
+          },
+          {
+            "data": "8/24/2015",
+            "occurrences": 10
+          },
+          {
+            "data": "12/25/2014",
+            "occurrences": 9
+          },
+          {
+            "data": "3/22/2015",
+            "occurrences": 7
+          },
+          {
+            "data": "2/26/2015",
+            "occurrences": 7
+          },
+          {
+            "data": "1/29/2015",
+            "occurrences": 7
+          },
+          {
+            "data": "9/21/2015",
+            "occurrences": 6
+          },
+          {
+            "data": "1/23/2015",
+            "occurrences": 6
+          },
+          {
+            "data": "2/19/2015",
+            "occurrences": 6
+          },
+          {
+            "data": "8/12/2015",
+            "occurrences": 6
+          },
+          {
+            "data": "4/17/2015",
+            "occurrences": 6
+          },
+          {
+            "data": "9/10/2015",
+            "occurrences": 6
+          },
+          {
+            "data": "8/13/2015",
+            "occurrences": 6
+          },
+          {
+            "data": "9/24/2015",
+            "occurrences": 6
+          },
+          {
+            "data": "12/17/2014",
+            "occurrences": 6
+          }
+        ],
+        "patternFrequencyTable": [
+          {
+            "pattern": "M/d/yyyy",
+            "occurrences": 945
+          },
+          {
+            "pattern": "d/M/yyyy",
+            "occurrences": 377
+          },
+          {
+            "pattern": "MM/dd/yyyy",
+            "occurrences": 165
+          },
+          {
+            "pattern": "d/M/yyyy H:mm:ss",
+            "occurrences": 43
+          },
+          {
+            "pattern": "d/M/yyyy HH:mm:ss",
+            "occurrences": 43
+          },
+          {
+            "pattern": "dd/MM/yyyy HH:mm:ss",
+            "occurrences": 43
+          },
+          {
+            "pattern": "dd/MM/yyyy H:mm:ss",
+            "occurrences": 43
+          },
+          {
+            "pattern": "MM/dd/yyyy HH:mm:ss",
+            "occurrences": 43
+          },
+          {
+            "pattern": "M/d/yyyy H:mm:ss",
+            "occurrences": 43
+          },
+          {
+            "pattern": "M/d/yyyy HH:mm:ss",
+            "occurrences": 43
+          },
+          {
+            "pattern": "MM/dd/yyyy H:mm:ss",
+            "occurrences": 43
+          },
+          {
+            "pattern": "dd/MM/yyyy",
+            "occurrences": 23
+          },
+          {
+            "pattern": "d.M.yyyy",
+            "occurrences": 5
+          },
+          {
+            "pattern": "dd-MM-yyyy",
+            "occurrences": 3
+          },
+          {
+            "pattern": "",
+            "occurrences": 2
+          }
+        ],
+        "quantiles": {
+          "median": "NaN",
+          "lowerQuantile": "NaN",
+          "upperQuantile": "NaN"
+        },
+        "histogram": {
+          "type": "date",
+          "items": [
+            {
+              "occurrences": 22,
+              "range": {
+                "min": 1414800000000,
+                "max": 1417392000000
+              }
+            },
+            {
+              "occurrences": 83,
+              "range": {
+                "min": 1417392000000,
+                "max": 1420070400000
+              }
+            },
+            {
+              "occurrences": 88,
+              "range": {
+                "min": 1420070400000,
+                "max": 1422748800000
+              }
+            },
+            {
+              "occurrences": 78,
+              "range": {
+                "min": 1422748800000,
+                "max": 1425168000000
+              }
+            },
+            {
+              "occurrences": 74,
+              "range": {
+                "min": 1425168000000,
+                "max": 1427846400000
+              }
+            },
+            {
+              "occurrences": 74,
+              "range": {
+                "min": 1427846400000,
+                "max": 1430438400000
+              }
+            },
+            {
+              "occurrences": 79,
+              "range": {
+                "min": 1430438400000,
+                "max": 1433116800000
+              }
+            },
+            {
+              "occurrences": 77,
+              "range": {
+                "min": 1433116800000,
+                "max": 1435708800000
+              }
+            },
+            {
+              "occurrences": 79,
+              "range": {
+                "min": 1435708800000,
+                "max": 1438387200000
+              }
+            },
+            {
+              "occurrences": 100,
+              "range": {
+                "min": 1438387200000,
+                "max": 1441065600000
+              }
+            },
+            {
+              "occurrences": 81,
+              "range": {
+                "min": 1441065600000,
+                "max": 1443657600000
+              }
+            },
+            {
+              "occurrences": 68,
+              "range": {
+                "min": 1443657600000,
+                "max": 1446336000000
+              }
+            },
+            {
+              "occurrences": 50,
+              "range": {
+                "min": 1446336000000,
+                "max": 1448928000000
+              }
+            },
+            {
+              "occurrences": 2,
+              "range": {
+                "min": 1448928000000,
+                "max": 1451606400000
+              }
+            },
+            {
+              "occurrences": 43,
+              "range": {
+                "min": 1451606400000,
+                "max": 1454284800000
+              }
+            }
+          ],
+          "pace": "MONTH"
+        },
+        "textLengthSummary": {
+          "minimalLength": "NaN",
+          "maximalLength": "NaN",
+          "averageLength": "NaN"
+        }
+      },
+      "domain": "",
+      "domainLabel": "",
+      "domainFrequency": 0,
+      "semanticDomains": [],
+      "domainForced": false,
+      "typeForced": false
+    },
+    {
+      "name": "campaign_id",
+      "headerSize": 0,
+      "type": "string",
+      "quality": {
+        "mostFrequentSubType": null,
+        "empty": 2,
+        "invalid": 0,
+        "valid": 998,
+        "invalidValues": []
+      },
+      "id": "0009",
+      "statistics": {
+        "count": 1000,
+        "valid": 998,
+        "invalid": 0,
+        "empty": 2,
+        "max": "NaN",
+        "min": "NaN",
+        "mean": "NaN",
+        "variance": "NaN",
+        "duplicateCount": 14,
+        "distinctCount": 986,
+        "frequencyTable": [
+          {
+            "data": "",
+            "occurrences": 2
+          },
+          {
+            "data": "HOCKEY_Y15Q03_unit",
+            "occurrences": 2
+          },
+          {
+            "data": "HOCKEY_Y14Q04_pump",
+            "occurrences": 2
+          },
+          {
+            "data": "HOCKEY_Y15Q04_bout",
+            "occurrences": 2
+          },
+          {
+            "data": "HOCKEY_Y14Q04_bass",
+            "occurrences": 2
+          },
+          {
+            "data": "HOCKEY_Y14Q04_fake",
+            "occurrences": 2
+          },
+          {
+            "data": "HOCKEY_Y15Q04_chum",
+            "occurrences": 2
+          },
+          {
+            "data": "HOCKEY_Y15Q04_dire",
+            "occurrences": 2
+          },
+          {
+            "data": "HOCKEY_Y15Q04_mews",
+            "occurrences": 2
+          },
+          {
+            "data": "HOCKEY_Y15Q04_stew",
+            "occurrences": 2
+          },
+          {
+            "data": "TRAIL_Y14Q04_fête",
+            "occurrences": 2
+          },
+          {
+            "data": "HOCKEY_Y15Q01_swum",
+            "occurrences": 2
+          },
+          {
+            "data": "HOCKEY_Y14Q04_tits",
+            "occurrences": 2
+          },
+          {
+            "data": "TRAIL_Y14Q04_levy",
+            "occurrences": 2
+          },
+          {
+            "data": "SKI_Y15Q03_nuns",
+            "occurrences": 1
+          }
+        ],
+        "patternFrequencyTable": [
+          {
+            "pattern": "AAAAAA_A99A99_aaaa",
+            "occurrences": 479
+          },
+          {
+            "pattern": "AAAAA_A99A99_aaaa",
+            "occurrences": 254
+          },
+          {
+            "pattern": "AAA_A99A99_aaaa",
+            "occurrences": 187
+          },
+          {
+            "pattern": "AAAA_A99A99_aaaa",
+            "occurrences": 59
+          },
+          {
+            "pattern": "AAAAAA_A99A99_aa'a",
+            "occurrences": 5
+          },
+          {
+            "pattern": "AAAAAA_A99A99_AA'a",
+            "occurrences": 5
+          },
+          {
+            "pattern": "AAAAA_A99A99_AA'a",
+            "occurrences": 5
+          },
+          {
+            "pattern": "",
+            "occurrences": 2
+          },
+          {
+            "pattern": "AAAAA_A99A99_Aaaa",
+            "occurrences": 2
+          },
+          {
+            "pattern": "AAA_A99A99_aa'a",
+            "occurrences": 1
+          },
+          {
+            "pattern": "AAAAA_A99A99_aa'a",
+            "occurrences": 1
+          }
+        ],
+        "quantiles": {
+          "median": "NaN",
+          "lowerQuantile": "NaN",
+          "upperQuantile": "NaN"
+        },
+        "histogram": null,
+        "textLengthSummary": {
+          "minimalLength": 0,
+          "maximalLength": 18,
+          "averageLength": 17.02
+        }
+      },
+      "domain": "",
+      "domainLabel": "",
+      "domainFrequency": 0,
+      "semanticDomains": [],
+      "domainForced": false,
+      "typeForced": false
+    },
+    {
+      "name": "lead_score",
+      "headerSize": 0,
+      "type": "integer",
+      "quality": {
+        "mostFrequentSubType": null,
+        "empty": 2,
+        "invalid": 1,
+        "valid": 997,
+        "invalidValues": [
+          "81\u0012"
+        ]
+      },
+      "id": "0010",
+      "statistics": {
+        "count": 1000,
+        "valid": 997,
+        "invalid": 1,
+        "empty": 2,
+        "max": 999,
+        "min": -87,
+        "mean": 80.1424272818456,
+        "variance": 27993.258810568244,
+        "duplicateCount": 887,
+        "distinctCount": 113,
+        "frequencyTable": [
+          {
+            "data": "999",
+            "occurrences": 31
+          },
+          {
+            "data": "60",
+            "occurrences": 17
+          },
+          {
+            "data": "92",
+            "occurrences": 16
+          },
+          {
+            "data": "1",
+            "occurrences": 16
+          },
+          {
+            "data": "82",
+            "occurrences": 16
+          },
+          {
+            "data": "5",
+            "occurrences": 15
+          },
+          {
+            "data": "9",
+            "occurrences": 15
+          },
+          {
+            "data": "79",
+            "occurrences": 15
+          },
+          {
+            "data": "11",
+            "occurrences": 14
+          },
+          {
+            "data": "64",
+            "occurrences": 14
+          },
+          {
+            "data": "67",
+            "occurrences": 14
+          },
+          {
+            "data": "80",
+            "occurrences": 14
+          },
+          {
+            "data": "84",
+            "occurrences": 14
+          },
+          {
+            "data": "93",
+            "occurrences": 13
+          },
+          {
+            "data": "41",
+            "occurrences": 13
+          }
+        ],
+        "patternFrequencyTable": [
+          {
+            "pattern": "99",
+            "occurrences": 852
+          },
+          {
+            "pattern": "9",
+            "occurrences": 101
+          },
+          {
+            "pattern": "999",
+            "occurrences": 37
+          },
+          {
+            "pattern": "-99",
+            "occurrences": 6
+          },
+          {
+            "pattern": "",
+            "occurrences": 2
+          },
+          {
+            "pattern": "99\u0012",
+            "occurrences": 1
+          },
+          {
+            "pattern": "-9",
+            "occurrences": 1
+          }
+        ],
+        "quantiles": {
+          "median": 55,
+          "lowerQuantile": 27,
+          "upperQuantile": 79
+        },
+        "histogram": {
+          "type": "number",
+          "items": [
+            {
+              "occurrences": 8,
+              "range": {
+                "min": -111,
+                "max": 1
+              }
+            },
+            {
+              "occurrences": 958,
+              "range": {
+                "min": 1,
+                "max": 113
+              }
+            },
+            {
+              "occurrences": 0,
+              "range": {
+                "min": 113,
+                "max": 225
+              }
+            },
+            {
+              "occurrences": 0,
+              "range": {
+                "min": 225,
+                "max": 337
+              }
+            },
+            {
+              "occurrences": 0,
+              "range": {
+                "min": 337,
+                "max": 449
+              }
+            },
+            {
+              "occurrences": 0,
+              "range": {
+                "min": 449,
+                "max": 561
+              }
+            },
+            {
+              "occurrences": 0,
+              "range": {
+                "min": 561,
+                "max": 673
+              }
+            },
+            {
+              "occurrences": 0,
+              "range": {
+                "min": 673,
+                "max": 785
+              }
+            },
+            {
+              "occurrences": 0,
+              "range": {
+                "min": 785,
+                "max": 897
+              }
+            },
+            {
+              "occurrences": 31,
+              "range": {
+                "min": 897,
+                "max": 1009
+              }
+            }
+          ]
+        },
+        "textLengthSummary": {
+          "minimalLength": "NaN",
+          "maximalLength": "NaN",
+          "averageLength": "NaN"
+        }
+      },
+      "domain": "",
+      "domainLabel": "",
+      "domainFrequency": 0,
+      "semanticDomains": [],
+      "domainForced": false,
+      "typeForced": false
+    }
+  ],
+  "lifecycle": {
+    "inProgress": false,
+    "importing": false,
+    "contentAnalyzed": false,
+    "schemaAnalyzed": true,
+    "qualityAnalyzed": true
+  },
+  "records": 1000,
+  "nbLinesHeader": 1,
+  "nbLinesFooter": 0,
+  "type": "text/csv",
+  "parameters": {
+    "HEADER_NB_LINES": "1",
+    "SEPARATOR": ";",
+    "COLUMN_HEADERS": "[\"id\",\"Name\",\"last_name\",\"email\",\"job_title\",\"company\",\"city\",\"state\",\"date\",\"campaign_id\",\"lead_score\"]"
+  },
+  "formatGuess": "formatGuess#csv",
+  "certificationStep": "NONE",
+  "location": {
+    "type": "LocalStoreLocation"
+  },
+  "name": "Customer Marketing Leads",
+  "author": "anonymous",
+  "created": 1460710673049,
+  "lastModificationDate": 1460710673049,
+  "sheetName": null,
+  "app-version": "2.0.m1-SNAPSHOT",
+  "draft": false,
+  "schemaParserResult": null,
+  "favorite": false,
+  "encoding": "UTF-8"
+}

@@ -49,6 +49,7 @@ public class ComponentReferenceProperties extends ComponentProperties {
     //
     public Property referenceType = newEnum("referenceType").setEnumClass(ReferenceType.class); //$NON-NLS-1$
 
+    // FIXME - make this componentName
     public Property componentType = newProperty("componentType").setFlags(EnumSet.of(DESIGN_TIME_ONLY)); //$NON-NLS-1$
 
     public Property componentInstanceId = newProperty("componentInstanceId"); //$NON-NLS-1$

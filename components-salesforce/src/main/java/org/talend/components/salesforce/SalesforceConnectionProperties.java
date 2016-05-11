@@ -209,6 +209,14 @@ public class SalesforceConnectionProperties extends ComponentProperties
                 boolean bulkMode = bulkConnection.getBooleanValue();
                 form.getWidget(httpChunked.getName()).setHidden(bulkMode);
                 form.getWidget(httpTraceMessage.getName()).setHidden(!bulkMode);
+                
+                Form proxyForm = form.getChildForm(proxy.getName());
+                if(proxyForm!=null) {
+	                boolean isUseProxy = proxy.useProxy.getBooleanValue();
+	                proxyForm.getWidget(proxy.host.getName()).setHidden(!isUseProxy);
+	                proxyForm.getWidget(proxy.port.getName()).setHidden(!isUseProxy);
+	                proxyForm.getWidget(proxy.userPassword.getName()).setHidden(!isUseProxy);
+                }
             }
         }
     }
