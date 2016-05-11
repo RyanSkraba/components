@@ -604,7 +604,11 @@ public class SalesforceBulkRuntime {
                 return;
             }else{
                 for(String key:result.values.keySet()){
-                    values.put(key,result.values.get(key));
+                	Object value = result.values.get(key);
+                	if("#N/A".equals(value)) {
+                		value = null;
+                	}
+                    values.put(key,value);
                 }
             }
         }
