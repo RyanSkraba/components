@@ -18,9 +18,11 @@ import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.daikon.avro.AvroRegistry;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.PropertyFactory;
+import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 
@@ -51,6 +53,7 @@ import java.util.Set;
  */
 public class TDataSetInputProperties extends FixedConnectorsComponentProperties {
 
+    private I18nMessages messageFormatter;
     public SchemaProperties schema = new SchemaProperties("schema");
     protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
     public Property dataSetName = PropertyFactory.newString("dataSetName");
@@ -85,10 +88,9 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
         return some;
     }
 
-    public void afterFetchSchema() throws IOException {
-        if (login.getStringValue().isEmpty() && dataSetName.getStringValue().isEmpty()
-                && url.getStringValue().isEmpty() && pass.getStringValue().isEmpty()) {
-            //TODO Some error here
+    public ValidationResult afterFetchSchema() throws IOException {
+        if (!isRequiredFieldRight()) {
+            return new ValidationResult().setStatus(ValidationResult.Result.ERROR);
         } else {
             DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(
                     removeQuotes(url.getStringValue()), removeQuotes(login.getStringValue()),
@@ -104,7 +106,24 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
             }
             AvroRegistry avroRegistry = DataPrepAvroRegistry.getDataPrepInstance();
             this.schema.schema.setValue(avroRegistry.inferSchema(scemaRow));
+            return ValidationResult.OK;
         }
+    }
+
+    private boolean isRequiredFieldRight() {
+        String urlStringValue = url.getStringValue();;
+        String loginStringValue = login.getStringValue();
+        String passStringValue = pass.getStringValue();
+        String dataSetNameStringValue = dataSetName.getStringValue();
+        if (urlStringValue == null || urlStringValue.isEmpty())
+            return false;
+        if (loginStringValue == null || loginStringValue.isEmpty())
+            return false;
+        if (passStringValue == null || passStringValue.isEmpty())
+            return false;
+        if (dataSetNameStringValue == null || dataSetNameStringValue.isEmpty())
+            return false;
+        return true;
     }
 
     public Schema getSchema() {
