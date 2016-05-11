@@ -89,8 +89,15 @@ public class DataPrepConnectionHandler {
 
     void create(String data) throws IOException {
         int index = dataSetName.lastIndexOf("/");
-        String setName = dataSetName.substring(index);
-        String folderName = dataSetName.substring(0,index);
+        String setName, folderName;
+        if (index != -1) {
+            setName = dataSetName.substring(index+1);
+            folderName = dataSetName.substring(0, index);
+        } else {
+            setName = dataSetName;
+            folderName = "";
+        }
+
         LOGGER.debug("Folder Name: " + folderName+ "DataSet name: " + setName);
 
         Request request = Request.Post(url+"/api/datasets?name=" + setName + "&folderPath="+folderName);
