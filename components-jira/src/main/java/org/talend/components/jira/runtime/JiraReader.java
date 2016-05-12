@@ -77,7 +77,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
     /**
      * Stores http parameters which are shared between requests
      */
-    private final Map<String, String> sharedParameters;
+    private final Map<String, Object> sharedParameters;
     
     /**
      * Runtime container
@@ -108,7 +108,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
      * @param container runtime container
      */
     public JiraReader(JiraSource source, String hostPort, String resource, String user, String password,
-            Map<String, String> sharedParameters, Schema schema, RuntimeContainer container) {
+            Map<String, Object> sharedParameters, Schema schema, RuntimeContainer container) {
         this.source = source;
         this.resource = resource;
         this.sharedParameters = sharedParameters;
@@ -215,7 +215,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
      * @throws IOException in case of exception during http connection
      */
     protected void makeHttpRequest() throws IOException {
-        Map<String, String> parameters = prepareParameters();
+        Map<String, Object> parameters = prepareParameters();
         response = rest.get(resource, parameters);
         entities = processResponse(response);
         if(!entities.isEmpty()) {
@@ -231,7 +231,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
      * 
      * @return map with shared parameters
      */
-    protected Map<String, String> prepareParameters() {
+    protected Map<String, Object> prepareParameters() {
         return sharedParameters;
     }
 

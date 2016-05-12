@@ -71,9 +71,9 @@ public class JiraReaderTest {
     public void pagingTest() throws IOException {
         String testUrl = "http://localhost:8080";
         String testResource = "/rest/api/2/search";
-        Map<String, String> parameters = new HashMap<>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("jql", "project=TP");
-        parameters.put("maxResults", "10");
+        parameters.put("maxResults", 10);
         DefaultComponentRuntimeContainerImpl container = new DefaultComponentRuntimeContainerImpl();
         Reader<IndexedRecord> jiraReader = new JiraSearchReader(null, testUrl, testResource, USER, PASS, parameters, null, container);
 
@@ -96,8 +96,8 @@ public class JiraReaderTest {
     public void getProjectsTest() throws IOException {
         String testUrl = "http://localhost:8080";
         String testResource = "/rest/api/2/project";
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("maxResults", "10");
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("maxResults", 10);
         DefaultComponentRuntimeContainerImpl container = new DefaultComponentRuntimeContainerImpl();
         Reader<IndexedRecord> jiraReader = new JiraProjectReader(null, testUrl, testResource, USER, PASS, parameters, null, container);
 

@@ -30,7 +30,7 @@ public class JiraProjectReader extends JiraReader {
      * {@inheritDoc}
      */
     public JiraProjectReader(JiraSource source, String hostPort, String resource, String user, String password,
-            Map<String, String> sharedParameters, Schema schema, RuntimeContainer container) {
+            Map<String, Object> sharedParameters, Schema schema, RuntimeContainer container) {
         super(source, hostPort, resource, user, password, sharedParameters, schema, container);
     }
     

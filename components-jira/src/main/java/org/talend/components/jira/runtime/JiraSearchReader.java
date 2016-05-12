@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.avro.Schema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jira.datum.Entity;
 import org.talend.components.jira.datum.Search;
@@ -26,6 +28,8 @@ import org.talend.components.jira.datum.Search;
  * 
  */
 public class JiraSearchReader extends JiraReader {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(JiraSearchReader.class);
     
     /**
      * Jira pagination parameter, which defines total number of entities
@@ -47,12 +51,18 @@ public class JiraSearchReader extends JiraReader {
      * {@inheritDoc}
      */
     public JiraSearchReader(JiraSource source, String hostPort, String resource, String user, String password,
-            Map<String, String> sharedParameters, Schema schema, RuntimeContainer container) {
+            Map<String, Object> sharedParameters, Schema schema, RuntimeContainer container) {
         super(source, hostPort, resource, user, password, sharedParameters, schema, container);
         
-        String maxRelultValue = sharedParameters.get("maxResults");
-        if (maxRelultValue != null) {
-            maxResults = Integer.parseInt(maxRelultValue);
+        if (sharedParameters.containsKey("maxResults")) {
+            Object maxResultsValue = sharedParameters.get("maxResults");
+            if (maxResultsValue instanceof Integer) {
+                maxResults = ((Integer) maxResultsValue).intValue();
+            } else {
+                LOG.debug("Wrong maxResult parameter type: {}", maxResultsValue.getClass().getName());
+            }
+        } else {
+            LOG.debug("Shared parameters doesn't contain maxResults parameter");
         }
     }
     
@@ -61,10 +71,10 @@ public class JiraSearchReader extends JiraReader {
      * It includes startAt parameter, which is required for pagination 
      */
     @Override
-    protected Map<String, String> prepareParameters() {
-        Map<String, String> sharedParameters = super.prepareParameters();
-        Map<String, String> parameters = new HashMap<>(sharedParameters);
-        parameters.put("startAt", Integer.toString(startAt));
+    protected Map<String, Object> prepareParameters() {
+        Map<String, Object> sharedParameters = super.prepareParameters();
+        Map<String, Object> parameters = new HashMap<>(sharedParameters);
+        parameters.put("startAt", startAt);
         return parameters;
     }
     

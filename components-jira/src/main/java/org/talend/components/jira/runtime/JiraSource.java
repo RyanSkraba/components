@@ -95,7 +95,7 @@ public class JiraSource implements Source {
         String password = properties.userPassword.password.getStringValue();
         String resourceType = properties.resource.getStringValue();
         String resourcePath = getResourcePath();
-        Map<String, String> sharedParameters = getSharedParameters();
+        Map<String, Object> sharedParameters = getSharedParameters();
         Schema dataSchema = (Schema) properties.schema.schema.getValue();
        
         JiraReader reader = null;
@@ -147,8 +147,8 @@ public class JiraSource implements Source {
      * 
      * @return shared http parametes
      */
-    Map<String, String> getSharedParameters() {
-        Map<String, String> sharedParameters = new HashMap<>();
+    Map<String, Object> getSharedParameters() {
+        Map<String, Object> sharedParameters = new HashMap<>();
 
         String jqlValue = properties.jql.getStringValue();
         if (jqlValue != null && !jqlValue.isEmpty()) {

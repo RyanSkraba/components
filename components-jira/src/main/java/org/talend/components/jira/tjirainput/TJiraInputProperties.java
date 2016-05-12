@@ -99,7 +99,7 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
     /**
      * Batch size property, which specifies how many Jira entities should be requested per request
      */
-    public Property batchSize = PropertyFactory.newString("batchSize");
+    public Property batchSize = PropertyFactory.newInteger("batchSize");
     
     /**
      * Return property, which denotes number of Jira entities obtained
@@ -134,7 +134,7 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
         resource.setValue(ISSUE);
         authorizationType.setValue(BASIC);
         jql.setValue("");
-        batchSize.setValue("50");
+        batchSize.setValue(50);
         
         returns = ComponentPropertyFactory.newReturnsProperty();
         numberOfRecords = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "numberOfRecords");
