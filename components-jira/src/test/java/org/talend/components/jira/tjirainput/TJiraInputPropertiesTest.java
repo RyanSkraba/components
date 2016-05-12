@@ -92,7 +92,7 @@ public class TJiraInputPropertiesTest {
         when(mainForm.getName()).thenReturn(Form.MAIN);
         when(mainForm.getWidget("userPassword")).thenReturn(userPasswordWidget);
         when(mainForm.getWidget("jql")).thenReturn(jqlWidget);
-        when(mainForm.getWidget("projectIdWidget")).thenReturn(projectIdWidget);
+        when(mainForm.getWidget("projectId")).thenReturn(projectIdWidget);
 
         referenceForm = mock(Form.class);
         when(referenceForm.getName()).thenReturn(Form.ADVANCED);
