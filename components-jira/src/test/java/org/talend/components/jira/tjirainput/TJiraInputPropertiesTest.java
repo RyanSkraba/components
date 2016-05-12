@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -62,6 +63,11 @@ public class TJiraInputPropertiesTest {
      * userPassword widget mock
      */
     private Widget jqlWidget;
+    
+    /**
+     * projectId widget mock
+     */
+    private Widget projectIdWidget;
 
     /**
      * {@link SchemaProperties} mock
@@ -80,11 +86,13 @@ public class TJiraInputPropertiesTest {
     public void setUpMocks() {
         userPasswordWidget = mock(Widget.class);
         jqlWidget = mock(Widget.class);
+        projectIdWidget = mock(Widget.class);
 
         mainForm = mock(Form.class);
         when(mainForm.getName()).thenReturn(Form.MAIN);
         when(mainForm.getWidget("userPassword")).thenReturn(userPasswordWidget);
         when(mainForm.getWidget("jql")).thenReturn(jqlWidget);
+        when(mainForm.getWidget("projectIdWidget")).thenReturn(projectIdWidget);
 
         referenceForm = mock(Form.class);
         when(referenceForm.getName()).thenReturn(Form.ADVANCED);
@@ -134,7 +142,9 @@ public class TJiraInputPropertiesTest {
         properties.afterResource();
 
         boolean jqlIsHidden = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
+        boolean projectIdIsHidden = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
         assertTrue(jqlIsHidden);
+        assertFalse(projectIdIsHidden);
     }
 
     /**
@@ -149,12 +159,14 @@ public class TJiraInputPropertiesTest {
         String resourceValue = properties.resource.getStringValue();
         String authorizationTypeValue = properties.authorizationType.getStringValue();
         String jqlValue = properties.jql.getStringValue();
+        String projectIdValue = properties.projectId.getStringValue();
         int batchSizeValue = properties.batchSize.getIntValue();
 
         assertThat(hostValue, equalTo("https://localhost:8080/"));
         assertThat(resourceValue, equalTo("issue"));
         assertThat(authorizationTypeValue, equalTo("Basic"));
         assertThat(jqlValue, equalTo(""));
+        assertThat(projectIdValue, equalTo(""));
         assertThat(batchSizeValue, equalTo(50));
     }
 
@@ -204,6 +216,7 @@ public class TJiraInputPropertiesTest {
 
         verify(userPasswordWidget).setHidden(false);
         verify(jqlWidget).setHidden(false);
+        verify(projectIdWidget).setHidden(true);
     }
 
     /**
@@ -221,6 +234,8 @@ public class TJiraInputPropertiesTest {
         verify(userPasswordWidget, never()).setHidden(true);
         verify(jqlWidget, never()).setHidden(false);
         verify(jqlWidget, never()).setHidden(true);
+        verify(projectIdWidget, never()).setHidden(false);
+        verify(projectIdWidget, never()).setHidden(true);
     }
 
     /**
@@ -237,6 +252,7 @@ public class TJiraInputPropertiesTest {
 
         verify(userPasswordWidget).setHidden(true);
         verify(jqlWidget).setHidden(false);
+        verify(projectIdWidget).setHidden(true);
     }
 
     /**
@@ -252,11 +268,12 @@ public class TJiraInputPropertiesTest {
 
         verify(userPasswordWidget).setHidden(false);
         verify(jqlWidget).setHidden(true);
+        verify(projectIdWidget).setHidden(false);
     }
 
     /**
      * Checks {@link TJiraInputProperties#setupLayout()} creates 2 forms: Main and Advanced Checks
-     * {@link TJiraInputProperties#setupLayout()} creates Main form, which contains 6 widgets and checks widgets names
+     * {@link TJiraInputProperties#setupLayout()} creates Main form, which contains 7 widgets and checks widgets names
      * Checks {@link TJiraInputProperties#setupLayout()} creates Advanced form, which contains 1 widget and checks
      * widgets names
      */
@@ -274,7 +291,7 @@ public class TJiraInputPropertiesTest {
         assertThat(advanced, notNullValue());
 
         Collection<Widget> mainWidgets = main.getWidgets();
-        assertThat(mainWidgets, hasSize(6));
+        assertThat(mainWidgets, hasSize(7));
         Widget schemaWidget = main.getWidget("schema");
         assertThat(schemaWidget, notNullValue());
         Widget hostWidget = main.getWidget("host");
@@ -287,6 +304,8 @@ public class TJiraInputPropertiesTest {
         assertThat(resourceWidget, notNullValue());
         Widget jqlWidget = main.getWidget("jql");
         assertThat(jqlWidget, notNullValue());
+        Widget projectIdWidget = main.getWidget("projectId");
+        assertThat(projectIdWidget, notNullValue());
 
         Collection<Widget> advancedWidgets = advanced.getWidgets();
         assertThat(advancedWidgets.size(), equalTo(1));

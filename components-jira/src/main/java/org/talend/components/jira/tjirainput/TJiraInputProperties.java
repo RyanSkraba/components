@@ -86,6 +86,11 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
     public Property jql = PropertyFactory.newString("jql");
     
     /**
+     * Jira project ID property
+     */
+    public Property projectId = PropertyFactory.newString("projectId");
+    
+    /**
      * Type of http authorization.
      * TODO maybe move it to Connection properties class and maybe in components-common
      */
