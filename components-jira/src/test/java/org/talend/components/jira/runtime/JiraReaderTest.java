@@ -27,6 +27,7 @@ import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 
 /**
  * Unit-tests for {@link JiraReader}
+ * FIXME it should not contain integration tests. IT should be moved to {@link JiraReaderTestIT}
  */
 public class JiraReaderTest {
 

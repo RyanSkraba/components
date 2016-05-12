@@ -20,6 +20,8 @@ import java.util.NoSuchElementException;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.joda.time.Instant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.container.RuntimeContainer;
@@ -33,6 +35,8 @@ import org.talend.daikon.avro.IndexedRecordAdapterFactory;
  * Jira reader implementation
  */
 public abstract class JiraReader implements Reader<IndexedRecord> {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(JiraReader.class);
 
     /**
      * {@link Source} instance, which had created this {@link Reader}
@@ -114,7 +118,12 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
         this.sharedParameters = sharedParameters;
         this.container = container;
         rest = new Rest(hostPort);
-        rest.setCredentials(user, password);
+        if (user != null && !user.isEmpty()) {
+            rest.setCredentials(user, password);
+            LOG.debug("{} user is used", user);
+        } else {
+            LOG.debug("{} user is used", "Anonymous");
+        }
         
         factory = new IssueAdapterFactory();
         factory.setSchema(schema);
