@@ -151,10 +151,10 @@ public class TJiraInputPropertiesTest {
         String jqlValue = properties.jql.getStringValue();
         String batchSizeValue = properties.batchSize.getStringValue();
 
-        assertThat(hostValue, equalTo("\"https://localhost:8080/\""));
+        assertThat(hostValue, equalTo("https://localhost:8080/"));
         assertThat(resourceValue, equalTo("issue"));
         assertThat(authorizationTypeValue, equalTo("Basic"));
-        assertThat(jqlValue, equalTo("\"\""));
+        assertThat(jqlValue, equalTo(""));
         assertThat(batchSizeValue, equalTo("50"));
     }
 

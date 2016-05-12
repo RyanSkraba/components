@@ -130,10 +130,10 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
     public void setupProperties() {
         super.setupProperties();
         setupSchema();
-        host.setValue("\"https://localhost:8080/\"");
+        host.setValue("https://localhost:8080/");
         resource.setValue(ISSUE);
         authorizationType.setValue(BASIC);
-        jql.setValue("\"\"");
+        jql.setValue("");
         batchSize.setValue("50");
         
         returns = ComponentPropertyFactory.newReturnsProperty();
