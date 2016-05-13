@@ -27,7 +27,7 @@ public class TDataSetTestIT {
     @Test
     public void testTDataSetInputProperties() {
         TDataSetInputProperties properties = (TDataSetInputProperties) componentService.
-                getComponentProperties("tDataSetInput");
+                getComponentProperties("tDatasetInput");
         Form f = properties.getForm(Form.MAIN);
         ComponentTestUtils.checkSerialize(properties, errorCollector);
         System.out.println(f);
@@ -38,7 +38,7 @@ public class TDataSetTestIT {
     @Test
     public void testTDataSetOutputProperties() {
         TDataSetOutputProperties properties = (TDataSetOutputProperties) componentService.
-                getComponentProperties("tDataSetOutput");
+                getComponentProperties("tDatasetOutput");
         Form form = properties.getForm(Form.MAIN);
         ComponentTestUtils.checkSerialize(properties, errorCollector);
         assertEquals(Form.MAIN, form.getName());
