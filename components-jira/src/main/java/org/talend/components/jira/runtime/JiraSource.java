@@ -20,6 +20,8 @@ import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.container.RuntimeContainer;
@@ -33,28 +35,72 @@ import org.talend.daikon.properties.ValidationResult;
  */
 public class JiraSource implements Source {
 
+    private static final Logger LOG = LoggerFactory.getLogger(JiraSource.class);
+    
     private static final long serialVersionUID = 1L;
 
     /**
      * Jira REST API version. It is a part of REST URL
      */
     private static final String REST_VERSION = "/rest/api/2/";
-
+    
     /**
-     * Jira component properties
+     * Host and port number of Jira server
      */
-    private TJiraInputProperties properties;
+    private String hostPort;
+    
+    /**
+     * Jira user ID
+     */
+    private String userId;
+    
+    /**
+     * Jira user password
+     */
+    private String password;
+    
+    /**
+     * Jira REST API resource type.
+     * Could be issue or project
+     */
+    private String resourceType;
+    
+    /**
+     * Schema of data to be retrieved
+     */
+    private Schema dataSchema;
+    
+    /**
+     * Optional Jira search query property
+     */
+    private String jql;
+    
+    /**
+     * Optional Jira batch size property
+     */
+    private int batchSize;
 
     /**
-     * Stores component properties in this object
+     * Saves component properties in this object
      * 
      * @param container runtime container
-     * @param properties
+     * @param properties component properties
      */
     @Override
     public void initialize(RuntimeContainer container, ComponentProperties properties) {
-        // FIXME could it throw cast exception?
-        this.properties = (TJiraInputProperties) properties;
+
+        if (properties instanceof TJiraInputProperties) {
+            TJiraInputProperties inputProperties = (TJiraInputProperties) properties;
+            this.hostPort = inputProperties.host.getStringValue();
+            this.userId = inputProperties.userPassword.userId.getStringValue();
+            this.password = inputProperties.userPassword.password.getStringValue();
+            this.resourceType = inputProperties.resource.getStringValue();
+            this.dataSchema = (Schema) inputProperties.schema.schema.getValue();
+            this.jql = inputProperties.jql.getStringValue();
+            this.batchSize = inputProperties.batchSize.getIntValue();
+        } else {
+            LOG.error("Wrong properties typs: {}", properties.getClass().getName());
+        }
     }
 
     /**
@@ -90,13 +136,8 @@ public class JiraSource implements Source {
      */
     @Override
     public Reader<IndexedRecord> createReader(RuntimeContainer container) {
-        String hostPort = properties.host.getStringValue();
-        String userId = properties.userPassword.userId.getStringValue();
-        String password = properties.userPassword.password.getStringValue();
-        String resourceType = properties.resource.getStringValue();
         String resourcePath = getResourcePath();
         Map<String, Object> sharedParameters = getSharedParameters();
-        Schema dataSchema = (Schema) properties.schema.schema.getValue();
        
         JiraReader reader = null;
         switch (resourceType) {
@@ -122,7 +163,6 @@ public class JiraSource implements Source {
      * @return resource path
      */
     String getResourcePath() {
-        String resourceType = properties.resource.getStringValue();
         String resourcePath = null;
         switch (resourceType) {
         case TJiraInputProperties.ISSUE: {
@@ -149,20 +189,75 @@ public class JiraSource implements Source {
      */
     Map<String, Object> getSharedParameters() {
         Map<String, Object> sharedParameters = new HashMap<>();
-
-        String jqlValue = properties.jql.getStringValue();
-        if (jqlValue != null && !jqlValue.isEmpty()) {
+        if (jql != null && !jql.isEmpty()) {
             String jqlKey = "jql";
-            sharedParameters.put(jqlKey, jqlValue);
+            sharedParameters.put(jqlKey, jql);
         }
-
-        String maxResultsValue = properties.batchSize.getStringValue();
-        if (maxResultsValue != null && !maxResultsValue.isEmpty()) {
-            String maxResultsKey = "maxResults";
-            sharedParameters.put(maxResultsKey, maxResultsValue);
-        }
-
+        String maxResultsKey = "maxResults";
+        sharedParameters.put(maxResultsKey, batchSize);
         return Collections.unmodifiableMap(sharedParameters);
     }
+    
+    /**
+     * Returns hostPort
+     * 
+     * @return the hostPort
+     */
+    public String getHostPort() {
+        return hostPort;
+    }
 
+    /**
+     * Returns userId
+     * 
+     * @return the userId
+     */
+    public String getUserId() {
+        return userId;
+    }
+
+    /**
+     * Returns password
+     * 
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * Returns resourceType
+     * 
+     * @return the resourceType
+     */
+    public String getResourceType() {
+        return resourceType;
+    }
+
+    /**
+     * Returns dataSchema
+     * 
+     * @return the dataSchema
+     */
+    public Schema getDataSchema() {
+        return dataSchema;
+    }
+
+    /**
+     * Returns Jira search query
+     * 
+     * @return Jira search query
+     */
+    public String getJql() {
+        return jql;
+    }
+    
+    /**
+     * Returns batch size
+     * 
+     * @return the batch size
+     */
+    public int getBatchSize() {
+        return batchSize;
+    }
 }
