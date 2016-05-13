@@ -100,5 +100,35 @@ public class JiraReaderTestIT {
         assertThat(entities.get(0).toString(), containsString("Public Project 1"));
         assertThat(entities.get(1).toString(), containsString("Public Project 2"));
     }
+    
+    /**
+     * Checks {@link JiraReader} supports read project by ID feature.
+     * Jira server has 3 projects. This test checks only 1 project retrieved.
+     * 
+     * TODO change JiraProjectReader to JiraProjectIdReader
+     * 
+     * @throws IOException in case of any exception
+     */
+    @Ignore
+    @Test
+    public void readProjectByIdTest() throws IOException {
+        String id = "/TP";
+        String resource = "rest/api/2/project" + id;
+
+        JiraProjectReader jiraReader = new JiraProjectReader(null, HOST_PORT, resource, USER, PASS, Collections.EMPTY_MAP,
+                null, container);
+
+        List<Object> entities = new ArrayList<>();
+        for (boolean hasNext = jiraReader.start(); hasNext; hasNext = jiraReader.advance()) {
+            Object entity = jiraReader.getCurrent().get(0);
+            LOG.debug(entity.toString());
+            entities.add(entity);
+        }
+
+        jiraReader.close();
+
+        assertThat(entities, hasSize(1));
+        assertThat(entities.get(0).toString(), containsString("Test Project"));
+    }
 
 }
