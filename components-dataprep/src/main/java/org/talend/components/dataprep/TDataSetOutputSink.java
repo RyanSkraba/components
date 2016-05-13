@@ -30,10 +30,12 @@ public class TDataSetOutputSink implements Sink {
 
     @Override
     public WriteOperation<?> createWriteOperation() {
-        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(properties.url.getStringValue(),
-                properties.login.getStringValue(), properties.pass.getStringValue(),
+        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler( //
+                properties.url.getStringValue(), //
+                properties.login.getStringValue(), //
+                properties.pass.getStringValue(), //
                 properties.dataSetName.getStringValue());
-        return new TDataSetWriteOperation(this, connectionHandler, properties.limit.getIntValue());
+        return new TDataSetWriteOperation(this, connectionHandler, properties.limit.getIntValue(), properties.mode.getStringValue());
     }
 
     @Override
@@ -48,7 +50,12 @@ public class TDataSetOutputSink implements Sink {
                 properties.dataSetName.getStringValue());
         boolean validate;
         try {
-            validate = connectionHandler.validate();
+            if (TDataSetOutputProperties.LIVE_DATASET.equals(properties.mode.getStringValue())) {
+                validate = true;
+            }
+            else {
+                validate = connectionHandler.validate();
+            }
         } catch (IOException e) {
             validate = false;
         }

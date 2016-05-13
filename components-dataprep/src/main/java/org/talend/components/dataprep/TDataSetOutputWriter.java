@@ -35,18 +35,24 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
     private boolean firstRow = true;
     private WriteOperation<WriterResult> writeOperation;
     private int limit;
+    private String mode;
 
-    TDataSetOutputWriter(WriteOperation<WriterResult> writeOperation,
-                         DataPrepConnectionHandler connectionHandler, int limit) {
+    TDataSetOutputWriter(WriteOperation<WriterResult> writeOperation, //
+                         DataPrepConnectionHandler connectionHandler, //
+                         int limit, //
+                         String mode) {
         this.writeOperation = writeOperation;
         this.connectionHandler = connectionHandler;
         this.limit = limit;
+        this.mode = mode;
     }
 
     @Override
     public void open(String uId) throws IOException {
         this.uId = uId;
-        connectionHandler.connect();
+        if (!isLiveDataSet()) {
+            connectionHandler.connect();
+        }
     }
 
     @Override
@@ -88,8 +94,13 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
     @Override
     public WriterResult close() throws IOException {
         LOGGER.debug("All data: {}", data);
-        connectionHandler.create(data.toString());
-        connectionHandler.logout();
+        if (isLiveDataSet()) {
+            connectionHandler.createInLiveDataSetMode(data.toString());
+        }
+        else {
+            connectionHandler.create(data.toString());
+            connectionHandler.logout();
+        }
         return new WriterResult(uId, counter);
     }
 
@@ -104,5 +115,9 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
                     .createAdapterFactory(datum.getClass());
         }
         return factory;
+    }
+
+    private boolean isLiveDataSet() {
+        return TDataSetOutputProperties.LIVE_DATASET.equals(mode);
     }
 }

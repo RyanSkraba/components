@@ -97,6 +97,17 @@ public class DataPrepConnectionHandler {
         LOGGER.debug("Create request response: {}", response);
     }
 
+    void createInLiveDataSetMode(String data) throws IOException {
+
+        LOGGER.debug("DataSet name: " + dataSetName);
+
+        // in live dataset, the request is a simple post to the livedataset url
+        Request request = Request.Post(url);
+        request.bodyString(data ,ContentType.create(ContentType.TEXT_PLAIN.getMimeType(), StandardCharsets.UTF_8));
+        HttpResponse response = request.execute().returnResponse();
+        LOGGER.debug("Create request response: {}", response);
+    }
+
     List<Column> readSourceSchema() throws IOException {
         Request request = Request.Get(url +"/api/datasets/"+ dataSetName + "/metadata");
         request.addHeader(authorisationHeader);
