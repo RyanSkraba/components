@@ -67,11 +67,11 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(ignoreNull);
 
-        Form refForm = new Form(this, Form.REFERENCE);
+        Form refForm = Form.createFromAndRegisterProperties(this, Form.REFERENCE);
         refForm.addRow(append);
         refForm.addRow(ignoreNull);
 
-        Form advancedForm = new Form(this, Form.ADVANCED);
+        Form advancedForm = Form.createFromAndRegisterProperties(this, Form.ADVANCED);
         advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.WidgetType.TABLE));
     }
     

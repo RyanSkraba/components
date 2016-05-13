@@ -33,7 +33,7 @@ public class UpsertRelationTable extends ComponentProperties {
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form mainForm = new Form(this, Form.MAIN);
+        Form mainForm = Form.createFromAndRegisterProperties(this, Form.MAIN);
         mainForm.addColumn(columnName);
         mainForm.addColumn(lookupFieldName);
         mainForm.addColumn(lookupFieldModuleName);
