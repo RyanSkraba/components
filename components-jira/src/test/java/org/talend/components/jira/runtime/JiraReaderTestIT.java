@@ -121,7 +121,7 @@ public class JiraReaderTestIT {
     @Ignore
     @Test
     public void readProjectByIdTest() throws IOException {
-        String id = "/TP";
+        String id = "TP";
 
         JiraProjectIdReader jiraReader = new JiraProjectIdReader(source, container, id);
 

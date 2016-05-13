@@ -68,6 +68,11 @@ public class JiraSource implements Source {
     private String jql;
     
     /**
+     * Optional Jira project ID property
+     */
+    private String projectId;
+    
+    /**
      * Optional Jira batch size property
      */
     private int batchSize;
@@ -90,6 +95,7 @@ public class JiraSource implements Source {
             this.dataSchema = (Schema) inputProperties.schema.schema.getValue();
             this.jql = inputProperties.jql.getStringValue();
             this.batchSize = inputProperties.batchSize.getIntValue();
+            this.projectId = inputProperties.projectId.getStringValue();
         } else {
             LOG.error("Wrong properties typs: {}", properties.getClass().getName());
         }
@@ -136,7 +142,11 @@ public class JiraSource implements Source {
             break;
         }
         case TJiraInputProperties.PROJECT: {
-            reader = new JiraProjectsReader(this, container);
+            if (projectId != null && !projectId.isEmpty()) {
+                reader = new JiraProjectIdReader(this, container, projectId);
+            } else {
+                reader = new JiraProjectsReader(this, container);
+            }
             break;
         }
         default: {
@@ -208,5 +218,14 @@ public class JiraSource implements Source {
      */
     int getBatchSize() {
         return batchSize;
+    }
+    
+    /**
+     * Returns Jira project ID
+     * 
+     * @return Jira project ID
+     */
+    String getProjectId() {
+        return projectId;
     }
 }

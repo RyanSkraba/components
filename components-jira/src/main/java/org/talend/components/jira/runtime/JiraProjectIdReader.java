@@ -29,7 +29,7 @@ public class JiraProjectIdReader extends JiraNoPaginationReader {
      * {@inheritDoc}
      */
     public JiraProjectIdReader(JiraSource source, RuntimeContainer container, String id) {
-        super(source, REST_RESOURCE + id, container);
+        super(source, REST_RESOURCE + "/" + id, container);
     }
 
     /**
