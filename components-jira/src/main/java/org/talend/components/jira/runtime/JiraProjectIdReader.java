@@ -12,36 +12,40 @@
 // ============================================================================
 package org.talend.components.jira.runtime;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jira.datum.Entity;
-import org.talend.components.jira.datum.Project;
+
 
 /**
- * {@link JiraReader} for rest/api/2/project Jira REST API resource
+ * {@link JiraReader} for /rest/api/2/project/{projectIdOrKey} Jira REST API resource
  */
-public class JiraProjectReader extends JiraNoPaginationReader {
+public class JiraProjectIdReader extends JiraNoPaginationReader {
 
     /**
      * {@inheritDoc}
      */
-    public JiraProjectReader(JiraSource source, String hostPort, String resource, String user, String password,
+    public JiraProjectIdReader(JiraSource source, String hostPort, String resource, String user, String password,
             Map<String, Object> sharedParameters, Schema schema, RuntimeContainer container) {
         super(source, hostPort, resource, user, password, sharedParameters, schema, container);
     }
 
     /**
-     * Retrieves project entities from response
+     * Wraps response into entity and returns {@link List} with only 1 entity
+     * It doesn't need to make additional action, because Jira server already
+     * returns single project json
      * 
      * @param response http response
      * @return {@link List} of entities retrieved from response
      */
+    @Override
     protected List<Entity> processResponse(String response) {
-        Project project = new Project(response);
-        List<Entity> entities = project.getEntities();
-        return entities;
+        Entity entity = new Entity(response);
+        return Collections.singletonList(entity);
     }
+
 }

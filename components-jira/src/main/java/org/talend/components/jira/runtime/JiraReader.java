@@ -247,6 +247,9 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
     /**
      * Process response. Updates http parameters for next request if needed.
      * Retrieves entities from response
+     * 
+     * @param response http response
+     * @return {@link List} of entities retrieved from response
      */
     protected abstract List<Entity> processResponse(String response); 
 

@@ -12,36 +12,32 @@
 // ============================================================================
 package org.talend.components.jira.runtime;
 
-import java.util.List;
+import java.io.IOException;
 import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.jira.datum.Entity;
-import org.talend.components.jira.datum.Project;
 
 /**
- * {@link JiraReader} for rest/api/2/project Jira REST API resource
+ * Common {@link JiraReader} for Jira REST API resources, which don't support pagination, e.g. Project resource
  */
-public class JiraProjectReader extends JiraNoPaginationReader {
+public abstract class JiraNoPaginationReader extends JiraReader {
 
     /**
      * {@inheritDoc}
      */
-    public JiraProjectReader(JiraSource source, String hostPort, String resource, String user, String password,
+    public JiraNoPaginationReader(JiraSource source, String hostPort, String resource, String user, String password,
             Map<String, Object> sharedParameters, Schema schema, RuntimeContainer container) {
         super(source, hostPort, resource, user, password, sharedParameters, schema, container);
     }
 
     /**
-     * Retrieves project entities from response
+     * Does nothing, because of no pagination support. Only 1 request is possible
      * 
-     * @param response http response
-     * @return {@link List} of entities retrieved from response
+     * @throws IOException doens't throw exception
      */
-    protected List<Entity> processResponse(String response) {
-        Project project = new Project(response);
-        List<Entity> entities = project.getEntities();
-        return entities;
+    @Override
+    protected void requestMoreRecords() throws IOException {
+        // nothing to do
     }
 }

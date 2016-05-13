@@ -105,8 +105,6 @@ public class JiraReaderTestIT {
      * Checks {@link JiraReader} supports read project by ID feature.
      * Jira server has 3 projects. This test checks only 1 project retrieved.
      * 
-     * TODO change JiraProjectReader to JiraProjectIdReader
-     * 
      * @throws IOException in case of any exception
      */
     @Ignore
@@ -115,7 +113,7 @@ public class JiraReaderTestIT {
         String id = "/TP";
         String resource = "rest/api/2/project" + id;
 
-        JiraProjectReader jiraReader = new JiraProjectReader(null, HOST_PORT, resource, USER, PASS, Collections.EMPTY_MAP,
+        JiraProjectIdReader jiraReader = new JiraProjectIdReader(null, HOST_PORT, resource, USER, PASS, Collections.EMPTY_MAP,
                 null, container);
 
         List<Object> entities = new ArrayList<>();

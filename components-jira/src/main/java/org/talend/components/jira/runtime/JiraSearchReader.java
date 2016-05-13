@@ -25,7 +25,7 @@ import org.talend.components.jira.datum.Entity;
 import org.talend.components.jira.datum.Search;
 
 /**
- * 
+ * {@link JiraReader} for rest/api/2/search Jira REST API resource
  */
 public class JiraSearchReader extends JiraReader {
     
@@ -81,6 +81,9 @@ public class JiraSearchReader extends JiraReader {
     /**
      * Process response. Updates total and startAt value.
      * Retrieves entities from response
+     * 
+     * @param response http response
+     * @return {@link List} of entities retrieved from response
      */
     protected List<Entity> processResponse(String response) {
         Search search = new Search(response);
