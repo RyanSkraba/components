@@ -41,7 +41,7 @@ public class TDataSetInputDefinition extends AbstractComponentDefinition impleme
 
     @Override
     public String[] getFamilies() {
-        return new String[] { "Data Preparation" };
+        return new String[] { "Talend Data Preparation" };
     }
 
     public String getMavenGroupId() {
