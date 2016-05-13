@@ -28,7 +28,7 @@ import aQute.bnd.annotation.component.Component;
 @Component(name = Constants.COMPONENT_BEAN_PREFIX + TDataSetOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TDataSetOutputDefinition extends AbstractComponentDefinition implements OutputComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tDataSetOutput";
+    public static final String COMPONENT_NAME = "tDatasetOutput";
 
 
     public TDataSetOutputDefinition() {
