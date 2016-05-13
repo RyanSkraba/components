@@ -143,6 +143,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
     public void afterLoginType() {
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(FORM_WIZARD));
+        refreshLayout(getForm(Form.ADVANCED));
     }
 
     @Override
@@ -180,14 +181,21 @@ public class SalesforceConnectionProperties extends ComponentProperties
                 form.getWidget(USERPASSWORD).setHidden(true);
             } else {
                 form.getWidget(loginType.getName()).setHidden(false);
+                String endpointValue = endpoint.getValue();
                 switch (loginType.getValue()) {
                 case BASIC:
                     form.getWidget(OAUTH).setHidden(true);
                     form.getWidget(USERPASSWORD).setHidden(false);
+                    if (endpointValue == null || endpointValue.contains(OAUTH_URL)) {
+                        endpoint.setValue(URL);
+                    }
                     break;
                 case OAUTH:
                     form.getWidget(OAUTH).setHidden(false);
                     form.getWidget(USERPASSWORD).setHidden(true);
+                    if (endpointValue == null || endpointValue.contains(URL)) {
+                        endpoint.setValue(OAUTH_URL);
+                    }
                     break;
 
                 default:
@@ -205,6 +213,14 @@ public class SalesforceConnectionProperties extends ComponentProperties
                 boolean bulkMode = bulkConnection.getValue();
                 form.getWidget(httpChunked.getName()).setHidden(bulkMode);
                 form.getWidget(httpTraceMessage.getName()).setHidden(!bulkMode);
+                
+                Form proxyForm = form.getChildForm(proxy.getName());
+                if(proxyForm!=null) {
+	                boolean isUseProxy = proxy.useProxy.getValue();
+	                proxyForm.getWidget(proxy.host.getName()).setHidden(!isUseProxy);
+	                proxyForm.getWidget(proxy.port.getName()).setHidden(!isUseProxy);
+	                proxyForm.getWidget(proxy.userPassword.getName()).setHidden(!isUseProxy);
+                }
             }
         }
     }

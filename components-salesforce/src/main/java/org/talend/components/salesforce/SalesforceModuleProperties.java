@@ -17,6 +17,7 @@ import static org.talend.daikon.properties.presentation.Widget.*;
 
 import java.util.List;
 
+import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.SchemaProperties;
@@ -37,8 +38,9 @@ public class SalesforceModuleProperties extends ComponentProperties implements S
     public Property<String> moduleName = newString("moduleName"); //$NON-NLS-1$
 
     public ISchemaListener schemaListener;
-    
+
     public SchemaProperties main = new SchemaProperties("main") {
+
         public void afterSchema() {
             if (schemaListener != null) {
                 schemaListener.afterSchema();
@@ -68,7 +70,7 @@ public class SalesforceModuleProperties extends ComponentProperties implements S
         moduleRefForm.addRow(main.getForm(Form.REFERENCE));
         refreshLayout(moduleRefForm);
     }
-    
+
     public void setSchemaListener(ISchemaListener schemaListener) {
         this.schemaListener = schemaListener;
     }

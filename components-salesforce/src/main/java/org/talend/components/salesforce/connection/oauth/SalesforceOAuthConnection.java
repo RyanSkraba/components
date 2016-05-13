@@ -109,8 +109,8 @@ public class SalesforceOAuthConnection {
         if (refreshToken != null && tokenFilePath != null) {
             File tokenFile = new File(tokenFilePath);
             if (!tokenFile.exists()) {
-                tokenFile.mkdirs();
                 try {
+                    tokenFile.getParentFile().mkdirs();
                     tokenFile.createNewFile();
                 } catch (IOException e) {
                     // TODO Auto-generated catch block

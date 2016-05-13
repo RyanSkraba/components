@@ -13,7 +13,7 @@
     <artifactId>${artifactId}</artifactId>
     <version>${version}</version>
     <properties>
-        <components.api.version>0.9.0-SNAPSHOT</components.api.version>
+        <components.api.version>0.10.0-SNAPSHOT</components.api.version>
     </properties>
     <packaging>bundle</packaging>
     <repositories>

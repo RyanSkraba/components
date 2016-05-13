@@ -1,12 +1,13 @@
 package org.talend.components.common;
 
 import static org.talend.daikon.properties.PropertyFactory.*;
-import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.presentation.Widget.*;
 
 import java.util.Collections;
 import java.util.Set;
 
 import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
@@ -18,7 +19,21 @@ public class BulkFileProperties extends FixedConnectorsComponentProperties {
 
     public Property<Boolean> append = newBoolean("append");
 
-    public SchemaProperties schema = new SchemaProperties("schema");
+    public ISchemaListener schemaListener;
+
+    public SchemaProperties schema = new SchemaProperties("schema") {
+
+        public void afterSchema() {
+            if (schemaListener != null) {
+                schemaListener.afterSchema();
+            }
+        }
+
+    };
+
+    public void setSchemaListener(ISchemaListener schemaListener) {
+        this.schemaListener = schemaListener;
+    }
 
     public BulkFileProperties(String name) {
         super(name);
@@ -36,6 +51,10 @@ public class BulkFileProperties extends FixedConnectorsComponentProperties {
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
-        return Collections.singleton(new PropertyPathConnector(Connector.MAIN_NAME, "schema"));
+        if (isOutputConnection) {
+            return Collections.emptySet();
+        } else {
+            return Collections.singleton(new PropertyPathConnector(Connector.MAIN_NAME, "schema"));
+        }
     }
 }

@@ -10,15 +10,22 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.salesforce;
+package org.talend.components.dataprep;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-/**
- * created by nrousseau on May 2, 2016
- * Detailled comment
- *
- */
-public interface ISchemaListener {
+import java.util.List;
 
-    public void afterSchema();
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class MetaData {
+    List<Column> columns;
+
+    public List<Column> getColumns() {
+        return columns;
+    }
+
+    public void setColumns(List<Column> columns) {
+        this.columns = columns;
+    }
+
 }

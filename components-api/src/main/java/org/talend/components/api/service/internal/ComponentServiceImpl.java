@@ -171,6 +171,11 @@ public class ComponentServiceImpl extends PropertiesServiceImpl<ComponentPropert
     }
 
     @Override
+    public boolean setNestedPropertiesValues(ComponentProperties targetProperties, ComponentProperties nestedValues) {
+        return targetProperties.updateNestedProperties(nestedValues);
+    }
+
+    @Override
     public InputStream getWizardPngImage(String wizardName, WizardImageType imageType) {
         ComponentWizardDefinition wizardDefinition = componentRegistry.getComponentWizards()
                 .get(Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);

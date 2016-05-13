@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,7 @@ import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.BulkFileProperties;
 import org.talend.components.common.runtime.BulkFileWriter;
+import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkProperties;
 
 /**
@@ -50,21 +52,24 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
                         .toString();
                 sbuilder.setLength(0);
             } else {
-                int index = getIndex(salesforceBulkProperties.upsertRelationTable.columnName.getValue(), header);
-                if (index > -1) {
-                    List<String> polymorphics = salesforceBulkProperties.upsertRelationTable.polymorphic.getValue();
-                    List<String> lookupFieldModuleNames = salesforceBulkProperties.upsertRelationTable.lookupFieldModuleName
-                            .getValue();
-                    List<String> lookupFieldNames = salesforceBulkProperties.upsertRelationTable.lookupFieldName.getValue();
-                    List<String> externalIdFromLookupFields = salesforceBulkProperties.upsertRelationTable.lookupFieldExternalIdName
-                            .getValue();
+                Object value = salesforceBulkProperties.upsertRelationTable.columnName.getValue();
+                if (value != null && value instanceof List) {
+                    int index = getIndex((List<String>) value, header);
+                    if (index > -1) {
+                        List<String> polymorphics = salesforceBulkProperties.upsertRelationTable.polymorphic.getValue();
+                        List<String> lookupFieldModuleNames = salesforceBulkProperties.upsertRelationTable.lookupFieldModuleName
+                                .getValue();
+                        List<String> lookupFieldNames = salesforceBulkProperties.upsertRelationTable.lookupFieldName.getValue();
+                        List<String> externalIdFromLookupFields = salesforceBulkProperties.upsertRelationTable.lookupFieldExternalIdName
+                                .getValue();
 
-                    if ("true".equals(polymorphics.get(index))) {
-                        sbuilder.append(lookupFieldModuleNames.get(index)).append(":");
+                        if ("true".equals(polymorphics.get(index))) {
+                            sbuilder.append(lookupFieldModuleNames.get(index)).append(":");
+                        }
+                        sbuilder.append(lookupFieldNames.get(index)).append(".").append(externalIdFromLookupFields.get(index));
+                        header = sbuilder.toString();
+                        sbuilder.setLength(0);
                     }
-                    sbuilder.append(lookupFieldNames.get(index)).append(".").append(externalIdFromLookupFields.get(index));
-                    header = sbuilder.toString();
-                    sbuilder.setLength(0);
                 }
             }
 
@@ -82,7 +87,7 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
 
     @Override
     public List<String> getValues(Object datum) {
-        IndexedRecord input = getFactory(datum).convertToAvro(datum);
+        IndexedRecord input = getFactory(datum).convertToAvro((IndexedRecord) datum);
         List<String> values = new ArrayList<String>();
         for (Schema.Field f : input.getSchema().getFields()) {
             if (input.get(f.pos()) == null) {
@@ -96,5 +101,13 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
             }
         }
         return values;
+    }
+
+    @Override
+    public WriterResult close() throws IOException {
+        if (container != null) {
+            container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_LINE, dataCount);
+        }
+        return super.close();
     }
 }

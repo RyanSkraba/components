@@ -12,11 +12,21 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcebulkexec;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
-import static org.talend.daikon.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.PropertyFactory.newProperty;
+import static org.talend.daikon.properties.presentation.Widget.widget;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.SchemaBuilder.FieldAssembler;
+import org.apache.avro.SchemaBuilder.FieldBuilder;
+import org.apache.avro.SchemaBuilder.RecordBuilder;
+import org.talend.components.api.component.ISchemaListener;
+import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.salesforce.SalesforceBulkProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.daikon.avro.SchemaConstants;
@@ -64,19 +74,73 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
         connection.bulkConnection.setValue(true);
         connection.httpChunked.setValue(false);
         upsertRelationTable.setUsePolymorphic(true);
+        
+        module.setSchemaListener(new ISchemaListener() {
+
+            @Override
+            public void afterSchema() {
+                updateOutputSchemas();
+                beforeUpsertKeyColumn();
+                beforeUpsertRelationTable();
+            }
+            
+        });
     }
 
+    private void updateOutputSchemas() {
+
+    	Schema inputSchema = (Schema) module.main.schema.getValue();
+        Schema mainOutputSchema = createRecordBuilderFromSchema(inputSchema, "output")
+        	.name("salesforce_id")
+    		.prop(SchemaConstants.TALEND_IS_LOCKED, "false")
+	        .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")
+	        .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")
+	        .type().stringType().noDefault()
+	        
+	        .name("salesforce_created")
+	        .prop(SchemaConstants.TALEND_IS_LOCKED, "false")
+	        .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")
+	        .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")
+	        .type().stringType().noDefault()
+	    .endRecord();
+
+        schemaFlow.schema.setValue(mainOutputSchema);
+        
+    	Schema rejectSchema = createRecordBuilderFromSchema(inputSchema, "rejectOutput")
+			.name("error")
+	        .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")
+	        .prop(SchemaConstants.TALEND_IS_LOCKED, "false")
+	        .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")
+	        .type().stringType().noDefault()
+	    .endRecord();
+
+        schemaReject.schema.setValue(rejectSchema);
+
+    }
+
+    private FieldAssembler<Schema> createRecordBuilderFromSchema(Schema inputSchema, String newSchemaName) {
+        RecordBuilder<Schema> recordBuilder = SchemaBuilder.record(newSchemaName);
+        FieldAssembler<Schema> fieldAssembler = recordBuilder.fields();
+        for (Field field : inputSchema.getFields()) {
+            FieldBuilder<Schema> fieldBuilder = fieldAssembler.name(field.name());
+            for (String propName : field.getObjectProps().keySet()) {
+                fieldBuilder.prop(propName, field.getObjectProps().get(propName).toString());
+            }
+            fieldAssembler = fieldBuilder.type().stringType().noDefault();
+        }
+        return fieldAssembler;
+    }
+    
     @Override
-    protected void setupRejectSchema() {
-        Schema s = SchemaBuilder.record("Reject")
-                // record set as read only for talend schema
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//$NON-NLS-1$
-                .fields().name("error")//$NON-NLS-1$
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
-                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
-                .type().stringType().noDefault().endRecord();
-        schemaReject.schema.setValue(s);
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        if (isOutputConnection) {
+        	HashSet<PropertyPathConnector> connectors = new HashSet<>();
+        	connectors.add(FLOW_CONNECTOR);
+        	connectors.add(REJECT_CONNECTOR);
+            return connectors;
+        } else {
+            return Collections.emptySet();
+        }
     }
 
 }

@@ -12,15 +12,15 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutputbulkexec;
 
-import org.apache.avro.Schema;
-import org.apache.avro.SchemaBuilder;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.VirtualComponentProperties;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkProperties;
-import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
-import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProperties implements VirtualComponentProperties {
 
@@ -33,17 +33,6 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
     @Override
     public void setupProperties() {
         super.setupProperties();
-
-        Schema s = SchemaBuilder.record("Main").prop(SchemaConstants.TALEND_IS_LOCKED, "true")//$NON-NLS-2$
-                .fields().name("salesforce_id").prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-2$
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
-                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
-                .type().stringType().noDefault().name("salesforce_created")
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
-                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
-                .type().stringType().noDefault().endRecord();
-        module.main.schema.setValue(s);
     }
 
     @Override
@@ -88,5 +77,17 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
         bulkExecProperties.module.connection.referencedComponent.componentInstanceId.setTaggedValue(ADD_QUOTES, true);
 
         return bulkExecProperties;
+    }
+
+    @Override
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        HashSet<PropertyPathConnector> connectors = new HashSet<>();
+        if (isOutputConnection) {
+            connectors.add(FLOW_CONNECTOR);
+            connectors.add(REJECT_CONNECTOR);
+        } else {
+            connectors.add(MAIN_CONNECTOR);
+        }
+        return connectors;
     }
 }

@@ -30,7 +30,7 @@ import org.talend.daikon.properties.service.Repository;
 
 public class SalesforceModuleListProperties extends ComponentProperties implements SalesforceProvideConnectionProperties {
 
-    private SalesforceConnectionProperties connectionProps;
+    public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection");
 
     private String repositoryLocation;
 
@@ -46,7 +46,7 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
     }
 
     public SalesforceModuleListProperties setConnection(SalesforceConnectionProperties connection) {
-        connectionProps = connection;
+        this.connection = connection;
         return this;
     }
 
@@ -66,7 +66,7 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
 
     // For the tests
     public SalesforceConnectionProperties getConnectionProps() {
-        return connectionProps;
+        return connection;
     }
 
     public void beforeFormPresentMain() throws Exception {
@@ -82,14 +82,13 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
             return vr;
         }
 
-        String connRepLocation = repo.storeProperties(connectionProps, (String) connectionProps.name.getValue(),
-                repositoryLocation, null);
+        String connRepLocation = repo.storeProperties(connection, (String) connection.name.getValue(), repositoryLocation, null);
 
         @SuppressWarnings("unchecked")
         List<NamedThing> selectedModuleNames = (List<NamedThing>) moduleName.getValue();
         for (NamedThing nl : selectedModuleNames) {
             SalesforceModuleProperties modProps = new SalesforceModuleProperties(nl.getName());
-            modProps.connection = connectionProps;
+            modProps.connection = connection;
             modProps.init();
             Schema schema = SalesforceSourceOrSink.getSchema(null, this, nl.getName());
             modProps.moduleName.setValue(nl.getName());
@@ -101,6 +100,6 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
 
     @Override
     public SalesforceConnectionProperties getConnectionProperties() {
-        return connectionProps;
+        return connection;
     }
 }

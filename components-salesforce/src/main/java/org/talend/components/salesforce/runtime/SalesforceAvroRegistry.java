@@ -104,7 +104,7 @@ public class SalesforceAvroRegistry extends AvroRegistry {
                 }
             }
             
-            if(field.getReferenceTo()!=null && field.getReferenceTo().length > 0){
+            if(field.getReferenceTo()!=null && field.getReferenceTo().length > 0 && field.getRelationshipName()!=null){
             	avroField.addProp(SalesforceSchemaConstants.REF_MODULE_NAME, field.getReferenceTo()[0]);
             	avroField.addProp(SalesforceSchemaConstants.REF_FIELD_NAME, field.getRelationshipName());
 	    	}

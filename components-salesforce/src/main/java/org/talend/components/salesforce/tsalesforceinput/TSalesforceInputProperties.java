@@ -58,9 +58,6 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
     @Override
     public void setupProperties() {
         super.setupProperties();
-        returns = ComponentPropertyFactory.newReturnsProperty();
-        ComponentPropertyFactory.newReturnProperty(returns, newInteger("NB_LINE"));
-
         batchSize.setValue(250);
         queryMode.setValue(QueryMode.QUERY);
         normalizeDelimiter.setValue(";");
@@ -104,6 +101,9 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
             Form advancedForm = getForm(Form.ADVANCED);
             connection.bulkConnection.setValue(!queryMode.getValue().equals(QueryMode.QUERY));
             if (advancedForm != null) {
+                advancedForm.getWidget(normalizeDelimiter.getName()).setHidden(queryMode.getValue().equals(QueryMode.BULK));
+                advancedForm.getWidget(columnNameDelimiter.getName()).setHidden(queryMode.getValue().equals(QueryMode.BULK));
+                advancedForm.getWidget(batchSize.getName()).setHidden(queryMode.getValue().equals(QueryMode.BULK));
                 advancedForm.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
             }
         }

@@ -84,7 +84,11 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
             }
             inputRecords = inputResult.getRecords();
             inputRecordsIndex = 0;
-            return inputRecords.length > 0;
+            boolean startable = inputRecords.length > 0;
+            if (startable) {
+                dataCount++;
+            }
+            return startable;
         } catch (ConnectionException e) {
             // Wrap the exception in an IOException.
             throw new IOException(e);
@@ -97,6 +101,7 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
 
         // Fast return conditions.
         if (inputRecordsIndex < inputRecords.length) {
+            dataCount++;
             return true;
         }
         if (inputResult.isDone()) {
