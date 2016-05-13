@@ -291,13 +291,11 @@ public class TJiraInputPropertiesTest {
         assertThat(advanced, notNullValue());
 
         Collection<Widget> mainWidgets = main.getWidgets();
-        assertThat(mainWidgets, hasSize(7));
+        assertThat(mainWidgets, hasSize(6));
         Widget schemaWidget = main.getWidget("schema");
         assertThat(schemaWidget, notNullValue());
         Widget hostWidget = main.getWidget("host");
         assertThat(hostWidget, notNullValue());
-        Widget authorizationWidget = main.getWidget("authorizationType");
-        assertThat(authorizationWidget, notNullValue());
         Widget userWidget = main.getWidget("userPassword");
         assertThat(userWidget, notNullValue());
         Widget resourceWidget = main.getWidget("resource");

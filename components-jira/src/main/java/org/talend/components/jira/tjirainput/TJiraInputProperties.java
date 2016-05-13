@@ -145,7 +145,6 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(schema.getForm(Form.REFERENCE));
         mainForm.addRow(host);
-        mainForm.addRow(authorizationType);
         mainForm.addRow(userPassword.getForm(Form.MAIN));
         mainForm.addRow(resource);
         mainForm.addRow(jql);
