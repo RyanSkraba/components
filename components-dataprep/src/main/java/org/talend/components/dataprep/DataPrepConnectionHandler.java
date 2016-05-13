@@ -12,6 +12,10 @@
 // ============================================================================
 package org.talend.components.dataprep;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -19,13 +23,9 @@ import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
 public class DataPrepConnectionHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TDataSetInputDefinition.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataPrepConnectionHandler.class);
 
     private final String url;
 
@@ -77,8 +77,7 @@ public class DataPrepConnectionHandler {
     }
 
     DataPrepStreamMapper readDataSetIterator() throws IOException {
-        Request request = Request.Get(url+ "/api/datasets/" + dataSetName + "?metadata=false").
-                addHeader(authorisationHeader);
+        Request request = Request.Get(url+ "/api/datasets/" + dataSetName + "?metadata=false").addHeader(authorisationHeader);
         HttpResponse current = request.execute().returnResponse();
         DataPrepStreamMapper dataPrepStreamMapper = new DataPrepStreamMapper(current.getEntity().getContent());
 
@@ -88,13 +87,22 @@ public class DataPrepConnectionHandler {
     }
 
     void create(String data) throws IOException {
-        int index = dataSetName.lastIndexOf("/");
-        String setName = dataSetName.substring(index);
-        String folderName = dataSetName.substring(0,index);
-        LOGGER.debug("Folder Name: " + folderName+ "DataSet name: " + setName);
 
-        Request request = Request.Post(url+"/api/datasets?name=" + setName + "&folderPath="+folderName);
+        LOGGER.debug("DataSet name: " + dataSetName);
+
+        Request request = Request.Post(url+"/api/datasets?name=" + dataSetName);
         request.addHeader(authorisationHeader);
+        request.bodyString(data ,ContentType.create(ContentType.TEXT_PLAIN.getMimeType(), StandardCharsets.UTF_8));
+        HttpResponse response = request.execute().returnResponse();
+        LOGGER.debug("Create request response: {}", response);
+    }
+
+    void createInLiveDataSetMode(String data) throws IOException {
+
+        LOGGER.debug("DataSet name: " + dataSetName);
+
+        // in live dataset, the request is a simple post to the livedataset url
+        Request request = Request.Post(url);
         request.bodyString(data ,ContentType.create(ContentType.TEXT_PLAIN.getMimeType(), StandardCharsets.UTF_8));
         HttpResponse response = request.execute().returnResponse();
         LOGGER.debug("Create request response: {}", response);

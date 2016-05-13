@@ -23,11 +23,13 @@ public class TDataSetWriteOperation implements WriteOperation<WriterResult> {
     private Sink sink;
     private DataPrepConnectionHandler connectionHandler;
     private int limit;
+    private String mode;
 
-    public TDataSetWriteOperation(Sink sink, DataPrepConnectionHandler connectionHandler, int limit) {
+    public TDataSetWriteOperation(Sink sink, DataPrepConnectionHandler connectionHandler, int limit, String mode ) {
         this.sink = sink;
         this.connectionHandler = connectionHandler;
         this.limit = limit;
+        this.mode = mode;
     }
 
     @Override
@@ -42,7 +44,7 @@ public class TDataSetWriteOperation implements WriteOperation<WriterResult> {
 
     @Override
     public Writer<WriterResult> createWriter(RuntimeContainer runtimeContainer) {
-        return new TDataSetOutputWriter(this, connectionHandler, limit);
+        return new TDataSetOutputWriter(this, connectionHandler, limit, mode);
     }
 
     @Override

@@ -12,6 +12,15 @@
 // ============================================================================
 package org.talend.components.dataprep;
 
+import static org.junit.Assert.assertTrue;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.util.Date;
+
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -22,28 +31,23 @@ import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-
-import static org.junit.Assert.assertTrue;
+import org.talend.components.api.component.runtime.Writer;
+import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.api.container.RuntimeContainer;
 
 @Ignore
 public class TDataPrepConnectionHandlerTest {
 
     private static final String URL = "http://10.42.10.60:8888";
-    private static final String LOGIN = "maxime@dataprep.com"; //"maksym@dataprep.com";
-    private static final String PASS = "maxime"; //"maksym";
+    private static final String LOGIN = "vincent@dataprep.com"; //"maksym@dataprep.com";
+    private static final String PASS = "vincent"; //"maksym";
     private String string;
 
     @Test
     @Ignore
     public void validate() throws IOException {
         DataPrepConnectionHandler connectionHandler =
-                new DataPrepConnectionHandler("http://10.42.10.60:8888","maxime@dataprep.com","maxime", "sldfjsl");
+                new DataPrepConnectionHandler(URL, LOGIN, PASS, "sldfjsl");
         assertTrue(connectionHandler.validate());
     }
 
@@ -86,13 +90,12 @@ public class TDataPrepConnectionHandlerTest {
         request.addHeader(httpHead);
         System.out.println(request.execute().returnContent().asString());
     }
+
     @Test
     public void createWithName() throws Exception {
-        String name = "fileName";
-        String folderPath = "/folderPath/";
+        String name = "test_from_vincent";
         String body = "col1, col2, col3\ntest1, test2, test3\ntest4, test5, test6";
-        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(
-                URL, LOGIN, PASS, folderPath+name);
+        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(URL, LOGIN, PASS, name);
         connectionHandler.connect();
         connectionHandler.create(body);
         connectionHandler.logout();
@@ -160,4 +163,24 @@ public class TDataPrepConnectionHandlerTest {
 //                .query(typeParam, type).query("_type", "xml").get(Products.class);
     }
 
+    @Test
+    public void testLiveDataSet() throws Exception {
+
+        RuntimeContainer container = null;
+
+        TDataSetOutputProperties properties = new TDataSetOutputProperties("TDataSetOutProperties");
+        properties.mode.setValue(TDataSetOutputProperties.LIVE_DATASET);
+        properties.url.setValue("http://127.0.0.1:8080/receivers2/debug");
+
+        TDataSetOutputSink sink = new TDataSetOutputSink();
+        sink.initialize(container, properties);
+        sink.validate(container);
+        final TDataSetWriteOperation writeOperation = (TDataSetWriteOperation) sink.createWriteOperation();
+        final Writer<WriterResult> writer = writeOperation.createWriter(container);
+        writer.open("test live datasets");
+        for (int i=0; i<50; i++) {
+            writer.write(i+";test-i;"+ new Date().getTime());
+        }
+        writer.close();
+    }
 }

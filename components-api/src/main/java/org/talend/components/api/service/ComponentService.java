@@ -113,6 +113,17 @@ public interface ComponentService extends PropertiesService<ComponentProperties>
     List<ComponentDefinition> getPossibleComponents(ComponentProperties... properties) throws Throwable;
 
     /**
+     * Copy the nestedValues properties into the targetProperties nested properties if the targetProperties accepts it.
+     * It is guarantied to be accepted if the targetProperties is associated with the Component definition that was
+     * return by {@link #getPossibleComponents(ComponentProperties...)} using the nestedValue as a parameter.
+     * 
+     * @param targetProperties the ComponentProperties to be updated with the nestedValues properties.
+     * @param nestedValues the ComponentProperties which properties will be copied inot the targetProperties.
+     * @return true if the copy was done and false if the targetProperties does not accept the nestedValues type.
+     */
+    boolean setNestedPropertiesValues(ComponentProperties targetProperties, ComponentProperties nestedValues);
+
+    /**
      * Return the png image related to the given wizard
      * 
      * @param wizardName, name of the wizard to get the image for

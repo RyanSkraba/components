@@ -14,10 +14,12 @@ package org.talend.components.api.properties;
 
 import java.lang.reflect.Field;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.daikon.properties.Properties;
+import org.talend.daikon.properties.PropertiesVisitor;
 import org.talend.daikon.properties.Property;
 
 /**
@@ -89,5 +91,34 @@ public abstract class ComponentProperties extends Properties {
     public void setConnectedSchema(Connector connector, Schema schema, boolean isOutputConnection) {
         // do nothing by default.
 
+    }
+
+    /**
+     * this will look for all authorized nested properties that shall be compatible with the nestedValues and copy all
+     * nestedValues properties into this.<br>
+     * This default implementation will look for all nested properties that matches the type of nestedValues and copy
+     * all nestedValues properties into it. This way of course be overriden if some component want to prevent the copy
+     * of a given type into it.
+     * 
+     * @param nestedValues values to be used update this current ComponentProperties nested Properties.
+     * @return true if the copy was done and false if the targetProperties does not accept the nestedValues type.
+     */
+    public boolean updateNestedProperties(final ComponentProperties nestedValues) {
+        if (nestedValues == null) {
+            return false;
+        } // else not null so perfect
+        final AtomicBoolean isCopied = new AtomicBoolean(false);
+        accept(new PropertiesVisitor() {
+
+            @Override
+            public void visit(Properties properties, Properties parent) {
+                if (properties.getClass().isAssignableFrom(nestedValues.getClass())) {
+                    properties.copyValuesFrom(nestedValues);
+                    isCopied.set(true);
+                } // else not a compatible nestedValues so keep going
+            }
+
+        }, this);
+        return isCopied.get();
     }
 }

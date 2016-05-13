@@ -356,4 +356,9 @@ public class ComponentServiceSpring implements ComponentService {
         componentServiceDelegate.setSchema(componentProperties, connector, schema, isOuput);
     }
 
+    @Override
+    public boolean setNestedPropertiesValues(ComponentProperties targetProperties, ComponentProperties nestedValues) {
+        return componentServiceDelegate.setNestedPropertiesValues(targetProperties, nestedValues);
+    }
+
 }

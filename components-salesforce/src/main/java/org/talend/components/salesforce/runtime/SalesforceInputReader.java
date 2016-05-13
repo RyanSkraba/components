@@ -13,11 +13,7 @@
 package org.talend.components.salesforce.runtime;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -30,6 +26,7 @@ import com.sforce.soap.partner.QueryResult;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.bind.XmlObject;
+import org.talend.daikon.avro.util.AvroUtils;
 
 public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
 
@@ -40,6 +37,7 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
     private transient SObject[] inputRecords;
 
     private transient int inputRecordsIndex;
+
 
     public SalesforceInputReader(RuntimeContainer container, SalesforceSource source, TSalesforceInputProperties props) {
         super(container, source);
@@ -52,25 +50,29 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
         if (querySchema == null) {
             querySchema = super.getSchema();
             if (inProperties.manualQuery.getBooleanValue()) {
-                SObject currentSObject = getCurrentSObject();
-                Iterator<XmlObject> children = currentSObject.getChildren();
-                List<String> columnsName = new ArrayList<>();
-                while (children.hasNext()) {
-                    columnsName.add(children.next().getName().getLocalPart());
-                }
-
-                List<Schema.Field> copyFieldList = new ArrayList<>();
-                for (Schema.Field se : querySchema.getFields()) {
-                    if (columnsName.contains(se.name())) {
-                        copyFieldList.add(new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal()));
+                if (AvroUtils.isIncludeAllFields((Schema) properties.module.main.schema.getValue())) {
+                    SObject currentSObject = getCurrentSObject();
+                    Iterator<XmlObject> children = currentSObject.getChildren();
+                    List<String> columnsName = new ArrayList<>();
+                    while (children.hasNext()) {
+                        columnsName.add(children.next().getName().getLocalPart());
                     }
+
+                    List<Schema.Field> copyFieldList = new ArrayList<>();
+                    for (Schema.Field se : querySchema.getFields()) {
+                        if (columnsName.contains(se.name())) {
+                            copyFieldList.add(new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal()));
+                        }
+                    }
+                    Map<String, Object> objectProps = querySchema.getObjectProps();
+                    querySchema = Schema.createRecord(querySchema.getName(), querySchema.getDoc(), querySchema.getNamespace(),
+                            querySchema.isError());
+                    querySchema.getObjectProps().putAll(objectProps);
+                    querySchema.setFields(copyFieldList);
                 }
-                Map<String, Object> objectProps = querySchema.getObjectProps();
-                querySchema = Schema.createRecord(querySchema.getName(), querySchema.getDoc(), querySchema.getNamespace(),
-                        querySchema.isError());
-                querySchema.getObjectProps().putAll(objectProps);
-                querySchema.setFields(copyFieldList);
             }
+            querySchema.addProp(SalesforceSchemaConstants.COLUMNNAME_DELIMTER, inProperties.columnNameDelimiter.getStringValue());
+            querySchema.addProp(SalesforceSchemaConstants.VALUE_DELIMITER, inProperties.normalizeDelimiter.getStringValue());
         }
         return querySchema;
     }
@@ -127,9 +129,9 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
     protected QueryResult executeSalesforceQuery() throws IOException, ConnectionException {
         TSalesforceInputProperties inProperties = (TSalesforceInputProperties) properties;
         getConnection().setQueryOptions(inProperties.batchSize.getIntValue());
-        if(inProperties.includeDeleted.getBooleanValue()){
+        if (inProperties.includeDeleted.getBooleanValue()) {
             return getConnection().queryAll(getQueryString(inProperties));
-        }else {
+        } else {
             return getConnection().query(getQueryString(inProperties));
         }
     }
