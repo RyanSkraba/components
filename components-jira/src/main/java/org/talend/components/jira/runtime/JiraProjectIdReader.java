@@ -14,24 +14,22 @@ package org.talend.components.jira.runtime;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.avro.Schema;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jira.datum.Entity;
-
 
 /**
  * {@link JiraReader} for /rest/api/2/project/{projectIdOrKey} Jira REST API resource
  */
 public class JiraProjectIdReader extends JiraNoPaginationReader {
+    
+    private static final String REST_RESOURCE = "rest/api/2/project";
 
     /**
      * {@inheritDoc}
      */
-    public JiraProjectIdReader(JiraSource source, String hostPort, String resource, String user, String password,
-            Map<String, Object> sharedParameters, Schema schema, RuntimeContainer container) {
-        super(source, hostPort, resource, user, password, sharedParameters, schema, container);
+    public JiraProjectIdReader(JiraSource source, RuntimeContainer container, String id) {
+        super(source, REST_RESOURCE + id, container);
     }
 
     /**

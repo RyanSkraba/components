@@ -13,9 +13,7 @@
 package org.talend.components.jira.runtime;
 
 import java.io.IOException;
-import java.util.Map;
 
-import org.apache.avro.Schema;
 import org.talend.components.api.container.RuntimeContainer;
 
 /**
@@ -26,9 +24,8 @@ public abstract class JiraNoPaginationReader extends JiraReader {
     /**
      * {@inheritDoc}
      */
-    public JiraNoPaginationReader(JiraSource source, String hostPort, String resource, String user, String password,
-            Map<String, Object> sharedParameters, Schema schema, RuntimeContainer container) {
-        super(source, hostPort, resource, user, password, sharedParameters, schema, container);
+    public JiraNoPaginationReader(JiraSource source, String resource, RuntimeContainer container) {
+        super(source, resource, container);
     }
 
     /**

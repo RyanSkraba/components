@@ -13,11 +13,12 @@
 package org.talend.components.jira.runtime;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.joda.time.Instant;
 import org.slf4j.Logger;
@@ -102,31 +103,25 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
      * Constructor sets required properties for http connection
      * 
      * @param source instance of {@link Source}, which had created this {@link Reader}
-     * @param hostPort url of Jira instance
      * @param resource REST resource to communicate
-     * @param user Basic authorization user id
-     * @param password Basic authorizatiion password
-     * @param sharedParameters map with http parameter which are shared between requests. It could include maxResult
-     * parameter
-     * @param Schema data schema
      * @param container runtime container
      */
-    public JiraReader(JiraSource source, String hostPort, String resource, String user, String password,
-            Map<String, Object> sharedParameters, Schema schema, RuntimeContainer container) {
+    public JiraReader(JiraSource source, String resource, RuntimeContainer container) {
         this.source = source;
         this.resource = resource;
-        this.sharedParameters = sharedParameters;
+        this.sharedParameters = createSharedParameters();
         this.container = container;
-        rest = new Rest(hostPort);
-        if (user != null && !user.isEmpty()) {
-            rest.setCredentials(user, password);
-            LOG.debug("{} user is used", user);
+        rest = new Rest(source.getHostPort());
+        String userId = source.getUserId();
+        if (userId != null && !userId.isEmpty()) {
+            rest.setCredentials(userId, source.getPassword());
+            LOG.debug("{} user is used", userId);
         } else {
             LOG.debug("{} user is used", "Anonymous");
         }
         
         factory = new IssueAdapterFactory();
-        factory.setSchema(schema);
+        factory.setSchema(source.getDataSchema());
     }
 
     /**
@@ -251,6 +246,23 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
      * @param response http response
      * @return {@link List} of entities retrieved from response
      */
-    protected abstract List<Entity> processResponse(String response); 
-
+    protected abstract List<Entity> processResponse(String response);
+    
+    /**
+     * Creates and returns map with shared http query parameters
+     * 
+     * @return shared http parameters
+     */
+    private Map<String, Object> createSharedParameters() {
+        Map<String, Object> sharedParameters = new HashMap<>();
+        String jqlValue = source.getJql();
+        if (jqlValue != null && !jqlValue.isEmpty()) {
+            String jqlKey = "jql";
+            sharedParameters.put(jqlKey, jqlValue);
+        }
+        int batchSize = source.getBatchSize();
+        String maxResultsKey = "maxResults";
+        sharedParameters.put(maxResultsKey, batchSize);
+        return Collections.unmodifiableMap(sharedParameters);
+    }
 }

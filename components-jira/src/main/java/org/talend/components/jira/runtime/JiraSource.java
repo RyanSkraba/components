@@ -13,10 +13,7 @@
 package org.talend.components.jira.runtime;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -38,11 +35,6 @@ public class JiraSource implements Source {
     private static final Logger LOG = LoggerFactory.getLogger(JiraSource.class);
     
     private static final long serialVersionUID = 1L;
-
-    /**
-     * Jira REST API version. It is a part of REST URL
-     */
-    private static final String REST_VERSION = "/rest/api/2/";
     
     /**
      * Host and port number of Jira server
@@ -136,21 +128,19 @@ public class JiraSource implements Source {
      */
     @Override
     public Reader<IndexedRecord> createReader(RuntimeContainer container) {
-        String resourcePath = getResourcePath();
-        Map<String, Object> sharedParameters = getSharedParameters();
-       
+
         JiraReader reader = null;
         switch (resourceType) {
         case TJiraInputProperties.ISSUE: {
-            reader =  new JiraSearchReader(this, hostPort, resourcePath, userId, password, sharedParameters, dataSchema, container);
+            reader =  new JiraSearchReader(this, container);
             break;
         }
         case TJiraInputProperties.PROJECT: {
-            reader = new JiraProjectsReader(this, hostPort, resourcePath, userId, password, sharedParameters, dataSchema, container);
+            reader = new JiraProjectsReader(this, container);
             break;
         }
         default: {
-            reader = new JiraSearchReader(this, hostPort, resourcePath, userId, password, sharedParameters, dataSchema, container);
+            reader = new JiraSearchReader(this, container);
             break;
         }
         }
@@ -158,52 +148,11 @@ public class JiraSource implements Source {
     }
     
     /**
-     * Builds and returns resource path
-     * 
-     * @return resource path
-     */
-    String getResourcePath() {
-        String resourcePath = null;
-        switch (resourceType) {
-        case TJiraInputProperties.ISSUE: {
-            resourcePath = REST_VERSION + "search";
-            break;
-        }
-        case TJiraInputProperties.PROJECT: {
-            resourcePath = REST_VERSION + "project";
-            // TODO Add project id /{projectIdOrKey}
-            break;
-        }
-        default: {
-            resourcePath = REST_VERSION + "search";
-            break;
-        }
-        }
-        return resourcePath;
-    }
-
-    /**
-     * Creates and returns map with shared http query parameters
-     * 
-     * @return shared http parametes
-     */
-    Map<String, Object> getSharedParameters() {
-        Map<String, Object> sharedParameters = new HashMap<>();
-        if (jql != null && !jql.isEmpty()) {
-            String jqlKey = "jql";
-            sharedParameters.put(jqlKey, jql);
-        }
-        String maxResultsKey = "maxResults";
-        sharedParameters.put(maxResultsKey, batchSize);
-        return Collections.unmodifiableMap(sharedParameters);
-    }
-    
-    /**
      * Returns hostPort
      * 
      * @return the hostPort
      */
-    public String getHostPort() {
+    String getHostPort() {
         return hostPort;
     }
 
@@ -212,7 +161,7 @@ public class JiraSource implements Source {
      * 
      * @return the userId
      */
-    public String getUserId() {
+    String getUserId() {
         return userId;
     }
 
@@ -221,7 +170,7 @@ public class JiraSource implements Source {
      * 
      * @return the password
      */
-    public String getPassword() {
+    String getPassword() {
         return password;
     }
 
@@ -230,7 +179,7 @@ public class JiraSource implements Source {
      * 
      * @return the resourceType
      */
-    public String getResourceType() {
+    String getResourceType() {
         return resourceType;
     }
 
@@ -239,7 +188,7 @@ public class JiraSource implements Source {
      * 
      * @return the dataSchema
      */
-    public Schema getDataSchema() {
+    Schema getDataSchema() {
         return dataSchema;
     }
 
@@ -248,7 +197,7 @@ public class JiraSource implements Source {
      * 
      * @return Jira search query
      */
-    public String getJql() {
+    String getJql() {
         return jql;
     }
     
@@ -257,7 +206,7 @@ public class JiraSource implements Source {
      * 
      * @return the batch size
      */
-    public int getBatchSize() {
+    int getBatchSize() {
         return batchSize;
     }
 }

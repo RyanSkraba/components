@@ -15,10 +15,13 @@ package org.talend.components.jira.runtime;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -60,6 +63,11 @@ public class JiraReaderTestIT {
      * Runtime container instance for tests
      */
     private RuntimeContainer container;
+    
+    /**
+     * Mocked {@link JiraSource} used for tests
+     */
+    private JiraSource source;
 
     /**
      * Instantiates instances used for tests
@@ -67,6 +75,11 @@ public class JiraReaderTestIT {
     @Before
     public void setUp() {
         container = new DefaultComponentRuntimeContainerImpl();
+        
+        source = mock(JiraSource.class);
+        when(source.getHostPort()).thenReturn(HOST_PORT);
+        when(source.getUserId()).thenReturn(USER);
+        when(source.getPassword()).thenReturn(PASS);
     }
 
     /**
@@ -82,10 +95,8 @@ public class JiraReaderTestIT {
     @Ignore
     @Test
     public void anonymousUserTest() throws IOException {
-        String resource = "rest/api/2/project";
-
-        JiraProjectsReader jiraReader = new JiraProjectsReader(null, HOST_PORT, resource, EMPTY_USER, PASS, Collections.EMPTY_MAP,
-                null, container);
+        when(source.getUserId()).thenReturn(EMPTY_USER);
+        JiraProjectsReader jiraReader = new JiraProjectsReader(source, container);
 
         List<Object> entities = new ArrayList<>();
         for (boolean hasNext = jiraReader.start(); hasNext; hasNext = jiraReader.advance()) {
@@ -111,10 +122,8 @@ public class JiraReaderTestIT {
     @Test
     public void readProjectByIdTest() throws IOException {
         String id = "/TP";
-        String resource = "rest/api/2/project" + id;
 
-        JiraProjectIdReader jiraReader = new JiraProjectIdReader(null, HOST_PORT, resource, USER, PASS, Collections.EMPTY_MAP,
-                null, container);
+        JiraProjectIdReader jiraReader = new JiraProjectIdReader(source, container, id);
 
         List<Object> entities = new ArrayList<>();
         for (boolean hasNext = jiraReader.start(); hasNext; hasNext = jiraReader.advance()) {
@@ -127,6 +136,7 @@ public class JiraReaderTestIT {
 
         assertThat(entities, hasSize(1));
         assertThat(entities.get(0).toString(), containsString("Test Project"));
+        assertThat(entities.get(0).toString(), not(startsWith("[")));
     }
 
 }

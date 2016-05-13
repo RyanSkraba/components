@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
@@ -30,6 +29,8 @@ import org.talend.components.jira.datum.Search;
 public class JiraSearchReader extends JiraReader {
     
     private static final Logger LOG = LoggerFactory.getLogger(JiraSearchReader.class);
+    
+    private static final String REST_RESOURCE = "rest/api/2/search";
     
     /**
      * Jira pagination parameter, which defines total number of entities
@@ -50,20 +51,10 @@ public class JiraSearchReader extends JiraReader {
     /**
      * {@inheritDoc}
      */
-    public JiraSearchReader(JiraSource source, String hostPort, String resource, String user, String password,
-            Map<String, Object> sharedParameters, Schema schema, RuntimeContainer container) {
-        super(source, hostPort, resource, user, password, sharedParameters, schema, container);
-        
-        if (sharedParameters.containsKey("maxResults")) {
-            Object maxResultsValue = sharedParameters.get("maxResults");
-            if (maxResultsValue instanceof Integer) {
-                maxResults = ((Integer) maxResultsValue).intValue();
-            } else {
-                LOG.debug("Wrong maxResult parameter type: {}", maxResultsValue.getClass().getName());
-            }
-        } else {
-            LOG.debug("Shared parameters doesn't contain maxResults parameter");
-        }
+    public JiraSearchReader(JiraSource source, RuntimeContainer container) {
+        super(source, REST_RESOURCE, container);
+        //TODO check if user specify blank batch size
+        maxResults = source.getBatchSize();
     }
     
     /**
