@@ -18,17 +18,17 @@ import java.util.Map;
 import org.apache.avro.Schema;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jira.datum.Entity;
-import org.talend.components.jira.datum.Project;
+import org.talend.components.jira.datum.Projects;
 
 /**
  * {@link JiraReader} for rest/api/2/project Jira REST API resource
  */
-public class JiraProjectReader extends JiraNoPaginationReader {
+public class JiraProjectsReader extends JiraNoPaginationReader {
 
     /**
      * {@inheritDoc}
      */
-    public JiraProjectReader(JiraSource source, String hostPort, String resource, String user, String password,
+    public JiraProjectsReader(JiraSource source, String hostPort, String resource, String user, String password,
             Map<String, Object> sharedParameters, Schema schema, RuntimeContainer container) {
         super(source, hostPort, resource, user, password, sharedParameters, schema, container);
     }
@@ -40,7 +40,7 @@ public class JiraProjectReader extends JiraNoPaginationReader {
      * @return {@link List} of entities retrieved from response
      */
     protected List<Entity> processResponse(String response) {
-        Project project = new Project(response);
+        Projects project = new Projects(response);
         List<Entity> entities = project.getEntities();
         return entities;
     }

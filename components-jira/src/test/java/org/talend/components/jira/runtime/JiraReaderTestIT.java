@@ -84,7 +84,7 @@ public class JiraReaderTestIT {
     public void anonymousUserTest() throws IOException {
         String resource = "rest/api/2/project";
 
-        JiraProjectReader jiraReader = new JiraProjectReader(null, HOST_PORT, resource, EMPTY_USER, PASS, Collections.EMPTY_MAP,
+        JiraProjectsReader jiraReader = new JiraProjectsReader(null, HOST_PORT, resource, EMPTY_USER, PASS, Collections.EMPTY_MAP,
                 null, container);
 
         List<Object> entities = new ArrayList<>();

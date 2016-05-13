@@ -105,7 +105,7 @@ public class JiraSource implements Source {
             break;
         }
         case TJiraInputProperties.PROJECT: {
-            reader = new JiraProjectReader(this, hostPort, resourcePath, userId, password, sharedParameters, dataSchema, container);
+            reader = new JiraProjectsReader(this, hostPort, resourcePath, userId, password, sharedParameters, dataSchema, container);
             break;
         }
         default: {

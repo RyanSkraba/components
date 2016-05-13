@@ -100,7 +100,7 @@ public class JiraReaderTest {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("maxResults", 10);
         DefaultComponentRuntimeContainerImpl container = new DefaultComponentRuntimeContainerImpl();
-        Reader<IndexedRecord> jiraReader = new JiraProjectReader(null, testUrl, testResource, USER, PASS, parameters, null, container);
+        Reader<IndexedRecord> jiraReader = new JiraProjectsReader(null, testUrl, testResource, USER, PASS, parameters, null, container);
 
         for (boolean hasNext = jiraReader.start(); hasNext; hasNext = jiraReader.advance()) {
             System.out.println(jiraReader.getCurrent().get(0));

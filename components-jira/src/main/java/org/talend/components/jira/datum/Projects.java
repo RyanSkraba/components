@@ -18,14 +18,14 @@ import java.util.List;
  * Jira entity class, which represents /rest/api/2/project result.
  * It contains pure JSON string and provides methods to get certain values from it
  */
-public class Project extends Entity {
+public class Projects extends Entity {
 
     /**
      * Constructor sets Entity JSON representation 
      *
      * @param json Entity JSON representation
      */
-    public Project(String json) {
+    public Projects(String json) {
         super(json);
     }
     

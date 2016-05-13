@@ -19,16 +19,16 @@ import java.util.List;
 import org.junit.Test;
 
 /**
- * Unit-tests for {@link Project} class
+ * Unit-tests for {@link Projects} class
  */
 public class ProjectTest {
     
     /**
-     * Check {@link Project#getEntities()} returns a list with correct number of entities inside it
+     * Check {@link Projects#getEntities()} returns a list with correct number of entities inside it
      */
     @Test
     public void getEntitiesTest() {
-        Project project = new Project(JsonDataProvider.getProjectJson());
+        Projects project = new Projects(JsonDataProvider.getProjectJson());
         List<Entity> entities = project.getEntities();
         assertEquals(2, entities.size());
     }
