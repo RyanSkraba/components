@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.apache.avro.Schema;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.HasSchemaProperty;
 import org.talend.components.common.SchemaProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.PropertyFactory;
@@ -34,7 +33,7 @@ import org.talend.daikon.properties.presentation.Form;
  * <li>{code schema}, an embedded property referring to a Schema.</li>
  * </ol>
  */
-public class ${componentName}Properties extends ComponentProperties implements HasSchemaProperty {
+public class ${componentName}Properties extends ComponentProperties {
 
     public Property filename = PropertyFactory.newString("filename"); //$NON-NLS-1$
     public SchemaProperties schema = new SchemaProperties("schema"); //$NON-NLS-1$
@@ -42,23 +41,19 @@ public class ${componentName}Properties extends ComponentProperties implements H
     public ${componentName}Properties(String name) {
         super(name);
     }
-    
+
+    @Override
+    public void setupProperties() {
+        super.setupProperties();
+        // Code for property initialization goes here
+    }
+
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form form = Form.create(this, Form.MAIN, "File Selection"); //$NON-NLS-1$
+        Form form = Form.create(this, Form.MAIN);
         form.addRow(schema.getForm(Form.REFERENCE));
         form.addRow(filename);
     }
 
-    @Override
-    public List<Schema> getSchemas() {
-        return Collections.singletonList(new Schema.Parser().parse(schema.schema.getStringValue()));
-    }
-
-    @Override
-    public void setSchemas(List<Schema> schemas) {
-        // nothing to be set here.
-    }    
-    
 }
