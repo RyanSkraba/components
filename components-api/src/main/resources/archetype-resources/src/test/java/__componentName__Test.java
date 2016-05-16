@@ -11,6 +11,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collections;
 
+import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -54,6 +56,11 @@ public class ${componentName}Test {
     public void test${componentName}Runtime() throws Exception {
         ${componentName}Definition def = (${componentName}Definition) getComponentService().getComponentDefinition("${componentName}");
         ${componentName}Properties props = (${componentName}Properties) getComponentService().getComponentProperties("${componentName}");
+
+        // Set up the test schema - not really used for anything now
+        Schema schema = SchemaBuilder.builder().record("testRecord").fields().name("field1").type().stringType().noDefault().endRecord();
+        props.schema.schema.setValue(schema);
+
         File temp = File.createTempFile("${componentName}testFile", ".txt");
         try {
             PrintWriter writer = new PrintWriter(temp.getAbsolutePath(), "UTF-8");
