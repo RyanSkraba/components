@@ -9,6 +9,7 @@ import java.util.Set;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
@@ -19,8 +20,16 @@ public class BulkFileProperties extends FixedConnectorsComponentProperties {
 
     public Property append = newProperty(Property.Type.BOOLEAN, "append");
 
+    public static final String ERROR_MESSAGE_NAME = "ERROR_MESSAGE";
+
+    public Property ERROR_MESSAGE;
+
+    public static final String NB_LINE_NAME = "NB_LINE";
+
+    public Property NB_LINE;
+
     public ISchemaListener schemaListener;
-    
+
     public SchemaProperties schema = new SchemaProperties("schema") {
 
         public void afterSchema() {
@@ -28,9 +37,18 @@ public class BulkFileProperties extends FixedConnectorsComponentProperties {
                 schemaListener.afterSchema();
             }
         }
-    
+
     };
-    
+
+    @Override
+    public void setupProperties() {
+        super.setupProperties();
+
+        returns = ComponentPropertyFactory.newReturnsProperty();
+        ERROR_MESSAGE = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.STRING, ERROR_MESSAGE_NAME); //$NON-NLS-1$
+        NB_LINE = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, NB_LINE_NAME); //$NON-NLS-1$
+    }
+
     public void setSchemaListener(ISchemaListener schemaListener) {
         this.schemaListener = schemaListener;
     }
@@ -51,10 +69,10 @@ public class BulkFileProperties extends FixedConnectorsComponentProperties {
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
-    	if (isOutputConnection) {
-        	return Collections.emptySet();
+        if (isOutputConnection) {
+            return Collections.emptySet();
         } else {
-        	return Collections.singleton(new PropertyPathConnector(Connector.MAIN_NAME, "schema"));
+            return Collections.singleton(new PropertyPathConnector(Connector.MAIN_NAME, "schema"));
         }
     }
 }

@@ -21,7 +21,6 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.DataRejectException;
-import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResult;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
@@ -31,114 +30,114 @@ import com.sforce.ws.ConnectionException;
 
 final class SalesforceBulkExecReader extends SalesforceReader {
 
-	protected SalesforceBulkRuntime bulkRuntime;
+    protected SalesforceBulkRuntime bulkRuntime;
 
-	private int batchIndex;
+    private int batchIndex;
 
-	private List<BulkResult> currentBatchResult;
+    private List<BulkResult> currentBatchResult;
 
-	private int resultIndex;
+    private int resultIndex;
 
-	private int successCount;
+    private int successCount;
 
-	private int rejectCount;
+    private int rejectCount;
 
-	public SalesforceBulkExecReader(RuntimeContainer container, SalesforceSource source,
-			TSalesforceBulkExecProperties props) {
-		super(container, source);
-		properties = props;
-	}
+    public SalesforceBulkExecReader(RuntimeContainer container, SalesforceSource source,
+                                    TSalesforceBulkExecProperties props) {
+        super(container, source);
+        properties = props;
+    }
 
-	@Override
-	public boolean start() throws IOException {
+    @Override
+    public boolean start() throws IOException {
 
-		TSalesforceBulkExecProperties sprops = (TSalesforceBulkExecProperties) properties;
-		bulkRuntime = new SalesforceBulkRuntime((SalesforceSource) getCurrentSource(), container);
-		bulkRuntime.setConcurrencyMode(sprops.bulkProperties.concurrencyMode.getStringValue());
-		bulkRuntime.setAwaitTime(sprops.bulkProperties.waitTimeCheckBatchState.getIntValue());
+        TSalesforceBulkExecProperties sprops = (TSalesforceBulkExecProperties) properties;
+        bulkRuntime = new SalesforceBulkRuntime((SalesforceSource) getCurrentSource(), container);
+        bulkRuntime.setConcurrencyMode(sprops.bulkProperties.concurrencyMode.getStringValue());
+        bulkRuntime.setAwaitTime(sprops.bulkProperties.waitTimeCheckBatchState.getIntValue());
 
-		try {
-			// We only support CSV file for bulk output
-			bulkRuntime.executeBulk(sprops.module.moduleName.getStringValue(), sprops.outputAction.getStringValue(),
-					sprops.upsertKeyColumn.getStringValue(), "csv", sprops.bulkFilePath.getStringValue(),
-					sprops.bulkProperties.bytesToCommit.getIntValue(),
-					sprops.bulkProperties.rowsToCommit.getIntValue());
-			if (bulkRuntime.getBatchCount() > 0) {
-				batchIndex = 0;
-				currentBatchResult = bulkRuntime.getBatchLog(0);
-				resultIndex = 0;
-				boolean startable = currentBatchResult.size() > 0;
-				if (startable) {
-					countData();
-				}
-				return startable;
-			}
-			return false;
-		} catch (AsyncApiException | ConnectionException e) {
-			throw new IOException(e);
-		}
-	}
+        try {
+            // We only support CSV file for bulk output
+            bulkRuntime.executeBulk(sprops.module.moduleName.getStringValue(), sprops.outputAction.getStringValue(),
+                    sprops.upsertKeyColumn.getStringValue(), "csv", sprops.bulkFilePath.getStringValue(),
+                    sprops.bulkProperties.bytesToCommit.getIntValue(),
+                    sprops.bulkProperties.rowsToCommit.getIntValue());
+            if (bulkRuntime.getBatchCount() > 0) {
+                batchIndex = 0;
+                currentBatchResult = bulkRuntime.getBatchLog(0);
+                resultIndex = 0;
+                boolean startable = currentBatchResult.size() > 0;
+                if (startable) {
+                    countData();
+                }
+                return startable;
+            }
+            return false;
+        } catch (AsyncApiException | ConnectionException e) {
+            throw new IOException(e);
+        }
+    }
 
-	protected Map<String, String> getResult() {
-		return null;
-	}
+    protected Map<String, String> getResult() {
+        return null;
+    }
 
-	@Override
-	public boolean advance() throws IOException {
-		if (++resultIndex >= currentBatchResult.size()) {
-			if (++batchIndex >= bulkRuntime.getBatchCount()) {
-				return false;
-			} else {
-				try {
-					currentBatchResult = bulkRuntime.getBatchLog(batchIndex);
-					resultIndex = 0;
-					boolean isAdvanced = currentBatchResult.size() > 0;
-					if (isAdvanced) {
-						countData();
-					}
-					return isAdvanced;
-				} catch (AsyncApiException | ConnectionException e) {
-					throw new IOException(e);
-				}
-			}
-		}
-		countData();
-		return true;
-	}
+    @Override
+    public boolean advance() throws IOException {
+        if (++resultIndex >= currentBatchResult.size()) {
+            if (++batchIndex >= bulkRuntime.getBatchCount()) {
+                return false;
+            } else {
+                try {
+                    currentBatchResult = bulkRuntime.getBatchLog(batchIndex);
+                    resultIndex = 0;
+                    boolean isAdvanced = currentBatchResult.size() > 0;
+                    if (isAdvanced) {
+                        countData();
+                    }
+                    return isAdvanced;
+                } catch (AsyncApiException | ConnectionException e) {
+                    throw new IOException(e);
+                }
+            }
+        }
+        countData();
+        return true;
+    }
 
-	@Override
-	public IndexedRecord getCurrent() {
-		BulkResult result = currentBatchResult.get(resultIndex);
-		IndexedRecord record = null;
-		try {
-			record = ((BulkResultAdapterFactory) getFactory()).convertToAvro(result);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		
-		if ("true".equalsIgnoreCase((String)result.getValue("Success"))) {
-			return record;
-		} else {
-			Map<String, Object> resultMessage = new HashMap<String, Object>();
-			String error = (String)result.getValue("Error");
-			resultMessage.put("error", error);
-			resultMessage.put("talend_record", record);
-			throw new DataRejectException(resultMessage);
-		}
+    @Override
+    public IndexedRecord getCurrent() {
+        BulkResult result = currentBatchResult.get(resultIndex);
+        IndexedRecord record = null;
+        try {
+            record = ((BulkResultAdapterFactory) getFactory()).convertToAvro(result);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-	}
-	
-	@Override
-	protected Schema getSchema() throws IOException {
+        if ("true".equalsIgnoreCase((String) result.getValue("Success"))) {
+            return record;
+        } else {
+            Map<String, Object> resultMessage = new HashMap<String, Object>();
+            String error = (String) result.getValue("Error");
+            resultMessage.put("error", error);
+            resultMessage.put("talend_record", record);
+            throw new DataRejectException(resultMessage);
+        }
+
+    }
+
+    @Override
+    protected Schema getSchema() throws IOException {
         if (querySchema == null) {
-        	TSalesforceBulkExecProperties sprops = (TSalesforceBulkExecProperties) properties;
-        	//TODO check the assert : the output schema have values even when no output connector 
-        	querySchema = (Schema) sprops.schemaFlow.schema.getValue();
+            TSalesforceBulkExecProperties sprops = (TSalesforceBulkExecProperties) properties;
+            //TODO check the assert : the output schema have values even when no output connector
+            querySchema = (Schema) sprops.schemaFlow.schema.getValue();
 
-        	//tsalesforcebulkexec don't support dynamic in fact, only tsalesforceoutputbulk support.
-        	
+            //tsalesforcebulkexec don't support dynamic in fact, only tsalesforceoutputbulk support.
+
         	/*
-        	BulkResult currentRow = currentBatchResult.get(resultIndex);
+            BulkResult currentRow = currentBatchResult.get(resultIndex);
         	Set<String> keys = currentRow.values.keySet();
         	
             List<Schema.Field> columnlist = new ArrayList<>();
@@ -158,25 +157,25 @@ final class SalesforceBulkExecReader extends SalesforceReader {
         return querySchema;
     }
 
-	@Override
-	public void close() throws IOException {
-		if (container != null) {
-			String currentComponent = container.getCurrentComponentId()
-					.replace("_" + TSalesforceBulkExecDefinition.COMPONENT_NAME, "");
-			container.setComponentData(currentComponent, SalesforceOutputProperties.NB_LINE, dataCount);
-			container.setComponentData(currentComponent, SalesforceOutputProperties.NB_SUCCESS, successCount);
-			container.setComponentData(currentComponent, SalesforceOutputProperties.NB_REJECT, rejectCount);
-		}
-		bulkRuntime.close();
-	}
+    @Override
+    public void close() throws IOException {
+        if (container != null) {
+            String currentComponent = container.getCurrentComponentId()
+                    .replace("_" + TSalesforceBulkExecDefinition.COMPONENT_NAME, "");
+            container.setComponentData(currentComponent, TSalesforceBulkExecProperties.NB_LINE_NAME, dataCount);
+            container.setComponentData(currentComponent, TSalesforceBulkExecProperties.NB_SUCCESS_NAME, successCount);
+            container.setComponentData(currentComponent, TSalesforceBulkExecProperties.NB_REJECT_NAME, rejectCount);
+        }
+        bulkRuntime.close();
+    }
 
-	protected void countData() {
-		dataCount++;
-		BulkResult result = currentBatchResult.get(resultIndex);
-		if ("true".equalsIgnoreCase(String.valueOf(result.getValue("Success")))) {
-			successCount++;
-		} else {
-			rejectCount++;
-		}
-	}
+    protected void countData() {
+        dataCount++;
+        BulkResult result = currentBatchResult.get(resultIndex);
+        if ("true".equalsIgnoreCase(String.valueOf(result.getValue("Success")))) {
+            successCount++;
+        } else {
+            rejectCount++;
+        }
+    }
 }

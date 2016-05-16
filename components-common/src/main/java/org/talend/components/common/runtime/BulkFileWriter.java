@@ -2,7 +2,6 @@ package org.talend.components.common.runtime;
 
 import com.csvreader.CsvWriter;
 import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.*;
 import org.talend.components.api.container.RuntimeContainer;
@@ -17,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  Generate bulk file
+ * Generate bulk file
  */
 public class BulkFileWriter implements Writer<WriterResult> {
 
@@ -57,29 +56,29 @@ public class BulkFileWriter implements Writer<WriterResult> {
         File file = new File(bulkProperties.bulkFilePath.getStringValue());
         file.getParentFile().mkdirs();
         csvWriter = new CsvWriter(new OutputStreamWriter(
-                new java.io.FileOutputStream(file, isAppend), charset),separator);
+                new java.io.FileOutputStream(file, isAppend), charset), separator);
     }
 
     private boolean headerIsReady = false;
-    
+
     @Override
     public void write(Object datum) throws IOException {
         if (null == datum) {
             return;
         }
-        
-    	if(!isAppend && !headerIsReady){
-    		Schema schema = new Schema.Parser().parse(bulkProperties.schema.schema.getStringValue());
-    		
-    		if (AvroUtils.isIncludeAllFields(schema) && (datum instanceof org.apache.avro.generic.IndexedRecord)) {
-    			org.apache.avro.generic.IndexedRecord record = (org.apache.avro.generic.IndexedRecord)datum;
-    			schema = record.getSchema();
+
+        if (!isAppend && !headerIsReady) {
+            Schema schema = new Schema.Parser().parse(bulkProperties.schema.schema.getStringValue());
+
+            if (AvroUtils.isIncludeAllFields(schema) && (datum instanceof org.apache.avro.generic.IndexedRecord)) {
+                org.apache.avro.generic.IndexedRecord record = (org.apache.avro.generic.IndexedRecord) datum;
+                schema = record.getSchema();
             }
-        	
+
             csvWriter.writeRecord(getHeaders(schema));
             headerIsReady = true;
         }
-    	
+
         List<String> values = getValues(datum);
         csvWriter.writeRecord(values.toArray(new String[values.size()]));
         dataCount++;
@@ -93,6 +92,9 @@ public class BulkFileWriter implements Writer<WriterResult> {
     public WriterResult close() throws IOException {
         flush();
         csvWriter.close();
+        if (container != null) {
+            container.setComponentData(container.getCurrentComponentId(), BulkFileProperties.NB_LINE_NAME, dataCount);
+        }
         return new WriterResult(uId, dataCount);
     }
 
@@ -101,31 +103,31 @@ public class BulkFileWriter implements Writer<WriterResult> {
         return writeOperation;
     }
 
-    public String[] getHeaders(Schema schema){
+    public String[] getHeaders(Schema schema) {
         List<String> headers = new ArrayList<String>();
-        for(Schema.Field f :schema.getFields()){
+        for (Schema.Field f : schema.getFields()) {
             headers.add(f.name());
         }
         return headers.toArray(new String[headers.size()]);
     }
 
-    public List<String> getValues(Object datum){
-        IndexedRecord input = getFactory(datum).convertToAvro((IndexedRecord)datum);
+    public List<String> getValues(Object datum) {
+        IndexedRecord input = getFactory(datum).convertToAvro((IndexedRecord) datum);
         List<String> values = new ArrayList<String>();
         for (Schema.Field f : input.getSchema().getFields()) {
-            if(input.get(f.pos()) != null){
+            if (input.get(f.pos()) != null) {
                 values.add(String.valueOf(input.get(f.pos())));
-            }else{
+            } else {
                 values.add("");
             }
         }
         return values;
     }
 
-    public IndexedRecordAdapterFactory<IndexedRecord, IndexedRecord> getFactory(Object datum){
+    public IndexedRecordAdapterFactory<IndexedRecord, IndexedRecord> getFactory(Object datum) {
         if (null == factory) {
             factory = new GenericAdapterFactory();
-            factory.setSchema(((IndexedRecord)datum).getSchema());
+            factory.setSchema(((IndexedRecord) datum).getSchema());
         }
         return factory;
     }
