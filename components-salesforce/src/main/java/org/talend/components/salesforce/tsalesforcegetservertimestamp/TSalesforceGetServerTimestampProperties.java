@@ -58,11 +58,11 @@ public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComp
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form mainForm = Form.createFromAndRegisterProperties(this, Form.MAIN);
+        Form mainForm = Form.create(this, Form.MAIN);
         mainForm.addRow(connection.getForm(Form.REFERENCE));
         mainForm.addRow(schema.getForm(Form.REFERENCE));
 
-        Form advancedForm = Form.createFromAndRegisterProperties(this, Form.ADVANCED);
+        Form advancedForm = Form.create(this, Form.ADVANCED);
         advancedForm.addRow(connection.getForm(Form.ADVANCED));
     }
 
