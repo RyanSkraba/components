@@ -94,7 +94,7 @@ public class JiraReaderTestIT {
      */
     @Ignore
     @Test
-    public void anonymousUserTest() throws IOException {
+    public void testAnonymousUser() throws IOException {
         when(source.getUserId()).thenReturn(EMPTY_USER);
         JiraProjectsReader jiraReader = new JiraProjectsReader(source, container);
 
@@ -120,7 +120,7 @@ public class JiraReaderTestIT {
      */
     @Ignore
     @Test
-    public void readProjectByIdTest() throws IOException {
+    public void testReadProjectById() throws IOException {
         String id = "TP";
 
         JiraProjectIdReader jiraReader = new JiraProjectIdReader(source, container, id);

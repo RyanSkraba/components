@@ -32,7 +32,7 @@ public class TJiraInputDefinitionTest {
      * Check {@link TJiraInputDefinition#getMavenGroupId()} returns "org.talend.components"
      */
     @Test
-    public void getMavenGroupIdTest() {
+    public void testGetMavenGroupId() {
         JiraDefinition definition = new TJiraInputDefinition();
         String mavenGroupId = definition.getMavenGroupId();
         assertThat(mavenGroupId, equalTo("org.talend.components"));
@@ -42,7 +42,7 @@ public class TJiraInputDefinitionTest {
      * Check {@link TJiraInputDefinition#getMavenArtifactId()} returns "components-jira"
      */
     @Test
-    public void getMavenArtifactIdTest() {
+    public void testGetMavenArtifactId() {
         JiraDefinition definition = new TJiraInputDefinition();
         String mavenArtifactId = definition.getMavenArtifactId();
         assertThat(mavenArtifactId, equalTo("components-jira"));
@@ -52,7 +52,7 @@ public class TJiraInputDefinitionTest {
      * Check {@link TJiraInputDefinition#getFamilies()} returns string array, which contains "Business/JIRA"
      */
     @Test
-    public void getFamiliesTest() {
+    public void testGetFamilies() {
         JiraDefinition definition = new TJiraInputDefinition();
         String[] families = definition.getFamilies();
         assertThat(families, arrayContaining("Business/JIRA"));
@@ -63,7 +63,7 @@ public class TJiraInputDefinitionTest {
      * "org.talend.components.jira.tjirainput.TJiraInputProperties"
      */
     @Test
-    public void getPropertyClassTest() {
+    public void testGetPropertyClass() {
         TJiraInputDefinition definition = new TJiraInputDefinition();
         Class<?> propertyClass = definition.getPropertyClass();
         String canonicalName = propertyClass.getCanonicalName();
@@ -74,7 +74,7 @@ public class TJiraInputDefinitionTest {
      * Check {@link TJiraInputDefinition#getRuntime()} returns instance of {@link JiraSource}
      */
     @Test
-    public void getRuntimeTest() {
+    public void testGetRuntime() {
         TJiraInputDefinition definition = new TJiraInputDefinition();
         Source source = definition.getRuntime();
         assertThat(source, is(instanceOf(JiraSource.class)));

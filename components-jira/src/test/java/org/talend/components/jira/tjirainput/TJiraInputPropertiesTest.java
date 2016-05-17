@@ -113,7 +113,7 @@ public class TJiraInputPropertiesTest {
      * authorizationType is chosen
      */
     @Test
-    public void afterAuthorizationTypeOAuthTest() {
+    public void testAfterAuthorizationTypeOAuth() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.setupProperties();
         properties.schema = schemaProperties;
@@ -131,7 +131,7 @@ public class TJiraInputPropertiesTest {
      * Checks {@link TJiraInputProperties#afterResource()} hides jql widget, if project resource chosen
      */
     @Test
-    public void afterResourceProjectTest() {
+    public void testAfterResourceProject() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.setupProperties();
         properties.schema = schemaProperties;
@@ -151,7 +151,7 @@ public class TJiraInputPropertiesTest {
      * Checks {@link TJiraInputProperties#setupProperties()} sets correct initial property values
      */
     @Test
-    public void setupPropertiesTest() {
+    public void testSetupProperties() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.setupProperties();
 
@@ -174,7 +174,7 @@ public class TJiraInputPropertiesTest {
      * Checks {@link TJiraInputProperties#setupSchema()} sets correct initial schema property
      */
     @Test
-    public void setupSchemaTest() {
+    public void testSetupSchema() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.setupSchema();
 
@@ -190,7 +190,7 @@ public class TJiraInputPropertiesTest {
      * called and correct schema after {@link TJiraInputProperties#setupSchema()} called
      */
     @Test
-    public void getSchemaTest() {
+    public void testGetSchema() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
 
         Schema schema = properties.getSchema();
@@ -208,7 +208,7 @@ public class TJiraInputPropertiesTest {
      * Checks {@link TJiraInputProperties#refreshLayout(Form)} doesn't hide userPassword and jqlWidget in initial state
      */
     @Test
-    public void refreshLayoutMainInitialTest() {
+    public void testRefreshLayoutMainInitial() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.setupProperties();
 
@@ -224,7 +224,7 @@ public class TJiraInputPropertiesTest {
      * parameter
      */
     @Test
-    public void refreshLayoutWrongFormTest() {
+    public void testRefreshLayoutWrongForm() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.setupProperties();
 
@@ -243,7 +243,7 @@ public class TJiraInputPropertiesTest {
      * type chosen
      */
     @Test
-    public void refreshLayoutOAuthTest() {
+    public void testRefreshLayoutOAuth() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.setupProperties();
         properties.authorizationType.setValue("OAuth");
@@ -259,7 +259,7 @@ public class TJiraInputPropertiesTest {
      * Checks {@link TJiraInputProperties#refreshLayout(Form)} hides jql widget, if project resource chosen
      */
     @Test
-    public void refreshLayoutProjectTest() {
+    public void testRefreshLayoutProject() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.setupProperties();
         properties.resource.setValue("project");
@@ -278,7 +278,7 @@ public class TJiraInputPropertiesTest {
      * widgets names
      */
     @Test
-    public void setupLayoutTest() {
+    public void testSetupLayout() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.schema = schemaProperties;
         properties.userPassword = userPasswordProperies;
@@ -316,7 +316,7 @@ public class TJiraInputPropertiesTest {
      * false is passed
      */
     @Test
-    public void getAllSchemaPropertiesConnectorsInputTest() {
+    public void testGetAllSchemaPropertiesConnectorsInput() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
 
         Set<PropertyPathConnector> connectors = properties.getAllSchemaPropertiesConnectors(false);
@@ -328,7 +328,7 @@ public class TJiraInputPropertiesTest {
      * connector, when true is passed
      */
     @Test
-    public void getAllSchemaPropertiesConnectorsOutputTest() {
+    public void testGetAllSchemaPropertiesConnectorsOutput() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
 
         Set<PropertyPathConnector> connectors = properties.getAllSchemaPropertiesConnectors(true);

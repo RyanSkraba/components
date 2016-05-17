@@ -27,7 +27,7 @@ public class ProjectTest {
      * Check {@link Projects#getEntities()} returns a list with correct number of entities inside it
      */
     @Test
-    public void getEntitiesTest() {
+    public void testGetEntities() {
         Projects project = new Projects(JsonDataProvider.getProjectJson());
         List<Entity> entities = project.getEntities();
         assertEquals(2, entities.size());

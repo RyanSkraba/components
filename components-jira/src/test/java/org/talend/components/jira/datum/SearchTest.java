@@ -27,7 +27,7 @@ public class SearchTest {
      * Check {@link Search#getTotal()} returns correct value of total field from JSON representation
      */
     @Test
-    public void getTotalTest() {
+    public void testGetTotal() {
         Search search = new Search(JsonDataProvider.getPaginationJson());
 
         int actual = search.getTotal();
@@ -38,7 +38,7 @@ public class SearchTest {
      * Check {@link Search#getTotal()} returns -1 value, when total property is not defined in JSON representation
      */
     @Test
-    public void getTotalUndefinedTest() {
+    public void testGetTotalUndefined() {
         Search search = new Search(JsonDataProvider.getNoPaginationJson());
 
         int actual = search.getTotal();
@@ -49,7 +49,7 @@ public class SearchTest {
      * Check {@link Search#getEntities()} returns a list with correct number of entities inside it
      */
     @Test
-    public void getEntitiesTest() {
+    public void testGetEntities() {
         Search search = new Search(JsonDataProvider.getPaginationJson());
 
         List<Entity> entities = search.getEntities();

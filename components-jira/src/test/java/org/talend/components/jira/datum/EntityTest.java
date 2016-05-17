@@ -25,7 +25,7 @@ public class EntityTest {
      * Check {@link Entity#getJson()} returns JSON representation without changes
      */
     @Test
-    public void getJsonTest() {
+    public void testGetJson() {
         String json = JsonDataProvider.getPaginationJson();
         Entity entity = new Entity(json);
 

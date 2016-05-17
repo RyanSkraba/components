@@ -64,7 +64,7 @@ public class JiraSourceTest {
      * {@link ComponentProperties}
      */
     @Test
-    public void initializeTest() {
+    public void testInitialize() {
         JiraSource jiraSource = new JiraSource();
         
         jiraSource.initialize(null, inputProperties);
@@ -92,7 +92,7 @@ public class JiraSourceTest {
      * {@link JiraSearchReader}
      */
     @Test
-    public void createReaderSearchTest() {
+    public void testCreateReaderSearch() {
         JiraSource jiraSource = new JiraSource();
         jiraSource.initialize(null, inputProperties);
         
@@ -106,7 +106,7 @@ public class JiraSourceTest {
      * {@link JiraProjectsReader}
      */
     @Test
-    public void createReaderProjectsTest() {
+    public void testCreateReaderProjects() {
         JiraSource jiraSource = new JiraSource();
         inputProperties.resource.setValue("project");
         inputProperties.projectId.setValue(null);
@@ -122,7 +122,7 @@ public class JiraSourceTest {
      * {@link JiraProjectIdReader}
      */
     @Test
-    public void createReaderProjectIdTest() {
+    public void testCreateReaderProjectId() {
         JiraSource jiraSource = new JiraSource();
         inputProperties.resource.setValue("project");
         inputProperties.projectId.setValue("TP");
