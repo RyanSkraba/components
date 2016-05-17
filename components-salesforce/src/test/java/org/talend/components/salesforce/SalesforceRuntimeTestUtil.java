@@ -265,7 +265,7 @@ public class SalesforceRuntimeTestUtil {
 		modelProperties.connection.userPassword.password.setValue(password);
 		modelProperties.connection.userPassword.securityKey.setValue(securityKey);
 
-		modelProperties.connection.timeout.setValue(120000);
+		modelProperties.connection.timeout.setValue(60000);
 		modelProperties.connection.bulkConnection.setValue("true");
 		modelProperties.bulkFilePath.setValue(data_file);
 		modelProperties.bulkProperties.bytesToCommit.setValue(10 * 1024 * 1024);
