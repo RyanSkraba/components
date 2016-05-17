@@ -20,21 +20,15 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 import java.util.Set;
 
 import org.apache.avro.Schema;
-import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
-import org.talend.components.common.SchemaProperties;
-import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.jira.testutils.Utils;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
@@ -45,82 +39,15 @@ import org.talend.daikon.properties.presentation.Widget;
 public class TJiraInputPropertiesTest {
 
     /**
-     * Main form mock
-     */
-    private Form mainForm;
-
-    /**
-     * Reference form mock
-     */
-    private Form referenceForm;
-
-    /**
-     * userPassword widget mock
-     */
-    private Widget userPasswordWidget;
-
-    /**
-     * userPassword widget mock
-     */
-    private Widget jqlWidget;
-    
-    /**
-     * projectId widget mock
-     */
-    private Widget projectIdWidget;
-
-    /**
-     * {@link SchemaProperties} mock
-     */
-    private SchemaProperties schemaProperties;
-
-    /**
-     * {@link UserPasswordProperties} mock
-     */
-    private UserPasswordProperties userPasswordProperies;
-
-    /**
-     * Sets up mocks required for tests
-     */
-    @Before
-    public void setUpMocks() {
-        userPasswordWidget = mock(Widget.class);
-        jqlWidget = mock(Widget.class);
-        projectIdWidget = mock(Widget.class);
-
-        mainForm = mock(Form.class);
-        when(mainForm.getName()).thenReturn(Form.MAIN);
-        when(mainForm.getWidget("userPassword")).thenReturn(userPasswordWidget);
-        when(mainForm.getWidget("jql")).thenReturn(jqlWidget);
-        when(mainForm.getWidget("projectId")).thenReturn(projectIdWidget);
-
-        referenceForm = mock(Form.class);
-        when(referenceForm.getName()).thenReturn(Form.ADVANCED);
-
-        schemaProperties = mock(SchemaProperties.class);
-        when(schemaProperties.getForm(Form.REFERENCE)).thenReturn(referenceForm);
-        when(schemaProperties.getName()).thenReturn("schema");
-        when(referenceForm.getProperties()).thenReturn(schemaProperties);
-
-        userPasswordProperies = mock(UserPasswordProperties.class);
-        when(userPasswordProperies.getForm(Form.MAIN)).thenReturn(mainForm);
-        when(userPasswordProperies.getName()).thenReturn("userPassword");
-        when(mainForm.getProperties()).thenReturn(userPasswordProperies);
-    }
-
-    /**
      * Checks {@link TJiraInputProperties#afterAuthorizationType()} hides userPassword widget, if OAuth
      * authorizationType is chosen
      */
     @Test
     public void testAfterAuthorizationTypeOAuth() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
-        properties.setupProperties();
-        properties.schema = schemaProperties;
-        properties.userPassword = userPasswordProperies;
-        properties.setupLayout();
-
+        properties.init();
         properties.authorizationType.setValue("OAuth");
+        
         properties.afterAuthorizationType();
 
         boolean userPasswordIsHidden = properties.getForm(Form.MAIN).getWidget("userPassword").isHidden();
@@ -133,12 +60,9 @@ public class TJiraInputPropertiesTest {
     @Test
     public void testAfterResourceProject() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
-        properties.setupProperties();
-        properties.schema = schemaProperties;
-        properties.userPassword = userPasswordProperies;
-        properties.setupLayout();
-
+        properties.init();
         properties.resource.setValue("project");
+        
         properties.afterResource();
 
         boolean jqlIsHidden = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
@@ -210,13 +134,16 @@ public class TJiraInputPropertiesTest {
     @Test
     public void testRefreshLayoutMainInitial() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
-        properties.setupProperties();
+        properties.init();
 
-        properties.refreshLayout(mainForm);
+        properties.refreshLayout(properties.getForm(Form.MAIN));
 
-        verify(userPasswordWidget).setHidden(false);
-        verify(jqlWidget).setHidden(false);
-        verify(projectIdWidget).setHidden(true);
+        boolean userPasswordIsHidden = properties.getForm(Form.MAIN).getWidget("userPassword").isHidden();
+        boolean jqlIsHidden = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
+        boolean projectIdIsHidden = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
+        assertFalse(userPasswordIsHidden);
+        assertFalse(jqlIsHidden);
+        assertTrue(projectIdIsHidden);
     }
 
     /**
@@ -226,16 +153,20 @@ public class TJiraInputPropertiesTest {
     @Test
     public void testRefreshLayoutWrongForm() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
-        properties.setupProperties();
+        properties.init();
+        
+        boolean userPasswordExpected = properties.getForm(Form.MAIN).getWidget("userPassword").isHidden();
+        boolean jqlExpected = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
+        boolean projectIdExpected = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
 
-        properties.refreshLayout(referenceForm);
-
-        verify(userPasswordWidget, never()).setHidden(false);
-        verify(userPasswordWidget, never()).setHidden(true);
-        verify(jqlWidget, never()).setHidden(false);
-        verify(jqlWidget, never()).setHidden(true);
-        verify(projectIdWidget, never()).setHidden(false);
-        verify(projectIdWidget, never()).setHidden(true);
+        properties.refreshLayout(new Form(properties, "NotMain"));
+        
+        boolean userPasswordActual = properties.getForm(Form.MAIN).getWidget("userPassword").isHidden();
+        boolean jqlActual = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
+        boolean projectIdActual = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
+        assertEquals(userPasswordExpected, userPasswordActual);
+        assertEquals(jqlExpected, jqlActual);
+        assertEquals(projectIdExpected, projectIdActual);
     }
 
     /**
@@ -245,14 +176,17 @@ public class TJiraInputPropertiesTest {
     @Test
     public void testRefreshLayoutOAuth() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
-        properties.setupProperties();
+        properties.init();
         properties.authorizationType.setValue("OAuth");
 
-        properties.refreshLayout(mainForm);
-
-        verify(userPasswordWidget).setHidden(true);
-        verify(jqlWidget).setHidden(false);
-        verify(projectIdWidget).setHidden(true);
+        properties.refreshLayout(properties.getForm(Form.MAIN));
+        
+        boolean userPasswordIsHidden = properties.getForm(Form.MAIN).getWidget("userPassword").isHidden();
+        boolean jqlIsHidden = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
+        boolean projectIdIsHidden = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
+        assertTrue(userPasswordIsHidden);
+        assertFalse(jqlIsHidden);
+        assertTrue(projectIdIsHidden);
     }
 
     /**
@@ -261,14 +195,17 @@ public class TJiraInputPropertiesTest {
     @Test
     public void testRefreshLayoutProject() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
-        properties.setupProperties();
+        properties.init();
         properties.resource.setValue("project");
 
-        properties.refreshLayout(mainForm);
-
-        verify(userPasswordWidget).setHidden(false);
-        verify(jqlWidget).setHidden(true);
-        verify(projectIdWidget).setHidden(false);
+        properties.refreshLayout(properties.getForm(Form.MAIN));
+        
+        boolean userPasswordIsHidden = properties.getForm(Form.MAIN).getWidget("userPassword").isHidden();
+        boolean jqlIsHidden = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
+        boolean projectIdIsHidden = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
+        assertFalse(userPasswordIsHidden);
+        assertTrue(jqlIsHidden);
+        assertFalse(projectIdIsHidden);
     }
 
     /**
@@ -280,8 +217,8 @@ public class TJiraInputPropertiesTest {
     @Test
     public void testSetupLayout() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
-        properties.schema = schemaProperties;
-        properties.userPassword = userPasswordProperies;
+        properties.schema.init();
+        properties.userPassword.init();
 
         properties.setupLayout();
 

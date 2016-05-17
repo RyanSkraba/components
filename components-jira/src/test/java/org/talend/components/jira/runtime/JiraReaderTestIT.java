@@ -17,20 +17,23 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.service.internal.ComponentServiceImpl;
+import org.talend.components.api.test.SimpleComponentRegistry;
+import org.talend.components.jira.tjirainput.TJiraInputDefinition;
+import org.talend.components.jira.tjirainput.TJiraInputProperties;
 
 /**
  * Integration tests for {@link JiraReader}
@@ -58,6 +61,8 @@ public class JiraReaderTestIT {
      * Jira server user id
      */
     private static final String PASS = "123456";
+    
+    private static ComponentService componentService;
 
     /**
      * Runtime container instance for tests
@@ -65,21 +70,33 @@ public class JiraReaderTestIT {
     private RuntimeContainer container;
     
     /**
-     * Mocked {@link JiraSource} used for tests
+     * {@link JiraSource} used for tests
      */
     private JiraSource source;
-
+    
+    /**
+     * Creates {@link ComponentService} for tests
+     */
+    @BeforeClass
+    public static void setUpService() {
+        SimpleComponentRegistry registry = new SimpleComponentRegistry();
+        registry.addComponent(TJiraInputDefinition.COMPONENT_NAME, new TJiraInputDefinition());
+        componentService = new ComponentServiceImpl(registry);
+    }
+    
     /**
      * Instantiates instances used for tests
      */
-    @Before
-    public void setUp() {
+    private void beforeTestAnonymousUser() {
         container = new DefaultComponentRuntimeContainerImpl();
         
-        source = mock(JiraSource.class);
-        when(source.getHostPort()).thenReturn(HOST_PORT);
-        when(source.getUserId()).thenReturn(USER);
-        when(source.getPassword()).thenReturn(PASS);
+        TJiraInputProperties properties = (TJiraInputProperties) componentService.getComponentProperties("tJIRAInput");
+        properties.host.setValue(HOST_PORT);
+        properties.userPassword.userId.setValue(EMPTY_USER);
+        properties.userPassword.password.setValue(PASS);
+        
+        source = new JiraSource();
+        source.initialize(container, properties);
     }
 
     /**
@@ -95,7 +112,7 @@ public class JiraReaderTestIT {
     @Ignore
     @Test
     public void testAnonymousUser() throws IOException {
-        when(source.getUserId()).thenReturn(EMPTY_USER);
+        beforeTestAnonymousUser();
         JiraProjectsReader jiraReader = new JiraProjectsReader(source, container);
 
         List<Object> entities = new ArrayList<>();
@@ -113,6 +130,21 @@ public class JiraReaderTestIT {
     }
     
     /**
+     * Instantiates instances used for tests
+     */
+    private void beforeReadProjectById() {
+        container = new DefaultComponentRuntimeContainerImpl();
+        
+        TJiraInputProperties properties = (TJiraInputProperties) componentService.getComponentProperties("tJIRAInput");
+        properties.host.setValue(HOST_PORT);
+        properties.userPassword.userId.setValue(USER);
+        properties.userPassword.password.setValue(PASS);
+        
+        source = new JiraSource();
+        source.initialize(container, properties);
+    }
+    
+    /**
      * Checks {@link JiraReader} supports read project by ID feature.
      * Jira server has 3 projects. This test checks only 1 project retrieved.
      * 
@@ -121,6 +153,7 @@ public class JiraReaderTestIT {
     @Ignore
     @Test
     public void testReadProjectById() throws IOException {
+        beforeReadProjectById();
         String id = "TP";
 
         JiraProjectIdReader jiraReader = new JiraProjectIdReader(source, container, id);
