@@ -10,11 +10,7 @@ import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
-import org.talend.components.api.component.Connector;
-import org.talend.components.api.component.Connector.ConnectorType;
 import org.talend.components.api.component.InputComponentDefinition;
-import org.talend.components.api.component.Trigger;
-import org.talend.components.api.component.Trigger.TriggerType;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
 
@@ -32,9 +28,7 @@ public class ${componentName}Definition extends AbstractComponentDefinition impl
 
 
     public ${componentName}Definition() {
-        setConnectors(new Connector(ConnectorType.FLOW, 0, 1));
-        setTriggers(new Trigger(TriggerType.ITERATE, 1, 1), new Trigger(TriggerType.SUBJOB_OK, 1, 0),
-                new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
+        super(COMPONENT_NAME);
     }
 
     @Override
@@ -61,12 +55,6 @@ public class ${componentName}Definition extends AbstractComponentDefinition impl
         return "${artifactId}";
     }
     
-    
-    @Override
-    public String getName() {
-        return COMPONENT_NAME;
-    }
-
     @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return ${componentName}Properties.class;
