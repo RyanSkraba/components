@@ -115,48 +115,27 @@ final class SalesforceBulkExecReader extends SalesforceReader {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		
-		if ("true".equalsIgnoreCase((String)result.getValue("Success"))) {
+
+		if ("true".equalsIgnoreCase((String) result.getValue("Success"))) {
 			return record;
 		} else {
 			Map<String, Object> resultMessage = new HashMap<String, Object>();
-			String error = (String)result.getValue("Error");
+			String error = (String) result.getValue("Error");
 			resultMessage.put("error", error);
 			resultMessage.put("talend_record", record);
 			throw new DataRejectException(resultMessage);
 		}
 
 	}
-	
+
 	@Override
 	protected Schema getSchema() throws IOException {
-        if (querySchema == null) {
-        	TSalesforceBulkExecProperties sprops = (TSalesforceBulkExecProperties) properties;
-        	//TODO check the assert : the output schema have values even when no output connector 
-        	querySchema = (Schema) sprops.schemaFlow.schema.getValue();
-
-        	//tsalesforcebulkexec don't support dynamic in fact, only tsalesforceoutputbulk support.
-        	
-        	/*
-        	BulkResult currentRow = currentBatchResult.get(resultIndex);
-        	Set<String> keys = currentRow.values.keySet();
-        	
-            List<Schema.Field> columnlist = new ArrayList<>();
-            for (Schema.Field se : querySchema.getFields()) {
-                if (keys.contains(se.name())) {
-                	columnlist.add(new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal()));
-                }
-            }
-            
-            Map<String, Object> objectProps = querySchema.getObjectProps();
-            querySchema = Schema.createRecord(querySchema.getName(), querySchema.getDoc(), querySchema.getNamespace(),
-                    querySchema.isError());
-            querySchema.getObjectProps().putAll(objectProps);
-            querySchema.setFields(columnlist);
-            */
-        }
-        return querySchema;
-    }
+		if (querySchema == null) {
+			TSalesforceBulkExecProperties sprops = (TSalesforceBulkExecProperties) properties;
+			querySchema = (Schema) sprops.schemaFlow.schema.getValue();
+		}
+		return querySchema;
+	}
 
 	@Override
 	public void close() throws IOException {

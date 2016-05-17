@@ -59,12 +59,6 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         super();
     }
 
-    @Override
-    protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props) throws Throwable {
-        assertTrue(form.getWidget(propName).isCallAfter());
-        return getComponentService().afterProperty(propName, props);
-    }
-
     @Test
     public void testGetProps() {
         ComponentProperties props = new TSalesforceConnectionDefinition().createProperties();

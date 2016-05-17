@@ -58,11 +58,11 @@ public abstract class SalesforceConnectionModuleProperties extends FixedConnecto
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form mainForm = new Form(this, Form.MAIN);
+        Form mainForm = Form.create(this, Form.MAIN);
         mainForm.addRow(connection.getForm(Form.REFERENCE));
         mainForm.addRow(module.getForm(Form.REFERENCE));
 
-        Form advancedForm = new Form(this, Form.ADVANCED);
+        Form advancedForm = Form.create(this, Form.ADVANCED);
         advancedForm.addRow(connection.getForm(Form.ADVANCED));
     }
 
