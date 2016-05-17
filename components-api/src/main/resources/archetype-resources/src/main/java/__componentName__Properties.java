@@ -5,9 +5,13 @@ package ${package};
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.PropertyFactory;
@@ -33,11 +37,12 @@ import org.talend.daikon.properties.presentation.Form;
  * <li>{code schema}, an embedded property referring to a Schema.</li>
  * </ol>
  */
-public class ${componentName}Properties extends ComponentProperties {
+public class ${componentName}Properties extends FixedConnectorsComponentProperties {
 
     public Property filename = PropertyFactory.newString("filename"); //$NON-NLS-1$
     public SchemaProperties schema = new SchemaProperties("schema"); //$NON-NLS-1$
-
+    protected transient PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
+ 
     public ${componentName}Properties(String name) {
         super(name);
     }
@@ -54,6 +59,14 @@ public class ${componentName}Properties extends ComponentProperties {
         Form form = Form.create(this, Form.MAIN);
         form.addRow(schema.getForm(Form.REFERENCE));
         form.addRow(filename);
+    }
+
+    @Override
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputComponent) {
+        if (isOutputComponent) {
+            return Collections.singleton(mainConnector);
+        }
+        return Collections.emptySet();
     }
 
 }
