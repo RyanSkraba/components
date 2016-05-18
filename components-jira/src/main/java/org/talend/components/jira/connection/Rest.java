@@ -99,11 +99,11 @@ public class Rest {
      * @return response result
      * @throws IOException
      */
-    public String get(String resource, Map<String, String> parameters) throws IOException {
+    public String get(String resource, Map<String, Object> parameters) throws IOException {
         try {
             URIBuilder builder = new URIBuilder(hostPort + resource);
-            for (Map.Entry<String, String> entry : parameters.entrySet()) {
-                builder.addParameter(entry.getKey(), entry.getValue());
+            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                builder.addParameter(entry.getKey(), entry.getValue().toString());
             }
             URI uri = builder.build();
             Request get = Request.Get(uri);

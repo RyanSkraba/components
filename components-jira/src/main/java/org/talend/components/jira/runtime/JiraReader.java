@@ -13,13 +13,12 @@
 package org.talend.components.jira.runtime;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.joda.time.Instant;
 import org.slf4j.Logger;
@@ -30,20 +29,15 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jira.avro.IssueAdapterFactory;
 import org.talend.components.jira.avro.IssueIndexedRecord;
 import org.talend.components.jira.connection.Rest;
+import org.talend.components.jira.datum.Entity;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
-
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
 
 /**
  * Jira reader implementation
  */
-public class JiraReader implements Reader<IndexedRecord> {
+public abstract class JiraReader implements Reader<IndexedRecord> {
     
-    /**
-     * Specifies some integer value is undefined
-     */
-    private static final int UNDEFINED = -1;
+    private static final Logger LOG = LoggerFactory.getLogger(JiraReader.class);
 
     /**
      * {@link Source} instance, which had created this {@link Reader}
@@ -68,12 +62,12 @@ public class JiraReader implements Reader<IndexedRecord> {
     /**
      * JSON string, which represents result obtained from Jira server
      */
-    private String inputResult;
+    private String response;
 
     /**
-     * A list of Jira entities in a form of JSON String obtained from Jira server
+     * A list of Jira {@link Entity} obtained from Jira server
      */
-    private List<String> entities;
+    private List<Entity> entities;
 
     /**
      * Index of current Jira entity
@@ -81,117 +75,125 @@ public class JiraReader implements Reader<IndexedRecord> {
     private int entityIndex = 0;
     
     /**
-     * Number of Jira entities obtained
+     * Number of Jira entities read
      */
     private int entityCounter = 0;
-    
-    /**
-     * Jira paging http parameter, which defines page size 
-     * (number of entities per request)
-     */
-    private int maxResults = 50;
-    
-    /**
-     * Jira paging http parameter, which defines from which entity to start
-     */
-    private int startAt = 0;
-    
-    /**
-     * Jira paging parameter, which defines total number of entities
-     */
-    private int total = UNDEFINED;
 
     /**
-     * Stores http query parameters which are shared between requests
+     * Stores http parameters which are shared between requests
      */
-    private Map<String, String> sharedParameters;
+    private final Map<String, Object> sharedParameters;
     
     /**
-     * Data schema
+     * Runtime container
      */
-    private Schema schema;
-    
     private final RuntimeContainer container;
+    
+    /**
+     * Denotes this {@link Reader} was started
+     */
+    private boolean started;
+    
+    /**
+     * Denotes this {@link Reader} has more records
+     */
+    private boolean hasMoreRecords;
 
     /**
      * Constructor sets required properties for http connection
      * 
      * @param source instance of {@link Source}, which had created this {@link Reader}
-     * @param hostPort url of Jira instance
      * @param resource REST resource to communicate
-     * @param user Basic authorization user id
-     * @param password Basic authorizatiion password
-     * @param sharedParameters map with http parameter which are shared between requests. It could include maxResult
-     * @param Schema data schema
-     * parameter
+     * @param container runtime container
      */
-    public JiraReader(JiraSource source, String hostPort, String resource, String user, String password,
-            Map<String, String> sharedParameters, Schema schema, RuntimeContainer container) {
+    public JiraReader(JiraSource source, String resource, RuntimeContainer container) {
         this.source = source;
         this.resource = resource;
-        this.sharedParameters = sharedParameters;
-        this.schema = schema;
+        this.sharedParameters = createSharedParameters();
         this.container = container;
-        rest = new Rest(hostPort);
-        rest.setCredentials(user, password);
-        
-        String maxRelultValue = sharedParameters.get("maxResults");
-        if (maxRelultValue != null) {
-            maxResults = Integer.parseInt(maxRelultValue);
+        rest = new Rest(source.getHostPort());
+        String userId = source.getUserId();
+        if (userId != null && !userId.isEmpty()) {
+            rest.setCredentials(userId, source.getPassword());
+            LOG.debug("{} user is used", userId);
+        } else {
+            LOG.debug("{} user is used", "Anonymous");
         }
+        
+        factory = new IssueAdapterFactory();
+        factory.setSchema(source.getDataSchema());
     }
 
     /**
-     * TODO implement it
-     * 
-     * @return
-     * @throws IOException
+     * {@inheritDoc}
+     * @throws IOException in case of exception during http connection 
      */
     @Override
     public boolean start() throws IOException {
-        if (!queryNextPage()) {
-            return false;
-        }
-        entities = getEntities(inputResult);
-        return true;
+        started = true;
+        makeHttpRequest();
+        return hasMoreRecords;
     }
 
     /**
-     * TODO implement it
+     * {@inheritDoc}
+     * @throws IOException in case {@link JiraReader#start()} wasn't invoked or
+     * in case of exception during http connection
      */
     @Override
     public boolean advance() throws IOException {
+        if (!started) {
+            throw new IOException("Reader wasn't started");
+        }
         entityIndex++;
+        entityCounter++;
 
         if (entityIndex < entities.size()) {
             return true;
+        } else {
+            hasMoreRecords = false;
+            requestMoreRecords();
         }
-        if (!queryNextPage()) {
-            return false;
-        }
-
-        entities = getEntities(inputResult);
-        entityIndex = 0;
-
-        return true;
+        return hasMoreRecords;
     }
+    
+    /**
+     * Tries to get more records
+     * 
+     * @throws IOException in case of exception during http connection
+     */
+    protected abstract void requestMoreRecords() throws IOException;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public IndexedRecord getCurrent() throws NoSuchElementException {
-        entityCounter++;
-        String entity = entities.get(entityIndex);
-        return getFactory().convertToAvro(entity);
+        if (!started) {
+            throw new NoSuchElementException("Reader wasn't started");
+        }
+        if (!hasMoreRecords) {
+            throw new NoSuchElementException("No records available");
+        }
+        
+        Entity entity = entities.get(entityIndex);
+        String json = entity.getJson();
+        return factory.convertToAvro(json);
     }
 
     /**
-     * TODO implement it (extend from BoundedReader)
-     * 
-     * @return
-     * @throws NoSuchElementException
+     * @return null
+     * @throws NoSuchElementException in case {@link JiraReader} wasn't started or 
+     * there is no more records available
      */
     @Override
     public Instant getCurrentTimestamp() throws NoSuchElementException {
-        // TODO Auto-generated method stub
+        if (!started) {
+            throw new NoSuchElementException("Reader wasn't started");
+        }
+        if (!hasMoreRecords) {
+            throw new NoSuchElementException("No records available");
+        }
         return null;
     }
 
@@ -212,148 +214,55 @@ public class JiraReader implements Reader<IndexedRecord> {
     }
 
     /**
-     * Returns an instance of {@link IndexedRecordAdapterFactory}
+     * Makes http request to the server and process its response
      * 
-     * @return {@link IssueAdapterFactory}
-     */
-    private IndexedRecordAdapterFactory<String, IssueIndexedRecord> getFactory() {
-        if (factory == null) {
-            factory = new IssueAdapterFactory();
-            factory.setSchema(schema);
-        }
-        return factory;
-    }
-
-    /**
-     * 
-     * 
-     * @return next response result
      * @throws IOException in case of exception during http connection
      */
-    private boolean queryNextPage() throws IOException {
-        
-        // check next pages availability
-        if (total != UNDEFINED && startAt >= total) {
-            return false;
-        }
-        
-        // generate parameters
-        Map<String, String> parameters = new HashMap<>(sharedParameters);
-        parameters.put("startAt", Integer.toString(startAt));
-        
-        // make request
-        inputResult = rest.get(resource, parameters);
-        
-        // readTotal
-        if (total == UNDEFINED) {
-            if (resource.endsWith("search")) {
-                total = new IssueParser().getTotal(inputResult);
-            }
-            // /rest/api/2/project doesn't support paging, so total is set to 0 to be less than startAt
-            if (resource.endsWith("project")) {
-                total = 0;
-            }
-        }
-        
-        // iterate startAt
-        startAt = startAt + maxResults;
-        
-        if (inputResult == null || inputResult.isEmpty()) {
-            return false;
-        } else {
-            return true;
+    protected void makeHttpRequest() throws IOException {
+        Map<String, Object> parameters = prepareParameters();
+        response = rest.get(resource, parameters);
+        entities = processResponse(response);
+        if(!entities.isEmpty()) {
+            hasMoreRecords = true;
+            entityIndex = 0;
+            entityCounter++;
         }
     }
 
     /**
-     * Splits JSON string to separate Jira entities
+     * Prepares and returns map with http parameters suitable for current REST API resource.
+     * Returns shared parameters by default
      * 
-     * @param inputResult whole response JSON string
-     * @return a list of JSON strings, which describes Jira entities
+     * @return map with shared parameters
      */
-    List<String> getEntities(String inputResult) {
-
-        if (resource.endsWith("search")) {
-            inputResult = inputResult.substring(inputResult.indexOf("issues"));
-        }
-        IssueParser parser = new IssueParser();
-        return parser.getEntities(inputResult);
+    protected Map<String, Object> prepareParameters() {
+        return sharedParameters;
     }
 
     /**
-     * Weird code to divide big JSON string into list of entities
+     * Process response. Updates http parameters for next request if needed.
+     * Retrieves entities from response
+     * 
+     * @param response http response
+     * @return {@link List} of entities retrieved from response
      */
-    public class IssueParser {
-
-        private final Logger LOG = LoggerFactory.getLogger(IssueParser.class);
-
-        List<String> getEntities(String inputResult) {
-
-            List<String> entities = new LinkedList<String>();
-            State currentState = State.READ_JSON_ARRAY;
-            StringBuilder entityBuilder = null;
-            int parenthesisState = 0;
-
-            for (char c : inputResult.toCharArray()) {
-
-                switch (c) {
-                case '{': {
-                    if (currentState == State.READ_JSON_ARRAY) {
-                        currentState = State.READ_JSON_OBJECT;
-                        entityBuilder = new StringBuilder();
-                    }
-                    parenthesisState++;
-                    entityBuilder.append(c);
-                    break;
-                }
-                case '}': {
-                    entityBuilder.append(c);
-                    parenthesisState--;
-                    if (parenthesisState == 0) {
-                        currentState = State.READ_JSON_ARRAY;
-                        entities.add(entityBuilder.toString());
-                    }
-                    break;
-                }
-                default: {
-                    if (currentState == State.READ_JSON_OBJECT) {
-                        entityBuilder.append(c);
-                    }
-                }
-                }
-            }
-            return entities;
-        }
-
-        int getTotal(String inputResult) {
-            JsonFactory factory = new JsonFactory();
-            try {
-                JsonParser parser = factory.createParser(inputResult);
-
-                // rewind until meet total field
-                String currentField = parser.nextFieldName();
-                do {
-                    currentField = parser.nextFieldName();
-                } while (!"total".equals(currentField));
-
-                // get total value
-                parser.nextValue();
-                String value = parser.getText();
-
-                return Integer.parseInt(value);
-            } catch (IOException e) {
-                LOG.debug("Exception during JSON parsing. {}", e.getMessage());
-            }
-            return UNDEFINED;
-        }
-
-    }
-
+    protected abstract List<Entity> processResponse(String response);
+    
     /**
-     * JSON Parser state
+     * Creates and returns map with shared http query parameters
+     * 
+     * @return shared http parameters
      */
-    private enum State {
-        READ_JSON_OBJECT,
-        READ_JSON_ARRAY,
+    private Map<String, Object> createSharedParameters() {
+        Map<String, Object> sharedParameters = new HashMap<>();
+        String jqlValue = source.getJql();
+        if (jqlValue != null && !jqlValue.isEmpty()) {
+            String jqlKey = "jql";
+            sharedParameters.put(jqlKey, jqlValue);
+        }
+        int batchSize = source.getBatchSize();
+        String maxResultsKey = "maxResults";
+        sharedParameters.put(maxResultsKey, batchSize);
+        return Collections.unmodifiableMap(sharedParameters);
     }
 }

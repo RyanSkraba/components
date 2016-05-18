@@ -64,19 +64,12 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
     private static final String OAUTH = "OAuth";
     
     /**
-     * UserPassword properties name
-     */
-    private static final String USERPASSWORD = "userPassword";
-    
-    /**
      * URL of Jira instance
      */
     public Property host = PropertyFactory.newString("host");
     
     /**
      * Jira resource. This may be issue, project etc.
-     * TODO clarify, which resources to support. Find solution to support variable set of resources.
-     * maybe Property.Type.String
      */
     public Property resource = PropertyFactory.newEnum("resource", ISSUE, PROJECT);
     
@@ -84,6 +77,11 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
      * Jira Query language request property
      */
     public Property jql = PropertyFactory.newString("jql");
+    
+    /**
+     * Jira project ID property
+     */
+    public Property projectId = PropertyFactory.newString("projectId");
     
     /**
      * Type of http authorization.
@@ -94,12 +92,12 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
     /**
      * User id and password properties for Basic Authorization
      */
-    public UserPasswordProperties userPassword = new UserPasswordProperties(USERPASSWORD);
+    public UserPasswordProperties userPassword = new UserPasswordProperties("userPassword");
     
     /**
      * Batch size property, which specifies how many Jira entities should be requested per request
      */
-    public Property batchSize = PropertyFactory.newString("batchSize");
+    public Property batchSize = PropertyFactory.newInteger("batchSize");
     
     /**
      * Return property, which denotes number of Jira entities obtained
@@ -130,11 +128,12 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
     public void setupProperties() {
         super.setupProperties();
         setupSchema();
-        host.setValue("\"https://localhost:8080/\"");
+        host.setValue("https://localhost:8080/");
         resource.setValue(ISSUE);
         authorizationType.setValue(BASIC);
-        jql.setValue("\"\"");
-        batchSize.setValue("50");
+        jql.setValue("");
+        projectId.setValue("");
+        batchSize.setValue(50);
         
         returns = ComponentPropertyFactory.newReturnsProperty();
         numberOfRecords = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, "numberOfRecords");
@@ -146,10 +145,10 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(schema.getForm(Form.REFERENCE));
         mainForm.addRow(host);
-        mainForm.addRow(authorizationType);
         mainForm.addRow(userPassword.getForm(Form.MAIN));
         mainForm.addRow(resource);
         mainForm.addRow(jql);
+        mainForm.addRow(projectId);
 
         Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(batchSize);
@@ -182,11 +181,11 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
             String authTypeValue = authorizationType.getStringValue();
             switch (authTypeValue) {
             case BASIC: {
-                form.getWidget(USERPASSWORD).setHidden(false);
+                form.getWidget(userPassword.getName()).setHidden(false);
                 break;
             }
             case OAUTH: {
-                form.getWidget(USERPASSWORD).setHidden(true);
+                form.getWidget(userPassword.getName()).setHidden(true);
                 break;
             }
             }
@@ -196,10 +195,12 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
             switch (resourceValue) {
             case PROJECT: {
                 form.getWidget(jql.getName()).setHidden(true);
+                form.getWidget(projectId.getName()).setHidden(false);
                 break;
             }
             case ISSUE: {
                 form.getWidget(jql.getName()).setHidden(false);
+                form.getWidget(projectId.getName()).setHidden(true);
                 break;
             }
             }

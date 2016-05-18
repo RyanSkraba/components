@@ -13,13 +13,12 @@
 package org.talend.components.jira.runtime;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.container.RuntimeContainer;
@@ -33,28 +32,73 @@ import org.talend.daikon.properties.ValidationResult;
  */
 public class JiraSource implements Source {
 
+    private static final Logger LOG = LoggerFactory.getLogger(JiraSource.class);
+    
     private static final long serialVersionUID = 1L;
-
+    
     /**
-     * Jira REST API version. It is a part of REST URL
+     * Host and port number of Jira server
      */
-    private static final String REST_VERSION = "/rest/api/2/";
-
+    private String hostPort;
+    
     /**
-     * Jira component properties
+     * Jira user ID
      */
-    private TJiraInputProperties properties;
+    private String userId;
+    
+    /**
+     * Jira user password
+     */
+    private String password;
+    
+    /**
+     * Jira REST API resource type.
+     * Could be issue or project
+     */
+    private String resourceType;
+    
+    /**
+     * Schema of data to be retrieved
+     */
+    private Schema dataSchema;
+    
+    /**
+     * Optional Jira search query property
+     */
+    private String jql;
+    
+    /**
+     * Optional Jira project ID property
+     */
+    private String projectId;
+    
+    /**
+     * Optional Jira batch size property
+     */
+    private int batchSize;
 
     /**
-     * Stores component properties in this object
+     * Saves component properties in this object
      * 
      * @param container runtime container
-     * @param properties
+     * @param properties component properties
      */
     @Override
     public void initialize(RuntimeContainer container, ComponentProperties properties) {
-        // FIXME could it throw cast exception?
-        this.properties = (TJiraInputProperties) properties;
+
+        if (properties instanceof TJiraInputProperties) {
+            TJiraInputProperties inputProperties = (TJiraInputProperties) properties;
+            this.hostPort = inputProperties.host.getStringValue();
+            this.userId = inputProperties.userPassword.userId.getStringValue();
+            this.password = inputProperties.userPassword.password.getStringValue();
+            this.resourceType = inputProperties.resource.getStringValue();
+            this.dataSchema = (Schema) inputProperties.schema.schema.getValue();
+            this.jql = inputProperties.jql.getStringValue();
+            this.batchSize = inputProperties.batchSize.getIntValue();
+            this.projectId = inputProperties.projectId.getStringValue();
+        } else {
+            LOG.error("Wrong properties typs: {}", properties.getClass().getName());
+        }
     }
 
     /**
@@ -90,62 +134,98 @@ public class JiraSource implements Source {
      */
     @Override
     public Reader<IndexedRecord> createReader(RuntimeContainer container) {
-        String hostPort = properties.host.getStringValue();
-        String userId = properties.userPassword.userId.getStringValue();
-        String password = properties.userPassword.password.getStringValue();
-        String resourcePath = getResourcePath();
-        Map<String, String> sharedParameters = getSharedParameters();
-        Schema dataSchema = (Schema) properties.schema.schema.getValue();
-        return new JiraReader(this, hostPort, resourcePath, userId, password, sharedParameters, dataSchema, container);
-    }
-    
-    /**
-     * Builds and returns resource path
-     * 
-     * @return resource path
-     */
-    String getResourcePath() {
-        String resourceType = properties.resource.getStringValue();
-        String resourcePath = null;
+
+        JiraReader reader = null;
         switch (resourceType) {
         case TJiraInputProperties.ISSUE: {
-            resourcePath = REST_VERSION + "search";
+            reader =  new JiraSearchReader(this, container);
             break;
         }
         case TJiraInputProperties.PROJECT: {
-            resourcePath = REST_VERSION + "project";
-            // TODO Add project id /{projectIdOrKey}
+            if (projectId != null && !projectId.isEmpty()) {
+                reader = new JiraProjectIdReader(this, container, projectId);
+            } else {
+                reader = new JiraProjectsReader(this, container);
+            }
             break;
         }
         default: {
-            resourcePath = REST_VERSION + "search";
+            reader = new JiraSearchReader(this, container);
             break;
         }
         }
-        return resourcePath;
+        return reader;
+    }
+    
+    /**
+     * Returns hostPort
+     * 
+     * @return the hostPort
+     */
+    String getHostPort() {
+        return hostPort;
     }
 
     /**
-     * Creates and returns map with shared http query parameters
+     * Returns userId
      * 
-     * @return shared http parametes
+     * @return the userId
      */
-    Map<String, String> getSharedParameters() {
-        Map<String, String> sharedParameters = new HashMap<>();
-
-        String jqlValue = properties.jql.getStringValue();
-        if (jqlValue != null && !jqlValue.isEmpty()) {
-            String jqlKey = "jql";
-            sharedParameters.put(jqlKey, jqlValue);
-        }
-
-        String maxResultsValue = properties.batchSize.getStringValue();
-        if (maxResultsValue != null && !maxResultsValue.isEmpty()) {
-            String maxResultsKey = "maxResults";
-            sharedParameters.put(maxResultsKey, maxResultsValue);
-        }
-
-        return Collections.unmodifiableMap(sharedParameters);
+    String getUserId() {
+        return userId;
     }
 
+    /**
+     * Returns password
+     * 
+     * @return the password
+     */
+    String getPassword() {
+        return password;
+    }
+
+    /**
+     * Returns resourceType
+     * 
+     * @return the resourceType
+     */
+    String getResourceType() {
+        return resourceType;
+    }
+
+    /**
+     * Returns dataSchema
+     * 
+     * @return the dataSchema
+     */
+    Schema getDataSchema() {
+        return dataSchema;
+    }
+
+    /**
+     * Returns Jira search query
+     * 
+     * @return Jira search query
+     */
+    String getJql() {
+        return jql;
+    }
+    
+    /**
+     * Returns batch size
+     * 
+     * @return the batch size
+     */
+    int getBatchSize() {
+        return batchSize;
+    }
+    
+    /**
+     * Returns Jira project ID
+     * 
+     * @return Jira project ID
+     */
+    String getProjectId() {
+        return projectId;
+    }
 }
