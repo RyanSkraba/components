@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.talend.components</groupId>
-	<version>0.10.0-SNAPSHOT</version>
+	<version>0.9.0-SNAPSHOT</version>
 	<artifactId>components</artifactId>
 	<packaging>pom</packaging>
 
@@ -20,6 +20,7 @@
 		<module>components-proptester</module>
 		<module>components-splunk</module>
 		<module>components-jira</module>
+		<module>components-dataprep</module>
 	</modules>
 	<profiles>
 		<profile>
