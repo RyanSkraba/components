@@ -198,6 +198,12 @@
                         <tag>${project.artifactId}-${project.version}</tag>
                     </configuration>
                 </plugin>
+                <plugin>
+					<groupId>org.apache.felix</groupId>
+					<artifactId>maven-bundle-plugin</artifactId>
+					<version>3.0.1</version>
+					<extensions>true</extensions>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
@@ -229,7 +235,7 @@
 						<configuration>
 							<tasks>
 								<echo file="target/classes/META-INF/maven/dependencies.txt"
-									message="${groupId}:${artifactId}:jar:${version}:runtime"
+									message="${project.groupId}:${project.artifactId}:jar:${project.version}:runtime"
 									append="true" encoding="UTF-8" />
 							</tasks>
 						</configuration>
