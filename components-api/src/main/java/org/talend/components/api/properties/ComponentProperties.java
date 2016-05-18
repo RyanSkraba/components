@@ -13,6 +13,7 @@
 package org.talend.components.api.properties;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -60,24 +61,38 @@ public abstract class ComponentProperties extends Properties {
      * return the schema associated with the connection name on input or output if any
      * 
      * @param connector token to get the associated schema
-     * @param isOutputConnection wheter the connection is an output connection in case output and inputs have same names
+     * @param isOutgoingConnection wheter the connection is an outgoint connection or an incoming one.
      * @return the schema related to the connection or null if none.
      */
-    public Schema getSchema(Connector connector, boolean isOutputConnection) {
+    public Schema getSchema(Connector connector, boolean isOutgoingConnection) {
         return null;
     }
 
     /**
-     * return the set of possible connections name that may be setup with a schema.
+     * return the set of all possible connectors for this component properties.
+     * This is mainly ther for the Studio and shall not be an service API for that reason.
+     * The list of connector returns by this should always be the same whatever the state of the component.
+     * 
+     * @param isOutgoingConnection true for getting all outgoing connectors for the Properties.
+     * @return set of connection eventually proposed by this Properties.
+     */
+    public Set<? extends Connector> getPossibleConnectors(boolean isOutgoingConnection) {
+        return Collections.EMPTY_SET;
+    }
+
+    /**
+     * return the set of available connector that may be setup with a schema according to the current state of this instance.
+     * The list of connector may differ according to the internal state of the component. This is up to the component developer
+     * to decide which connector is avaialble and when.
      * 
      * @param existingConnectors list of connections already connected that may be of use to compute what remains to be
-     * connected.
-     * @param isOutputConnection wether we query the possible output or input connections.
-     * @return set of connection left to be connected.
+     *            connected.
+     * @param isOutgoingConnection wether we query the possible output or input connections.
+     * @return set of connection left to be connected, never null.
      */
     public Set<? extends Connector> getAvailableConnectors(Set<? extends Connector> existingConnectors,
-            boolean isOutputConnection) {
-        return null;
+            boolean isOutgoingConnection) {
+        return Collections.EMPTY_SET;
     }
 
     /**
@@ -85,10 +100,10 @@ public abstract class ComponentProperties extends Properties {
      * 
      * @param connector used to identify which schema to set.
      * @param schema schema to set.
-     * @param isOutputConnection wether the connector is an output connector.
+     * @param isOutgoingConnection true if connector is an outgoing connectors.
      * 
      */
-    public void setConnectedSchema(Connector connector, Schema schema, boolean isOutputConnection) {
+    public void setConnectedSchema(Connector connector, Schema schema, boolean isOutgoingConnection) {
         // do nothing by default.
 
     }
