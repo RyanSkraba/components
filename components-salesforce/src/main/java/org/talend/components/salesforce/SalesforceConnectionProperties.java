@@ -19,6 +19,7 @@ import static org.talend.daikon.properties.PropertyFactory.newString;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
 import org.talend.components.common.ProxyProperties;
@@ -90,6 +91,10 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
     public ComponentReferenceProperties referencedComponent = new ComponentReferenceProperties("referencedComponent", this);
 
+    public static final String ERROR_MESSAGE_NAME = "ERROR_MESSAGE";
+
+    public Property ERROR_MESSAGE;
+
     public SalesforceConnectionProperties(String name) {
         super(name);
     }
@@ -102,6 +107,9 @@ public class SalesforceConnectionProperties extends ComponentProperties
         endpoint.setValue(URL);
         timeout.setValue(60000);
         httpChunked.setValue(true);
+
+        returns = ComponentPropertyFactory.newReturnsProperty();
+        ERROR_MESSAGE = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.STRING, ERROR_MESSAGE_NAME);
 
     }
 

@@ -36,39 +36,39 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
         super(writeOperation, bulkProperties, container);
     }
 
-	@Override
-	public String[] getHeaders(Schema schema) {
-		TSalesforceOutputBulkProperties salesforceBulkProperties = (TSalesforceOutputBulkProperties)bulkProperties;
+    @Override
+    public String[] getHeaders(Schema schema) {
+        TSalesforceOutputBulkProperties salesforceBulkProperties = (TSalesforceOutputBulkProperties) bulkProperties;
 
-		List<String> headers = new ArrayList<String>();
-		StringBuilder sbuilder = new StringBuilder();
-        for(Schema.Field f :schema.getFields()){
-        	String header = f.name();
+        List<String> headers = new ArrayList<String>();
+        StringBuilder sbuilder = new StringBuilder();
+        for (Schema.Field f : schema.getFields()) {
+            String header = f.name();
 
-        	String ref_module_name = f.getProp(SalesforceSchemaConstants.REF_MODULE_NAME);
-        	String ref_field_name = f.getProp(SalesforceSchemaConstants.REF_FIELD_NAME);
-        	if(ref_module_name!=null) {
-        		header = sbuilder.append(ref_module_name).append(":").append(ref_field_name).append(".").append(f.name()).toString();
-        		sbuilder.setLength(0);
-        	} else {
-        		Object value = salesforceBulkProperties.upsertRelationTable.columnName.getValue();
-        		if(value!=null && value instanceof List) {
-	        		int index = getIndex((List<String>)value, header);
-	            	if(index > -1) {
-	            		List<String> polymorphics = (List<String>)salesforceBulkProperties.upsertRelationTable.polymorphic.getValue();
-	            		List<String> lookupFieldModuleNames = (List<String>)salesforceBulkProperties.upsertRelationTable.lookupFieldModuleName.getValue();
-	            		List<String> lookupFieldNames = (List<String>)salesforceBulkProperties.upsertRelationTable.lookupFieldName.getValue();
-	            		List<String> externalIdFromLookupFields = (List<String>)salesforceBulkProperties.upsertRelationTable.lookupFieldExternalIdName.getValue();
+            String ref_module_name = f.getProp(SalesforceSchemaConstants.REF_MODULE_NAME);
+            String ref_field_name = f.getProp(SalesforceSchemaConstants.REF_FIELD_NAME);
+            if (ref_module_name != null) {
+                header = sbuilder.append(ref_module_name).append(":").append(ref_field_name).append(".").append(f.name()).toString();
+                sbuilder.setLength(0);
+            } else {
+                Object value = salesforceBulkProperties.upsertRelationTable.columnName.getValue();
+                if (value != null && value instanceof List) {
+                    int index = getIndex((List<String>) value, header);
+                    if (index > -1) {
+                        List<String> polymorphics = (List<String>) salesforceBulkProperties.upsertRelationTable.polymorphic.getValue();
+                        List<String> lookupFieldModuleNames = (List<String>) salesforceBulkProperties.upsertRelationTable.lookupFieldModuleName.getValue();
+                        List<String> lookupFieldNames = (List<String>) salesforceBulkProperties.upsertRelationTable.lookupFieldName.getValue();
+                        List<String> externalIdFromLookupFields = (List<String>) salesforceBulkProperties.upsertRelationTable.lookupFieldExternalIdName.getValue();
 
-	            		if("true".equals(polymorphics.get(index))) {
-	            			sbuilder.append(lookupFieldModuleNames.get(index)).append(":");
-	            		}
-	            		sbuilder.append(lookupFieldNames.get(index)).append(".").append(externalIdFromLookupFields.get(index));
-	            		header = sbuilder.toString();
-	            		sbuilder.setLength(0);
-	            	}
-        		}
-        	}
+                        if ("true".equals(polymorphics.get(index))) {
+                            sbuilder.append(lookupFieldModuleNames.get(index)).append(":");
+                        }
+                        sbuilder.append(lookupFieldNames.get(index)).append(".").append(externalIdFromLookupFields.get(index));
+                        header = sbuilder.toString();
+                        sbuilder.setLength(0);
+                    }
+                }
+            }
 
             headers.add(header);
         }
@@ -83,8 +83,8 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
     }
 
     @Override
-    public List<String> getValues(Object datum){
-        IndexedRecord input = getFactory(datum).convertToAvro((IndexedRecord)datum);
+    public List<String> getValues(Object datum) {
+        IndexedRecord input = getFactory(datum).convertToAvro((IndexedRecord) datum);
         List<String> values = new ArrayList<String>();
         for (Schema.Field f : input.getSchema().getFields()) {
             if (input.get(f.pos()) == null) {
@@ -98,13 +98,5 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
             }
         }
         return values;
-    }
-
-    @Override
-    public WriterResult close() throws IOException {
-        if (container != null) {
-            container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_LINE, dataCount);
-        }
-        return super.close();
     }
 }

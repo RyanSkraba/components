@@ -85,6 +85,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
     public void afterQueryMode() {
         refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(Form.ADVANCED));
     }
 
     public void afterManualQuery() {
@@ -94,21 +95,22 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        if (form.getName().equals(Form.MAIN)) {
+        if (Form.MAIN.equals(form.getName())) {
             form.getWidget(includeDeleted.getName())
                     .setHidden(!(queryMode.getValue() != null && queryMode.getValue().equals(QUERY_QUERY)));
 
             form.getWidget(query.getName()).setHidden(!manualQuery.getBooleanValue());
             form.getWidget(condition.getName()).setHidden(manualQuery.getBooleanValue());
-            Form advancedForm = getForm(Form.ADVANCED);
-            connection.bulkConnection.setValue(!queryMode.getValue().equals(QUERY_QUERY));
-            if (advancedForm != null) {
-                advancedForm.getWidget(normalizeDelimiter.getName()).setHidden(queryMode.getValue().equals(QUERY_BULK));
-                advancedForm.getWidget(columnNameDelimiter.getName()).setHidden(queryMode.getValue().equals(QUERY_BULK));
-                advancedForm.getWidget(batchSize.getName()).setHidden(queryMode.getValue().equals(QUERY_BULK));
-                advancedForm.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
-            }
         }
+        if (Form.ADVANCED.equals(form.getName())) {
+            boolean isBulkQuery = queryMode.getValue().equals(QUERY_BULK);
+            form.getWidget(normalizeDelimiter.getName()).setHidden(isBulkQuery);
+            form.getWidget(columnNameDelimiter.getName()).setHidden(isBulkQuery);
+            form.getWidget(batchSize.getName()).setHidden(isBulkQuery);
+            form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
+            form.getChildForm(connection.getName()).getWidget(connection.timeout.getName()).setHidden(isBulkQuery);
+        }
+
     }
 
     @Override
