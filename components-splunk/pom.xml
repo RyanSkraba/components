@@ -172,7 +172,10 @@
 											<port>${splunk.ec.port}:8088</port>
 										</ports>
 										<wait>
-											<url>http://${docker.host.address}:${splunk.webui.port}</url>
+                                                                                   <http>
+                                                                                        <url>http://${docker.host.address}:${splunk.webui.port}/en-US/account/login?return_to=%2Fen-US%2F</url>
+                                                                                   </http>
+                                                                                   <time>30000</time>
 										</wait>
 									</run>
 								</image>
