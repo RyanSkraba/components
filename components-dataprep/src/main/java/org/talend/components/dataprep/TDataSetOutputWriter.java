@@ -23,15 +23,16 @@ import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class TDataSetOutputWriter implements Writer<WriterResult> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TDataSetInputDefinition.class);
     private IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory;
-    private StringBuilder data = new StringBuilder();
     private int counter = 0;
     private String uId;
     private DataPrepConnectionHandler connectionHandler;
+    private OutputStream outputStream;
     private boolean firstRow = true;
     private WriteOperation<WriterResult> writeOperation;
     private int limit;
@@ -50,13 +51,16 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
     @Override
     public void open(String uId) throws IOException {
         this.uId = uId;
-        if (!isLiveDataSet()) {
-            connectionHandler.connect();
+        connectionHandler.connect();
+        if (isLiveDataSet()) {
+            outputStream = connectionHandler.createInLiveDataSetMode();
+        } else {
+            outputStream = connectionHandler.create();
         }
     }
 
     @Override
-    public void write(Object datum) {
+    public void write(Object datum) throws IOException {
         if (datum == null || counter > limit) {
             LOGGER.debug("Datum: {}", datum);
             return;
@@ -64,7 +68,6 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
 
         LOGGER.debug("Datum: {}", datum);
         IndexedRecord input = getFactory(datum).convertToAvro(datum);
-
         StringBuilder row = new StringBuilder();
         if (firstRow) {
             for (Schema.Field f : input.getSchema().getFields()) {
@@ -85,22 +88,16 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
                 row.append(String.valueOf(input.get(f.pos())));
             }
         }
-        data.append(row);
-        data.append("\n");
+        row.append("\n");
         LOGGER.debug("Row data: {}", row);
+        outputStream.write(row.toString().getBytes());
+        outputStream.flush();
         counter++;
     }
 
     @Override
     public WriterResult close() throws IOException {
-        LOGGER.debug("All data: {}", data);
-        if (isLiveDataSet()) {
-            connectionHandler.createInLiveDataSetMode(data.toString());
-        }
-        else {
-            connectionHandler.create(data.toString());
-            connectionHandler.logout();
-        }
+        connectionHandler.logout();
         return new WriterResult(uId, counter);
     }
 

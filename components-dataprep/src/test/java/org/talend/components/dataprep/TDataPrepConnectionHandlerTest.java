@@ -12,15 +12,6 @@
 // ============================================================================
 package org.talend.components.dataprep;
 
-import static org.junit.Assert.assertTrue;
-
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.util.Date;
-
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -31,12 +22,20 @@ import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
 
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.util.Date;
+
 @Ignore
 public class TDataPrepConnectionHandlerTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TDataPrepConnectionHandlerTest.class);
 
     private static final String URL = "http://10.42.10.60:8888";
     private static final String LOGIN = "vincent@dataprep.com"; //"maksym@dataprep.com";
@@ -44,36 +43,22 @@ public class TDataPrepConnectionHandlerTest {
     private String string;
 
     @Test
-    @Ignore
     public void validate() throws IOException {
         DataPrepConnectionHandler connectionHandler =
                 new DataPrepConnectionHandler(URL, LOGIN, PASS, "sldfjsl");
-        assertTrue(connectionHandler.validate());
+        connectionHandler.validate();
     }
 
     @Test
     public void readSchema() throws IOException {
         DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(
                 URL, LOGIN, PASS, "0d3df0df4a4aca0529ef5755bd03519adb115248");
-        System.out.println(connectionHandler.connect());
+        LOGGER.debug(connectionHandler.connect().toString());
         for (Column column: connectionHandler.readSourceSchema()) {
-            System.out.println(column);
+            LOGGER.debug(column.toString());
         }
         connectionHandler.logout();
     }
-
-//    @Test
-//    public void readDataSchema() throws IOException {
-//        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(
-//                URL, LOGIN, PASS, "7291aa08-fed5-4267-83f5-ede7e7d66a72");
-//        System.out.println(connectionHandler.connect());
-//        for (Map<String,String> record: connectionHandler.readDataSet()) {
-//            for (Map.Entry<String,String> field: record.entrySet())
-//                System.out.println(field.getValue());
-//            System.out.println("\n");
-//        }
-//        connectionHandler.logout();
-//    }
 
     @Test
     public void logout() throws IOException {
@@ -88,7 +73,7 @@ public class TDataPrepConnectionHandlerTest {
         Header httpHead = response.getFirstHeader("Authorization");
         Request request = Request.Get(URL +"/api/datasets/"+ "db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e" + "/metadata");
         request.addHeader(httpHead);
-        System.out.println(request.execute().returnContent().asString());
+        LOGGER.debug(request.execute().returnContent().asString());
     }
 
     @Test
@@ -97,7 +82,7 @@ public class TDataPrepConnectionHandlerTest {
         String body = "col1, col2, col3\ntest1, test2, test3\ntest4, test5, test6";
         DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(URL, LOGIN, PASS, name);
         connectionHandler.connect();
-        connectionHandler.create(body);
+        connectionHandler.create(new ByteArrayInputStream(body.getBytes()));
         connectionHandler.logout();
     }
 
@@ -116,7 +101,7 @@ public class TDataPrepConnectionHandlerTest {
             logout();
         }
         string = current.getEntity().toString();
-        System.out.println(string);
+        LOGGER.debug(string);
     }
 
     @Test
@@ -130,7 +115,7 @@ public class TDataPrepConnectionHandlerTest {
         while (!jsonParser.isClosed() && jsonParser.getCurrentToken() != JsonToken.END_ARRAY) {
             JsonToken token;
             while ((token = jsonParser.nextToken()) != JsonToken.END_OBJECT) {
-                System.out.println(token);
+                LOGGER.debug(token.toString());
             }
         }
     }
@@ -144,23 +129,17 @@ public class TDataPrepConnectionHandlerTest {
         connection.setDoOutput(true);
 
         String body = "col1, col2, col3\ntest1, test2, test3\ntest4, test5, test6";
-        DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+        OutputStream outputStream = new DataOutputStream(connection.getOutputStream());
 
         for (int i = 0; i < 100000; i++) {
-            outputStream.writeBytes(body);
+            outputStream.write(body.getBytes());
             outputStream.flush();
-            System.out.println(i);
+            LOGGER.debug(Integer.valueOf(i).toString());
         }
         outputStream.close();
 
-        System.out.println(connection.getResponseCode());
-        System.out.println(connection.getResponseMessage());
-    }
-
-    @Test
-    public void sendDataWithStreamApache() throws IOException{
-//        WebClient.create(URL).path(path).accept(MediaType.APPLICATION_XML)
-//                .query(typeParam, type).query("_type", "xml").get(Products.class);
+        LOGGER.debug(Integer.valueOf(connection.getResponseCode()).toString());
+        LOGGER.debug(connection.getResponseMessage());
     }
 
     @Test
