@@ -12,23 +12,25 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.ws.ConnectionException;
+import org.talend.components.api.component.runtime.AbstractBoundedReader;
+import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.salesforce.SalesforceGetDeletedUpdatedProperties;
+import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
+
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.NoSuchElementException;
-
-import org.talend.components.api.component.runtime.AbstractBoundedReader;
-import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
-
-import com.sforce.soap.partner.PartnerConnection;
-import com.sforce.ws.ConnectionException;
 
 public class SalesforceServerTimeStampReader extends AbstractBoundedReader<Long> {
 
     private transient Long result;
 
+    protected int dataCount;
+
     public SalesforceServerTimeStampReader(RuntimeContainer container, SalesforceSource source,
-            TSalesforceGetServerTimestampProperties props) {
+                                           TSalesforceGetServerTimestampProperties props) {
         super(container, source);
     }
 
@@ -37,10 +39,15 @@ public class SalesforceServerTimeStampReader extends AbstractBoundedReader<Long>
         PartnerConnection connection = ((SalesforceSource) getCurrentSource()).connect(container).connection;
         try {
             Calendar serverTimestamp = connection.getServerTimestamp().getTimestamp();
-            if(serverTimestamp !=null ){
+            if (serverTimestamp != null) {
                 result = serverTimestamp.getTimeInMillis();
             }
-            return result != null;
+            if (result != null) {
+                dataCount++;
+                return true;
+            } else {
+                return false;
+            }
         } catch (ConnectionException e) {
             throw new IOException(e);
         }
@@ -54,6 +61,13 @@ public class SalesforceServerTimeStampReader extends AbstractBoundedReader<Long>
     @Override
     public Long getCurrent() throws NoSuchElementException {
         return result;
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (container != null) {
+            container.setComponentData(container.getCurrentComponentId(), TSalesforceGetServerTimestampProperties.NB_LINE_NAME, dataCount);
+        }
     }
 
 }

@@ -75,12 +75,17 @@ public abstract class FixedConnectorsComponentProperties extends ComponentProper
      */
     abstract protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection);
 
+    @Override
+    public Set<? extends Connector> getPossibleConnectors(boolean isOutputConnection) {
+        return getAllSchemaPropertiesConnectors(isOutputConnection);
+    }
+
     /**
      * this implmentation simply compute the diff between all connection names returned by
      * {@link #getAllSchemaPropertiesConnectors(boolean)} and the existingConnectors.
      * 
      * @param existingConnectors list of connectors already connected that may be of use to compute what remains to be
-     * connected.
+     *            connected.
      * @param isOutputConnection wether we query the possible output or input connections.
      * @return set of connector left to be connected.
      */

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
@@ -47,8 +46,8 @@ public class BulkFileWriter implements Writer<WriterResult> {
 
     protected int dataCount;
 
-
-    public BulkFileWriter(WriteOperation<WriterResult> writeOperation, BulkFileProperties bulkProperties, RuntimeContainer container) {
+    public BulkFileWriter(WriteOperation<WriterResult> writeOperation, BulkFileProperties bulkProperties,
+            RuntimeContainer container) {
         this.writeOperation = writeOperation;
         this.container = container;
         this.sink = writeOperation.getSink();
@@ -62,28 +61,32 @@ public class BulkFileWriter implements Writer<WriterResult> {
         File file = new File(bulkProperties.bulkFilePath.getStringValue());
         file.getParentFile().mkdirs();
         csvWriter = new CsvWriter(new OutputStreamWriter(new java.io.FileOutputStream(file, isAppend), charset), separator);
+
+        fileIsEmpty = (file.length() == 0);
     }
 
     private boolean headerIsReady = false;
-    
+
+    private boolean fileIsEmpty = false;
+
     @Override
     public void write(Object datum) throws IOException {
         if (null == datum) {
             return;
         }
-        
-    	if(!isAppend && !headerIsReady){
-    		Schema schema = new Schema.Parser().parse(bulkProperties.schema.schema.getStringValue());
-    		
-    		if (AvroUtils.isIncludeAllFields(schema) && (datum instanceof org.apache.avro.generic.IndexedRecord)) {
-    			org.apache.avro.generic.IndexedRecord record = (org.apache.avro.generic.IndexedRecord)datum;
-    			schema = record.getSchema();
+
+        if (!headerIsReady && (!isAppend || fileIsEmpty)) {
+            Schema schema = new Schema.Parser().parse(bulkProperties.schema.schema.getStringValue());
+
+            if (AvroUtils.isIncludeAllFields(schema) && (datum instanceof org.apache.avro.generic.IndexedRecord)) {
+                org.apache.avro.generic.IndexedRecord record = (org.apache.avro.generic.IndexedRecord) datum;
+                schema = record.getSchema();
             }
-        	
+
             csvWriter.writeRecord(getHeaders(schema));
             headerIsReady = true;
         }
-    	
+
         List<String> values = getValues(datum);
         csvWriter.writeRecord(values.toArray(new String[values.size()]));
         dataCount++;
@@ -97,6 +100,9 @@ public class BulkFileWriter implements Writer<WriterResult> {
     public WriterResult close() throws IOException {
         flush();
         csvWriter.close();
+        if (container != null) {
+            container.setComponentData(container.getCurrentComponentId(), BulkFileProperties.NB_LINE_NAME, dataCount);
+        }
         return new WriterResult(uId, dataCount);
     }
 
@@ -114,7 +120,7 @@ public class BulkFileWriter implements Writer<WriterResult> {
     }
 
     public List<String> getValues(Object datum) {
-        IndexedRecord input = getFactory(datum).convertToAvro((IndexedRecord)datum);
+        IndexedRecord input = getFactory(datum).convertToAvro((IndexedRecord) datum);
         List<String> values = new ArrayList<String>();
         for (Schema.Field f : input.getSchema().getFields()) {
             if (input.get(f.pos()) != null) {
@@ -126,10 +132,10 @@ public class BulkFileWriter implements Writer<WriterResult> {
         return values;
     }
 
-    public IndexedRecordAdapterFactory<IndexedRecord, IndexedRecord> getFactory(Object datum){
+    public IndexedRecordAdapterFactory<IndexedRecord, IndexedRecord> getFactory(Object datum) {
         if (null == factory) {
             factory = new GenericAdapterFactory();
-            factory.setSchema(((IndexedRecord)datum).getSchema());
+            factory.setSchema(((IndexedRecord) datum).getSchema());
         }
         return factory;
     }

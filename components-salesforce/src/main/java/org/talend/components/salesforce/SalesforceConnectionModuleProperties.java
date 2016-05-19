@@ -17,6 +17,7 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.FixedConnectorsComponentProperties;
+import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.presentation.Form;
 
@@ -28,7 +29,9 @@ public abstract class SalesforceConnectionModuleProperties extends FixedConnecto
 
     // Collections
     //
-    public static final String NB_LINE = "NB_LINE";
+    public static final String NB_LINE_NAME = "NB_LINE";
+
+    public Property<Integer> NB_LINE = PropertyFactory.newInteger(NB_LINE_NAME);
 
     public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection"); //$NON-NLS-1$
 
@@ -43,9 +46,8 @@ public abstract class SalesforceConnectionModuleProperties extends FixedConnecto
     @Override
     public void setupProperties() {
         super.setupProperties();
-        returns = ComponentPropertyFactory.newReturnsProperty();
-        ComponentPropertyFactory.newReturnProperty(returns, PropertyFactory.newString("ERROR_MESSAGE")); //$NON-NLS-1$
-        ComponentPropertyFactory.newReturnProperty(returns, PropertyFactory.newInteger(NB_LINE));
+        returns = connection.returns;
+        NB_LINE = ComponentPropertyFactory.newReturnProperty(returns, NB_LINE);
         // Allow for subclassing
         module = new SalesforceModuleProperties("module");
         module.connection = connection;

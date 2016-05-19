@@ -5,10 +5,13 @@ package ${package};
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.api.properties.HasSchemaProperty;
+import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.PropertyFactory;
@@ -34,31 +37,36 @@ import org.talend.daikon.properties.presentation.Form;
  * <li>{code schema}, an embedded property referring to a Schema.</li>
  * </ol>
  */
-public class ${componentName}Properties extends ComponentProperties implements HasSchemaProperty {
+public class ${componentName}Properties extends FixedConnectorsComponentProperties {
 
     public Property filename = PropertyFactory.newString("filename"); //$NON-NLS-1$
     public SchemaProperties schema = new SchemaProperties("schema"); //$NON-NLS-1$
-
+    protected transient PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
+ 
     public ${componentName}Properties(String name) {
         super(name);
     }
-    
+
+    @Override
+    public void setupProperties() {
+        super.setupProperties();
+        // Code for property initialization goes here
+    }
+
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form form = Form.create(this, Form.MAIN, "File Selection"); //$NON-NLS-1$
+        Form form = Form.create(this, Form.MAIN);
         form.addRow(schema.getForm(Form.REFERENCE));
         form.addRow(filename);
     }
 
     @Override
-    public List<Schema> getSchemas() {
-        return Collections.singletonList(new Schema.Parser().parse(schema.schema.getStringValue()));
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputComponent) {
+        if (isOutputComponent) {
+            return Collections.singleton(mainConnector);
+        }
+        return Collections.emptySet();
     }
 
-    @Override
-    public void setSchemas(List<Schema> schemas) {
-        // nothing to be set here.
-    }    
-    
 }

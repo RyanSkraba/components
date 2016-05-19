@@ -381,9 +381,9 @@ final class SalesforceWriter implements Writer<WriterResult> {
         // this should be computed according to the result of the write I guess but I don't know yet how exceptions are
         // handled by Beam.
         if (container != null) {
-            container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_LINE, dataCount);
-            container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_SUCCESS, successCount);
-            container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_REJECT, rejectCount);
+            container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_LINE_NAME, dataCount);
+            container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_SUCCESS_NAME, successCount);
+            container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_REJECT_NAME, rejectCount);
         }
         return new WriterResult(uId, dataCount);
     }

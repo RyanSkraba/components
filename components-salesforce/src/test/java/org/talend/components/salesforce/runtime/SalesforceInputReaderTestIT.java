@@ -140,4 +140,40 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
         return fa.endRecord();
     }
+
+    @Test
+    public void testManualQuery() throws Throwable {
+        TSalesforceInputProperties props = createTSalesforceInputProperties(false, false);
+        props.manualQuery.setValue(true);
+        // Manual query with foreign key
+        props.module.main.schema.setValue(SchemaBuilder.builder().record("MakeRowRecord").fields()
+                .name("Id").type().nullable().stringType().noDefault()
+                .name("Name").type().nullable().stringType().noDefault()
+                .name("Owner_Name").type().nullable().stringType().noDefault()
+                .name("Owner_Id").type().nullable().stringType().noDefault().endRecord());
+        props.query.setValue("SELECT Id, Name, Owner.Name ,Owner.Id FROM Account");
+        List<IndexedRecord> rowsWithForeignKey = readRows(props);
+        // Manual query with foreign key
+        props.module.main.schema.setValue(SchemaBuilder.builder().record("MakeRowRecord").fields()
+                .name("Id").type().nullable().stringType().noDefault()
+                .name("Name").type().nullable().stringType().noDefault()
+                .name("OwnerId").type().nullable().stringType().noDefault().endRecord());
+        props.query.setValue("SELECT Id, Name, OwnerId FROM Account");
+        List<IndexedRecord> rowsCommon = readRows(props);
+
+        assertEquals(rowsWithForeignKey.size(), rowsCommon.size());
+        if (rowsWithForeignKey.size() > 0) {
+            IndexedRecord fkRecord = rowsWithForeignKey.get(0);
+            IndexedRecord commonRecord = rowsCommon.get(0);
+            assertNotNull(fkRecord);
+            assertNotNull(commonRecord);
+            Schema schemaFK = fkRecord.getSchema();
+            Schema schemaCommon = commonRecord.getSchema();
+
+            assertNotNull(schemaFK);
+            assertNotNull(schemaCommon);
+            assertEquals(commonRecord.get(schemaCommon.getField("OwnerId").pos()), fkRecord.get(schemaFK.getField("Owner_Id").pos()));
+            System.out.println("Account records Owner id: " + fkRecord.get(schemaFK.getField("Owner_Id").pos()));
+        }
+    }
 }

@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.dataprep;
 
+import java.io.IOException;
+
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
@@ -19,34 +21,48 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.dataprep.TDataSetOutputProperties.Mode;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
-
-import java.io.IOException;
 
 public class TDataSetOutputWriter implements Writer<WriterResult> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TDataSetInputDefinition.class);
+
     private IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory;
+
     private StringBuilder data = new StringBuilder();
+
     private int counter = 0;
+
     private String uId;
+
     private DataPrepConnectionHandler connectionHandler;
+
     private boolean firstRow = true;
+
     private WriteOperation<WriterResult> writeOperation;
+
     private int limit;
 
-    TDataSetOutputWriter(WriteOperation<WriterResult> writeOperation,
-                         DataPrepConnectionHandler connectionHandler, int limit) {
+    private Mode mode;
+
+    TDataSetOutputWriter(WriteOperation<WriterResult> writeOperation, //
+            DataPrepConnectionHandler connectionHandler, //
+            int limit, //
+            Mode mode) {
         this.writeOperation = writeOperation;
         this.connectionHandler = connectionHandler;
         this.limit = limit;
+        this.mode = mode;
     }
 
     @Override
     public void open(String uId) throws IOException {
         this.uId = uId;
-        connectionHandler.connect();
+        if (!isLiveDataSet()) {
+            connectionHandler.connect();
+        }
     }
 
     @Override
@@ -62,7 +78,7 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
         StringBuilder row = new StringBuilder();
         if (firstRow) {
             for (Schema.Field f : input.getSchema().getFields()) {
-                if (f.pos()!=0) {
+                if (f.pos() != 0) {
                     row.append(",");
                 }
                 row.append(String.valueOf(f.name()));
@@ -73,7 +89,7 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
         }
         for (Schema.Field f : input.getSchema().getFields()) {
             if (input.get(f.pos()) != null) {
-                if (f.pos()!=0) {
+                if (f.pos() != 0) {
                     row.append(",");
                 }
                 row.append(String.valueOf(input.get(f.pos())));
@@ -88,8 +104,12 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
     @Override
     public WriterResult close() throws IOException {
         LOGGER.debug("All data: {}", data);
-        connectionHandler.create(data.toString());
-        connectionHandler.logout();
+        if (isLiveDataSet()) {
+            connectionHandler.createInLiveDataSetMode(data.toString());
+        } else {
+            connectionHandler.create(data.toString());
+            connectionHandler.logout();
+        }
         return new WriterResult(uId, counter);
     }
 
@@ -104,5 +124,9 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
                     .createAdapterFactory(datum.getClass());
         }
         return factory;
+    }
+
+    private boolean isLiveDataSet() {
+        return Mode.LIVE_DATASET.equals(mode);
     }
 }

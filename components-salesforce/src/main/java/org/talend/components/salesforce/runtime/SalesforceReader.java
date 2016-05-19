@@ -25,7 +25,6 @@ import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 import org.talend.daikon.avro.util.AvroUtils;
 
 import com.sforce.soap.partner.PartnerConnection;
-import com.sforce.soap.partner.PartnerConnection;
 
 public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
 
@@ -116,7 +115,7 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
     @Override
     public void close() throws IOException {
         if (container != null) {
-            container.setComponentData(container.getCurrentComponentId(), TSalesforceInputProperties.NB_LINE, dataCount);
+            container.setComponentData(container.getCurrentComponentId(), SalesforceConnectionModuleProperties.NB_LINE_NAME, dataCount);
         }
     }
 }

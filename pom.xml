@@ -20,6 +20,7 @@
 		<module>components-proptester</module>
 		<module>components-splunk</module>
 		<module>components-jira</module>
+		<module>components-dataprep</module>
 	</modules>
 	<profiles>
 		<profile>

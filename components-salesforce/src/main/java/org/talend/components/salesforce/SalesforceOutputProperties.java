@@ -32,9 +32,9 @@ import org.talend.daikon.properties.presentation.Widget;
 
 public class SalesforceOutputProperties extends SalesforceConnectionModuleProperties {
 
-    public static final String NB_SUCCESS = "NB_SUCCESS";
+    public static final String NB_SUCCESS_NAME = "NB_SUCCESS";
 
-    public static final String NB_REJECT = "NB_REJECT";
+    public static final String NB_REJECT_NAME = "NB_REJECT";
 
     public enum OutputAction {
         INSERT,
@@ -62,6 +62,10 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
     public SchemaProperties schemaFlow = new SchemaProperties("schemaFlow"); //$NON-NLS-1$
 
     public SchemaProperties schemaReject = new SchemaProperties("schemaReject"); //$NON-NLS-1$
+
+    public Property NB_SUCCESS = newInteger(NB_SUCCESS_NAME);
+
+    public Property NB_REJECT = newInteger(NB_REJECT_NAME);
 
     public SalesforceOutputProperties(String name) {
         super(name);
@@ -101,10 +105,8 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
 
         outputAction.setValue(OutputAction.INSERT);
 
-        returns = ComponentPropertyFactory.newReturnsProperty();
-        ComponentPropertyFactory.newReturnProperty(returns, newInteger(NB_LINE));
-        ComponentPropertyFactory.newReturnProperty(returns, newInteger(NB_SUCCESS));
-        ComponentPropertyFactory.newReturnProperty(returns, newInteger(NB_REJECT));
+        ComponentPropertyFactory.newReturnProperty(returns, NB_SUCCESS);
+        ComponentPropertyFactory.newReturnProperty(returns, NB_REJECT);
 
         setupRejectSchema();
 

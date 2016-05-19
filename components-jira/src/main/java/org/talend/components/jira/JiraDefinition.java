@@ -48,7 +48,7 @@ public abstract class JiraDefinition extends AbstractComponentDefinition {
     
     @Override
     public String[] getFamilies() {
-        return new String[] { "Business/Jira" };
+        return new String[] { "Business/JIRA" };
     }
 
 }

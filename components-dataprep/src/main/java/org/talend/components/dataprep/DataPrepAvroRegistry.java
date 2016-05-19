@@ -1,5 +1,12 @@
 package org.talend.components.dataprep;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.avro.Schema;
 import org.talend.daikon.avro.AvroConverter;
 import org.talend.daikon.avro.AvroRegistry;
@@ -8,16 +15,10 @@ import org.talend.daikon.avro.util.AvroTypes;
 import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.java8.SerializableFunction;
 
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 public class DataPrepAvroRegistry extends AvroRegistry {
 
     public static final String FAMILY_NAME = "Data Preparation";
+
     private static DataPrepAvroRegistry dataPrepInstance;
 
     private DataPrepAvroRegistry() {
@@ -49,8 +50,9 @@ public class DataPrepAvroRegistry extends AvroRegistry {
     }
 
     public static DataPrepAvroRegistry getDataPrepInstance() {
-        if (dataPrepInstance == null)
+        if (dataPrepInstance == null) {
             dataPrepInstance = new DataPrepAvroRegistry();
+        }
         return dataPrepInstance;
     }
 
@@ -71,16 +73,18 @@ public class DataPrepAvroRegistry extends AvroRegistry {
     private Schema inferSchemaDataPrepResult(DataPrepField[] in) {
         List<Schema.Field> fields = new ArrayList<>();
         for (DataPrepField field : in) {
-
-            Schema.Field avroField = new Schema.Field(field.getColumnName(), inferSchema(field), null, field.getContent());
+            // forces a String type for all dataprep schemas because schema is not enforced by dataprep.
+            // some data may not be of the right type.
+            // TODO this makes most of this class not usefull and should be refactored
+            Schema.Field avroField = new Schema.Field(field.getColumnName(), AvroTypes._string(), null, field.getContent());
 
             switch (field.getType()) {
-                case "date":
-                    avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd");
-                    break;
-                //TODO add right handling Date type
-                default:
-                    break;
+            case "date":
+                avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd");
+                break;
+            // TODO add right handling Date type
+            default:
+                break;
             }
             fields.add(avroField);
         }
@@ -98,24 +102,24 @@ public class DataPrepAvroRegistry extends AvroRegistry {
     private Schema inferSchemaField(DataPrepField field) {
         Schema base;
         switch (field.getType()) {
-            case "boolean":
-                base = AvroTypes._boolean();
-                break;
-            case "double":
-                base = AvroTypes._double();
-                break;
-            case "integer":
-                base = AvroTypes._int();
-                break;
-            case "float":
-                base = AvroTypes._float();
-                break;
-            default:
-                base = AvroTypes._string();
-                break;
+        case "boolean":
+            base = AvroTypes._boolean();
+            break;
+        case "double":
+            base = AvroTypes._double();
+            break;
+        case "integer":
+            base = AvroTypes._int();
+            break;
+        case "float":
+            base = AvroTypes._float();
+            break;
+        default:
+            base = AvroTypes._string();
+            break;
         }
 
-        //TODO add handling for numeric, any and date.
+        // TODO add handling for numeric, any and date.
 
         return base;
     }

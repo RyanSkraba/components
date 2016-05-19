@@ -12,17 +12,18 @@
 // ============================================================================
 package org.talend.components.dataprep;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.dataprep.TDataSetOutputProperties.Mode;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 public class TDataSetOutputSink implements Sink {
 
@@ -30,10 +31,12 @@ public class TDataSetOutputSink implements Sink {
 
     @Override
     public WriteOperation<?> createWriteOperation() {
-        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(properties.url.getStringValue(),
-                properties.login.getStringValue(), properties.pass.getStringValue(),
+        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler( //
+                properties.url.getStringValue(), //
+                properties.login.getStringValue(), //
+                properties.pass.getStringValue(), //
                 properties.dataSetName.getStringValue());
-        return new TDataSetWriteOperation(this, connectionHandler, properties.limit.getIntValue());
+        return new TDataSetWriteOperation(this, connectionHandler, properties.limit.getValue(), properties.mode.getValue());
     }
 
     @Override
@@ -44,18 +47,22 @@ public class TDataSetOutputSink implements Sink {
     @Override
     public ValidationResult validate(RuntimeContainer runtimeContainer) {
         DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(properties.url.getStringValue(),
-                properties.login.getStringValue(), properties.pass.getStringValue(),
-                properties.dataSetName.getStringValue());
+                properties.login.getStringValue(), properties.pass.getStringValue(), properties.dataSetName.getStringValue());
         boolean validate;
         try {
-            validate = connectionHandler.validate();
+            if (Mode.LIVE_DATASET.equals(properties.mode.getValue())) {
+                validate = true;
+            } else {
+                validate = connectionHandler.validate();
+            }
         } catch (IOException e) {
             validate = false;
         }
-        if (validate)
+        if (validate) {
             return ValidationResult.OK;
-        else
+        } else {
             return new ValidationResult().setStatus(ValidationResult.Result.ERROR);
+        }
     }
 
     @Override

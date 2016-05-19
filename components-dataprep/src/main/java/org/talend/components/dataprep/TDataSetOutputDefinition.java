@@ -28,7 +28,7 @@ import aQute.bnd.annotation.component.Component;
 @Component(name = Constants.COMPONENT_BEAN_PREFIX + TDataSetOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TDataSetOutputDefinition extends AbstractComponentDefinition implements OutputComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tDataSetOutput"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tDatasetOutput";
 
 
     public TDataSetOutputDefinition() {
@@ -39,7 +39,7 @@ public class TDataSetOutputDefinition extends AbstractComponentDefinition implem
 
     @Override
     public String[] getFamilies() {
-        return new String[] { "Data Preparation" }; //$NON-NLS-1$
+        return new String[]{"Talend Data Preparation"};
     }
 
     public String getMavenGroupId() {

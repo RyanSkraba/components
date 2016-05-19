@@ -16,6 +16,7 @@ import static org.talend.daikon.properties.PropertyFactory.*;
 import static org.talend.daikon.properties.presentation.Widget.*;
 
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
 import org.talend.components.common.ProxyProperties;
@@ -89,6 +90,10 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
     public ComponentReferenceProperties referencedComponent = new ComponentReferenceProperties("referencedComponent", this);
 
+    public static final String ERROR_MESSAGE_NAME = "ERROR_MESSAGE";
+
+    public Property ERROR_MESSAGE;
+
     public SalesforceConnectionProperties(String name) {
         super(name);
     }
@@ -102,13 +107,16 @@ public class SalesforceConnectionProperties extends ComponentProperties
         timeout.setValue(60000);
         httpChunked.setValue(true);
 
+        returns = ComponentPropertyFactory.newReturnsProperty();
+        ERROR_MESSAGE = ComponentPropertyFactory.newReturnProperty(returns, newString(ERROR_MESSAGE_NAME));
+
     }
 
     @Override
     public void setupLayout() {
         super.setupLayout();
 
-        Form wizardForm = new Form(this, FORM_WIZARD);
+        Form wizardForm = Form.create(this, FORM_WIZARD);
         wizardForm.addRow(name);
         wizardForm.addRow(widget(loginType).setDeemphasize(true));
         wizardForm.addRow(oauth.getForm(Form.MAIN));
@@ -116,12 +124,12 @@ public class SalesforceConnectionProperties extends ComponentProperties
         wizardForm.addRow(widget(advanced).setWidgetType(WidgetType.BUTTON));
         wizardForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
 
-        Form mainForm = new Form(this, Form.MAIN);
+        Form mainForm = Form.create(this, Form.MAIN);
         mainForm.addRow(loginType);
         mainForm.addRow(oauth.getForm(Form.MAIN));
         mainForm.addRow(userPassword.getForm(Form.MAIN));
 
-        Form advancedForm = new Form(this, Form.ADVANCED);
+        Form advancedForm = Form.create(this, Form.ADVANCED);
         advancedForm.addRow(endpoint);
         advancedForm.addRow(bulkConnection);
         advancedForm.addRow(needCompression);
@@ -133,7 +141,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
         advanced.setFormtoShow(advancedForm);
 
         // A form for a reference to a connection, used in a tSalesforceInput for example
-        Form refForm = new Form(this, Form.REFERENCE);
+        Form refForm = Form.create(this, Form.REFERENCE);
         Widget compListWidget = widget(referencedComponent).setWidgetType(WidgetType.COMPONENT_REFERENCE);
         referencedComponent.componentType.setValue(TSalesforceConnectionDefinition.COMPONENT_NAME);
         refForm.addRow(compListWidget);
@@ -213,13 +221,13 @@ public class SalesforceConnectionProperties extends ComponentProperties
                 boolean bulkMode = bulkConnection.getValue();
                 form.getWidget(httpChunked.getName()).setHidden(bulkMode);
                 form.getWidget(httpTraceMessage.getName()).setHidden(!bulkMode);
-                
+
                 Form proxyForm = form.getChildForm(proxy.getName());
-                if(proxyForm!=null) {
-	                boolean isUseProxy = proxy.useProxy.getValue();
-	                proxyForm.getWidget(proxy.host.getName()).setHidden(!isUseProxy);
-	                proxyForm.getWidget(proxy.port.getName()).setHidden(!isUseProxy);
-	                proxyForm.getWidget(proxy.userPassword.getName()).setHidden(!isUseProxy);
+                if (proxyForm != null) {
+                    boolean isUseProxy = proxy.useProxy.getValue();
+                    proxyForm.getWidget(proxy.host.getName()).setHidden(!isUseProxy);
+                    proxyForm.getWidget(proxy.port.getName()).setHidden(!isUseProxy);
+                    proxyForm.getWidget(proxy.userPassword.getName()).setHidden(!isUseProxy);
                 }
             }
         }

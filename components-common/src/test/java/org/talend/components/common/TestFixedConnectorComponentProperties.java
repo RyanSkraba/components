@@ -108,7 +108,7 @@ public class TestFixedConnectorComponentProperties {
     }
 
     @Test
-    public void testGetAvailableconnectors() {
+    public void testGetAvailableConnectors() {
         ComponentProperties componentProperties = getComponentService().getComponentProperties("foo"); //$NON-NLS-1$
         Set<? extends Connector> availableConnections = componentProperties.getAvailableConnectors(null, true);
         assertThat(availableConnections, hasSize(2));
@@ -116,6 +116,13 @@ public class TestFixedConnectorComponentProperties {
                 true);
         assertThat(availableConnections, hasSize(1));
         assertTrue(availableConnections.contains(TestProperties.REJECT_CONNECTOR));
+    }
+
+    @Test
+    public void testGetAllPossibleConnectors() {
+        ComponentProperties componentProperties = getComponentService().getComponentProperties("foo"); //$NON-NLS-1$
+        Set<? extends Connector> allConnections = componentProperties.getPossibleConnectors(true);
+        assertThat(allConnections, hasSize(2));
     }
 
     @Test

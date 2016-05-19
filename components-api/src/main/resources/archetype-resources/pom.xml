@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.10.0-SNAPSHOT</version>
+        <version>0.8.3</version>
     </parent>
 
     <name>Components - ${componentName}</name>
@@ -13,13 +13,17 @@
     <artifactId>${artifactId}</artifactId>
     <version>${version}</version>
     <properties>
-        <components.api.version>0.10.0-SNAPSHOT</components.api.version>
+        <components.api.version>0.8.3</components.api.version>
     </properties>
     <packaging>bundle</packaging>
     <repositories>
         <repository>
             <id>snapshots</id>
             <url>http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
+        </repository>
+        <repository>
+            <id>releases</id>
+            <url>http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceRelease/</url>
         </repository>
     </repositories>
     <dependencies>
@@ -63,7 +67,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.5.4</version>
                 <extensions>true</extensions>
                 <executions>
                     <execution>

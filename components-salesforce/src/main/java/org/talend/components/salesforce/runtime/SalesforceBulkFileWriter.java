@@ -102,12 +102,4 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
         }
         return values;
     }
-
-    @Override
-    public WriterResult close() throws IOException {
-        if (container != null) {
-            container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_LINE, dataCount);
-        }
-        return super.close();
-    }
 }

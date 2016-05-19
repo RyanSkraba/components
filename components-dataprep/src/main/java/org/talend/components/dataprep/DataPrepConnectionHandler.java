@@ -12,6 +12,12 @@
 // ============================================================================
 package org.talend.components.dataprep;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -19,13 +25,9 @@ import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
 public class DataPrepConnectionHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TDataSetInputDefinition.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataPrepConnectionHandler.class);
 
     private final String url;
 
@@ -47,7 +49,7 @@ public class DataPrepConnectionHandler {
     }
 
     HttpResponse connect() throws IOException {
-        Request request = Request.Post(url+"/login?username="+login+"&password="+pass);
+        Request request = Request.Post(url + "/login?username=" + login + "&password=" + pass);
         HttpResponse response = request.execute().returnResponse();
         LOGGER.debug("Connect Response: " + response.toString());
         authorisationHeader = response.getFirstHeader("Authorization");
@@ -55,9 +57,9 @@ public class DataPrepConnectionHandler {
     }
 
     HttpResponse logout() throws IOException {
-        Request request = Request.Post(url+"/logout").addHeader(authorisationHeader);
+        Request request = Request.Post(url + "/logout").addHeader(authorisationHeader);
         HttpResponse response = request.execute().returnResponse();
-        LOGGER.debug("Logout Response: "+ response.toString());
+        LOGGER.debug("Logout Response: " + response.toString());
         return response;
     }
 
@@ -70,15 +72,15 @@ public class DataPrepConnectionHandler {
         int statusLogout;
         statusLogin = returnStatusCode(connect());
         statusLogout = returnStatusCode(logout());
-        if (statusLogin == STATUS_OK && statusLogout == STATUS_OK)
+        if (statusLogin == STATUS_OK && statusLogout == STATUS_OK) {
             return true;
-        else
+        } else {
             return false;
+        }
     }
 
     DataPrepStreamMapper readDataSetIterator() throws IOException {
-        Request request = Request.Get(url+ "/api/datasets/" + dataSetName + "?metadata=false").
-                addHeader(authorisationHeader);
+        Request request = Request.Get(url + "/api/datasets/" + dataSetName + "?metadata=false").addHeader(authorisationHeader);
         HttpResponse current = request.execute().returnResponse();
         DataPrepStreamMapper dataPrepStreamMapper = new DataPrepStreamMapper(current.getEntity().getContent());
 
@@ -88,40 +90,47 @@ public class DataPrepConnectionHandler {
     }
 
     void create(String data) throws IOException {
-        int index = dataSetName.lastIndexOf("/");
-        String setName, folderName;
-        if (index != -1) {
-            setName = dataSetName.substring(index+1);
-            folderName = dataSetName.substring(0, index);
-        } else {
-            setName = dataSetName;
-            folderName = "";
-        }
 
-        LOGGER.debug("Folder Name: " + folderName+ "DataSet name: " + setName);
+        LOGGER.debug("DataSet name: " + dataSetName);
 
-        Request request = Request.Post(url+"/api/datasets?name=" + setName + "&folderPath="+folderName);
+        Request request = Request.Post(url + "/api/datasets?name=" + dataSetName);
         request.addHeader(authorisationHeader);
-        request.bodyString(data ,ContentType.create(ContentType.TEXT_PLAIN.getMimeType(), StandardCharsets.UTF_8));
+        request.bodyString(data, ContentType.create(ContentType.TEXT_PLAIN.getMimeType(), StandardCharsets.UTF_8));
+        HttpResponse response = request.execute().returnResponse();
+        LOGGER.debug("Create request response: {}", response);
+    }
+
+    void createInLiveDataSetMode(String data) throws IOException {
+
+        LOGGER.debug("DataSet name: " + dataSetName);
+
+        // in live dataset, the request is a simple post to the livedataset url
+        Request request = Request.Post(url);
+        request.bodyString(data, ContentType.create(ContentType.TEXT_PLAIN.getMimeType(), StandardCharsets.UTF_8));
         HttpResponse response = request.execute().returnResponse();
         LOGGER.debug("Create request response: {}", response);
     }
 
     List<Column> readSourceSchema() throws IOException {
-        Request request = Request.Get(url +"/api/datasets/"+ dataSetName + "/metadata");
+        Request request = Request.Get(url + "/api/datasets/" + dataSetName + "/metadata");
         request.addHeader(authorisationHeader);
 
         DataPrepStreamMapper dataPrepStreamMapper = null;
         MetaData metaData;
 
         try {
-            dataPrepStreamMapper = new DataPrepStreamMapper(request.execute().returnResponse().getEntity().getContent());
+            HttpResponse response = request.execute().returnResponse();
+            if (response.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                LOGGER.error("Failed to retrieve Schema from dataprep server : " + response.getStatusLine().getStatusCode());
+                // TODO i18n
+                throw new IOException("Failed to connect to Dataprep server : " + response.getStatusLine().getStatusCode());
+            }
+            dataPrepStreamMapper = new DataPrepStreamMapper(response.getEntity().getContent());
             metaData = dataPrepStreamMapper.getMetaData();
         } finally {
             if (dataPrepStreamMapper != null) {
                 dataPrepStreamMapper.close();
             }
-            logout();
         }
 
         return metaData.getColumns();

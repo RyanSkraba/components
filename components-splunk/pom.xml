@@ -15,6 +15,8 @@
     <version>0.2.0-SNAPSHOT</version>
     <properties>
         <components.api.version>0.10.0-SNAPSHOT</components.api.version>
+        <splunk.webui.port>8000</splunk.webui.port>
+        <splunk.ec.port>8088</splunk.ec.port>
     </properties>
     <packaging>bundle</packaging>
     <repositories>
@@ -77,8 +79,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.5.4</version>
-                <extensions>true</extensions>
                 <executions>
                     <execution>
                         <id>lib-jar</id>
@@ -136,6 +136,59 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <splunk.ec.address>http://${docker.host.address}:${splunk.ec.port}</splunk.ec.address>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.15.1</version>
+
+				<executions>
+					<execution>
+						<id>start</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>start</goal>
+						</goals>
+						<configuration>
+							<images>
+								<image>
+									<name>dchmyga/splunk</name>
+									<run>
+										<env>
+											<SPLUNK_START_ARGS>--accept-license</SPLUNK_START_ARGS>
+										</env>
+										<ports>
+											<port>${splunk.webui.port}:8000</port>
+											<port>${splunk.ec.port}:8088</port>
+										</ports>
+										<wait>
+                                                                                   <http>
+                                                                                        <url>http://${docker.host.address}:${splunk.webui.port}/en-US/account/login?return_to=%2Fen-US%2F</url>
+                                                                                   </http>
+                                                                                   <time>30000</time>
+										</wait>
+									</run>
+								</image>
+							</images>
+						</configuration>
+					</execution>
+					<execution>
+						<id>stop</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
         </plugins>
     </build>
 </project>

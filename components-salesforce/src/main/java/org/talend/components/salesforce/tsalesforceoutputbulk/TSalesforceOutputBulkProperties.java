@@ -41,11 +41,8 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
     public void setupProperties() {
         super.setupProperties();
 
-        returns = ComponentPropertyFactory.newReturnsProperty();
         upsertRelationTable.setUsePolymorphic(true);
-        ComponentPropertyFactory.newReturnProperty(returns, newString("ERROR_MESSAGE")); //$NON-NLS-1$ 
-        ComponentPropertyFactory.newReturnProperty(returns, newInteger("NB_LINE")); //$NON-NLS-1$
-            
+
         this.setSchemaListener(new ISchemaListener() {
 
             @Override

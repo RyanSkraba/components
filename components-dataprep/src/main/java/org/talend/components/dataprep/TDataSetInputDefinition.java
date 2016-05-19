@@ -30,7 +30,7 @@ import aQute.bnd.annotation.component.Component;
 @Component(name = Constants.COMPONENT_BEAN_PREFIX + TDataSetInputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TDataSetInputDefinition extends AbstractComponentDefinition implements InputComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tDataSetInput";
+    public static final String COMPONENT_NAME = "tDatasetInput";
 
 
     public TDataSetInputDefinition() {
@@ -41,7 +41,7 @@ public class TDataSetInputDefinition extends AbstractComponentDefinition impleme
 
     @Override
     public String[] getFamilies() {
-        return new String[] { "Data Preparation" };
+        return new String[] { "Talend Data Preparation" };
     }
 
     public String getMavenGroupId() {

@@ -23,7 +23,6 @@ import org.apache.avro.SchemaBuilder.FieldAssembler;
 import org.apache.avro.SchemaBuilder.FieldBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
@@ -34,7 +33,7 @@ import org.talend.daikon.avro.util.AvroUtils;
 
 public class TSplunkEventCollectorWriterTestIT {
 
-    private static final String URL = "http://127.0.0.1:8088";
+    private static final String URL = System.getProperty("splunk.ec.address");
 
     private final static String WRONG_TOKEN = "1111";
 
@@ -42,7 +41,6 @@ public class TSplunkEventCollectorWriterTestIT {
 
     private final static String COMPONENT_ID = "Splunk_test";
 
-    @Ignore
     @Test
     public void testWritingOneRecord() throws IOException {
         DefaultComponentRuntimeContainerImpl container = new TestingRuntimeContainer(COMPONENT_ID);
@@ -72,7 +70,6 @@ public class TSplunkEventCollectorWriterTestIT {
 
     }
 
-    @Ignore
     @Test
     public void testWritingFiveRecords() throws IOException {
         TestingRuntimeContainer container = new TestingRuntimeContainer(COMPONENT_ID);
@@ -101,7 +98,6 @@ public class TSplunkEventCollectorWriterTestIT {
         writer = null;
     }
 
-    @Ignore
     @Test
     public void testWritingOneRecordWithWrongToken() throws IOException {
         TestingRuntimeContainer container = new TestingRuntimeContainer(COMPONENT_ID);

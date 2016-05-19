@@ -12,8 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,6 +55,7 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputPropert
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
+import org.talend.components.salesforce.tsalesforceoutputbulkexec.TSalesforceOutputBulkExecDefinition;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.util.AvroUtils;
 import org.talend.daikon.properties.Property;
@@ -97,31 +100,51 @@ public class SalesforceTestBase extends AbstractComponentTest {
     // default implementation for pure java test. Shall be overriden of Spring or OSGI tests
     @Override
     public ComponentService getComponentService() {
-        if (componentService == null) {
-            SimpleComponentRegistry testComponentRegistry = new SimpleComponentRegistry();
-            testComponentRegistry.addComponent(TSalesforceConnectionDefinition.COMPONENT_NAME,
-                    new TSalesforceConnectionDefinition());
-            testComponentRegistry.addComponent(TSalesforceBulkExecDefinition.COMPONENT_NAME, new TSalesforceBulkExecDefinition());
-            testComponentRegistry.addComponent(TSalesforceGetServerTimestampDefinition.COMPONENT_NAME,
-                    new TSalesforceGetServerTimestampDefinition());
-            testComponentRegistry.addComponent(TSalesforceInputDefinition.COMPONENT_NAME, new TSalesforceInputDefinition());
-            testComponentRegistry.addComponent(TSalesforceOutputDefinition.COMPONENT_NAME, new TSalesforceOutputDefinition());
-            testComponentRegistry.addComponent(TSalesforceGetDeletedDefinition.COMPONENT_NAME,
-                    new TSalesforceGetDeletedDefinition());
-            testComponentRegistry.addComponent(TSalesforceGetUpdatedDefinition.COMPONENT_NAME,
-                    new TSalesforceGetUpdatedDefinition());
-            testComponentRegistry.addComponent(TSalesforceOutputBulkDefinition.COMPONENT_NAME,
-                    new TSalesforceOutputBulkDefinition());
-            SalesforceConnectionWizardDefinition scwd = new SalesforceConnectionWizardDefinition();
-            testComponentRegistry.addWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, scwd);
-            testComponentRegistry.addWizard(SalesforceModuleWizardDefinition.COMPONENT_WIZARD_NAME,
-                    new SalesforceModuleWizardDefinition());
-            testComponentRegistry.addWizard(SalesforceConnectionEditWizardDefinition.COMPONENT_WIZARD_NAME,
-                    new SalesforceConnectionEditWizardDefinition());
-            componentService = new SimpleComponentService(testComponentRegistry);
-        }
-        return componentService;
-    }
+		if (componentService == null) {
+			SimpleComponentRegistry testComponentRegistry = new SimpleComponentRegistry();
+			
+			//register component
+			testComponentRegistry.addComponent(TSalesforceConnectionDefinition.COMPONENT_NAME,
+					new TSalesforceConnectionDefinition());
+
+			testComponentRegistry.addComponent(TSalesforceInputDefinition.COMPONENT_NAME,
+					new TSalesforceInputDefinition());
+
+			testComponentRegistry.addComponent(TSalesforceOutputDefinition.COMPONENT_NAME,
+					new TSalesforceOutputDefinition());
+
+			testComponentRegistry.addComponent(TSalesforceGetDeletedDefinition.COMPONENT_NAME,
+					new TSalesforceGetDeletedDefinition());
+
+			testComponentRegistry.addComponent(TSalesforceGetUpdatedDefinition.COMPONENT_NAME,
+					new TSalesforceGetUpdatedDefinition());
+			
+			testComponentRegistry.addComponent(TSalesforceGetServerTimestampDefinition.COMPONENT_NAME,
+					new TSalesforceGetServerTimestampDefinition());
+
+			testComponentRegistry.addComponent(TSalesforceOutputBulkDefinition.COMPONENT_NAME,
+					new TSalesforceOutputBulkDefinition());
+			
+			testComponentRegistry.addComponent(TSalesforceBulkExecDefinition.COMPONENT_NAME,
+					new TSalesforceBulkExecDefinition());
+			
+			testComponentRegistry.addComponent(TSalesforceOutputBulkExecDefinition.COMPONENT_NAME,
+					new TSalesforceOutputBulkExecDefinition());
+			
+			//register wizard
+			SalesforceConnectionWizardDefinition scwd = new SalesforceConnectionWizardDefinition();
+			testComponentRegistry.addWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, scwd);
+
+			testComponentRegistry.addWizard(SalesforceModuleWizardDefinition.COMPONENT_WIZARD_NAME,
+					new SalesforceModuleWizardDefinition());
+
+			testComponentRegistry.addWizard(SalesforceConnectionEditWizardDefinition.COMPONENT_WIZARD_NAME,
+					new SalesforceConnectionEditWizardDefinition());
+
+			componentService = new SimpleComponentService(testComponentRegistry);
+		}
+		return componentService;
+	}
 
     protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props) throws Throwable {
         assertTrue(form.getWidget(propName).isCallAfter());

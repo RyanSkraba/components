@@ -141,9 +141,9 @@ final class SalesforceBulkExecReader extends SalesforceReader {
         if (container != null) {
             String currentComponent = container.getCurrentComponentId()
                     .replace("_" + TSalesforceBulkExecDefinition.COMPONENT_NAME, "");
-            container.setComponentData(currentComponent, SalesforceOutputProperties.NB_LINE, dataCount);
-            container.setComponentData(currentComponent, SalesforceOutputProperties.NB_SUCCESS, successCount);
-            container.setComponentData(currentComponent, SalesforceOutputProperties.NB_REJECT, rejectCount);
+            container.setComponentData(currentComponent, TSalesforceBulkExecProperties.NB_LINE_NAME, dataCount);
+            container.setComponentData(currentComponent, TSalesforceBulkExecProperties.NB_SUCCESS_NAME, successCount);
+            container.setComponentData(currentComponent, TSalesforceBulkExecProperties.NB_REJECT_NAME, rejectCount);
         }
         bulkRuntime.close();
     }

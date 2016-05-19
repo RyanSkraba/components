@@ -76,14 +76,17 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
      * Jira resource. This may be issue, project etc. TODO clarify, which resources to support. Find solution to support
      * variable set of resources. maybe Property.Type.String
      */
-    public Property<JiraResource> resource = PropertyFactory.newProperty(new TypeLiteral<JiraResource>() {
-        // empty on purpose
-    }, "resource");
+    public Property<JiraResource> resource = PropertyFactory.newEnum("resource", JiraResource.class);
 
     /**
      * Jira Query language request property
      */
     public Property<String> jql = PropertyFactory.newString("jql");
+
+    /**
+     * Jira project ID property
+     */
+    public Property projectId = PropertyFactory.newString("projectId");
 
     /**
      * Type of http authorization. TODO maybe move it to Connection properties class and maybe in components-common
@@ -100,7 +103,7 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
     /**
      * Batch size property, which specifies how many Jira entities should be requested per request
      */
-    public Property<String> batchSize = PropertyFactory.newString("batchSize");
+    public Property<Integer> batchSize = PropertyFactory.newInteger("batchSize");
 
     /**
      * Return property, which denotes number of Jira entities obtained
@@ -131,11 +134,12 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
     public void setupProperties() {
         super.setupProperties();
         setupSchema();
-        host.setValue("\"https://localhost:8080/\"");
+        host.setValue("https://localhost:8080/");
         resource.setValue(JiraResource.ISSUE);
         authorizationType.setValue(ConnectionType.BASIC);
-        jql.setValue("\"\"");
-        batchSize.setValue("50");
+        jql.setValue("");
+        projectId.setValue("");
+        batchSize.setValue(50);
 
         returns = ComponentPropertyFactory.newReturnsProperty();
         numberOfRecords = ComponentPropertyFactory.newReturnProperty(returns, PropertyFactory.newInteger("numberOfRecords"));
@@ -147,10 +151,10 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(schema.getForm(Form.REFERENCE));
         mainForm.addRow(host);
-        mainForm.addRow(authorizationType);
         mainForm.addRow(userPassword.getForm(Form.MAIN));
         mainForm.addRow(resource);
         mainForm.addRow(jql);
+        mainForm.addRow(projectId);
 
         Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(batchSize);
@@ -197,10 +201,12 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
             switch (resourceValue) {
             case PROJECT: {
                 form.getWidget(jql.getName()).setHidden(true);
+                form.getWidget(projectId.getName()).setHidden(false);
                 break;
             }
             case ISSUE: {
                 form.getWidget(jql.getName()).setHidden(false);
+                form.getWidget(projectId.getName()).setHidden(true);
                 break;
             }
             }
