@@ -128,7 +128,7 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
     public void setupProperties() {
         super.setupProperties();
         setupSchema();
-        host.setValue("https://localhost:8080/");
+        host.setValue("https://jira.atlassian.com/");
         resource.setValue(ISSUE);
         authorizationType.setValue(BASIC);
         jql.setValue("");
