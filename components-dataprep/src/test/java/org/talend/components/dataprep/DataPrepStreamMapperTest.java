@@ -1,7 +1,9 @@
 package org.talend.components.dataprep;
 
+import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -13,7 +15,7 @@ public class DataPrepStreamMapperTest {
     //datasetid=7fa267c6-87c8-4ba2-9b24-fe300bf2f163
 
     @Test
-    public void metaDataMappingTest() throws IOException {
+    public void testMetaDataMapping() throws IOException {
         InputStream inputStream = DataPrepStreamMapperTest.class.getResourceAsStream("metadata.json");
         DataPrepStreamMapper streamMapper = new DataPrepStreamMapper(inputStream);
         MetaData metaData = streamMapper.getMetaData();
@@ -24,7 +26,7 @@ public class DataPrepStreamMapperTest {
     }
 
     @Test
-    public void rowDataSetIteratorTest() throws IOException {
+    public void testRowDataSetIterator() throws IOException {
         InputStream inputStream = DataPrepStreamMapperTest.class.getResourceAsStream("dataset.json");
         DataPrepStreamMapper streamMapper = new DataPrepStreamMapper(inputStream);
         streamMapper.initIterator();
@@ -35,5 +37,12 @@ public class DataPrepStreamMapperTest {
             assertTrue("10 columns should be in record", nextRecord.size() == 11);
             }
         streamMapper.close();
+    }
+    @Test
+    public void testRowDataSetIteratorFalse() throws IOException {
+        String falseMetaData = "{\"records\": null}";
+        DataPrepStreamMapper streamMapper =
+                new DataPrepStreamMapper(new ByteArrayInputStream(falseMetaData.getBytes()));
+        Assert.assertFalse(streamMapper.initIterator());
     }
 }

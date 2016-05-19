@@ -37,7 +37,6 @@ class DataPrepStreamMapper {
 
     private DataPrepStreamMapper() {
         objectMapper = new ObjectMapper();
-//        objectMapper.configure(Mapp, false);
     }
 
     public DataPrepStreamMapper (InputStream inputStream) throws IOException {
