@@ -42,7 +42,8 @@ public class BulkFileWriter implements Writer<WriterResult> {
 
     protected int dataCount;
 
-    public BulkFileWriter(WriteOperation<WriterResult> writeOperation, BulkFileProperties bulkProperties, RuntimeContainer container) {
+    public BulkFileWriter(WriteOperation<WriterResult> writeOperation, BulkFileProperties bulkProperties,
+            RuntimeContainer container) {
         this.writeOperation = writeOperation;
         this.container = container;
         this.sink = writeOperation.getSink();
@@ -55,11 +56,14 @@ public class BulkFileWriter implements Writer<WriterResult> {
         this.uId = uId;
         File file = new File(bulkProperties.bulkFilePath.getStringValue());
         file.getParentFile().mkdirs();
-        csvWriter = new CsvWriter(new OutputStreamWriter(
-                new java.io.FileOutputStream(file, isAppend), charset), separator);
+        csvWriter = new CsvWriter(new OutputStreamWriter(new java.io.FileOutputStream(file, isAppend), charset), separator);
+
+        fileIsEmpty = (file.length() == 0);
     }
 
     private boolean headerIsReady = false;
+
+    private boolean fileIsEmpty = false;
 
     @Override
     public void write(Object datum) throws IOException {
@@ -67,7 +71,7 @@ public class BulkFileWriter implements Writer<WriterResult> {
             return;
         }
 
-        if (!isAppend && !headerIsReady) {
+        if (!headerIsReady && (!isAppend || fileIsEmpty)) {
             Schema schema = new Schema.Parser().parse(bulkProperties.schema.schema.getStringValue());
 
             if (AvroUtils.isIncludeAllFields(schema) && (datum instanceof org.apache.avro.generic.IndexedRecord)) {

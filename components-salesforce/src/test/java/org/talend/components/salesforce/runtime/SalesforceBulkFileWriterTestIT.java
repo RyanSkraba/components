@@ -28,84 +28,100 @@ import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputB
  */
 public class SalesforceBulkFileWriterTestIT extends SalesforceTestBase {
 
-	@Rule
-	public TemporaryFolder tempFolder = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
 
-	SalesforceRuntimeTestUtil util = new SalesforceRuntimeTestUtil();
+    SalesforceRuntimeTestUtil util = new SalesforceRuntimeTestUtil();
 
-	@Test
-	public void testBasic() throws Exception {
-		TSalesforceOutputBulkDefinition definition = (TSalesforceOutputBulkDefinition) getComponentService()
-				.getComponentDefinition(TSalesforceOutputBulkDefinition.COMPONENT_NAME);
+    @Test
+    public void testBasic() throws Exception {
+        TSalesforceOutputBulkDefinition definition = (TSalesforceOutputBulkDefinition) getComponentService()
+                .getComponentDefinition(TSalesforceOutputBulkDefinition.COMPONENT_NAME);
 
-		String data_file = tempFolder.newFile("data.txt").getAbsolutePath();
+        String data_file = tempFolder.newFile("data.txt").getAbsolutePath();
 
-		TSalesforceOutputBulkProperties modelProperties = util.simulateUserBasicAction(definition, data_file,
-				util.getTestSchema1());
+        TSalesforceOutputBulkProperties modelProperties = util.simulateUserBasicAction(definition, data_file,
+                util.getTestSchema1());
 
-		String[] expected = { "FirstName", "LastName", "Phone" };
-		List actual = modelProperties.upsertRelationTable.columnName.getPossibleValues();
-		Assert.assertArrayEquals(expected, actual.toArray());
+        String[] expected = { "FirstName", "LastName", "Phone" };
+        List actual = modelProperties.upsertRelationTable.columnName.getPossibleValues();
+        Assert.assertArrayEquals(expected, actual.toArray());
 
-		util.simulateRuntimeCaller(definition, modelProperties, util.getTestSchema1(), util.getTestData());
+        util.simulateRuntimeCaller(definition, modelProperties, util.getTestSchema1(), util.getTestData());
 
-		String[] expected1 = { "FirstName,LastName,Phone", "Wei,Wang,010-11111111", "Jin,Zhao,010-11111112",
-				"Wei,Yuan,#N/A" };
-		util.compareFileContent(data_file, expected1);
+        String[] expected1 = { "FirstName,LastName,Phone", "Wei,Wang,010-11111111", "Jin,Zhao,010-11111112", "Wei,Yuan,#N/A" };
+        util.compareFileContent(data_file, expected1);
 
-		// test ignore null
-		modelProperties.ignoreNull.setValue("true");
-		util.simulateRuntimeCaller(definition, modelProperties, util.getTestSchema1(), util.getTestData());
+        // test ignore null
+        modelProperties.ignoreNull.setValue("true");
+        util.simulateRuntimeCaller(definition, modelProperties, util.getTestSchema1(), util.getTestData());
 
-		String[] expected2 = { "FirstName,LastName,Phone", "Wei,Wang,010-11111111", "Jin,Zhao,010-11111112",
-				"Wei,Yuan," };
-		util.compareFileContent(data_file, expected2);
+        String[] expected2 = { "FirstName,LastName,Phone", "Wei,Wang,010-11111111", "Jin,Zhao,010-11111112", "Wei,Yuan," };
+        util.compareFileContent(data_file, expected2);
 
-		// test append
-		modelProperties.append.setValue("true");
-		util.simulateRuntimeCaller(definition, modelProperties, util.getTestSchema1(), util.getTestData());
+        // test append
+        modelProperties.append.setValue("true");
+        util.simulateRuntimeCaller(definition, modelProperties, util.getTestSchema1(), util.getTestData());
 
-		String[] expected3 = { "FirstName,LastName,Phone", "Wei,Wang,010-11111111", "Jin,Zhao,010-11111112",
-				"Wei,Yuan,", "Wei,Wang,010-11111111", "Jin,Zhao,010-11111112", "Wei,Yuan," };
-		util.compareFileContent(data_file, expected3);
+        String[] expected3 = { "FirstName,LastName,Phone", "Wei,Wang,010-11111111", "Jin,Zhao,010-11111112", "Wei,Yuan,",
+                "Wei,Wang,010-11111111", "Jin,Zhao,010-11111112", "Wei,Yuan," };
+        util.compareFileContent(data_file, expected3);
 
-	}
+    }
 
-	@Test
-	public void testUpsertAction() throws Exception {
-		TSalesforceOutputBulkDefinition definition = (TSalesforceOutputBulkDefinition) getComponentService()
-				.getComponentDefinition(TSalesforceOutputBulkDefinition.COMPONENT_NAME);
+    @Test
+    public void testAppendWhenFileIsEmptyOrNotExist() throws Exception {
+        TSalesforceOutputBulkDefinition definition = (TSalesforceOutputBulkDefinition) getComponentService()
+                .getComponentDefinition(TSalesforceOutputBulkDefinition.COMPONENT_NAME);
 
-		String data_file = tempFolder.newFile("data.txt").getAbsolutePath();
+        String data_file = tempFolder.newFile("data.txt").getAbsolutePath();
 
-		TSalesforceOutputBulkProperties modelProperties = util.simulateUserBasicAction(definition, data_file,
-				util.getTestSchema1());
+        TSalesforceOutputBulkProperties modelProperties = util.simulateUserBasicAction(definition, data_file,
+                util.getTestSchema1());
 
-		java.util.List<String> columnNames = new java.util.ArrayList<String>();
-		columnNames.add("Phone");
-		modelProperties.upsertRelationTable.columnName.setValue(columnNames);
+        modelProperties.append.setValue("true");
 
-		java.util.List<String> lookupFieldExternalIdNames = new java.util.ArrayList<String>();
-		lookupFieldExternalIdNames.add("eid");
-		modelProperties.upsertRelationTable.lookupFieldExternalIdName.setValue(lookupFieldExternalIdNames);
+        util.simulateRuntimeCaller(definition, modelProperties, util.getTestSchema1(), util.getTestData());
 
-		java.util.List<String> lookupFieldNames = new java.util.ArrayList<String>();
-		lookupFieldNames.add("lfn");
-		modelProperties.upsertRelationTable.lookupFieldName.setValue(lookupFieldNames);
+        String[] expected1 = { "FirstName,LastName,Phone", "Wei,Wang,010-11111111", "Jin,Zhao,010-11111112", "Wei,Yuan,#N/A" };
+        util.compareFileContent(data_file, expected1);
+    }
 
-		java.util.List<String> polymorphics = new java.util.ArrayList<String>();
-		polymorphics.add("true");
-		modelProperties.upsertRelationTable.polymorphic.setValue(polymorphics);
+    @Test
+    public void testUpsertAction() throws Exception {
+        TSalesforceOutputBulkDefinition definition = (TSalesforceOutputBulkDefinition) getComponentService()
+                .getComponentDefinition(TSalesforceOutputBulkDefinition.COMPONENT_NAME);
 
-		java.util.List<String> lookupFieldModuleNames = new java.util.ArrayList<String>();
-		lookupFieldModuleNames.add("fmn");
-		modelProperties.upsertRelationTable.lookupFieldModuleName.setValue(lookupFieldModuleNames);
+        String data_file = tempFolder.newFile("data.txt").getAbsolutePath();
 
-		util.simulateRuntimeCaller(definition, modelProperties, util.getTestSchema1(), util.getTestData());
+        TSalesforceOutputBulkProperties modelProperties = util.simulateUserBasicAction(definition, data_file,
+                util.getTestSchema1());
 
-		String[] expected1 = { "FirstName,LastName,fmn:lfn.eid", "Wei,Wang,010-11111111", "Jin,Zhao,010-11111112",
-				"Wei,Yuan,#N/A" };
-		util.compareFileContent(data_file, expected1);
-	}
+        java.util.List<String> columnNames = new java.util.ArrayList<String>();
+        columnNames.add("Phone");
+        modelProperties.upsertRelationTable.columnName.setValue(columnNames);
+
+        java.util.List<String> lookupFieldExternalIdNames = new java.util.ArrayList<String>();
+        lookupFieldExternalIdNames.add("eid");
+        modelProperties.upsertRelationTable.lookupFieldExternalIdName.setValue(lookupFieldExternalIdNames);
+
+        java.util.List<String> lookupFieldNames = new java.util.ArrayList<String>();
+        lookupFieldNames.add("lfn");
+        modelProperties.upsertRelationTable.lookupFieldName.setValue(lookupFieldNames);
+
+        java.util.List<String> polymorphics = new java.util.ArrayList<String>();
+        polymorphics.add("true");
+        modelProperties.upsertRelationTable.polymorphic.setValue(polymorphics);
+
+        java.util.List<String> lookupFieldModuleNames = new java.util.ArrayList<String>();
+        lookupFieldModuleNames.add("fmn");
+        modelProperties.upsertRelationTable.lookupFieldModuleName.setValue(lookupFieldModuleNames);
+
+        util.simulateRuntimeCaller(definition, modelProperties, util.getTestSchema1(), util.getTestData());
+
+        String[] expected1 = { "FirstName,LastName,fmn:lfn.eid", "Wei,Wang,010-11111111", "Jin,Zhao,010-11111112",
+                "Wei,Yuan,#N/A" };
+        util.compareFileContent(data_file, expected1);
+    }
 
 }
