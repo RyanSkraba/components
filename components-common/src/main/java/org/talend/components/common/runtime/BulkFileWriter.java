@@ -58,7 +58,7 @@ public class BulkFileWriter implements Writer<WriterResult> {
         file.getParentFile().mkdirs();
         csvWriter = new CsvWriter(new OutputStreamWriter(new java.io.FileOutputStream(file, isAppend), charset), separator);
 
-        sfileIsEmpty = (file.length() == 0);
+        fileIsEmpty = (file.length() == 0);
     }
 
     private boolean headerIsReady = false;
