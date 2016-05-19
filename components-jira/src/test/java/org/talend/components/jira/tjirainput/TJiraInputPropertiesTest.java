@@ -89,7 +89,7 @@ public class TJiraInputPropertiesTest {
         assertThat(hostValue, equalTo("https://jira.atlassian.com/"));
         assertThat(resourceValue, equalTo("issue"));
         assertThat(authorizationTypeValue, equalTo("Basic"));
-        assertThat(jqlValue, equalTo(""));
+        assertThat(jqlValue, equalTo("summary ~ \\\"some word\\\" AND project=PROJECT_ID"));
         assertThat(projectIdValue, equalTo(""));
         assertThat(batchSizeValue, equalTo(50));
     }

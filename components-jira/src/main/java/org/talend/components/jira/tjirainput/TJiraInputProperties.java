@@ -131,7 +131,7 @@ public class TJiraInputProperties extends FixedConnectorsComponentProperties {
         host.setValue("https://jira.atlassian.com/");
         resource.setValue(ISSUE);
         authorizationType.setValue(BASIC);
-        jql.setValue("");
+        jql.setValue("summary ~ \\\"some word\\\" AND project=PROJECT_ID");
         projectId.setValue("");
         batchSize.setValue(50);
         
