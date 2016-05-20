@@ -42,6 +42,7 @@ public class TDataSetOutputDefinition extends AbstractComponentDefinition implem
         return new String[]{"Talend Data Preparation"};
     }
 
+    @Override
     public String getMavenGroupId() {
         return "org.talend.components";
     }
@@ -50,8 +51,7 @@ public class TDataSetOutputDefinition extends AbstractComponentDefinition implem
     public String getMavenArtifactId() {
         return "components-dataprep";
     }
-    
-    
+
     @Override
     public String getName() {
         return COMPONENT_NAME;
@@ -65,5 +65,10 @@ public class TDataSetOutputDefinition extends AbstractComponentDefinition implem
     @Override
     public Sink getRuntime() {
         return new TDataSetOutputSink();
+    }
+
+    @Override
+    public boolean isSchemaAutoPropagate() {
+        return true;
     }
 }

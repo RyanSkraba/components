@@ -41,6 +41,13 @@ public class TDataSetTestIT {
         Assert.assertNotNull(properties.getSchema());
         Assert.assertEquals(Collections.singleton(connector), properties.getAllSchemaPropertiesConnectors(true));
     }
+    @Test
+    public void testRemoveQuotes() {
+        TDataSetInputProperties properties = (TDataSetInputProperties) componentService.
+                getComponentProperties("tDatasetInput");
+        Assert.assertEquals("somestr", properties.removeQuotes("\"somestr\""));
+
+    }
 
     @Test
     public void testTDataSetOutputDefinition() {

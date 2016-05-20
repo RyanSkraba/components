@@ -50,14 +50,18 @@ public class TDataSetOutputProperties extends FixedConnectorsComponentProperties
     /** Constant for live dataset. */
     public static final String LIVE_DATASET="livedataset";
 
-    public Property dataSetName = PropertyFactory.newString("dataSetName");
-    public Property login = PropertyFactory.newString("login");
-    public Property pass = PropertyFactory.newString("pass");
-    public Property url = PropertyFactory.newString("url");
-    public Property mode = PropertyFactory.newEnum("mode", "create", "update", "create&update", LIVE_DATASET);
-    public SchemaProperties schema = new SchemaProperties("schema");
-    protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
-    public Property limit = PropertyFactory.newString("limit", "100");
+    public static final Property dataSetName = PropertyFactory.newString("dataSetName");
+    public static final Property login = PropertyFactory.newString("login");
+    public static final Property pass = PropertyFactory.newString("pass");
+    public static final Property url = PropertyFactory.newString("url");
+    public static final Property mode = PropertyFactory.newEnum("mode",
+            DataPrepOutputModes.CREATE.toString(),
+            DataPrepOutputModes.UPDATE.toString(),
+            DataPrepOutputModes.CREATEANDUPDATE.toString(),
+            DataPrepOutputModes.LIVEDATASET.toString());
+    public static final SchemaProperties schema = new SchemaProperties("schema");
+    public static final Property limit = PropertyFactory.newString("limit", "100");
+    protected PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
     public TDataSetOutputProperties(String name) {
         super(name);
@@ -65,7 +69,7 @@ public class TDataSetOutputProperties extends FixedConnectorsComponentProperties
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean b) {
-        return Collections.singleton(MAIN_CONNECTOR);
+        return Collections.singleton(mainConnector);
     }
     
     @Override
@@ -83,5 +87,16 @@ public class TDataSetOutputProperties extends FixedConnectorsComponentProperties
 
     public Schema getSchema() {
         return (Schema) schema.schema.getValue();
+    }
+
+    public RuntimeProperties getRuntimeProperties() {
+        RuntimeProperties runtimeProperties = new RuntimeProperties();
+        runtimeProperties.setUlr(url.getStringValue());
+        runtimeProperties.setLogin(login.getStringValue());
+        runtimeProperties.setPass(pass.getStringValue());
+        runtimeProperties.setDataSetName(dataSetName.getStringValue());
+        runtimeProperties.setMode(mode.getStringValue());
+        runtimeProperties.setLimit(limit.getStringValue());
+        return runtimeProperties;
     }
 }

@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 class DataPrepStreamMapper {
 
@@ -32,7 +31,6 @@ class DataPrepStreamMapper {
 
     private ObjectMapper objectMapper;
     private JsonParser jsonParser;
-    private JsonToken currentToken;
     private MappingIterator<Map<String,String>> iterator;
 
     private DataPrepStreamMapper() {
@@ -45,9 +43,10 @@ class DataPrepStreamMapper {
     }
 
     public boolean initIterator() throws IOException {
+        JsonToken currentToken;
         while ((currentToken = jsonParser.nextToken()) != JsonToken.END_OBJECT) {
             if (currentToken == JsonToken.START_ARRAY) {
-                currentToken = jsonParser.nextToken();
+                jsonParser.nextToken();
                 this.iterator = objectMapper.readValues(jsonParser, new TypeReference<Map<String, String>>() {
                 });
                 return true;
@@ -56,7 +55,7 @@ class DataPrepStreamMapper {
         return false;
     }
 
-    Map<String, String> nextRecord() throws NoSuchElementException {
+    Map<String, String> nextRecord() {
         Map<String, String> record = iterator.next();
         record.remove("tdpId");
         LOGGER.debug("Record is : {}", record);
@@ -71,8 +70,7 @@ class DataPrepStreamMapper {
         jsonParser.close();
     }
 
-    MetaData getMetaData() throws IOException {
-        MetaData metaData = objectMapper.readValue(jsonParser, MetaData.class);
-        return metaData;
+    MetaData getMetaData() throws IOException{
+        return objectMapper.readValue(jsonParser, MetaData.class);
     }
 }

@@ -80,6 +80,7 @@ public class DataPrepAdaptorFactory implements IndexedRecordAdapterFactory<DataP
             return value;
         }
 
+        @Override
         public Schema getSchema() {
             return DataPrepAdaptorFactory.this.getSchema();
         }

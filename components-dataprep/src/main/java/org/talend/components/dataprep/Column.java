@@ -16,7 +16,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Column {
-    private String name, type, id;
+    private String name;
+    private String type;
+    private String id;
 
     public String getName() {
         return name;

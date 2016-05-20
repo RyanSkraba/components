@@ -13,6 +13,8 @@
 package org.talend.components.dataprep;
 
 import org.apache.avro.Schema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
@@ -22,6 +24,7 @@ import org.talend.daikon.properties.ValidationResult;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,62 +43,70 @@ import java.util.List;
 public class TDataSetInputSource implements BoundedSource {
 
     /** Default serial version UID. */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -3740291007255450917L;
 
     /** Configuration extracted from the input properties. */
-    private TDataSetInputProperties properties;
+    private RuntimeProperties runtimeProperties;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataPrepConnectionHandler.class);
 
     private transient Schema schema;
 
-    private DataPrepConnectionHandler connectionHandler;
-
+    @Override
     public void initialize(RuntimeContainer container, ComponentProperties properties) {
-        this.properties = (TDataSetInputProperties) properties;
-        schema = new Schema.Parser().parse(this.properties.schema.schema.getStringValue());
+        this.runtimeProperties = ((TDataSetInputProperties) properties).getRuntimeProperties();
+        schema = new Schema.Parser().parse(runtimeProperties.getSchema());
     }
 
+    @Override
     public BoundedReader createReader(RuntimeContainer container) {
         return new TDataSetInputReader(container, this, getConnectionHandler(), this.schema);
     }
 
     private DataPrepConnectionHandler getConnectionHandler() {
-        if (connectionHandler == null) {
-            connectionHandler = new DataPrepConnectionHandler(properties.url.getStringValue(), properties.login.getStringValue(),
-                    properties.pass.getStringValue(), properties.dataSetName.getStringValue());
-            return connectionHandler;
-        } else
-            return this.connectionHandler;
+            return new DataPrepConnectionHandler(
+                    runtimeProperties.getUlr(), //
+                    runtimeProperties.getLogin(), //
+                    runtimeProperties.getPass(), //
+                    runtimeProperties.getDataSetName());
     }
 
+    @Override
     public ValidationResult validate(RuntimeContainer container) {
         try {
             getConnectionHandler().validate();
         } catch (IOException e) {
+            LOGGER.debug("Validation isn't passed. Reason: {}", e);
             return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
                     .setMessage(e.getMessage());
         }
         return ValidationResult.OK;
     }
 
+    @Override
     public Schema getSchema(RuntimeContainer container, String schemaName) throws IOException {
         return null;
     }
 
+    @Override
     public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
-        return null;
+        return Collections.emptyList();
     }
 
+    @Override
     public List<? extends BoundedSource> splitIntoBundles(long desiredBundleSizeBytes, RuntimeContainer adaptor)
             throws Exception {
         // There can be only one.
         return Arrays.asList(this);
     }
 
+    @Override
     public long getEstimatedSizeBytes(RuntimeContainer adaptor) {
         // This will be ignored since the source will never be split.
         return 0;
     }
 
+    @Override
     public boolean producesSortedKeys(RuntimeContainer adaptor) {
         return false;
     }

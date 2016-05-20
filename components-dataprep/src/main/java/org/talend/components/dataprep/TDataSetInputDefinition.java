@@ -44,6 +44,7 @@ public class TDataSetInputDefinition extends AbstractComponentDefinition impleme
         return new String[] { "Talend Data Preparation" };
     }
 
+    @Override
     public String getMavenGroupId() {
         return "org.talend.components";
     }
@@ -61,5 +62,10 @@ public class TDataSetInputDefinition extends AbstractComponentDefinition impleme
     @Override
     public Source getRuntime() {
         return new TDataSetInputSource();
+    }
+
+    @Override
+    public boolean isSchemaAutoPropagate() {
+        return true;
     }
 }

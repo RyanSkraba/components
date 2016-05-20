@@ -19,12 +19,12 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 /**
  * Simple implementation of a reader.
@@ -66,7 +66,7 @@ public class TDataSetInputReader extends AbstractBoundedReader<IndexedRecord> {
     }
 
     @Override
-    public IndexedRecord getCurrent() throws NoSuchElementException {
+    public IndexedRecord getCurrent() {
         Map<String,String> recordMap = dataPrepStreamMapper.nextRecord();
         LOGGER.debug("Record from data set: {}", recordMap);
         DataPrepField[] record = new DataPrepField[sourceSchema.size()];
@@ -78,7 +78,7 @@ public class TDataSetInputReader extends AbstractBoundedReader<IndexedRecord> {
         try {
             return ((DataPrepAdaptorFactory) getFactory()).convertToAvro(record);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ComponentException(e);
         }
     }
 
@@ -94,5 +94,4 @@ public class TDataSetInputReader extends AbstractBoundedReader<IndexedRecord> {
         adaptorFactory.setSchema(schema);
         return adaptorFactory;
     }
-
 }

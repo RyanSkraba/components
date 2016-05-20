@@ -13,6 +13,8 @@
 package org.talend.components.dataprep;
 
 import org.apache.avro.Schema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
@@ -26,34 +28,34 @@ import java.util.List;
 
 public class TDataSetOutputSink implements Sink {
 
-    TDataSetOutputProperties properties;
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataPrepConnectionHandler.class);
+
+    RuntimeProperties runtimeProperties;
 
     @Override
     public WriteOperation<?> createWriteOperation() {
-        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler( //
-                properties.url.getStringValue(), //
-                properties.login.getStringValue(), //
-                properties.pass.getStringValue(), //
-                properties.dataSetName.getStringValue());
-        return new TDataSetWriteOperation(this, connectionHandler, properties.limit.getIntValue(), properties.mode.getStringValue());
+        return new TDataSetWriteOperation(this, runtimeProperties);
     }
 
     @Override
     public void initialize(RuntimeContainer runtimeContainer, ComponentProperties componentProperties) {
-        this.properties = (TDataSetOutputProperties) componentProperties;
+        this.runtimeProperties = ((TDataSetOutputProperties) componentProperties).getRuntimeProperties();
     }
 
     @Override
     public ValidationResult validate(RuntimeContainer runtimeContainer) {
-        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(properties.url.getStringValue(),
-                properties.login.getStringValue(), properties.pass.getStringValue(),
-                properties.dataSetName.getStringValue());
-            if (TDataSetOutputProperties.LIVE_DATASET.equals(properties.mode.getStringValue())) {
+        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler( //
+                runtimeProperties.getUlr(), //
+                runtimeProperties.getLogin(), //
+                runtimeProperties.getPass(), //
+                runtimeProperties.getDataSetName());
+            if (DataPrepOutputModes.LIVEDATASET.equals(runtimeProperties.getMode())) {
                 return ValidationResult.OK;
             }
             try {
                 connectionHandler.validate();
             } catch (IOException e) {
+                LOGGER.debug("Validation isn't passed. Reason: {}", e);
                 return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
                         .setMessage(e.getMessage());
             }

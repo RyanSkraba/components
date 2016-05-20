@@ -36,16 +36,17 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
     private boolean firstRow = true;
     private WriteOperation<WriterResult> writeOperation;
     private int limit;
-    private String mode;
+    private DataPrepOutputModes mode;
 
-    TDataSetOutputWriter(WriteOperation<WriterResult> writeOperation, //
-                         DataPrepConnectionHandler connectionHandler, //
-                         int limit, //
-                         String mode) {
+    TDataSetOutputWriter(WriteOperation<WriterResult> writeOperation, RuntimeProperties runtimeProperties) {
         this.writeOperation = writeOperation;
-        this.connectionHandler = connectionHandler;
-        this.limit = limit;
-        this.mode = mode;
+        this.connectionHandler = new DataPrepConnectionHandler( //
+                runtimeProperties.getUlr(), //
+                runtimeProperties.getLogin(), //
+                runtimeProperties.getPass(), //
+                runtimeProperties.getDataSetName());
+        this.limit = Integer.valueOf(runtimeProperties.getLimit());
+        this.mode = runtimeProperties.getMode();
     }
 
     @Override
@@ -115,6 +116,6 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
     }
 
     private boolean isLiveDataSet() {
-        return TDataSetOutputProperties.LIVE_DATASET.equals(mode);
+        return DataPrepOutputModes.LIVEDATASET.equals(mode);
     }
 }

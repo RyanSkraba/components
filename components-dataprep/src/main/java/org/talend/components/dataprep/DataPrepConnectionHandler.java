@@ -28,7 +28,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-public class DataPrepConnectionHandler {
+class DataPrepConnectionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataPrepConnectionHandler.class);
 
@@ -43,8 +43,6 @@ public class DataPrepConnectionHandler {
     private HttpURLConnection urlConnection;
 
     private Header authorisationHeader;
-
-    private static final int STATUS_OK = 200;
 
     DataPrepConnectionHandler(String url, String login, String pass, String dataSetName) {
         this.url = url;
@@ -95,7 +93,7 @@ public class DataPrepConnectionHandler {
         } catch (IOException e) {
             LOGGER.debug("Validation isn't passed. Reason: {}", e.getMessage());
             //TODO i18n
-            throw new IOException("Validation isn't passed. Reason: " + e.getMessage());
+            throw new IOException("Validation isn't passed. Reason: " + e.getMessage(), e);
         }
     }
 

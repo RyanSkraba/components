@@ -21,7 +21,6 @@ import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.daikon.avro.AvroRegistry;
-import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.PropertyFactory;
@@ -60,21 +59,19 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
 
     private static final Logger LOG = LoggerFactory.getLogger(TDataSetInputProperties.class);
 
-    private I18nMessages messageFormatter;
+    public static final SchemaProperties schema = new SchemaProperties("schema");
 
-    public SchemaProperties schema = new SchemaProperties("schema");
+    public static final PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
-    protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
+    public static final Property dataSetName = PropertyFactory.newString("dataSetName");
 
-    public Property dataSetName = PropertyFactory.newString("dataSetName");
+    public static final Property login = PropertyFactory.newString("login");
 
-    public Property login = PropertyFactory.newString("login");
+    public static final Property pass = PropertyFactory.newString("pass");
 
-    public Property pass = PropertyFactory.newString("pass");
+    public static final Property url = PropertyFactory.newString("url");
 
-    public Property url = PropertyFactory.newString("url");
-
-    public PresentationItem fetchSchema = new PresentationItem("fetchSchema", "FetchSchema");
+    public static final PresentationItem fetchSchema = new PresentationItem("fetchSchema", "FetchSchema");
 
     public TDataSetInputProperties(String name) {
         super(name);
@@ -82,7 +79,7 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean b) {
-        return Collections.singleton(MAIN_CONNECTOR);
+        return Collections.singleton(mainConnector);
     }
 
     @Override
@@ -96,10 +93,10 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
         form.addRow(Widget.widget(fetchSchema).setWidgetType(Widget.WidgetType.BUTTON));
     }
 
-    private String removeQuotes(String str) {
-        //TODO Make check about existed quotes
-        String some = str.substring(1, str.length() - 1);
-        return some;
+    String removeQuotes(String str) {
+        if (str.startsWith("\"") && str.endsWith("\""))
+            return str.substring(1, str.length() - 1);
+        return str;
     }
 
     public ValidationResult afterFetchSchema() {
@@ -135,30 +132,40 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
                 i++;
             }
             AvroRegistry avroRegistry = DataPrepAvroRegistry.getDataPrepInstance();
-            this.schema.schema.setValue(avroRegistry.inferSchema(scemaRow));
+            schema.schema.setValue(avroRegistry.inferSchema(scemaRow));
 
             return ValidationResult.OK;
         }
     }
 
     private boolean isRequiredFieldRight() {
-        String urlStringValue = url.getStringValue();
-        String loginStringValue = login.getStringValue();
-        String passStringValue = pass.getStringValue();
-        String dataSetNameStringValue = dataSetName.getStringValue();
-        if (urlStringValue == null || urlStringValue.isEmpty()) {
+        if (isNotNullAndNotEmpty(url.getStringValue())) {
             return false;
         }
-        if (loginStringValue == null || loginStringValue.isEmpty()) {
+        if (isNotNullAndNotEmpty(login.getStringValue())) {
             return false;
         }
-        if (passStringValue == null || passStringValue.isEmpty()) {
+        if (isNotNullAndNotEmpty(pass.getStringValue())) {
             return false;
         }
-        if (dataSetNameStringValue == null || dataSetNameStringValue.isEmpty()) {
+        if (isNotNullAndNotEmpty(dataSetName.getStringValue())) {
             return false;
         }
         return true;
+    }
+
+    private boolean isNotNullAndNotEmpty(String propertyStringValue) {
+        return propertyStringValue == null || propertyStringValue.isEmpty();
+    }
+
+    public RuntimeProperties getRuntimeProperties() {
+        RuntimeProperties runtimeProperties = new RuntimeProperties();
+        runtimeProperties.setUlr(url.getStringValue());
+        runtimeProperties.setLogin(login.getStringValue());
+        runtimeProperties.setPass(pass.getStringValue());
+        runtimeProperties.setDataSetName(dataSetName.getStringValue());
+        runtimeProperties.setSchema(schema.schema.getStringValue());
+        return runtimeProperties;
     }
 
     public Schema getSchema() {

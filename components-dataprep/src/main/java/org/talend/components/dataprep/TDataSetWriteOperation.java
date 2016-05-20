@@ -21,30 +21,26 @@ import org.talend.components.api.container.RuntimeContainer;
 public class TDataSetWriteOperation implements WriteOperation<WriterResult> {
 
     private Sink sink;
-    private DataPrepConnectionHandler connectionHandler;
-    private int limit;
-    private String mode;
+    private RuntimeProperties runtimeProperties;
 
-    public TDataSetWriteOperation(Sink sink, DataPrepConnectionHandler connectionHandler, int limit, String mode ) {
+    public TDataSetWriteOperation(Sink sink, RuntimeProperties runtimeProperties ) {
         this.sink = sink;
-        this.connectionHandler = connectionHandler;
-        this.limit = limit;
-        this.mode = mode;
+        this.runtimeProperties = runtimeProperties;
     }
 
     @Override
     public void initialize(RuntimeContainer runtimeContainer) {
-
+        // Nothing to do here
     }
 
     @Override
     public void finalize(Iterable<WriterResult> iterable, RuntimeContainer runtimeContainer) {
-
+        // Nothing to do here
     }
 
     @Override
     public Writer<WriterResult> createWriter(RuntimeContainer runtimeContainer) {
-        return new TDataSetOutputWriter(this, connectionHandler, limit, mode);
+        return new TDataSetOutputWriter(this, runtimeProperties);
     }
 
     @Override

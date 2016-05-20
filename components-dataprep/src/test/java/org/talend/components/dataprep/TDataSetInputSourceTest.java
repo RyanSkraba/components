@@ -11,6 +11,7 @@ import org.talend.components.api.test.SpringApp;
 
 import javax.inject.Inject;
 import java.util.Arrays;
+import java.util.Collections;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -50,7 +51,7 @@ public class TDataSetInputSourceTest {
 
     @Test
     public void testGetSchemaNames() throws Exception {
-        Assert.assertNull(inputSource.getSchemaNames(null));
+        Assert.assertEquals(Collections.emptyList(),inputSource.getSchemaNames(null));
     }
 
     @Test

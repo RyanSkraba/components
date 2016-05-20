@@ -12,28 +12,18 @@
 // ============================================================================
 package org.talend.components.dataprep;
 
-public class DataPrepField {
+public enum DataPrepOutputModes {
+    CREATE, UPDATE,
+    CREATEANDUPDATE {
+        @Override
+        public String toString() {
+            return "create&update";
+        }
 
-    private final String columnName;
-    private final String type;
-    private final String content;
+    }, LIVEDATASET;
 
-    DataPrepField (String columnName, String type, String content) {
-        this.columnName = columnName;
-        this.type = type;
-        this.content = content;
+    @Override
+    public String toString() {
+        return super.toString().toLowerCase();
     }
-
-    public String getColumnName() {
-        return columnName;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
 }
