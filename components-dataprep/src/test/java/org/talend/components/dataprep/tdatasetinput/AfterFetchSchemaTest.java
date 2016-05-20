@@ -10,7 +10,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.test.SpringApp;
+import org.talend.components.api.test.SpringTestApp;
 import org.talend.daikon.properties.ValidationResult;
 
 import javax.inject.Inject;
@@ -18,7 +18,7 @@ import javax.inject.Inject;
 import static org.hamcrest.Matchers.equalTo;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SpringApp.class)
+@SpringApplicationConfiguration(classes = SpringTestApp.class)
 @WebIntegrationTest("server.port:0")
 public class AfterFetchSchemaTest {
 

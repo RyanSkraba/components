@@ -21,12 +21,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.talend.components.api.test.SpringApp;
+import org.talend.components.api.test.SpringTestApp;
 
 import java.io.IOException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SpringApp.class)
+@SpringApplicationConfiguration(classes = SpringTestApp.class)
 @WebIntegrationTest("server.port:0")
 public class DataPrepConnectionHandlerTest {
 
