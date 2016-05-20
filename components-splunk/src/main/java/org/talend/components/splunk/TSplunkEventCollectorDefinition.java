@@ -59,6 +59,11 @@ public class TSplunkEventCollectorDefinition extends AbstractComponentDefinition
     }
 
     @Override
+    public boolean isSchemaAutoPropagate() {
+        return true;
+    }
+
+    @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return TSplunkEventCollectorProperties.class;
     }
