@@ -18,7 +18,7 @@ public class DataPrepField {
     private final String type;
     private final String content;
 
-    DataPrepField (String columnName, String type, String content) {
+    public DataPrepField (String columnName, String type, String content) {
         this.columnName = columnName;
         this.type = type;
         this.content = content;

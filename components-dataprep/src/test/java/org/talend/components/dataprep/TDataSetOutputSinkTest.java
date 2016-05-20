@@ -8,6 +8,8 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.SpringApp;
+import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputDefinition;
+import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
 
 import javax.inject.Inject;
 import java.util.Collections;

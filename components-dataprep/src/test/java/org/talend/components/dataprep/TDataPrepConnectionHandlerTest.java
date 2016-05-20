@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
 
 import java.io.*;
 import java.net.HttpURLConnection;

@@ -28,7 +28,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-class DataPrepConnectionHandler {
+public class DataPrepConnectionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataPrepConnectionHandler.class);
 
@@ -44,14 +44,14 @@ class DataPrepConnectionHandler {
 
     private Header authorisationHeader;
 
-    DataPrepConnectionHandler(String url, String login, String pass, String dataSetName) {
+    public DataPrepConnectionHandler(String url, String login, String pass, String dataSetName) {
         this.url = url;
         this.login = login;
         this.pass = pass;
         this.dataSetName = dataSetName;
     }
 
-    HttpResponse connect() throws IOException {
+    public HttpResponse connect() throws IOException {
         Request request = Request.Post(url + "/login?username=" + login + "&password=" + pass + "&client-app=studio");
         HttpResponse response = request.execute().returnResponse();
         authorisationHeader = response.getFirstHeader("Authorization");
@@ -63,7 +63,7 @@ class DataPrepConnectionHandler {
         return response;
     }
 
-    HttpResponse logout() throws IOException{
+    public HttpResponse logout() throws IOException{
         HttpResponse response;
         try {
             if (urlConnection != null) {
@@ -149,7 +149,7 @@ class DataPrepConnectionHandler {
         return urlConnection.getOutputStream();
     }
 
-    List<Column> readSourceSchema() throws IOException {
+    public List<Column> readSourceSchema() throws IOException {
         Request request = Request.Get(url + "/api/datasets/" + dataSetName + "/metadata");
         request.addHeader(authorisationHeader);
 

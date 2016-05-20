@@ -10,36 +10,39 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.dataprep;
+package org.talend.components.dataprep.tdatasetinput;
 
 import org.talend.components.api.Constants;
-import org.talend.components.api.component.*;
-import org.talend.components.api.component.Trigger.TriggerType;
-import org.talend.components.api.component.runtime.Sink;
+import org.talend.components.api.component.AbstractComponentDefinition;
+import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.InputComponentDefinition;
+import org.talend.components.api.component.Trigger;
+import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
 
 import aQute.bnd.annotation.component.Component;
+import org.talend.components.dataprep.TDataSetInputSource;
 
 /**
- * The TDataSetOutputDefinition acts as an entry point for all of services that
+ * The TDataSetInputDefinition acts as an entry point for all of services that
  * a component provides to integrate with the Studio (at design-time) and other 
  * components (at run-time).
  */
-@Component(name = Constants.COMPONENT_BEAN_PREFIX + TDataSetOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TDataSetOutputDefinition extends AbstractComponentDefinition implements OutputComponentDefinition {
+@Component(name = Constants.COMPONENT_BEAN_PREFIX + TDataSetInputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+public class TDataSetInputDefinition extends AbstractComponentDefinition implements InputComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tDatasetOutput";
+    public static final String COMPONENT_NAME = "tDatasetInput";
 
 
-    public TDataSetOutputDefinition() {
+    public TDataSetInputDefinition() {
         super(COMPONENT_NAME);
-        setTriggers(new Trigger(TriggerType.ITERATE, 1, 1), new Trigger(TriggerType.SUBJOB_OK, 1, 0),
-                new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
+        setTriggers(new Trigger(Trigger.TriggerType.ITERATE, 1, 1), new Trigger(Trigger.TriggerType.SUBJOB_OK, 1, 0),
+                new Trigger(Trigger.TriggerType.SUBJOB_ERROR, 1, 0));
     }
 
     @Override
     public String[] getFamilies() {
-        return new String[]{"Talend Data Preparation"};
+        return new String[] { "Talend Data Preparation" };
     }
 
     @Override
@@ -53,18 +56,13 @@ public class TDataSetOutputDefinition extends AbstractComponentDefinition implem
     }
 
     @Override
-    public String getName() {
-        return COMPONENT_NAME;
-    }
-
-    @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
-        return TDataSetOutputProperties.class;
+        return TDataSetInputProperties.class;
     }
 
     @Override
-    public Sink getRuntime() {
-        return new TDataSetOutputSink();
+    public Source getRuntime() {
+        return new TDataSetInputSource();
     }
 
     @Override
