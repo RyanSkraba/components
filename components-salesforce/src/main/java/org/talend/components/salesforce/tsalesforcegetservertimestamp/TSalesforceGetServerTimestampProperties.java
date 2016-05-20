@@ -15,7 +15,6 @@ package org.talend.components.salesforce.tsalesforcegetservertimestamp;
 import java.util.Collections;
 import java.util.Set;
 
-import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.component.Connector;
@@ -52,8 +51,7 @@ public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComp
     @Override
     public void setupProperties() {
         super.setupProperties();
-        Schema s = SchemaBuilder.record("Main")
-                .fields().name("ServerTimeStamp")
+        Schema s = SchemaBuilder.record("Main").fields().name("ServerTimeStamp")
                 .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'")
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "20")//$NON-NLS-1$
                 .type(AvroTypes._date()).noDefault().endRecord();
@@ -77,7 +75,7 @@ public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComp
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        if (form.getName().equals(Form.ADVANCED)) {
+        if (form != null && form.getName().equals(Form.ADVANCED)) {
             form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
             form.getChildForm(connection.getName()).getWidget(connection.httpTraceMessage.getName()).setHidden(true);
         }

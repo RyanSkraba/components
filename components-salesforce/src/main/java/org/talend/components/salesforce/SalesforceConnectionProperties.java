@@ -12,10 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.PropertyFactory.newBoolean;
-import static org.talend.daikon.properties.PropertyFactory.newEnum;
-import static org.talend.daikon.properties.PropertyFactory.newInteger;
-import static org.talend.daikon.properties.PropertyFactory.newString;
+import static org.talend.daikon.properties.PropertyFactory.*;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import org.talend.components.api.properties.ComponentProperties;
@@ -177,6 +174,9 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
     @Override
     public void refreshLayout(Form form) {
+        if (form == null) {
+            return;
+        }
         super.refreshLayout(form);
 
         String refComponentIdValue = getReferencedComponentId();
@@ -217,13 +217,13 @@ public class SalesforceConnectionProperties extends ComponentProperties
                 boolean bulkMode = bulkConnection.getBooleanValue();
                 form.getWidget(httpChunked.getName()).setHidden(bulkMode);
                 form.getWidget(httpTraceMessage.getName()).setHidden(!bulkMode);
-                
+
                 Form proxyForm = form.getChildForm(proxy.getName());
-                if(proxyForm!=null) {
-	                boolean isUseProxy = proxy.useProxy.getBooleanValue();
-	                proxyForm.getWidget(proxy.host.getName()).setHidden(!isUseProxy);
-	                proxyForm.getWidget(proxy.port.getName()).setHidden(!isUseProxy);
-	                proxyForm.getWidget(proxy.userPassword.getName()).setHidden(!isUseProxy);
+                if (proxyForm != null) {
+                    boolean isUseProxy = proxy.useProxy.getBooleanValue();
+                    proxyForm.getWidget(proxy.host.getName()).setHidden(!isUseProxy);
+                    proxyForm.getWidget(proxy.port.getName()).setHidden(!isUseProxy);
+                    proxyForm.getWidget(proxy.userPassword.getName()).setHidden(!isUseProxy);
                 }
             }
         }

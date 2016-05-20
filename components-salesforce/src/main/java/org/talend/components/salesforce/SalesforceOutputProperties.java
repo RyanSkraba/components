@@ -12,8 +12,9 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
-import static org.talend.daikon.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.PropertyFactory.newEnum;
+import static org.talend.daikon.properties.PropertyFactory.newString;
+import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -113,8 +114,8 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
 
         outputAction.setValue(ACTION_INSERT);
 
-        NB_SUCCESS = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, NB_SUCCESS_NAME); //$NON-NLS-1$
-        NB_REJECT = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, NB_REJECT_NAME); //$NON-NLS-1$
+        NB_SUCCESS = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, NB_SUCCESS_NAME); // $NON-NLS-1$
+        NB_REJECT = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, NB_REJECT_NAME); // $NON-NLS-1$
 
         setupRejectSchema();
 
@@ -146,7 +147,7 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
-        if (form.getName().equals(Form.MAIN)) {
+        if (form != null && form.getName().equals(Form.MAIN)) {
             Form advForm = getForm(Form.ADVANCED);
             if (advForm != null) {
                 boolean isUpsert = ACTION_UPSERT.equals(outputAction.getValue());

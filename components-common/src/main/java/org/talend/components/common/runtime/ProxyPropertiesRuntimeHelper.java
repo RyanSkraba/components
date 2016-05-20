@@ -14,12 +14,12 @@ public class ProxyPropertiesRuntimeHelper {
             return;
         }
         if (ProxyProperties.ProxyType.HTTP.equals(type)) {
-            System.setProperty("http.proxySet", "true");
-            System.setProperty("http.proxyHost", properties.host.getStringValue());
-            System.setProperty("http.proxyPort", properties.port.getStringValue());
-            System.setProperty("http.nonProxyHosts", "192.168.0.* | localhost");
-            System.setProperty("http.proxyUser", properties.userPassword.userId.getStringValue());
-            System.setProperty("http.proxyPassword", properties.userPassword.password.getStringValue());
+            setPropertyValue("http.proxySet", "true");
+            setPropertyValue("http.proxyHost", properties.host.getStringValue());
+            setPropertyValue("http.proxyPort", properties.port.getStringValue());
+            setPropertyValue("http.nonProxyHosts", "192.168.0.* | localhost");
+            setPropertyValue("http.proxyUser", properties.userPassword.userId.getStringValue());
+            setPropertyValue("http.proxyPassword", properties.userPassword.password.getStringValue());
             Authenticator.setDefault(new java.net.Authenticator() {
 
                 @Override
@@ -29,19 +29,35 @@ public class ProxyPropertiesRuntimeHelper {
                 }
             });
         } else if (ProxyProperties.ProxyType.SOCKS.equals(type)) {
-            System.setProperty("socksProxySet", "true");
-            System.setProperty("socksProxyHost", properties.host.getStringValue());
-            System.setProperty("socksProxyPort", properties.port.getStringValue());
-            System.setProperty("java.net.socks.username", properties.userPassword.userId.getStringValue());
-            System.setProperty("java.net.socks.password", properties.userPassword.password.getStringValue());
+            setPropertyValue("socksProxySet", "true");
+            setPropertyValue("socksProxyHost", properties.host.getStringValue());
+            setPropertyValue("socksProxyPort", properties.port.getStringValue());
+            setPropertyValue("java.net.socks.username", properties.userPassword.userId.getStringValue());
+            setPropertyValue("java.net.socks.password", properties.userPassword.password.getStringValue());
         } else if (ProxyProperties.ProxyType.HTTPS.equals(type)) {
-            System.setProperty("https.proxyHost", properties.host.getStringValue());
-            System.setProperty("https.proxyPort", properties.port.getStringValue());
+            setPropertyValue("https.proxyHost", properties.host.getStringValue());
+            setPropertyValue("https.proxyPort", properties.port.getStringValue());
         } else if (ProxyProperties.ProxyType.FTP.equals(type)) {
-            System.setProperty("ftpProxySet", "true");
-            System.setProperty("ftp.proxyHost", properties.host.getStringValue());
-            System.setProperty("ftp.proxyPort", properties.port.getStringValue());
-            System.setProperty("ftp.nonProxyHosts", "192.168.0.* | localhost");
+            setPropertyValue("ftpProxySet", "true");
+            setPropertyValue("ftp.proxyHost", properties.host.getStringValue());
+            setPropertyValue("ftp.proxyPort", properties.port.getStringValue());
+            setPropertyValue("ftp.nonProxyHosts", "192.168.0.* | localhost");
         }
+
+    }
+
+    public static void setPropertyValue(String name, String value) {
+        if (name != null && value != null) {
+            System.setProperty(name, value);
+        }
+    }
+
+    public static String removeProperty(String name) {
+        String value = null;
+        if (name != null) {
+            value = System.getProperty(name);
+            System.clearProperty(name);
+        }
+        return value;
     }
 }

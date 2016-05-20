@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceinput;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.PropertyFactory.newProperty;
 
 import java.util.Collections;
 import java.util.Set;
@@ -94,6 +94,9 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
     @Override
     public void refreshLayout(Form form) {
+        if (form == null) {
+            return;
+        }
         super.refreshLayout(form);
         if (Form.MAIN.equals(form.getName())) {
             form.getWidget(includeDeleted.getName())

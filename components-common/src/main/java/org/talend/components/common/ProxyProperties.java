@@ -12,7 +12,8 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.PropertyFactory.newInteger;
+import static org.talend.daikon.properties.PropertyFactory.newProperty;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Property;
@@ -58,12 +59,13 @@ public class ProxyProperties extends ComponentProperties {
 
     public void afterUseProxy() {
         refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(Form.REFERENCE));
     }
 
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        if (form.getName().equals(Form.MAIN)) {
+        if (form != null && form.getName().equals(Form.MAIN)) {
             boolean isUseProxy = useProxy.getBooleanValue();
             form.getWidget(HOST).setHidden(!isUseProxy);
             form.getWidget(PORT).setHidden(!isUseProxy);
