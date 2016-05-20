@@ -1,19 +1,20 @@
 package org.talend.components.dataprep;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.test.SpringApp;
-import org.talend.daikon.properties.presentation.Form;
 
 import javax.inject.Inject;
-
-import static org.junit.Assert.assertEquals;
+import java.util.Collections;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -25,24 +26,39 @@ public class TDataSetTestIT {
     public ErrorCollector errorCollector = new ErrorCollector();
 
     @Test
+    public void testTDataSetInputDefinition() {
+        TDataSetInputDefinition inputDefinition =
+                (TDataSetInputDefinition) componentService.getComponentDefinition("tDatasetInput");
+        Assert.assertArrayEquals(new String[] {"Talend Data Preparation"}, inputDefinition.getFamilies());
+    }
+
+    @Test
     public void testTDataSetInputProperties() {
         TDataSetInputProperties properties = (TDataSetInputProperties) componentService.
                 getComponentProperties("tDatasetInput");
-        Form f = properties.getForm(Form.MAIN);
-        ComponentTestUtils.checkSerialize(properties, errorCollector);
-        System.out.println(f);
-        System.out.println(properties);
-        assertEquals(Form.MAIN, f.getName());
+        PropertyPathConnector connector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
+
+        Assert.assertNotNull(properties.getSchema());
+        Assert.assertEquals(Collections.singleton(connector), properties.getAllSchemaPropertiesConnectors(true));
+    }
+
+    @Test
+    public void testTDataSetOutputDefinition() {
+        TDataSetOutputDefinition outputDefinition =
+                (TDataSetOutputDefinition) componentService.getComponentDefinition("tDatasetOutput");
+        Assert.assertArrayEquals(new String[] {"Talend Data Preparation"}, outputDefinition.getFamilies());
+        Assert.assertEquals("org.talend.components", outputDefinition.getMavenGroupId());
+        Assert.assertEquals("components-dataprep", outputDefinition.getMavenArtifactId());
     }
 
     @Test
     public void testTDataSetOutputProperties() {
         TDataSetOutputProperties properties = (TDataSetOutputProperties) componentService.
                 getComponentProperties("tDatasetOutput");
-        Form form = properties.getForm(Form.MAIN);
-        ComponentTestUtils.checkSerialize(properties, errorCollector);
-        assertEquals(Form.MAIN, form.getName());
-        assertEquals("Default limit should be 100", "100", properties.limit.getStringValue());
+        PropertyPathConnector connector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
+
+        Assert.assertNotNull(properties.getSchema());
+        Assert.assertEquals(Collections.singleton(connector), properties.getAllSchemaPropertiesConnectors(true));
     }
 
     @Test

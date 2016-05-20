@@ -14,6 +14,7 @@
 		<module>components-api</module>
 		<module>components-common</module>
 		<module>components-common-oauth</module>
+		<module>components-archetypes</module>
 		<module>components-salesforce</module>
 		<module>components-webtest</module>
 		<module>components-osgitest</module>

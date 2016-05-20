@@ -12,13 +12,6 @@
 // ============================================================================
 package org.talend.components.dataprep;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.avro.Schema;
 import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
@@ -36,6 +29,12 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The ComponentProperties subclass provided by a component stores the
@@ -83,7 +82,6 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean b) {
-
         return Collections.singleton(MAIN_CONNECTOR);
     }
 
@@ -99,6 +97,7 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
     }
 
     private String removeQuotes(String str) {
+        //TODO Make check about existed quotes
         String some = str.substring(1, str.length() - 1);
         return some;
     }
@@ -144,7 +143,6 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
 
     private boolean isRequiredFieldRight() {
         String urlStringValue = url.getStringValue();
-        ;
         String loginStringValue = login.getStringValue();
         String passStringValue = pass.getStringValue();
         String dataSetNameStringValue = dataSetName.getStringValue();

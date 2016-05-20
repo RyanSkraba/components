@@ -81,10 +81,10 @@ public class TJiraInputPropertiesTest {
         String projectIdValue = properties.projectId.getStringValue();
         int batchSizeValue = properties.batchSize.getValue();
 
-        assertThat(hostValue, equalTo("https://localhost:8080/"));
+        assertThat(hostValue, equalTo("https://jira.atlassian.com/"));
         assertThat(resourceValue, equalTo(JiraResource.ISSUE));
         assertThat(authorizationTypeValue, equalTo(ConnectionType.BASIC));
-        assertThat(jqlValue, equalTo(""));
+        assertThat(jqlValue, equalTo("summary ~ \\\"some word\\\" AND project=PROJECT_ID"));
         assertThat(projectIdValue, equalTo(""));
         assertThat(batchSizeValue, equalTo(50));
     }

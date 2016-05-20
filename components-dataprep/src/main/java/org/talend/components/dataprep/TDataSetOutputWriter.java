@@ -13,6 +13,7 @@
 package org.talend.components.dataprep;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -31,13 +32,13 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
 
     private IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory;
 
-    private StringBuilder data = new StringBuilder();
-
     private int counter = 0;
 
     private String uId;
 
     private DataPrepConnectionHandler connectionHandler;
+
+    private OutputStream outputStream;
 
     private boolean firstRow = true;
 
@@ -60,13 +61,16 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
     @Override
     public void open(String uId) throws IOException {
         this.uId = uId;
-        if (!isLiveDataSet()) {
-            connectionHandler.connect();
+        connectionHandler.connect();
+        if (isLiveDataSet()) {
+            outputStream = connectionHandler.createInLiveDataSetMode();
+        } else {
+            outputStream = connectionHandler.create();
         }
     }
 
     @Override
-    public void write(Object datum) {
+    public void write(Object datum) throws IOException {
         if (datum == null || counter > limit) {
             LOGGER.debug("Datum: {}", datum);
             return;
@@ -95,21 +99,17 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
                 row.append(String.valueOf(input.get(f.pos())));
             }
         }
-        data.append(row);
-        data.append("\n");
+        row.append("\n");
         LOGGER.debug("Row data: {}", row);
+        outputStream.write(row.toString().getBytes());
+        outputStream.flush();
         counter++;
     }
 
     @Override
     public WriterResult close() throws IOException {
-        LOGGER.debug("All data: {}", data);
-        if (isLiveDataSet()) {
-            connectionHandler.createInLiveDataSetMode(data.toString());
-        } else {
-            connectionHandler.create(data.toString());
-            connectionHandler.logout();
-        }
+
+        connectionHandler.logout();
         return new WriterResult(uId, counter);
     }
 
