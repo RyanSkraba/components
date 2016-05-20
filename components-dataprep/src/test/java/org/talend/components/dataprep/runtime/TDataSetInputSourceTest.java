@@ -1,4 +1,4 @@
-package org.talend.components.dataprep;
+package org.talend.components.dataprep.runtime;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -8,6 +8,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.SpringApp;
+import org.talend.components.dataprep.runtime.TDataSetInputSource;
 import org.talend.components.dataprep.tdatasetinput.TDataSetInputDefinition;
 import org.talend.components.dataprep.tdatasetinput.TDataSetInputProperties;
 

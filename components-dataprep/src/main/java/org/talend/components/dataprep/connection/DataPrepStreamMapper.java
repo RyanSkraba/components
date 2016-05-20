@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.dataprep;
+package org.talend.components.dataprep.connection;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-class DataPrepStreamMapper {
+public class DataPrepStreamMapper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataPrepStreamMapper.class);
 
@@ -55,18 +55,18 @@ class DataPrepStreamMapper {
         return false;
     }
 
-    Map<String, String> nextRecord() {
+    public Map<String, String> nextRecord() {
         Map<String, String> record = iterator.next();
         record.remove("tdpId");
         LOGGER.debug("Record is : {}", record);
         return record;
     }
 
-    boolean hasNextRecord() {
+    public boolean hasNextRecord() {
         return iterator.hasNext();
     }
 
-    void close() throws IOException {
+    public void close() throws IOException {
         jsonParser.close();
     }
 

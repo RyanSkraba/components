@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.dataprep;
+package org.talend.components.dataprep.runtime;
 
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
@@ -19,6 +19,7 @@ import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 import org.talend.components.dataprep.tdatasetinput.TDataSetInputProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;

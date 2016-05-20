@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.dataprep;
+package org.talend.components.dataprep.runtime;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.dataprep.connection.Column;
+import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
 
 import java.io.*;
@@ -83,7 +85,7 @@ public class TDataPrepConnectionHandlerTest {
         String body = "col1, col2, col3\ntest1, test2, test3\ntest4, test5, test6";
         DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(URL, LOGIN, PASS, name);
         connectionHandler.connect();
-        connectionHandler.create(new ByteArrayInputStream(body.getBytes()));
+        connectionHandler.create();
         connectionHandler.logout();
     }
 

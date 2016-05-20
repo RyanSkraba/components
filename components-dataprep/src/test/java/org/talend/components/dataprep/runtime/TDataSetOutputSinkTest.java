@@ -1,4 +1,4 @@
-package org.talend.components.dataprep;
+package org.talend.components.dataprep.runtime;
 
 import org.junit.Assert;
 import org.junit.Before;

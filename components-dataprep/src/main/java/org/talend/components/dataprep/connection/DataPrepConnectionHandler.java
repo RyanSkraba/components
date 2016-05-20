@@ -10,22 +10,19 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.dataprep;
+package org.talend.components.dataprep.connection;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
-import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class DataPrepConnectionHandler {
@@ -86,7 +83,7 @@ public class DataPrepConnectionHandler {
         return response.getStatusLine().getStatusCode();
     }
 
-    void validate() throws IOException {
+    public void validate() throws IOException {
         try {
             connect();
             logout();
@@ -97,7 +94,7 @@ public class DataPrepConnectionHandler {
         }
     }
 
-    DataPrepStreamMapper readDataSetIterator() throws IOException {
+    public DataPrepStreamMapper readDataSetIterator() throws IOException {
         Request request = Request.Get(url + "/api/datasets/" + dataSetName + "?metadata=false").addHeader(authorisationHeader);
         HttpResponse current = request.execute().returnResponse();
         if (returnStatusCode(current) != HttpServletResponse.SC_OK) {
@@ -109,24 +106,7 @@ public class DataPrepConnectionHandler {
         return new DataPrepStreamMapper(current.getEntity().getContent());
     }
 
-    void create(InputStream data) throws IOException {
-
-        LOGGER.debug("DataSet name: " + dataSetName);
-
-        Request request = Request.Post(url + "/api/datasets?name=" + dataSetName);
-        request.addHeader(authorisationHeader);
-
-        request.bodyStream(data, ContentType.create(ContentType.TEXT_PLAIN.getMimeType(), StandardCharsets.UTF_8));
-        HttpResponse response = request.execute().returnResponse();
-        if (returnStatusCode(response)!= HttpServletResponse.SC_OK) {
-            LOGGER.error("Failed to send Dataset to Dataprep server : {}", returnStatusCode(response));
-            // TODO i18n
-            throw new IOException("Failed to connect to Dataprep server : " + returnStatusCode(response));
-        }
-        LOGGER.debug("Create request response: {}", response);
-    }
-
-    OutputStream createInLiveDataSetMode() throws IOException {
+    public OutputStream createInLiveDataSetMode() throws IOException {
 
         LOGGER.debug("DataSet name: " + dataSetName);
 
@@ -139,7 +119,7 @@ public class DataPrepConnectionHandler {
         return urlConnection.getOutputStream();
     }
 
-    OutputStream create() throws IOException {
+    public OutputStream create() throws IOException {
         URL connectionUrl = new URL(url + "/api/datasets?name=" + dataSetName + "&folderPath=" + "folderName");
         urlConnection = (HttpURLConnection) connectionUrl.openConnection();
         urlConnection.setRequestMethod("POST");

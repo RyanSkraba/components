@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.dataprep;
+package org.talend.components.dataprep.connection;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

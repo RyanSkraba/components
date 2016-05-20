@@ -21,7 +21,7 @@ import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
 
 import aQute.bnd.annotation.component.Component;
-import org.talend.components.dataprep.TDataSetInputSource;
+import org.talend.components.dataprep.runtime.TDataSetInputSource;
 
 /**
  * The TDataSetInputDefinition acts as an entry point for all of services that
