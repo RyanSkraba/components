@@ -123,7 +123,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         SalesforceConnectionProperties connProps = properties.getConnectionProperties();
         String endpoint = connProps.endpoint.getStringValue();
         endpoint = StringUtils.strip(endpoint, "\"");
-        if (SalesforceConnectionProperties.LoginType.OAUTH.equals(connProps.loginType.getValue())) {
+        if (SalesforceConnectionProperties.LoginType.OAuth.equals(connProps.loginType.getValue())) {
             SalesforceOAuthConnection oauthConnection = new SalesforceOAuthConnection(connProps.oauth, endpoint, API_VERSION);
             oauthConnection.login(config);
         } else {

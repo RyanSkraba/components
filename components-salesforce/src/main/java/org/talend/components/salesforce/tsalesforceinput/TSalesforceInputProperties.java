@@ -27,8 +27,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class TSalesforceInputProperties extends SalesforceConnectionModuleProperties {
 
     public enum QueryMode {
-        QUERY,
-        BULK;
+        Query,
+        Bulk;
     }
 
     public Property<QueryMode> queryMode = newEnum("queryMode", QueryMode.class);
@@ -58,7 +58,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
     public void setupProperties() {
         super.setupProperties();
         batchSize.setValue(250);
-        queryMode.setValue(QueryMode.QUERY);
+        queryMode.setValue(QueryMode.Query);
         normalizeDelimiter.setValue(";");
         columnNameDelimiter.setValue("_");
 
@@ -94,13 +94,13 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN)) {
             form.getWidget(includeDeleted.getName())
-                    .setHidden(!(queryMode.getValue() != null && queryMode.getValue().equals(QueryMode.QUERY)));
+                    .setHidden(!(queryMode.getValue() != null && queryMode.getValue().equals(QueryMode.Query)));
 
             form.getWidget(query.getName()).setHidden(!manualQuery.getValue());
             form.getWidget(condition.getName()).setHidden(manualQuery.getValue());
         }
         if (Form.ADVANCED.equals(form.getName())) {
-            boolean isBulkQuery = queryMode.getValue().equals(QueryMode.BULK);
+            boolean isBulkQuery = queryMode.getValue().equals(QueryMode.Bulk);
             form.getWidget(normalizeDelimiter.getName()).setHidden(isBulkQuery);
             form.getWidget(columnNameDelimiter.getName()).setHidden(isBulkQuery);
             form.getWidget(batchSize.getName()).setHidden(isBulkQuery);

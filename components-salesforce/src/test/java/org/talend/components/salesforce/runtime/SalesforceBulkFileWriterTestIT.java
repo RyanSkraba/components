@@ -109,8 +109,8 @@ public class SalesforceBulkFileWriterTestIT extends SalesforceTestBase {
         lookupFieldNames.add("lfn");
         modelProperties.upsertRelationTable.lookupFieldName.setValue(lookupFieldNames);
 
-        java.util.List<String> polymorphics = new java.util.ArrayList<String>();
-        polymorphics.add("true");
+        java.util.List<Boolean> polymorphics = new java.util.ArrayList<Boolean>();
+        polymorphics.add(Boolean.TRUE);
         modelProperties.upsertRelationTable.polymorphic.setValue(polymorphics);
 
         java.util.List<String> lookupFieldModuleNames = new java.util.ArrayList<String>();

@@ -352,7 +352,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
         inputProps.connection = props.connection;
         inputProps.module = props.module;
         inputProps.batchSize.setValue(200);
-        inputProps.queryMode.setValue(TSalesforceInputProperties.QueryMode.QUERY);
+        inputProps.queryMode.setValue(TSalesforceInputProperties.QueryMode.Query);
         List<IndexedRecord> inputRows = readRows(inputProps);
         return inputRows;
     }

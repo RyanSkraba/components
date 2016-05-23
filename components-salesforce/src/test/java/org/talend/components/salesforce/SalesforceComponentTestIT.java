@@ -79,15 +79,15 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         ComponentTestUtils.checkSerialize(props, errorCollector);
         Property<LoginType> loginType = (Property<LoginType>) props.getProperty("loginType");
         System.out.println(loginType.getPossibleValues());
-        assertEquals(SalesforceConnectionProperties.LoginType.BASIC, loginType.getPossibleValues().get(0));
-        assertEquals(SalesforceConnectionProperties.LoginType.OAUTH, loginType.getPossibleValues().get(1));
-        assertEquals(SalesforceConnectionProperties.LoginType.BASIC, loginType.getValue());
+        assertEquals(SalesforceConnectionProperties.LoginType.Basic, loginType.getPossibleValues().get(0));
+        assertEquals(SalesforceConnectionProperties.LoginType.OAuth, loginType.getPossibleValues().get(1));
+        assertEquals(SalesforceConnectionProperties.LoginType.Basic, loginType.getValue());
         Form mainForm = props.getForm(Form.MAIN);
         assertEquals("Salesforce Connection Settings", mainForm.getTitle());
         assertFalse(mainForm.getWidget(SalesforceUserPasswordProperties.class).isHidden());
         assertTrue(mainForm.getWidget(OauthProperties.class).isHidden());
 
-        loginType.setValue(SalesforceConnectionProperties.LoginType.OAUTH);
+        loginType.setValue(SalesforceConnectionProperties.LoginType.OAuth);
         props = checkAndAfter(mainForm, "loginType", props);
         mainForm = props.getForm(Form.MAIN);
         assertTrue(mainForm.isRefreshUI());
@@ -367,7 +367,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
             props = (SalesforceConnectionProperties) getComponentService()
                     .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
         }
-        props.loginType.setValue(SalesforceConnectionProperties.LoginType.OAUTH);
+        props.loginType.setValue(SalesforceConnectionProperties.LoginType.OAuth);
         Form mainForm = props.getForm(Form.MAIN);
         props = (SalesforceConnectionProperties) checkAndAfter(mainForm, "loginType", props);
         props.oauth.clientId.setValue("3MVG9Y6d_Btp4xp6ParHznfCCUh0d9fU3LYcvd_hCXz3G3Owp4KvaDhNuEOrXJTBd09JMoPdZeDtNYxXZM4X2");

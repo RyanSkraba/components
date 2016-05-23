@@ -37,7 +37,7 @@ public class TestJsonSerialize {
     @Test
     public void TestSerializationSizes() throws IOException {
         TSalesforceInputProperties tsip = (TSalesforceInputProperties) new TSalesforceInputProperties(null).init();
-        tsip.connection.loginType.setValue(SalesforceConnectionProperties.LoginType.BASIC);
+        tsip.connection.loginType.setValue(SalesforceConnectionProperties.LoginType.Basic);
         tsip.connection.userPassword.userId.setValue("foooo");
         // jsonio
         String jsonioString = tsip.toSerialized();

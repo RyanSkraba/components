@@ -49,8 +49,8 @@ public class SalesforceConnectionProperties extends ComponentProperties
     public Property<String> name = newString("name").setRequired();
 
     public enum LoginType {
-        BASIC,
-        OAUTH;
+        Basic,
+        OAuth;
 
     }
 
@@ -102,7 +102,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
     public void setupProperties() {
         super.setupProperties();
 
-        loginType.setValue(LoginType.BASIC);
+        loginType.setValue(LoginType.Basic);
         endpoint.setValue(URL);
         timeout.setValue(60000);
         httpChunked.setValue(true);
@@ -118,14 +118,14 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
         Form wizardForm = Form.create(this, FORM_WIZARD);
         wizardForm.addRow(name);
-        wizardForm.addRow(widget(loginType).setDeemphasize(true));
+        wizardForm.addRow(widget(loginType).setWidgetType(WidgetType.ENUMERATION).setDeemphasize(true));
         wizardForm.addRow(oauth.getForm(Form.MAIN));
         wizardForm.addRow(userPassword.getForm(Form.MAIN));
         wizardForm.addRow(widget(advanced).setWidgetType(WidgetType.BUTTON));
         wizardForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
 
         Form mainForm = Form.create(this, Form.MAIN);
-        mainForm.addRow(loginType);
+        mainForm.addRow(widget(loginType).setWidgetType(WidgetType.ENUMERATION));
         mainForm.addRow(oauth.getForm(Form.MAIN));
         mainForm.addRow(userPassword.getForm(Form.MAIN));
 
@@ -191,14 +191,14 @@ public class SalesforceConnectionProperties extends ComponentProperties
                 form.getWidget(loginType.getName()).setHidden(false);
                 String endpointValue = endpoint.getValue();
                 switch (loginType.getValue()) {
-                case BASIC:
+                case Basic:
                     form.getWidget(OAUTH).setHidden(true);
                     form.getWidget(USERPASSWORD).setHidden(false);
                     if (endpointValue == null || endpointValue.contains(OAUTH_URL)) {
                         endpoint.setValue(URL);
                     }
                     break;
-                case OAUTH:
+                case OAuth:
                     form.getWidget(OAUTH).setHidden(false);
                     form.getWidget(USERPASSWORD).setHidden(true);
                     if (endpointValue == null || endpointValue.contains(URL)) {

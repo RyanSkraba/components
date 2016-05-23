@@ -55,7 +55,7 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
             if (properties instanceof TSalesforceBulkExecProperties) {
                 useBulkFactory = true;
             } else if (properties instanceof TSalesforceInputProperties) {
-                if (TSalesforceInputProperties.QueryMode.BULK
+                if (TSalesforceInputProperties.QueryMode.Bulk
                         .equals(((TSalesforceInputProperties) properties).queryMode.getValue())) {
                     useBulkFactory = true;
                 }

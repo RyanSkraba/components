@@ -19,6 +19,12 @@ public class UpsertRelationTable extends ComponentProperties {
     private static final TypeLiteral<List<String>> LIST_STRING_TYPE = new TypeLiteral<List<String>>() {// empty
     };
 
+    /**
+     * 
+     */
+    private static final TypeLiteral<List<Boolean>> LIST_BOOLEAN_TYPE = new TypeLiteral<List<Boolean>>() {// empty
+    };
+
     private boolean usePolymorphic;
 
     /**
@@ -39,7 +45,7 @@ public class UpsertRelationTable extends ComponentProperties {
 
     public Property<List<String>> lookupFieldExternalIdName = newProperty(LIST_STRING_TYPE, "lookupFieldExternalIdName");
 
-    public Property<List<String>> polymorphic = newProperty(LIST_STRING_TYPE, "polymorphic");
+    public Property<List<Boolean>> polymorphic = newProperty(LIST_BOOLEAN_TYPE, "polymorphic");
 
     @Override
     public void setupLayout() {
