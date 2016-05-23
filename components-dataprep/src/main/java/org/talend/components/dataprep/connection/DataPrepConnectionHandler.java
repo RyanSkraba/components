@@ -120,7 +120,7 @@ public class DataPrepConnectionHandler {
     }
 
     public OutputStream create() throws IOException {
-        URL connectionUrl = new URL(url + "/api/datasets?name=" + dataSetName + "&folderPath=" + "folderName");
+        URL connectionUrl = new URL(url + "/api/datasets?name=" + dataSetName);
         urlConnection = (HttpURLConnection) connectionUrl.openConnection();
         urlConnection.setRequestMethod("POST");
         urlConnection.setRequestProperty(authorisationHeader.getName(), authorisationHeader.getValue());
