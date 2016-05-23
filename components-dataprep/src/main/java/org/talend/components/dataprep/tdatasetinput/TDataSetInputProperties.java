@@ -83,8 +83,11 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
     }
 
     @Override
-    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean b) {
-        return Collections.singleton(mainConnector);
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        if (isOutputConnection) {
+            return Collections.singleton(mainConnector);
+        }
+        return Collections.emptySet();
     }
 
     @Override

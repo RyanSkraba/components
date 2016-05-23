@@ -36,6 +36,7 @@ public class TDataSetOutputDefinitionAndPropertiesTest {
         PropertyPathConnector connector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
         Assert.assertNotNull(properties.getSchema());
-        Assert.assertEquals(Collections.singleton(connector), properties.getAllSchemaPropertiesConnectors(true));
+        Assert.assertEquals(Collections.emptySet(), properties.getAllSchemaPropertiesConnectors(true));
+        Assert.assertEquals(Collections.singleton(connector), properties.getAllSchemaPropertiesConnectors(false));
     }
 }

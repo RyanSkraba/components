@@ -35,6 +35,7 @@ public class TDataSetInputDefinitionAndPropertiesTest {
 
         Assert.assertNotNull(properties.getSchema());
         Assert.assertEquals(Collections.singleton(connector), properties.getAllSchemaPropertiesConnectors(true));
+        Assert.assertEquals(Collections.emptySet(), properties.getAllSchemaPropertiesConnectors(false));
     }
     @Test
     public void testRemoveQuotes() {
