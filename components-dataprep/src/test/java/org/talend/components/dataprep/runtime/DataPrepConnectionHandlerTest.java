@@ -40,7 +40,7 @@ public class DataPrepConnectionHandlerTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataPrepConnectionHandlerTest.class);
 
-    private static final String URL = "http://10.42.10.60:8888";
+    private static final String URL = "http://localhost:8080";
     private static final String LOGIN = "vincent@dataprep.com"; //"maksym@dataprep.com";
     private static final String PASS = "vincent"; //"maksym";
     private String string;

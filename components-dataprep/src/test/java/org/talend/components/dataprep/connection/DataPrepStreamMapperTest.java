@@ -23,6 +23,13 @@ public class DataPrepStreamMapperTest {
 
         assertNotNull(metaData.getColumns());
         assertTrue("Columns quantity is 11", metaData.getColumns().size() == 11);
+        for (Column column: metaData.getColumns()) {
+            assertNotNull(column.getName());
+            assertNotNull(column.getId());
+            assertNotNull(column.getType());
+            assertTrue("Column.toString() should match the pattern: \"Name: \\\\w+ Type: \\\\w+ ID: \\\\w+\\n\"", column.toString()
+                    .matches("Name: \\w+ Type: \\w+ ID: \\w+\n"));
+        }
     }
 
     @Test

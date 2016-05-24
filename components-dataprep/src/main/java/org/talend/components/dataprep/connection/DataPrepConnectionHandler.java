@@ -52,7 +52,7 @@ public class DataPrepConnectionHandler {
         Request request = Request.Post(url + "/login?username=" + login + "&password=" + pass + "&client-app=studio");
         HttpResponse response = request.execute().returnResponse();
         authorisationHeader = response.getFirstHeader("Authorization");
-        if (returnStatusCode(response) != HttpServletResponse.SC_OK && authorisationHeader != null) {
+        if (returnStatusCode(response) != HttpServletResponse.SC_OK && authorisationHeader == null) {
             LOGGER.error("Failed to login to Dataprep server: {}", response.getStatusLine().toString());
             // TODO i18n
             throw new IOException("Failed to login to Dataprep server: " + response.getStatusLine().toString());
@@ -60,7 +60,7 @@ public class DataPrepConnectionHandler {
         return response;
     }
 
-    public HttpResponse logout() throws IOException{
+    public HttpResponse logout() throws IOException {
         HttpResponse response;
         try {
             if (urlConnection != null) {
