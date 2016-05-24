@@ -157,8 +157,12 @@ public class TDataPrepConnectionHandlerTest {
         RuntimeContainer container = null;
 
         TDataSetOutputProperties properties = new TDataSetOutputProperties("TDataSetOutProperties");
-        properties.mode.setValue(Mode.LIVE_DATASET);
-        properties.url.setValue("http://127.0.0.1:8080/receivers2/debug");
+        properties.mode.setValue(Mode.CREATE);
+        properties.url.setValue("http://127.0.0.1:8888");
+        properties.dataSetName.setValue("TDP-1879");
+        properties.login.setValue("vincent@dataprep.com");
+        properties.pass.setValue("vincent");
+        properties.limit.setValue(100);
 
         TDataSetOutputSink sink = new TDataSetOutputSink();
         sink.initialize(container, properties);
