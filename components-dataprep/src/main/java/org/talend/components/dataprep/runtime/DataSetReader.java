@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * Simple implementation of a reader.
  */
-public class TDataSetInputReader extends AbstractBoundedReader<IndexedRecord> {
+public class DataSetReader extends AbstractBoundedReader<IndexedRecord> {
 
     /** Default serial version UID. */
     private static final long serialVersionUID = 1L;
@@ -49,8 +49,8 @@ public class TDataSetInputReader extends AbstractBoundedReader<IndexedRecord> {
 
     private DataPrepStreamMapper dataPrepStreamMapper;
 
-    public TDataSetInputReader(RuntimeContainer container, BoundedSource source,
-                               DataPrepConnectionHandler connectionHandler, Schema schema) {
+    public DataSetReader(RuntimeContainer container, BoundedSource source,
+                         DataPrepConnectionHandler connectionHandler, Schema schema) {
         super(container, source);
         this.connectionHandler = connectionHandler;
         this.schema = schema;

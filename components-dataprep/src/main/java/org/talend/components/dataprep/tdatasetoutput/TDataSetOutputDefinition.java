@@ -19,7 +19,7 @@ import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.properties.ComponentProperties;
 
 import aQute.bnd.annotation.component.Component;
-import org.talend.components.dataprep.runtime.TDataSetOutputSink;
+import org.talend.components.dataprep.runtime.DataSetSink;
 
 /**
  * The TDataSetOutputDefinition acts as an entry point for all of services that
@@ -65,7 +65,7 @@ public class TDataSetOutputDefinition extends AbstractComponentDefinition implem
 
     @Override
     public Sink getRuntime() {
-        return new TDataSetOutputSink();
+        return new DataSetSink();
     }
 
     @Override

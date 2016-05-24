@@ -8,7 +8,6 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.SpringApp;
-import org.talend.components.dataprep.runtime.TDataSetInputSource;
 import org.talend.components.dataprep.tdatasetinput.TDataSetInputDefinition;
 import org.talend.components.dataprep.tdatasetinput.TDataSetInputProperties;
 
@@ -18,18 +17,18 @@ import java.util.Collections;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
-public class TDataSetInputSourceTest {
+public class DataSetSourceTest {
     @Inject
     private ComponentService componentService;
 
-    private TDataSetInputSource inputSource;
+    private DataSetSource inputSource;
 
     private TDataSetInputDefinition definition;
 
     @Before
     public void setInputSource() {
         definition = (TDataSetInputDefinition) (componentService.getComponentDefinition("tDatasetInput"));
-        inputSource = (TDataSetInputSource) definition.getRuntime();
+        inputSource = (DataSetSource) definition.getRuntime();
     }
 
     @Test

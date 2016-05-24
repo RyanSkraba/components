@@ -18,12 +18,12 @@ import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
 
-public class TDataSetWriteOperation implements WriteOperation<WriterResult> {
+public class DataSetOperation implements WriteOperation<WriterResult> {
 
     private Sink sink;
     private RuntimeProperties runtimeProperties;
 
-    public TDataSetWriteOperation(Sink sink, RuntimeProperties runtimeProperties ) {
+    public DataSetOperation(Sink sink, RuntimeProperties runtimeProperties ) {
         this.sink = sink;
         this.runtimeProperties = runtimeProperties;
     }
@@ -40,7 +40,7 @@ public class TDataSetWriteOperation implements WriteOperation<WriterResult> {
 
     @Override
     public Writer<WriterResult> createWriter(RuntimeContainer runtimeContainer) {
-        return new TDataSetOutputWriter(this, runtimeProperties);
+        return new DataSetWriter(this, runtimeProperties);
     }
 
     @Override

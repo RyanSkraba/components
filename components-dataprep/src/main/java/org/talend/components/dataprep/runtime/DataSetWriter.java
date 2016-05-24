@@ -27,7 +27,7 @@ import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class TDataSetOutputWriter implements Writer<WriterResult> {
+public class DataSetWriter implements Writer<WriterResult> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TDataSetInputDefinition.class);
     private IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory;
@@ -40,10 +40,10 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
     private int limit;
     private DataPrepOutputModes mode;
 
-    TDataSetOutputWriter(WriteOperation<WriterResult> writeOperation, RuntimeProperties runtimeProperties) {
+    DataSetWriter(WriteOperation<WriterResult> writeOperation, RuntimeProperties runtimeProperties) {
         this.writeOperation = writeOperation;
         this.connectionHandler = new DataPrepConnectionHandler( //
-                runtimeProperties.getUlr(), //
+                runtimeProperties.getUrl(), //
                 runtimeProperties.getLogin(), //
                 runtimeProperties.getPass(), //
                 runtimeProperties.getDataSetName());

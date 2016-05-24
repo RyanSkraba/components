@@ -39,10 +39,10 @@ import java.util.List;
  * or locally), so:
  *
  * <ul>
- * <li>the simplified logic for reading is found in the {@link TDataSetInputReader}, and</li>
+ * <li>the simplified logic for reading is found in the {@link DataSetReader}, and</li>
  * </ul>
  */
-public class TDataSetInputSource implements BoundedSource {
+public class DataSetSource implements BoundedSource {
 
     /** Default serial version UID. */
     private static final long serialVersionUID = -3740291007255450917L;
@@ -62,12 +62,12 @@ public class TDataSetInputSource implements BoundedSource {
 
     @Override
     public BoundedReader createReader(RuntimeContainer container) {
-        return new TDataSetInputReader(container, this, getConnectionHandler(), this.schema);
+        return new DataSetReader(container, this, getConnectionHandler(), this.schema);
     }
 
     private DataPrepConnectionHandler getConnectionHandler() {
             return new DataPrepConnectionHandler(
-                    runtimeProperties.getUlr(), //
+                    runtimeProperties.getUrl(), //
                     runtimeProperties.getLogin(), //
                     runtimeProperties.getPass(), //
                     runtimeProperties.getDataSetName());

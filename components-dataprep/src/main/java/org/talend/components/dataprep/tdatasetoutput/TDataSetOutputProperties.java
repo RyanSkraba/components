@@ -92,7 +92,7 @@ public class TDataSetOutputProperties extends FixedConnectorsComponentProperties
 
     public RuntimeProperties getRuntimeProperties() {
         RuntimeProperties runtimeProperties = new RuntimeProperties();
-        runtimeProperties.setUlr(url.getStringValue());
+        runtimeProperties.setUrl(url.getStringValue());
         runtimeProperties.setLogin(login.getStringValue());
         runtimeProperties.setPass(pass.getStringValue());
         runtimeProperties.setDataSetName(dataSetName.getStringValue());

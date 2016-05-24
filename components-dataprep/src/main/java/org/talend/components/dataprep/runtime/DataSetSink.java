@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-public class TDataSetOutputSink implements Sink {
+public class DataSetSink implements Sink {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataPrepConnectionHandler.class);
 
@@ -36,7 +36,7 @@ public class TDataSetOutputSink implements Sink {
 
     @Override
     public WriteOperation<?> createWriteOperation() {
-        return new TDataSetWriteOperation(this, runtimeProperties);
+        return new DataSetOperation(this, runtimeProperties);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class TDataSetOutputSink implements Sink {
     @Override
     public ValidationResult validate(RuntimeContainer runtimeContainer) {
         DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler( //
-                runtimeProperties.getUlr(), //
+                runtimeProperties.getUrl(), //
                 runtimeProperties.getLogin(), //
                 runtimeProperties.getPass(), //
                 runtimeProperties.getDataSetName());

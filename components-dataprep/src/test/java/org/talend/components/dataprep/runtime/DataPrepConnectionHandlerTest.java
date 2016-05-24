@@ -36,9 +36,9 @@ import java.net.HttpURLConnection;
 import java.util.Date;
 
 @Ignore
-public class TDataPrepConnectionHandlerTest {
+public class DataPrepConnectionHandlerTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TDataPrepConnectionHandlerTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataPrepConnectionHandlerTest.class);
 
     private static final String URL = "http://10.42.10.60:8888";
     private static final String LOGIN = "vincent@dataprep.com"; //"maksym@dataprep.com";
@@ -158,10 +158,10 @@ public class TDataPrepConnectionHandlerTest {
         properties.pass.setValue("vincent");
         properties.limit.setValue("100");
 
-        TDataSetOutputSink sink = new TDataSetOutputSink();
+        DataSetSink sink = new DataSetSink();
         sink.initialize(container, properties);
         sink.validate(container);
-        final TDataSetWriteOperation writeOperation = (TDataSetWriteOperation) sink.createWriteOperation();
+        final DataSetOperation writeOperation = (DataSetOperation) sink.createWriteOperation();
         final Writer<WriterResult> writer = writeOperation.createWriter(container);
         writer.open("test live datasets");
         for (int i=0; i<50; i++) {

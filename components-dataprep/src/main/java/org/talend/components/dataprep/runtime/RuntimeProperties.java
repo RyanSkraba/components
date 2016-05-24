@@ -17,7 +17,7 @@ import java.io.Serializable;
 public class RuntimeProperties implements Serializable {
 
     private static final long serialVersionUID = 3992422924211437022L;
-    private String ulr;
+    private String url;
     private String login;
     private String pass;
     private DataPrepOutputModes mode;
@@ -25,12 +25,12 @@ public class RuntimeProperties implements Serializable {
     private String schema;
     private String limit;
 
-    public String getUlr() {
-        return ulr;
+    public String getUrl() {
+        return url;
     }
 
-    public void setUlr(String ulr) {
-        this.ulr = ulr;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getLogin() {

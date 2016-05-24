@@ -16,19 +16,19 @@ import java.util.Collections;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
-public class TDataSetOutputSinkTest {
+public class DataSetSinkTest {
 
         @Inject
         private ComponentService componentService;
 
-        private TDataSetOutputSink outputSink;
+        private DataSetSink outputSink;
 
         private TDataSetOutputDefinition definition;
 
     @Before
     public void setInputSource() {
         definition = (TDataSetOutputDefinition) (componentService.getComponentDefinition("tDatasetOutput"));
-        outputSink = (TDataSetOutputSink) definition.getRuntime();
+        outputSink = (DataSetSink) definition.getRuntime();
     }
 
     @Test
