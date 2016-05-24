@@ -121,7 +121,7 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         super.setupLayout();
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(outputAction);
-        mainForm.addColumn(upsertKeyColumn);
+        mainForm.addColumn(widget(upsertKeyColumn).setWidgetType(WidgetType.ENUMERATION));
 
         Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.WidgetType.TABLE));
@@ -144,6 +144,10 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
                 boolean isUpsert = OutputAction.UPSERT.equals(outputAction.getValue());
                 form.getWidget(upsertKeyColumn.getName()).setHidden(!isUpsert);
                 advForm.getWidget(upsertRelationTable.getName()).setHidden(!isUpsert);
+                if (isUpsert) {
+                    beforeUpsertKeyColumn();
+                    beforeUpsertRelationTable();
+                }
             }
         }
     }
