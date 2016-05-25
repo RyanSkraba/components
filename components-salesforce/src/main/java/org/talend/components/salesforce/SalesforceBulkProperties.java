@@ -21,8 +21,8 @@ import org.talend.daikon.properties.presentation.Form;
 public class SalesforceBulkProperties extends ComponentProperties {
 
     public enum Concurrency {
-        PARALLEL,
-        SERIAL;
+        Parallel,
+        Serial;
     }
 
     public Property<Concurrency> concurrencyMode = newEnum("concurrencyMode", Concurrency.class);

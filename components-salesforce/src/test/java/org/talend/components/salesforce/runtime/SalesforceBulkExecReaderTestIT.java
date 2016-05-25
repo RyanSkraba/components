@@ -141,7 +141,7 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
         props.bulkFilePath.setValue(bulkFilePath);
         props.bulkProperties.bytesToCommit.setValue(10 * 1024 * 1024);
         props.bulkProperties.rowsToCommit.setValue(10000);
-        props.bulkProperties.concurrencyMode.setValue(Concurrency.PARALLEL);
+        props.bulkProperties.concurrencyMode.setValue(Concurrency.Parallel);
         props.bulkProperties.waitTimeCheckBatchState.setValue(10000);
 
         props.module.main.schema.setValue(getMakeRowSchema(false));

@@ -141,10 +141,10 @@ public class SalesforceBulkRuntime {
 
     public void setConcurrencyMode(Concurrency mode) {
         switch (mode) {
-        case PARALLEL:
+        case Parallel:
             concurrencyMode = ConcurrencyMode.Parallel;
             break;
-        case SERIAL:
+        case Serial:
             concurrencyMode = ConcurrencyMode.Serial;
             break;
 

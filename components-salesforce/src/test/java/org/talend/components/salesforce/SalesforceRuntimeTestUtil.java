@@ -282,7 +282,7 @@ public class SalesforceRuntimeTestUtil {
         modelProperties.bulkFilePath.setValue(data_file);
         modelProperties.bulkProperties.bytesToCommit.setValue(10 * 1024 * 1024);
         modelProperties.bulkProperties.rowsToCommit.setValue(10000);
-        modelProperties.bulkProperties.concurrencyMode.setValue(Concurrency.PARALLEL);
+        modelProperties.bulkProperties.concurrencyMode.setValue(Concurrency.Parallel);
         modelProperties.bulkProperties.waitTimeCheckBatchState.setValue(10000);
 
         modelProperties.module.moduleName.setValue(module);
