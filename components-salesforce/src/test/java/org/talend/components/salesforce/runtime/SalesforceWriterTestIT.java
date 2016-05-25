@@ -12,7 +12,9 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,11 +22,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.api.exception.DataRejectException;
+import org.talend.components.salesforce.SalesforceOutputProperties;
+import org.talend.components.salesforce.SalesforceRuntimeTestUtil;
 import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.Property;
@@ -43,7 +49,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
     @Test
     public void testWriterOpenCloseWithEmptyData() throws Throwable {
-        TSalesforceOutputProperties props = createAccountSalesforceoutputProperties();
+        TSalesforceOutputProperties props = createSalesforceoutputProperties(EXISTING_MODULE_NAME);
         // this is mainly to check that open and close do not throw any exceptions.
         // insert
         props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
@@ -74,7 +80,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
     @Ignore("test not finished")
     @Test
     public void testOutputUpsert() throws Throwable {
-        TSalesforceOutputProperties props = createAccountSalesforceoutputProperties();
+        TSalesforceOutputProperties props = createSalesforceoutputProperties(EXISTING_MODULE_NAME);
         props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.UPSERT);
         props.afterOutputAction();
 
@@ -98,7 +104,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
      * properties.
      */
     protected void runOutputInsert(boolean isDynamic) throws Exception {
-        TSalesforceOutputProperties props = createAccountSalesforceoutputProperties();
+        TSalesforceOutputProperties props = createSalesforceoutputProperties(EXISTING_MODULE_NAME);
         setupProps(props.connection, !SalesforceTestBase.ADD_QUOTES);
 
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
@@ -117,7 +123,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
             WriterResult writeResult = writeRows(saleforceWriter, outputRows);
             assertEquals(outputRows.size(), writeResult.getDataCount());
             // create a new props for reading the data, the schema may be altered in the original output props
-            TSalesforceOutputProperties readprops = createAccountSalesforceoutputProperties();
+            TSalesforceOutputProperties readprops = createSalesforceoutputProperties(EXISTING_MODULE_NAME);
             setupProps(readprops.connection, !SalesforceTestBase.ADD_QUOTES);
             readprops.module.moduleName.setValue(EXISTING_MODULE_NAME);
             readprops.module.afterModuleName();// to update the schema.
@@ -142,6 +148,66 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         }
     }
 
+    SalesforceRuntimeTestUtil util = new SalesforceRuntimeTestUtil();
+
+    @Test
+    public void testRejectByUpdateAction() throws Exception {
+        List<String> ids = util.createTestData();
+
+        String id = ids.get(0);
+
+        List<IndexedRecord> outputRows = new ArrayList<IndexedRecord>();
+        GenericData.Record datarow = new GenericData.Record(util.getTestSchema4());
+        datarow.put("Id", id);
+        datarow.put("FirstName", "Wei");
+        datarow.put("LastName", "Wang");
+        datarow.put("Phone", "010-89492686");// update the field
+        outputRows.add(datarow);
+
+        datarow = new GenericData.Record(util.getTestSchema4());
+        datarow.put("Id", "not_exist");// should reject
+        datarow.put("FirstName", "Who");
+        datarow.put("LastName", "Who");
+        datarow.put("Phone", "010-89492686");
+        outputRows.add(datarow);
+
+        TSalesforceOutputProperties props = createSalesforceoutputProperties(util.getTestModuleName());
+        setupProps(props.connection, !SalesforceTestBase.ADD_QUOTES);
+
+        props.module.moduleName.setValue(util.getTestModuleName());
+        props.module.main.schema.setValue(util.getTestSchema4());
+
+        props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.UPDATE);
+
+        Writer<WriterResult> writer = createSalesforceOutputWriter(props);
+
+        writer.open("foo");
+
+        java.util.Map<String, Object> reject_info = null;
+        try {
+            for (IndexedRecord row : outputRows) {
+                try {
+                    writer.write(row);
+                } catch (DataRejectException e) {
+                    reject_info = e.getRejectInfo();
+                }
+            }
+
+            assertTrue(reject_info != null);
+            assertEquals("Id", reject_info.get("errorFields"));
+            assertEquals("MALFORMED_ID", reject_info.get("errorCode"));
+        } finally {
+            try {
+                WriterResult result = writer.close();
+                int success_count = (Integer) adaptor.getComponentData(adaptor.getCurrentComponentId(),
+                        SalesforceOutputProperties.NB_SUCCESS_NAME);
+                assertEquals(1, success_count);
+            } finally {
+                util.deleteTestData(ids);
+            }
+        }
+    }
+
     public Writer<WriterResult> createSalesforceOutputWriter(TSalesforceOutputProperties props) {
         SalesforceSink salesforceSink = new SalesforceSink();
         salesforceSink.initialize(adaptor, props);
@@ -150,10 +216,10 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         return saleforceWriter;
     }
 
-    public static TSalesforceOutputProperties createAccountSalesforceoutputProperties() throws Exception {
+    public static TSalesforceOutputProperties createSalesforceoutputProperties(String moduleName) throws Exception {
         TSalesforceOutputProperties props = (TSalesforceOutputProperties) new TSalesforceOutputProperties("foo").init();
         setupProps(props.connection, !ADD_QUOTES);
-        props.module.moduleName.setValue(EXISTING_MODULE_NAME);
+        props.module.moduleName.setValue(moduleName);
         props.module.afterModuleName();// to setup schema.
         return props;
     }
