@@ -102,6 +102,10 @@ public class SalesforceRuntimeTestUtil {
         return testData;
     }
 
+    public String getTestModuleName() {
+        return module;
+    }
+
     private void login(String endpoint) throws ConnectionException {
         ConnectorConfig config = new ConnectorConfig();
 
@@ -132,12 +136,12 @@ public class SalesforceRuntimeTestUtil {
 
             SaveResult[] results = partnerConnection.create(contacts.toArray(new SObject[0]));
 
-            for (SaveResult result : results) {
-                if (result.isSuccess()) {
-                    ids.add(result.getId());
+            for (int j = 0; j < results.length; j++) {
+                if (results[j].isSuccess()) {
+                    ids.add(results[j].getId());
                 } else {
-                    for (int i = 0; i < result.getErrors().length; i++) {
-                        com.sforce.soap.partner.Error err = result.getErrors()[i];
+                    for (int i = 0; i < results[j].getErrors().length; i++) {
+                        com.sforce.soap.partner.Error err = results[j].getErrors()[i];
                         Assert.fail(err.getMessage());
                     }
                 }
@@ -154,12 +158,12 @@ public class SalesforceRuntimeTestUtil {
         try {
             DeleteResult[] results = partnerConnection.delete(ids.toArray(new String[0]));
 
-            for (DeleteResult result : results) {
-                if (result.isSuccess()) {
+            for (int j = 0; j < results.length; j++) {
+                if (results[j].isSuccess()) {
 
                 } else {
-                    for (int i = 0; i < result.getErrors().length; i++) {
-                        com.sforce.soap.partner.Error err = result.getErrors()[i];
+                    for (int i = 0; i < results[j].getErrors().length; i++) {
+                        com.sforce.soap.partner.Error err = results[j].getErrors()[i];
                         Assert.fail(err.getMessage());
                     }
                 }
