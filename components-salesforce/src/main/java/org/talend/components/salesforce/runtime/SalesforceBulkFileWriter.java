@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,15 +26,14 @@ import org.talend.components.common.runtime.BulkFileWriter;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkProperties;
 
-import java.io.IOException;
-
 /**
  * Prepare Data Files for bulk execution
  */
 final class SalesforceBulkFileWriter extends BulkFileWriter {
 
-    public SalesforceBulkFileWriter(WriteOperation<WriterResult> writeOperation, BulkFileProperties bulkProperties, RuntimeContainer container) {
-        super(writeOperation, bulkProperties, container);
+    public SalesforceBulkFileWriter(WriteOperation<WriterResult> writeOperation, BulkFileProperties bulkProperties,
+            RuntimeContainer adaptor) {
+        super(writeOperation, bulkProperties, adaptor);
     }
 
     @Override
@@ -48,19 +48,22 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
             String ref_module_name = f.getProp(SalesforceSchemaConstants.REF_MODULE_NAME);
             String ref_field_name = f.getProp(SalesforceSchemaConstants.REF_FIELD_NAME);
             if (ref_module_name != null) {
-                header = sbuilder.append(ref_module_name).append(":").append(ref_field_name).append(".").append(f.name()).toString();
+                header = sbuilder.append(ref_module_name).append(":").append(ref_field_name).append(".").append(f.name())
+                        .toString();
                 sbuilder.setLength(0);
             } else {
                 Object value = salesforceBulkProperties.upsertRelationTable.columnName.getValue();
                 if (value != null && value instanceof List) {
                     int index = getIndex((List<String>) value, header);
                     if (index > -1) {
-                        List<String> polymorphics = (List<String>) salesforceBulkProperties.upsertRelationTable.polymorphic.getValue();
-                        List<String> lookupFieldModuleNames = (List<String>) salesforceBulkProperties.upsertRelationTable.lookupFieldModuleName.getValue();
-                        List<String> lookupFieldNames = (List<String>) salesforceBulkProperties.upsertRelationTable.lookupFieldName.getValue();
-                        List<String> externalIdFromLookupFields = (List<String>) salesforceBulkProperties.upsertRelationTable.lookupFieldExternalIdName.getValue();
+                        List<Boolean> polymorphics = salesforceBulkProperties.upsertRelationTable.polymorphic.getValue();
+                        List<String> lookupFieldModuleNames = salesforceBulkProperties.upsertRelationTable.lookupFieldModuleName
+                                .getValue();
+                        List<String> lookupFieldNames = salesforceBulkProperties.upsertRelationTable.lookupFieldName.getValue();
+                        List<String> externalIdFromLookupFields = salesforceBulkProperties.upsertRelationTable.lookupFieldExternalIdName
+                                .getValue();
 
-                        if ("true".equals(polymorphics.get(index))) {
+                        if (polymorphics.get(index)) {
                             sbuilder.append(lookupFieldModuleNames.get(index)).append(":");
                         }
                         sbuilder.append(lookupFieldNames.get(index)).append(".").append(externalIdFromLookupFields.get(index));
@@ -88,7 +91,7 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
         List<String> values = new ArrayList<String>();
         for (Schema.Field f : input.getSchema().getFields()) {
             if (input.get(f.pos()) == null) {
-                if (((TSalesforceOutputBulkProperties) bulkProperties).ignoreNull.getBooleanValue()) {
+                if (((TSalesforceOutputBulkProperties) bulkProperties).ignoreNull.getValue()) {
                     values.add("");
                 } else {
                     values.add("#N/A");

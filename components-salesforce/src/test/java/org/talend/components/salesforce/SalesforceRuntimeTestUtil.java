@@ -17,6 +17,7 @@ import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
+import org.talend.components.salesforce.SalesforceBulkProperties.Concurrency;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
@@ -239,10 +240,10 @@ public class SalesforceRuntimeTestUtil {
         TSalesforceOutputBulkProperties runtimeProperties = (TSalesforceOutputBulkProperties) definition
                 .createRuntimeProperties();
         // pass all the value from the ui model
-        runtimeProperties.schema.schema.setValue(modelProperties.schema.schema.getStringValue());
+        runtimeProperties.schema.schema.setValue(modelProperties.schema.schema.getValue());
         runtimeProperties.bulkFilePath.setValue(modelProperties.bulkFilePath.getStringValue());
-        runtimeProperties.append.setValue(modelProperties.append.getStringValue());
-        runtimeProperties.ignoreNull.setValue(modelProperties.ignoreNull.getStringValue());
+        runtimeProperties.append.setValue(modelProperties.append.getValue());
+        runtimeProperties.ignoreNull.setValue(modelProperties.ignoreNull.getValue());
 
         Object obj = modelProperties.upsertRelationTable.columnName.getValue();
         if (obj != null && obj instanceof List && !((List) obj).isEmpty()) {
@@ -277,11 +278,11 @@ public class SalesforceRuntimeTestUtil {
         modelProperties.connection.userPassword.securityKey.setValue(securityKey);
 
         modelProperties.connection.timeout.setValue(60000);
-        modelProperties.connection.bulkConnection.setValue("true");
+        modelProperties.connection.bulkConnection.setValue(true);
         modelProperties.bulkFilePath.setValue(data_file);
         modelProperties.bulkProperties.bytesToCommit.setValue(10 * 1024 * 1024);
         modelProperties.bulkProperties.rowsToCommit.setValue(10000);
-        modelProperties.bulkProperties.concurrencyMode.setValue(SalesforceBulkProperties.CONCURRENCY_PARALLEL);
+        modelProperties.bulkProperties.concurrencyMode.setValue(Concurrency.Parallel);
         modelProperties.bulkProperties.waitTimeCheckBatchState.setValue(10000);
 
         modelProperties.module.moduleName.setValue(module);

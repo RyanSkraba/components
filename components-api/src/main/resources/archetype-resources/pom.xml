@@ -6,22 +6,21 @@
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
         <version>0.11.0-SNAPSHOT</version>
-        <relativePath>../components-parent/pom.xml</relativePath>        
     </parent>
 
-    <name>Components - tSplunkEventCollector</name>
-    <groupId>org.talend.components</groupId>
-    <artifactId>components-splunk</artifactId>
-    <version>0.11.0-SNAPSHOT</version>
-    <properties>
-        <splunk.webui.port>8000</splunk.webui.port>
-        <splunk.ec.port>8088</splunk.ec.port>
-    </properties>
+    <name>Components - ${componentName}</name>
+    <groupId>${groupId}</groupId>
+    <artifactId>${artifactId}</artifactId>
+    <version>${version}</version>
     <packaging>bundle</packaging>
     <repositories>
         <repository>
             <id>snapshots</id>
             <url>http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
+        </repository>
+        <repository>
+            <id>releases</id>
+            <url>http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceRelease/</url>
         </repository>
     </repositories>
     <dependencies>
@@ -48,19 +47,6 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        
-        <dependency>
-        	<groupId>org.apache.httpcomponents</groupId>
-        	<artifactId>httpclient</artifactId>
-        	<version>4.2.6</version>
-       	</dependency>
-        
         <!-- spring jar for integration tests -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -78,6 +64,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
                 <executions>
                     <execution>
                         <id>lib-jar</id>
@@ -87,9 +74,9 @@
                         </goals>
                         <configuration>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.splunk.lib</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>${package}.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
-                                <Include-Resource>{maven-resources},META-INF/maven/org.talend.components/components-splunk/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
+                                <Include-Resource>{maven-resources},META-INF/maven/${groupId}/${artifactId}/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
                                 <Service-Component>*</Service-Component>                                
                             </instructions>
                         </configuration>
@@ -105,9 +92,9 @@
                             <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
                             <instructions>
                                 <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*</Import-Package>
-                                <Bundle-SymbolicName>org.talend.components.splunk.test</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>${package}.test</Bundle-SymbolicName>
                                 <Bundle-Name>Test Fragment for ${project.name}</Bundle-Name>
-                                <Fragment-Host>org.talend.components.splunk</Fragment-Host>
+                                <Fragment-Host>${package}</Fragment-Host>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                                 <DynamicImport-Package>*</DynamicImport-Package>
                                 <Embed-Dependency></Embed-Dependency>
@@ -125,73 +112,16 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.splunk</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>${package}</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
                                 <Import-Package>*,aQute.bnd.annotation.component</Import-Package>
                                 <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*</Embed-Dependency>
-                                <Include-Resource>{maven-resources},META-INF/maven/org.talend.components/components-splunk/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
+                                <Include-Resource>{maven-resources},META-INF/maven/${groupId}/${artifactId}/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
                             </instructions>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
-                        <splunk.ec.address>http://${docker.host.address}:${splunk.ec.port}</splunk.ec.address>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-			<plugin>
-				<groupId>io.fabric8</groupId>
-				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.15.1</version>
-
-				<executions>
-					<execution>
-						<id>start</id>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>start</goal>
-						</goals>
-						<configuration>
-							<skip>${skipITs}</skip>
-							<images>
-								<image>
-									<name>dchmyga/splunk</name>
-									<run>
-										<env>
-											<SPLUNK_START_ARGS>--accept-license</SPLUNK_START_ARGS>
-										</env>
-										<ports>
-											<port>${splunk.webui.port}:8000</port>
-											<port>${splunk.ec.port}:8088</port>
-										</ports>
-										<wait>
-                                                                                   <http>
-                                                                                        <url>http://${docker.host.address}:${splunk.webui.port}/en-US/account/login?return_to=%2Fen-US%2F</url>
-                                                                                   </http>
-                                                                                   <time>30000</time>
-										</wait>
-									</run>
-								</image>
-							</images>
-						</configuration>
-					</execution>
-					<execution>
-						<id>stop</id>
-						<phase>post-integration-test</phase>
-						<goals>
-							<goal>stop</goal>
-						</goals>
-						<configuration>
-							<skip>${skipITs}</skip>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
         </plugins>
     </build>
 </project>

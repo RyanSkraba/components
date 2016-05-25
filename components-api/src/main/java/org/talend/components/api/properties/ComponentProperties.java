@@ -39,7 +39,7 @@ public abstract class ComponentProperties extends Properties {
      * A special property for the values that a component returns. If this is used, this will be a {@link Property} that
      * contains each of the values the component returns.
      */
-    public Property returns;
+    public Property<String> returns;
 
     /**
      * named constructor to be used is these properties are nested in other properties. Do not subclass this method for

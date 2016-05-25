@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.PropertyFactory.newEnum;
-import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.*;
 
 import java.util.List;
 
@@ -35,11 +35,12 @@ public class SalesforceModuleProperties extends ComponentProperties implements S
     //
     // Properties
     //
-    public Property moduleName = newEnum("moduleName"); //$NON-NLS-1$
+    public Property<String> moduleName = newString("moduleName"); //$NON-NLS-1$
 
     public ISchemaListener schemaListener;
-    
+
     public SchemaProperties main = new SchemaProperties("main") {
+
         public void afterSchema() {
             if (schemaListener != null) {
                 schemaListener.afterSchema();
@@ -69,7 +70,7 @@ public class SalesforceModuleProperties extends ComponentProperties implements S
         moduleRefForm.addRow(main.getForm(Form.REFERENCE));
         refreshLayout(moduleRefForm);
     }
-    
+
     public void setSchemaListener(ISchemaListener schemaListener) {
         this.schemaListener = schemaListener;
     }

@@ -18,19 +18,20 @@ import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.presentation.Form;
 
 /**
  * Properties common to input and output Salesforce components.
  */
-public abstract class SalesforceConnectionModuleProperties extends FixedConnectorsComponentProperties implements
-        SalesforceProvideConnectionProperties {
+public abstract class SalesforceConnectionModuleProperties extends FixedConnectorsComponentProperties
+        implements SalesforceProvideConnectionProperties {
 
     // Collections
     //
     public static final String NB_LINE_NAME = "NB_LINE";
 
-    public Property NB_LINE;
+    public Property<Integer> NB_LINE = PropertyFactory.newInteger(NB_LINE_NAME);
 
     public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection"); //$NON-NLS-1$
 
@@ -46,24 +47,24 @@ public abstract class SalesforceConnectionModuleProperties extends FixedConnecto
     public void setupProperties() {
         super.setupProperties();
         returns = connection.returns;
-        NB_LINE = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, NB_LINE_NAME);
+        NB_LINE = ComponentPropertyFactory.newReturnProperty(returns, NB_LINE);
         // Allow for subclassing
         module = new SalesforceModuleProperties("module");
         module.connection = connection;
     }
 
     public Schema getSchema() {
-        return (Schema) module.main.schema.getValue();
+        return module.main.schema.getValue();
     }
 
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form mainForm = Form.create(this, Form.MAIN);
+        Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(connection.getForm(Form.REFERENCE));
         mainForm.addRow(module.getForm(Form.REFERENCE));
 
-        Form advancedForm = Form.create(this, Form.ADVANCED);
+        Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(connection.getForm(Form.ADVANCED));
     }
 
@@ -80,7 +81,7 @@ public abstract class SalesforceConnectionModuleProperties extends FixedConnecto
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        for (Form childForm: connection.getForms()) {
+        for (Form childForm : connection.getForms()) {
             connection.refreshLayout(childForm);
         }
     }

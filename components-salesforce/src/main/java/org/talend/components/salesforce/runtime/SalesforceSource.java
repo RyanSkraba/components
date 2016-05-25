@@ -12,6 +12,9 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedReader;
@@ -22,9 +25,6 @@ import org.talend.components.salesforce.tsalesforcegetdeleted.TSalesforceGetDele
 import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
 import org.talend.components.salesforce.tsalesforcegetupdated.TSalesforceGetUpdatedProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class SalesforceSource extends SalesforceSourceOrSink implements BoundedSource {
 
@@ -55,11 +55,11 @@ public class SalesforceSource extends SalesforceSourceOrSink implements BoundedS
     public BoundedReader createReader(RuntimeContainer adaptor) {
         if (properties instanceof TSalesforceInputProperties) {
             TSalesforceInputProperties sfInProperties = (TSalesforceInputProperties) properties;
-            boolean isBulk = TSalesforceInputProperties.QUERY_BULK.equals(sfInProperties.queryMode.getStringValue());
+            boolean isBulk = TSalesforceInputProperties.QueryMode.Bulk.equals(sfInProperties.queryMode.getValue());
             sfInProperties.connection.bulkConnection.setValue(isBulk);
-            if(isBulk){
+            if (isBulk) {
                 return new SalesforceBulkQueryInputReader(adaptor, this, sfInProperties);
-            }else{
+            } else {
                 return new SalesforceInputReader(adaptor, this, sfInProperties);
             }
         } else if (properties instanceof TSalesforceGetServerTimestampProperties) {
@@ -68,7 +68,7 @@ public class SalesforceSource extends SalesforceSourceOrSink implements BoundedS
             return new SalesforceGetDeletedReader(adaptor, this, (TSalesforceGetDeletedProperties) properties);
         } else if (properties instanceof TSalesforceGetUpdatedProperties) {
             return new SalesforceGetUpdatedReader(adaptor, this, (TSalesforceGetUpdatedProperties) properties);
-        }else if (properties instanceof TSalesforceBulkExecProperties) {
+        } else if (properties instanceof TSalesforceBulkExecProperties) {
             ((TSalesforceBulkExecProperties) properties).connection.bulkConnection.setValue(true);
             return new SalesforceBulkExecReader(adaptor, this, (TSalesforceBulkExecProperties) properties);
         }

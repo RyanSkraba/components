@@ -24,6 +24,7 @@ import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jira.tjirainput.TJiraInputProperties;
+import org.talend.components.jira.tjirainput.TJiraInputProperties.JiraResource;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 
@@ -33,45 +34,45 @@ import org.talend.daikon.properties.ValidationResult;
 public class JiraSource implements Source {
 
     private static final Logger LOG = LoggerFactory.getLogger(JiraSource.class);
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     /**
      * Host and port number of Jira server
      */
     private String hostPort;
-    
+
     /**
      * Jira user ID
      */
     private String userId;
-    
+
     /**
      * Jira user password
      */
     private String password;
-    
+
     /**
      * Jira REST API resource type.
      * Could be issue or project
      */
-    private String resourceType;
-    
+    private JiraResource resourceType;
+
     /**
      * Schema of data to be retrieved
      */
     private Schema dataSchema;
-    
+
     /**
      * Optional Jira search query property
      */
     private String jql;
-    
+
     /**
      * Optional Jira project ID property
      */
     private String projectId;
-    
+
     /**
      * Optional Jira batch size property
      */
@@ -88,13 +89,13 @@ public class JiraSource implements Source {
 
         if (properties instanceof TJiraInputProperties) {
             TJiraInputProperties inputProperties = (TJiraInputProperties) properties;
-            this.hostPort = inputProperties.host.getStringValue();
-            this.userId = inputProperties.userPassword.userId.getStringValue();
-            this.password = inputProperties.userPassword.password.getStringValue();
-            this.resourceType = inputProperties.resource.getStringValue();
-            this.dataSchema = (Schema) inputProperties.schema.schema.getValue();
+            this.hostPort = inputProperties.host.getValue();
+            this.userId = inputProperties.userPassword.userId.getValue();
+            this.password = inputProperties.userPassword.password.getValue();
+            this.resourceType = inputProperties.resource.getValue();
+            this.dataSchema = inputProperties.schema.schema.getValue();
             this.jql = inputProperties.jql.getStringValue();
-            this.batchSize = inputProperties.batchSize.getIntValue();
+            this.batchSize = inputProperties.batchSize.getValue();
             this.projectId = inputProperties.projectId.getStringValue();
         } else {
             LOG.error("Wrong properties typs: {}", properties.getClass().getName());
@@ -137,11 +138,11 @@ public class JiraSource implements Source {
 
         JiraReader reader = null;
         switch (resourceType) {
-        case TJiraInputProperties.ISSUE: {
-            reader =  new JiraSearchReader(this, container);
+        case ISSUE: {
+            reader = new JiraSearchReader(this, container);
             break;
         }
-        case TJiraInputProperties.PROJECT: {
+        case PROJECT: {
             if (projectId != null && !projectId.isEmpty()) {
                 reader = new JiraProjectIdReader(this, container, projectId);
             } else {
@@ -156,7 +157,7 @@ public class JiraSource implements Source {
         }
         return reader;
     }
-    
+
     /**
      * Returns hostPort
      * 
@@ -189,7 +190,7 @@ public class JiraSource implements Source {
      * 
      * @return the resourceType
      */
-    String getResourceType() {
+    JiraResource getResourceType() {
         return resourceType;
     }
 
@@ -210,7 +211,7 @@ public class JiraSource implements Source {
     String getJql() {
         return jql;
     }
-    
+
     /**
      * Returns batch size
      * 
@@ -219,7 +220,7 @@ public class JiraSource implements Source {
     int getBatchSize() {
         return batchSize;
     }
-    
+
     /**
      * Returns Jira project ID
      * 

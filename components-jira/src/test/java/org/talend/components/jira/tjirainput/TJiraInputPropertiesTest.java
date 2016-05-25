@@ -13,15 +13,8 @@
 package org.talend.components.jira.tjirainput;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import java.util.Collection;
 import java.util.Set;
@@ -30,6 +23,8 @@ import org.apache.avro.Schema;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.jira.testutils.Utils;
+import org.talend.components.jira.tjirainput.TJiraInputProperties.ConnectionType;
+import org.talend.components.jira.tjirainput.TJiraInputProperties.JiraResource;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 
@@ -46,8 +41,8 @@ public class TJiraInputPropertiesTest {
     public void testAfterAuthorizationTypeOAuth() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.init();
-        properties.authorizationType.setValue("OAuth");
-        
+        properties.authorizationType.setValue(ConnectionType.OAUTH);
+
         properties.afterAuthorizationType();
 
         boolean userPasswordIsHidden = properties.getForm(Form.MAIN).getWidget("userPassword").isHidden();
@@ -61,8 +56,8 @@ public class TJiraInputPropertiesTest {
     public void testAfterResourceProject() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.init();
-        properties.resource.setValue("project");
-        
+        properties.resource.setValue(JiraResource.PROJECT);
+
         properties.afterResource();
 
         boolean jqlIsHidden = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
@@ -80,15 +75,15 @@ public class TJiraInputPropertiesTest {
         properties.setupProperties();
 
         String hostValue = properties.host.getStringValue();
-        String resourceValue = properties.resource.getStringValue();
-        String authorizationTypeValue = properties.authorizationType.getStringValue();
+        JiraResource resourceValue = properties.resource.getValue();
+        ConnectionType authorizationTypeValue = properties.authorizationType.getValue();
         String jqlValue = properties.jql.getStringValue();
         String projectIdValue = properties.projectId.getStringValue();
-        int batchSizeValue = properties.batchSize.getIntValue();
+        int batchSizeValue = properties.batchSize.getValue();
 
         assertThat(hostValue, equalTo("https://jira.atlassian.com/"));
-        assertThat(resourceValue, equalTo("issue"));
-        assertThat(authorizationTypeValue, equalTo("Basic"));
+        assertThat(resourceValue, equalTo(JiraResource.ISSUE));
+        assertThat(authorizationTypeValue, equalTo(ConnectionType.BASIC));
         assertThat(jqlValue, equalTo("summary ~ \\\"some word\\\" AND project=PROJECT_ID"));
         assertThat(projectIdValue, equalTo(""));
         assertThat(batchSizeValue, equalTo(50));
@@ -102,7 +97,7 @@ public class TJiraInputPropertiesTest {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.setupSchema();
 
-        Schema schema = (Schema) properties.schema.schema.getValue();
+        Schema schema = properties.schema.schema.getValue();
         String actualSchema = schema.toString();
         String expectedSchema = Utils.readFile("src/test/resources/org/talend/components/jira/tjirainput/schema.json");
 
@@ -154,13 +149,13 @@ public class TJiraInputPropertiesTest {
     public void testRefreshLayoutWrongForm() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.init();
-        
+
         boolean userPasswordExpected = properties.getForm(Form.MAIN).getWidget("userPassword").isHidden();
         boolean jqlExpected = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
         boolean projectIdExpected = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
 
         properties.refreshLayout(new Form(properties, "NotMain"));
-        
+
         boolean userPasswordActual = properties.getForm(Form.MAIN).getWidget("userPassword").isHidden();
         boolean jqlActual = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
         boolean projectIdActual = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
@@ -177,10 +172,10 @@ public class TJiraInputPropertiesTest {
     public void testRefreshLayoutOAuth() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.init();
-        properties.authorizationType.setValue("OAuth");
+        properties.authorizationType.setValue(ConnectionType.OAUTH);
 
         properties.refreshLayout(properties.getForm(Form.MAIN));
-        
+
         boolean userPasswordIsHidden = properties.getForm(Form.MAIN).getWidget("userPassword").isHidden();
         boolean jqlIsHidden = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
         boolean projectIdIsHidden = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
@@ -196,10 +191,10 @@ public class TJiraInputPropertiesTest {
     public void testRefreshLayoutProject() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.init();
-        properties.resource.setValue("project");
+        properties.resource.setValue(JiraResource.PROJECT);
 
         properties.refreshLayout(properties.getForm(Form.MAIN));
-        
+
         boolean userPasswordIsHidden = properties.getForm(Form.MAIN).getWidget("userPassword").isHidden();
         boolean jqlIsHidden = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
         boolean projectIdIsHidden = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();

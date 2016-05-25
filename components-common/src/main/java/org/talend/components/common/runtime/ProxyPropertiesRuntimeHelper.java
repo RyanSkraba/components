@@ -10,7 +10,7 @@ public class ProxyPropertiesRuntimeHelper {
      * Set proxy configuration with ProxyProperties type and Proxy type
      */
     public static void setProxy(final ProxyProperties properties, ProxyProperties.ProxyType type) {
-        if (!properties.useProxy.getBooleanValue()) {
+        if (!properties.useProxy.getValue()) {
             return;
         }
         if (ProxyProperties.ProxyType.HTTP.equals(type)) {

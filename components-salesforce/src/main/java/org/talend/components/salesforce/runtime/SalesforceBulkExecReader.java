@@ -21,6 +21,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.DataRejectException;
+import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResult;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
@@ -42,8 +43,7 @@ final class SalesforceBulkExecReader extends SalesforceReader {
 
     private int rejectCount;
 
-    public SalesforceBulkExecReader(RuntimeContainer container, SalesforceSource source,
-                                    TSalesforceBulkExecProperties props) {
+    public SalesforceBulkExecReader(RuntimeContainer container, SalesforceSource source, TSalesforceBulkExecProperties props) {
         super(container, source);
         properties = props;
     }
@@ -53,15 +53,14 @@ final class SalesforceBulkExecReader extends SalesforceReader {
 
         TSalesforceBulkExecProperties sprops = (TSalesforceBulkExecProperties) properties;
         bulkRuntime = new SalesforceBulkRuntime((SalesforceSource) getCurrentSource(), container);
-        bulkRuntime.setConcurrencyMode(sprops.bulkProperties.concurrencyMode.getStringValue());
-        bulkRuntime.setAwaitTime(sprops.bulkProperties.waitTimeCheckBatchState.getIntValue());
+        bulkRuntime.setConcurrencyMode(sprops.bulkProperties.concurrencyMode.getValue());
+        bulkRuntime.setAwaitTime(sprops.bulkProperties.waitTimeCheckBatchState.getValue());
 
         try {
             // We only support CSV file for bulk output
-            bulkRuntime.executeBulk(sprops.module.moduleName.getStringValue(), sprops.outputAction.getStringValue(),
+            bulkRuntime.executeBulk(sprops.module.moduleName.getStringValue(), sprops.outputAction.getValue(),
                     sprops.upsertKeyColumn.getStringValue(), "csv", sprops.bulkFilePath.getStringValue(),
-                    sprops.bulkProperties.bytesToCommit.getIntValue(),
-                    sprops.bulkProperties.rowsToCommit.getIntValue());
+                    sprops.bulkProperties.bytesToCommit.getValue(), sprops.bulkProperties.rowsToCommit.getValue());
             if (bulkRuntime.getBatchCount() > 0) {
                 batchIndex = 0;
                 currentBatchResult = bulkRuntime.getBatchLog(0);
@@ -131,7 +130,8 @@ final class SalesforceBulkExecReader extends SalesforceReader {
     protected Schema getSchema() throws IOException {
         if (querySchema == null) {
             TSalesforceBulkExecProperties sprops = (TSalesforceBulkExecProperties) properties;
-            querySchema = (Schema) sprops.schemaFlow.schema.getValue();
+            // TODO check the assert : the output schema have values even when no output connector
+            querySchema = sprops.schemaFlow.schema.getValue();
         }
         return querySchema;
     }

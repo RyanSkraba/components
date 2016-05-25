@@ -36,14 +36,6 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
 
     public static final String NB_REJECT_NAME = "NB_REJECT";
 
-    public static final String ACTION_INSERT = "INSERT";
-
-    public static final String ACTION_UPDATE = "UPDATE";
-
-    public static final String ACTION_UPSERT = "UPSERT";
-
-    public static final String ACTION_DELETE = "DELETE";
-
     public enum OutputAction {
         INSERT,
         UPDATE,
@@ -51,9 +43,9 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         DELETE
     }
 
-    public Property outputAction = newEnum("outputAction", ACTION_INSERT, ACTION_UPDATE, ACTION_UPSERT, ACTION_DELETE); // $NON-NLS-1$
+    public Property<OutputAction> outputAction = newEnum("outputAction", OutputAction.class); // $NON-NLS-1$
 
-    public Property upsertKeyColumn = newString("upsertKeyColumn"); //$NON-NLS-1$
+    public Property<String> upsertKeyColumn = newString("upsertKeyColumn"); //$NON-NLS-1$
 
     //
     // Advanced
@@ -71,9 +63,9 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
 
     public SchemaProperties schemaReject = new SchemaProperties("schemaReject"); //$NON-NLS-1$
 
-    public Property NB_SUCCESS;
+    public Property NB_SUCCESS = newInteger(NB_SUCCESS_NAME);
 
-    public Property NB_REJECT;
+    public Property NB_REJECT = newInteger(NB_REJECT_NAME);
 
     public SalesforceOutputProperties(String name) {
         super(name);
@@ -111,10 +103,10 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
     public void setupProperties() {
         super.setupProperties();
 
-        outputAction.setValue(ACTION_INSERT);
+        outputAction.setValue(OutputAction.INSERT);
 
-        NB_SUCCESS = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, NB_SUCCESS_NAME); //$NON-NLS-1$
-        NB_REJECT = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, NB_REJECT_NAME); //$NON-NLS-1$
+        ComponentPropertyFactory.newReturnProperty(returns, NB_SUCCESS);
+        ComponentPropertyFactory.newReturnProperty(returns, NB_REJECT);
 
         setupRejectSchema();
 
@@ -129,7 +121,7 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         super.setupLayout();
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(outputAction);
-        mainForm.addColumn(upsertKeyColumn);
+        mainForm.addColumn(widget(upsertKeyColumn).setWidgetType(WidgetType.ENUMERATION));
 
         Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.WidgetType.TABLE));
@@ -149,9 +141,13 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         if (form.getName().equals(Form.MAIN)) {
             Form advForm = getForm(Form.ADVANCED);
             if (advForm != null) {
-                boolean isUpsert = ACTION_UPSERT.equals(outputAction.getValue());
+                boolean isUpsert = OutputAction.UPSERT.equals(outputAction.getValue());
                 form.getWidget(upsertKeyColumn.getName()).setHidden(!isUpsert);
                 advForm.getWidget(upsertRelationTable.getName()).setHidden(!isUpsert);
+                if (isUpsert) {
+                    beforeUpsertKeyColumn();
+                    beforeUpsertRelationTable();
+                }
             }
         }
     }

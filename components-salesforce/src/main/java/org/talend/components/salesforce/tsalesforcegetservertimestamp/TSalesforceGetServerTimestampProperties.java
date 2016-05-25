@@ -15,7 +15,6 @@ package org.talend.components.salesforce.tsalesforcegetservertimestamp;
 import java.util.Collections;
 import java.util.Set;
 
-import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.component.Connector;
@@ -28,6 +27,7 @@ import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.util.AvroTypes;
 import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.presentation.Form;
 
 public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComponentProperties
@@ -43,7 +43,7 @@ public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComp
 
     public static final String NB_LINE_NAME = "NB_LINE";
 
-    public Property NB_LINE;
+    public Property<Integer> NB_LINE = PropertyFactory.newInteger(NB_LINE_NAME);
 
     public TSalesforceGetServerTimestampProperties(String name) {
         super(name);
@@ -52,15 +52,14 @@ public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComp
     @Override
     public void setupProperties() {
         super.setupProperties();
-        Schema s = SchemaBuilder.record("Main")
-                .fields().name("ServerTimeStamp")
+        Schema s = SchemaBuilder.record("Main").fields().name("ServerTimeStamp")
                 .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'")
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "20")//$NON-NLS-1$
                 .type(AvroTypes._date()).noDefault().endRecord();
         schema.schema.setValue(s);
 
         returns = connection.returns;
-        NB_LINE = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, NB_LINE_NAME);
+        NB_LINE = ComponentPropertyFactory.newReturnProperty(returns, NB_LINE);
     }
 
     @Override
