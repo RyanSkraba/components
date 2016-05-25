@@ -158,6 +158,7 @@
 							<goal>start</goal>
 						</goals>
 						<configuration>
+							<skip>${skipITs}</skip>
 							<images>
 								<image>
 									<name>dchmyga/splunk</name>
@@ -186,6 +187,9 @@
 						<goals>
 							<goal>stop</goal>
 						</goals>
+						<configuration>
+							<skip>${skipITs}</skip>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
