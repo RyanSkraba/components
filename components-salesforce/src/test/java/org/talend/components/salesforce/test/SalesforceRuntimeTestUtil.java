@@ -1,4 +1,4 @@
-package org.talend.components.salesforce;
+package org.talend.components.salesforce.test;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -17,6 +17,7 @@ import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceBulkProperties.Concurrency;
 import org.talend.components.salesforce.runtime.SalesforceBulkFileSink;
 import org.talend.components.salesforce.runtime.SalesforceSource;

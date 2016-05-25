@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2015 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -12,37 +12,39 @@
 // ============================================================================
 package org.talend.components.api;
 
-import javax.inject.Inject;
+import java.util.Properties;
 
-import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
-import org.talend.components.api.service.ComponentService;
-import org.talend.components.common.ProxyPropertiesTest;
+import org.talend.components.api.properties.ComponentPropertiesImpl;
+import org.talend.components.api.test.ComponentTestUtils;
+import org.talend.components.runtimeservice.RuntimeUtil;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class ComponentCommonTestIT extends ProxyPropertiesTest {
-
-    @Inject
-    ComponentService osgiCompService;
+public class ComponentsPaxExamOptionsTest {
 
     @Configuration
     public Option[] config() {
-
-        return PaxExamOptions.getOptions();
-        // these debug option do not work, I still don't know how to debug this :, cleanCaches(),
-        // vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
-        // , systemTimeout(0)
+        return ComponentsPaxExamOptions.getOptions();
     }
 
-    @Before
-    public void setypComponentService() {
-        componentService = osgiCompService;
+    @Test
+    public void test() {
+        // just check one class of each bundle added in the pax exam option can be instantiated.
+        // daikon
+        new Properties();
+        // components-api
+        new ComponentPropertiesImpl("foo");
+        // api-service
+        new ComponentTestUtils();
+        // runtime service
+        new RuntimeUtil();
     }
 
 }

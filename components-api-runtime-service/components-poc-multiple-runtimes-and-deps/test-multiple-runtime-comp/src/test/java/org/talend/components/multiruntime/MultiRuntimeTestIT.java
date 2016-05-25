@@ -10,7 +10,9 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api;
+package org.talend.components.multiruntime;
+
+import static org.ops4j.pax.exam.CoreOptions.*;
 
 import javax.inject.Inject;
 
@@ -25,8 +27,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.talend.components.api.ComponentsPaxExamOptions;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.multiruntime.AbstractMultiRuntimeComponentTests;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
@@ -37,11 +39,8 @@ public class MultiRuntimeTestIT extends AbstractMultiRuntimeComponentTests {
 
     @Configuration
     public Option[] config() {
-
-        return PaxExamOptions.getOptions();
-        // these debug option do not work, I still don't know how to debug this :, cleanCaches(),
-        // vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
-        // , systemTimeout(0)
+        return options(composite(ComponentsPaxExamOptions.getOptions()), //
+                linkBundle("org.talend.components-multiple-runtime-comp"));
     }
 
     @Override

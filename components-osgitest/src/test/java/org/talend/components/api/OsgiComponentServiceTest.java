@@ -19,7 +19,6 @@ import java.util.Hashtable;
 
 import javax.inject.Inject;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,20 +30,16 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
-import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.ComponentServiceTest;
-import org.talend.components.api.service.testcomponent.TestComponentDefinition;
 import org.talend.components.api.service.testcomponent.TestComponentInstaller;
-import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
-import org.talend.components.api.wizard.ComponentWizardDefinition;
 
 /**
  * created by sgandon on 7 sept. 2015 Detailled comment
  */
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class ComponentServiceTestIT extends ComponentServiceTest {
+public class OsgiComponentServiceTest extends ComponentServiceTest {
 
     @Inject
     private ComponentService osgiCompService;
@@ -52,7 +47,7 @@ public class ComponentServiceTestIT extends ComponentServiceTest {
     // Ensure that the TestComponentInstaller is registered before the osgiCompService is created.
     @BeforeClass
     public static void installTestComponents() {
-        BundleContext bundleContext = FrameworkUtil.getBundle(ComponentServiceTestIT.class).getBundleContext();
+        BundleContext bundleContext = FrameworkUtil.getBundle(ComponentServiceTest.class).getBundleContext();
         final Dictionary<String, Object> props = new Hashtable<String, Object>();
         props.put("component.name", "test");
         bundleContext.registerService(ComponentInstaller.class, new TestComponentInstaller(), props);
@@ -61,7 +56,7 @@ public class ComponentServiceTestIT extends ComponentServiceTest {
     @Configuration
     public Option[] config() {
         try {
-            return PaxExamOptions.getOptions();
+            return ComponentsPaxExamOptions.getOptions();
         } catch (Exception e) {
             e.printStackTrace();
             throw e;

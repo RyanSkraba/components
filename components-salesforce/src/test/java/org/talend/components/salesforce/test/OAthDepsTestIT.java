@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api;
+package org.talend.components.salesforce.test;
 
 import javax.inject.Inject;
 
@@ -34,11 +34,7 @@ public class OAthDepsTestIT {
 
     @Configuration
     public Option[] config() {
-
-        return PaxExamOptions.getOptions();
-        // these debug option do not work, I still don't know how to debug this :, cleanCaches(),
-        // vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
-        // , systemTimeout(0)
+        return OsgiSalesfoceComponentTestIT.getSalesforcePaxExamOption();
     }
 
     @Test(expected = NullPointerException.class)

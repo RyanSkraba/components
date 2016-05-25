@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedSource;
+import org.talend.components.salesforce.runtime.SalesforceSource;
 
 public class SalesforceSourceTest {
 

@@ -21,7 +21,7 @@ import java.util.Calendar;
 
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedReader;
-import org.talend.components.salesforce.SalesforceTestBase;
+import org.talend.components.salesforce.test.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
 
 public class SalesforceServerTimeStampReaderTestIT extends SalesforceTestBase {

@@ -67,11 +67,47 @@
             <artifactId>daikon-spring</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-osgitest</artifactId>
+            <version>0.15.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
     <build>
         <plugins>
             <plugin>
+                <groupId>com.github.veithen.alta</groupId>
+                <artifactId>alta-maven-plugin</artifactId>
+                <version>0.4.2-Talend</version>
+                <executions>
+                    <execution>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>generate-test-resources</goal>
+                        </goals>
+                        <configuration>
+                            <name>%groupId%-%artifactId%.link</name>
+                            <value>%url%</value>
+                            <separator>${line.separator}</separator>
+                            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                            <dependencySet>
+                                <scope>test</scope>
+                            </dependencySet>
+                            <artifacts>
+                              <artifact>
+                                  <groupId>${project.groupId}</groupId>
+                                  <artifactId>${project.artifactId}</artifactId>
+                                  <classifier>bundle</classifier>
+                                  <version>${project.version}</version>
+                              </artifact>
+                           </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>          
+			<plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <executions>
@@ -132,6 +168,28 @@
                     </execution>
                 </executions>
             </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.20-PAXEXAM-PATCH</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<argLine>-Xms512m -Xmx1024m</argLine>
+					<systemPropertyVariables>
+						<pax.exam.karaf.version>4.0.2</pax.exam.karaf.version>
+						<salesforce.user>${salesforce.user}</salesforce.user>
+						<salesforce.password>${salesforce.password}</salesforce.password>
+						<salesforce.key>${salesforce.key}</salesforce.key>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
         </plugins>
     </build>
 

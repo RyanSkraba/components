@@ -13,6 +13,7 @@ import java.util.Date;
 
 import org.apache.avro.Schema;
 import org.junit.Test;
+import org.talend.components.salesforce.runtime.SalesforceAvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 

@@ -26,7 +26,7 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
-import org.talend.components.salesforce.SalesforceTestBase;
+import org.talend.components.salesforce.test.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.avro.AvroUtils;

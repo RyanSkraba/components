@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.salesforce;
+package org.talend.components.salesforce.test;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
@@ -43,6 +43,10 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentRegistry;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.test.AbstractComponentTest;
+import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.SalesforceFamilyDefinition;
+import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
 import org.talend.components.salesforce.runtime.SalesforceSink;
 import org.talend.components.salesforce.runtime.SalesforceSource;

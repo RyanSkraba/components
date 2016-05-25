@@ -1,14 +1,8 @@
 package org.talend.components.multiruntime;
 
-import java.util.Collections;
-import java.util.Set;
-
-import org.talend.components.api.component.Connector;
-import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.Source;
-import org.talend.components.common.FixedConnectorsComponentProperties;
-import org.talend.components.common.SchemaProperties;
+import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.runtimeservice.RuntimeUtil;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
@@ -35,7 +29,7 @@ import org.talend.daikon.sandbox.SandboxedInstance;
  * <li>{code schema}, an embedded property referring to a Schema.</li>
  * </ol>
  */
-public class MultiRuntimeComponentProperties extends FixedConnectorsComponentProperties {
+public class MultiRuntimeComponentProperties extends ComponentPropertiesImpl {
 
     public enum Version {
         VERSION_0_1,
@@ -43,10 +37,6 @@ public class MultiRuntimeComponentProperties extends FixedConnectorsComponentPro
     }
 
     public Property<Version> version = PropertyFactory.newEnum("version", Version.class); //$NON-NLS-1$
-
-    public SchemaProperties schema = new SchemaProperties("schema"); //$NON-NLS-1$
-
-    protected transient PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
     public MultiRuntimeComponentProperties(String name) {
         super(name);
@@ -62,16 +52,7 @@ public class MultiRuntimeComponentProperties extends FixedConnectorsComponentPro
     public void setupLayout() {
         super.setupLayout();
         Form form = Form.create(this, Form.MAIN);
-        form.addRow(schema.getForm(Form.REFERENCE));
         form.addRow(version);
-    }
-
-    @Override
-    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputComponent) {
-        if (isOutputComponent) {
-            return Collections.singleton(mainConnector);
-        }
-        return Collections.emptySet();
     }
 
     // this simulates the possible client callback that wuld need some runtime access for getting schema for instance.

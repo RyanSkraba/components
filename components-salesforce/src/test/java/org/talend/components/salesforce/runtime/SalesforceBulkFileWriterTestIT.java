@@ -18,8 +18,8 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.talend.components.salesforce.SalesforceRuntimeTestUtil;
-import org.talend.components.salesforce.SalesforceTestBase;
+import org.talend.components.salesforce.test.SalesforceRuntimeTestUtil;
+import org.talend.components.salesforce.test.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkProperties;
 

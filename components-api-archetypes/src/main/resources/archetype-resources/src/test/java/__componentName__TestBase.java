@@ -13,9 +13,7 @@ import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.test.SpringTestApp;
 import org.talend.components.api.test.AbstractComponentTest;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SpringTestApp.class)
-public class Spring${componentName}TestIT extends ${componentName}TestBase {
+public class ${componentName}TestBase extends AbstractComponentTest {
     @Inject
     private ComponentService componentService;
 
@@ -23,4 +21,8 @@ public class Spring${componentName}TestIT extends ${componentName}TestBase {
         return componentService;
     }
     
+    @Test
+    public void componentHasBeenRegistered(){
+        checkComponentIsRegistered("${componentName}");
+    }
 }

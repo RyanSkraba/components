@@ -34,6 +34,14 @@
 		    <artifactId>commons-collections</artifactId>
 		    <version>3.2</version>
 		</dependency>
+		<!-- same as above but as an OSGI bundle -->
+       <dependency>
+           <groupId>org.apache.servicemix.bundles</groupId>
+           <artifactId>org.apache.servicemix.bundles.commons-collections</artifactId>
+           <version>3.2.1_3</version>
+           <scope>test</scope>
+       </dependency>
+		
         <!-- Generated Jar files from the WSDL -->
         <dependency>
             <groupId>com.force.api</groupId>
@@ -81,6 +89,14 @@
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
             <version>0.15.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-common</artifactId>
+            <version>0.15.0-SNAPSHOT</version>
+            <classifier>bundle</classifier>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
@@ -93,6 +109,14 @@
             <groupId>org.talend.components</groupId>
             <artifactId>components-common-oauth</artifactId>
             <version>0.15.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-common-oauth</artifactId>
+            <version>0.15.0-SNAPSHOT</version>
+            <classifier>bundle</classifier>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>biz.aQute.bnd</groupId>
@@ -144,21 +168,70 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- OSGI paxexam dependencies -->
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-osgitest</artifactId>
+            <version>0.15.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
+    
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
+		    <plugin>
+		        <groupId>com.github.veithen.alta</groupId>
+		        <artifactId>alta-maven-plugin</artifactId>
+		        <version>0.4.2-Talend</version>
+		        <executions>
+		            <execution>
+		                <phase>pre-integration-test</phase>
+		                <goals>
+		                    <goal>generate-test-resources</goal>
+		                </goals>
+		                <configuration>
+                            <name>%groupId%-%artifactId%-%dahsClassifier%.link</name>
+		                    <value>%url%</value>
+		                    <separator>${line.separator}</separator>
+		                    <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+		                    <dependencySet>
+		                        <scope>test</scope>
+		                    </dependencySet>
+		                    <artifacts>
+		                      <artifact>
+		                          <groupId>${project.groupId}</groupId>
+		                          <artifactId>${project.artifactId}</artifactId>
+		                          <classifier>bundle</classifier>
+		                          <version>${project.version}</version>
+		                      </artifact>
+		                   </artifacts>
+		                </configuration>
+		            </execution>
+		        </executions>
+		    </plugin>          
+           <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-failsafe-plugin</artifactId>
+               <version>2.20-PAXEXAM-PATCH</version>
+               <executions>
+                   <execution>
+                       <goals>
+                           <goal>integration-test</goal>
+                           <goal>verify</goal>
+                       </goals>
+                   </execution>
+               </executions>
+               <configuration>
+                   <argLine>-Xms512m -Xmx1024m</argLine>
+                   <systemPropertyVariables>
+                       <pax.exam.karaf.version>4.0.2</pax.exam.karaf.version>
                         <salesforce.user>${salesforce.user}</salesforce.user>
                         <salesforce.password>${salesforce.password}</salesforce.password>
                         <salesforce.key>${salesforce.key}</salesforce.key>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
+                   </systemPropertyVariables>
+               </configuration>
+           </plugin>            
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -180,28 +253,6 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>test-bundle</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>tests</classifier>
-                            <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
-                            <instructions>
-                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*,org.hamcrest*</Import-Package>
-                                <Bundle-SymbolicName>org.talend.components.salesforce.test</Bundle-SymbolicName>
-                                <Bundle-Name>Test Fragment for ${project.name}</Bundle-Name>
-                                <Fragment-Host>org.talend.components.salesforce</Fragment-Host>
-                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                                <DynamicImport-Package>*</DynamicImport-Package>
-                                <Embed-Dependency></Embed-Dependency>
-                                <Export-Package>*</Export-Package>
-                                <Include-Resource>=target/test-classes/</Include-Resource>
-                            </instructions>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>default-jar</id>
                         <phase>package</phase>
                         <goals>
@@ -211,7 +262,7 @@
                             <classifier>bundle</classifier>
                             <instructions>
                                 <Bundle-SymbolicName>org.talend.components.salesforce</Bundle-SymbolicName>
-                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*,org.apache.avro.*,org.apache.oltu.oauth2*</Import-Package>
+                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*,org.apache.avro.*,org.apache.oltu.oauth2*,org.codehaus.jackson*</Import-Package>
                                 <Service-Component>*</Service-Component>
                                 <Embed-Dependency>!components*,*;scope=compile|runtime;artifactId=!commons-beanutils|commons-collections</Embed-Dependency>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>

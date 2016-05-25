@@ -34,13 +34,9 @@ public class MultiRuntimeComponentSource implements BoundedSource {
     /** Configuration extracted from the input properties. */
     private MultiRuntimeComponentProperties properties;
 
-    private transient Schema schema;
-
     @Override
     public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
         this.properties = (MultiRuntimeComponentProperties) properties;
-        // FIXME - this should be moved to the properties setup
-        schema = new Schema.Parser().parse(this.properties.schema.schema.getStringValue());
         return ValidationResult.OK;
     }
 

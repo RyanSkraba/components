@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.api.test;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +21,11 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Writer;
+import org.talend.components.api.exception.ComponentException;
+import org.talend.components.api.exception.error.ComponentsApiErrorCode;
 import org.talend.components.api.service.ComponentService;
 
 public abstract class AbstractComponentTest {
@@ -39,6 +44,19 @@ public abstract class AbstractComponentTest {
     @Test
     public void testAllImages() {
         ComponentTestUtils.testAllImages(getComponentService());
+    }
+
+    protected void checkComponentIsRegistered(String componentName) {
+        try {
+            ComponentDefinition componentDefinition = getComponentService().getComponentDefinition(componentName);
+            assertNotNull(componentDefinition);
+        } catch (ComponentException ce) {
+            if (ce.getCode() == ComponentsApiErrorCode.WRONG_COMPONENT_NAME) {
+                fail("Could not find component [], please check the registered component familly is in package org.talend.components");
+            } else {
+                throw ce;
+            }
+        }
     }
 
     public static Map<String, Object> getConsolidatedResults(Result result, Writer writer) {

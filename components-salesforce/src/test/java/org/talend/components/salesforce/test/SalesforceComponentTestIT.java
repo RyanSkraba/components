@@ -10,14 +10,13 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.salesforce;
+package org.talend.components.salesforce.test;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -40,6 +39,12 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.common.CommonTestUtils;
 import org.talend.components.common.oauth.OauthProperties;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.SalesforceConnectionWizard;
+import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
+import org.talend.components.salesforce.SalesforceModuleListProperties;
+import org.talend.components.salesforce.SalesforceModuleProperties;
+import org.talend.components.salesforce.SalesforceUserPasswordProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties.LoginType;
 import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
 import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
@@ -326,13 +331,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
         ComponentWizard[] subWizards = getComponentService().getComponentWizardsForProperties(connProps, "location")
                 .toArray(new ComponentWizard[3]);
-        Arrays.sort(subWizards, new Comparator<ComponentWizard>() {
-
-            @Override
-            public int compare(ComponentWizard o1, ComponentWizard o2) {
-                return o1.getDefinition().getName().compareTo(o2.getDefinition().getName());
-            }
-        });
+        Arrays.sort(subWizards, new WizardNameComparator());
         assertEquals(3, subWizards.length);
         // Edit connection wizard - we copy the connection properties, as we present the UI, so we use the
         // connection properties object created by the new wizard
