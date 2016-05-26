@@ -12,20 +12,29 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.PropertyFactory.newDate;
+import static org.talend.daikon.properties.PropertyFactory.newProperty;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Set;
 
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 
 public class SalesforceGetDeletedUpdatedProperties extends SalesforceConnectionModuleProperties {
 
-    public Property startDate = newDate("startDate").setRequired();
+    /**
+     * 
+     */
+    private static final TypeLiteral<Calendar> CALENDAR_TYPE_LITERAL = new TypeLiteral<Calendar>() {
+        // empty on purpose
+    };
 
-    public Property endDate = newDate("endDate").setRequired();
+    public Property<Calendar> startDate = newProperty(CALENDAR_TYPE_LITERAL, "startDate").setRequired();
+
+    public Property<Calendar> endDate = newProperty(CALENDAR_TYPE_LITERAL, "endDate").setRequired();
 
     public SalesforceGetDeletedUpdatedProperties(String name) {
         super(name);

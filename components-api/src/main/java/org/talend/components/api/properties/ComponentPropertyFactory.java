@@ -18,6 +18,7 @@ import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.PropertyFactory;
 
 /**
  * Make new {@link Property} objects.
@@ -30,20 +31,20 @@ public class ComponentPropertyFactory {
      *
      * @return a {@link Property} that will contain the return properties
      */
-    public static Property newReturnsProperty() {
+    public static Property<String> newReturnsProperty() {
         // Container for the returns
-        return new Property(ComponentProperties.RETURNS);
+        return PropertyFactory.newProperty(ComponentProperties.RETURNS);
     }
 
     /**
      * Adds a new return property.
      *
      * @param returns the {@link Property} returned by {@link #newReturnsProperty()}
-     * @param type the type of the returns property
+     * @param returnProp the property to be added to the returns property
      * @param name the name of the returns property
      * @return a {@link Property}
      */
-    public static Property newReturnProperty(Property returns, Property.Type type, String name) {
+    public static <T> Property<T> newReturnProperty(Property<String> returns, Property<T> returnProp) {
         if (returns == null) {
             throw new TalendRuntimeException(CommonErrorCodes.UNEXPECTED_EXCEPTION, new NullPointerException());
         }
@@ -51,9 +52,8 @@ public class ComponentPropertyFactory {
             throw new ComponentException(ComponentsApiErrorCode.WRONG_RETURNS_TYPE_NAME,
                     ExceptionContext.build().put("name", returns.getName()));
         }
-        Property p = new Property(type, name);
-        returns.addChild(p);
-        return p;
+        returns.addChild(returnProp);
+        return returnProp;
     }
 
 }

@@ -1,5 +1,9 @@
 package org.talend.components.dataprep;
 
+import java.util.Collections;
+
+import javax.inject.Inject;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,20 +12,18 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.SpringApp;
-
-import javax.inject.Inject;
-import java.util.Collections;
+import org.talend.components.dataprep.TDataSetOutputProperties.Mode;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
 public class TDataSetOutputSinkTest {
 
-        @Inject
-        private ComponentService componentService;
+    @Inject
+    private ComponentService componentService;
 
-        private TDataSetOutputSink outputSink;
+    private TDataSetOutputSink outputSink;
 
-        private TDataSetOutputDefinition definition;
+    private TDataSetOutputDefinition definition;
 
     @Before
     public void setInputSource() {
@@ -54,7 +56,7 @@ public class TDataSetOutputSinkTest {
     public void validateLiveDataSet() {
         TDataSetOutputProperties properties = (TDataSetOutputProperties) definition.createProperties();
         properties.setValue("url", "http://127.0.0.1");
-        properties.setValue("mode", properties.LIVE_DATASET);
+        properties.setValue("mode", Mode.LIVE_DATASET);
         outputSink.initialize(null, properties);
         outputSink.validate(null);
     }
@@ -67,6 +69,6 @@ public class TDataSetOutputSinkTest {
 
     @Test
     public void testGetSchema() throws Exception {
-        Assert.assertNull(outputSink.getSchema(null,null));
+        Assert.assertNull(outputSink.getSchema(null, null));
     }
 }

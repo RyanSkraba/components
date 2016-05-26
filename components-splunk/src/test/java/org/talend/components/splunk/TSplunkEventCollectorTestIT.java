@@ -69,7 +69,7 @@ public class TSplunkEventCollectorTestIT {
 
         props = new TSplunkEventCollectorDefinition().createProperties();
         ComponentTestUtils.checkSerialize(props, errorCollector);
-        Property extendedOutput = (Property) props.getProperty("extendedOutput");
+        Property<Boolean> extendedOutput = (Property<Boolean>) props.getProperty("extendedOutput");
         assertEquals(true, extendedOutput.getValue());
         Form advForm = props.getForm(Form.ADVANCED);
         assertFalse(advForm.getWidget("eventsBatchSize").isHidden());

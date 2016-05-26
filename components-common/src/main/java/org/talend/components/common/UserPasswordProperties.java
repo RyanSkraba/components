@@ -24,9 +24,9 @@ import org.talend.daikon.properties.presentation.Widget.WidgetType;
 
 public class UserPasswordProperties extends ComponentProperties {
 
-    public Property userId = newProperty("userId").setRequired(true); //$NON-NLS-1$
+    public Property<String> userId = newProperty("userId").setRequired(true); //$NON-NLS-1$
 
-    public Property password = newProperty("password").setRequired(true)
+    public Property<String> password = newProperty("password").setRequired(true)
             .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
     public UserPasswordProperties(String name) {

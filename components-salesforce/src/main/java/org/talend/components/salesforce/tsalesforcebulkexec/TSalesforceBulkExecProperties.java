@@ -37,7 +37,7 @@ import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
 
-    public Property bulkFilePath = newProperty("bulkFilePath");
+    public Property<String> bulkFilePath = newProperty("bulkFilePath");
 
     public SalesforceBulkProperties bulkProperties = new SalesforceBulkProperties("bulkProperties");
 

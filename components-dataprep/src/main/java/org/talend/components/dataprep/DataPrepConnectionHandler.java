@@ -54,7 +54,7 @@ public class DataPrepConnectionHandler {
     }
 
     HttpResponse connect() throws IOException {
-        Request request = Request.Post(url + "/login?username=" + login + "&password=" + pass);
+        Request request = Request.Post(url + "/login?username=" + login + "&password=" + pass + "&client-app=studio");
         HttpResponse response = request.execute().returnResponse();
         authorisationHeader = response.getFirstHeader("Authorization");
         if (returnStatusCode(response) != HttpServletResponse.SC_OK && authorisationHeader != null) {
@@ -74,7 +74,7 @@ public class DataPrepConnectionHandler {
                 urlConnection.disconnect();
             }
         } finally {
-            Request request = Request.Post(url + "/logout").addHeader(authorisationHeader);
+            Request request = Request.Post(url + "/logout?client-app=STUDIO").addHeader(authorisationHeader);
             response = request.execute().returnResponse();
             if (returnStatusCode(response) != HttpServletResponse.SC_OK && authorisationHeader != null) {
                 // TODO i18n

@@ -37,7 +37,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
     public static final String OAUTH_URL = "https://login.salesforce.com/services/oauth2";
 
-    public Property endpoint = (Property) newString("endpoint").setRequired();
+    public Property<String> endpoint = newString("endpoint").setRequired();
 
     public static final String FORM_WIZARD = "Wizard";
 
@@ -46,25 +46,27 @@ public class SalesforceConnectionProperties extends ComponentProperties
     //
 
     // Only for the wizard use
-    public Property name = (Property) newString("name").setRequired();
+    public Property<String> name = newString("name").setRequired();
 
-    public static final String LOGIN_BASIC = "Basic";
+    public enum LoginType {
+        Basic,
+        OAuth;
 
-    public static final String LOGIN_OAUTH = "OAuth";
+    }
 
-    public Property loginType = (Property) newEnum("loginType", LOGIN_BASIC, LOGIN_OAUTH).setRequired();
+    public Property<LoginType> loginType = newEnum("loginType", LoginType.class).setRequired();
 
-    public Property bulkConnection = newBoolean("bulkConnection"); //$NON-NLS-1$
+    public Property<Boolean> bulkConnection = newBoolean("bulkConnection"); //$NON-NLS-1$
 
-    public Property needCompression = newBoolean("needCompression"); //$NON-NLS-1$
+    public Property<Boolean> needCompression = newBoolean("needCompression"); //$NON-NLS-1$
 
-    public Property timeout = newInteger("timeout"); //$NON-NLS-1$
+    public Property<Integer> timeout = newInteger("timeout"); //$NON-NLS-1$
 
-    public Property httpTraceMessage = newBoolean("httpTraceMessage"); //$NON-NLS-1$
+    public Property<Boolean> httpTraceMessage = newBoolean("httpTraceMessage"); //$NON-NLS-1$
 
-    public Property httpChunked = newBoolean("httpChunked"); //$NON-NLS-1$
+    public Property<Boolean> httpChunked = newBoolean("httpChunked"); //$NON-NLS-1$
 
-    public Property clientId = newString("clientId"); //$NON-NLS-1$
+    public Property<String> clientId = newString("clientId"); //$NON-NLS-1$
 
     //
     // Presentation items
@@ -100,13 +102,13 @@ public class SalesforceConnectionProperties extends ComponentProperties
     public void setupProperties() {
         super.setupProperties();
 
-        loginType.setValue(LOGIN_BASIC);
+        loginType.setValue(LoginType.Basic);
         endpoint.setValue(URL);
         timeout.setValue(60000);
         httpChunked.setValue(true);
 
         returns = ComponentPropertyFactory.newReturnsProperty();
-        ERROR_MESSAGE = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.STRING, ERROR_MESSAGE_NAME);
+        ERROR_MESSAGE = ComponentPropertyFactory.newReturnProperty(returns, newString(ERROR_MESSAGE_NAME));
 
     }
 
@@ -116,14 +118,14 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
         Form wizardForm = Form.create(this, FORM_WIZARD);
         wizardForm.addRow(name);
-        wizardForm.addRow(widget(loginType).setDeemphasize(true));
+        wizardForm.addRow(widget(loginType).setWidgetType(WidgetType.ENUMERATION).setDeemphasize(true));
         wizardForm.addRow(oauth.getForm(Form.MAIN));
         wizardForm.addRow(userPassword.getForm(Form.MAIN));
         wizardForm.addRow(widget(advanced).setWidgetType(WidgetType.BUTTON));
         wizardForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
 
         Form mainForm = Form.create(this, Form.MAIN);
-        mainForm.addRow(loginType);
+        mainForm.addRow(widget(loginType).setWidgetType(WidgetType.ENUMERATION));
         mainForm.addRow(oauth.getForm(Form.MAIN));
         mainForm.addRow(userPassword.getForm(Form.MAIN));
 
@@ -152,6 +154,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
         refreshLayout(getForm(Form.ADVANCED));
     }
 
+    @Override
     public void afterReferencedComponent() {
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(Form.REFERENCE));
@@ -189,20 +192,24 @@ public class SalesforceConnectionProperties extends ComponentProperties
                 form.getWidget(USERPASSWORD).setHidden(true);
             } else {
                 form.getWidget(loginType.getName()).setHidden(false);
-                String endpointValue = endpoint.getStringValue();
-                if (LOGIN_OAUTH.equals(loginType.getValue())) {
-                    form.getWidget(OAUTH).setHidden(false);
-                    form.getWidget(USERPASSWORD).setHidden(true);
-                    if (endpointValue == null || endpointValue.contains(URL)) {
-                        endpoint.setValue(OAUTH_URL);
-                    }
-                } else if (LOGIN_BASIC.equals(loginType.getValue())) {
+                String endpointValue = endpoint.getValue();
+                switch (loginType.getValue()) {
+                case Basic:
                     form.getWidget(OAUTH).setHidden(true);
                     form.getWidget(USERPASSWORD).setHidden(false);
                     if (endpointValue == null || endpointValue.contains(OAUTH_URL)) {
                         endpoint.setValue(URL);
                     }
-                } else {
+                    break;
+                case OAuth:
+                    form.getWidget(OAUTH).setHidden(false);
+                    form.getWidget(USERPASSWORD).setHidden(true);
+                    if (endpointValue == null || endpointValue.contains(URL)) {
+                        endpoint.setValue(OAUTH_URL);
+                    }
+                    break;
+
+                default:
                     throw new RuntimeException("Enum value should be handled :" + loginType.getValue());
                 }
             }
@@ -214,13 +221,13 @@ public class SalesforceConnectionProperties extends ComponentProperties
             } else {
                 form.setHidden(false);
 
-                boolean bulkMode = bulkConnection.getBooleanValue();
+                boolean bulkMode = bulkConnection.getValue();
                 form.getWidget(httpChunked.getName()).setHidden(bulkMode);
                 form.getWidget(httpTraceMessage.getName()).setHidden(!bulkMode);
 
                 Form proxyForm = form.getChildForm(proxy.getName());
                 if (proxyForm != null) {
-                    boolean isUseProxy = proxy.useProxy.getBooleanValue();
+                    boolean isUseProxy = proxy.useProxy.getValue();
                     proxyForm.getWidget(proxy.host.getName()).setHidden(!isUseProxy);
                     proxyForm.getWidget(proxy.port.getName()).setHidden(!isUseProxy);
                     proxyForm.getWidget(proxy.userPassword.getName()).setHidden(!isUseProxy);
@@ -240,8 +247,9 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
     public SalesforceConnectionProperties getReferencedConnectionProperties() {
         SalesforceConnectionProperties refProps = (SalesforceConnectionProperties) referencedComponent.componentProperties;
-        if (refProps != null)
+        if (refProps != null) {
             return refProps;
+        }
         return null;
     }
 }

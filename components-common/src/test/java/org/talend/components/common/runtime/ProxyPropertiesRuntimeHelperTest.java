@@ -38,7 +38,7 @@ public class ProxyPropertiesRuntimeHelperTest {
         assertNull(System.getProperty("java.net.socks.password"));
 
         proxyProperties.host.setValue("192.168.32.162");
-        proxyProperties.port.setValue("1080");
+        proxyProperties.port.setValue(1080);
         proxyProperties.userPassword.userId.setValue("talend");
 
         ProxyPropertiesRuntimeHelper.setProxy(proxyProperties, ProxyProperties.ProxyType.SOCKS);

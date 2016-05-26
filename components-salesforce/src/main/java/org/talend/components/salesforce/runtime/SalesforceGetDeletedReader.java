@@ -15,19 +15,18 @@ package org.talend.components.salesforce.runtime;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
-import com.sforce.soap.partner.DeletedRecord;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.SalesforceGetDeletedUpdatedProperties;
 
+import com.sforce.soap.partner.DeletedRecord;
 import com.sforce.soap.partner.GetDeletedResult;
 import com.sforce.ws.ConnectionException;
 
 public class SalesforceGetDeletedReader extends SalesforceGetDeletedUpdatedReader<GetDeletedResult> {
 
     public SalesforceGetDeletedReader(RuntimeContainer adaptor, SalesforceSource source,
-                                      SalesforceGetDeletedUpdatedProperties props) {
+            SalesforceGetDeletedUpdatedProperties props) {
         super(adaptor, source, props);
     }
 
@@ -46,7 +45,7 @@ public class SalesforceGetDeletedReader extends SalesforceGetDeletedUpdatedReade
     @Override
     protected GetDeletedResult getResult() throws IOException, ConnectionException {
         SalesforceGetDeletedUpdatedProperties props = (SalesforceGetDeletedUpdatedProperties) properties;
-        return getConnection().getDeleted(module, props.startDate.getCalendarValue(), props.endDate.getCalendarValue());
+        return getConnection().getDeleted(module, props.startDate.getValue(), props.endDate.getValue());
     }
 
 }

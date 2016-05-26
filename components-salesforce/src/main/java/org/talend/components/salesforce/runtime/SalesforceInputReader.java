@@ -13,7 +13,11 @@
 package org.talend.components.salesforce.runtime;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -21,12 +25,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
+import org.talend.daikon.avro.util.AvroUtils;
 
 import com.sforce.soap.partner.QueryResult;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.bind.XmlObject;
-import org.talend.daikon.avro.util.AvroUtils;
 
 public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
 
@@ -38,7 +42,6 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
 
     private transient int inputRecordsIndex;
 
-
     public SalesforceInputReader(RuntimeContainer container, SalesforceSource source, TSalesforceInputProperties props) {
         super(container, source);
         properties = props;
@@ -49,8 +52,8 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
         TSalesforceInputProperties inProperties = (TSalesforceInputProperties) properties;
         if (querySchema == null) {
             querySchema = super.getSchema();
-            if (inProperties.manualQuery.getBooleanValue()) {
-                if (AvroUtils.isIncludeAllFields((Schema) properties.module.main.schema.getValue())) {
+            if (inProperties.manualQuery.getValue()) {
+                if (AvroUtils.isIncludeAllFields(properties.module.main.schema.getValue())) {
                     SObject currentSObject = getCurrentSObject();
                     Iterator<XmlObject> children = currentSObject.getChildren();
                     List<String> columnsName = new ArrayList<>();
@@ -128,8 +131,8 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
 
     protected QueryResult executeSalesforceQuery() throws IOException, ConnectionException {
         TSalesforceInputProperties inProperties = (TSalesforceInputProperties) properties;
-        getConnection().setQueryOptions(inProperties.batchSize.getIntValue());
-        if (inProperties.includeDeleted.getBooleanValue()) {
+        getConnection().setQueryOptions(inProperties.batchSize.getValue());
+        if (inProperties.includeDeleted.getValue()) {
             return getConnection().queryAll(getQueryString(inProperties));
         } else {
             return getConnection().query(getQueryString(inProperties));

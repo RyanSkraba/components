@@ -12,6 +12,9 @@
 // ============================================================================
 package org.talend.components.dataprep;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
@@ -19,29 +22,36 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.dataprep.TDataSetOutputProperties.Mode;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
-
-import java.io.IOException;
-import java.io.OutputStream;
 
 public class TDataSetOutputWriter implements Writer<WriterResult> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TDataSetInputDefinition.class);
+
     private IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory;
+
     private int counter = 0;
+
     private String uId;
+
     private DataPrepConnectionHandler connectionHandler;
+
     private OutputStream outputStream;
+
     private boolean firstRow = true;
+
     private WriteOperation<WriterResult> writeOperation;
+
     private int limit;
-    private String mode;
+
+    private Mode mode;
 
     TDataSetOutputWriter(WriteOperation<WriterResult> writeOperation, //
-                         DataPrepConnectionHandler connectionHandler, //
-                         int limit, //
-                         String mode) {
+            DataPrepConnectionHandler connectionHandler, //
+            int limit, //
+            Mode mode) {
         this.writeOperation = writeOperation;
         this.connectionHandler = connectionHandler;
         this.limit = limit;
@@ -68,10 +78,11 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
 
         LOGGER.debug("Datum: {}", datum);
         IndexedRecord input = getFactory(datum).convertToAvro(datum);
+
         StringBuilder row = new StringBuilder();
         if (firstRow) {
             for (Schema.Field f : input.getSchema().getFields()) {
-                if (f.pos()!=0) {
+                if (f.pos() != 0) {
                     row.append(",");
                 }
                 row.append(String.valueOf(f.name()));
@@ -82,7 +93,7 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
         }
         for (Schema.Field f : input.getSchema().getFields()) {
             if (input.get(f.pos()) != null) {
-                if (f.pos()!=0) {
+                if (f.pos() != 0) {
                     row.append(",");
                 }
                 row.append(String.valueOf(input.get(f.pos())));
@@ -97,6 +108,7 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
 
     @Override
     public WriterResult close() throws IOException {
+
         connectionHandler.logout();
         return new WriterResult(uId, counter);
     }
@@ -115,6 +127,6 @@ public class TDataSetOutputWriter implements Writer<WriterResult> {
     }
 
     private boolean isLiveDataSet() {
-        return TDataSetOutputProperties.LIVE_DATASET.equals(mode);
+        return Mode.LIVE_DATASET.equals(mode);
     }
 }

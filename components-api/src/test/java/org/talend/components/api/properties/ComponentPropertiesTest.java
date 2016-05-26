@@ -14,6 +14,7 @@ package org.talend.components.api.properties;
 
 import static org.junit.Assert.*;
 
+import org.apache.commons.lang3.reflect.TypeUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.daikon.properties.Property;
@@ -74,17 +75,18 @@ public class ComponentPropertiesTest {
 
     @Test
     public void testSetReturnsProperty() {
-        Property element = ComponentPropertyFactory.newReturnsProperty();
+        Property<String> element = ComponentPropertyFactory.newReturnsProperty();
         assertEquals("returns", element.getName());
-        assertEquals(Property.Type.STRING, element.getType());
+        assertEquals(TypeUtils.toString(String.class), element.getType());
     }
 
     @Test
     public void testNewReturnProperty() throws IllegalAccessException {
-        Property element = ComponentPropertyFactory.newReturnsProperty();
-        Property returnProperty = ComponentPropertyFactory.newReturnProperty(element, Property.Type.BOOLEAN, "childName");
+        Property<String> element = ComponentPropertyFactory.newReturnsProperty();
+        Property<Boolean> returnProperty = ComponentPropertyFactory.newReturnProperty(element,
+                PropertyFactory.newBoolean("childName"));
         assertEquals("childName", returnProperty.getName());
-        assertEquals(Property.Type.BOOLEAN, returnProperty.getType());
+        assertEquals(TypeUtils.toString(Boolean.class), returnProperty.getType());
         assertEquals(returnProperty, element.getChild("childName"));
     }
 

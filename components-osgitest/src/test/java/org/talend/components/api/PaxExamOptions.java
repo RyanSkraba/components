@@ -26,9 +26,9 @@ public class PaxExamOptions {
     /**
      * 
      */
-    private static final String DAIKON_VERSION = "0.9.0-SNAPSHOT";
+    private static final String DAIKON_VERSION = "0.10.0-SNAPSHOT";
 
-    private static final String COMPONENTS_VERSION = "0.10.0-SNAPSHOT";
+    private static final String COMPONENTS_VERSION = "0.11.0-SNAPSHOT";
 
     private static final String APACHE_KARAF_AID = "apache-karaf";
 
@@ -50,8 +50,8 @@ public class PaxExamOptions {
                 mavenBundle().groupId("org.codehaus.jackson").artifactId("jackson-mapper-asl"), //
                 mavenBundle().groupId("com.google.guava").artifactId("guava").version("15.0"), //
                 mavenBundle().groupId("org.apache.commons").artifactId("commons-compress"), //
-
-        mavenBundle().groupId("org.apache.avro").artifactId("avro").version("1.8.0"), //
+                mavenBundle().groupId("org.apache.commons").artifactId("commons-lang3").version("3.4"), //
+                mavenBundle().groupId("org.apache.avro").artifactId("avro").version("1.8.0"), //
                 mavenBundle().groupId("org.eclipse.jetty.orbit").artifactId("javax.servlet").version("3.0.0.v201112011016"), //
                 mavenBundle().groupId("org.talend.daikon").artifactId("daikon").classifier("bundle").version(DAIKON_VERSION),
                 // //

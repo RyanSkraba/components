@@ -34,18 +34,18 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
     //
     // Advanced
     //
-    public Property extendInsert = newBoolean("extendInsert", true); //$NON-NLS-1$
+    public Property<Boolean> extendInsert = newBoolean("extendInsert", true); //$NON-NLS-1$
 
-    public Property ceaseForError = newBoolean("ceaseForError", true); //$NON-NLS-1$
+    public Property<Boolean> ceaseForError = newBoolean("ceaseForError", true); //$NON-NLS-1$
 
-    public Property ignoreNull = newBoolean("ignoreNull"); //$NON-NLS-1$
+    public Property<Boolean> ignoreNull = newBoolean("ignoreNull"); //$NON-NLS-1$
 
-    public Property retrieveInsertId = newBoolean("retrieveInsertId"); //$NON-NLS-1$
+    public Property<Boolean> retrieveInsertId = newBoolean("retrieveInsertId"); //$NON-NLS-1$
 
-    public Property commitLevel = newInteger("commitLevel", 200); //$NON-NLS-1$
+    public Property<Integer> commitLevel = newInteger("commitLevel", 200); //$NON-NLS-1$
 
     // FIXME - should be file
-    public Property logFileName = newString("logFileName"); //$NON-NLS-1$
+    public Property<String> logFileName = newString("logFileName"); //$NON-NLS-1$
 
     public TSalesforceOutputProperties(String name) {
         super(name);
@@ -54,7 +54,8 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
     @Override
     public void setupProperties() {
         super.setupProperties();
-        upsertKeyColumn.setType(Property.Type.ENUM);
+        // TODO, chack why this was made an ENUM
+        // upsertKeyColumn.setType(Property.Type.ENUM);
 
         module.setSchemaListener(new ISchemaListener() {
 
@@ -69,9 +70,8 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
 
     private void updateOutputSchemas() {
         // get the main schema (input one)
-        Schema inputSchema = (Schema) module.main.schema.getValue();
-        if (!extendInsert.getBooleanValue() && retrieveInsertId.getBooleanValue()
-                && ACTION_INSERT.equals(outputAction.getValue())) {
+        Schema inputSchema = module.main.schema.getValue();
+        if (!extendInsert.getValue() && retrieveInsertId.getValue() && OutputAction.INSERT.equals(outputAction.getValue())) {
 
             Schema mainOutputSchema = createRecordBuilderFromSchema(inputSchema, "output").name("salesforce_id")
                     .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
@@ -146,11 +146,11 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
 
             form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
             form.getChildForm(connection.getName()).getWidget(connection.httpTraceMessage.getName()).setHidden(true);
-            form.getWidget("commitLevel").setHidden(!extendInsert.getBooleanValue());
+            form.getWidget("commitLevel").setHidden(!extendInsert.getValue());
             form.getWidget("retrieveInsertId")
-                    .setHidden(extendInsert.getBooleanValue() && ACTION_INSERT.equals(outputAction.getValue()));
-            form.getWidget("ignoreNull")
-                    .setHidden(!ACTION_UPDATE.equals(outputAction.getValue()) || ACTION_UPSERT.equals(outputAction.getValue()));
+                    .setHidden(extendInsert.getValue() && OutputAction.INSERT.equals(outputAction.getValue()));
+            form.getWidget("ignoreNull").setHidden(
+                    !OutputAction.UPDATE.equals(outputAction.getValue()) || OutputAction.UPSERT.equals(outputAction.getValue()));
         }
     }
 

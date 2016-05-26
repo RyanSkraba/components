@@ -12,16 +12,15 @@
 // ============================================================================
 package org.talend.components.api.properties;
 
-import org.talend.daikon.properties.Property;
-import org.talend.daikon.properties.presentation.Form;
+import static org.talend.daikon.properties.Property.Flags.*;
+import static org.talend.daikon.properties.PropertyFactory.*;
 
 import java.lang.reflect.Field;
 import java.util.EnumSet;
 import java.util.List;
 
-import static org.talend.daikon.properties.Property.Flags.DESIGN_TIME_ONLY;
-import static org.talend.daikon.properties.PropertyFactory.newEnum;
-import static org.talend.daikon.properties.PropertyFactory.newProperty;
+import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.presentation.Form;
 
 /**
  * A reference to another component. This could be in one of the following states:
@@ -30,8 +29,8 @@ import static org.talend.daikon.properties.PropertyFactory.newProperty;
  * <li>Reference to a particular instance of a component. In this case, the {@link #componentProperties} will be
  * populated by the {@link org.talend.daikon.properties.presentation.Widget}.</li>
  *
- * IMPORTANT - when using {@code ComponentReferenceProperties} the property name in the enclosingProperties
- * must be {@code referencedComponent}.
+ * IMPORTANT - when using {@code ComponentReferenceProperties} the property name in the enclosingProperties must be
+ * {@code referencedComponent}.
  *
  * The {@link org.talend.daikon.properties.presentation.Widget.WidgetType#COMPONENT_REFERENCE} uses this class as its
  * properties and the Widget will populate these values.
@@ -47,12 +46,11 @@ public class ComponentReferenceProperties extends ComponentProperties {
     //
     // Properties
     //
-    public Property referenceType = newEnum("referenceType").setEnumClass(ReferenceType.class); //$NON-NLS-1$
+    public Property<ReferenceType> referenceType = newEnum("referenceType", ReferenceType.class);
 
-    // FIXME - make this componentName
-    public Property componentType = newProperty("componentType").setFlags(EnumSet.of(DESIGN_TIME_ONLY)); //$NON-NLS-1$
+    public Property<String> componentType = newProperty("componentType").setFlags(EnumSet.of(DESIGN_TIME_ONLY)); //$NON-NLS-1$
 
-    public Property componentInstanceId = newProperty("componentInstanceId"); //$NON-NLS-1$
+    public Property<String> componentInstanceId = newProperty("componentInstanceId"); //$NON-NLS-1$
 
     /**
      * The properties associated with the referenced component. This can be used at design time. This is non-null only
@@ -71,23 +69,27 @@ public class ComponentReferenceProperties extends ComponentProperties {
         this.enclosingProperties = enclosing;
     }
 
-    // IMPORTANT - this is the name of the property in the enclosingProperties that uses this ComponentReferenceProperties
+    // IMPORTANT - this is the name of the property in the enclosingProperties that uses this
+    // ComponentReferenceProperties
     public void afterReferencedComponent() {
-        if (enclosingProperties != null)
+        if (enclosingProperties != null) {
             enclosingProperties.afterReferencedComponent();
+        }
     }
 
     @Override
     public List<Form> getForms() {
-        if (enclosingProperties != null)
-            return ((ComponentProperties)enclosingProperties).getForms();
+        if (enclosingProperties != null) {
+            return ((ComponentProperties) enclosingProperties).getForms();
+        }
         return super.getForms();
     }
 
     @Override
     protected boolean acceptUninitializedField(Field f) {
-        if (super.acceptUninitializedField(f))
+        if (super.acceptUninitializedField(f)) {
             return true;
+        }
         // we accept that return field is not intialized after setupProperties.
         return "componentProperties".equals(f.getName());
     }
