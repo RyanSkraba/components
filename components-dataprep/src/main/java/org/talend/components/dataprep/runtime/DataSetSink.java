@@ -36,7 +36,7 @@ public class DataSetSink implements Sink {
 
     @Override
     public WriteOperation<?> createWriteOperation() {
-        return new DataSetWriteOperation(this, runtimeProperties);
+        return new DataSetWriteOperation(this);
     }
 
     @Override
@@ -72,5 +72,9 @@ public class DataSetSink implements Sink {
     @Override
     public Schema getSchema(RuntimeContainer runtimeContainer, String s) throws IOException {
         return null;
+    }
+
+    RuntimeProperties getRuntimeProperties() {
+        return runtimeProperties;
     }
 }

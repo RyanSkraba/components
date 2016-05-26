@@ -40,31 +40,34 @@ public class DataSetWriter implements Writer<WriterResult> {
     private int limit;
     private DataPrepOutputModes mode;
 
-    DataSetWriter(WriteOperation<WriterResult> writeOperation, RuntimeProperties runtimeProperties) {
+    DataSetWriter(WriteOperation<WriterResult> writeOperation) {
         this.writeOperation = writeOperation;
-        this.connectionHandler = new DataPrepConnectionHandler( //
-                runtimeProperties.getUrl(), //
-                runtimeProperties.getLogin(), //
-                runtimeProperties.getPass(), //
-                runtimeProperties.getDataSetName());
-        this.limit = Integer.valueOf(runtimeProperties.getLimit());
-        this.mode = runtimeProperties.getMode();
     }
 
     @Override
     public void open(String uId) throws IOException {
         this.uId = uId;
-        connectionHandler.connect();
+        DataSetSink sink = (DataSetSink) getWriteOperation().getSink();
+        RuntimeProperties runtimeProperties = sink.getRuntimeProperties();
+        connectionHandler = new DataPrepConnectionHandler( //
+                runtimeProperties.getUrl(), //
+                runtimeProperties.getLogin(), //
+                runtimeProperties.getPass(), //
+                runtimeProperties.getDataSetName());
+        limit = Integer.valueOf(runtimeProperties.getLimit());
+        mode = runtimeProperties.getMode();
+
         if (isLiveDataSet()) {
             outputStream = connectionHandler.createInLiveDataSetMode();
         } else {
+            connectionHandler.connect();
             outputStream = connectionHandler.create();
         }
     }
 
     @Override
     public void write(Object datum) throws IOException {
-        if (datum == null || counter > limit) {
+        if (datum == null || counter >= limit) {
             LOGGER.debug("Datum: {}", datum);
             return;
         } // else handle the data.
@@ -100,7 +103,9 @@ public class DataSetWriter implements Writer<WriterResult> {
 
     @Override
     public WriterResult close() throws IOException {
-        connectionHandler.logout();
+        if (!isLiveDataSet()) {
+            connectionHandler.logout();
+        }
         return new WriterResult(uId, counter);
     }
 
