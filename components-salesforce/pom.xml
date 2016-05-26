@@ -125,6 +125,7 @@
                                 <Bundle-SymbolicName>org.talend.components.salesforce.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                                 <Service-Component>*</Service-Component>                                
+                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                                 <Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
                             </instructions>
                         </configuration>
