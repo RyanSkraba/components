@@ -18,12 +18,12 @@ import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
 
-public class DataSetOperation implements WriteOperation<WriterResult> {
+public class DataSetWriteOperation implements WriteOperation<WriterResult> {
 
     private Sink sink;
     private RuntimeProperties runtimeProperties;
 
-    public DataSetOperation(Sink sink, RuntimeProperties runtimeProperties ) {
+    public DataSetWriteOperation(Sink sink, RuntimeProperties runtimeProperties ) {
         this.sink = sink;
         this.runtimeProperties = runtimeProperties;
     }

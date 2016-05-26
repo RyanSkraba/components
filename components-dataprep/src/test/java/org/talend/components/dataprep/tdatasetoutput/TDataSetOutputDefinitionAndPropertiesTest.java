@@ -27,6 +27,7 @@ public class TDataSetOutputDefinitionAndPropertiesTest {
         Assert.assertArrayEquals(new String[] {"Talend Data Preparation"}, outputDefinition.getFamilies());
         Assert.assertEquals("org.talend.components", outputDefinition.getMavenGroupId());
         Assert.assertEquals("components-dataprep", outputDefinition.getMavenArtifactId());
+        Assert.assertTrue(outputDefinition.isSchemaAutoPropagate());
     }
 
     @Test

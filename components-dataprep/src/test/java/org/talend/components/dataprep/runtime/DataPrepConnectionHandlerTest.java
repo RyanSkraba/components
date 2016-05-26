@@ -161,7 +161,7 @@ public class DataPrepConnectionHandlerTest {
         DataSetSink sink = new DataSetSink();
         sink.initialize(container, properties);
         sink.validate(container);
-        final DataSetOperation writeOperation = (DataSetOperation) sink.createWriteOperation();
+        final DataSetWriteOperation writeOperation = (DataSetWriteOperation) sink.createWriteOperation();
         final Writer<WriterResult> writer = writeOperation.createWriter(container);
         writer.open("test live datasets");
         for (int i=0; i<50; i++) {

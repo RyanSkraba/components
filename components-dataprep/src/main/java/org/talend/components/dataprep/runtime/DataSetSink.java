@@ -36,7 +36,7 @@ public class DataSetSink implements Sink {
 
     @Override
     public WriteOperation<?> createWriteOperation() {
-        return new DataSetOperation(this, runtimeProperties);
+        return new DataSetWriteOperation(this, runtimeProperties);
     }
 
     @Override

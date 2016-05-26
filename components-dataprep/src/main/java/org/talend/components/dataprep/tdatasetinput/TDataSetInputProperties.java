@@ -34,7 +34,6 @@ import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -64,19 +63,19 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
 
     private static final Logger LOG = LoggerFactory.getLogger(TDataSetInputProperties.class);
 
-    public static final SchemaProperties schema = new SchemaProperties("schema");
+    public SchemaProperties schema = new SchemaProperties("schema");
 
-    public static final PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
+    public PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
-    public static final Property dataSetName = PropertyFactory.newString("dataSetName");
+    public Property url = PropertyFactory.newString("url");
 
-    public static final Property login = PropertyFactory.newString("login");
+    public Property login = PropertyFactory.newString("login");
 
-    public static final Property pass = PropertyFactory.newString("pass");
+    public Property pass = PropertyFactory.newString("pass");
 
-    public static final Property url = PropertyFactory.newString("url");
+    public Property dataSetName = PropertyFactory.newString("dataSetName");
 
-    public static final PresentationItem fetchSchema = new PresentationItem("fetchSchema", "FetchSchema");
+    public PresentationItem fetchSchema = new PresentationItem("fetchSchema", "FetchSchema");
 
     public TDataSetInputProperties(String name) {
         super(name);
@@ -115,22 +114,27 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
                     removeQuotes(login.getStringValue()), removeQuotes(pass.getStringValue()),
                     removeQuotes(dataSetName.getStringValue()));
             List<Column> columnList = null;
+            boolean wasProblem = false;
+            ValidationResult validationResult = ValidationResult.OK;
             try {
                 HttpResponse response = connectionHandler.connect();
-                if (response.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                    LOG.error("Failed to connect to Dataprep server : " + response.getStatusLine().getStatusCode());
-                    // TODO i18n
-                    return new ValidationResult().setStatus(Result.ERROR)
-                            .setMessage("Failed to connect to Dataprep server : " + response.getStatusLine().getStatusCode());
-                }
-                try {
-                    columnList = connectionHandler.readSourceSchema();
-                } finally {
-                    connectionHandler.logout();
-                }
+                columnList = connectionHandler.readSourceSchema();
             } catch (IOException e) {
-                LOG.error("Dataprep fetch schema error.", e);
-                return new ValidationResult().setStatus(Result.ERROR).setMessage(e.getMessage());
+                LOG.debug("Dataprep fetch schema error.", e);
+                wasProblem = true;
+                validationResult = new ValidationResult().setStatus(Result.ERROR).setMessage(e.getMessage());
+            } finally {
+                try {
+                    connectionHandler.logout();
+                } catch (IOException e) {
+                    LOG.debug("");
+                    wasProblem = true;
+                    validationResult = new ValidationResult().setStatus(Result.ERROR).setMessage(e.getMessage());
+                }
+            }
+
+            if (wasProblem) {
+                return validationResult;
             }
 
             DataPrepField[] scemaRow = new DataPrepField[columnList.size()];
@@ -142,7 +146,7 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
             AvroRegistry avroRegistry = DataPrepAvroRegistry.getDataPrepInstance();
             schema.schema.setValue(avroRegistry.inferSchema(scemaRow));
 
-            return ValidationResult.OK;
+            return validationResult;
         }
     }
 

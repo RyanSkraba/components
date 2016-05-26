@@ -49,15 +49,13 @@ import java.util.Set;
  */
 public class TDataSetOutputProperties extends FixedConnectorsComponentProperties {
 
-    /** Constant for live dataset. */
-
-    public static final Property dataSetName = PropertyFactory.newString("dataSetName");
-    public static final Property login = PropertyFactory.newString("login");
-    public static final Property pass = PropertyFactory.newString("pass");
-    public static final Property url = PropertyFactory.newString("url");
-    public static final Property mode = PropertyFactory.newEnum("mode", DataPrepOutputModes.values());
-    public static final SchemaProperties schema = new SchemaProperties("schema");
-    public static final Property limit = PropertyFactory.newString("limit", "100");
+    public Property login = PropertyFactory.newString("login");
+    public Property pass = PropertyFactory.newString("pass");
+    public Property url = PropertyFactory.newString("url");
+    public Property mode = PropertyFactory.newEnum("mode", DataPrepOutputModes.values());
+    public Property dataSetName = PropertyFactory.newString("dataSetName");
+    public Property limit = PropertyFactory.newString("limit", "100");
+    public SchemaProperties schema = new SchemaProperties("schema");
     protected PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
     public TDataSetOutputProperties(String name) {
