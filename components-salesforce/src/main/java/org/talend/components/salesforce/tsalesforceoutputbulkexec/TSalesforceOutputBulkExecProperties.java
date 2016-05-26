@@ -60,11 +60,11 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
         // add quotes for generation)
         outputBulkProperties.upsertRelationTable.columnName.setPossibleValues(upsertRelationTable.columnName.getPossibleValues());
         outputBulkProperties.upsertRelationTable.columnName.setValue(upsertRelationTable.columnName.getValue());
-        outputBulkProperties.upsertRelationTable.lookupFieldExternalIdName.setValue(upsertRelationTable.lookupFieldExternalIdName
-                .getValue());
+        outputBulkProperties.upsertRelationTable.lookupFieldExternalIdName
+                .setValue(upsertRelationTable.lookupFieldExternalIdName.getValue());
         outputBulkProperties.upsertRelationTable.lookupFieldName.setValue(upsertRelationTable.lookupFieldName.getValue());
-        outputBulkProperties.upsertRelationTable.lookupFieldModuleName.setValue(upsertRelationTable.lookupFieldModuleName
-                .getValue());
+        outputBulkProperties.upsertRelationTable.lookupFieldModuleName
+                .setValue(upsertRelationTable.lookupFieldModuleName.getValue());
         outputBulkProperties.upsertRelationTable.polymorphic.setValue(upsertRelationTable.polymorphic.getValue());
         return outputBulkProperties;
     }

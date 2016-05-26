@@ -18,6 +18,7 @@ import static org.talend.daikon.properties.presentation.Widget.*;
 import java.util.List;
 
 import org.apache.avro.Schema;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 import org.talend.daikon.NamedThing;
@@ -39,7 +40,8 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
     //
     // Properties
     //
-    public Property moduleName = newString("moduleName").setOccurMaxTimes(Property.INFINITE); //$NON-NLS-1$
+    public Property<List<NamedThing>> selectedModuleNames = newProperty(new TypeLiteral<List<NamedThing>>() {
+    }, "selectedModuleNames"); //$NON-NLS-1$
 
     public SalesforceModuleListProperties(String name) {
         super(name);
@@ -60,7 +62,7 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
         super.setupLayout();
         Form moduleForm = Form.create(this, Form.MAIN);
         // Since this is a repeating property it has a list of values
-        moduleForm.addRow(widget(moduleName).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
+        moduleForm.addRow(widget(selectedModuleNames).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
         refreshLayout(moduleForm);
     }
 
@@ -71,7 +73,7 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
 
     public void beforeFormPresentMain() throws Exception {
         moduleNames = SalesforceSourceOrSink.getSchemaNames(null, this);
-        moduleName.setPossibleValues(moduleNames);
+        selectedModuleNames.setPossibleValues(moduleNames);
         getForm(Form.MAIN).setAllowBack(true);
         getForm(Form.MAIN).setAllowFinish(true);
     }
@@ -84,14 +86,13 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
 
         String connRepLocation = repo.storeProperties(connection, connection.name.getValue(), repositoryLocation, null);
 
-        @SuppressWarnings("unchecked")
-        List<NamedThing> selectedModuleNames = (List<NamedThing>) moduleName.getValue();
-        for (NamedThing nl : selectedModuleNames) {
-            SalesforceModuleProperties modProps = new SalesforceModuleProperties(nl.getName());
+        for (NamedThing nl : selectedModuleNames.getValue()) {
+            String moduleId = nl.getName();
+            SalesforceModuleProperties modProps = new SalesforceModuleProperties(moduleId);
             modProps.connection = connection;
             modProps.init();
-            Schema schema = SalesforceSourceOrSink.getSchema(null, this, nl.getName());
-            modProps.moduleName.setValue(nl);
+            Schema schema = SalesforceSourceOrSink.getSchema(null, this, moduleId);
+            modProps.moduleName.setValue(moduleId);
             modProps.main.schema.setValue(schema);
             repo.storeProperties(modProps, nl.getName(), connRepLocation, "main.schema");
         }

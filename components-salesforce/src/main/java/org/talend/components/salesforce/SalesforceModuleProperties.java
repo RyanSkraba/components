@@ -23,7 +23,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 import org.talend.daikon.NamedThing;
-import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.StringProperty;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
@@ -35,7 +35,7 @@ public class SalesforceModuleProperties extends ComponentProperties implements S
     //
     // Properties
     //
-    public Property<String> moduleName = newString("moduleName"); //$NON-NLS-1$
+    public StringProperty moduleName = newString("moduleName"); //$NON-NLS-1$
 
     public ISchemaListener schemaListener;
 
@@ -80,7 +80,7 @@ public class SalesforceModuleProperties extends ComponentProperties implements S
     public ValidationResult beforeModuleName() throws Exception {
         try {
             List<NamedThing> moduleNames = SalesforceSourceOrSink.getSchemaNames(null, connection);
-            moduleName.setPossibleValues(moduleNames);
+            moduleName.setPossibleNamedThingValues(moduleNames);
         } catch (ComponentException ex) {
             return ex.getValidationResult();
         }

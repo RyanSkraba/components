@@ -35,6 +35,7 @@ public class SalesforceBulkFileWriterTestIT extends SalesforceTestBase {
 
     @Test
     public void testBasic() throws Exception {
+
         TSalesforceOutputBulkDefinition definition = (TSalesforceOutputBulkDefinition) getComponentService()
                 .getComponentDefinition(TSalesforceOutputBulkDefinition.COMPONENT_NAME);
 
@@ -44,7 +45,7 @@ public class SalesforceBulkFileWriterTestIT extends SalesforceTestBase {
                 util.getTestSchema1());
 
         String[] expected = { "FirstName", "LastName", "Phone" };
-        List actual = modelProperties.upsertRelationTable.columnName.getPossibleValues();
+        List<String> actual = (List<String>) modelProperties.upsertRelationTable.columnName.getPossibleValues();
         Assert.assertArrayEquals(expected, actual.toArray());
 
         util.simulateRuntimeCaller(definition, modelProperties, util.getTestSchema1(), util.getTestData());
