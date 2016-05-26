@@ -82,7 +82,7 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
             return vr;
         }
 
-        String connRepLocation = repo.storeProperties(connection, (String) connection.name.getValue(), repositoryLocation, null);
+        String connRepLocation = repo.storeProperties(connection, connection.name.getValue(), repositoryLocation, null);
 
         @SuppressWarnings("unchecked")
         List<NamedThing> selectedModuleNames = (List<NamedThing>) moduleName.getValue();
@@ -91,7 +91,7 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
             modProps.connection = connection;
             modProps.init();
             Schema schema = SalesforceSourceOrSink.getSchema(null, this, nl.getName());
-            modProps.moduleName.setValue(nl.getName());
+            modProps.moduleName.setValue(nl);
             modProps.main.schema.setValue(schema);
             repo.storeProperties(modProps, nl.getName(), connRepLocation, "main.schema");
         }
