@@ -12,10 +12,9 @@
 // ============================================================================
 package org.talend.components.jira.runtime;
 
-import static org.junit.Assert.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -26,22 +25,23 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jira.testutils.Utils;
 import org.talend.components.jira.tjirainput.TJiraInputProperties;
+import org.talend.components.jira.tjirainput.TJiraInputProperties.JiraResource;
 
 /**
  * Unit-tests for {@link JiraSource} class
  */
 public class JiraSourceTest {
-    
+
     /**
      * {@link ComponentProperties} for {@link JiraSource}
      */
     private TJiraInputProperties inputProperties;
-    
+
     /**
      * JSON string, which describes {@link Schema}
      */
     private String schemaValue;
-    
+
     /**
      * Prepares required instances for tests
      */
@@ -51,9 +51,9 @@ public class JiraSourceTest {
         inputProperties.host.setValue("hostValue");
         inputProperties.userPassword.userId.setValue("userIdValue");
         inputProperties.userPassword.password.setValue("passwordValue");
-        inputProperties.resource.setValue("issue");
+        inputProperties.resource.setValue(JiraResource.ISSUE);
         schemaValue = Utils.readFile("src/test/resources/org/talend/components/jira/tjirainput/schema.json");
-        inputProperties.schema.schema.setValue(schemaValue);
+        inputProperties.schema.schema.setValue(new Schema.Parser().parse(schemaValue));
         inputProperties.jql.setValue("jqlValue");
         inputProperties.batchSize.setValue(50);
         inputProperties.projectId.setValue("projectIdValue");
@@ -66,17 +66,17 @@ public class JiraSourceTest {
     @Test
     public void testInitialize() {
         JiraSource jiraSource = new JiraSource();
-        
+
         jiraSource.initialize(null, inputProperties);
-        
+
         String hostPort = jiraSource.getHostPort();
         assertEquals("hostValue", hostPort);
         String userId = jiraSource.getUserId();
         assertEquals("userIdValue", userId);
         String password = jiraSource.getPassword();
         assertEquals("passwordValue", password);
-        String resourceType = jiraSource.getResourceType();
-        assertEquals("issue", resourceType);
+        JiraResource resourceType = jiraSource.getResourceType();
+        assertEquals(JiraResource.ISSUE, resourceType);
         Schema dataSchema = jiraSource.getDataSchema();
         assertEquals(schemaValue, dataSchema.toString());
         String jql = jiraSource.getJql();
@@ -86,7 +86,7 @@ public class JiraSourceTest {
         String projectId = jiraSource.getProjectId();
         assertEquals("projectIdValue", projectId);
     }
-    
+
     /**
      * Checks {@link JiraSource#createReader(RuntimeContainer)} creates
      * {@link JiraSearchReader}
@@ -95,12 +95,12 @@ public class JiraSourceTest {
     public void testCreateReaderSearch() {
         JiraSource jiraSource = new JiraSource();
         jiraSource.initialize(null, inputProperties);
-        
+
         Reader<IndexedRecord> reader = jiraSource.createReader(null);
-        
+
         assertThat(reader, is(instanceOf(JiraSearchReader.class)));
     }
-    
+
     /**
      * Checks {@link JiraSource#createReader(RuntimeContainer)} creates
      * {@link JiraProjectsReader}
@@ -108,15 +108,15 @@ public class JiraSourceTest {
     @Test
     public void testCreateReaderProjects() {
         JiraSource jiraSource = new JiraSource();
-        inputProperties.resource.setValue("project");
+        inputProperties.resource.setValue(JiraResource.PROJECT);
         inputProperties.projectId.setValue(null);
         jiraSource.initialize(null, inputProperties);
-        
+
         Reader<IndexedRecord> reader = jiraSource.createReader(null);
-        
+
         assertThat(reader, is(instanceOf(JiraProjectsReader.class)));
     }
-    
+
     /**
      * Checks {@link JiraSource#createReader(RuntimeContainer)} creates
      * {@link JiraProjectIdReader}
@@ -124,12 +124,12 @@ public class JiraSourceTest {
     @Test
     public void testCreateReaderProjectId() {
         JiraSource jiraSource = new JiraSource();
-        inputProperties.resource.setValue("project");
+        inputProperties.resource.setValue(JiraResource.PROJECT);
         inputProperties.projectId.setValue("TP");
         jiraSource.initialize(null, inputProperties);
-        
+
         Reader<IndexedRecord> reader = jiraSource.createReader(null);
-        
+
         assertThat(reader, is(instanceOf(JiraProjectIdReader.class)));
     }
 }

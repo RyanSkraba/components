@@ -1,7 +1,7 @@
 package org.talend.components.common;
 
-import static org.talend.daikon.properties.PropertyFactory.newProperty;
-import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.*;
 
 import java.util.Collections;
 import java.util.Set;
@@ -16,9 +16,9 @@ import org.talend.daikon.properties.presentation.Widget;
 
 public class BulkFileProperties extends FixedConnectorsComponentProperties {
 
-    public Property bulkFilePath = newProperty("bulkFilePath").setRequired();
+    public Property<String> bulkFilePath = newProperty("bulkFilePath").setRequired();
 
-    public Property append = newProperty(Property.Type.BOOLEAN, "append");
+    public Property<Boolean> append = newBoolean("append");
 
     public static final String ERROR_MESSAGE_NAME = "ERROR_MESSAGE";
 
@@ -45,8 +45,8 @@ public class BulkFileProperties extends FixedConnectorsComponentProperties {
         super.setupProperties();
 
         returns = ComponentPropertyFactory.newReturnsProperty();
-        ERROR_MESSAGE = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.STRING, ERROR_MESSAGE_NAME); //$NON-NLS-1$
-        NB_LINE = ComponentPropertyFactory.newReturnProperty(returns, Property.Type.INT, NB_LINE_NAME); //$NON-NLS-1$
+        ERROR_MESSAGE = ComponentPropertyFactory.newReturnProperty(returns, newString(ERROR_MESSAGE_NAME));
+        NB_LINE = ComponentPropertyFactory.newReturnProperty(returns, newString(NB_LINE_NAME));
     }
 
     public void setSchemaListener(ISchemaListener schemaListener) {

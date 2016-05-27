@@ -28,22 +28,22 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * The ComponentProperties subclass provided by a component stores the 
+ * The ComponentProperties subclass provided by a component stores the
  * configuration of a component and is used for:
  * 
  * <ol>
- * <li>Specifying the format and type of information (properties) that is 
- *     provided at design-time to configure a component for run-time,</li>
+ * <li>Specifying the format and type of information (properties) that is
+ * provided at design-time to configure a component for run-time,</li>
  * <li>Validating the properties of the component at design-time,</li>
  * <li>Containing the untyped values of the properties, and</li>
- * <li>All of the UI information for laying out and presenting the 
- *     properties to the user.</li>
+ * <li>All of the UI information for laying out and presenting the
+ * properties to the user.</li>
  * </ol>
  * 
  * The TDataSetOutputProperties has two properties:
  * <ol>
  * <li>{code dataSetName}, a simple property which is a String containing the
- *     file path that this component will read.</li>
+ * file path that this component will read.</li>
  * <li>{code schema}, an embedded property referring to a Schema.</li>
  * </ol>
  */
@@ -52,11 +52,12 @@ public class TDataSetOutputProperties extends FixedConnectorsComponentProperties
     public Property login = PropertyFactory.newString("login");
     public Property pass = PropertyFactory.newString("pass");
     public Property url = PropertyFactory.newString("url");
-    public Property mode = PropertyFactory.newEnum("mode", DataPrepOutputModes.values());
+    public Property mode = PropertyFactory.newEnum("mode", DataPrepOutputModes.class);
     public Property dataSetName = PropertyFactory.newString("dataSetName");
-    public Property limit = PropertyFactory.newString("limit", "100");
+    public Property<Integer> limit = PropertyFactory.newInteger("limit", 100);
     public SchemaProperties schema = new SchemaProperties("schema");
-    protected PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
+
+    protected transient PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
     public TDataSetOutputProperties(String name) {
         super(name);
@@ -70,7 +71,7 @@ public class TDataSetOutputProperties extends FixedConnectorsComponentProperties
             return Collections.singleton(mainConnector);
         }
     }
-    
+
     @Override
     public void setupLayout() {
         super.setupLayout();

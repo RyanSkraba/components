@@ -24,7 +24,6 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.properties.Property;
-import org.talend.daikon.properties.Property.Type;
 import org.talend.daikon.properties.PropertyFactory;
 
 /**
@@ -46,19 +45,20 @@ public abstract class FixedConnectorsComponentProperties extends ComponentProper
      * This default implementation uses {@link PropertyPathConnector} to find the SchemaProperties or Property of type
      * Schema instances avaialble in this Object. It return null if none found
      */
+    @SuppressWarnings("unchecked")
     @Override
     public Schema getSchema(Connector connector, boolean isOutputConnection) {
         if (connector instanceof PropertyPathConnector) {
             NamedThing property = getProperty(((PropertyPathConnector) connector).getPropertyPath());
             if (property != null) {
-                Property schemaProp = null;
+                Property<Schema> schemaProp = null;
                 if (property instanceof SchemaProperties) {
                     SchemaProperties schemaProperties = (SchemaProperties) property;
                     schemaProp = schemaProperties.schema;
                 } else if (property instanceof Property) {
-                    schemaProp = (Property) property;
+                    schemaProp = (Property<Schema>) property;
                 }
-                return (schemaProp != null && schemaProp.getType() == Type.SCHEMA) ? (Schema) schemaProp.getValue() : null;
+                return schemaProp != null ? schemaProp.getValue() : null;
             } else {// else path not found so throw exception
                 throw new ComponentException(ComponentsErrorCode.WRONG_CONNECTOR,
                         ExceptionContext.build().put("properties", this.getClass().getCanonicalName()));
@@ -102,17 +102,17 @@ public abstract class FixedConnectorsComponentProperties extends ComponentProper
         return diff;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void setConnectedSchema(Connector connector, Schema schema, boolean isOutputConnection) {
         if (connector instanceof PropertyPathConnector) {
             NamedThing property = getProperty(((PropertyPathConnector) connector).getPropertyPath());
             if (property != null) {
-                Property schemaProp = null;
                 if (property instanceof SchemaProperties) {
                     SchemaProperties schemaProperties = (SchemaProperties) property;
                     schemaProperties.schema.setValue(schema);
                 } else if (property instanceof Property) {
-                    ((Property) property).setValue(schema);
+                    ((Property<Schema>) property).setValue(schema);
                 }
             } else {// else path not found so throw exception
                 throw new ComponentException(ComponentsErrorCode.WRONG_CONNECTOR,

@@ -13,7 +13,7 @@
 package org.talend.components.salesforce.tsalesforceoutput;
 
 import static org.talend.daikon.properties.PropertyFactory.*;
-import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.presentation.Widget.*;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -34,18 +34,18 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
     //
     // Advanced
     //
-    public Property extendInsert = newBoolean("extendInsert", true); //$NON-NLS-1$
+    public Property<Boolean> extendInsert = newBoolean("extendInsert", true); //$NON-NLS-1$
 
-    public Property ceaseForError = newBoolean("ceaseForError", true); //$NON-NLS-1$
+    public Property<Boolean> ceaseForError = newBoolean("ceaseForError", true); //$NON-NLS-1$
 
-    public Property ignoreNull = newBoolean("ignoreNull"); //$NON-NLS-1$
+    public Property<Boolean> ignoreNull = newBoolean("ignoreNull"); //$NON-NLS-1$
 
-    public Property retrieveInsertId = newBoolean("retrieveInsertId"); //$NON-NLS-1$
+    public Property<Boolean> retrieveInsertId = newBoolean("retrieveInsertId"); //$NON-NLS-1$
 
-    public Property commitLevel = newInteger("commitLevel", 200); //$NON-NLS-1$
+    public Property<Integer> commitLevel = newInteger("commitLevel", 200); //$NON-NLS-1$
 
     // FIXME - should be file
-    public Property logFileName = newString("logFileName"); //$NON-NLS-1$
+    public Property<String> logFileName = newString("logFileName"); //$NON-NLS-1$
 
     public TSalesforceOutputProperties(String name) {
         super(name);
@@ -54,7 +54,8 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
     @Override
     public void setupProperties() {
         super.setupProperties();
-        upsertKeyColumn.setType(Property.Type.ENUM);
+        // TODO, chack why this was made an ENUM
+        // upsertKeyColumn.setType(Property.Type.ENUM);
 
         module.setSchemaListener(new ISchemaListener() {
 
@@ -69,22 +70,21 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
 
     private void updateOutputSchemas() {
         // get the main schema (input one)
-        Schema inputSchema = (Schema) module.main.schema.getValue();
-        if (!extendInsert.getBooleanValue() && retrieveInsertId.getBooleanValue()
-                && ACTION_INSERT.equals(outputAction.getValue())) {
+        Schema inputSchema = module.main.schema.getValue();
+        if (!extendInsert.getValue() && retrieveInsertId.getValue() && OutputAction.INSERT.equals(outputAction.getValue())) {
 
             Schema mainOutputSchema = createRecordBuilderFromSchema(inputSchema, "output").name("salesforce_id")
-                        .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
-                        .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
-                        .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
-                        .type().stringType().noDefault().endRecord();
+                    .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
+                    .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
+                    .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
+                    .type().stringType().noDefault().endRecord();
 
             schemaFlow.schema.setValue(mainOutputSchema);
         } else {
             schemaFlow.schema.setValue(inputSchema);
         }
 
-        Schema rejectSchema = createRecordBuilderFromSchema(inputSchema, "rejectOutput").name("errorCode") //$NON-NLS-1$  //$NON-NLS-2$
+        Schema rejectSchema = createRecordBuilderFromSchema(inputSchema, "rejectOutput").name("errorCode") //$NON-NLS-1$ //$NON-NLS-2$
                 .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
                 // column set as non-read-only, to let the user edit the field if needed
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
@@ -101,7 +101,7 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
 
         schemaReject.schema.setValue(rejectSchema);
     }
-    
+
     private FieldAssembler<Schema> createRecordBuilderFromSchema(Schema inputSchema, String newSchemaName) {
         RecordBuilder<Schema> recordBuilder = SchemaBuilder.record(newSchemaName);
         FieldAssembler<Schema> fieldAssembler = recordBuilder.fields();
@@ -146,11 +146,11 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
 
             form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
             form.getChildForm(connection.getName()).getWidget(connection.httpTraceMessage.getName()).setHidden(true);
-            form.getWidget("commitLevel").setHidden(!extendInsert.getBooleanValue());
-            form.getWidget("retrieveInsertId").setHidden(
-                    extendInsert.getBooleanValue() && ACTION_INSERT.equals(outputAction.getValue()));
+            form.getWidget("commitLevel").setHidden(!extendInsert.getValue());
+            form.getWidget("retrieveInsertId")
+                    .setHidden(extendInsert.getValue() && OutputAction.INSERT.equals(outputAction.getValue()));
             form.getWidget("ignoreNull").setHidden(
-                    !ACTION_UPDATE.equals(outputAction.getValue()) || ACTION_UPSERT.equals(outputAction.getValue()));
+                    !OutputAction.UPDATE.equals(outputAction.getValue()) || OutputAction.UPSERT.equals(outputAction.getValue()));
         }
     }
 

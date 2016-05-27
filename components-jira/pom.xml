@@ -6,19 +6,18 @@
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
-		<version>0.10.0-SNAPSHOT</version>
+		<version>0.11.0-SNAPSHOT</version>
 		<relativePath>../components-parent/pom.xml</relativePath>
 	</parent>
 
 	<properties>
-		<components.api.version>0.10.0-SNAPSHOT</components.api.version>
 		<httpcomponents.version>4.5.1</httpcomponents.version>
 	</properties>
 
 	<name>Components - Jira</name>
 	<groupId>org.talend.components</groupId>
 	<artifactId>components-jira</artifactId>
-	<version>0.10.0-SNAPSHOT</version>
+	<version>0.11.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
 	<repositories>
@@ -34,21 +33,21 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>${components.api.version}</version>
+			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
 
 		<!-- Shared component properties such as Use/Password or Schema -->
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-common</artifactId>
-			<version>${components.api.version}</version>
+			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
 
 		<!-- Jar containing Test utils methods -->
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>${components.api.version}</version>
+			<version>0.11.0-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
@@ -129,6 +128,7 @@
 								<Bundle-Name>${project.name} lib</Bundle-Name>
 								<Include-Resource>{maven-resources},META-INF/maven/org.talend.components/components-jira/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
 								<Service-Component>*</Service-Component>
+                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
 							</instructions>
 						</configuration>
 					</execution>
@@ -168,6 +168,7 @@
 								<Import-Package>!org.joda.convert,*,aQute.bnd.annotation.component</Import-Package>
 								<Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*</Embed-Dependency>
 								<Include-Resource>{maven-resources},META-INF/maven/org.talend.components/components-jira/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
+                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
 							</instructions>
 						</configuration>
 					</execution>

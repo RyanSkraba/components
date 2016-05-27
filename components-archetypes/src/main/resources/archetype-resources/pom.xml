@@ -81,6 +81,7 @@
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                                 <Include-Resource>{maven-resources},META-INF/maven/${groupId}/${artifactId}/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
                                 <Service-Component>*</Service-Component>                                
+                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                             </instructions>
                         </configuration>
                     </execution>
@@ -120,6 +121,7 @@
                                 <Import-Package>*,aQute.bnd.annotation.component</Import-Package>
                                 <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*</Embed-Dependency>
                                 <Include-Resource>{maven-resources},META-INF/maven/${groupId}/${artifactId}/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
+                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                             </instructions>
                         </configuration>
                     </execution>

@@ -16,7 +16,6 @@ import static org.talend.daikon.properties.PropertyFactory.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Property;
-import org.talend.daikon.properties.Property.Type;
 import org.talend.daikon.properties.presentation.Form;
 
 public class ProxyProperties extends ComponentProperties {
@@ -28,15 +27,15 @@ public class ProxyProperties extends ComponentProperties {
         FTP
     };
 
-    public Property useProxy = newProperty(Type.BOOLEAN, "useProxy").setRequired(true); //$NON-NLS-1$
+    public Property<Boolean> useProxy = newBoolean("useProxy").setRequired(true); //$NON-NLS-1$
 
     private static final String HOST = "host";
 
-    public Property host = newProperty(HOST).setRequired(true);
+    public Property<String> host = newProperty(HOST).setRequired(true);
 
     private static final String PORT = "port";
 
-    public Property port = newInteger(PORT).setRequired(true);
+    public Property<Integer> port = newInteger(PORT).setRequired(true);
 
     private static final String USERPASSWORD = "userPassword";
 
@@ -64,7 +63,7 @@ public class ProxyProperties extends ComponentProperties {
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN)) {
-            boolean isUseProxy = useProxy.getBooleanValue();
+            boolean isUseProxy = useProxy.getValue();
             form.getWidget(HOST).setHidden(!isUseProxy);
             form.getWidget(PORT).setHidden(!isUseProxy);
             form.getWidget(USERPASSWORD).setHidden(!isUseProxy);

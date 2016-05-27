@@ -20,7 +20,6 @@ import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
-import org.talend.components.dataprep.tdatasetinput.TDataSetInputDefinition;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 
@@ -29,15 +28,24 @@ import java.io.OutputStream;
 
 public class DataSetWriter implements Writer<WriterResult> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TDataSetInputDefinition.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataSetWriter.class);
+
     private IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory;
+
     private int counter = 0;
+
     private String uId;
+
     private DataPrepConnectionHandler connectionHandler;
+
     private OutputStream outputStream;
+
     private boolean firstRow = true;
+
     private WriteOperation<WriterResult> writeOperation;
+
     private int limit;
+
     private DataPrepOutputModes mode;
 
     DataSetWriter(WriteOperation<WriterResult> writeOperation) {
@@ -77,7 +85,7 @@ public class DataSetWriter implements Writer<WriterResult> {
         StringBuilder row = new StringBuilder();
         if (firstRow) {
             for (Schema.Field f : input.getSchema().getFields()) {
-                if (f.pos()!=0) {
+                if (f.pos() != 0) {
                     row.append(",");
                 }
                 row.append(String.valueOf(f.name()));
@@ -88,7 +96,7 @@ public class DataSetWriter implements Writer<WriterResult> {
         }
         for (Schema.Field f : input.getSchema().getFields()) {
             if (input.get(f.pos()) != null) {
-                if (f.pos()!=0) {
+                if (f.pos() != 0) {
                     row.append(",");
                 }
                 row.append(String.valueOf(input.get(f.pos())));

@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutputbulk;
 
-import static org.talend.daikon.properties.PropertyFactory.newProperty;
-import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ import org.talend.daikon.properties.presentation.Widget;
 
 public class TSalesforceOutputBulkProperties extends BulkFileProperties {
 
-    public Property ignoreNull = newProperty(Property.Type.BOOLEAN, "ignoreNull");
+    public Property<Boolean> ignoreNull = newBoolean("ignoreNull");
 
     public UpsertRelationTable upsertRelationTable = new UpsertRelationTable("upsertRelationTable");
 
@@ -40,7 +40,7 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
     @Override
     public void setupProperties() {
         super.setupProperties();
-        
+
         upsertRelationTable.setUsePolymorphic(true);
 
         this.setSchemaListener(new ISchemaListener() {
@@ -52,7 +52,7 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
             
         });
     }
-    
+
     public void beforeUpsertRelationTable() {
         upsertRelationTable.columnName.setPossibleValues(getFieldNames(schema.schema));
     }
@@ -64,14 +64,14 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(ignoreNull);
 
-        Form refForm = Form.create(this, Form.REFERENCE);
+        Form refForm = new Form(this, Form.REFERENCE);
         refForm.addRow(append);
         refForm.addRow(ignoreNull);
 
-        Form advancedForm = Form.create(this, Form.ADVANCED);
+        Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.WidgetType.TABLE));
     }
-    
+
     protected List<String> getFieldNames(Property schema) {
         String sJson = schema.getStringValue();
         Schema s = new Schema.Parser().parse(sJson);

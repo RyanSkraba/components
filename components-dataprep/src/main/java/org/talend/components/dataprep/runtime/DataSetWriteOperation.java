@@ -17,10 +17,15 @@ import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 
 public class DataSetWriteOperation implements WriteOperation<WriterResult> {
 
     private Sink sink;
+
+    private DataPrepConnectionHandler connectionHandler;
+
+    private int limit;
 
     public DataSetWriteOperation(Sink sink) {
         this.sink = sink;

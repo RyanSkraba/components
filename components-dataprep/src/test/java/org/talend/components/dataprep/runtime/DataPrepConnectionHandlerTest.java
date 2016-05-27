@@ -31,7 +31,11 @@ import org.talend.components.dataprep.connection.Column;
 import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.util.Date;
 
@@ -40,24 +44,26 @@ public class DataPrepConnectionHandlerTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataPrepConnectionHandlerTest.class);
 
-    private static final String URL = "http://localhost:8080";
-    private static final String LOGIN = "vincent@dataprep.com"; //"maksym@dataprep.com";
-    private static final String PASS = "vincent"; //"maksym";
+    private static final String URL = "http://10.42.10.60:8888";
+
+    private static final String LOGIN = "vincent@dataprep.com"; // "maksym@dataprep.com";
+
+    private static final String PASS = "vincent"; // "maksym";
+
     private String string;
 
     @Test
     public void validate() throws IOException {
-        DataPrepConnectionHandler connectionHandler =
-                new DataPrepConnectionHandler(URL, LOGIN, PASS, "sldfjsl");
+        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(URL, LOGIN, PASS, "sldfjsl");
         connectionHandler.validate();
     }
 
     @Test
     public void readSchema() throws IOException {
-        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(
-                URL, LOGIN, PASS, "0d3df0df4a4aca0529ef5755bd03519adb115248");
+        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(URL, LOGIN, PASS,
+                "0d3df0df4a4aca0529ef5755bd03519adb115248");
         LOGGER.debug(connectionHandler.connect().toString());
-        for (Column column: connectionHandler.readSourceSchema()) {
+        for (Column column : connectionHandler.readSourceSchema()) {
             LOGGER.debug(column.toString());
         }
         connectionHandler.logout();
@@ -65,16 +71,19 @@ public class DataPrepConnectionHandlerTest {
 
     @Test
     public void logout() throws IOException {
-        Request.Post(URL+"/logout").addHeader("Authorization","Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZW1vdGVTZXNzaW9uSWQiOiI5MzI0NjhiZS1mMWVhLTQ2YzctYTBhMC1jZTgyZWFhYWU4OWIiLCJyb2xlcyI6WyJBRE1JTklTVFJBVE9SIiwiREFUQV9DVVJBVE9SIiwiREFUQV9TQ0lFTlRJU1QiXSwiaXNzIjoiZGF0YS1wcmVwIiwiZXhwIjoxNDYxODUwMzI2LCJpYXQiOjE0NjE4NDY3MjYsInVzZXJJZCI6InZpbmNlbnRAZGF0YXByZXAuY29tIiwianRpIjoiNThmODY1OWQtOWRjOC00YTUyLTk5ZmUtMTNiOTU0MTgzMjhhIn0.k14tGLc0mKPX73WAdfZSBQO8Ac47yRxF1HmQUMNS2XI").execute();
+        Request.Post(URL + "/logout")
+                .addHeader("Authorization",
+                        "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZW1vdGVTZXNzaW9uSWQiOiI5MzI0NjhiZS1mMWVhLTQ2YzctYTBhMC1jZTgyZWFhYWU4OWIiLCJyb2xlcyI6WyJBRE1JTklTVFJBVE9SIiwiREFUQV9DVVJBVE9SIiwiREFUQV9TQ0lFTlRJU1QiXSwiaXNzIjoiZGF0YS1wcmVwIiwiZXhwIjoxNDYxODUwMzI2LCJpYXQiOjE0NjE4NDY3MjYsInVzZXJJZCI6InZpbmNlbnRAZGF0YXByZXAuY29tIiwianRpIjoiNThmODY1OWQtOWRjOC00YTUyLTk5ZmUtMTNiOTU0MTgzMjhhIn0.k14tGLc0mKPX73WAdfZSBQO8Ac47yRxF1HmQUMNS2XI")
+                .execute();
     }
 
     @Test
     public void schema() throws IOException {
-        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(
-                URL, LOGIN, PASS, "db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
+        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(URL, LOGIN, PASS,
+                "db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
         HttpResponse response = connectionHandler.connect();
         Header httpHead = response.getFirstHeader("Authorization");
-        Request request = Request.Get(URL +"/api/datasets/"+ "db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e" + "/metadata");
+        Request request = Request.Get(URL + "/api/datasets/" + "db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e" + "/metadata");
         request.addHeader(httpHead);
         LOGGER.debug(request.execute().returnContent().asString());
     }
@@ -151,12 +160,12 @@ public class DataPrepConnectionHandlerTest {
         RuntimeContainer container = null;
 
         TDataSetOutputProperties properties = new TDataSetOutputProperties("TDataSetOutProperties");
-        properties.mode.setValue("create");
+        properties.mode.setValue(DataPrepOutputModes.CREATE);
         properties.url.setValue("http://127.0.0.1:8888");
         properties.dataSetName.setValue("TDP-1879");
         properties.login.setValue("vincent@dataprep.com");
         properties.pass.setValue("vincent");
-        properties.limit.setValue("100");
+        properties.limit.setValue(100);
 
         DataSetSink sink = new DataSetSink();
         sink.initialize(container, properties);
@@ -164,10 +173,9 @@ public class DataPrepConnectionHandlerTest {
         final DataSetWriteOperation writeOperation = (DataSetWriteOperation) sink.createWriteOperation();
         final Writer<WriterResult> writer = writeOperation.createWriter(container);
         writer.open("test live datasets");
-        for (int i=0; i<50; i++) {
-            writer.write(i+";test-i;"+ new Date().getTime());
+        for (int i = 0; i < 50; i++) {
+            writer.write(i + ";test-i;" + new Date().getTime());
         }
         writer.close();
     }
-
 }

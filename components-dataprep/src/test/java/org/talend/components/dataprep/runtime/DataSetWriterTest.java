@@ -42,7 +42,7 @@ public class DataSetWriterTest {
         properties.url.setValue("http://localhost:8080");
         properties.login.setValue("vincent@dataprep.com");
         properties.pass.setValue("vincent");
-        properties.limit.setValue("10");
+        properties.limit.setValue(10);
         sink = (DataSetSink) definition.getRuntime();
     }
 

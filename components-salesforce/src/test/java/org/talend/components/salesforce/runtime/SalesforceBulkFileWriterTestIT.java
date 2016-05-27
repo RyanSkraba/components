@@ -53,14 +53,14 @@ public class SalesforceBulkFileWriterTestIT extends SalesforceTestBase {
         util.compareFileContent(data_file, expected1);
 
         // test ignore null
-        modelProperties.ignoreNull.setValue("true");
+        modelProperties.ignoreNull.setValue(true);
         util.simulateRuntimeCaller(definition, modelProperties, util.getTestSchema1(), util.getTestData());
 
         String[] expected2 = { "FirstName,LastName,Phone", "Wei,Wang,010-11111111", "Jin,Zhao,010-11111112", "Wei,Yuan," };
         util.compareFileContent(data_file, expected2);
 
         // test append
-        modelProperties.append.setValue("true");
+        modelProperties.append.setValue(true);
         util.simulateRuntimeCaller(definition, modelProperties, util.getTestSchema1(), util.getTestData());
 
         String[] expected3 = { "FirstName,LastName,Phone", "Wei,Wang,010-11111111", "Jin,Zhao,010-11111112", "Wei,Yuan,",
@@ -79,7 +79,7 @@ public class SalesforceBulkFileWriterTestIT extends SalesforceTestBase {
         TSalesforceOutputBulkProperties modelProperties = util.simulateUserBasicAction(definition, data_file,
                 util.getTestSchema1());
 
-        modelProperties.append.setValue("true");
+        modelProperties.append.setValue(true);
 
         util.simulateRuntimeCaller(definition, modelProperties, util.getTestSchema1(), util.getTestData());
 
@@ -109,8 +109,8 @@ public class SalesforceBulkFileWriterTestIT extends SalesforceTestBase {
         lookupFieldNames.add("lfn");
         modelProperties.upsertRelationTable.lookupFieldName.setValue(lookupFieldNames);
 
-        java.util.List<String> polymorphics = new java.util.ArrayList<String>();
-        polymorphics.add("true");
+        java.util.List<Boolean> polymorphics = new java.util.ArrayList<Boolean>();
+        polymorphics.add(Boolean.TRUE);
         modelProperties.upsertRelationTable.polymorphic.setValue(polymorphics);
 
         java.util.List<String> lookupFieldModuleNames = new java.util.ArrayList<String>();

@@ -40,6 +40,7 @@ import org.talend.components.api.service.AbstractComponentTest;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.SimpleComponentRegistry;
 import org.talend.components.api.test.SimpleComponentService;
+import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
 import org.talend.components.salesforce.runtime.SalesforceSink;
 import org.talend.components.salesforce.runtime.SalesforceSource;
 import org.talend.components.salesforce.runtime.SalesforceWriteOperation;
@@ -99,51 +100,48 @@ public class SalesforceTestBase extends AbstractComponentTest {
     // default implementation for pure java test. Shall be overriden of Spring or OSGI tests
     @Override
     public ComponentService getComponentService() {
-		if (componentService == null) {
-			SimpleComponentRegistry testComponentRegistry = new SimpleComponentRegistry();
-			
-			//register component
-			testComponentRegistry.addComponent(TSalesforceConnectionDefinition.COMPONENT_NAME,
-					new TSalesforceConnectionDefinition());
+        if (componentService == null) {
+            SimpleComponentRegistry testComponentRegistry = new SimpleComponentRegistry();
 
-			testComponentRegistry.addComponent(TSalesforceInputDefinition.COMPONENT_NAME,
-					new TSalesforceInputDefinition());
+            // register component
+            testComponentRegistry.addComponent(TSalesforceConnectionDefinition.COMPONENT_NAME,
+                    new TSalesforceConnectionDefinition());
 
-			testComponentRegistry.addComponent(TSalesforceOutputDefinition.COMPONENT_NAME,
-					new TSalesforceOutputDefinition());
+            testComponentRegistry.addComponent(TSalesforceInputDefinition.COMPONENT_NAME, new TSalesforceInputDefinition());
 
-			testComponentRegistry.addComponent(TSalesforceGetDeletedDefinition.COMPONENT_NAME,
-					new TSalesforceGetDeletedDefinition());
+            testComponentRegistry.addComponent(TSalesforceOutputDefinition.COMPONENT_NAME, new TSalesforceOutputDefinition());
 
-			testComponentRegistry.addComponent(TSalesforceGetUpdatedDefinition.COMPONENT_NAME,
-					new TSalesforceGetUpdatedDefinition());
-			
-			testComponentRegistry.addComponent(TSalesforceGetServerTimestampDefinition.COMPONENT_NAME,
-					new TSalesforceGetServerTimestampDefinition());
+            testComponentRegistry.addComponent(TSalesforceGetDeletedDefinition.COMPONENT_NAME,
+                    new TSalesforceGetDeletedDefinition());
 
-			testComponentRegistry.addComponent(TSalesforceOutputBulkDefinition.COMPONENT_NAME,
-					new TSalesforceOutputBulkDefinition());
-			
-			testComponentRegistry.addComponent(TSalesforceBulkExecDefinition.COMPONENT_NAME,
-					new TSalesforceBulkExecDefinition());
-			
-			testComponentRegistry.addComponent(TSalesforceOutputBulkExecDefinition.COMPONENT_NAME,
-					new TSalesforceOutputBulkExecDefinition());
-			
-			//register wizard
-			SalesforceConnectionWizardDefinition scwd = new SalesforceConnectionWizardDefinition();
-			testComponentRegistry.addWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, scwd);
+            testComponentRegistry.addComponent(TSalesforceGetUpdatedDefinition.COMPONENT_NAME,
+                    new TSalesforceGetUpdatedDefinition());
 
-			testComponentRegistry.addWizard(SalesforceModuleWizardDefinition.COMPONENT_WIZARD_NAME,
-					new SalesforceModuleWizardDefinition());
+            testComponentRegistry.addComponent(TSalesforceGetServerTimestampDefinition.COMPONENT_NAME,
+                    new TSalesforceGetServerTimestampDefinition());
 
-			testComponentRegistry.addWizard(SalesforceConnectionEditWizardDefinition.COMPONENT_WIZARD_NAME,
-					new SalesforceConnectionEditWizardDefinition());
+            testComponentRegistry.addComponent(TSalesforceOutputBulkDefinition.COMPONENT_NAME,
+                    new TSalesforceOutputBulkDefinition());
 
-			componentService = new SimpleComponentService(testComponentRegistry);
-		}
-		return componentService;
-	}
+            testComponentRegistry.addComponent(TSalesforceBulkExecDefinition.COMPONENT_NAME, new TSalesforceBulkExecDefinition());
+
+            testComponentRegistry.addComponent(TSalesforceOutputBulkExecDefinition.COMPONENT_NAME,
+                    new TSalesforceOutputBulkExecDefinition());
+
+            // register wizard
+            SalesforceConnectionWizardDefinition scwd = new SalesforceConnectionWizardDefinition();
+            testComponentRegistry.addWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, scwd);
+
+            testComponentRegistry.addWizard(SalesforceModuleWizardDefinition.COMPONENT_WIZARD_NAME,
+                    new SalesforceModuleWizardDefinition());
+
+            testComponentRegistry.addWizard(SalesforceConnectionEditWizardDefinition.COMPONENT_WIZARD_NAME,
+                    new SalesforceConnectionEditWizardDefinition());
+
+            componentService = new SimpleComponentService(testComponentRegistry);
+        }
+        return componentService;
+    }
 
     protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props) throws Throwable {
         assertTrue(form.getWidget(propName).isCallAfter());
@@ -351,7 +349,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
         inputProps.connection = props.connection;
         inputProps.module = props.module;
         inputProps.batchSize.setValue(200);
-        inputProps.queryMode.setValue(TSalesforceInputProperties.QUERY_QUERY);
+        inputProps.queryMode.setValue(TSalesforceInputProperties.QueryMode.Query);
         List<IndexedRecord> inputRows = readRows(inputProps);
         return inputRows;
     }
@@ -408,7 +406,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
     protected void deleteRows(List<IndexedRecord> rows, SalesforceConnectionModuleProperties props) throws Exception {
         TSalesforceOutputProperties deleteProperties = new TSalesforceOutputProperties("delete"); //$NON-NLS-1$
         deleteProperties.copyValuesFrom(props);
-        deleteProperties.outputAction.setValue(TSalesforceOutputProperties.ACTION_DELETE);
+        deleteProperties.outputAction.setValue(OutputAction.DELETE);
         System.out.println("deleting " + rows.size() + " rows");
         doWriteRows(deleteProperties, rows);
     }
@@ -451,7 +449,8 @@ public class SalesforceTestBase extends AbstractComponentTest {
         // filtering rows
         List<IndexedRecord> rowToBeDeleted = getAllTestRows(rows);
         // deleting rows
-        TSalesforceOutputProperties salesforceoutputProperties = SalesforceWriterTestIT.createAccountSalesforceoutputProperties();
+        TSalesforceOutputProperties salesforceoutputProperties = SalesforceWriterTestIT
+                .createSalesforceoutputProperties(EXISTING_MODULE_NAME);
         setupProps(salesforceoutputProperties.connection, !ADD_QUOTES);
         new SalesforceTestBase().deleteRows(rowToBeDeleted, salesforceoutputProperties);
     }

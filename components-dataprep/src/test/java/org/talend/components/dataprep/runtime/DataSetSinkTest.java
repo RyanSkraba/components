@@ -18,12 +18,12 @@ import java.util.Collections;
 @SpringApplicationConfiguration(classes = SpringApp.class)
 public class DataSetSinkTest {
 
-        @Inject
-        private ComponentService componentService;
+    @Inject
+    private ComponentService componentService;
 
         private DataSetSink outputSink;
 
-        private TDataSetOutputDefinition definition;
+    private TDataSetOutputDefinition definition;
 
     @Before
     public void setInputSource() {
@@ -69,6 +69,6 @@ public class DataSetSinkTest {
 
     @Test
     public void testGetSchema() throws Exception {
-        Assert.assertNull(outputSink.getSchema(null,null));
+        Assert.assertNull(outputSink.getSchema(null, null));
     }
 }

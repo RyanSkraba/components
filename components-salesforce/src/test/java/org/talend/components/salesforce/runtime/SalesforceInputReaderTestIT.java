@@ -82,7 +82,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         props.connection.timeout.setValue(60000);
         props.batchSize.setValue(100);
         if (isBulkQury) {
-            props.queryMode.setValue(TSalesforceInputProperties.QUERY_BULK);
+            props.queryMode.setValue(TSalesforceInputProperties.QueryMode.Bulk);
             props.connection.bulkConnection.setValue(true);
             props.manualQuery.setValue(true);
             props.query.setValue(
