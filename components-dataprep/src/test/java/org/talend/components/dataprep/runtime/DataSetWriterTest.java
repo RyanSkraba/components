@@ -49,7 +49,7 @@ public class DataSetWriterTest {
     @Test
     public void testWriter() throws IOException {
         properties.dataSetName.setValue("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
-        properties.mode.setValue(DataPrepOutputModes.CREATE);
+        properties.mode.setValue(DataPrepOutputModes.Create);
 
         sink.initialize(null, properties);
         writer = (DataSetWriter) sink.createWriteOperation().createWriter(null);
@@ -67,7 +67,7 @@ public class DataSetWriterTest {
     public void testWriteLiveDataSet() throws IOException {
         properties.login.setValue("");
         properties.pass.setValue("");
-        properties.mode.setValue(DataPrepOutputModes.LIVEDATASET);
+        properties.mode.setValue(DataPrepOutputModes.LiveDataset);
 
         sink.initialize(null, properties);
         writer = (DataSetWriter) sink.createWriteOperation().createWriter(null);

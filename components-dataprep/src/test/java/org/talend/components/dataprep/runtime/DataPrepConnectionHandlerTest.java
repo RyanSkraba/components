@@ -160,7 +160,7 @@ public class DataPrepConnectionHandlerTest {
         RuntimeContainer container = null;
 
         TDataSetOutputProperties properties = new TDataSetOutputProperties("TDataSetOutProperties");
-        properties.mode.setValue(DataPrepOutputModes.CREATE);
+        properties.mode.setValue(DataPrepOutputModes.Create);
         properties.url.setValue("http://127.0.0.1:8888");
         properties.dataSetName.setValue("TDP-1879");
         properties.login.setValue("vincent@dataprep.com");

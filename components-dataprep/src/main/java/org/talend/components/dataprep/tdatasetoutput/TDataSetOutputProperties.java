@@ -95,7 +95,7 @@ public class TDataSetOutputProperties extends FixedConnectorsComponentProperties
         runtimeProperties.setLogin(login.getStringValue());
         runtimeProperties.setPass(pass.getStringValue());
         runtimeProperties.setDataSetName(dataSetName.getStringValue());
-        runtimeProperties.setMode(mode.getStringValue());
+        runtimeProperties.setMode((DataPrepOutputModes) mode.getValue());
         runtimeProperties.setLimit(limit.getStringValue());
         return runtimeProperties;
     }

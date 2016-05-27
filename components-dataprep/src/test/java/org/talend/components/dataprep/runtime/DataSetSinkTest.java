@@ -56,7 +56,7 @@ public class DataSetSinkTest {
     public void validateLiveDataSet() {
         TDataSetOutputProperties properties = (TDataSetOutputProperties) definition.createProperties();
         properties.setValue("url", "http://127.0.0.1");
-        properties.setValue("mode", DataPrepOutputModes.LIVEDATASET);
+        properties.setValue("mode", DataPrepOutputModes.LiveDataset);
         outputSink.initialize(null, properties);
         outputSink.validate(null);
     }

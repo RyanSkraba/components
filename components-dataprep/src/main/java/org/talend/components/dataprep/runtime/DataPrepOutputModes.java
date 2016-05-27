@@ -13,17 +13,8 @@
 package org.talend.components.dataprep.runtime;
 
 public enum DataPrepOutputModes {
-    CREATE, UPDATE,
-    CREATEANDUPDATE {
-        @Override
-        public String toString() {
-            return "create&update";
-        }
-
-    }, LIVEDATASET;
-
-    @Override
-    public String toString() {
-        return super.toString().toLowerCase();
-    }
+    Create,
+    Update,
+    CreateAndUpdate,
+    LiveDataset;
 }

@@ -61,12 +61,8 @@ public class RuntimeProperties implements Serializable {
         this.dataSetName = dataSetName;
     }
 
-    public void setMode(String mode) {
-        for (DataPrepOutputModes m: DataPrepOutputModes.values()) {
-            if (m.toString().equals(mode)) {
-                this.mode = m;
-            }
-        }
+    public void setMode(DataPrepOutputModes mode) {
+        this.mode = mode;
     }
 
     public String getSchema() {

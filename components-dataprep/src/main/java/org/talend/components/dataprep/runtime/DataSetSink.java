@@ -51,7 +51,7 @@ public class DataSetSink implements Sink {
                 runtimeProperties.getLogin(), //
                 runtimeProperties.getPass(), //
                 runtimeProperties.getDataSetName());
-            if (DataPrepOutputModes.LIVEDATASET.equals(runtimeProperties.getMode())) {
+            if (DataPrepOutputModes.LiveDataset.equals(runtimeProperties.getMode())) {
                 return ValidationResult.OK;
             }
             try {

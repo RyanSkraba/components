@@ -131,6 +131,6 @@ public class DataSetWriter implements Writer<WriterResult> {
     }
 
     private boolean isLiveDataSet() {
-        return DataPrepOutputModes.LIVEDATASET.equals(mode);
+        return DataPrepOutputModes.LiveDataset.equals(mode);
     }
 }
