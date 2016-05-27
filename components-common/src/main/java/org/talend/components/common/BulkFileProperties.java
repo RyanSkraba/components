@@ -46,7 +46,7 @@ public class BulkFileProperties extends FixedConnectorsComponentProperties {
 
         returns = ComponentPropertyFactory.newReturnsProperty();
         ERROR_MESSAGE = ComponentPropertyFactory.newReturnProperty(returns, newString(ERROR_MESSAGE_NAME));
-        NB_LINE = ComponentPropertyFactory.newReturnProperty(returns, newString(NB_LINE_NAME));
+        NB_LINE = ComponentPropertyFactory.newReturnProperty(returns, newInteger(NB_LINE_NAME));
     }
 
     public void setSchemaListener(ISchemaListener schemaListener) {
