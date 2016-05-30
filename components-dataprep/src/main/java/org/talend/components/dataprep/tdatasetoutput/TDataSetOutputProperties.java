@@ -49,11 +49,11 @@ import java.util.Set;
  */
 public class TDataSetOutputProperties extends FixedConnectorsComponentProperties {
 
-    public Property login = PropertyFactory.newString("login");
-    public Property pass = PropertyFactory.newString("pass");
-    public Property url = PropertyFactory.newString("url");
-    public Property mode = PropertyFactory.newEnum("mode", DataPrepOutputModes.class);
-    public Property dataSetName = PropertyFactory.newString("dataSetName");
+    public Property<String> login = PropertyFactory.newString("login");
+    public Property<String> pass = PropertyFactory.newString("pass");
+    public Property<String> url = PropertyFactory.newString("url");
+    public Property<DataPrepOutputModes> mode = PropertyFactory.newEnum("mode", DataPrepOutputModes.class);
+    public Property<String> dataSetName = PropertyFactory.newString("dataSetName");
     public Property<Integer> limit = PropertyFactory.newInteger("limit", 100);
     public SchemaProperties schema = new SchemaProperties("schema");
 
@@ -86,7 +86,7 @@ public class TDataSetOutputProperties extends FixedConnectorsComponentProperties
     }
 
     public Schema getSchema() {
-        return (Schema) schema.schema.getValue();
+        return schema.schema.getValue();
     }
 
     public RuntimeProperties getRuntimeProperties() {
@@ -95,7 +95,7 @@ public class TDataSetOutputProperties extends FixedConnectorsComponentProperties
         runtimeProperties.setLogin(login.getStringValue());
         runtimeProperties.setPass(pass.getStringValue());
         runtimeProperties.setDataSetName(dataSetName.getStringValue());
-        runtimeProperties.setMode((DataPrepOutputModes) mode.getValue());
+        runtimeProperties.setMode(mode.getValue());
         runtimeProperties.setLimit(limit.getStringValue());
         return runtimeProperties;
     }

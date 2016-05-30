@@ -13,7 +13,6 @@
 package org.talend.components.dataprep.tdatasetinput;
 
 import org.apache.avro.Schema;
-import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.Connector;
@@ -67,13 +66,13 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
 
     public PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
-    public Property url = PropertyFactory.newString("url");
+    public Property<String> url = PropertyFactory.newString("url");
 
-    public Property login = PropertyFactory.newString("login");
+    public Property<String> login = PropertyFactory.newString("login");
 
-    public Property pass = PropertyFactory.newString("pass");
+    public Property<String> pass = PropertyFactory.newString("pass");
 
-    public Property dataSetName = PropertyFactory.newString("dataSetName");
+    public Property<String> dataSetName = PropertyFactory.newString("dataSetName");
 
     public PresentationItem fetchSchema = new PresentationItem("fetchSchema", "FetchSchema");
 
@@ -117,7 +116,7 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
             boolean wasProblem = false;
             ValidationResult validationResult = ValidationResult.OK;
             try {
-                HttpResponse response = connectionHandler.connect();
+                connectionHandler.connect();
                 columnList = connectionHandler.readSourceSchema();
             } catch (IOException e) {
                 LOG.debug("Dataprep fetch schema error.", e);
@@ -127,7 +126,7 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
                 try {
                     connectionHandler.logout();
                 } catch (IOException e) {
-                    LOG.debug("");
+                    LOG.debug("Failed to logout to Dataprep server: {}", e);
                     wasProblem = true;
                     validationResult = new ValidationResult().setStatus(Result.ERROR).setMessage(e.getMessage());
                 }
@@ -181,6 +180,6 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
     }
 
     public Schema getSchema() {
-        return (Schema) schema.schema.getValue();
+        return schema.schema.getValue();
     }
 }
