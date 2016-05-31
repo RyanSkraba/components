@@ -77,8 +77,8 @@ public class DataPrepAvroRegistry extends AvroRegistry {
     }
 
     /**
-     * Infers an Avro schema for the given DataPrep row. This can be an expensive operation so the schema
-     * should be cached where possible. This is always an {@link Schema.Type#RECORD}.
+     * Infers an Avro schema for the given DataPrep row. This can be an expensive operation so the schema should be
+     * cached where possible. This is always an {@link Schema.Type#RECORD}.
      *
      * @param in the DescribeSObjectResult to analyse.
      * @return the schema for data given from the object.

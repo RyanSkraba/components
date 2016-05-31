@@ -12,6 +12,11 @@
 // ============================================================================
 package org.talend.components.dataprep.runtime;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +28,6 @@ import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 import org.talend.components.dataprep.tdatasetinput.TDataSetInputProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * The TDataSetInputSource provides the mechanism to supply data to other components at run-time.
@@ -66,11 +66,10 @@ public class DataSetSource implements BoundedSource {
     }
 
     private DataPrepConnectionHandler getConnectionHandler() {
-            return new DataPrepConnectionHandler(
-                    runtimeProperties.getUrl(), //
-                    runtimeProperties.getLogin(), //
-                    runtimeProperties.getPass(), //
-                    runtimeProperties.getDataSetName());
+        return new DataPrepConnectionHandler(runtimeProperties.getUrl(), //
+                runtimeProperties.getLogin(), //
+                runtimeProperties.getPass(), //
+                runtimeProperties.getDataSetName());
     }
 
     @Override
@@ -79,8 +78,7 @@ public class DataSetSource implements BoundedSource {
             getConnectionHandler().validate();
         } catch (IOException e) {
             LOGGER.debug("Validation isn't passed. Reason: {}", e);
-            return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
-                    .setMessage(e.getMessage());
+            return new ValidationResult().setStatus(ValidationResult.Result.ERROR).setMessage(e.getMessage());
         }
         return ValidationResult.OK;
     }

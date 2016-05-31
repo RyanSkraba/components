@@ -1,5 +1,9 @@
 package org.talend.components.dataprep.runtime;
 
+import java.io.IOException;
+
+import javax.inject.Inject;
+
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
@@ -19,9 +23,6 @@ import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.util.AvroUtils;
 
-import javax.inject.Inject;
-import java.io.IOException;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
 @WebIntegrationTest
@@ -31,7 +32,9 @@ public class DataSetWriterTest {
     private ComponentService componentService;
 
     private DataSetWriter writer;
+
     private TDataSetOutputProperties properties;
+
     private DataSetSink sink;
 
     @Before
@@ -56,7 +59,7 @@ public class DataSetWriterTest {
 
         IndexedRecord record = createIndexedRecord();
         writer.open("test");
-        for (int i = 0; i<15; i++) {
+        for (int i = 0; i < 15; i++) {
             writer.write(record);
         }
         WriterResult result = writer.close();
@@ -74,7 +77,7 @@ public class DataSetWriterTest {
 
         IndexedRecord record = createIndexedRecord();
         writer.open("testLiveDataSet");
-        for (int i = 0; i<15; i++) {
+        for (int i = 0; i < 15; i++) {
             writer.write(record);
         }
         WriterResult result = writer.close();
@@ -98,7 +101,8 @@ public class DataSetWriterTest {
         return defaultSchema;
     }
 
-    private SchemaBuilder.FieldAssembler<Schema> addField(SchemaBuilder.FieldAssembler<Schema> record, String name, Class<?> type, AvroRegistry avroReg) {
+    private SchemaBuilder.FieldAssembler<Schema> addField(SchemaBuilder.FieldAssembler<Schema> record, String name, Class<?> type,
+            AvroRegistry avroReg) {
         Schema base = avroReg.getConverter(type).getSchema();
         SchemaBuilder.FieldBuilder<Schema> fieldBuilder = record.name(name);
         fieldBuilder.type(AvroUtils.wrapAsNullable(base)).noDefault();

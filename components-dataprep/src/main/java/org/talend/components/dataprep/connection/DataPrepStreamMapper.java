@@ -30,14 +30,16 @@ public class DataPrepStreamMapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataPrepStreamMapper.class);
 
     private ObjectMapper objectMapper;
+
     private JsonParser jsonParser;
-    private MappingIterator<Map<String,String>> iterator;
+
+    private MappingIterator<Map<String, String>> iterator;
 
     private DataPrepStreamMapper() {
         objectMapper = new ObjectMapper();
     }
 
-    public DataPrepStreamMapper (InputStream inputStream) throws IOException {
+    public DataPrepStreamMapper(InputStream inputStream) throws IOException {
         this();
         this.jsonParser = new JsonFactory().createParser(inputStream);
     }
@@ -70,7 +72,7 @@ public class DataPrepStreamMapper {
         jsonParser.close();
     }
 
-    MetaData getMetaData() throws IOException{
+    MetaData getMetaData() throws IOException {
         return objectMapper.readValue(jsonParser, MetaData.class);
     }
 }

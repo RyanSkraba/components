@@ -1,5 +1,9 @@
 package org.talend.components.dataprep.runtime;
 
+import java.util.Collections;
+
+import javax.inject.Inject;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,9 +15,6 @@ import org.talend.components.api.test.SpringApp;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputDefinition;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
 
-import javax.inject.Inject;
-import java.util.Collections;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
 public class DataSetSinkTest {
@@ -21,7 +22,7 @@ public class DataSetSinkTest {
     @Inject
     private ComponentService componentService;
 
-        private DataSetSink outputSink;
+    private DataSetSink outputSink;
 
     private TDataSetOutputDefinition definition;
 

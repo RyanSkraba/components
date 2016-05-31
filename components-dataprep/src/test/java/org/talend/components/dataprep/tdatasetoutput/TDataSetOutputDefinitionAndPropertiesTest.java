@@ -1,5 +1,9 @@
 package org.talend.components.dataprep.tdatasetoutput;
 
+import java.util.Collections;
+
+import javax.inject.Inject;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,9 +14,6 @@ import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.SpringApp;
 
-import javax.inject.Inject;
-import java.util.Collections;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
 public class TDataSetOutputDefinitionAndPropertiesTest {
@@ -22,9 +23,9 @@ public class TDataSetOutputDefinitionAndPropertiesTest {
 
     @Test
     public void testTDataSetOutputDefinition() {
-        TDataSetOutputDefinition outputDefinition =
-                (TDataSetOutputDefinition) componentService.getComponentDefinition("tDatasetOutput");
-        Assert.assertArrayEquals(new String[] {"Talend Data Preparation"}, outputDefinition.getFamilies());
+        TDataSetOutputDefinition outputDefinition = (TDataSetOutputDefinition) componentService
+                .getComponentDefinition("tDatasetOutput");
+        Assert.assertArrayEquals(new String[] { "Talend Data Preparation" }, outputDefinition.getFamilies());
         Assert.assertEquals("org.talend.components", outputDefinition.getMavenGroupId());
         Assert.assertEquals("components-dataprep", outputDefinition.getMavenArtifactId());
         Assert.assertTrue(outputDefinition.isSchemaAutoPropagate());
@@ -32,8 +33,8 @@ public class TDataSetOutputDefinitionAndPropertiesTest {
 
     @Test
     public void testTDataSetOutputProperties() {
-        TDataSetOutputProperties properties = (TDataSetOutputProperties) componentService.
-                getComponentProperties("tDatasetOutput");
+        TDataSetOutputProperties properties = (TDataSetOutputProperties) componentService
+                .getComponentProperties("tDatasetOutput");
         PropertyPathConnector connector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
         Assert.assertNotNull(properties.getSchema());

@@ -16,8 +16,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Column {
+
     private String name;
+
     private String type;
+
     private String id;
 
     public String getName() {
@@ -46,6 +49,6 @@ public class Column {
 
     @Override
     public String toString() {
-        return "Name: "+ getName()+" Type: "+ getType() +" ID: " + getId()+ "\n";
+        return "Name: " + getName() + " Type: " + getType() + " ID: " + getId() + "\n";
     }
 }

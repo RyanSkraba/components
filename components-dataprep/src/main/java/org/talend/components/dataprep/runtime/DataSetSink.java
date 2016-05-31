@@ -12,6 +12,10 @@
 // ============================================================================
 package org.talend.components.dataprep.runtime;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +27,6 @@ import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 public class DataSetSink implements Sink {
 
@@ -51,16 +51,15 @@ public class DataSetSink implements Sink {
                 runtimeProperties.getLogin(), //
                 runtimeProperties.getPass(), //
                 runtimeProperties.getDataSetName());
-            if (DataPrepOutputModes.LiveDataset.equals(runtimeProperties.getMode())) {
-                return ValidationResult.OK;
-            }
-            try {
-                connectionHandler.validate();
-            } catch (IOException e) {
-                LOGGER.debug("Validation isn't passed. Reason: {}", e);
-                return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
-                        .setMessage(e.getMessage());
-            }
+        if (DataPrepOutputModes.LiveDataset.equals(runtimeProperties.getMode())) {
+            return ValidationResult.OK;
+        }
+        try {
+            connectionHandler.validate();
+        } catch (IOException e) {
+            LOGGER.debug("Validation isn't passed. Reason: {}", e);
+            return new ValidationResult().setStatus(ValidationResult.Result.ERROR).setMessage(e.getMessage());
+        }
         return ValidationResult.OK;
     }
 

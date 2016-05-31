@@ -1,5 +1,8 @@
 package org.talend.components.dataprep.tdatasetinput;
 
+import static org.hamcrest.Matchers.equalTo;
+
+import javax.inject.Inject;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -12,10 +15,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.SpringApp;
 import org.talend.daikon.properties.ValidationResult;
-
-import javax.inject.Inject;
-
-import static org.hamcrest.Matchers.equalTo;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -30,8 +29,8 @@ public class AfterFetchSchemaTest {
 
     @Test
     public void testAfterFetchSchema() {
-        TDataSetInputProperties properties = (TDataSetInputProperties) componentService
-                .getComponentDefinition("tDatasetInput").createProperties();
+        TDataSetInputProperties properties = (TDataSetInputProperties) componentService.getComponentDefinition("tDatasetInput")
+                .createProperties();
         properties.url.setValue("http://localhost:8080");
         properties.login.setValue("vincent@dataprep.com");
         properties.pass.setValue("vincent");
@@ -41,8 +40,8 @@ public class AfterFetchSchemaTest {
 
     @Test
     public void testAfterFetchSchemaFailed() {
-        TDataSetInputProperties properties = (TDataSetInputProperties) componentService
-                .getComponentDefinition("tDatasetInput").createProperties();
+        TDataSetInputProperties properties = (TDataSetInputProperties) componentService.getComponentDefinition("tDatasetInput")
+                .createProperties();
         properties.url.setValue("http://localhost:8080");
         properties.login.setValue("vincent@dataprep.com");
         properties.pass.setValue("wrong");
@@ -52,8 +51,8 @@ public class AfterFetchSchemaTest {
 
     @Test
     public void testFieldSetting() {
-        TDataSetInputProperties properties = (TDataSetInputProperties) componentService
-                .getComponentDefinition("tDatasetInput").createProperties();
+        TDataSetInputProperties properties = (TDataSetInputProperties) componentService.getComponentDefinition("tDatasetInput")
+                .createProperties();
         collector.checkThat(properties.afterFetchSchema().getStatus(), equalTo(ValidationResult.Result.ERROR));
         properties.url.setValue("http://localhost:8080");
         collector.checkThat(properties.afterFetchSchema().getStatus(), equalTo(ValidationResult.Result.ERROR));

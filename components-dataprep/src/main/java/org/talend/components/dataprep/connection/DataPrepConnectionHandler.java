@@ -89,7 +89,7 @@ public class DataPrepConnectionHandler {
             logout();
         } catch (IOException e) {
             LOGGER.debug("Validation isn't passed. Reason: {}", e.getMessage());
-            //TODO i18n
+            // TODO i18n
             throw new IOException("Validation isn't passed. Reason: " + e.getMessage(), e);
         }
     }

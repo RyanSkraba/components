@@ -1,5 +1,7 @@
 package org.talend.components.dataprep;
 
+import javax.inject.Inject;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
@@ -10,11 +12,10 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.test.SpringApp;
 
-import javax.inject.Inject;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
 public class TDataSetTestIT {
+
     @Inject
     private ComponentService componentService;
 

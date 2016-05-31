@@ -13,24 +13,25 @@
 package org.talend.components.dataprep.tdatasetoutput;
 
 import org.talend.components.api.Constants;
-import org.talend.components.api.component.*;
+import org.talend.components.api.component.AbstractComponentDefinition;
+import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.OutputComponentDefinition;
+import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.properties.ComponentProperties;
-
-import aQute.bnd.annotation.component.Component;
 import org.talend.components.dataprep.runtime.DataSetSink;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
- * The TDataSetOutputDefinition acts as an entry point for all of services that
- * a component provides to integrate with the Studio (at design-time) and other 
- * components (at run-time).
+ * The TDataSetOutputDefinition acts as an entry point for all of services that a component provides to integrate with
+ * the Studio (at design-time) and other components (at run-time).
  */
 @Component(name = Constants.COMPONENT_BEAN_PREFIX + TDataSetOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TDataSetOutputDefinition extends AbstractComponentDefinition implements OutputComponentDefinition {
 
     public static final String COMPONENT_NAME = "tDatasetOutput";
-
 
     public TDataSetOutputDefinition() {
         super(COMPONENT_NAME);
@@ -40,7 +41,7 @@ public class TDataSetOutputDefinition extends AbstractComponentDefinition implem
 
     @Override
     public String[] getFamilies() {
-        return new String[]{"Talend Data Preparation"};
+        return new String[] { "Talend Data Preparation" };
     }
 
     @Override

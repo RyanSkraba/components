@@ -18,6 +18,7 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MetaData {
+
     List<Column> columns;
 
     public List<Column> getColumns() {

@@ -30,9 +30,13 @@ import java.io.IOException;
 public class DataPrepConnectionHandlerTest {
 
     private DataPrepConnectionHandler connectionHandler;
+
     private static final String URL = "http://localhost:8080";
+
     private static final String LOGIN = "vincent@dataprep.com";
+
     private static final String PASS = "vincent";
+
     private static final String ID = "db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e";
 
     @Before
@@ -57,8 +61,9 @@ public class DataPrepConnectionHandlerTest {
     public void testLogout() throws IOException {
         connectionHandler.connect();
         HttpResponse response = connectionHandler.logout();
-        Assert.assertEquals(200 , response.getStatusLine().getStatusCode());
+        Assert.assertEquals(200, response.getStatusLine().getStatusCode());
     }
+
     @Test
     public void testFailedLogout() throws IOException {
         connectionHandler = new DataPrepConnectionHandler(URL, "testLogout", "testLogout", "any");
@@ -85,7 +90,7 @@ public class DataPrepConnectionHandlerTest {
     }
 
     @Test
-    public void testReadSourceSchema() throws IOException{
+    public void testReadSourceSchema() throws IOException {
         connectionHandler.connect();
         Assert.assertNotNull(connectionHandler.readSourceSchema());
     }

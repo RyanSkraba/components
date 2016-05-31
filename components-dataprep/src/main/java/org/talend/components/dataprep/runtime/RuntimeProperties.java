@@ -17,12 +17,19 @@ import java.io.Serializable;
 public class RuntimeProperties implements Serializable {
 
     private static final long serialVersionUID = 3992422924211437022L;
+
     private String url;
+
     private String login;
+
     private String pass;
+
     private DataPrepOutputModes mode;
+
     private String dataSetName;
+
     private String schema;
+
     private String limit;
 
     public String getUrl() {

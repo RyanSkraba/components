@@ -12,6 +12,11 @@
 // ============================================================================
 package org.talend.components.dataprep.tdatasetinput;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,28 +38,20 @@ import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 /**
- * The ComponentProperties subclass provided by a component stores the
- * configuration of a component and is used for:
+ * The ComponentProperties subclass provided by a component stores the configuration of a component and is used for:
  * 
  * <ol>
- * <li>Specifying the format and type of information (properties) that is
- * provided at design-time to configure a component for run-time,</li>
+ * <li>Specifying the format and type of information (properties) that is provided at design-time to configure a
+ * component for run-time,</li>
  * <li>Validating the properties of the component at design-time,</li>
  * <li>Containing the untyped values of the properties, and</li>
- * <li>All of the UI information for laying out and presenting the
- * properties to the user.</li>
+ * <li>All of the UI information for laying out and presenting the properties to the user.</li>
  * </ol>
  * 
  * The TDataSetInputProperties has two properties:
  * <ol>
- * <li>{code filename}, a simple property which is a String containing the
- * file path that this component will read.</li>
+ * <li>{code filename}, a simple property which is a String containing the file path that this component will read.</li>
  * <li>{code schema}, an embedded property referring to a Schema.</li>
  * </ol>
  */

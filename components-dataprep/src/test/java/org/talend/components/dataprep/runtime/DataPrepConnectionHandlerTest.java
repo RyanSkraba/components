@@ -12,6 +12,14 @@
 // ============================================================================
 package org.talend.components.dataprep.runtime;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.util.Date;
+
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -30,14 +38,6 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.dataprep.connection.Column;
 import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
-
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.util.Date;
 
 @Ignore
 public class DataPrepConnectionHandlerTest {
@@ -100,12 +100,11 @@ public class DataPrepConnectionHandlerTest {
 
     @Test
     public void readData() throws IOException {
-        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(
-                URL, LOGIN, PASS, "db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
+        DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(URL, LOGIN, PASS,
+                "db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
         HttpResponse response = connectionHandler.connect();
         Header httpHead = response.getFirstHeader("Authorization");
-        Request request = Request.Get(URL+ "/api/datasets/" + "should be fixed" + "?metadata=false").
-                addHeader(httpHead);
+        Request request = Request.Get(URL + "/api/datasets/" + "should be fixed" + "?metadata=false").addHeader(httpHead);
         HttpResponse current = null;
         try {
             current = request.execute().returnResponse();
@@ -118,12 +117,12 @@ public class DataPrepConnectionHandlerTest {
 
     @Test
     public void newRowHandling() throws IOException {
-        String inputData = string; //"records":[{"0000":"test1","0001":" test2","0002":" test3","tdpId":1},{"0000":"test4","0001":" test5","0002":" test6","tdpId":2}];
+        String inputData = string; // "records":[{"0000":"test1","0001":" test2","0002":"
+                                   // test3","tdpId":1},{"0000":"test4","0001":" test5","0002":" test6","tdpId":2}];
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES,
-                false);
-        JsonParser jsonParser = new JsonFactory().
-                createJsonParser(new BufferedInputStream(new ByteArrayInputStream(inputData.getBytes())));
+        objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        JsonParser jsonParser = new JsonFactory()
+                .createJsonParser(new BufferedInputStream(new ByteArrayInputStream(inputData.getBytes())));
         while (!jsonParser.isClosed() && jsonParser.getCurrentToken() != JsonToken.END_ARRAY) {
             JsonToken token;
             while ((token = jsonParser.nextToken()) != JsonToken.END_OBJECT) {
@@ -134,7 +133,8 @@ public class DataPrepConnectionHandlerTest {
 
     @Test
     public void sendDataWithStream() throws IOException {
-        java.net.URL url = new java.net.URL("http://52.31.50.21:80/api/datasets?name=" + "setName1" + "&folderPath="+"folderName");
+        java.net.URL url = new java.net.URL(
+                "http://52.31.50.21:80/api/datasets?name=" + "setName1" + "&folderPath=" + "folderName");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "text/plain");

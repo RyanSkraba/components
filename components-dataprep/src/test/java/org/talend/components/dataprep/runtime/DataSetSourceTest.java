@@ -18,6 +18,7 @@ import java.util.Collections;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
 public class DataSetSourceTest {
+
     @Inject
     private ComponentService componentService;
 
@@ -53,7 +54,7 @@ public class DataSetSourceTest {
 
     @Test
     public void testGetSchemaNames() throws Exception {
-        Assert.assertEquals(Collections.emptyList(),inputSource.getSchemaNames(null));
+        Assert.assertEquals(Collections.emptyList(), inputSource.getSchemaNames(null));
     }
 
     @Test
