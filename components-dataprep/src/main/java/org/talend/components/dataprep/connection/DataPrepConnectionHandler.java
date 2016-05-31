@@ -24,6 +24,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -135,7 +138,18 @@ public class DataPrepConnectionHandler {
     }
 
     public OutputStream create() throws IOException {
-        URL connectionUrl = new URL(url + "/api/datasets?name=" + dataSetName);
+        URI uri;
+        try {
+            URL localUrl = new URL(url);
+            uri = new URI(localUrl.getProtocol(), null, localUrl.getHost(),
+                    localUrl.getPort(), "/api/datasets", "name=" + dataSetName, null);
+            LOGGER.debug("Request is: {}", uri);
+            System.out.println(uri);
+        } catch (MalformedURLException|URISyntaxException e) {
+            LOGGER.debug("It's not possible to create right request from input parameters. {}", e);
+            throw new IOException(e);
+        }
+        URL connectionUrl = uri.toURL();
         urlConnection = (HttpURLConnection) connectionUrl.openConnection();
         urlConnection.setRequestMethod("POST");
         urlConnection.setRequestProperty(authorisationHeader.getName(), authorisationHeader.getValue());
