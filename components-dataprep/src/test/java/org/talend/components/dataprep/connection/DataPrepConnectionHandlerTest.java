@@ -17,6 +17,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -26,12 +27,12 @@ import java.io.IOException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
-@WebIntegrationTest
+@WebIntegrationTest("server.port:0")
 public class DataPrepConnectionHandlerTest {
 
     private DataPrepConnectionHandler connectionHandler;
 
-    private static final String URL = "http://localhost:8080";
+    private static final String URL = "http://localhost:";
 
     private static final String LOGIN = "vincent@dataprep.com";
 
@@ -39,9 +40,12 @@ public class DataPrepConnectionHandlerTest {
 
     private static final String ID = "db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e";
 
+    @Value("${local.server.port}")
+    private int serverPort;
+
     @Before
     public void setConnectionHandler() {
-        connectionHandler = new DataPrepConnectionHandler(URL, LOGIN, PASS, ID);
+        connectionHandler = new DataPrepConnectionHandler(URL+serverPort, LOGIN, PASS, ID);
     }
 
     @Test
@@ -53,7 +57,7 @@ public class DataPrepConnectionHandlerTest {
 
     @Test(expected = IOException.class)
     public void testFailedLogin() throws IOException {
-        connectionHandler = new DataPrepConnectionHandler(URL, LOGIN, "wrong", "any");
+        connectionHandler = new DataPrepConnectionHandler(URL+serverPort, LOGIN, "wrong", "any");
         connectionHandler.connect();
     }
 
@@ -66,7 +70,7 @@ public class DataPrepConnectionHandlerTest {
 
     @Test
     public void testFailedLogout() throws IOException {
-        connectionHandler = new DataPrepConnectionHandler(URL, "testLogout", "testLogout", "any");
+        connectionHandler = new DataPrepConnectionHandler(URL+serverPort, "testLogout", "testLogout", "any");
         Assert.assertEquals(200, connectionHandler.connect().getStatusLine().getStatusCode());
         Assert.assertEquals(400, connectionHandler.logout().getStatusLine().getStatusCode());
     }
@@ -85,7 +89,7 @@ public class DataPrepConnectionHandlerTest {
 
     @Test(expected = IOException.class)
     public void testFailedValidate() throws IOException {
-        connectionHandler = new DataPrepConnectionHandler(URL, LOGIN, "wrong", "any");
+        connectionHandler = new DataPrepConnectionHandler(URL+serverPort, LOGIN, "wrong", "any");
         connectionHandler.validate();
     }
 
@@ -97,7 +101,7 @@ public class DataPrepConnectionHandlerTest {
 
     @Test(expected = IOException.class)
     public void testFailedReadSourceSchema() throws IOException {
-        connectionHandler = new DataPrepConnectionHandler(URL, LOGIN, PASS, "any");
+        connectionHandler = new DataPrepConnectionHandler(URL+serverPort, LOGIN, PASS, "any");
         connectionHandler.connect();
         connectionHandler.readSourceSchema();
     }
@@ -125,7 +129,7 @@ public class DataPrepConnectionHandlerTest {
 
     @Test(expected = IOException.class)
     public void testFailedReadDataSetIterator() throws IOException {
-        connectionHandler = new DataPrepConnectionHandler(URL, LOGIN, PASS, "any");
+        connectionHandler = new DataPrepConnectionHandler(URL+serverPort, LOGIN, PASS, "any");
         Assert.assertEquals(200, connectionHandler.connect().getStatusLine().getStatusCode());
         connectionHandler.readDataSetIterator();
     }

@@ -1,9 +1,5 @@
 package org.talend.components.dataprep.runtime;
 
-import java.io.IOException;
-
-import javax.inject.Inject;
-
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
@@ -12,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -23,9 +20,12 @@ import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.util.AvroUtils;
 
+import javax.inject.Inject;
+import java.io.IOException;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
-@WebIntegrationTest
+@WebIntegrationTest("server.port:0")
 public class DataSetWriterTest {
 
     @Inject
@@ -37,12 +37,15 @@ public class DataSetWriterTest {
 
     private DataSetSink sink;
 
+    @Value("${local.server.port}")
+    private int serverPort;
+
     @Before
     public void setDefaultValues() {
         TDataSetOutputDefinition definition = (TDataSetOutputDefinition) componentService
                 .getComponentDefinition("tDatasetOutput");
         properties = (TDataSetOutputProperties) definition.createProperties();
-        properties.url.setValue("http://localhost:8080");
+        properties.url.setValue("http://localhost:"+serverPort);
         properties.login.setValue("vincent@dataprep.com");
         properties.pass.setValue("vincent");
         properties.limit.setValue(10);
