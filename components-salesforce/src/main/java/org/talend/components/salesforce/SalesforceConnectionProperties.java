@@ -28,7 +28,6 @@ import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
-import org.talend.daikon.properties.presentation.Widget.WidgetType;
 
 public class SalesforceConnectionProperties extends ComponentProperties
         implements SalesforceProvideConnectionProperties, ComponentReferencePropertiesEnclosing {
@@ -118,14 +117,14 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
         Form wizardForm = Form.create(this, FORM_WIZARD);
         wizardForm.addRow(name);
-        wizardForm.addRow(widget(loginType).setWidgetType(WidgetType.ENUMERATION).setDeemphasize(true));
+        wizardForm.addRow(widget(loginType).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE).setDeemphasize(true));
         wizardForm.addRow(oauth.getForm(Form.MAIN));
         wizardForm.addRow(userPassword.getForm(Form.MAIN));
-        wizardForm.addRow(widget(advanced).setWidgetType(WidgetType.BUTTON));
-        wizardForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
+        wizardForm.addRow(widget(advanced).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
+        wizardForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
 
         Form mainForm = Form.create(this, Form.MAIN);
-        mainForm.addRow(widget(loginType).setWidgetType(WidgetType.ENUMERATION));
+        mainForm.addRow(widget(loginType).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
         mainForm.addRow(oauth.getForm(Form.MAIN));
         mainForm.addRow(userPassword.getForm(Form.MAIN));
 
@@ -142,7 +141,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
         // A form for a reference to a connection, used in a tSalesforceInput for example
         Form refForm = Form.create(this, Form.REFERENCE);
-        Widget compListWidget = widget(referencedComponent).setWidgetType(WidgetType.COMPONENT_REFERENCE);
+        Widget compListWidget = widget(referencedComponent).setWidgetType(Widget.COMPONENT_REFERENCE_WIDGET_TYPE);
         referencedComponent.componentType.setValue(TSalesforceConnectionDefinition.COMPONENT_NAME);
         refForm.addRow(compListWidget);
         refForm.addRow(mainForm);

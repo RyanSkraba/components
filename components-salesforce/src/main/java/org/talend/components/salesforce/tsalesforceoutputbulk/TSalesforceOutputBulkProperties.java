@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.apache.avro.Schema;
 import org.talend.components.api.component.ISchemaListener;
-import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.BulkFileProperties;
 import org.talend.components.salesforce.UpsertRelationTable;
 import org.talend.daikon.properties.Property;
@@ -47,9 +46,9 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
 
             @Override
             public void afterSchema() {
-            	beforeUpsertRelationTable();
+                beforeUpsertRelationTable();
             }
-            
+
         });
     }
 
@@ -69,7 +68,7 @@ public class TSalesforceOutputBulkProperties extends BulkFileProperties {
         refForm.addRow(ignoreNull);
 
         Form advancedForm = new Form(this, Form.ADVANCED);
-        advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.WidgetType.TABLE));
+        advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.TABLE_WIDGET_TYPE));
     }
 
     protected List<String> getFieldNames(Property schema) {

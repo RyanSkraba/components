@@ -62,7 +62,7 @@ public class BulkFileProperties extends FixedConnectorsComponentProperties {
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(schema.getForm(Form.REFERENCE));
-        mainForm.addRow(widget(bulkFilePath).setWidgetType(Widget.WidgetType.FILE));
+        mainForm.addRow(widget(bulkFilePath).setWidgetType(Widget.FILE_WIDGET_TYPE));
         mainForm.addRow(append);
 
     }

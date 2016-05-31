@@ -38,7 +38,6 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
-import org.talend.daikon.properties.presentation.Widget.WidgetType;
 import org.talend.daikon.properties.service.Repository;
 
 public class TestComponentProperties extends ComponentProperties implements ComponentReferencePropertiesEnclosing {
@@ -131,10 +130,10 @@ public class TestComponentProperties extends ComponentProperties implements Comp
         Form form = Form.create(this, Form.MAIN);
         mainForm = form;
         form.addRow(userId);
-        form.addRow(widget(password).setWidgetType(WidgetType.HIDDEN_TEXT));
+        form.addRow(widget(password).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
         form.addRow(testPI);
-        form.addRow(widget(nameList).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
-        form.addRow(widget(nameListRef).setWidgetType(Widget.WidgetType.NAME_SELECTION_REFERENCE));
+        form.addRow(widget(nameList).setWidgetType(Widget.NAME_SELECTION_AREA_WIDGET_TYPE));
+        form.addRow(widget(nameListRef).setWidgetType(Widget.NAME_SELECTION_REFERENCE_WIDGET_TYPE));
 
         form = Form.create(this, "restoreTest");
         restoreForm = form;
@@ -147,7 +146,7 @@ public class TestComponentProperties extends ComponentProperties implements Comp
         form.addRow(nestedProps.getForm(Form.MAIN));
 
         Form refForm = new Form(this, Form.REFERENCE);
-        Widget compListWidget = widget(referencedComponent).setWidgetType(WidgetType.COMPONENT_REFERENCE);
+        Widget compListWidget = widget(referencedComponent).setWidgetType(Widget.COMPONENT_REFERENCE_WIDGET_TYPE);
         referencedComponent.componentType.setValue("refComp");
         refForm.addRow(compListWidget);
         refForm.addRow(mainForm);

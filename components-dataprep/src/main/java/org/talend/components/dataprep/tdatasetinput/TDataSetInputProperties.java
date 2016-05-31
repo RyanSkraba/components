@@ -91,9 +91,9 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
         form.addRow(schema.getForm(Form.REFERENCE));
         form.addRow(url);
         form.addRow(login);
-        form.addRow(Widget.widget(pass).setWidgetType(Widget.WidgetType.HIDDEN_TEXT));
+        form.addRow(Widget.widget(pass).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
         form.addRow(dataSetName);
-        form.addRow(Widget.widget(fetchSchema).setWidgetType(Widget.WidgetType.BUTTON));
+        form.addRow(Widget.widget(fetchSchema).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
     }
 
     public ValidationResult afterFetchSchema() {

@@ -20,7 +20,7 @@ import java.util.EnumSet;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
-import org.talend.daikon.properties.presentation.Widget.WidgetType;
+import org.talend.daikon.properties.presentation.Widget;
 
 public class UserPasswordProperties extends ComponentProperties {
 
@@ -38,7 +38,7 @@ public class UserPasswordProperties extends ComponentProperties {
         super.setupLayout();
         Form form = Form.create(this, Form.MAIN);
         form.addRow(userId);
-        form.addRow(widget(password).setWidgetType(WidgetType.HIDDEN_TEXT));
+        form.addRow(widget(password).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
     }
 
 }

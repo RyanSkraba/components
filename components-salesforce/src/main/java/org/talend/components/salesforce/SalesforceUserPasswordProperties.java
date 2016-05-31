@@ -35,7 +35,7 @@ public class SalesforceUserPasswordProperties extends UserPasswordProperties {
     public void setupLayout() {
         super.setupLayout();
         Form form = getForm(Form.MAIN);
-        form.addColumn(widget(securityKey).setWidgetType(Widget.WidgetType.HIDDEN_TEXT));
+        form.addColumn(widget(securityKey).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
 
     }
 

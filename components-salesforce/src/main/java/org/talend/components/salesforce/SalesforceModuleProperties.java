@@ -61,11 +61,11 @@ public class SalesforceModuleProperties extends ComponentProperties implements S
     public void setupLayout() {
         super.setupLayout();
         Form moduleForm = Form.create(this, Form.MAIN);
-        moduleForm.addRow(widget(moduleName).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
+        moduleForm.addRow(widget(moduleName).setWidgetType(Widget.NAME_SELECTION_AREA_WIDGET_TYPE));
         refreshLayout(moduleForm);
 
         Form moduleRefForm = Form.create(this, Form.REFERENCE);
-        moduleRefForm.addRow(widget(moduleName).setWidgetType(Widget.WidgetType.NAME_SELECTION_REFERENCE));
+        moduleRefForm.addRow(widget(moduleName).setWidgetType(Widget.NAME_SELECTION_REFERENCE_WIDGET_TYPE));
 
         moduleRefForm.addRow(main.getForm(Form.REFERENCE));
         refreshLayout(moduleRefForm);

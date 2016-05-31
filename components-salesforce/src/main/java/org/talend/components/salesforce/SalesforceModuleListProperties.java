@@ -62,7 +62,7 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
         super.setupLayout();
         Form moduleForm = Form.create(this, Form.MAIN);
         // Since this is a repeating property it has a list of values
-        moduleForm.addRow(widget(selectedModuleNames).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
+        moduleForm.addRow(widget(selectedModuleNames).setWidgetType(Widget.NAME_SELECTION_AREA_WIDGET_TYPE));
         refreshLayout(moduleForm);
     }
 

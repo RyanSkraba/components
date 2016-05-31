@@ -48,6 +48,6 @@ public class OauthProperties extends ComponentProperties {
         form.addColumn(clientSecret);
         form.addRow(callbackHost);
         form.addColumn(callbackPort);
-        form.addRow(widget(tokenFile).setWidgetType(Widget.WidgetType.FILE));
+        form.addRow(widget(tokenFile).setWidgetType(Widget.FILE_WIDGET_TYPE));
     }
 }

@@ -123,7 +123,7 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
         advancedForm.addRow(ignoreNull);
         advancedForm.addRow(retrieveInsertId);
         advancedForm.addRow(commitLevel);
-        advancedForm.addRow(widget(logFileName).setWidgetType(Widget.WidgetType.FILE));
+        advancedForm.addRow(widget(logFileName).setWidgetType(Widget.FILE_WIDGET_TYPE));
     }
 
     public void afterExtendInsert() {

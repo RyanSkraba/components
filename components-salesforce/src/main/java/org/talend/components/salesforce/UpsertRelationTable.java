@@ -9,7 +9,6 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
-import org.talend.daikon.properties.presentation.Widget.WidgetType;
 
 public class UpsertRelationTable extends ComponentProperties {
 
@@ -51,7 +50,7 @@ public class UpsertRelationTable extends ComponentProperties {
     public void setupLayout() {
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
-        mainForm.addColumn(new Widget(columnName).setWidgetType(WidgetType.ENUMERATION));
+        mainForm.addColumn(new Widget(columnName).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
         mainForm.addColumn(lookupFieldName);
         mainForm.addColumn(lookupFieldModuleName);
         if (usePolymorphic) {

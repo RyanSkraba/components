@@ -32,7 +32,7 @@ import org.talend.daikon.properties.presentation.Form;
  * IMPORTANT - when using {@code ComponentReferenceProperties} the property name in the enclosingProperties must be
  * {@code referencedComponent}.
  *
- * The {@link org.talend.daikon.properties.presentation.Widget.WidgetType#COMPONENT_REFERENCE} uses this class as its
+ * The {@link org.talend.daikon.properties.presentation.WidgetType#COMPONENT_REFERENCE} uses this class as its
  * properties and the Widget will populate these values.
  */
 public class ComponentReferenceProperties extends ComponentProperties {
