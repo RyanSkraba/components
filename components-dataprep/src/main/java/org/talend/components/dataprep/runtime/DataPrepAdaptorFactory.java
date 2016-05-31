@@ -10,14 +10,16 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.dataprep;
+package org.talend.components.dataprep.runtime;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.talend.components.dataprep.connection.DataPrepField;
 import org.talend.daikon.avro.AvroConverter;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 
-public class DataPrepAdaptorFactory implements IndexedRecordAdapterFactory<DataPrepField[],IndexedRecord> {
+public class DataPrepAdaptorFactory implements IndexedRecordAdapterFactory<DataPrepField[], IndexedRecord> {
+
     private Schema schema;
 
     @Override
@@ -46,8 +48,11 @@ public class DataPrepAdaptorFactory implements IndexedRecordAdapterFactory<DataP
     }
 
     private class DataPrepIndexedRecord implements IndexedRecord {
+
         private DataPrepField[] dataPrepFields;
+
         private AvroConverter[] fieldConverter;
+
         private String[] names;
 
         DataPrepIndexedRecord(DataPrepField[] dataPrepFields) {
@@ -71,15 +76,16 @@ public class DataPrepAdaptorFactory implements IndexedRecordAdapterFactory<DataP
                 }
             }
             Object value = null;
-            for (DataPrepField field: dataPrepFields) {
+            for (DataPrepField field : dataPrepFields) {
 
-                    if (field.getColumnName().equals(names[i])) {
-                        value = fieldConverter[i].convertToAvro(field.getContent());
-                    }
+                if (field.getColumnName().equals(names[i])) {
+                    value = fieldConverter[i].convertToAvro(field.getContent());
+                }
             }
             return value;
         }
 
+        @Override
         public Schema getSchema() {
             return DataPrepAdaptorFactory.this.getSchema();
         }

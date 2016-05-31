@@ -10,7 +10,11 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.dataprep;
+package org.talend.components.dataprep.runtime;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -19,17 +23,18 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.ComponentException;
+import org.talend.components.dataprep.connection.Column;
+import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
+import org.talend.components.dataprep.connection.DataPrepField;
+import org.talend.components.dataprep.connection.DataPrepStreamMapper;
+import org.talend.components.dataprep.tdatasetinput.TDataSetInputDefinition;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
 
 /**
  * Simple implementation of a reader.
  */
-public class TDataSetInputReader extends AbstractBoundedReader<IndexedRecord> {
+public class DataSetReader extends AbstractBoundedReader<IndexedRecord> {
 
     /** Default serial version UID. */
     private static final long serialVersionUID = 1L;
@@ -44,8 +49,8 @@ public class TDataSetInputReader extends AbstractBoundedReader<IndexedRecord> {
 
     private DataPrepStreamMapper dataPrepStreamMapper;
 
-    public TDataSetInputReader(RuntimeContainer container, BoundedSource source,
-                               DataPrepConnectionHandler connectionHandler, Schema schema) {
+    public DataSetReader(RuntimeContainer container, BoundedSource source, DataPrepConnectionHandler connectionHandler,
+            Schema schema) {
         super(container, source);
         this.connectionHandler = connectionHandler;
         this.schema = schema;
@@ -66,19 +71,19 @@ public class TDataSetInputReader extends AbstractBoundedReader<IndexedRecord> {
     }
 
     @Override
-    public IndexedRecord getCurrent() throws NoSuchElementException {
-        Map<String,String> recordMap = dataPrepStreamMapper.nextRecord();
+    public IndexedRecord getCurrent() {
+        Map<String, String> recordMap = dataPrepStreamMapper.nextRecord();
         LOGGER.debug("Record from data set: {}", recordMap);
         DataPrepField[] record = new DataPrepField[sourceSchema.size()];
         int i = 0;
-        for (Column column: sourceSchema) {
+        for (Column column : sourceSchema) {
             record[i] = new DataPrepField(column.getName(), column.getType(), recordMap.get(column.getId()));
             i++;
         }
         try {
             return ((DataPrepAdaptorFactory) getFactory()).convertToAvro(record);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ComponentException(e);
         }
     }
 
@@ -94,5 +99,4 @@ public class TDataSetInputReader extends AbstractBoundedReader<IndexedRecord> {
         adaptorFactory.setSchema(schema);
         return adaptorFactory;
     }
-
 }

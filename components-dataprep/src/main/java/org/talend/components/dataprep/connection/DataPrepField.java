@@ -10,15 +10,17 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.dataprep;
+package org.talend.components.dataprep.connection;
 
 public class DataPrepField {
 
     private final String columnName;
+
     private final String type;
+
     private final String content;
 
-    DataPrepField (String columnName, String type, String content) {
+    public DataPrepField(String columnName, String type, String content) {
         this.columnName = columnName;
         this.type = type;
         this.content = content;
@@ -35,6 +37,5 @@ public class DataPrepField {
     public String getContent() {
         return content;
     }
-
 
 }

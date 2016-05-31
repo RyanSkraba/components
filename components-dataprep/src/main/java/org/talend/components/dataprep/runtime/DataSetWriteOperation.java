@@ -10,16 +10,16 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.dataprep;
+package org.talend.components.dataprep.runtime;
 
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.dataprep.TDataSetOutputProperties.Mode;
+import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 
-public class TDataSetWriteOperation implements WriteOperation<WriterResult> {
+public class DataSetWriteOperation implements WriteOperation<WriterResult> {
 
     private Sink sink;
 
@@ -27,28 +27,23 @@ public class TDataSetWriteOperation implements WriteOperation<WriterResult> {
 
     private int limit;
 
-    private Mode mode;
-
-    public TDataSetWriteOperation(Sink sink, DataPrepConnectionHandler connectionHandler, int limit, Mode mode) {
+    public DataSetWriteOperation(Sink sink) {
         this.sink = sink;
-        this.connectionHandler = connectionHandler;
-        this.limit = limit;
-        this.mode = mode;
     }
 
     @Override
     public void initialize(RuntimeContainer runtimeContainer) {
-
+        // Nothing to do here
     }
 
     @Override
     public void finalize(Iterable<WriterResult> iterable, RuntimeContainer runtimeContainer) {
-
+        // Nothing to do here
     }
 
     @Override
     public Writer<WriterResult> createWriter(RuntimeContainer runtimeContainer) {
-        return new TDataSetOutputWriter(this, connectionHandler, limit, mode);
+        return new DataSetWriter(this);
     }
 
     @Override

@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.dataprep;
+package org.talend.components.dataprep.connection;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -24,30 +24,31 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
-class DataPrepStreamMapper {
+public class DataPrepStreamMapper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataPrepStreamMapper.class);
 
     private ObjectMapper objectMapper;
+
     private JsonParser jsonParser;
-    private JsonToken currentToken;
-    private MappingIterator<Map<String,String>> iterator;
+
+    private MappingIterator<Map<String, String>> iterator;
 
     private DataPrepStreamMapper() {
         objectMapper = new ObjectMapper();
     }
 
-    public DataPrepStreamMapper (InputStream inputStream) throws IOException {
+    public DataPrepStreamMapper(InputStream inputStream) throws IOException {
         this();
         this.jsonParser = new JsonFactory().createParser(inputStream);
     }
 
     public boolean initIterator() throws IOException {
+        JsonToken currentToken;
         while ((currentToken = jsonParser.nextToken()) != JsonToken.END_OBJECT) {
             if (currentToken == JsonToken.START_ARRAY) {
-                currentToken = jsonParser.nextToken();
+                jsonParser.nextToken();
                 this.iterator = objectMapper.readValues(jsonParser, new TypeReference<Map<String, String>>() {
                 });
                 return true;
@@ -56,23 +57,22 @@ class DataPrepStreamMapper {
         return false;
     }
 
-    Map<String, String> nextRecord() throws NoSuchElementException {
+    public Map<String, String> nextRecord() {
         Map<String, String> record = iterator.next();
         record.remove("tdpId");
         LOGGER.debug("Record is : {}", record);
         return record;
     }
 
-    boolean hasNextRecord() {
+    public boolean hasNextRecord() {
         return iterator.hasNext();
     }
 
-    void close() throws IOException {
+    public void close() throws IOException {
         jsonParser.close();
     }
 
     MetaData getMetaData() throws IOException {
-        MetaData metaData = objectMapper.readValue(jsonParser, MetaData.class);
-        return metaData;
+        return objectMapper.readValue(jsonParser, MetaData.class);
     }
 }

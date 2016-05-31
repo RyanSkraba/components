@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.dataprep;
+package org.talend.components.dataprep.tdatasetoutput;
 
 import java.util.Collections;
 import java.util.Set;
@@ -20,41 +20,32 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
+import org.talend.components.dataprep.runtime.DataPrepOutputModes;
+import org.talend.components.dataprep.runtime.RuntimeProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 
 /**
- * The ComponentProperties subclass provided by a component stores the
- * configuration of a component and is used for:
+ * The ComponentProperties subclass provided by a component stores the configuration of a component and is used for:
  * 
  * <ol>
- * <li>Specifying the format and type of information (properties) that is
- * provided at design-time to configure a component for run-time,</li>
+ * <li>Specifying the format and type of information (properties) that is provided at design-time to configure a
+ * component for run-time,</li>
  * <li>Validating the properties of the component at design-time,</li>
  * <li>Containing the untyped values of the properties, and</li>
- * <li>All of the UI information for laying out and presenting the
- * properties to the user.</li>
+ * <li>All of the UI information for laying out and presenting the properties to the user.</li>
  * </ol>
  * 
  * The TDataSetOutputProperties has two properties:
  * <ol>
- * <li>{code dataSetName}, a simple property which is a String containing the
- * file path that this component will read.</li>
+ * <li>{code dataSetName}, a simple property which is a String containing the file path that this component will read.
+ * </li>
  * <li>{code schema}, an embedded property referring to a Schema.</li>
  * </ol>
  */
 public class TDataSetOutputProperties extends FixedConnectorsComponentProperties {
-
-    enum Mode {
-        CREATE,
-        UPDATE,
-        CREATE_AND_UPDATE,
-        LIVE_DATASET
-    };
-
-    public Property<String> dataSetName = PropertyFactory.newString("dataSetName");
 
     public Property<String> login = PropertyFactory.newString("login");
 
@@ -62,21 +53,27 @@ public class TDataSetOutputProperties extends FixedConnectorsComponentProperties
 
     public Property<String> url = PropertyFactory.newString("url");
 
-    public Property<Mode> mode = PropertyFactory.newEnum("mode", Mode.class);
+    public Property<DataPrepOutputModes> mode = PropertyFactory.newEnum("mode", DataPrepOutputModes.class);
+
+    public Property<String> dataSetName = PropertyFactory.newString("dataSetName");
+
+    public Property<Integer> limit = PropertyFactory.newInteger("limit", 100);
 
     public SchemaProperties schema = new SchemaProperties("schema");
 
-    protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
-
-    public Property<Integer> limit = PropertyFactory.newInteger("limit", 100);
+    protected transient PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
     public TDataSetOutputProperties(String name) {
         super(name);
     }
 
     @Override
-    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean b) {
-        return Collections.singleton(MAIN_CONNECTOR);
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        if (isOutputConnection) {
+            return Collections.emptySet();
+        } else {
+            return Collections.singleton(mainConnector);
+        }
     }
 
     @Override
@@ -93,6 +90,17 @@ public class TDataSetOutputProperties extends FixedConnectorsComponentProperties
     }
 
     public Schema getSchema() {
-        return (Schema) schema.schema.getValue();
+        return schema.schema.getValue();
+    }
+
+    public RuntimeProperties getRuntimeProperties() {
+        RuntimeProperties runtimeProperties = new RuntimeProperties();
+        runtimeProperties.setUrl(url.getStringValue());
+        runtimeProperties.setLogin(login.getStringValue());
+        runtimeProperties.setPass(pass.getStringValue());
+        runtimeProperties.setDataSetName(dataSetName.getStringValue());
+        runtimeProperties.setMode(mode.getValue());
+        runtimeProperties.setLimit(limit.getStringValue());
+        return runtimeProperties;
     }
 }

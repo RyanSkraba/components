@@ -1,4 +1,4 @@
-package org.talend.components.dataprep;
+package org.talend.components.dataprep.runtime;
 
 import java.util.Collections;
 
@@ -12,23 +12,24 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.SpringApp;
-import org.talend.components.dataprep.TDataSetOutputProperties.Mode;
+import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputDefinition;
+import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
-public class TDataSetOutputSinkTest {
+public class DataSetSinkTest {
 
     @Inject
     private ComponentService componentService;
 
-    private TDataSetOutputSink outputSink;
+    private DataSetSink outputSink;
 
     private TDataSetOutputDefinition definition;
 
     @Before
     public void setInputSource() {
         definition = (TDataSetOutputDefinition) (componentService.getComponentDefinition("tDatasetOutput"));
-        outputSink = (TDataSetOutputSink) definition.getRuntime();
+        outputSink = (DataSetSink) definition.getRuntime();
     }
 
     @Test
@@ -56,7 +57,7 @@ public class TDataSetOutputSinkTest {
     public void validateLiveDataSet() {
         TDataSetOutputProperties properties = (TDataSetOutputProperties) definition.createProperties();
         properties.setValue("url", "http://127.0.0.1");
-        properties.setValue("mode", Mode.LIVE_DATASET);
+        properties.setValue("mode", DataPrepOutputModes.LiveDataset);
         outputSink.initialize(null, properties);
         outputSink.validate(null);
     }
