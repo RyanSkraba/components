@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.exception.ComponentException;
-import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 import org.talend.daikon.NamedThing;
@@ -28,7 +28,7 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.StringProperty;
 
-public class SalesforceModuleProperties extends ComponentProperties implements SalesforceProvideConnectionProperties {
+public class SalesforceModuleProperties extends ComponentPropertiesImpl implements SalesforceProvideConnectionProperties {
 
     public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection");
 

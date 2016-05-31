@@ -20,7 +20,7 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.error.ComponentsErrorCode;
-import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.properties.property.Property;
@@ -30,7 +30,7 @@ import org.talend.daikon.properties.property.PropertyFactory;
  * this class provide a simple mechanism for handle Properties component with a fixed set of connection (hence a fixed
  * set of schemas )in {@link Property}. This is supposed to be used a direct ComponentProperties and not nested ones.
  */
-public abstract class FixedConnectorsComponentProperties extends ComponentProperties {
+public abstract class FixedConnectorsComponentProperties extends ComponentPropertiesImpl {
 
     /**
      * FixedSchemaComponentProperties constructor comment.

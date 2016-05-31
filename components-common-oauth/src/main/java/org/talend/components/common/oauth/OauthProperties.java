@@ -12,22 +12,22 @@
 // ============================================================================
 package org.talend.components.common.oauth;
 
-import org.talend.components.api.properties.ComponentProperties;
+import static org.talend.daikon.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.property.PropertyFactory.*;
+
+import java.util.EnumSet;
+
+import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
-import java.util.EnumSet;
-
-import static org.talend.daikon.properties.presentation.Widget.widget;
-import static org.talend.daikon.properties.property.PropertyFactory.*;
-
-public class OauthProperties extends ComponentProperties {
+public class OauthProperties extends ComponentPropertiesImpl {
 
     public Property<String> clientId = newProperty("clientId").setRequired(true); //$NON-NLS-1$
 
     public Property<String> clientSecret = newProperty("clientSecret").setRequired(true)
-            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));; //$NON-NLS-1$
+            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));;
 
     public Property<String> callbackHost = newProperty("callbackHost").setRequired(true); //$NON-NLS-1$
 

@@ -15,7 +15,7 @@ package org.talend.components.salesforce;
 import static org.talend.daikon.properties.presentation.Widget.*;
 import static org.talend.daikon.properties.property.PropertyFactory.*;
 
-import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
@@ -29,7 +29,7 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
-public class SalesforceConnectionProperties extends ComponentProperties
+public class SalesforceConnectionProperties extends ComponentPropertiesImpl
         implements SalesforceProvideConnectionProperties, ComponentReferencePropertiesEnclosing {
 
     public static final String URL = "https://www.salesforce.com/services/Soap/u/34.0";
