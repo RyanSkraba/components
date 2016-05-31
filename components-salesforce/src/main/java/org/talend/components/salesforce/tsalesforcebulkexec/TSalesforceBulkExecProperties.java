@@ -86,6 +86,10 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
             
         });
     }
+    
+    protected boolean isUpsertKeyColumnClosedList() {
+        return false;
+    }
 
     private void updateOutputSchemas() {
 
