@@ -26,9 +26,9 @@ import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.util.AvroTypes;
-import org.talend.daikon.properties.Property;
-import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComponentProperties
         implements SalesforceProvideConnectionProperties {

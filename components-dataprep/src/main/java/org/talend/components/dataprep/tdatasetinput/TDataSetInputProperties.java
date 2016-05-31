@@ -26,12 +26,12 @@ import org.talend.components.dataprep.runtime.DataPrepAvroRegistry;
 import org.talend.components.dataprep.runtime.RuntimeProperties;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.properties.PresentationItem;
-import org.talend.daikon.properties.Property;
-import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 import java.io.IOException;
 import java.util.Collections;

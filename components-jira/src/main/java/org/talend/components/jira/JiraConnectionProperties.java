@@ -14,26 +14,26 @@ package org.talend.components.jira;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Properties;
-import org.talend.daikon.properties.PropertyFactory;
-import org.talend.daikon.properties.StringProperty;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.PropertyFactory;
+import org.talend.daikon.properties.property.StringProperty;
 
 /**
  * Jira connection {@link Properties}
  */
 public class JiraConnectionProperties extends ComponentProperties {
-    
+
     private static final String INITIAL_HOST = "https://jira.atlassian.com";
-    
+
     /**
      * Host URL
      */
     public StringProperty hostUrl = PropertyFactory.newString("hostUrl");
-    
+
     /**
      * User id and password properties for Basic Authentication
      */
-    public BasicAuthenticationProperties basicAuthentication = new BasicAuthenticationProperties("basicAuthentication"); 
+    public BasicAuthenticationProperties basicAuthentication = new BasicAuthenticationProperties("basicAuthentication");
 
     /**
      * Constructor sets properties name
@@ -43,7 +43,7 @@ public class JiraConnectionProperties extends ComponentProperties {
     public JiraConnectionProperties(String name) {
         super(name);
     }
-    
+
     /**
      * {@inheritDoc}
      */

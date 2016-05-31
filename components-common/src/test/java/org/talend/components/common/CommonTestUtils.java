@@ -22,7 +22,7 @@ import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
 import org.talend.daikon.NamedThing;
-import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.property.Property;
 
 public class CommonTestUtils {
 

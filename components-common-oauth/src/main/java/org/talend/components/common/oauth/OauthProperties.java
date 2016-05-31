@@ -12,16 +12,15 @@
 // ============================================================================
 package org.talend.components.common.oauth;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
-
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.properties.property.Property;
 
 import java.util.EnumSet;
 
 import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.*;
 
 public class OauthProperties extends ComponentProperties {
 

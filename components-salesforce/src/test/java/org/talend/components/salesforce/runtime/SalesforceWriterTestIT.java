@@ -33,7 +33,7 @@ import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.SalesforceRuntimeTestUtil;
 import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
-import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.property.Property;
 
 public class SalesforceWriterTestIT extends SalesforceTestBase {
 

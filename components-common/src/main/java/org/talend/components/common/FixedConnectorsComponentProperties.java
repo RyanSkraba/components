@@ -23,8 +23,8 @@ import org.talend.components.api.exception.error.ComponentsErrorCode;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.exception.ExceptionContext;
-import org.talend.daikon.properties.Property;
-import org.talend.daikon.properties.PropertyFactory;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 /**
  * this class provide a simple mechanism for handle Properties component with a fixed set of connection (hence a fixed

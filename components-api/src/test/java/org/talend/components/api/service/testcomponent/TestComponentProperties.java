@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.api.service.testcomponent;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.property.PropertyFactory.*;
 import static org.talend.daikon.properties.presentation.Widget.*;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ import org.talend.components.api.service.testcomponent.nestedprop.NestedComponen
 import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.Properties;
-import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;

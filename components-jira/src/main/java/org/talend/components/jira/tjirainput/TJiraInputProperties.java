@@ -25,9 +25,9 @@ import org.talend.components.jira.JiraProperties;
 import org.talend.components.jira.Resource;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.properties.Properties;
-import org.talend.daikon.properties.Property;
-import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 /**
  * {@link Properties} for Jira input component.

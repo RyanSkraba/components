@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
 import static org.talend.daikon.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.property.PropertyFactory.*;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -24,9 +24,9 @@ import org.apache.avro.SchemaBuilder.RecordBuilder;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.daikon.avro.SchemaConstants;
-import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 public class TSalesforceOutputProperties extends SalesforceOutputProperties {

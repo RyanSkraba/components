@@ -22,10 +22,10 @@ import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.dataprep.runtime.DataPrepOutputModes;
 import org.talend.components.dataprep.runtime.RuntimeProperties;
-import org.talend.daikon.properties.Property;
-import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 /**
  * The ComponentProperties subclass provided by a component stores the configuration of a component and is used for:

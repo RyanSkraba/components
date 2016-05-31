@@ -21,7 +21,7 @@ import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.PropertiesVisitor;
-import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.property.Property;
 
 /**
  * for all details see {@link Properties}. This class adds a specific {@link ComponentProperties#returns} property which

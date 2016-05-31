@@ -58,8 +58,8 @@ import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputB
 import org.talend.components.salesforce.tsalesforceoutputbulkexec.TSalesforceOutputBulkExecDefinition;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.util.AvroUtils;
-import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
 
 import com.sforce.async.AsyncApiException;

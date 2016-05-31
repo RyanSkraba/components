@@ -14,7 +14,7 @@ package org.talend.components.api.component;
 
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.Properties;
-import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.property.Property;
 
 /**
  * class used to identify connections with a given {@link Property} or {@link Properties} by using their path relative

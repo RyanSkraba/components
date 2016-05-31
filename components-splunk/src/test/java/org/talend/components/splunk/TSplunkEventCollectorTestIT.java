@@ -20,8 +20,8 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.test.SpringApp;
 import org.talend.components.splunk.objects.SplunkJSONEventField;
-import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)

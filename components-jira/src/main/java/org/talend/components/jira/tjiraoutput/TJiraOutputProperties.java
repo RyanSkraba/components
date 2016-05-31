@@ -12,11 +12,10 @@
 // ============================================================================
 package org.talend.components.jira.tjiraoutput;
 
-import static org.talend.components.jira.Action.DELETE;
-import static org.talend.components.jira.Action.INSERT;
-import static org.talend.components.jira.Mode.ADVANCED;
-import static org.talend.components.jira.Resource.ISSUE;
-import static org.talend.daikon.avro.SchemaConstants.TALEND_IS_LOCKED;
+import static org.talend.components.jira.Action.*;
+import static org.talend.components.jira.Mode.*;
+import static org.talend.components.jira.Resource.*;
+import static org.talend.daikon.avro.SchemaConstants.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,33 +32,33 @@ import org.talend.components.jira.Mode;
 import org.talend.components.jira.Resource;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.properties.Properties;
-import org.talend.daikon.properties.Property;
-import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 /**
  * {@link Properties} for Jira output component.
  */
 public class TJiraOutputProperties extends JiraProperties {
-    
+
     /**
      * Output result properties names
      */
     public static final String NB_LINE = "NB_LINE";
-    
+
     public static final String NB_SUCCESS = "NB_SUCCESS";
 
     public static final String NB_REJECT = "NB_REJECT";
-    
+
     /**
      * Corresponding schemas for each Action
      */
     private static final Schema deleteSchema;
-    
+
     private static final Schema insertSchema;
-    
+
     private static final Schema updateSchema;
-    
+
     /**
      * Initializes schema constants
      */
@@ -71,11 +70,11 @@ public class TJiraOutputProperties extends JiraProperties {
         Schema.Field deleteIdField = new Schema.Field("id", stringSchema, null, null, Order.ASCENDING);
         deleteSchema = Schema.createRecord("jira", null, null, false, Collections.singletonList(deleteIdField));
         deleteSchema.addProp(TALEND_IS_LOCKED, "true");
-        
+
         Schema.Field insertJsonField = new Schema.Field("json", stringSchema, null, null, Order.ASCENDING);
         insertSchema = Schema.createRecord("jira", null, null, false, Collections.singletonList(insertJsonField));
         insertSchema.addProp(TALEND_IS_LOCKED, "true");
-        
+
         Schema.Field updateIdField = new Schema.Field("id", stringSchema, null, null, Order.ASCENDING);
         Schema.Field updateJsonField = new Schema.Field("json", stringSchema, null, null, Order.ASCENDING);
         List<Schema.Field> fields = Arrays.asList(updateIdField, updateJsonField);
@@ -117,7 +116,7 @@ public class TJiraOutputProperties extends JiraProperties {
         action.setValue(INSERT);
         deleteSubtasks.setValue(true);
         mode.setValue(ADVANCED);
-        
+
         returns = ComponentPropertyFactory.newReturnsProperty();
         ComponentPropertyFactory.newReturnProperty(returns, PropertyFactory.newInteger(NB_LINE));
         ComponentPropertyFactory.newReturnProperty(returns, PropertyFactory.newInteger(NB_SUCCESS));
@@ -133,7 +132,7 @@ public class TJiraOutputProperties extends JiraProperties {
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(action);
         mainForm.addColumn(deleteSubtasks);
-        
+
         Form advancedForm = new Form(this, Form.ADVANCED);
     }
 
@@ -186,17 +185,18 @@ public class TJiraOutputProperties extends JiraProperties {
             return Collections.singleton(MAIN_CONNECTOR);
         }
     }
-    
+
     /**
      * Refreshes form layout after action is changed
      */
     public void afterAction() {
         refreshLayout(getForm(Form.MAIN));
     }
-    
+
     /**
      * Refreshes form layout after resource is changed
      */
+    @Override
     public void afterResource() {
         refreshLayout(getForm(Form.MAIN));
     }
