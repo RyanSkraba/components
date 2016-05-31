@@ -83,16 +83,26 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         public ValidationResult afterModuleName() throws Exception {
             ValidationResult validationResult = super.afterModuleName();
             List<String> fieldNames = getFieldNames(main.schema);
-            upsertKeyColumn.setPossibleValues(fieldNames);
+            
+            if(isUpsertKeyColumnClosedList()) {
+                upsertKeyColumn.setPossibleValues(fieldNames);
+            }
+            
             upsertRelationTable.columnName.setPossibleValues(fieldNames);
             return validationResult;
         }
+    }
+    
+    protected boolean isUpsertKeyColumnClosedList() {
+        return true;
     }
 
     public static final boolean POLY = true;
 
     public void beforeUpsertKeyColumn() {
-        upsertKeyColumn.setPossibleValues(getFieldNames(module.main.schema));
+        if(isUpsertKeyColumnClosedList()) {
+            upsertKeyColumn.setPossibleValues(getFieldNames(module.main.schema));
+        }
     }
 
     public void beforeUpsertRelationTable() {
@@ -121,7 +131,12 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         super.setupLayout();
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(outputAction);
-        mainForm.addColumn(widget(upsertKeyColumn).setWidgetType(WidgetType.ENUMERATION));
+        
+        if(isUpsertKeyColumnClosedList()) {
+            mainForm.addColumn(widget(upsertKeyColumn).setWidgetType(WidgetType.ENUMERATION));
+        } else {
+            mainForm.addColumn(upsertKeyColumn);
+        }
 
         Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.WidgetType.TABLE));
