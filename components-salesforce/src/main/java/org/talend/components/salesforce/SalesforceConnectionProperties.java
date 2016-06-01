@@ -168,6 +168,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
     public ValidationResult validateTestConnection() throws Exception {
         ValidationResult vr = SalesforceSourceOrSink.validateConnection(this);
         if (vr.getStatus() == ValidationResult.Result.OK) {
+            vr.setMessage("Connection successfull");
             getForm(FORM_WIZARD).setAllowForward(true);
         } else {
             getForm(FORM_WIZARD).setAllowForward(false);
