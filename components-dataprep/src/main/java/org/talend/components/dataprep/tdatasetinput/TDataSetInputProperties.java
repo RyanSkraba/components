@@ -96,20 +96,13 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
         form.addRow(Widget.widget(fetchSchema).setWidgetType(Widget.WidgetType.BUTTON));
     }
 
-    String removeQuotes(String str) {
-        if (str.startsWith("\"") && str.endsWith("\""))
-            return str.substring(1, str.length() - 1);
-        return str;
-    }
-
     public ValidationResult afterFetchSchema() {
         if (!isRequiredFieldRight()) {
             return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
                     .setMessage("All fields is required. You don't set one of them");
         } else {
-            DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(removeQuotes(url.getStringValue()),
-                    removeQuotes(login.getStringValue()), removeQuotes(pass.getStringValue()),
-                    removeQuotes(dataSetName.getStringValue()));
+            DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(url.getStringValue(),
+                    login.getStringValue(), pass.getStringValue(), dataSetName.getStringValue());
             List<Column> columnList = null;
             boolean wasProblem = false;
             ValidationResult validationResult = ValidationResult.OK;
