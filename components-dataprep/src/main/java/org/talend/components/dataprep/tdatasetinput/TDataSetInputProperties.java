@@ -12,11 +12,6 @@
 // ============================================================================
 package org.talend.components.dataprep.tdatasetinput;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +32,11 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The ComponentProperties subclass provided by a component stores the configuration of a component and is used for:
@@ -104,7 +104,8 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
 
     public ValidationResult afterFetchSchema() {
         if (!isRequiredFieldRight()) {
-            return new ValidationResult().setStatus(ValidationResult.Result.ERROR);
+            return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
+                    .setMessage("All fields is required. You don't set one of them");
         } else {
             DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(removeQuotes(url.getStringValue()),
                     removeQuotes(login.getStringValue()), removeQuotes(pass.getStringValue()),
