@@ -1,9 +1,5 @@
 package org.talend.components.dataprep.tdatasetinput;
 
-import java.util.Collections;
-
-import javax.inject.Inject;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,6 +9,9 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.SpringApp;
+
+import javax.inject.Inject;
+import java.util.Collections;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -39,12 +38,5 @@ public class TDataSetInputDefinitionAndPropertiesTest {
         Assert.assertNotNull(properties.getSchema());
         Assert.assertEquals(Collections.singleton(connector), properties.getAllSchemaPropertiesConnectors(true));
         Assert.assertEquals(Collections.emptySet(), properties.getAllSchemaPropertiesConnectors(false));
-    }
-
-    @Test
-    public void testRemoveQuotes() {
-        TDataSetInputProperties properties = (TDataSetInputProperties) componentService.getComponentProperties("tDatasetInput");
-        Assert.assertEquals("somestr", properties.removeQuotes("\"somestr\""));
-        Assert.assertEquals("somestr", properties.removeQuotes("somestr"));
     }
 }
