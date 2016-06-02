@@ -32,6 +32,9 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.test.SimpleComponentRegistry;
+import org.talend.components.jira.runtime.reader.JiraProjectIdReader;
+import org.talend.components.jira.runtime.reader.JiraProjectsReader;
+import org.talend.components.jira.runtime.reader.JiraReader;
 import org.talend.components.jira.tjirainput.TJiraInputDefinition;
 import org.talend.components.jira.tjirainput.TJiraInputProperties;
 
@@ -91,9 +94,9 @@ public class JiraReaderTestIT {
         container = new DefaultComponentRuntimeContainerImpl();
         
         TJiraInputProperties properties = (TJiraInputProperties) componentService.getComponentProperties("tJIRAInput");
-        properties.host.setValue(HOST_PORT);
-        properties.userPassword.userId.setValue(EMPTY_USER);
-        properties.userPassword.password.setValue(PASS);
+        properties.connection.hostUrl.setValue(HOST_PORT);
+        properties.connection.basicAuthentication.userId.setValue(EMPTY_USER);
+        properties.connection.basicAuthentication.password.setValue(PASS);
         
         source = new JiraSource();
         source.initialize(container, properties);
@@ -136,9 +139,9 @@ public class JiraReaderTestIT {
         container = new DefaultComponentRuntimeContainerImpl();
         
         TJiraInputProperties properties = (TJiraInputProperties) componentService.getComponentProperties("tJIRAInput");
-        properties.host.setValue(HOST_PORT);
-        properties.userPassword.userId.setValue(USER);
-        properties.userPassword.password.setValue(PASS);
+        properties.connection.hostUrl.setValue(HOST_PORT);
+        properties.connection.basicAuthentication.userId.setValue(USER);
+        properties.connection.basicAuthentication.password.setValue(PASS);
         
         source = new JiraSource();
         source.initialize(container, properties);

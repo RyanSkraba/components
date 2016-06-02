@@ -16,18 +16,21 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import org.apache.commons.codec.binary.Base64;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,9 +78,29 @@ public class Rest {
      */
     public Rest(String hostPort) {
         headers = new LinkedList<Header>();
+        if (!hostPort.endsWith("/")) {
+            hostPort = hostPort + "/";
+        }
         this.hostPort = hostPort;
         contentType = ContentType.create("application/json", StandardCharsets.UTF_8);
     }
+    
+    /**
+     * Checks connection to the host
+     * 
+     * @return HTTP status code
+     * @throws IOException if host is unreachable
+     */
+    public int checkConnection() throws IOException {
+        int statusCode = 0;
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpHead httpHead = new HttpHead(hostPort);
+            try (CloseableHttpResponse response = httpClient.execute(httpHead)) {
+                statusCode = response.getStatusLine().getStatusCode();
+            }
+        }
+        return statusCode;
+    }   
 
     /**
      * Executes Http Get request
@@ -113,8 +136,8 @@ public class Rest {
             return get.execute().returnContent().asString();
         } catch (URISyntaxException e) {
             LOG.debug("Wrong URI. {}", e.getMessage());
+            throw new IOException("Wrong URI", e);
         }
-        return null;
     }
 
     /**
@@ -123,14 +146,36 @@ public class Rest {
      * @param resource REST API resource. E. g. issue/{issueId}
      * @return http status code
      * @throws IOException
-     * @throws ClientProtocolException
      */
-    public int delete(String resource) throws ClientProtocolException, IOException {
-        Request delete = Request.Delete(hostPort + resource);
-        for (Header header : headers) {
-            delete.addHeader(header);
+    @SuppressWarnings("unchecked")
+    public int delete(String resource) throws IOException {
+        return delete(resource, Collections.EMPTY_MAP);
+    }
+    
+    /**
+     * Executes Http Delete request
+     * 
+     * @param resource REST API resource. E. g. issue/{issueId}
+     * @param parameters http query parameters
+     * @return http status code
+     * @throws IOException
+     */
+    public int delete(String resource, Map<String, Object> parameters) throws IOException {
+        try {
+            URIBuilder builder = new URIBuilder(hostPort + resource);
+            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                builder.addParameter(entry.getKey(), entry.getValue().toString());
+            }
+            URI uri = builder.build();
+            Request delete = Request.Delete(uri);
+            for (Header header : headers) {
+                delete.addHeader(header);
+            }
+            return delete.execute().returnResponse().getStatusLine().getStatusCode();
+        } catch (URISyntaxException e) {
+            LOG.debug("Wrong URI. {}", e.getMessage());
+            throw new IOException("Wrong URI", e);
         }
-        return delete.execute().returnResponse().getStatusLine().getStatusCode();
     }
 
     /**
@@ -138,20 +183,16 @@ public class Rest {
      * 
      * @param resource REST API resource. E. g. issue/{issueId}
      * @param body message body
-     * @return response result
+     * @return response status code
      * @throws ClientProtocolException
      * @throws IOException
      */
-    public String post(String resource, String body) throws ClientProtocolException, IOException {
+    public int post(String resource, String body) throws ClientProtocolException, IOException {
         Request post = Request.Post(hostPort + resource).bodyString(body, contentType);
         for (Header header : headers) {
             post.addHeader(header);
         }
-        Content content = post.execute().returnContent();
-        if (content != null) {
-            return content.asString();
-        }
-        return null;
+        return post.execute().returnResponse().getStatusLine().getStatusCode();
     }
 
     /**

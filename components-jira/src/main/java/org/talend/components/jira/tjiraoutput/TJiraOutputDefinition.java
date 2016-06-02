@@ -10,46 +10,46 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.jira.tjirainput;
+package org.talend.components.jira.tjiraoutput;
 
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.InputComponentDefinition;
+import org.talend.components.api.component.OutputComponentDefinition;
 import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.Trigger.TriggerType;
-import org.talend.components.api.component.runtime.Source;
+import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jira.JiraDefinition;
-import org.talend.components.jira.runtime.JiraSource;
+import org.talend.components.jira.runtime.JiraSink;
 
 import aQute.bnd.annotation.component.Component;
 
 /**
- * Jira input component definition
+ * Jira output component definition
  */
-@Component(name = Constants.COMPONENT_BEAN_PREFIX + TJiraInputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TJiraInputDefinition extends JiraDefinition implements InputComponentDefinition {
-
+@Component(name = Constants.COMPONENT_BEAN_PREFIX + TJiraOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+public class TJiraOutputDefinition extends JiraDefinition implements OutputComponentDefinition{
+    
     /**
-     * Jira input component name
+     * Jira output component name
      */
-    public static final String COMPONENT_NAME = "tJIRAInput";
+    public static final String COMPONENT_NAME = "tJIRAOutput";
     
     /**
      * Constructor sets component name
      */
-    public TJiraInputDefinition() {
+    public TJiraOutputDefinition() {
         super(COMPONENT_NAME);
         setTriggers(new Trigger(TriggerType.ITERATE, 1, 1), new Trigger(TriggerType.SUBJOB_OK, 1, 0),
                 new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
-    }
-
+    }    
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public Source getRuntime() {
-        return new JiraSource();
+    public Sink getRuntime() {
+        return new JiraSink();
     }
 
     /**
@@ -57,7 +57,7 @@ public class TJiraInputDefinition extends JiraDefinition implements InputCompone
      */
     @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
-        return TJiraInputProperties.class;
+        return TJiraOutputProperties.class;
     }
-    
+
 }

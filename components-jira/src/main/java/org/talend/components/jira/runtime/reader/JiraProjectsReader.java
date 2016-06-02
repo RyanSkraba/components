@@ -10,40 +10,38 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.jira.runtime;
+package org.talend.components.jira.runtime.reader;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jira.datum.Entity;
+import org.talend.components.jira.datum.Projects;
+import org.talend.components.jira.runtime.JiraSource;
 
 /**
- * {@link JiraReader} for /rest/api/2/project/{projectIdOrKey} Jira REST API resource
+ * {@link JiraReader} for rest/api/2/project Jira REST API resource
  */
-public class JiraProjectIdReader extends JiraNoPaginationReader {
-    
-    private static final String REST_RESOURCE = "rest/api/2/project";
+public class JiraProjectsReader extends JiraNoPaginationReader {
 
+    private static final String REST_RESOURCE = "rest/api/2/project";
+    
     /**
      * {@inheritDoc}
      */
-    public JiraProjectIdReader(JiraSource source, RuntimeContainer container, String id) {
-        super(source, REST_RESOURCE + "/" + id, container);
+    public JiraProjectsReader(JiraSource source, RuntimeContainer container) {
+        super(source, REST_RESOURCE, container);
     }
 
     /**
-     * Wraps response into entity and returns {@link List} with only 1 entity
-     * It doesn't need to make additional action, because Jira server already
-     * returns single project json
+     * Retrieves project entities from response
      * 
      * @param response http response
      * @return {@link List} of entities retrieved from response
      */
-    @Override
     protected List<Entity> processResponse(String response) {
-        Entity entity = new Entity(response);
-        return Collections.singletonList(entity);
+        Projects project = new Projects(response);
+        List<Entity> entities = project.getEntities();
+        return entities;
     }
-
 }

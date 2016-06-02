@@ -10,11 +10,12 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.jira.runtime;
+package org.talend.components.jira.runtime.reader;
 
 import java.io.IOException;
 
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.jira.runtime.JiraSource;
 
 /**
  * Common {@link JiraReader} for Jira REST API resources, which don't support pagination, e.g. Project resource

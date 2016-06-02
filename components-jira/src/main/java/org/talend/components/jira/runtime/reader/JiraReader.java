@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.jira.runtime;
+package org.talend.components.jira.runtime.reader;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -30,6 +30,7 @@ import org.talend.components.jira.avro.IssueAdapterFactory;
 import org.talend.components.jira.avro.IssueIndexedRecord;
 import org.talend.components.jira.connection.Rest;
 import org.talend.components.jira.datum.Entity;
+import org.talend.components.jira.runtime.JiraSource;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 
 /**
@@ -114,14 +115,14 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
         rest = new Rest(source.getHostPort());
         String userId = source.getUserId();
         if (userId != null && !userId.isEmpty()) {
-            rest.setCredentials(userId, source.getPassword());
+            rest.setCredentials(userId, source.getUserPassword());
             LOG.debug("{} user is used", userId);
         } else {
             LOG.debug("{} user is used", "Anonymous");
         }
         
         factory = new IssueAdapterFactory();
-        factory.setSchema(source.getDataSchema());
+        factory.setSchema(source.getSchema());
     }
 
     /**

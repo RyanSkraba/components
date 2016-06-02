@@ -1,0 +1,6 @@
+{
+    "key": "ITP",
+    "name": "Integration Test Project",
+    "projectTemplateKey": "com.atlassian.jira-core-project-templates:jira-core-project-management",
+    "lead": "UserID"
+}
