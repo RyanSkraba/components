@@ -12,23 +12,30 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.component.runtime.Sink;
+import org.talend.components.api.component.runtime.SinkWithFeedback;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
-public class SalesforceSink extends SalesforceSourceOrSink implements Sink {
+public class SalesforceSink extends SalesforceSourceOrSink implements SinkWithFeedback<IndexedRecord, IndexedRecord> {
 
     /** Default serial version UID. */
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOG = LoggerFactory.getLogger(SalesforceSink.class);
+
+    private final List<IndexedRecord> successfulWrites = new ArrayList<>();
+
+    private final List<IndexedRecord> rejectedWrites = new ArrayList<>();
 
     public SalesforceSink() {
     }
@@ -47,7 +54,7 @@ public class SalesforceSink extends SalesforceSourceOrSink implements Sink {
     }
 
     @Override
-    public WriteOperation<?> createWriteOperation() {
+    public SalesforceWriteOperation createWriteOperation() {
         return new SalesforceWriteOperation(this);
     }
 
@@ -58,7 +65,17 @@ public class SalesforceSink extends SalesforceSourceOrSink implements Sink {
      * @return the properties
      */
     public TSalesforceOutputProperties getSalesforceOutputProperties() {
-        return (TSalesforceOutputProperties ) properties;
+        return (TSalesforceOutputProperties) properties;
+    }
+
+    @Override
+    public List<IndexedRecord> getSuccessfulWrites() {
+        return successfulWrites;
+    }
+
+    @Override
+    public List<IndexedRecord> getRejectedWrites() {
+        return rejectedWrites;
     }
 
 }

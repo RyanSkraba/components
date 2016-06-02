@@ -148,66 +148,6 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         }
     }
 
-    SalesforceRuntimeTestUtil util = new SalesforceRuntimeTestUtil();
-
-    @Test
-    public void testRejectByUpdateAction() throws Exception {
-        List<String> ids = util.createTestData();
-
-        String id = ids.get(0);
-
-        List<IndexedRecord> outputRows = new ArrayList<IndexedRecord>();
-        GenericData.Record datarow = new GenericData.Record(util.getTestSchema4());
-        datarow.put("Id", id);
-        datarow.put("FirstName", "Wei");
-        datarow.put("LastName", "Wang");
-        datarow.put("Phone", "010-89492686");// update the field
-        outputRows.add(datarow);
-
-        datarow = new GenericData.Record(util.getTestSchema4());
-        datarow.put("Id", "not_exist");// should reject
-        datarow.put("FirstName", "Who");
-        datarow.put("LastName", "Who");
-        datarow.put("Phone", "010-89492686");
-        outputRows.add(datarow);
-
-        TSalesforceOutputProperties props = createSalesforceoutputProperties(util.getTestModuleName());
-        setupProps(props.connection, !SalesforceTestBase.ADD_QUOTES);
-
-        props.module.moduleName.setValue(util.getTestModuleName());
-        props.module.main.schema.setValue(util.getTestSchema4());
-
-        props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.UPDATE);
-
-        Writer<WriterResult> writer = createSalesforceOutputWriter(props);
-
-        writer.open("foo");
-
-        java.util.Map<String, Object> reject_info = null;
-        try {
-            for (IndexedRecord row : outputRows) {
-                try {
-                    writer.write(row);
-                } catch (DataRejectException e) {
-                    reject_info = e.getRejectInfo();
-                }
-            }
-
-            assertTrue(reject_info != null);
-            assertEquals("Id", reject_info.get("errorFields"));
-            assertEquals("MALFORMED_ID", reject_info.get("errorCode"));
-        } finally {
-            try {
-                WriterResult result = writer.close();
-                int success_count = (Integer) adaptor.getComponentData(adaptor.getCurrentComponentId(),
-                        SalesforceOutputProperties.NB_SUCCESS_NAME);
-                assertEquals(1, success_count);
-            } finally {
-                util.deleteTestData(ids);
-            }
-        }
-    }
-
     public Writer<WriterResult> createSalesforceOutputWriter(TSalesforceOutputProperties props) {
         SalesforceSink salesforceSink = new SalesforceSink();
         salesforceSink.initialize(adaptor, props);

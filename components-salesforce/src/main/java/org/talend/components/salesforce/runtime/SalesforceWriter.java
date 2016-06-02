@@ -21,12 +21,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.exception.DataRejectException;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
@@ -43,29 +43,29 @@ import com.sforce.ws.bind.XmlObject;
 
 final class SalesforceWriter implements Writer<WriterResult> {
 
-    private SalesforceWriteOperation salesforceWriteOperation;
+    private final SalesforceWriteOperation salesforceWriteOperation;
 
     private PartnerConnection connection;
 
     private String uId;
 
-    private SalesforceSink sink;
+    private final SalesforceSink sink;
 
-    private RuntimeContainer container;
+    private final RuntimeContainer container;
 
-    private TSalesforceOutputProperties sprops;
+    private final TSalesforceOutputProperties sprops;
 
     private String upsertKeyColumn;
 
-    protected List<String> deleteItems;
+    protected final List<IndexedRecord> deleteItems;
 
-    protected List<SObject> insertItems;
+    protected final List<IndexedRecord> insertItems;
 
-    protected List<SObject> upsertItems;
+    protected final List<IndexedRecord> upsertItems;
 
-    protected List<SObject> updateItems;
+    protected final List<IndexedRecord> updateItems;
 
-    protected int commitLevel;
+    protected final int commitLevel;
 
     protected boolean exceptionForErrors;
 
@@ -74,6 +74,8 @@ final class SalesforceWriter implements Writer<WriterResult> {
     private int successCount;
 
     private int rejectCount;
+
+    private int deleteFieldId = -1;
 
     private transient IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory;
 
@@ -123,75 +125,72 @@ final class SalesforceWriter implements Writer<WriterResult> {
         }
         IndexedRecord input = factory.convertToAvro(datum);
 
-        if (!TSalesforceOutputProperties.OutputAction.DELETE.equals(sprops.outputAction.getValue())) {
-            SObject so = new SObject();
-            so.setType(sprops.module.moduleName.getStringValue());
-            Map<String, Map<String, String>> referenceFieldsMap = null;
-            boolean isUpsert = SalesforceOutputProperties.OutputAction.UPSERT.equals(sprops.outputAction.getValue());
-            if (isUpsert) {
-                referenceFieldsMap = getReferenceFieldsMap();
+        // Clean the feedback records at each write.
+        salesforceWriteOperation.getSink().getSuccessfulWrites().clear();
+        salesforceWriteOperation.getSink().getRejectedWrites().clear();
+
+        switch (sprops.outputAction.getValue()) {
+        case INSERT:
+            insert(input);
+            break;
+        case UPDATE:
+            update(input);
+            break;
+        case UPSERT:
+            upsert(input);
+            break;
+        case DELETE:
+            delete(input);
+        }
+    }
+
+    private SObject createSObject(IndexedRecord input) {
+        SObject so = new SObject();
+        so.setType(sprops.module.moduleName.getStringValue());
+        for (Schema.Field f : input.getSchema().getFields()) {
+            Object value = input.get(f.pos());
+            if (value != null) {
+                Schema.Field se = schema.getField(f.name());
+                if (se != null) {
+                    addSObjectField(so, se.schema().getType(), se.name(), value);
+                }
             }
-            for (Schema.Field f : input.getSchema().getFields()) {
-                Object value = input.get(f.pos());
-                if (value != null) {
-                    Schema.Field se = schema.getField(f.name());
-                    if (se != null) {
-                        if (isUpsert && referenceFieldsMap != null && referenceFieldsMap.get(se.name()) != null) {
-                            Map<String, String> relationMap = referenceFieldsMap.get(se.name());
-                            String lookupFieldName = relationMap.get("lookupFieldName");
-                            so.setField(lookupFieldName, null);
-                            so.getChild(lookupFieldName).setField("type", relationMap.get("lookupFieldModuleName"));
-                            addSObjectField(so.getChild(lookupFieldName), se.schema().getType(),
-                                    relationMap.get("lookupFieldExternalIdName"), value);
-                        } else {
-                            addSObjectField(so, se.schema().getType(), se.name(), value);
-                        }
+        }
+        return so;
+    }
+
+    private SObject createSObjectForUpsert(IndexedRecord input) {
+        SObject so = new SObject();
+        so.setType(sprops.module.moduleName.getStringValue());
+        Map<String, Map<String, String>> referenceFieldsMap = getReferenceFieldsMap();
+        for (Schema.Field f : input.getSchema().getFields()) {
+            Object value = input.get(f.pos());
+            if (value != null) {
+                Schema.Field se = schema.getField(f.name());
+                if (se != null) {
+                    if (referenceFieldsMap != null && referenceFieldsMap.get(se.name()) != null) {
+                        Map<String, String> relationMap = referenceFieldsMap.get(se.name());
+                        String lookupFieldName = relationMap.get("lookupFieldName");
+                        so.setField(lookupFieldName, null);
+                        so.getChild(lookupFieldName).setField("type", relationMap.get("lookupFieldModuleName"));
+                        addSObjectField(so.getChild(lookupFieldName), se.schema().getType(),
+                                relationMap.get("lookupFieldExternalIdName"), value);
+                    } else {
+                        addSObjectField(so, se.schema().getType(), se.name(), value);
                     }
                 }
             }
-
-            switch (sprops.outputAction.getValue()) {
-            case INSERT:
-                insert(so);
-                break;
-            case UPDATE:
-                update(so);
-                break;
-            case UPSERT:
-                upsert(so);
-                break;
-            case DELETE:
-                // See below
-                throw new RuntimeException("Impossible");
-            }
-        } else { // DELETE
-            String id = getIdValue(input);
-            if (id != null) {
-                delete(id);
-            }
         }
+        return so;
     }
 
-    protected String getIdValue(IndexedRecord input) {
-        String ID = "Id";
-        Schema.Field idField = input.getSchema().getField(ID);
-        if (null != idField) {
-            return (String) input.get(idField.pos());
-        }
-        throw new RuntimeException(ID + " not found");
-    }
-
-    protected void addSObjectField(XmlObject xmlObject, Schema.Type expected, String fieldName, Object value) {
+    private void addSObjectField(XmlObject xmlObject, Schema.Type expected, String fieldName, Object value) {
         Object valueToAdd = null;
         // Convert stuff here
         switch (expected) {
         case BYTES:
             valueToAdd = Charset.defaultCharset().decode(ByteBuffer.wrap((byte[]) value)).toString();
             break;
-        // case DATE:
-        // case DATETIME:
-        // valueToAdd = container.formatDate((Date) value, se.getPattern());
-        // break;
         default:
             valueToAdd = value;
             break;
@@ -199,57 +198,31 @@ final class SalesforceWriter implements Writer<WriterResult> {
         xmlObject.setField(fieldName, valueToAdd);
     }
 
-    protected SaveResult[] insert(SObject sObject) throws IOException {
-        insertItems.add(sObject);
+    private SaveResult[] insert(IndexedRecord input) throws IOException {
+        insertItems.add(input);
         return doInsert();
     }
 
-    protected SaveResult[] doInsert() throws IOException {
+    private SaveResult[] doInsert() throws IOException {
         if (insertItems.size() >= commitLevel) {
-            SObject[] accs = insertItems.toArray(new SObject[insertItems.size()]);
+            SObject[] accs = new SObject[insertItems.size()];
+            for (int i = 0; i < insertItems.size(); i++)
+                accs[i] = createSObject(insertItems.get(i));
+
             String[] changedItemKeys = new String[accs.length];
-            SaveResult[] sr;
-            try {
-                sr = connection.create(accs);
-                insertItems.clear();
-                if (sr != null && sr.length != 0) {
-                    int batch_idx = -1;
-                    for (SaveResult result : sr) {
-                        handleResults(result.getSuccess(), result.getErrors(), changedItemKeys, ++batch_idx);
-                    }
-                }
-                return sr;
-            } catch (ConnectionException e) {
-                throw new IOException(e);
-            }
-        }
-        return null;
-    }
-
-    protected SaveResult[] update(SObject sObject) throws IOException {
-        updateItems.add(sObject);
-        return doUpdate();
-    }
-
-    protected SaveResult[] doUpdate() throws IOException {
-        if (updateItems.size() >= commitLevel) {
-            SObject[] upds = updateItems.toArray(new SObject[updateItems.size()]);
-            String[] changedItemKeys = new String[upds.length];
-            for (int ix = 0; ix < upds.length; ++ix) {
-                changedItemKeys[ix] = upds[ix].getId();
-            }
             SaveResult[] saveResults;
             try {
-                saveResults = connection.update(upds);
-                updateItems.clear();
-                upds = null;
-
+                saveResults = connection.create(accs);
                 if (saveResults != null && saveResults.length != 0) {
                     int batch_idx = -1;
-                    for (SaveResult result : saveResults) {
-                        handleResults(result.getSuccess(), result.getErrors(), changedItemKeys, ++batch_idx);
+                    for (int i = 0; i < saveResults.length; i++) {
+                        if (saveResults[i].getSuccess())
+                            handleSuccess(insertItems.get(i), saveResults[i].getId());
+                        else
+                            handleReject(insertItems.get(i), saveResults[i].getErrors(), changedItemKeys, ++batch_idx);
                     }
                 }
+                insertItems.clear();
                 return saveResults;
             } catch (ConnectionException e) {
                 throw new IOException(e);
@@ -258,14 +231,54 @@ final class SalesforceWriter implements Writer<WriterResult> {
         return null;
     }
 
-    protected UpsertResult[] upsert(SObject sObject) throws IOException {
-        upsertItems.add(sObject);
+    private SaveResult[] update(IndexedRecord input) throws IOException {
+        updateItems.add(input);
+        return doUpdate();
+    }
+
+    private SaveResult[] doUpdate() throws IOException {
+        if (updateItems.size() >= commitLevel) {
+            SObject[] upds = new SObject[updateItems.size()];
+            for (int i = 0; i < updateItems.size(); i++)
+                upds[i] = createSObject(updateItems.get(i));
+
+            String[] changedItemKeys = new String[upds.length];
+            for (int ix = 0; ix < upds.length; ++ix) {
+                changedItemKeys[ix] = upds[ix].getId();
+            }
+            SaveResult[] saveResults;
+            try {
+                saveResults = connection.update(upds);
+                upds = null;
+                if (saveResults != null && saveResults.length != 0) {
+                    int batch_idx = -1;
+                    for (int i = 0; i < saveResults.length; i++) {
+                        if (saveResults[i].getSuccess())
+                            handleSuccess(updateItems.get(i), saveResults[i].getId());
+                        else
+                            handleReject(updateItems.get(i), saveResults[i].getErrors(), changedItemKeys, ++batch_idx);
+                    }
+                }
+                updateItems.clear();
+                return saveResults;
+            } catch (ConnectionException e) {
+                throw new IOException(e);
+            }
+        }
+        return null;
+    }
+
+    private UpsertResult[] upsert(IndexedRecord input) throws IOException {
+        upsertItems.add(input);
         return doUpsert();
     }
 
-    protected UpsertResult[] doUpsert() throws IOException {
+    private UpsertResult[] doUpsert() throws IOException {
         if (upsertItems.size() >= commitLevel) {
-            SObject[] upds = upsertItems.toArray(new SObject[upsertItems.size()]);
+            SObject[] upds = new SObject[upsertItems.size()];
+            for (int i = 0; i < upsertItems.size(); i++)
+                upds[i] = createSObjectForUpsert(upsertItems.get(i));
+
             String[] changedItemKeys = new String[upds.length];
             for (int ix = 0; ix < upds.length; ++ix) {
                 Object value = upds[ix].getField(upsertKeyColumn);
@@ -278,15 +291,17 @@ final class SalesforceWriter implements Writer<WriterResult> {
             UpsertResult[] upsertResults;
             try {
                 upsertResults = connection.upsert(upsertKeyColumn, upds);
-                upsertItems.clear();
                 upds = null;
-
                 if (upsertResults != null && upsertResults.length != 0) {
                     int batch_idx = -1;
-                    for (UpsertResult result : upsertResults) {
-                        handleResults(result.getSuccess(), result.getErrors(), changedItemKeys, ++batch_idx);
+                    for (int i = 0; i < upsertResults.length; i++) {
+                        if (upsertResults[i].getSuccess())
+                            handleSuccess(upsertItems.get(i), upsertResults[i].getId());
+                        else
+                            handleReject(upsertItems.get(0), upsertResults[i].getErrors(), changedItemKeys, ++batch_idx);
                     }
                 }
+                upsertItems.clear();
                 return upsertResults;
             } catch (ConnectionException e) {
                 new IOException(e);
@@ -296,77 +311,106 @@ final class SalesforceWriter implements Writer<WriterResult> {
 
     }
 
-    protected void handleResults(boolean success, Error[] resultErrors, String[] changedItemKeys, int batchIdx)
-            throws IOException {
-        // StringBuilder errors = new StringBuilder("");
-
-        Map<String, Object> resultMessage = new HashMap<String, Object>();
-
-        if (success) {
-            successCount++;
-            // TODO: send back the ID
+    private void handleSuccess(IndexedRecord input, String id) {
+        successCount++;
+        Schema outSchema = sprops.schemaFlow.schema.getValue();
+        if (outSchema == null || outSchema.getFields().size() == 0)
+            return;
+        if (input.getSchema().equals(outSchema)) {
+            sink.getSuccessfulWrites().add(input);
         } else {
-            // TODO now we use batch mode for commit the data to salesforce, but the batch size is 1 at any time, so the
-            // code is ok now, but we need fix it.
-            rejectCount++;
-            for (Error error : resultErrors) {
-                if (error.getStatusCode() != null) {
-                    resultMessage.put("errorCode", error.getStatusCode().toString());
-                }
-                if (error.getFields() != null) {
-                    StringBuffer fields = new StringBuffer();
-                    for (String field : error.getFields()) {
-                        fields.append(field);
-                        fields.append(",");
-                    }
-                    if (fields.length() > 0) {
-                        fields.deleteCharAt(fields.length() - 1);
-                    }
-                    resultMessage.put("errorFields", fields.toString());
-                }
-                resultMessage.put("errorMessage", error.getMessage());
+            IndexedRecord successful = new GenericData.Record(outSchema);
+            for (Schema.Field outField : successful.getSchema().getFields()) {
+                Object outValue = null;
+                Schema.Field inField = input.getSchema().getField(outField.name());
+                if (inField != null)
+                    outValue = input.get(inField.pos());
+                else if (TSalesforceOutputProperties.FIELD_SALESFORCE_ID.equals(outField.name()))
+                    outValue = id;
+                successful.put(outField.pos(), outValue);
             }
-
-            throw new DataRejectException(resultMessage);
-
-            /*
-             * errors = SalesforceRuntime.addLog(resultErrors, batchIdx < changedItemKeys.length ?
-             * changedItemKeys[batchIdx] : "Batch index out of bounds", null);
-             */
+            sink.getSuccessfulWrites().add(successful);
         }
-
-        /*
-         * if (exceptionForErrors && errors.toString().length() > 0) { throw new IOException(errors.toString()); }
-         */
-
     }
 
-    protected DeleteResult[] delete(String id) throws IOException {
+    private void handleReject(IndexedRecord input, Error[] resultErrors, String[] changedItemKeys, int batchIdx)
+            throws IOException {
+
+        rejectCount++;
+        Schema outSchema = sprops.schemaReject.schema.getValue();
+        if (outSchema == null || outSchema.getFields().size() == 0)
+            return;
+        if (input.getSchema().equals(outSchema)) {
+            sink.getRejectedWrites().add(input);
+        } else {
+            IndexedRecord reject = new GenericData.Record(outSchema);
+            for (Schema.Field outField : reject.getSchema().getFields()) {
+                Object outValue = null;
+                Schema.Field inField = input.getSchema().getField(outField.name());
+                if (inField != null)
+                    outValue = input.get(inField.pos());
+                else if (resultErrors.length > 0) {
+                    Error error = resultErrors[0];
+                    if (TSalesforceOutputProperties.FIELD_ERROR_CODE.equals(outField.name()))
+                        outValue = error.getStatusCode() != null ? error.getStatusCode().toString() : null;
+                    else if (TSalesforceOutputProperties.FIELD_ERROR_FIELDS.equals(outField.name())) {
+                        StringBuffer fields = new StringBuffer();
+                        for (String field : error.getFields()) {
+                            fields.append(field);
+                            fields.append(",");
+                        }
+                        if (fields.length() > 0) {
+                            fields.deleteCharAt(fields.length() - 1);
+                        }
+                        outValue = fields.toString();
+                    } else if (TSalesforceOutputProperties.FIELD_ERROR_MESSAGE.equals(outField.name()))
+                        outValue = error.getMessage();
+                }
+                reject.put(outField.pos(), outValue);
+            }
+            sink.getRejectedWrites().add(reject);
+        }
+    }
+
+    private DeleteResult[] delete(IndexedRecord input) throws IOException {
+        // Calculate the field position of the Id the first time that it is used. The Id field must be present in the
+        // schema to delete rows.
+        if (deleteFieldId == -1) {
+            String ID = "Id";
+            Schema.Field idField = input.getSchema().getField(ID);
+            if (null == idField)
+                throw new RuntimeException(ID + " not found");
+            deleteFieldId = idField.pos();
+        }
+        String id = (String) input.get(deleteFieldId);
         if (id == null) {
             return null;
         }
-        deleteItems.add(id);
+        deleteItems.add(input);
         return doDelete();
     }
 
-    protected DeleteResult[] doDelete() throws IOException {
+    private DeleteResult[] doDelete() throws IOException {
         if (deleteItems.size() >= commitLevel) {
-            String[] delIDs = deleteItems.toArray(new String[deleteItems.size()]);
+            String[] delIDs = new String[deleteItems.size()];
             String[] changedItemKeys = new String[delIDs.length];
             for (int ix = 0; ix < delIDs.length; ++ix) {
+                delIDs[ix] = (String) deleteItems.get(ix).get(deleteFieldId);
                 changedItemKeys[ix] = delIDs[ix];
             }
             DeleteResult[] dr;
             try {
                 dr = connection.delete(delIDs);
-                deleteItems.clear();
-
                 if (dr != null && dr.length != 0) {
                     int batch_idx = -1;
-                    for (DeleteResult result : dr) {
-                        handleResults(result.getSuccess(), result.getErrors(), changedItemKeys, ++batch_idx);
+                    for (int i = 0; i < dr.length; i++) {
+                        if (dr[i].getSuccess())
+                            handleSuccess(deleteItems.get(i), dr[i].getId());
+                        else
+                            handleReject(deleteItems.get(i), dr[i].getErrors(), changedItemKeys, ++batch_idx);
                     }
                 }
+                deleteItems.clear();
                 return dr;
             } catch (ConnectionException e) {
                 throw new IOException(e);
@@ -388,7 +432,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
         return new WriterResult(uId, dataCount);
     }
 
-    protected void logout() throws IOException {
+    private void logout() throws IOException {
         // Finish anything uncommitted
         doInsert();
         doDelete();
@@ -401,12 +445,11 @@ final class SalesforceWriter implements Writer<WriterResult> {
         return salesforceWriteOperation;
     }
 
-    protected Map<String, Map<String, String>> getReferenceFieldsMap() {
-        Object value = sprops.upsertRelationTable.columnName.getValue();
+    private Map<String, Map<String, String>> getReferenceFieldsMap() {
+        List<String> columns = sprops.upsertRelationTable.columnName.getValue();
         Map<String, Map<String, String>> referenceFieldsMap = null;
-        if (value != null && value instanceof List) {
+        if (columns != null) {
             referenceFieldsMap = new HashMap<>();
-            List<String> columns = (List<String>) value;
             List<String> lookupFieldModuleNames = sprops.upsertRelationTable.lookupFieldModuleName.getValue();
             List<String> lookupFieldNames = sprops.upsertRelationTable.lookupFieldName.getValue();
             List<String> externalIdFromLookupFields = sprops.upsertRelationTable.lookupFieldExternalIdName.getValue();

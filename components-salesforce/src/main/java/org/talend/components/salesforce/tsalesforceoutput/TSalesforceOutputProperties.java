@@ -31,6 +31,14 @@ import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 public class TSalesforceOutputProperties extends SalesforceOutputProperties {
 
+    public static final String FIELD_SALESFORCE_ID = "salesforce_id";
+
+    public static final String FIELD_ERROR_CODE = "errorCode";
+
+    public static final String FIELD_ERROR_FIELDS = "errorFields";
+
+    public static final String FIELD_ERROR_MESSAGE = "errorMessage";
+
     //
     // Advanced
     //
@@ -54,7 +62,7 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
     @Override
     public void setupProperties() {
         super.setupProperties();
-        
+
         module.setSchemaListener(new ISchemaListener() {
 
             @Override
@@ -71,7 +79,7 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
         Schema inputSchema = module.main.schema.getValue();
         if (!extendInsert.getValue() && retrieveInsertId.getValue() && OutputAction.INSERT.equals(outputAction.getValue())) {
 
-            Schema mainOutputSchema = createRecordBuilderFromSchema(inputSchema, "output").name("salesforce_id")
+            Schema mainOutputSchema = createRecordBuilderFromSchema(inputSchema, "output").name(FIELD_SALESFORCE_ID)
                     .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
                     .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
                     .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
@@ -82,16 +90,16 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
             schemaFlow.schema.setValue(inputSchema);
         }
 
-        Schema rejectSchema = createRecordBuilderFromSchema(inputSchema, "rejectOutput").name("errorCode") //$NON-NLS-1$ //$NON-NLS-2$
+        Schema rejectSchema = createRecordBuilderFromSchema(inputSchema, "rejectOutput").name(FIELD_ERROR_CODE) //$NON-NLS-1$ //$NON-NLS-2$
                 .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
                 // column set as non-read-only, to let the user edit the field if needed
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
-                .type().stringType().noDefault().name("errorFields")//$NON-NLS-1$
+                .type().stringType().noDefault().name(FIELD_ERROR_FIELDS)// $NON-NLS-1$
                 .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
-                .type().stringType().noDefault().name("errorMessage")//$NON-NLS-1$
+                .type().stringType().noDefault().name(FIELD_ERROR_MESSAGE)// $NON-NLS-1$
                 .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
