@@ -131,9 +131,9 @@ public class TJiraOutputProperties extends JiraProperties {
         super.setupLayout();
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(action);
-        mainForm.addColumn(deleteSubtasks);
-
+        
         Form advancedForm = new Form(this, Form.ADVANCED);
+        advancedForm.addRow(deleteSubtasks);
     }
 
     /**
@@ -142,18 +142,11 @@ public class TJiraOutputProperties extends JiraProperties {
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-
+        
+        Action actionValue = action.getValue();
+        Resource resourceValue = resource.getValue();
+        
         if (form.getName().equals(Form.MAIN)) {
-
-            Action actionValue = action.getValue();
-            Resource resourceValue = resource.getValue();
-
-            // deleteSubtasks property visibility
-            if (DELETE.equals(actionValue) && ISSUE.equals(resourceValue)) {
-                form.getWidget(deleteSubtasks.getName()).setHidden(false);
-            } else {
-                form.getWidget(deleteSubtasks.getName()).setHidden(true);
-            }
 
             // sets corresponding schema property for chosen action
             switch (actionValue) {
@@ -171,6 +164,16 @@ public class TJiraOutputProperties extends JiraProperties {
             }
             }
 
+        }
+        
+        if (form.getName().equals(Form.ADVANCED)) {
+
+            // deleteSubtasks property visibility
+            if (DELETE.equals(actionValue) && ISSUE.equals(resourceValue)) {
+                form.getWidget(deleteSubtasks.getName()).setHidden(false);
+            } else {
+                form.getWidget(deleteSubtasks.getName()).setHidden(true);
+            }
         }
     }
 
@@ -191,6 +194,7 @@ public class TJiraOutputProperties extends JiraProperties {
      */
     public void afterAction() {
         refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(Form.ADVANCED));
     }
 
     /**
@@ -198,7 +202,7 @@ public class TJiraOutputProperties extends JiraProperties {
      */
     @Override
     public void afterResource() {
-        refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(Form.ADVANCED));
     }
 
 }

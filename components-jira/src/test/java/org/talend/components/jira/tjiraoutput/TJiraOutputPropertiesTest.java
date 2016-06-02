@@ -82,7 +82,7 @@ public class TJiraOutputPropertiesTest {
         assertThat(advanced, notNullValue());
 
         Collection<Widget> mainWidgets = main.getWidgets();
-        assertThat(mainWidgets, hasSize(5));
+        assertThat(mainWidgets, hasSize(4));
         // JiraProperties widgets
         Widget connectionWidget = main.getWidget("connection");
         assertThat(connectionWidget, notNullValue());
@@ -93,11 +93,11 @@ public class TJiraOutputPropertiesTest {
         // TJiraOutputProperties widgets
         Widget actionWidget = main.getWidget("action");
         assertThat(actionWidget, notNullValue());
-        Widget deleteSubtasksWidget = main.getWidget("deleteSubtasks");
-        assertThat(deleteSubtasksWidget, notNullValue());
         
         Collection<Widget> advancedWidgets = advanced.getWidgets();
-        assertThat(advancedWidgets, is(empty()));
+        assertThat(advancedWidgets, hasSize(1));
+        Widget deleteSubtasksWidget = advanced.getWidget("deleteSubtasks");
+        assertThat(deleteSubtasksWidget, notNullValue());
     }
     
     /**
@@ -110,7 +110,7 @@ public class TJiraOutputPropertiesTest {
 
         properties.refreshLayout(properties.getForm(Form.MAIN));
 
-        boolean deleteSubtasksHidden = properties.getForm(Form.MAIN).getWidget("deleteSubtasks").isHidden();
+        boolean deleteSubtasksHidden = properties.getForm(Form.ADVANCED).getWidget("deleteSubtasks").isHidden();
         assertTrue(deleteSubtasksHidden);
     }
     
@@ -126,7 +126,7 @@ public class TJiraOutputPropertiesTest {
 
         properties.afterAction();
 
-        boolean deleteSubtasksHidden = properties.getForm(Form.MAIN).getWidget("deleteSubtasks").isHidden();
+        boolean deleteSubtasksHidden = properties.getForm(Form.ADVANCED).getWidget("deleteSubtasks").isHidden();
         assertTrue(deleteSubtasksHidden);
 
         Schema schema = (Schema) properties.schema.schema.getValue();
@@ -147,7 +147,7 @@ public class TJiraOutputPropertiesTest {
 
         properties.afterAction();
 
-        boolean deleteSubtasksHidden = properties.getForm(Form.MAIN).getWidget("deleteSubtasks").isHidden();
+        boolean deleteSubtasksHidden = properties.getForm(Form.ADVANCED).getWidget("deleteSubtasks").isHidden();
         assertTrue(deleteSubtasksHidden);
 
         Schema schema = (Schema) properties.schema.schema.getValue();
@@ -187,7 +187,7 @@ public class TJiraOutputPropertiesTest {
         
         properties.afterAction();
 
-        boolean deleteSubtasksIsHidden = properties.getForm(Form.MAIN).getWidget("deleteSubtasks").isHidden();
+        boolean deleteSubtasksIsHidden = properties.getForm(Form.ADVANCED).getWidget("deleteSubtasks").isHidden();
         assertFalse(deleteSubtasksIsHidden);
     }
     
@@ -204,7 +204,7 @@ public class TJiraOutputPropertiesTest {
         
         properties.afterAction();
 
-        boolean deleteSubtasksIsHidden = properties.getForm(Form.MAIN).getWidget("deleteSubtasks").isHidden();
+        boolean deleteSubtasksIsHidden = properties.getForm(Form.ADVANCED).getWidget("deleteSubtasks").isHidden();
         assertTrue(deleteSubtasksIsHidden);
     }
 
