@@ -14,11 +14,11 @@ package org.talend.components.common;
 
 import static org.talend.daikon.properties.property.PropertyFactory.*;
 
-import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 
-public class ProxyProperties extends ComponentProperties {
+public class ProxyProperties extends Properties {
 
     public enum ProxyType {
         HTTP,
