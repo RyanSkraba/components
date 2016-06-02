@@ -12,10 +12,6 @@
 // ============================================================================
 package org.talend.components.dataprep.runtime;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +22,22 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
 import org.talend.daikon.NamedThing;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 public class DataSetSink implements Sink {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataPrepConnectionHandler.class);
+    private static final long serialVersionUID = 3228265006313531905L;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataSetSink.class);
+
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(DataSetSink.class);
 
     RuntimeProperties runtimeProperties;
 
@@ -57,8 +64,9 @@ public class DataSetSink implements Sink {
         try {
             connectionHandler.validate();
         } catch (IOException e) {
-            LOGGER.debug("Validation isn't passed. Reason: {}", e);
-            return new ValidationResult().setStatus(ValidationResult.Result.ERROR).setMessage(e.getMessage());
+            LOGGER.debug(messages.getMessage("error.validationFailed", e));
+            return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
+                    .setMessage(messages.getMessage("error.validationFailed", e));
         }
         return ValidationResult.OK;
     }

@@ -99,7 +99,7 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
     public ValidationResult afterFetchSchema() {
         if (!isRequiredFieldRight()) {
             return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
-                    .setMessage("All fields is required. You don't set one of them");
+                    .setMessage(getI18nMessage("error.allFieldsIsRequired"));
         } else {
             DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(url.getStringValue(),
                     login.getStringValue(), pass.getStringValue(), dataSetName.getStringValue());
@@ -110,16 +110,18 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
                 connectionHandler.connect();
                 columnList = connectionHandler.readSourceSchema();
             } catch (IOException e) {
-                LOG.debug("Dataprep fetch schema error.", e);
+                LOG.debug(getI18nMessage("error.schemaIsNotFetched", e));
                 wasProblem = true;
-                validationResult = new ValidationResult().setStatus(Result.ERROR).setMessage(e.getMessage());
+                validationResult = new ValidationResult().setStatus(Result.ERROR)
+                        .setMessage(getI18nMessage("error.schemaIsNotFetched", e.getMessage()));
             } finally {
                 try {
                     connectionHandler.logout();
                 } catch (IOException e) {
-                    LOG.debug("Failed to logout to Dataprep server: {}", e);
+                    LOG.debug(getI18nMessage("error.failedToLogout", e));
                     wasProblem = true;
-                    validationResult = new ValidationResult().setStatus(Result.ERROR).setMessage(e.getMessage());
+                    validationResult = new ValidationResult().setStatus(Result.ERROR)
+                            .setMessage(getI18nMessage("error.failedToLogout", e.getMessage()));
                 }
             }
 
@@ -127,33 +129,22 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
                 return validationResult;
             }
 
-            DataPrepField[] scemaRow = new DataPrepField[columnList.size()];
+            DataPrepField[] schemaRow = new DataPrepField[columnList.size()];
             int i = 0;
             for (Column column : columnList) {
-                scemaRow[i] = new DataPrepField(column.getName(), column.getType(), null);
+                schemaRow[i] = new DataPrepField(column.getName(), column.getType(), null);
                 i++;
             }
             AvroRegistry avroRegistry = DataPrepAvroRegistry.getDataPrepInstance();
-            schema.schema.setValue(avroRegistry.inferSchema(scemaRow));
+            schema.schema.setValue(avroRegistry.inferSchema(schemaRow));
 
             return validationResult;
         }
     }
 
     private boolean isRequiredFieldRight() {
-        if (isNotNullAndNotEmpty(url.getStringValue())) {
-            return false;
-        }
-        if (isNotNullAndNotEmpty(login.getStringValue())) {
-            return false;
-        }
-        if (isNotNullAndNotEmpty(pass.getStringValue())) {
-            return false;
-        }
-        if (isNotNullAndNotEmpty(dataSetName.getStringValue())) {
-            return false;
-        }
-        return true;
+        return !isNotNullAndNotEmpty(url.getStringValue()) && !isNotNullAndNotEmpty(login.getStringValue())
+                && !isNotNullAndNotEmpty(pass.getStringValue()) && !isNotNullAndNotEmpty(dataSetName.getStringValue());
     }
 
     private boolean isNotNullAndNotEmpty(String propertyStringValue) {

@@ -17,6 +17,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -28,6 +30,12 @@ import java.util.List;
 public class DataPrepConnectionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataPrepConnectionHandler.class);
+
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(DataPrepConnectionHandler.class);
+    public static final String API_DATASETS = "/api/datasets/";
+    public static final String CONTENT_TYPE = "Content-Type";
+    public static final String TEXT_PLAIN = "text/plain";
 
     private final String url;
 
@@ -53,9 +61,8 @@ public class DataPrepConnectionHandler {
         HttpResponse response = request.execute().returnResponse();
         authorisationHeader = response.getFirstHeader("Authorization");
         if (returnStatusCode(response) != HttpServletResponse.SC_OK && authorisationHeader == null) {
-            LOGGER.error("Failed to login to Dataprep server: {}", response.getStatusLine().toString());
-            // TODO i18n
-            throw new IOException("Failed to login to Dataprep server: " + response.getStatusLine().toString());
+            LOGGER.error(messages.getMessage("error.loginFailed", response.getStatusLine()));
+            throw new IOException(messages.getMessage("error.loginFailed", response.getStatusLine()));
         }
         return response;
     }
@@ -72,8 +79,7 @@ public class DataPrepConnectionHandler {
             Request request = Request.Post(url + "/logout?client-app=STUDIO").addHeader(authorisationHeader);
             response = request.execute().returnResponse();
             if (returnStatusCode(response) != HttpServletResponse.SC_OK && authorisationHeader != null) {
-                // TODO i18n
-                LOGGER.error("Failed to logout to Dataprep server: {}", response.getStatusLine().toString());
+                LOGGER.error(messages.getMessage("error.logoutFailed", response.getStatusLine()));
             }
         }
         return response;
@@ -88,22 +94,20 @@ public class DataPrepConnectionHandler {
             connect();
             logout();
         } catch (IOException e) {
-            LOGGER.debug("Validation isn't passed. Reason: {}", e.getMessage());
-            // TODO i18n
-            throw new IOException("Validation isn't passed. Reason: " + e.getMessage(), e);
+            LOGGER.debug(messages.getMessage("error.validationFailed", e.getMessage()));
+            throw new IOException(messages.getMessage("error.validationFailed", e));
         }
     }
 
     public DataPrepStreamMapper readDataSetIterator() throws IOException {
-        Request request = Request.Get(url + "/api/datasets/" + dataSetName + "?metadata=false").addHeader(authorisationHeader);
-        HttpResponse current = request.execute().returnResponse();
-        if (returnStatusCode(current) != HttpServletResponse.SC_OK) {
-            LOGGER.error("Failed to retrieve DateSet from Dataprep server : " + returnStatusCode(current));
-            // TODO i18n
-            throw new IOException("Failed to connect to Dataprep server : " + returnStatusCode(current));
+        Request request = Request.Get(url + API_DATASETS + dataSetName + "?metadata=false").addHeader(authorisationHeader);
+        HttpResponse response = request.execute().returnResponse();
+        if (returnStatusCode(response) != HttpServletResponse.SC_OK) {
+            LOGGER.error(messages.getMessage("error.retrieveDatasetFailed", returnStatusCode(response)));
+            throw new IOException(messages.getMessage("error.retrieveDatasetFailed", returnStatusCode(response)));
         }
-        LOGGER.debug("Read DataSet Response: {} ", current);
-        return new DataPrepStreamMapper(current.getEntity().getContent());
+        LOGGER.debug("Read DataSet Response: {} ", response);
+        return new DataPrepStreamMapper(response.getEntity().getContent());
     }
 
     public OutputStream createInLiveDataSetMode() throws IOException {
@@ -114,18 +118,18 @@ public class DataPrepConnectionHandler {
         URL connectionUrl = new URL(url);
         urlConnection = (HttpURLConnection) connectionUrl.openConnection();
         urlConnection.setRequestMethod("POST");
-        urlConnection.setRequestProperty("Content-Type", "text/plain");
+        urlConnection.setRequestProperty(CONTENT_TYPE, TEXT_PLAIN);
         urlConnection.setDoOutput(true);
         return urlConnection.getOutputStream();
     }
 
     public OutputStream update() throws IOException {
-        URL connectionUrl = new URL(url + "/api/datasets/" + dataSetName);
+        URL connectionUrl = new URL(url + API_DATASETS + dataSetName);
         LOGGER.debug("Request is {}", connectionUrl);
         urlConnection = (HttpURLConnection) connectionUrl.openConnection();
         urlConnection.setRequestMethod("PUT");
         urlConnection.setRequestProperty(authorisationHeader.getName(), authorisationHeader.getValue());
-        urlConnection.setRequestProperty("Content-Type", "text/plain");
+        urlConnection.setRequestProperty(CONTENT_TYPE, TEXT_PLAIN);
         urlConnection.setDoOutput(true);
         return urlConnection.getOutputStream();
     }
@@ -135,13 +139,13 @@ public class DataPrepConnectionHandler {
         urlConnection = (HttpURLConnection) connectionUrl.openConnection();
         urlConnection.setRequestMethod("POST");
         urlConnection.setRequestProperty(authorisationHeader.getName(), authorisationHeader.getValue());
-        urlConnection.setRequestProperty("Content-Type", "text/plain");
+        urlConnection.setRequestProperty(CONTENT_TYPE, TEXT_PLAIN);
         urlConnection.setDoOutput(true);
         return urlConnection.getOutputStream();
     }
 
     public List<Column> readSourceSchema() throws IOException {
-        Request request = Request.Get(url + "/api/datasets/" + dataSetName + "/metadata");
+        Request request = Request.Get(url + API_DATASETS + dataSetName + "/metadata");
         request.addHeader(authorisationHeader);
 
         DataPrepStreamMapper dataPrepStreamMapper = null;
@@ -150,9 +154,8 @@ public class DataPrepConnectionHandler {
         try {
             HttpResponse response = request.execute().returnResponse();
             if (returnStatusCode(response) != HttpServletResponse.SC_OK) {
-                LOGGER.error("Failed to retrieve Schema from Dataprep server : " + returnStatusCode(response));
-                // TODO i18n
-                throw new IOException("Failed to connect to Dataprep server : " + returnStatusCode(response));
+                LOGGER.error(messages.getMessage("error.retrieveSchemaFailed", returnStatusCode(response)));
+                throw new IOException(messages.getMessage("error.retrieveSchemaFailed", returnStatusCode(response)));
             }
             dataPrepStreamMapper = new DataPrepStreamMapper(response.getEntity().getContent());
             metaData = dataPrepStreamMapper.getMetaData();
