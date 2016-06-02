@@ -119,6 +119,12 @@ public class DataPrepConnectionHandlerTest {
         connectionHandler.create().write("Hello".getBytes());
         connectionHandler.logout();
     }
+    @Test
+    public void testUpdate() throws IOException {
+        connectionHandler.connect();
+        connectionHandler.update().write("Hello".getBytes());
+        connectionHandler.logout();
+    }
 
     @Test
     public void testReadDataSetIterator() throws IOException {

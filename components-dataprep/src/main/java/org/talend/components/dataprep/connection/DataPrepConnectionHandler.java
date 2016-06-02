@@ -119,6 +119,17 @@ public class DataPrepConnectionHandler {
         return urlConnection.getOutputStream();
     }
 
+    public OutputStream update() throws IOException {
+        URL connectionUrl = new URL(url + "/api/datasets/" + dataSetName);
+        LOGGER.debug("Request is {}", connectionUrl);
+        urlConnection = (HttpURLConnection) connectionUrl.openConnection();
+        urlConnection.setRequestMethod("PUT");
+        urlConnection.setRequestProperty(authorisationHeader.getName(), authorisationHeader.getValue());
+        urlConnection.setRequestProperty("Content-Type", "text/plain");
+        urlConnection.setDoOutput(true);
+        return urlConnection.getOutputStream();
+    }
+
     public OutputStream create() throws IOException {
         URL connectionUrl = new URL(url + "/api/datasets?name=" + dataSetName);
         urlConnection = (HttpURLConnection) connectionUrl.openConnection();
