@@ -91,10 +91,10 @@ public class TJiraInputProperties extends JiraProperties {
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
+        Resource resourceValue = resource.getValue();
         if (form.getName().equals(Form.MAIN)) {
 
             // refresh after resource changed
-            Resource resourceValue = resource.getValue();
             switch (resourceValue) {
             case PROJECT: {
                 form.getWidget(jql.getName()).setHidden(true);
@@ -104,6 +104,21 @@ public class TJiraInputProperties extends JiraProperties {
             case ISSUE: {
                 form.getWidget(jql.getName()).setHidden(false);
                 form.getWidget(projectId.getName()).setHidden(true);
+                break;
+            }
+            }
+        }
+        
+        if (form.getName().equals(Form.ADVANCED)) {
+
+            // refresh after resource changed
+            switch (resourceValue) {
+            case PROJECT: {
+                form.getWidget(batchSize.getName()).setHidden(true);
+                break;
+            }
+            case ISSUE: {
+                form.getWidget(batchSize.getName()).setHidden(false);
                 break;
             }
             }

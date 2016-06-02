@@ -83,6 +83,7 @@ public abstract class JiraProperties extends FixedConnectorsComponentProperties 
      */
     public void afterResource() {
         refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(Form.ADVANCED));
     }
 
 }
