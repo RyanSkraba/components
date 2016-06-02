@@ -19,9 +19,10 @@ import org.talend.daikon.avro.AvroRegistry;
  * In certain cases, a {@link Sink} is not the "end" of a Pipeline, but can provide records to indicate more information
  * about which writes succeeded or failed.
  * 
- * This looks like a transformation, but only applies to {@link Sink} runtimes. Immediately after each write operation,
- * the methods added by this interface can be called to get the list of successful and rejected records. The list is
- * only valid immediately after the write operation and will be rewritten with the next "batch" on subsequent writes.
+ * This looks like a transformation, but only applies to {@link Sink} runtimes. Immediately after each
+ * {@link Writer#write(Object)} operation, the methods added by this interface can be called to get the list of
+ * successful and rejected records. The list is only valid immediately after the write operation and will be rewritten
+ * with the next "batch" on subsequent writes.
  * 
  * The output records that an implementing component provides follow the same rules as other outputs in the component
  * framework: it is either an {@link IndexedRecord}, or provides a mechanism to convert to an {@link IndexedRecord} via
@@ -32,7 +33,7 @@ import org.talend.daikon.avro.AvroRegistry;
  * @param RejectT the type of the output records that indicate failure. This can be the same as the incoming record or
  * can be enriched with information why the record was rejected.
  */
-public interface SinkWithFeedback<MainT, RejectT> extends Sink {
+public interface WriterWithFeedback<WriteT, MainT, RejectT> extends Writer<WriteT> {
 
     /**
      * @return The list of records immediately after a write operation that were successfully written to the

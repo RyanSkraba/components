@@ -157,7 +157,7 @@ public class SalesforceSinkTestIT {
         SalesforceWriteOperation sfWriteOp = sfSink.createWriteOperation();
         sfWriteOp.initialize(container);
 
-        Writer<WriterResult> sfWriter = sfSink.createWriteOperation().createWriter(container);
+        SalesforceWriter sfWriter = sfSink.createWriteOperation().createWriter(container);
         sfWriter.open("uid1");
 
         // Write one record.
@@ -168,9 +168,9 @@ public class SalesforceSinkTestIT {
         r.put(3, "deleteme");
         sfWriter.write(r);
 
-        assertThat(sfSink.getRejectedWrites(), empty());
-        assertThat(sfSink.getSuccessfulWrites(), hasSize(1));
-        assertThat(sfSink.getSuccessfulWrites().get(0), is(r));
+        assertThat(sfWriter.getRejectedWrites(), empty());
+        assertThat(sfWriter.getSuccessfulWrites(), hasSize(1));
+        assertThat(sfWriter.getSuccessfulWrites().get(0), is(r));
 
         // Rejected and successful writes are reset on the next record.
         r = new GenericData.Record(SCHEMA_INSERT_ACCOUNT);
@@ -180,9 +180,9 @@ public class SalesforceSinkTestIT {
         r.put(3, "deleteme2");
         sfWriter.write(r);
 
-        assertThat(sfSink.getRejectedWrites(), empty());
-        assertThat(sfSink.getSuccessfulWrites(), hasSize(1));
-        assertThat(sfSink.getSuccessfulWrites().get(0), is(r));
+        assertThat(sfWriter.getRejectedWrites(), empty());
+        assertThat(sfWriter.getSuccessfulWrites(), hasSize(1));
+        assertThat(sfWriter.getSuccessfulWrites().get(0), is(r));
 
         // Finish the Writer, WriteOperation and Sink.
         WriterResult wr1 = sfWriter.close();
@@ -216,7 +216,7 @@ public class SalesforceSinkTestIT {
         SalesforceWriteOperation sfWriteOp = sfSink.createWriteOperation();
         sfWriteOp.initialize(container);
 
-        Writer<WriterResult> sfWriter = sfSink.createWriteOperation().createWriter(container);
+        SalesforceWriter sfWriter = sfSink.createWriteOperation().createWriter(container);
         sfWriter.open("uid1");
 
         // Write one record.
@@ -227,11 +227,11 @@ public class SalesforceSinkTestIT {
         r.put(3, "deleteme");
         sfWriter.write(r);
 
-        assertThat(sfSink.getRejectedWrites(), empty());
-        assertThat(sfSink.getSuccessfulWrites(), hasSize(1));
+        assertThat(sfWriter.getRejectedWrites(), empty());
+        assertThat(sfWriter.getSuccessfulWrites(), hasSize(1));
 
         // Check the successful record (main output)
-        IndexedRecord main = sfSink.getSuccessfulWrites().get(0);
+        IndexedRecord main = sfWriter.getSuccessfulWrites().get(0);
         assertThat(main.getSchema().getFields(), hasSize(5));
 
         // Check the values copied from the incoming record.
@@ -274,7 +274,7 @@ public class SalesforceSinkTestIT {
         SalesforceWriteOperation sfWriteOp = sfSink.createWriteOperation();
         sfWriteOp.initialize(container);
 
-        Writer<WriterResult> sfWriter = sfSink.createWriteOperation().createWriter(container);
+        SalesforceWriter sfWriter = sfSink.createWriteOperation().createWriter(container);
         sfWriter.open("uid1");
 
         // Write one record, which should fail for missing name.
@@ -285,11 +285,11 @@ public class SalesforceSinkTestIT {
         r.put(3, "deleteme");
         sfWriter.write(r);
 
-        assertThat(sfSink.getSuccessfulWrites(), empty());
-        assertThat(sfSink.getRejectedWrites(), hasSize(1));
+        assertThat(sfWriter.getSuccessfulWrites(), empty());
+        assertThat(sfWriter.getRejectedWrites(), hasSize(1));
 
         // Check the rejected record.
-        IndexedRecord rejected = sfSink.getRejectedWrites().get(0);
+        IndexedRecord rejected = sfWriter.getRejectedWrites().get(0);
         assertThat(rejected.getSchema().getFields(), hasSize(7));
 
         // Check the values copied from the incoming record.
@@ -337,7 +337,7 @@ public class SalesforceSinkTestIT {
         SalesforceWriteOperation sfWriteOp = sfSink.createWriteOperation();
         sfWriteOp.initialize(container);
 
-        Writer<WriterResult> sfWriter = sfSink.createWriteOperation().createWriter(container);
+        SalesforceWriter sfWriter = sfSink.createWriteOperation().createWriter(container);
         sfWriter.open("uid1");
 
         // Write one record, which should fail for the bad ID
@@ -349,11 +349,11 @@ public class SalesforceSinkTestIT {
         r.put(4, "deleteme");
         sfWriter.write(r);
 
-        assertThat(sfSink.getSuccessfulWrites(), empty());
-        assertThat(sfSink.getRejectedWrites(), hasSize(1));
+        assertThat(sfWriter.getSuccessfulWrites(), empty());
+        assertThat(sfWriter.getRejectedWrites(), hasSize(1));
 
         // Check the rejected record.
-        IndexedRecord rejected = sfSink.getRejectedWrites().get(0);
+        IndexedRecord rejected = sfWriter.getRejectedWrites().get(0);
         assertThat(rejected.getSchema().getFields(), hasSize(8));
 
         // Check the values copied from the incoming record.

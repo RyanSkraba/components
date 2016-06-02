@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +25,8 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.WriteOperation;
-import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
@@ -41,7 +42,7 @@ import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.bind.XmlObject;
 
-final class SalesforceWriter implements Writer<WriterResult> {
+final class SalesforceWriter implements WriterWithFeedback<WriterResult, IndexedRecord, IndexedRecord> {
 
     private final SalesforceWriteOperation salesforceWriteOperation;
 
@@ -81,6 +82,10 @@ final class SalesforceWriter implements Writer<WriterResult> {
 
     private transient Schema schema;
 
+    private final List<IndexedRecord> successfulWrites = new ArrayList<>();
+
+    private final List<IndexedRecord> rejectedWrites = new ArrayList<>();
+
     public SalesforceWriter(SalesforceWriteOperation salesforceWriteOperation, RuntimeContainer container) {
         this.salesforceWriteOperation = salesforceWriteOperation;
         this.container = container;
@@ -93,7 +98,6 @@ final class SalesforceWriter implements Writer<WriterResult> {
         updateItems = new ArrayList<>(arraySize);
         upsertItems = new ArrayList<>(arraySize);
         upsertKeyColumn = "";
-
     }
 
     @Override
@@ -126,8 +130,8 @@ final class SalesforceWriter implements Writer<WriterResult> {
         IndexedRecord input = factory.convertToAvro(datum);
 
         // Clean the feedback records at each write.
-        salesforceWriteOperation.getSink().getSuccessfulWrites().clear();
-        salesforceWriteOperation.getSink().getRejectedWrites().clear();
+        successfulWrites.clear();
+        rejectedWrites.clear();
 
         switch (sprops.outputAction.getValue()) {
         case INSERT:
@@ -317,7 +321,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
         if (outSchema == null || outSchema.getFields().size() == 0)
             return;
         if (input.getSchema().equals(outSchema)) {
-            sink.getSuccessfulWrites().add(input);
+            successfulWrites.add(input);
         } else {
             IndexedRecord successful = new GenericData.Record(outSchema);
             for (Schema.Field outField : successful.getSchema().getFields()) {
@@ -329,7 +333,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
                     outValue = id;
                 successful.put(outField.pos(), outValue);
             }
-            sink.getSuccessfulWrites().add(successful);
+            successfulWrites.add(successful);
         }
     }
 
@@ -341,7 +345,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
         if (outSchema == null || outSchema.getFields().size() == 0)
             return;
         if (input.getSchema().equals(outSchema)) {
-            sink.getRejectedWrites().add(input);
+            rejectedWrites.add(input);
         } else {
             IndexedRecord reject = new GenericData.Record(outSchema);
             for (Schema.Field outField : reject.getSchema().getFields()) {
@@ -368,7 +372,7 @@ final class SalesforceWriter implements Writer<WriterResult> {
                 }
                 reject.put(outField.pos(), outValue);
             }
-            sink.getRejectedWrites().add(reject);
+            rejectedWrites.add(reject);
         }
     }
 
@@ -426,7 +430,8 @@ final class SalesforceWriter implements Writer<WriterResult> {
         // handled by Beam.
         if (container != null) {
             container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_LINE_NAME, dataCount);
-            container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_SUCCESS_NAME, successCount);
+            container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_SUCCESS_NAME,
+                    successCount);
             container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_REJECT_NAME, rejectCount);
         }
         return new WriterResult(uId, dataCount);
@@ -464,4 +469,13 @@ final class SalesforceWriter implements Writer<WriterResult> {
         return referenceFieldsMap;
     }
 
+    @Override
+    public List<IndexedRecord> getSuccessfulWrites() {
+        return Collections.unmodifiableList(successfulWrites);
+    }
+
+    @Override
+    public List<IndexedRecord> getRejectedWrites() {
+        return Collections.unmodifiableList(rejectedWrites);
+    }
 }
