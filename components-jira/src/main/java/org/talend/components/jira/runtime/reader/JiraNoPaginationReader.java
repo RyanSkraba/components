@@ -14,7 +14,6 @@ package org.talend.components.jira.runtime.reader;
 
 import java.io.IOException;
 
-import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jira.runtime.JiraSource;
 
 /**
@@ -25,8 +24,8 @@ public abstract class JiraNoPaginationReader extends JiraReader {
     /**
      * {@inheritDoc}
      */
-    public JiraNoPaginationReader(JiraSource source, String resource, RuntimeContainer container) {
-        super(source, resource, container);
+    public JiraNoPaginationReader(JiraSource source, String resource) {
+        super(source, resource);
     }
 
     /**

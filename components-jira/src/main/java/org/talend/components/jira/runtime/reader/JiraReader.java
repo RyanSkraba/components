@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Source;
-import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jira.avro.IssueAdapterFactory;
 import org.talend.components.jira.avro.IssueIndexedRecord;
 import org.talend.components.jira.connection.Rest;
@@ -77,19 +76,9 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
     private int entityIndex = 0;
 
     /**
-     * Number of Jira entities read
-     */
-    private int entityCounter = 0;
-
-    /**
      * Stores http parameters which are shared between requests
      */
     private final Map<String, Object> sharedParameters;
-
-    /**
-     * Runtime container
-     */
-    private final RuntimeContainer container;
 
     /**
      * Denotes this {@link Reader} was started
@@ -101,6 +90,9 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
      */
     private boolean hasMoreRecords;
 
+    /**
+     * Return result
+     */
     private Result result;
 
     /**
@@ -108,13 +100,11 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
      * 
      * @param source instance of {@link Source}, which had created this {@link Reader}
      * @param resource REST resource to communicate
-     * @param container runtime container
      */
-    public JiraReader(JiraSource source, String resource, RuntimeContainer container) {
+    public JiraReader(JiraSource source, String resource) {
         this.source = source;
         this.resource = resource;
         this.sharedParameters = createSharedParameters();
-        this.container = container;
         this.result = new Result();
         rest = new Rest(source.getHostPort());
         String userId = source.getUserId();
@@ -153,7 +143,6 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
             throw new IOException("Reader wasn't started");
         }
         entityIndex++;
-        entityCounter++;
 
         if (entityIndex < entities.size()) {
             return true;
@@ -205,6 +194,14 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
     }
 
     /**
+     * Does nothing
+     */
+    @Override
+    public void close() throws IOException {
+        // nothing to be done here
+    }
+
+    /**
      * Returns {@link Source} instance
      * 
      * @return {@link Source} instance, which had created this {@link Reader}
@@ -214,13 +211,13 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
         return source;
     }
 
-    @Override
-    public void close() throws IOException {
-    }
-
+    /**
+     * Returns return values
+     * 
+     * @return map with return values
+     */
     @Override
     public Map<String, Object> getReturnValues() {
-        result.totalCount = entityCounter;
         return result.toMap();
     }
 
@@ -236,7 +233,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
         if (!entities.isEmpty()) {
             hasMoreRecords = true;
             entityIndex = 0;
-            entityCounter++;
+            result.totalCount = result.totalCount + entities.size();
         }
     }
 

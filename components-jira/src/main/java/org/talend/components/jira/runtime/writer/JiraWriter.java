@@ -51,11 +51,6 @@ public class JiraWriter implements Writer<Result> {
     private final JiraWriteOperation writeOperation;
 
     /**
-     * Unique ID of this {@link Writer} to distinguish it from other Writers
-     */
-    private String uId;
-
-    /**
      * Defines whether {@link Writer} was already opened
      */
     protected boolean opened;
@@ -65,6 +60,9 @@ public class JiraWriter implements Writer<Result> {
      */
     protected final String resource;
 
+    /**
+     * Return results
+     */
     protected Result result;
 
     /**
@@ -88,7 +86,6 @@ public class JiraWriter implements Writer<Result> {
             LOG.debug("Writer is already opened");
             return;
         }
-        this.uId = uId;
         result = new Result(uId);
 
         String hostPort = writeOperation.getSink().getHostPort();

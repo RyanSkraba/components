@@ -43,7 +43,7 @@ public class JiraWriterTest {
      * {@link JiraWriteOperation} mock
      */
     private JiraWriteOperation writeOperation;
-
+    
     /**
      * Sets up mocks used in tests
      */
@@ -64,7 +64,6 @@ public class JiraWriterTest {
     @Test
     public void testOpen() {
         JiraWriter writer = new JiraWriter(writeOperation);
-
         writer.open("uId");
 
         Rest connection = writer.getConnection();
@@ -77,7 +76,6 @@ public class JiraWriterTest {
     @Test
     public void testGetWriteOperation() {
         JiraWriter writer = new JiraWriter(writeOperation);
-
         JiraWriteOperation actualWriteOperation = writer.getWriteOperation();
 
         assertEquals(writeOperation, actualWriteOperation);
