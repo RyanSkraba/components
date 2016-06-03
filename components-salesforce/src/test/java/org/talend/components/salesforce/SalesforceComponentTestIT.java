@@ -104,7 +104,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
     public void testInputProps() throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputDefinition().createProperties();
         assertEquals(2, props.queryMode.getPossibleValues().size());
-        Property<String> returns = (Property<String>) props.getProperty(ComponentProperties.RETURNS);
+        Property<String> returns = props.getReturns();
+        LOGGER.debug(returns.getChildren().toString());
         assertEquals("NB_LINE", returns.getChildren().get(1).getName());
     }
 
@@ -438,7 +439,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
                 "moduleName", moduleProps);
         moduleProps.moduleName.setValue("Account");
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
-        Schema schema = new Schema.Parser().parse(moduleProps.main.schema.getStringValue());
+        Schema schema = moduleProps.main.schema.getValue();
         LOGGER.debug(schema.toString());
         for (Schema.Field child : schema.getFields()) {
             LOGGER.debug(child.name());
@@ -597,7 +598,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
         String serialized = outputProps.toSerialized();
 
-        TSalesforceOutputProperties afterSerialized = ComponentProperties.fromSerialized(serialized,
+        TSalesforceOutputProperties afterSerialized = Properties.Helper.fromSerialized(serialized,
                 TSalesforceOutputProperties.class).properties;
         assertEquals(2, afterSerialized.getAvailableConnectors(null, true).size());
         for (Connector connector : afterSerialized.getAvailableConnectors(null, true)) {
@@ -633,7 +634,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
         String serialized = outputProps.toSerialized();
 
-        TSalesforceOutputProperties afterSerialized = ComponentProperties.fromSerialized(serialized,
+        TSalesforceOutputProperties afterSerialized = Properties.Helper.fromSerialized(serialized,
                 TSalesforceOutputProperties.class).properties;
 
         main2 = (Schema) afterSerialized.getValuedProperty("module.main.schema").getValue();

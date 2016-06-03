@@ -25,6 +25,7 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ErrorCollector;
@@ -58,6 +59,8 @@ import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputB
 import org.talend.components.salesforce.tsalesforceoutputbulkexec.TSalesforceOutputBulkExecDefinition;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.util.AvroUtils;
+import org.talend.daikon.properties.Properties;
+import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
@@ -147,14 +150,19 @@ public class SalesforceTestBase extends AbstractComponentTest {
 
     protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props) throws Throwable {
         assertTrue(form.getWidget(propName).isCallAfter());
-        return getComponentService().afterProperty(propName, props);
+        ComponentProperties afterProperty = (ComponentProperties) getComponentService().afterProperty(propName, props);
+        assertEquals(
+                "ComponentProperties after failed[" + props.getClass().getCanonicalName() + "/after"
+                        + StringUtils.capitalize(propName) + "] :" + afterProperty.getValidationResult().getMessage(),
+                ValidationResult.Result.OK, afterProperty.getValidationResult().getStatus());
+        return afterProperty;
     }
 
     static public SalesforceConnectionProperties setupProps(SalesforceConnectionProperties props, boolean addQuotes) {
         if (props == null) {
             props = (SalesforceConnectionProperties) new SalesforceConnectionProperties("foo").init();
         }
-        ComponentProperties userPassword = (ComponentProperties) props.getProperty("userPassword");
+        Properties userPassword = (Properties) props.getProperty("userPassword");
         ((Property) userPassword.getProperty("userId")).setValue(addQuotes ? "\"" + userId + "\"" : userId);
         ((Property) userPassword.getProperty("password")).setValue(addQuotes ? "\"" + password + "\"" : password);
         ((Property) userPassword.getProperty("securityKey")).setValue(addQuotes ? "\"" + securityKey + "\"" : securityKey);

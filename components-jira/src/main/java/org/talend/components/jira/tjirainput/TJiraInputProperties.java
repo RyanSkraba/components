@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.jira.tjirainput;
 
-import static org.talend.daikon.avro.SchemaConstants.TALEND_IS_LOCKED;
+import static org.talend.daikon.avro.SchemaConstants.*;
 
 import java.util.Collections;
 import java.util.Set;
@@ -69,8 +69,7 @@ public class TJiraInputProperties extends JiraProperties {
         projectId.setValue("");
         batchSize.setValue(50);
 
-        returns = ComponentPropertyFactory.newReturnsProperty();
-        ComponentPropertyFactory.newReturnProperty(returns, PropertyFactory.newInteger("numberOfRecords"));
+        ComponentPropertyFactory.newReturnProperty(getReturns(), PropertyFactory.newInteger("numberOfRecords"));
     }
 
     /**

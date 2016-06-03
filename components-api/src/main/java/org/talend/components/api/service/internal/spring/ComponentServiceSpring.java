@@ -45,6 +45,7 @@ import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.exception.error.CommonErrorCodes;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.service.Repository;
 
 import io.swagger.annotations.Api;
@@ -147,8 +148,7 @@ public class ComponentServiceSpring implements ComponentService {
     @POST
     @Path("/makeFormCancelable")
     @Produces(MediaType.APPLICATION_JSON)
-    public ComponentProperties makeFormCancelable(
-            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties,
+    public Properties makeFormCancelable(@ApiParam(name = "properties", value = "properties") Properties properties,
             @ApiParam(name = "formName", value = "Name of the form") String formName) {
         return componentServiceDelegate.makeFormCancelable(properties, formName);
     }
@@ -157,8 +157,7 @@ public class ComponentServiceSpring implements ComponentService {
     @POST
     @Path("/cancelFormValues")
     @Produces(MediaType.APPLICATION_JSON)
-    public ComponentProperties cancelFormValues(
-            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties,
+    public Properties cancelFormValues(@ApiParam(name = "properties", value = "properties") Properties properties,
             @ApiParam(name = "formName", value = "Name of the form") String formName) {
         return componentServiceDelegate.cancelFormValues(properties, formName);
     }
@@ -167,9 +166,9 @@ public class ComponentServiceSpring implements ComponentService {
     @POST
     @Path("/properties/{propName}/validate")
     @Produces(MediaType.APPLICATION_JSON)
-    public ComponentProperties validateProperty(
+    public Properties validateProperty(
             @PathParam("propName") @ApiParam(name = "propName", value = "Name of property") String propName,
-            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties) throws Throwable {
+            @ApiParam(name = "properties", value = "properties") Properties properties) throws Throwable {
         componentServiceDelegate.validateProperty(propName, properties);
         return properties;
     }
@@ -178,9 +177,9 @@ public class ComponentServiceSpring implements ComponentService {
     @POST
     @Path("/properties/{propName}/beforeActivate")
     @Produces(MediaType.APPLICATION_JSON)
-    public ComponentProperties beforePropertyActivate(
+    public Properties beforePropertyActivate(
             @PathParam("propName") @ApiParam(name = "propName", value = "Name of property") String propName,
-            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties) throws Throwable {
+            @ApiParam(name = "properties", value = "properties") Properties properties) throws Throwable {
         componentServiceDelegate.beforePropertyActivate(propName, properties);
         return properties;
     }
@@ -189,9 +188,9 @@ public class ComponentServiceSpring implements ComponentService {
     @POST
     @Path("/properties/{propName}/beforeRender")
     @Produces(MediaType.APPLICATION_JSON)
-    public ComponentProperties beforePropertyPresent(
+    public Properties beforePropertyPresent(
             @PathParam("propName") @ApiParam(name = "propName", value = "Name of property") String propName,
-            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties) throws Throwable {
+            @ApiParam(name = "properties", value = "properties") Properties properties) throws Throwable {
         componentServiceDelegate.beforePropertyPresent(propName, properties);
         return properties;
     }
@@ -200,9 +199,9 @@ public class ComponentServiceSpring implements ComponentService {
     @POST
     @Path("/properties/{propName}/after")
     @Produces(MediaType.APPLICATION_JSON)
-    public ComponentProperties afterProperty(
+    public Properties afterProperty(
             @PathParam("propName") @ApiParam(name = "propName", value = "Name of property") String propName,
-            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties) throws Throwable {
+            @ApiParam(name = "properties", value = "properties") Properties properties) throws Throwable {
         componentServiceDelegate.afterProperty(propName, properties);
         return properties;
     }
@@ -211,9 +210,9 @@ public class ComponentServiceSpring implements ComponentService {
     @POST
     @Path("/properties/beforeFormPresent/{formName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ComponentProperties beforeFormPresent(
+    public Properties beforeFormPresent(
             @PathParam("formName") @ApiParam(name = "formName", value = "Name of form") String formName,
-            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties) throws Throwable {
+            @ApiParam(name = "properties", value = "properties") Properties properties) throws Throwable {
         componentServiceDelegate.beforeFormPresent(formName, properties);
         return properties;
     }
@@ -222,9 +221,8 @@ public class ComponentServiceSpring implements ComponentService {
     @POST
     @Path("/properties/afterFormNext/{formName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ComponentProperties afterFormNext(
-            @PathParam("formName") @ApiParam(name = "formName", value = "Name of form") String formName,
-            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties) throws Throwable {
+    public Properties afterFormNext(@PathParam("formName") @ApiParam(name = "formName", value = "Name of form") String formName,
+            @ApiParam(name = "properties", value = "properties") Properties properties) throws Throwable {
         componentServiceDelegate.afterFormNext(formName, properties);
         return properties;
     }
@@ -233,9 +231,8 @@ public class ComponentServiceSpring implements ComponentService {
     @POST
     @Path("/properties/afterFormBack/{formName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ComponentProperties afterFormBack(
-            @PathParam("formName") @ApiParam(name = "formName", value = "Name of form") String formName,
-            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties) throws Throwable {
+    public Properties afterFormBack(@PathParam("formName") @ApiParam(name = "formName", value = "Name of form") String formName,
+            @ApiParam(name = "properties", value = "properties") Properties properties) throws Throwable {
         componentServiceDelegate.afterFormBack(formName, properties);
         return properties;
     }
@@ -244,9 +241,8 @@ public class ComponentServiceSpring implements ComponentService {
     @POST
     @Path("/properties/afterFormFinish/{formName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ComponentProperties afterFormFinish(
-            @PathParam("formName") @ApiParam(name = "formName", value = "Name of form") String formName,
-            @ApiParam(name = "properties", value = "Component properties") ComponentProperties properties) throws Throwable {
+    public Properties afterFormFinish(@PathParam("formName") @ApiParam(name = "formName", value = "Name of form") String formName,
+            @ApiParam(name = "properties", value = "properties") Properties properties) throws Throwable {
         componentServiceDelegate.afterFormFinish(formName, properties);
         return properties;
     }
@@ -335,8 +331,7 @@ public class ComponentServiceSpring implements ComponentService {
 
     // FIXME - make this work for web
     @Override
-    public String storeProperties(ComponentProperties properties, String name, String repositoryLocation,
-            String schemaPropertyName) {
+    public String storeProperties(Properties properties, String name, String repositoryLocation, String schemaPropertyName) {
         return componentServiceDelegate.storeProperties(properties, name, repositoryLocation, schemaPropertyName);
     }
 

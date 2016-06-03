@@ -115,8 +115,8 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
 
         outputAction.setValue(OutputAction.INSERT);
 
-        ComponentPropertyFactory.newReturnProperty(returns, NB_SUCCESS);
-        ComponentPropertyFactory.newReturnProperty(returns, NB_REJECT);
+        ComponentPropertyFactory.newReturnProperty(getReturns(), NB_SUCCESS);
+        ComponentPropertyFactory.newReturnProperty(getReturns(), NB_REJECT);
 
         setupRejectSchema();
 

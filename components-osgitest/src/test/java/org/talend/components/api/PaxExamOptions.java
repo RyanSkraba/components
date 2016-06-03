@@ -40,7 +40,7 @@ public class PaxExamOptions {
         return options(mavenBundle("org.apache.felix", "org.apache.felix.scr"), //
 
         mavenBundle("org.slf4j", "slf4j-api"), //
-                mavenBundle("org.slf4j", "slf4j-simple").noStart(), mavenBundle("commons-lang", "commons-lang", "2.4"), //
+                mavenBundle("org.slf4j", "log4j-over-slf4j").noStart(), mavenBundle("commons-lang", "commons-lang", "2.4"), //
                 mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-annotations"), //
                 mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-core"), //
                 mavenBundle().groupId("com.cedarsoftware").artifactId("json-io"), //

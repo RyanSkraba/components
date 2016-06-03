@@ -78,7 +78,7 @@ import org.talend.daikon.properties.service.PropertiesServiceImpl;
  * Main Component Service implementation that is not related to any framework (neither OSGI, nor Spring) it uses a
  * ComponentRegistry implementation that will be provided by framework specific Service classes
  */
-public class ComponentServiceImpl extends PropertiesServiceImpl<ComponentProperties>implements ComponentService {
+public class ComponentServiceImpl extends PropertiesServiceImpl implements ComponentService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ComponentServiceImpl.class);
 

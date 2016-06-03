@@ -25,13 +25,14 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.service.PropertiesService;
 import org.talend.daikon.properties.service.Repository;
 
 /**
  * The Main service provided by this project to get access to all registered components and their properties.
  */
-public interface ComponentService extends PropertiesService<ComponentProperties> {
+public interface ComponentService extends PropertiesService<Properties> {
 
     /**
      * Get the list of all the component names that are registered
@@ -85,7 +86,7 @@ public interface ComponentService extends PropertiesService<ComponentProperties>
      *
      * @param name the name of the wizard
      * @param location an arbitrary repositoryLocation string to optionally be used in the wizard processing. This is
-     * given to an implementation of the {@link Repository} object when the {@link ComponentProperties} are stored.
+     *            given to an implementation of the {@link Repository} object when the {@link ComponentProperties} are stored.
      * @return a {@code ComponentWizard} object.
      * @exception ComponentException thrown if the wizard is not registered in the service
      */
@@ -156,8 +157,8 @@ public interface ComponentService extends PropertiesService<ComponentProperties>
      * 
      * @param componentName name of the component to get the dependencies of.
      * @return a set of maven uri following the pax-maven uri scheme @see
-     * <a href="https://ops4j1.jira.com/wiki/display/paxurl/Mvn+Protocol">https://ops4j1.jira.com/wiki/display/paxurl/
-     * Mvn+Protocol</a>
+     *         <a href="https://ops4j1.jira.com/wiki/display/paxurl/Mvn+Protocol">https://ops4j1.jira.com/wiki/display/paxurl/
+     *         Mvn+Protocol</a>
      */
     Set<String> getMavenUriDependencies(String componentName);
 
@@ -180,8 +181,8 @@ public interface ComponentService extends PropertiesService<ComponentProperties>
      * @param schema schema to be set for the given connector
      * @param isOuput true is the connection is an output connection, false if it is an input connection
      * @return the schema associated with a given connector token of input or ouput connectors, may be null if schema is
-     * associated with the connector. This should never be the case for output connections but may be null for input
-     * connections because the component does not need to have any input schema and can handle any data type.
+     *         associated with the connector. This should never be the case for output connections but may be null for input
+     *         connections because the component does not need to have any input schema and can handle any data type.
      */
     void setSchema(ComponentProperties componentProperties, Connector connector, Schema schema, boolean isOuput);
 
@@ -191,7 +192,7 @@ public interface ComponentService extends PropertiesService<ComponentProperties>
      * @param componentProperties the Properties to get the connectors from
      * @param connectedConnetor list of connectors already setup. This shall be managed by the client.
      * @param isOuput true is the requested connections are output connections, false if the request is on input
-     * connections
+     *            connections
      * @return the set of availalble connectors, may be empty.
      */
     Set<? extends Connector> getAvailableConnectors(ComponentProperties componentProperties,

@@ -26,6 +26,11 @@ import org.talend.daikon.properties.property.PropertyFactory;
 public class ComponentPropertyFactory {
 
     /**
+     * Name of the special Returns property.
+     */
+    public static final String RETURNS = "returns";
+
+    /**
      * Used if there are returns to set the "returns" property with a {@link Property} that contains the returns
      * properties.
      *
@@ -33,7 +38,7 @@ public class ComponentPropertyFactory {
      */
     public static Property<String> newReturnsProperty() {
         // Container for the returns
-        return PropertyFactory.newProperty(ComponentProperties.RETURNS);
+        return PropertyFactory.newProperty(RETURNS);
     }
 
     /**
@@ -48,7 +53,7 @@ public class ComponentPropertyFactory {
         if (returns == null) {
             throw new TalendRuntimeException(CommonErrorCodes.UNEXPECTED_EXCEPTION, new NullPointerException());
         }
-        if (!ComponentProperties.RETURNS.equals(returns.getName())) {
+        if (!RETURNS.equals(returns.getName())) {
             throw new ComponentException(ComponentsApiErrorCode.WRONG_RETURNS_TYPE_NAME,
                     ExceptionContext.build().put("name", returns.getName()));
         }

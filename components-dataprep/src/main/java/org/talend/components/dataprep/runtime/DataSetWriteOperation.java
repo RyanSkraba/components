@@ -17,15 +17,12 @@ import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 
 public class DataSetWriteOperation implements WriteOperation<WriterResult> {
 
+    private static final long serialVersionUID = 7572409371695331857L;
+
     private Sink sink;
-
-    private DataPrepConnectionHandler connectionHandler;
-
-    private int limit;
 
     public DataSetWriteOperation(Sink sink) {
         this.sink = sink;

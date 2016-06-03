@@ -12,16 +12,17 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import com.sforce.soap.partner.QueryResult;
-import com.sforce.soap.partner.sobject.SObject;
-import com.sforce.ws.ConnectionException;
-import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.salesforce.SalesforceGetDeletedUpdatedProperties;
-import org.apache.avro.generic.IndexedRecord;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.avro.generic.IndexedRecord;
+import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.salesforce.SalesforceGetDeletedUpdatedProperties;
+
+import com.sforce.soap.partner.QueryResult;
+import com.sforce.soap.partner.sobject.SObject;
+import com.sforce.ws.ConnectionException;
 
 public abstract class SalesforceGetDeletedUpdatedReader<ResultT> extends SalesforceReader<IndexedRecord> {
 

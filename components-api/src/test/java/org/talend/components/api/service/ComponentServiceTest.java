@@ -30,6 +30,7 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.service.testcomponent.ComponentPropertiesWithDefinedI18N;
 import org.talend.components.api.service.testcomponent.TestComponentDefinition;
@@ -45,7 +46,7 @@ import org.talend.daikon.i18n.I18nMessages;
 
 public class ComponentServiceTest extends AbstractComponentTest {
 
-    static class NotExistingComponentProperties extends ComponentProperties {
+    static class NotExistingComponentProperties extends ComponentPropertiesImpl {
 
         /**
          * DOC sgandon NotExistingComponentProperties constructor comment.
