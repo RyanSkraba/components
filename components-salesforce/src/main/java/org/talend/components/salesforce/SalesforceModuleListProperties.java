@@ -12,23 +12,24 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
 import static org.talend.daikon.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.property.PropertyFactory.*;
 
 import java.util.List;
 
 import org.apache.avro.Schema;
-import org.talend.components.api.properties.ComponentProperties;
+import org.apache.commons.lang3.reflect.TypeLiteral;
+import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.Properties;
-import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.service.Repository;
 
-public class SalesforceModuleListProperties extends ComponentProperties implements SalesforceProvideConnectionProperties {
+public class SalesforceModuleListProperties extends ComponentPropertiesImpl implements SalesforceProvideConnectionProperties {
 
     public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection");
 
@@ -39,7 +40,8 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
     //
     // Properties
     //
-    public Property moduleName = newString("moduleName").setOccurMaxTimes(Property.INFINITE); //$NON-NLS-1$
+    public Property<List<NamedThing>> selectedModuleNames = newProperty(new TypeLiteral<List<NamedThing>>() {
+    }, "selectedModuleNames"); //$NON-NLS-1$
 
     public SalesforceModuleListProperties(String name) {
         super(name);
@@ -60,7 +62,7 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
         super.setupLayout();
         Form moduleForm = Form.create(this, Form.MAIN);
         // Since this is a repeating property it has a list of values
-        moduleForm.addRow(widget(moduleName).setWidgetType(Widget.WidgetType.NAME_SELECTION_AREA));
+        moduleForm.addRow(widget(selectedModuleNames).setWidgetType(Widget.NAME_SELECTION_AREA_WIDGET_TYPE));
         refreshLayout(moduleForm);
     }
 
@@ -71,7 +73,7 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
 
     public void beforeFormPresentMain() throws Exception {
         moduleNames = SalesforceSourceOrSink.getSchemaNames(null, this);
-        moduleName.setPossibleValues(moduleNames);
+        selectedModuleNames.setPossibleValues(moduleNames);
         getForm(Form.MAIN).setAllowBack(true);
         getForm(Form.MAIN).setAllowFinish(true);
     }
@@ -82,16 +84,15 @@ public class SalesforceModuleListProperties extends ComponentProperties implemen
             return vr;
         }
 
-        String connRepLocation = repo.storeProperties(connection, (String) connection.name.getValue(), repositoryLocation, null);
+        String connRepLocation = repo.storeProperties(connection, connection.name.getValue(), repositoryLocation, null);
 
-        @SuppressWarnings("unchecked")
-        List<NamedThing> selectedModuleNames = (List<NamedThing>) moduleName.getValue();
-        for (NamedThing nl : selectedModuleNames) {
-            SalesforceModuleProperties modProps = new SalesforceModuleProperties(nl.getName());
+        for (NamedThing nl : selectedModuleNames.getValue()) {
+            String moduleId = nl.getName();
+            SalesforceModuleProperties modProps = new SalesforceModuleProperties(moduleId);
             modProps.connection = connection;
             modProps.init();
-            Schema schema = SalesforceSourceOrSink.getSchema(null, this, nl.getName());
-            modProps.moduleName.setValue(nl.getName());
+            Schema schema = SalesforceSourceOrSink.getSchema(null, this, moduleId);
+            modProps.moduleName.setValue(moduleId);
             modProps.main.schema.setValue(schema);
             repo.storeProperties(modProps, nl.getName(), connRepLocation, "main.schema");
         }

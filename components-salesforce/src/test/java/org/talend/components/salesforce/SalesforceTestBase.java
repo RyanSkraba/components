@@ -12,10 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,9 +25,12 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ErrorCollector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
@@ -58,8 +59,10 @@ import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputB
 import org.talend.components.salesforce.tsalesforceoutputbulkexec.TSalesforceOutputBulkExecDefinition;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.util.AvroUtils;
-import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.Properties;
+import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
 
 import com.sforce.async.AsyncApiException;
@@ -67,6 +70,8 @@ import com.sforce.ws.ConnectionException;
 
 @SuppressWarnings("nls")
 public class SalesforceTestBase extends AbstractComponentTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceTestBase.class);
 
     @Rule
     public ErrorCollector errorCollector = new ErrorCollector();
@@ -145,14 +150,19 @@ public class SalesforceTestBase extends AbstractComponentTest {
 
     protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props) throws Throwable {
         assertTrue(form.getWidget(propName).isCallAfter());
-        return getComponentService().afterProperty(propName, props);
+        ComponentProperties afterProperty = (ComponentProperties) getComponentService().afterProperty(propName, props);
+        assertEquals(
+                "ComponentProperties after failed[" + props.getClass().getCanonicalName() + "/after"
+                        + StringUtils.capitalize(propName) + "] :" + afterProperty.getValidationResult().getMessage(),
+                ValidationResult.Result.OK, afterProperty.getValidationResult().getStatus());
+        return afterProperty;
     }
 
     static public SalesforceConnectionProperties setupProps(SalesforceConnectionProperties props, boolean addQuotes) {
         if (props == null) {
             props = (SalesforceConnectionProperties) new SalesforceConnectionProperties("foo").init();
         }
-        ComponentProperties userPassword = (ComponentProperties) props.getProperty("userPassword");
+        Properties userPassword = (Properties) props.getProperty("userPassword");
         ((Property) userPassword.getProperty("userId")).setValue(addQuotes ? "\"" + userId + "\"" : userId);
         ((Property) userPassword.getProperty("password")).setValue(addQuotes ? "\"" + password + "\"" : password);
         ((Property) userPassword.getProperty("securityKey")).setValue(addQuotes ? "\"" + securityKey + "\"" : securityKey);
@@ -212,7 +222,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
             if (isDynamic) {
                 row.put("ShippingState", "CA");
             }
-            System.out.println("Row to insert: " + row.get("Name") //
+            LOGGER.debug("Row to insert: " + row.get("Name") //
                     + " id: " + row.get("Id") //
                     + " shippingPostalCode: " + row.get("ShippingPostalCode") //
                     + " billingPostalCode: " + row.get("BillingPostalCode") //
@@ -249,8 +259,8 @@ public class SalesforceTestBase extends AbstractComponentTest {
                 }
             }
 
-            System.out.println("check: " + row.get(iName) + " id: " + row.get(iId) + " post: " + row.get(iBillingPostalCode)
-                    + " st: " + " post: " + row.get(iBillingStreet));
+            LOGGER.debug("check: " + row.get(iName) + " id: " + row.get(iId) + " post: " + row.get(iBillingPostalCode) + " st: "
+                    + " post: " + row.get(iBillingStreet));
             String check = (String) row.get(iShippingStreet);
             if (check == null || !check.equals(SalesforceTestBase.TEST_KEY)) {
                 continue;
@@ -275,7 +285,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
     public List<String> getDeleteIds(List<IndexedRecord> rows) {
         List<String> ids = new ArrayList<>();
         for (IndexedRecord row : rows) {
-            System.out.println("del: " + row.get(row.getSchema().getField("Name").pos()) + " id: "
+            LOGGER.debug("del: " + row.get(row.getSchema().getField("Name").pos()) + " id: "
                     + row.get(row.getSchema().getField("Id").pos()) + " post: "
                     + row.get(row.getSchema().getField("BillingPostalCode").pos()) + " st: " + " post: "
                     + row.get(row.getSchema().getField("BillingStreet").pos()));
@@ -305,7 +315,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
                     continue;
                 }
             }
-            System.out.println("Found match: " + row.get(row.getSchema().getField("Name").pos()) //
+            LOGGER.debug("Found match: " + row.get(row.getSchema().getField("Name").pos()) //
                     + " id: " + row.get(row.getSchema().getField("Id").pos()) //
                     + " shippingPostalCode: " + row.get(row.getSchema().getField("ShippingPostalCode").pos()) //
                     + " billingPostalCode: " + row.get(row.getSchema().getField("BillingPostalCode").pos()) //
@@ -323,7 +333,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
             if (check == null || !check.equals(TEST_KEY)) {
                 continue;
             }
-            System.out.println("Test row is: " + row.get(row.getSchema().getField("Name").pos()) + " id: "
+            LOGGER.debug("Test row is: " + row.get(row.getSchema().getField("Name").pos()) + " id: "
                     + row.get(row.getSchema().getField("Id").pos()) + " post: "
                     + row.get(row.getSchema().getField("BillingPostalCode").pos()) + " st: " + " post: "
                     + row.get(row.getSchema().getField("BillingStreet").pos()));
@@ -407,7 +417,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
         TSalesforceOutputProperties deleteProperties = new TSalesforceOutputProperties("delete"); //$NON-NLS-1$
         deleteProperties.copyValuesFrom(props);
         deleteProperties.outputAction.setValue(OutputAction.DELETE);
-        System.out.println("deleting " + rows.size() + " rows");
+        LOGGER.debug("deleting " + rows.size() + " rows");
         doWriteRows(deleteProperties, rows);
     }
 

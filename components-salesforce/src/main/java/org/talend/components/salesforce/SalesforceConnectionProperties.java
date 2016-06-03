@@ -12,10 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
 import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.*;
 
-import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
@@ -24,13 +24,12 @@ import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
 import org.talend.daikon.properties.PresentationItem;
-import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
-import org.talend.daikon.properties.presentation.Widget.WidgetType;
+import org.talend.daikon.properties.property.Property;
 
-public class SalesforceConnectionProperties extends ComponentProperties
+public class SalesforceConnectionProperties extends ComponentPropertiesImpl
         implements SalesforceProvideConnectionProperties, ComponentReferencePropertiesEnclosing {
 
     public static final String URL = "https://www.salesforce.com/services/Soap/u/34.0";
@@ -118,14 +117,14 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
         Form wizardForm = Form.create(this, FORM_WIZARD);
         wizardForm.addRow(name);
-        wizardForm.addRow(widget(loginType).setWidgetType(WidgetType.ENUMERATION).setDeemphasize(true));
+        wizardForm.addRow(widget(loginType).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE).setDeemphasize(true));
         wizardForm.addRow(oauth.getForm(Form.MAIN));
         wizardForm.addRow(userPassword.getForm(Form.MAIN));
-        wizardForm.addRow(widget(advanced).setWidgetType(WidgetType.BUTTON));
-        wizardForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(WidgetType.BUTTON));
+        wizardForm.addRow(widget(advanced).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
+        wizardForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
 
         Form mainForm = Form.create(this, Form.MAIN);
-        mainForm.addRow(widget(loginType).setWidgetType(WidgetType.ENUMERATION));
+        mainForm.addRow(widget(loginType).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
         mainForm.addRow(oauth.getForm(Form.MAIN));
         mainForm.addRow(userPassword.getForm(Form.MAIN));
 
@@ -142,7 +141,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
 
         // A form for a reference to a connection, used in a tSalesforceInput for example
         Form refForm = Form.create(this, Form.REFERENCE);
-        Widget compListWidget = widget(referencedComponent).setWidgetType(WidgetType.COMPONENT_REFERENCE);
+        Widget compListWidget = widget(referencedComponent).setWidgetType(Widget.COMPONENT_REFERENCE_WIDGET_TYPE);
         referencedComponent.componentType.setValue(TSalesforceConnectionDefinition.COMPONENT_NAME);
         refForm.addRow(compListWidget);
         refForm.addRow(mainForm);
@@ -168,6 +167,7 @@ public class SalesforceConnectionProperties extends ComponentProperties
     public ValidationResult validateTestConnection() throws Exception {
         ValidationResult vr = SalesforceSourceOrSink.validateConnection(this);
         if (vr.getStatus() == ValidationResult.Result.OK) {
+            vr.setMessage("Connection successfull");
             getForm(FORM_WIZARD).setAllowForward(true);
         } else {
             getForm(FORM_WIZARD).setAllowForward(false);

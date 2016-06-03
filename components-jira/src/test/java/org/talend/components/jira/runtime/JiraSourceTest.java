@@ -13,8 +13,9 @@
 package org.talend.components.jira.runtime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -23,9 +24,12 @@ import org.junit.Test;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.jira.Resource;
+import org.talend.components.jira.runtime.reader.JiraProjectIdReader;
+import org.talend.components.jira.runtime.reader.JiraProjectsReader;
+import org.talend.components.jira.runtime.reader.JiraSearchReader;
 import org.talend.components.jira.testutils.Utils;
 import org.talend.components.jira.tjirainput.TJiraInputProperties;
-import org.talend.components.jira.tjirainput.TJiraInputProperties.JiraResource;
 
 /**
  * Unit-tests for {@link JiraSource} class
@@ -48,10 +52,10 @@ public class JiraSourceTest {
     @Before
     public void setUp() {
         inputProperties = new TJiraInputProperties("root");
-        inputProperties.host.setValue("hostValue");
-        inputProperties.userPassword.userId.setValue("userIdValue");
-        inputProperties.userPassword.password.setValue("passwordValue");
-        inputProperties.resource.setValue(JiraResource.ISSUE);
+        inputProperties.connection.hostUrl.setValue("hostValue");
+        inputProperties.connection.basicAuthentication.userId.setValue("userIdValue");
+        inputProperties.connection.basicAuthentication.password.setValue("passwordValue");
+        inputProperties.resource.setValue(Resource.ISSUE);
         schemaValue = Utils.readFile("src/test/resources/org/talend/components/jira/tjirainput/schema.json");
         inputProperties.schema.schema.setValue(new Schema.Parser().parse(schemaValue));
         inputProperties.jql.setValue("jqlValue");
@@ -69,16 +73,6 @@ public class JiraSourceTest {
 
         jiraSource.initialize(null, inputProperties);
 
-        String hostPort = jiraSource.getHostPort();
-        assertEquals("hostValue", hostPort);
-        String userId = jiraSource.getUserId();
-        assertEquals("userIdValue", userId);
-        String password = jiraSource.getPassword();
-        assertEquals("passwordValue", password);
-        JiraResource resourceType = jiraSource.getResourceType();
-        assertEquals(JiraResource.ISSUE, resourceType);
-        Schema dataSchema = jiraSource.getDataSchema();
-        assertEquals(schemaValue, dataSchema.toString());
         String jql = jiraSource.getJql();
         assertEquals("jqlValue", jql);
         int bathcSize = jiraSource.getBatchSize();
@@ -108,7 +102,7 @@ public class JiraSourceTest {
     @Test
     public void testCreateReaderProjects() {
         JiraSource jiraSource = new JiraSource();
-        inputProperties.resource.setValue(JiraResource.PROJECT);
+        inputProperties.resource.setValue(Resource.PROJECT);
         inputProperties.projectId.setValue(null);
         jiraSource.initialize(null, inputProperties);
 
@@ -124,7 +118,7 @@ public class JiraSourceTest {
     @Test
     public void testCreateReaderProjectId() {
         JiraSource jiraSource = new JiraSource();
-        inputProperties.resource.setValue(JiraResource.PROJECT);
+        inputProperties.resource.setValue(Resource.PROJECT);
         inputProperties.projectId.setValue("TP");
         jiraSource.initialize(null, inputProperties);
 

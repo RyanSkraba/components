@@ -12,56 +12,30 @@
 // ============================================================================
 package org.talend.components.jira.runtime;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.jira.Resource;
+import org.talend.components.jira.runtime.reader.JiraProjectIdReader;
+import org.talend.components.jira.runtime.reader.JiraProjectsReader;
+import org.talend.components.jira.runtime.reader.JiraReader;
+import org.talend.components.jira.runtime.reader.JiraSearchReader;
 import org.talend.components.jira.tjirainput.TJiraInputProperties;
-import org.talend.components.jira.tjirainput.TJiraInputProperties.JiraResource;
-import org.talend.daikon.NamedThing;
-import org.talend.daikon.properties.ValidationResult;
 
 /**
- * Jira source implementation
+ * Jira {@link Source} implementation
  */
-public class JiraSource implements Source {
+public class JiraSource extends JiraSourceOrSink implements Source {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JiraSource.class);
-
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Host and port number of Jira server
-     */
-    private String hostPort;
-
-    /**
-     * Jira user ID
-     */
-    private String userId;
-
-    /**
-     * Jira user password
-     */
-    private String password;
+    private static final long serialVersionUID = 6087511765623929542L; 
 
     /**
      * Jira REST API resource type.
      * Could be issue or project
      */
-    private JiraResource resourceType;
-
-    /**
-     * Schema of data to be retrieved
-     */
-    private Schema dataSchema;
+    private Resource resourceType;
 
     /**
      * Optional Jira search query property
@@ -81,53 +55,17 @@ public class JiraSource implements Source {
     /**
      * Saves component properties in this object
      * 
-     * @param container runtime container
+     * @param container {@link RuntimeContainer} instance
      * @param properties component properties
      */
     @Override
     public void initialize(RuntimeContainer container, ComponentProperties properties) {
-
-        if (properties instanceof TJiraInputProperties) {
-            TJiraInputProperties inputProperties = (TJiraInputProperties) properties;
-            this.hostPort = inputProperties.host.getValue();
-            this.userId = inputProperties.userPassword.userId.getValue();
-            this.password = inputProperties.userPassword.password.getValue();
-            this.resourceType = inputProperties.resource.getValue();
-            this.dataSchema = inputProperties.schema.schema.getValue();
-            this.jql = inputProperties.jql.getStringValue();
-            this.batchSize = inputProperties.batchSize.getValue();
-            this.projectId = inputProperties.projectId.getStringValue();
-        } else {
-            LOG.error("Wrong properties typs: {}", properties.getClass().getName());
-        }
-    }
-
-    /**
-     * TODO implement it
-     */
-    @Override
-    public ValidationResult validate(RuntimeContainer container) {
-        return ValidationResult.OK;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * Component doesn't retrieve schemas from {@link Source}. Static schema is used in UI.
-     */
-    @Override
-    public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * Component doesn't retrieve schemas from {@link Source}. Static schema is used in UI
-     */
-    @Override
-    public Schema getSchema(RuntimeContainer container, String schemaName) throws IOException {
-        return null;
+        super.initialize(container, properties);
+        TJiraInputProperties inputProperties = (TJiraInputProperties) properties;
+        this.jql = inputProperties.jql.getStringValue();
+        this.batchSize = inputProperties.batchSize.getValue();
+        this.projectId = inputProperties.projectId.getStringValue();
+        this.resourceType = inputProperties.resource.getValue();
     }
 
     /**
@@ -159,56 +97,11 @@ public class JiraSource implements Source {
     }
 
     /**
-     * Returns hostPort
-     * 
-     * @return the hostPort
-     */
-    String getHostPort() {
-        return hostPort;
-    }
-
-    /**
-     * Returns userId
-     * 
-     * @return the userId
-     */
-    String getUserId() {
-        return userId;
-    }
-
-    /**
-     * Returns password
-     * 
-     * @return the password
-     */
-    String getPassword() {
-        return password;
-    }
-
-    /**
-     * Returns resourceType
-     * 
-     * @return the resourceType
-     */
-    JiraResource getResourceType() {
-        return resourceType;
-    }
-
-    /**
-     * Returns dataSchema
-     * 
-     * @return the dataSchema
-     */
-    Schema getDataSchema() {
-        return dataSchema;
-    }
-
-    /**
      * Returns Jira search query
      * 
      * @return Jira search query
      */
-    String getJql() {
+    public String getJql() {
         return jql;
     }
 
@@ -217,7 +110,7 @@ public class JiraSource implements Source {
      * 
      * @return the batch size
      */
-    int getBatchSize() {
+    public int getBatchSize() {
         return batchSize;
     }
 
@@ -226,7 +119,7 @@ public class JiraSource implements Source {
      * 
      * @return Jira project ID
      */
-    String getProjectId() {
+    public String getProjectId() {
         return projectId;
     }
 }

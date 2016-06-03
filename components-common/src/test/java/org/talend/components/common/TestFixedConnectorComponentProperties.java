@@ -32,8 +32,8 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.test.SimpleComponentDefinition;
 import org.talend.components.api.test.SimpleComponentRegistry;
-import org.talend.daikon.properties.Property;
-import org.talend.daikon.properties.PropertyFactory;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 public class TestFixedConnectorComponentProperties {
 

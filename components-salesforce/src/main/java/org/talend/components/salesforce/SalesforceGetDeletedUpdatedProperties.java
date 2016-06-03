@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.PropertyFactory.newProperty;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -20,8 +20,8 @@ import java.util.Set;
 
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.talend.components.api.component.PropertyPathConnector;
-import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
 
 public class SalesforceGetDeletedUpdatedProperties extends SalesforceConnectionModuleProperties {
 

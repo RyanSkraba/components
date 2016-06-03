@@ -12,18 +12,18 @@
 // ============================================================================
 package org.talend.components.api.service.testcomponent;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.property.PropertyFactory.*;
 
-import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
-import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.property.Property;
 
-public class ComponentPropertiesWithDefinedI18N extends ComponentProperties {
+public class ComponentPropertiesWithDefinedI18N extends ComponentPropertiesImpl {
 
     public static final String A_GREAT_PROP_NAME2 = "aGreatProp2"; //$NON-NLS-1$
 
-    public Property aGreatProp2 = newProperty(A_GREAT_PROP_NAME2);
+    public Property<String> aGreatProp2 = newProperty(A_GREAT_PROP_NAME2);
 
     public ComponentPropertiesWithDefinedI18N(String name) {
         super(name);

@@ -136,12 +136,12 @@ public class SalesforceRuntimeTestUtil {
 
             SaveResult[] results = partnerConnection.create(contacts.toArray(new SObject[0]));
 
-            for (int j = 0; j < results.length; j++) {
-                if (results[j].isSuccess()) {
-                    ids.add(results[j].getId());
+            for (SaveResult result : results) {
+                if (result.isSuccess()) {
+                    ids.add(result.getId());
                 } else {
-                    for (int i = 0; i < results[j].getErrors().length; i++) {
-                        com.sforce.soap.partner.Error err = results[j].getErrors()[i];
+                    for (int i = 0; i < result.getErrors().length; i++) {
+                        com.sforce.soap.partner.Error err = result.getErrors()[i];
                         Assert.fail(err.getMessage());
                     }
                 }
@@ -158,12 +158,12 @@ public class SalesforceRuntimeTestUtil {
         try {
             DeleteResult[] results = partnerConnection.delete(ids.toArray(new String[0]));
 
-            for (int j = 0; j < results.length; j++) {
-                if (results[j].isSuccess()) {
+            for (DeleteResult result : results) {
+                if (result.isSuccess()) {
 
                 } else {
-                    for (int i = 0; i < results[j].getErrors().length; i++) {
-                        com.sforce.soap.partner.Error err = results[j].getErrors()[i];
+                    for (int i = 0; i < result.getErrors().length; i++) {
+                        com.sforce.soap.partner.Error err = result.getErrors()[i];
                         Assert.fail(err.getMessage());
                     }
                 }

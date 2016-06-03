@@ -12,15 +12,15 @@
 // ============================================================================
 package org.talend.components.api.properties;
 
-import static org.talend.daikon.properties.Property.Flags.*;
-import static org.talend.daikon.properties.PropertyFactory.*;
+import static org.talend.daikon.properties.property.Property.Flags.*;
+import static org.talend.daikon.properties.property.PropertyFactory.*;
 
 import java.lang.reflect.Field;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
 
 /**
  * A reference to another component. This could be in one of the following states:
@@ -32,10 +32,10 @@ import org.talend.daikon.properties.presentation.Form;
  * IMPORTANT - when using {@code ComponentReferenceProperties} the property name in the enclosingProperties must be
  * {@code referencedComponent}.
  *
- * The {@link org.talend.daikon.properties.presentation.Widget.WidgetType#COMPONENT_REFERENCE} uses this class as its
+ * The {@link org.talend.daikon.properties.presentation.WidgetType#COMPONENT_REFERENCE} uses this class as its
  * properties and the Widget will populate these values.
  */
-public class ComponentReferenceProperties extends ComponentProperties {
+public class ComponentReferenceProperties extends ComponentPropertiesImpl {
 
     public enum ReferenceType {
         THIS_COMPONENT,

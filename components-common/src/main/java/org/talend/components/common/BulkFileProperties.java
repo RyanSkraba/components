@@ -1,7 +1,7 @@
 package org.talend.components.common;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
 import static org.talend.daikon.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.property.PropertyFactory.*;
 
 import java.util.Collections;
 import java.util.Set;
@@ -10,9 +10,9 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentPropertyFactory;
-import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.properties.property.Property;
 
 public class BulkFileProperties extends FixedConnectorsComponentProperties {
 
@@ -46,7 +46,7 @@ public class BulkFileProperties extends FixedConnectorsComponentProperties {
 
         returns = ComponentPropertyFactory.newReturnsProperty();
         ERROR_MESSAGE = ComponentPropertyFactory.newReturnProperty(returns, newString(ERROR_MESSAGE_NAME));
-        NB_LINE = ComponentPropertyFactory.newReturnProperty(returns, newString(NB_LINE_NAME));
+        NB_LINE = ComponentPropertyFactory.newReturnProperty(returns, newInteger(NB_LINE_NAME));
     }
 
     public void setSchemaListener(ISchemaListener schemaListener) {
@@ -62,7 +62,7 @@ public class BulkFileProperties extends FixedConnectorsComponentProperties {
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(schema.getForm(Form.REFERENCE));
-        mainForm.addRow(widget(bulkFilePath).setWidgetType(Widget.WidgetType.FILE));
+        mainForm.addRow(widget(bulkFilePath).setWidgetType(Widget.FILE_WIDGET_TYPE));
         mainForm.addRow(append);
 
     }

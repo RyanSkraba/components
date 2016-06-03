@@ -20,8 +20,8 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.test.SpringApp;
 import org.talend.components.splunk.objects.SplunkJSONEventField;
-import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -121,7 +121,7 @@ public class TSplunkEventCollectorTestIT {
 
     protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props) throws Throwable {
         assertTrue(form.getWidget(propName).isCallAfter());
-        return getComponentService().afterProperty(propName, props);
+        return (ComponentProperties) getComponentService().afterProperty(propName, props);
     }
 
 }

@@ -1,0 +1,11 @@
+{
+	"fields" : {
+		"project" : {
+			"key" : "ITP"
+		},
+		"summary" : "Integration test issue 1",
+		"issuetype" : {
+			"id" : "10001"
+		}
+	}
+}

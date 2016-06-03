@@ -45,14 +45,14 @@ public class SchemaPropertiesTest {
         assertNotNull("Schema", schemaProperties.getForm(Form.MAIN).getName());
         assertNotNull(schemaProperties.getForm(Form.MAIN).getWidget(schemaProperties.schema.getName()));
         assertEquals(1, schemaProperties.getForm(Form.MAIN).getWidget(schemaProperties.schema.getName()).getRow());
-        assertEquals(Widget.WidgetType.SCHEMA_EDITOR,
+        assertEquals(Widget.SCHEMA_EDITOR_WIDGET_TYPE,
                 schemaProperties.getForm(Form.MAIN).getWidget(schemaProperties.schema.getName()).getWidgetType());
 
         assertNotNull(schemaProperties.getForm(Form.REFERENCE));
         assertNotNull("Schema", schemaProperties.getForm(Form.REFERENCE).getName());
         assertNotNull(schemaProperties.getForm(Form.REFERENCE).getWidget(schemaProperties.schema.getName()));
         assertEquals(1, schemaProperties.getForm(Form.REFERENCE).getWidget(schemaProperties.schema.getName()).getRow());
-        assertEquals(Widget.WidgetType.SCHEMA_REFERENCE,
+        assertEquals(Widget.SCHEMA_REFERENCE_WIDGET_TYPE,
                 schemaProperties.getForm(Form.REFERENCE).getWidget(schemaProperties.schema.getName()).getWidgetType());
 
         // add element

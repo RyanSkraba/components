@@ -13,8 +13,14 @@
 package org.talend.components.jira.tjirainput;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.Set;
@@ -22,9 +28,8 @@ import java.util.Set;
 import org.apache.avro.Schema;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.jira.Resource;
 import org.talend.components.jira.testutils.Utils;
-import org.talend.components.jira.tjirainput.TJiraInputProperties.ConnectionType;
-import org.talend.components.jira.tjirainput.TJiraInputProperties.JiraResource;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 
@@ -34,29 +39,13 @@ import org.talend.daikon.properties.presentation.Widget;
 public class TJiraInputPropertiesTest {
 
     /**
-     * Checks {@link TJiraInputProperties#afterAuthorizationType()} hides userPassword widget, if OAuth
-     * authorizationType is chosen
-     */
-    @Test
-    public void testAfterAuthorizationTypeOAuth() {
-        TJiraInputProperties properties = new TJiraInputProperties("root");
-        properties.init();
-        properties.authorizationType.setValue(ConnectionType.OAUTH);
-
-        properties.afterAuthorizationType();
-
-        boolean userPasswordIsHidden = properties.getForm(Form.MAIN).getWidget("userPassword").isHidden();
-        assertTrue(userPasswordIsHidden);
-    }
-
-    /**
      * Checks {@link TJiraInputProperties#afterResource()} hides jql widget, if project resource chosen
      */
     @Test
     public void testAfterResourceProject() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.init();
-        properties.resource.setValue(JiraResource.PROJECT);
+        properties.resource.setValue(Resource.PROJECT);
 
         properties.afterResource();
 
@@ -74,16 +63,12 @@ public class TJiraInputPropertiesTest {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.setupProperties();
 
-        String hostValue = properties.host.getStringValue();
-        JiraResource resourceValue = properties.resource.getValue();
-        ConnectionType authorizationTypeValue = properties.authorizationType.getValue();
-        String jqlValue = properties.jql.getStringValue();
-        String projectIdValue = properties.projectId.getStringValue();
+        Resource resourceValue = properties.resource.getValue();
+        String jqlValue = properties.jql.getValue();
+        String projectIdValue = properties.projectId.getValue();
         int batchSizeValue = properties.batchSize.getValue();
 
-        assertThat(hostValue, equalTo("https://jira.atlassian.com/"));
-        assertThat(resourceValue, equalTo(JiraResource.ISSUE));
-        assertThat(authorizationTypeValue, equalTo(ConnectionType.BASIC));
+        assertThat(resourceValue, equalTo(Resource.ISSUE));
         assertThat(jqlValue, equalTo("summary ~ \\\"some word\\\" AND project=PROJECT_ID"));
         assertThat(projectIdValue, equalTo(""));
         assertThat(batchSizeValue, equalTo(50));
@@ -105,25 +90,6 @@ public class TJiraInputPropertiesTest {
     }
 
     /**
-     * Checks {@link TJiraInputProperties#getSchema()} returns null if {@link TJiraInputProperties#setupSchema()} wasn't
-     * called and correct schema after {@link TJiraInputProperties#setupSchema()} called
-     */
-    @Test
-    public void testGetSchema() {
-        TJiraInputProperties properties = new TJiraInputProperties("root");
-
-        Schema schema = properties.getSchema();
-        assertThat("if setupSchema() wasn't null", schema, is(nullValue()));
-
-        properties.setupSchema();
-        schema = properties.getSchema();
-        String actualSchema = schema.toString();
-        String expectedSchema = Utils.readFile("src/test/resources/org/talend/components/jira/tjirainput/schema.json");
-
-        assertThat("after setupSchema() called", actualSchema, equalTo(expectedSchema));
-    }
-
-    /**
      * Checks {@link TJiraInputProperties#refreshLayout(Form)} doesn't hide userPassword and jqlWidget in initial state
      */
     @Test
@@ -133,10 +99,8 @@ public class TJiraInputPropertiesTest {
 
         properties.refreshLayout(properties.getForm(Form.MAIN));
 
-        boolean userPasswordIsHidden = properties.getForm(Form.MAIN).getWidget("userPassword").isHidden();
         boolean jqlIsHidden = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
         boolean projectIdIsHidden = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
-        assertFalse(userPasswordIsHidden);
         assertFalse(jqlIsHidden);
         assertTrue(projectIdIsHidden);
     }
@@ -150,38 +114,15 @@ public class TJiraInputPropertiesTest {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.init();
 
-        boolean userPasswordExpected = properties.getForm(Form.MAIN).getWidget("userPassword").isHidden();
         boolean jqlExpected = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
         boolean projectIdExpected = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
 
         properties.refreshLayout(new Form(properties, "NotMain"));
 
-        boolean userPasswordActual = properties.getForm(Form.MAIN).getWidget("userPassword").isHidden();
         boolean jqlActual = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
         boolean projectIdActual = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
-        assertEquals(userPasswordExpected, userPasswordActual);
         assertEquals(jqlExpected, jqlActual);
         assertEquals(projectIdExpected, projectIdActual);
-    }
-
-    /**
-     * Checks {@link TJiraInputProperties#refreshLayout(Form)} hides basic authorization widget, if OAuth authorization
-     * type chosen
-     */
-    @Test
-    public void testRefreshLayoutOAuth() {
-        TJiraInputProperties properties = new TJiraInputProperties("root");
-        properties.init();
-        properties.authorizationType.setValue(ConnectionType.OAUTH);
-
-        properties.refreshLayout(properties.getForm(Form.MAIN));
-
-        boolean userPasswordIsHidden = properties.getForm(Form.MAIN).getWidget("userPassword").isHidden();
-        boolean jqlIsHidden = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
-        boolean projectIdIsHidden = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
-        assertTrue(userPasswordIsHidden);
-        assertFalse(jqlIsHidden);
-        assertTrue(projectIdIsHidden);
     }
 
     /**
@@ -191,21 +132,19 @@ public class TJiraInputPropertiesTest {
     public void testRefreshLayoutProject() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.init();
-        properties.resource.setValue(JiraResource.PROJECT);
+        properties.resource.setValue(Resource.PROJECT);
 
         properties.refreshLayout(properties.getForm(Form.MAIN));
 
-        boolean userPasswordIsHidden = properties.getForm(Form.MAIN).getWidget("userPassword").isHidden();
         boolean jqlIsHidden = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
         boolean projectIdIsHidden = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
-        assertFalse(userPasswordIsHidden);
         assertTrue(jqlIsHidden);
         assertFalse(projectIdIsHidden);
     }
 
     /**
      * Checks {@link TJiraInputProperties#setupLayout()} creates 2 forms: Main and Advanced Checks
-     * {@link TJiraInputProperties#setupLayout()} creates Main form, which contains 7 widgets and checks widgets names
+     * {@link TJiraInputProperties#setupLayout()} creates Main form, which contains 5 widgets and checks widgets names
      * Checks {@link TJiraInputProperties#setupLayout()} creates Advanced form, which contains 1 widget and checks
      * widgets names
      */
@@ -213,7 +152,7 @@ public class TJiraInputPropertiesTest {
     public void testSetupLayout() {
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.schema.init();
-        properties.userPassword.init();
+        properties.connection.init();
 
         properties.setupLayout();
 
@@ -223,15 +162,15 @@ public class TJiraInputPropertiesTest {
         assertThat(advanced, notNullValue());
 
         Collection<Widget> mainWidgets = main.getWidgets();
-        assertThat(mainWidgets, hasSize(6));
-        Widget schemaWidget = main.getWidget("schema");
-        assertThat(schemaWidget, notNullValue());
-        Widget hostWidget = main.getWidget("host");
-        assertThat(hostWidget, notNullValue());
-        Widget userWidget = main.getWidget("userPassword");
-        assertThat(userWidget, notNullValue());
+        assertThat(mainWidgets, hasSize(5));
+        // JiraProperties widgets
+        Widget connectionWidget = main.getWidget("connection");
+        assertThat(connectionWidget, notNullValue());
         Widget resourceWidget = main.getWidget("resource");
         assertThat(resourceWidget, notNullValue());
+        Widget schemaWidget = main.getWidget("schema");
+        assertThat(schemaWidget, notNullValue());
+        // TJiraInputProperties widgets
         Widget jqlWidget = main.getWidget("jql");
         assertThat(jqlWidget, notNullValue());
         Widget projectIdWidget = main.getWidget("projectId");

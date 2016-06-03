@@ -37,8 +37,6 @@ public class TJiraInputDefinition extends JiraDefinition implements InputCompone
     
     /**
      * Constructor sets component name
-     * 
-     * @param componentName component name
      */
     public TJiraInputDefinition() {
         super(COMPONENT_NAME);
@@ -46,11 +44,17 @@ public class TJiraInputDefinition extends JiraDefinition implements InputCompone
                 new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Source getRuntime() {
         return new JiraSource();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return TJiraInputProperties.class;

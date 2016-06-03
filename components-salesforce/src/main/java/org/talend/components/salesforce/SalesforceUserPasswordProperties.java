@@ -12,15 +12,15 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
 import static org.talend.daikon.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.property.PropertyFactory.*;
 
 import java.util.EnumSet;
 
 import org.talend.components.common.UserPasswordProperties;
-import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.properties.property.Property;
 
 public class SalesforceUserPasswordProperties extends UserPasswordProperties {
 
@@ -35,7 +35,7 @@ public class SalesforceUserPasswordProperties extends UserPasswordProperties {
     public void setupLayout() {
         super.setupLayout();
         Form form = getForm(Form.MAIN);
-        form.addColumn(widget(securityKey).setWidgetType(Widget.WidgetType.HIDDEN_TEXT));
+        form.addColumn(widget(securityKey).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
 
     }
 

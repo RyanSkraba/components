@@ -27,7 +27,7 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
 import org.talend.daikon.NamedThing;
-import org.talend.daikon.properties.Property;
+import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.spring.BndToSpringBeanNameGenerator;
 
 import jline.console.ConsoleReader;
@@ -198,7 +198,7 @@ public class PropertiesTester {
                     void run() {
                         Property p = resolveProperty();
                         try {
-                            testProps = componentService.beforePropertyPresent(p.getName(), testProps);
+                            testProps = (ComponentProperties) componentService.beforePropertyPresent(p.getName(), testProps);
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();
                         }
@@ -211,7 +211,7 @@ public class PropertiesTester {
                     void run() {
                         Property p = resolveProperty();
                         try {
-                            testProps = componentService.beforePropertyActivate(p.getName(), testProps);
+                            testProps = (ComponentProperties) componentService.beforePropertyActivate(p.getName(), testProps);
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();
                         }
@@ -223,7 +223,7 @@ public class PropertiesTester {
                     void run() {
                         Property p = resolveProperty();
                         try {
-                            testProps = componentService.afterProperty(p.getName(), testProps);
+                            testProps = (ComponentProperties) componentService.afterProperty(p.getName(), testProps);
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();
                         }
@@ -235,7 +235,7 @@ public class PropertiesTester {
                     void run() {
                         Property p = resolveProperty();
                         try {
-                            testProps = componentService.validateProperty(p.getName(), testProps);
+                            testProps = (ComponentProperties) componentService.validateProperty(p.getName(), testProps);
                             System.out.println(testProps.getValidationResult());
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();

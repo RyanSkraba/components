@@ -16,13 +16,13 @@ import static org.talend.daikon.properties.presentation.Widget.*;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
-import org.talend.components.api.properties.ComponentProperties;
-import org.talend.daikon.properties.Property;
-import org.talend.daikon.properties.PropertyFactory;
+import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
-public class SchemaProperties extends ComponentProperties {
+public class SchemaProperties extends PropertiesImpl {
 
     /** An empty schema is used for an uninitialized SchemaProperties. */
     public static final Schema EMPTY_SCHEMA = SchemaBuilder.builder().record("EmptyRecord").fields().endRecord(); //$NON-NLS-1$
@@ -52,10 +52,10 @@ public class SchemaProperties extends ComponentProperties {
         super.setupLayout();
 
         Form schemaForm = Form.create(this, Form.MAIN);
-        schemaForm.addRow(widget(schema).setWidgetType(Widget.WidgetType.SCHEMA_EDITOR));
+        schemaForm.addRow(widget(schema).setWidgetType(Widget.SCHEMA_EDITOR_WIDGET_TYPE));
 
         Form schemaRefForm = Form.create(this, Form.REFERENCE);
-        schemaRefForm.addRow(widget(schema).setWidgetType(Widget.WidgetType.SCHEMA_REFERENCE));
+        schemaRefForm.addRow(widget(schema).setWidgetType(Widget.SCHEMA_REFERENCE_WIDGET_TYPE));
     }
 
 }

@@ -1,16 +1,17 @@
 package org.talend.components.salesforce.runtime;
 
-import com.sforce.soap.partner.sobject.SObject;
-import com.sforce.ws.bind.XmlObject;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.daikon.avro.AvroConverter;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import com.sforce.soap.partner.sobject.SObject;
+import com.sforce.ws.bind.XmlObject;
 
 /**
  * Creates an {@link IndexedRecordAdapterFactory} that knows how to interpret Salesforce {@link SObject} objects.

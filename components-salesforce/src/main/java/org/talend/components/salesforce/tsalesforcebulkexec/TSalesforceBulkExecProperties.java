@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcebulkexec;
 
-import static org.talend.daikon.properties.PropertyFactory.newProperty;
 import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -30,9 +30,9 @@ import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.salesforce.SalesforceBulkProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.daikon.avro.SchemaConstants;
-import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
@@ -49,11 +49,11 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
     public void setupLayout() {
         super.setupLayout();
         Form mainForm = getForm(Form.MAIN);
-        mainForm.addRow(widget(bulkFilePath).setWidgetType(Widget.WidgetType.FILE));
+        mainForm.addRow(widget(bulkFilePath).setWidgetType(Widget.FILE_WIDGET_TYPE));
 
         Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(widget(bulkProperties.getForm(Form.MAIN).setName("bulkProperties")));
-        advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.WidgetType.TABLE));
+        advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.TABLE_WIDGET_TYPE));
     }
 
     @Override
@@ -87,9 +87,14 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
         });
     }
 
+    @Override
+    protected boolean isUpsertKeyColumnClosedList() {
+        return false;
+    }
+
     private void updateOutputSchemas() {
 
-        Schema inputSchema = (Schema) module.main.schema.getValue();
+        Schema inputSchema = module.main.schema.getValue();
         Schema mainOutputSchema = createRecordBuilderFromSchema(inputSchema, "output").name("salesforce_id")
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "false").prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255").type().stringType().noDefault()

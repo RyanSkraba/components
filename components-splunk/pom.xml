@@ -5,14 +5,14 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.11.0-SNAPSHOT</version>
+        <version>0.12.0-SNAPSHOT</version>
         <relativePath>../components-parent/pom.xml</relativePath>        
     </parent>
 
     <name>Components - tSplunkEventCollector</name>
     <groupId>org.talend.components</groupId>
     <artifactId>components-splunk</artifactId>
-    <version>0.11.0-SNAPSHOT</version>
+    <version>0.12.0-SNAPSHOT</version>
     <properties>
         <splunk.webui.port>8000</splunk.webui.port>
         <splunk.ec.port>8088</splunk.ec.port>
@@ -30,21 +30,21 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.11.0-SNAPSHOT</version>
+            <version>0.12.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Shared component properties such as Use/Password or Schema -->
         <dependency>
           <groupId>org.talend.components</groupId>
           <artifactId>components-common</artifactId>
-          <version>0.11.0-SNAPSHOT</version>
+          <version>0.12.0-SNAPSHOT</version>
         </dependency>
         
         <!-- Jar containing Test utils methods -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.11.0-SNAPSHOT</version>
+            <version>0.12.0-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -91,6 +91,7 @@
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                                 <Include-Resource>{maven-resources},META-INF/maven/org.talend.components/components-splunk/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
                                 <Service-Component>*</Service-Component>                                
+                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                             </instructions>
                         </configuration>
                     </execution>
@@ -130,6 +131,7 @@
                                 <Import-Package>*,aQute.bnd.annotation.component</Import-Package>
                                 <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*</Embed-Dependency>
                                 <Include-Resource>{maven-resources},META-INF/maven/org.talend.components/components-splunk/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
+                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                             </instructions>
                         </configuration>
                     </execution>

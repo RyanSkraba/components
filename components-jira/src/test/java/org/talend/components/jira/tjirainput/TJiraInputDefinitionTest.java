@@ -17,6 +17,8 @@ import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.talend.components.api.component.runtime.Source;
@@ -59,6 +61,16 @@ public class TJiraInputDefinitionTest {
     }
     
     /**
+     * Check {@link TJiraInputDefinition#getName()} returns "tJIRAInput"
+     */
+    @Test
+    public void testGetName() {
+        JiraDefinition definition = new TJiraInputDefinition();
+        String componentName = definition.getName();
+        assertEquals(componentName, "tJIRAInput");
+    }
+    
+    /**
      * Check {@link TJiraInputDefinition#getPropertyClass()} returns class, which canonical name is
      * "org.talend.components.jira.tjirainput.TJiraInputProperties"
      */
@@ -78,5 +90,15 @@ public class TJiraInputDefinitionTest {
         TJiraInputDefinition definition = new TJiraInputDefinition();
         Source source = definition.getRuntime();
         assertThat(source, is(instanceOf(JiraSource.class)));
+    }
+    
+    /**
+     * Check {@link TJiraInputDefinition#isSchemaAutoPropagate()} returns <code>true</code>
+     */
+    @Test
+    public void testIsSchemaAutoPropagate() {
+        TJiraInputDefinition definition = new TJiraInputDefinition();
+        boolean result = definition.isSchemaAutoPropagate();
+        assertTrue(result);
     }
 }

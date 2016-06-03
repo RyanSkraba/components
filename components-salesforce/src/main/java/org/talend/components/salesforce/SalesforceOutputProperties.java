@@ -12,9 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.PropertyFactory.*;
-import static org.talend.daikon.properties.presentation.Widget.WidgetType;
 import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,10 +25,10 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.SchemaProperties;
-import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.properties.property.Property;
 
 public class SalesforceOutputProperties extends SalesforceConnectionModuleProperties {
 
@@ -84,16 +83,26 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         public ValidationResult afterModuleName() throws Exception {
             ValidationResult validationResult = super.afterModuleName();
             List<String> fieldNames = getFieldNames(main.schema);
-            upsertKeyColumn.setPossibleValues(fieldNames);
+
+            if (isUpsertKeyColumnClosedList()) {
+                upsertKeyColumn.setPossibleValues(fieldNames);
+            }
+
             upsertRelationTable.columnName.setPossibleValues(fieldNames);
             return validationResult;
         }
     }
 
+    protected boolean isUpsertKeyColumnClosedList() {
+        return true;
+    }
+
     public static final boolean POLY = true;
 
     public void beforeUpsertKeyColumn() {
-        upsertKeyColumn.setPossibleValues(getFieldNames(module.main.schema));
+        if (isUpsertKeyColumnClosedList()) {
+            upsertKeyColumn.setPossibleValues(getFieldNames(module.main.schema));
+        }
     }
 
     public void beforeUpsertRelationTable() {
@@ -122,10 +131,15 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         super.setupLayout();
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(outputAction);
-        mainForm.addColumn(widget(upsertKeyColumn).setWidgetType(WidgetType.ENUMERATION));
+
+        if (isUpsertKeyColumnClosedList()) {
+            mainForm.addColumn(widget(upsertKeyColumn).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
+        } else {
+            mainForm.addColumn(upsertKeyColumn);
+        }
 
         Form advancedForm = getForm(Form.ADVANCED);
-        advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.WidgetType.TABLE));
+        advancedForm.addRow(widget(upsertRelationTable).setWidgetType(Widget.TABLE_WIDGET_TYPE));
         // check
         // I18N
     }
