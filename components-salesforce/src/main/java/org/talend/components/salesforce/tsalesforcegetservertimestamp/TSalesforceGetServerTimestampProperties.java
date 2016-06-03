@@ -76,7 +76,7 @@ public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComp
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        if (form != null && form.getName().equals(Form.ADVANCED)) {
+        if (form.getName().equals(Form.ADVANCED)) {
             form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
             form.getChildForm(connection.getName()).getWidget(connection.httpTraceMessage.getName()).setHidden(true);
         }

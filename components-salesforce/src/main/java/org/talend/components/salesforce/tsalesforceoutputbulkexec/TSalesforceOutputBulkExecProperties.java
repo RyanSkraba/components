@@ -12,8 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutputbulkexec;
 
-import static org.talend.components.salesforce.SalesforceOutputProperties.OutputAction.UPSERT;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,8 +46,8 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
-        if (form != null && Form.ADVANCED.equals(form.getName())) {
-            boolean isUpsert = UPSERT.equals(outputAction.getValue());
+        if (Form.ADVANCED.equals(form.getName())) {
+            boolean isUpsert = OutputAction.UPSERT.equals(outputAction.getValue());
             form.getWidget(upsertRelationTable.getName()).setHidden(!isUpsert);
         }
     }
@@ -77,7 +75,7 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
     public ComponentProperties getOutputComponentProperties() {
         TSalesforceBulkExecProperties bulkExecProperties = new TSalesforceBulkExecProperties("bulkExecProperties");
         bulkExecProperties.copyValuesFrom(this);
-        
+
         // we need to pass also the possible values, only way from the studio to know it comes from a combo box (need to
         // add quotes for generation)
         bulkExecProperties.upsertRelationTable.columnName.setPossibleValues(upsertRelationTable.columnName.getPossibleValues());

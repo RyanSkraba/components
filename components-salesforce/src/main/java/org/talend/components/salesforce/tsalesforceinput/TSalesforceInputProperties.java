@@ -91,9 +91,6 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
     @Override
     public void refreshLayout(Form form) {
-        if (form == null) {
-            return;
-        }
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN)) {
             form.getWidget(includeDeleted.getName())

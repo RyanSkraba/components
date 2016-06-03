@@ -57,13 +57,12 @@ public class ProxyProperties extends PropertiesImpl {
 
     public void afterUseProxy() {
         refreshLayout(getForm(Form.MAIN));
-        refreshLayout(getForm(Form.REFERENCE));
     }
 
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        if (form != null && form.getName().equals(Form.MAIN)) {
+        if (form.getName().equals(Form.MAIN)) {
             boolean isUseProxy = useProxy.getValue();
             form.getWidget(HOST).setHidden(!isUseProxy);
             form.getWidget(PORT).setHidden(!isUseProxy);

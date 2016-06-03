@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.presentation.Widget.*;
 import static org.talend.daikon.properties.property.PropertyFactory.*;
 
 import java.util.ArrayList;
@@ -153,7 +153,7 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
-        if (form != null && form.getName().equals(Form.MAIN)) {
+        if (form.getName().equals(Form.MAIN)) {
             Form advForm = getForm(Form.ADVANCED);
             if (advForm != null) {
                 boolean isUpsert = OutputAction.UPSERT.equals(outputAction.getValue());

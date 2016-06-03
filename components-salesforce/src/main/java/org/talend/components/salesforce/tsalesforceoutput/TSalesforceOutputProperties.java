@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
-import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.presentation.Widget.*;
 import static org.talend.daikon.properties.property.PropertyFactory.*;
 
 import org.apache.avro.Schema;
@@ -54,7 +54,7 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
     @Override
     public void setupProperties() {
         super.setupProperties();
-
+        
         module.setSchemaListener(new ISchemaListener() {
 
             @Override
@@ -140,7 +140,7 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
-        if (form != null && form.getName().equals(Form.ADVANCED)) {
+        if (form.getName().equals(Form.ADVANCED)) {
 
             form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
             form.getChildForm(connection.getName()).getWidget(connection.httpTraceMessage.getName()).setHidden(true);

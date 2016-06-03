@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcebulkexec;
 
-import static org.talend.daikon.properties.presentation.Widget.widget;
-import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+import static org.talend.daikon.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.property.PropertyFactory.*;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -60,7 +60,7 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
-        if (form != null && Form.ADVANCED.equals(form.getName())) {
+        if (Form.ADVANCED.equals(form.getName())) {
             form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
             form.getChildForm(connection.getName()).getWidget(connection.httpChunked.getName()).setHidden(true);
             form.getWidget(upsertRelationTable.getName()).setHidden(true);
@@ -99,7 +99,7 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "false").prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255").type().stringType().noDefault()
 
-                .name("salesforce_created").prop(SchemaConstants.TALEND_IS_LOCKED, "false")
+        .name("salesforce_created").prop(SchemaConstants.TALEND_IS_LOCKED, "false")
                 .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")
                 .type().stringType().noDefault().endRecord();
 

@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.presentation.Widget.*;
 import static org.talend.daikon.properties.property.PropertyFactory.*;
 
 import org.talend.components.api.properties.ComponentPropertiesImpl;
@@ -177,9 +177,6 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
 
     @Override
     public void refreshLayout(Form form) {
-        if (form == null) {
-            return;
-        }
         super.refreshLayout(form);
 
         String refComponentIdValue = getReferencedComponentId();
