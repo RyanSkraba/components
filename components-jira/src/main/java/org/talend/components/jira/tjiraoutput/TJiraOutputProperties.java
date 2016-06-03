@@ -117,10 +117,9 @@ public class TJiraOutputProperties extends JiraProperties {
         deleteSubtasks.setValue(true);
         mode.setValue(ADVANCED);
 
-        returns = ComponentPropertyFactory.newReturnsProperty();
-        ComponentPropertyFactory.newReturnProperty(returns, PropertyFactory.newInteger(NB_LINE));
-        ComponentPropertyFactory.newReturnProperty(returns, PropertyFactory.newInteger(NB_SUCCESS));
-        ComponentPropertyFactory.newReturnProperty(returns, PropertyFactory.newInteger(NB_REJECT));
+        ComponentPropertyFactory.newReturnProperty(getReturns(), PropertyFactory.newInteger(NB_LINE));
+        ComponentPropertyFactory.newReturnProperty(getReturns(), PropertyFactory.newInteger(NB_SUCCESS));
+        ComponentPropertyFactory.newReturnProperty(getReturns(), PropertyFactory.newInteger(NB_REJECT));
     }
 
     /**
@@ -131,7 +130,7 @@ public class TJiraOutputProperties extends JiraProperties {
         super.setupLayout();
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(action);
-        
+
         Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(deleteSubtasks);
     }
@@ -142,10 +141,10 @@ public class TJiraOutputProperties extends JiraProperties {
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        
+
         Action actionValue = action.getValue();
         Resource resourceValue = resource.getValue();
-        
+
         if (form.getName().equals(Form.MAIN)) {
 
             // sets corresponding schema property for chosen action
@@ -165,7 +164,7 @@ public class TJiraOutputProperties extends JiraProperties {
             }
 
         }
-        
+
         if (form.getName().equals(Form.ADVANCED)) {
 
             // deleteSubtasks property visibility

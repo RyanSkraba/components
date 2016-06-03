@@ -46,11 +46,15 @@ public abstract class SalesforceConnectionModuleProperties extends FixedConnecto
     @Override
     public void setupProperties() {
         super.setupProperties();
-        returns = connection.returns;
-        NB_LINE = ComponentPropertyFactory.newReturnProperty(returns, NB_LINE);
+        NB_LINE = ComponentPropertyFactory.newReturnProperty(getReturns(), NB_LINE);
         // Allow for subclassing
         module = new SalesforceModuleProperties("module");
         module.connection = connection;
+    }
+
+    @Override
+    public Property getReturns() {
+        return connection.getReturns();
     }
 
     public Schema getSchema() {

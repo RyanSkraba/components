@@ -104,7 +104,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
     public void testInputProps() throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputDefinition().createProperties();
         assertEquals(2, props.queryMode.getPossibleValues().size());
-        Property<String> returns = (Property<String>) props.getProperty(ComponentProperties.RETURNS);
+        Property<String> returns = props.getReturns();
+        LOGGER.debug(returns.getChildren().toString());
         assertEquals("NB_LINE", returns.getChildren().get(1).getName());
     }
 

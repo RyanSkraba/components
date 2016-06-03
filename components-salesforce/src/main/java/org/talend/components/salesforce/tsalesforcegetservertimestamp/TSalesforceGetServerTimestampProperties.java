@@ -58,8 +58,12 @@ public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComp
                 .type(AvroTypes._date()).noDefault().endRecord();
         schema.schema.setValue(s);
 
-        returns = connection.returns;
-        NB_LINE = ComponentPropertyFactory.newReturnProperty(returns, NB_LINE);
+        NB_LINE = ComponentPropertyFactory.newReturnProperty(getReturns(), NB_LINE);
+    }
+
+    @Override
+    public Property getReturns() {
+        return connection.getReturns();
     }
 
     @Override

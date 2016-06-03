@@ -82,9 +82,8 @@ public class TSplunkEventCollectorProperties extends FixedConnectorsComponentPro
 
         setupDefaultSchema();
 
-        returns = ComponentPropertyFactory.newReturnsProperty();
-        RESPONSE_CODE = ComponentPropertyFactory.newReturnProperty(returns, PropertyFactory.newInteger(RESPONSE_CODE_NAME)); // $NON-NLS-1$
-        ERROR_MESSAGE = ComponentPropertyFactory.newReturnProperty(returns, PropertyFactory.newString(ERROR_MESSAGE_NAME)); // $NON-NLS-1$
+        RESPONSE_CODE = ComponentPropertyFactory.newReturnProperty(getReturns(), PropertyFactory.newInteger(RESPONSE_CODE_NAME)); // $NON-NLS-1$
+        ERROR_MESSAGE = ComponentPropertyFactory.newReturnProperty(getReturns(), PropertyFactory.newString(ERROR_MESSAGE_NAME)); // $NON-NLS-1$
     }
 
     private void setupDefaultSchema() {

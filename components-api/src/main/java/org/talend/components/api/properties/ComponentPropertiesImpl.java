@@ -32,15 +32,10 @@ import org.talend.daikon.properties.property.Property;
 public class ComponentPropertiesImpl extends PropertiesImpl implements ComponentProperties {
 
     /**
-     * Name of the special Returns property.
-     */
-    public static final String RETURNS = "returns";
-
-    /**
      * A special property for the values that a component returns. If this is used, this will be a {@link Property} that
      * contains each of the values the component returns.
      */
-    public Property<String> returns;
+    public final Property<String> returns = ComponentPropertyFactory.newReturnsProperty();
 
     /**
      * named constructor to be used is these properties are nested in other properties. Do not subclass this method for
@@ -55,7 +50,7 @@ public class ComponentPropertiesImpl extends PropertiesImpl implements Component
     @Override
     protected boolean acceptUninitializedField(Field f) {
         // we accept that return field is not intialized after setupProperties.
-        return RETURNS.equals(f.getName());
+        return ComponentPropertyFactory.RETURNS.equals(f.getName());
     }
 
     /**
@@ -141,5 +136,10 @@ public class ComponentPropertiesImpl extends PropertiesImpl implements Component
 
         }, this);
         return isCopied.get();
+    }
+
+    @Override
+    public Property<String> getReturns() {
+        return returns;
     }
 }

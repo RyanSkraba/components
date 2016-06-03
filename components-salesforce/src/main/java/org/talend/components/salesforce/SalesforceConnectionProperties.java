@@ -91,8 +91,6 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
 
     public static final String ERROR_MESSAGE_NAME = "ERROR_MESSAGE";
 
-    public Property ERROR_MESSAGE;
-
     public SalesforceConnectionProperties(String name) {
         super(name);
     }
@@ -106,8 +104,7 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
         timeout.setValue(60000);
         httpChunked.setValue(true);
 
-        returns = ComponentPropertyFactory.newReturnsProperty();
-        ERROR_MESSAGE = ComponentPropertyFactory.newReturnProperty(returns, newString(ERROR_MESSAGE_NAME));
+        ComponentPropertyFactory.newReturnProperty(getReturns(), newString(ERROR_MESSAGE_NAME));
 
     }
 
