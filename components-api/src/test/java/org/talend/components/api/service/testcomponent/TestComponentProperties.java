@@ -26,7 +26,7 @@ import java.util.Set;
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
-import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
@@ -40,7 +40,7 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.service.Repository;
 
-public class TestComponentProperties extends ComponentProperties implements ComponentReferencePropertiesEnclosing {
+public class TestComponentProperties extends ComponentPropertiesImpl implements ComponentReferencePropertiesEnclosing {
 
     public static final String USER_ID_PROP_NAME = "userId"; //$NON-NLS-1$
 

@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.Properties;
@@ -29,7 +29,7 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.service.Repository;
 
-public class SalesforceModuleListProperties extends ComponentProperties implements SalesforceProvideConnectionProperties {
+public class SalesforceModuleListProperties extends ComponentPropertiesImpl implements SalesforceProvideConnectionProperties {
 
     public SalesforceConnectionProperties connection = new SalesforceConnectionProperties("connection");
 

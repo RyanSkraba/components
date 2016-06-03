@@ -597,7 +597,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
         String serialized = outputProps.toSerialized();
 
-        TSalesforceOutputProperties afterSerialized = ComponentProperties.fromSerialized(serialized,
+        TSalesforceOutputProperties afterSerialized = Properties.Helper.fromSerialized(serialized,
                 TSalesforceOutputProperties.class).properties;
         assertEquals(2, afterSerialized.getAvailableConnectors(null, true).size());
         for (Connector connector : afterSerialized.getAvailableConnectors(null, true)) {
@@ -633,7 +633,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
         String serialized = outputProps.toSerialized();
 
-        TSalesforceOutputProperties afterSerialized = ComponentProperties.fromSerialized(serialized,
+        TSalesforceOutputProperties afterSerialized = Properties.Helper.fromSerialized(serialized,
                 TSalesforceOutputProperties.class).properties;
 
         main2 = (Schema) afterSerialized.getValuedProperty("module.main.schema").getValue();

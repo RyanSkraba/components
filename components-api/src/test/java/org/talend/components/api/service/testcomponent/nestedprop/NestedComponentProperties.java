@@ -14,17 +14,17 @@ package org.talend.components.api.service.testcomponent.nestedprop;
 
 import static org.talend.daikon.properties.property.PropertyFactory.*;
 
-import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.presentation.Form;
 
-public class NestedComponentProperties extends ComponentProperties {
+public class NestedComponentProperties extends ComponentPropertiesImpl {
 
     public static final String A_GREAT_PROP_NAME = "aGreatProperty"; //$NON-NLS-1$
 
-    public Property aGreatProperty = newProperty(A_GREAT_PROP_NAME);
+    public Property<String> aGreatProperty = newProperty(A_GREAT_PROP_NAME);
 
-    public Property anotherProp = newProperty("anotherProp");
+    public Property<String> anotherProp = newProperty("anotherProp");
 
     public NestedComponentProperties(String name) {
         super(name);

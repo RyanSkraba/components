@@ -22,7 +22,7 @@ import org.talend.daikon.properties.property.PropertyFactory;
 
 public class ComponentPropertiesTest {
 
-    private final class NestedNestedProperties extends ComponentProperties {
+    private final class NestedNestedProperties extends ComponentPropertiesImpl{
 
         public Property value = PropertyFactory.newString("value");
 
@@ -35,7 +35,7 @@ public class ComponentPropertiesTest {
         }
     }
 
-    private final class NestedProperty extends ComponentProperties {
+    private final class NestedProperty extends ComponentPropertiesImpl{
 
         public Property three = PropertyFactory.newString("three");
 
@@ -50,7 +50,7 @@ public class ComponentPropertiesTest {
         }
     }
 
-    private final class ComponentPropertiesTestClass extends ComponentProperties {
+    private final class ComponentPropertiesTestClass extends ComponentPropertiesImpl{
 
         public Property one = PropertyFactory.newString("one");
 

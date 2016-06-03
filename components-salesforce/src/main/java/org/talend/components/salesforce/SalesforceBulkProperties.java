@@ -14,11 +14,11 @@ package org.talend.components.salesforce;
 
 import static org.talend.daikon.properties.property.PropertyFactory.*;
 
-import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 
-public class SalesforceBulkProperties extends ComponentProperties {
+public class SalesforceBulkProperties extends ComponentPropertiesImpl {
 
     public enum Concurrency {
         Parallel,

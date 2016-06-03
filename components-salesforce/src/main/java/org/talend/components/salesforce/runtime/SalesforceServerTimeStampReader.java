@@ -12,16 +12,16 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import com.sforce.soap.partner.PartnerConnection;
-import com.sforce.ws.ConnectionException;
-import org.talend.components.api.component.runtime.AbstractBoundedReader;
-import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.salesforce.SalesforceGetDeletedUpdatedProperties;
-import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
-
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.NoSuchElementException;
+
+import org.talend.components.api.component.runtime.AbstractBoundedReader;
+import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampProperties;
+
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.ws.ConnectionException;
 
 public class SalesforceServerTimeStampReader extends AbstractBoundedReader<Long> {
 

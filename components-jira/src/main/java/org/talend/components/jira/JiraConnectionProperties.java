@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.jira;
 
-import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.PropertyFactory;
@@ -21,7 +21,7 @@ import org.talend.daikon.properties.property.StringProperty;
 /**
  * Jira connection {@link Properties}
  */
-public class JiraConnectionProperties extends ComponentProperties {
+public class JiraConnectionProperties extends ComponentPropertiesImpl {
 
     private static final String INITIAL_HOST = "https://jira.atlassian.com";
 

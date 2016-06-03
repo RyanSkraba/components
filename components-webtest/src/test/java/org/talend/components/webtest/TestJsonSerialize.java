@@ -23,9 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
+import org.talend.daikon.properties.Properties;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = TestApplication.class)
@@ -42,7 +42,7 @@ public class TestJsonSerialize {
         // jsonio
         String jsonioString = tsip.toSerialized();
         System.out.println("jsonio:" + FileUtils.byteCountToDisplaySize(jsonioString.getBytes().length));
-        TSalesforceInputProperties salesforceInputProperties = ComponentProperties.fromSerialized(jsonioString,
+        TSalesforceInputProperties salesforceInputProperties = Properties.Helper.fromSerialized(jsonioString,
                 TSalesforceInputProperties.class).properties;
         assertNull(salesforceInputProperties.connection.proxy.host.getValue());
         assertEquals("foooo", tsip.connection.userPassword.userId.getValue());
