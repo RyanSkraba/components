@@ -23,11 +23,7 @@ import org.talend.daikon.i18n.I18nMessages;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.*;
 import java.util.List;
 
 public class DataPrepConnectionHandler {
@@ -36,8 +32,11 @@ public class DataPrepConnectionHandler {
 
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(DataPrepConnectionHandler.class);
+
     public static final String API_DATASETS = "/api/datasets/";
+
     public static final String CONTENT_TYPE = "Content-Type";
+
     public static final String TEXT_PLAIN = "text/plain";
 
     private final String url;
@@ -141,13 +140,12 @@ public class DataPrepConnectionHandler {
         URI uri;
         try {
             URL localUrl = new URL(url);
-            uri = new URI(localUrl.getProtocol(), null, localUrl.getHost(),
-                    localUrl.getPort(), "/api/datasets", "name=" + dataSetName, null);
+            uri = new URI(localUrl.getProtocol(), null, localUrl.getHost(), localUrl.getPort(), "/api/datasets",
+                    "name=" + dataSetName, null);
             LOGGER.debug("Request is: {}", uri);
-            System.out.println(uri);
-        } catch (MalformedURLException|URISyntaxException e) {
-            LOGGER.debug("It's not possible to create right request from input parameters. {}", e);
-            throw new IOException(e);
+        } catch (MalformedURLException | URISyntaxException e) {
+            LOGGER.debug(messages.getMessage("error.wrongInputParameters", e));
+            throw new IOException(messages.getMessage("error.wrongInputParameters", e));
         }
         URL connectionUrl = uri.toURL();
         urlConnection = (HttpURLConnection) connectionUrl.openConnection();

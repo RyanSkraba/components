@@ -71,8 +71,8 @@ public class DataPrepConnectionHandlerTest {
     @Test
     public void testFailedLogout() throws IOException {
         connectionHandler = new DataPrepConnectionHandler(URL+serverPort, "testLogout", "testLogout", "any");
-        Assert.assertEquals(200, connectionHandler.connect().getStatusLine().getStatusCode());
-        Assert.assertEquals(400, connectionHandler.logout().getStatusLine().getStatusCode());
+        Assert.assertEquals(200, returnStatusCode(connectionHandler.connect()));
+        Assert.assertEquals(400, returnStatusCode(connectionHandler.logout()));
     }
 
     @Test
@@ -108,35 +108,52 @@ public class DataPrepConnectionHandlerTest {
 
     @Test
     public void testCreateInLiveDataSetMode() throws IOException {
-        connectionHandler.connect();
+        Assert.assertEquals(200, returnStatusCode(connectionHandler.connect()));
+        //Exception shouldn't be thrown.
         connectionHandler.createInLiveDataSetMode().write("Hello".getBytes());
-        connectionHandler.logout();
+        Assert.assertEquals(200, returnStatusCode(connectionHandler.logout()));
     }
 
     @Test
     public void testCreate() throws IOException {
-        connectionHandler.connect();
+        Assert.assertEquals(200, returnStatusCode(connectionHandler.connect()));
+        //Exception shouldn't be thrown.
         connectionHandler.create().write("Hello".getBytes());
-        connectionHandler.logout();
+        Assert.assertEquals(200, returnStatusCode(connectionHandler.logout()));
     }
+
+    @Test
+    public void testNameWithSpacesInCreateMode() throws IOException {
+        connectionHandler = new DataPrepConnectionHandler(URL + serverPort, LOGIN, PASS, "??Hello world");
+        Assert.assertEquals(200, returnStatusCode(connectionHandler.connect()));
+        //Exception shouldn't be thrown.
+        connectionHandler.create().write("Hello".getBytes());
+        Assert.assertEquals(200, returnStatusCode(connectionHandler.logout()));
+    }
+
     @Test
     public void testUpdate() throws IOException {
-        connectionHandler.connect();
+        Assert.assertEquals(200, returnStatusCode(connectionHandler.connect()));
+        //Exception shouldn't be thrown.
         connectionHandler.update().write("Hello".getBytes());
-        connectionHandler.logout();
+        Assert.assertEquals(200, returnStatusCode(connectionHandler.logout()));
     }
 
     @Test
     public void testReadDataSetIterator() throws IOException {
-        Assert.assertEquals(200, connectionHandler.connect().getStatusLine().getStatusCode());
+        Assert.assertEquals(200, returnStatusCode(connectionHandler.connect()));
         Assert.assertNotNull(connectionHandler.readDataSetIterator());
-        Assert.assertEquals(200, connectionHandler.logout().getStatusLine().getStatusCode());
+        Assert.assertEquals(200, returnStatusCode(connectionHandler.logout()));
     }
 
     @Test(expected = IOException.class)
     public void testFailedReadDataSetIterator() throws IOException {
         connectionHandler = new DataPrepConnectionHandler(URL+serverPort, LOGIN, PASS, "any");
-        Assert.assertEquals(200, connectionHandler.connect().getStatusLine().getStatusCode());
+        Assert.assertEquals(200, returnStatusCode(connectionHandler.connect()));
         connectionHandler.readDataSetIterator();
+    }
+
+    private int returnStatusCode(HttpResponse response) {
+        return response.getStatusLine().getStatusCode();
     }
 }
