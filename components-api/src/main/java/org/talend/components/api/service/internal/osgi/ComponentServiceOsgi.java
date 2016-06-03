@@ -37,6 +37,7 @@ import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.service.Repository;
 
 import aQute.bnd.annotation.component.Activate;
@@ -147,12 +148,12 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
-    public ComponentProperties makeFormCancelable(ComponentProperties properties, String formName) {
+    public Properties makeFormCancelable(Properties properties, String formName) {
         return componentServiceDelegate.makeFormCancelable(properties, formName);
     }
 
     @Override
-    public ComponentProperties cancelFormValues(ComponentProperties properties, String formName) {
+    public Properties cancelFormValues(Properties properties, String formName) {
         return componentServiceDelegate.cancelFormValues(properties, formName);
     }
 
@@ -162,42 +163,42 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
-    public ComponentProperties validateProperty(String propName, ComponentProperties properties) throws Throwable {
+    public Properties validateProperty(String propName, Properties properties) throws Throwable {
         return componentServiceDelegate.validateProperty(propName, properties);
     }
 
     @Override
-    public ComponentProperties beforePropertyActivate(String propName, ComponentProperties properties) throws Throwable {
+    public Properties beforePropertyActivate(String propName, Properties properties) throws Throwable {
         return componentServiceDelegate.beforePropertyActivate(propName, properties);
     }
 
     @Override
-    public ComponentProperties beforePropertyPresent(String propName, ComponentProperties properties) throws Throwable {
+    public Properties beforePropertyPresent(String propName, Properties properties) throws Throwable {
         return componentServiceDelegate.beforePropertyPresent(propName, properties);
     }
 
     @Override
-    public ComponentProperties afterProperty(String propName, ComponentProperties properties) throws Throwable {
+    public Properties afterProperty(String propName, Properties properties) throws Throwable {
         return componentServiceDelegate.afterProperty(propName, properties);
     }
 
     @Override
-    public ComponentProperties beforeFormPresent(String formName, ComponentProperties properties) throws Throwable {
+    public Properties beforeFormPresent(String formName, Properties properties) throws Throwable {
         return componentServiceDelegate.beforeFormPresent(formName, properties);
     }
 
     @Override
-    public ComponentProperties afterFormNext(String formName, ComponentProperties properties) throws Throwable {
+    public Properties afterFormNext(String formName, Properties properties) throws Throwable {
         return componentServiceDelegate.afterFormNext(formName, properties);
     }
 
     @Override
-    public ComponentProperties afterFormBack(String formName, ComponentProperties properties) throws Throwable {
+    public Properties afterFormBack(String formName, Properties properties) throws Throwable {
         return componentServiceDelegate.afterFormBack(formName, properties);
     }
 
     @Override
-    public ComponentProperties afterFormFinish(String formName, ComponentProperties properties) throws Throwable {
+    public Properties afterFormFinish(String formName, Properties properties) throws Throwable {
         return componentServiceDelegate.afterFormFinish(formName, properties);
     }
 
@@ -227,8 +228,7 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
-    public String storeProperties(ComponentProperties properties, String name, String repositoryLocation,
-            String schemaPropertyName) {
+    public String storeProperties(Properties properties, String name, String repositoryLocation, String schemaPropertyName) {
         return componentServiceDelegate.storeProperties(properties, name, repositoryLocation, schemaPropertyName);
     }
 

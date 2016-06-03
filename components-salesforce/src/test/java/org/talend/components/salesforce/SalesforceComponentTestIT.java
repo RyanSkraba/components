@@ -438,7 +438,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
                 "moduleName", moduleProps);
         moduleProps.moduleName.setValue("Account");
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
-        Schema schema = new Schema.Parser().parse(moduleProps.main.schema.getStringValue());
+        Schema schema = moduleProps.main.schema.getValue();
         LOGGER.debug(schema.toString());
         for (Schema.Field child : schema.getFields()) {
             LOGGER.debug(child.name());
