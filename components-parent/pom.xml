@@ -117,11 +117,11 @@
 				<version>${hamcrest.version}</version>
 				<scope>test</scope>
 			</dependency>
-			<dependency>
-				<groupId>biz.aQute</groupId>
-				<artifactId>bndlib</artifactId>
-				<version>1.50.0</version>
-			</dependency>
+	        <dependency>
+	            <groupId>biz.aQute.bnd</groupId>
+	            <artifactId>annotation</artifactId>
+	            <version>2.4.0</version>
+	        </dependency>
 			<dependency>
 				<groupId>javax.inject</groupId>
 				<artifactId>javax.inject</artifactId>

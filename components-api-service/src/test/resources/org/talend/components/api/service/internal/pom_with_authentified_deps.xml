@@ -1,0 +1,26 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- parent is on an authenticated server -->
+	<parent>
+		<groupId>org.talend.studio</groupId>
+		<artifactId>parent-pom-tup</artifactId>
+		<version>6.0.0</version>
+	</parent>
+
+	<artifactId>org.talend.test.dependencies</artifactId>
+	<packaging>bundle</packaging>
+	<name>Component API test depenencies pom</name>
+
+	<dependencies>
+		<!-- simple dependency but in talend repo -->
+		<dependency>
+			<groupId>org.talend.components.salesforce</groupId>
+			<artifactId>partner</artifactId>
+			<version>34.0.0</version>
+			<!-- <scope>provided</scope> -->
+		</dependency>
+
+	</dependencies>
+</project>

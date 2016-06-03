@@ -57,6 +57,10 @@ public class PaxExamOptions {
                 // //
                 mavenBundle().groupId("org.talend.daikon").artifactId("daikon").classifier("tests").version(DAIKON_VERSION)
                         .noStart(),
+                mavenBundle().groupId("org.talend.components").artifactId("components-api-service").classifier("bundle")
+                        .version(COMPONENTS_VERSION), //
+                mavenBundle().groupId("org.talend.components").artifactId("components-api-service").classifier("tests")
+                        .version(COMPONENTS_VERSION).noStart(), //
                 mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("bundle")
                         .version(COMPONENTS_VERSION), //
                 mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("tests")
