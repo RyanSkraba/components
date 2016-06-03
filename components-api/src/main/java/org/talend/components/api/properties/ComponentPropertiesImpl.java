@@ -12,23 +12,51 @@
 // ============================================================================
 package org.talend.components.api.properties;
 
+import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.daikon.properties.Properties;
+import org.talend.daikon.properties.PropertiesImpl;
+import org.talend.daikon.properties.PropertiesVisitor;
+import org.talend.daikon.properties.property.Property;
 
 /**
- * for all details see {@link Properties}. This class adds a specific {@link ComponentProperties#returns} property which
+ * for all details see {@link Properties}. This class adds a specific {@link ComponentPropertiesImpl#returns} property which
  * is a schema element defining what is the type of data the component ouputs.
  */
 
-public interface ComponentProperties extends Properties {
+public class ComponentPropertiesImpl extends PropertiesImpl implements ComponentProperties {
 
     /**
      * Name of the special Returns property.
      */
     public static final String RETURNS = "returns";
+
+    /**
+     * A special property for the values that a component returns. If this is used, this will be a {@link Property} that
+     * contains each of the values the component returns.
+     */
+    public Property<String> returns;
+
+    /**
+     * named constructor to be used is these properties are nested in other properties. Do not subclass this method for
+     * initialization, use {@link #init()} instead.
+     * 
+     * @param name, uniquely identify the property among other properties when used as nested properties.
+     */
+    public ComponentPropertiesImpl(String name) {
+        super(name);
+    }
+
+    @Override
+    protected boolean acceptUninitializedField(Field f) {
+        // we accept that return field is not intialized after setupProperties.
+        return RETURNS.equals(f.getName());
+    }
 
     /**
      * return the schema associated with the connection name on input or output if any
@@ -37,7 +65,10 @@ public interface ComponentProperties extends Properties {
      * @param isOutgoingConnection wheter the connection is an outgoint connection or an incoming one.
      * @return the schema related to the connection or null if none.
      */
-    public Schema getSchema(Connector connector, boolean isOutgoingConnection);
+    @Override
+    public Schema getSchema(Connector connector, boolean isOutgoingConnection) {
+        return null;
+    }
 
     /**
      * return the set of all possible connectors for this component properties.
@@ -47,7 +78,10 @@ public interface ComponentProperties extends Properties {
      * @param isOutgoingConnection true for getting all outgoing connectors for the Properties.
      * @return set of connection eventually proposed by this Properties.
      */
-    public Set<? extends Connector> getPossibleConnectors(boolean isOutgoingConnection);
+    @Override
+    public Set<? extends Connector> getPossibleConnectors(boolean isOutgoingConnection) {
+        return Collections.emptySet();
+    }
 
     /**
      * return the set of available connector that may be setup with a schema according to the current state of this instance.
@@ -59,8 +93,11 @@ public interface ComponentProperties extends Properties {
      * @param isOutgoingConnection wether we query the possible output or input connections.
      * @return set of connection left to be connected, never null.
      */
+    @Override
     public Set<? extends Connector> getAvailableConnectors(Set<? extends Connector> existingConnectors,
-            boolean isOutgoingConnection);
+            boolean isOutgoingConnection) {
+        return Collections.emptySet();
+    }
 
     /**
      * set the schema related to the connector with the schema at the other end of the connection.
@@ -70,7 +107,11 @@ public interface ComponentProperties extends Properties {
      * @param isOutgoingConnection true if connector is an outgoing connectors.
      * 
      */
-    public void setConnectedSchema(Connector connector, Schema schema, boolean isOutgoingConnection);
+    @Override
+    public void setConnectedSchema(Connector connector, Schema schema, boolean isOutgoingConnection) {
+        // do nothing by default.
+
+    }
 
     /**
      * this will look for all authorized nested properties that shall be compatible with the nestedValues and copy all
@@ -82,5 +123,23 @@ public interface ComponentProperties extends Properties {
      * @param nestedValues values to be used update this current ComponentProperties nested Properties.
      * @return true if the copy was done and false if the targetProperties does not accept the nestedValues type.
      */
-    public boolean updateNestedProperties(final ComponentProperties nestedValues);
+    @Override
+    public boolean updateNestedProperties(final ComponentProperties nestedValues) {
+        if (nestedValues == null) {
+            return false;
+        } // else not null so perfect
+        final AtomicBoolean isCopied = new AtomicBoolean(false);
+        accept(new PropertiesVisitor() {
+
+            @Override
+            public void visit(Properties properties, Properties parent) {
+                if (properties.getClass().isAssignableFrom(nestedValues.getClass())) {
+                    properties.copyValuesFrom(nestedValues);
+                    isCopied.set(true);
+                } // else not a compatible nestedValues so keep going
+            }
+
+        }, this);
+        return isCopied.get();
+    }
 }

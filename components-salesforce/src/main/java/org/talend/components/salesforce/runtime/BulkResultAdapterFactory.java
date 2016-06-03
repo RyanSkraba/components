@@ -3,9 +3,9 @@ package org.talend.components.salesforce.runtime;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
+import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResult;
 import org.talend.daikon.avro.AvroConverter;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
-import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResult;
 
 
 public class BulkResultAdapterFactory implements IndexedRecordAdapterFactory<BulkResult, IndexedRecord> {

@@ -16,13 +16,13 @@ import static org.talend.daikon.properties.presentation.Widget.*;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
-import org.talend.daikon.properties.Properties;
+import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
-public class SchemaProperties extends Properties {
+public class SchemaProperties extends PropertiesImpl {
 
     /** An empty schema is used for an uninitialized SchemaProperties. */
     public static final Schema EMPTY_SCHEMA = SchemaBuilder.builder().record("EmptyRecord").fields().endRecord(); //$NON-NLS-1$

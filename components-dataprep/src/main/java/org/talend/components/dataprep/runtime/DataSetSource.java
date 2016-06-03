@@ -12,11 +12,6 @@
 // ============================================================================
 package org.talend.components.dataprep.runtime;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +22,13 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 import org.talend.components.dataprep.tdatasetinput.TDataSetInputProperties;
 import org.talend.daikon.NamedThing;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * The TDataSetInputSource provides the mechanism to supply data to other components at run-time.
@@ -47,10 +48,13 @@ public class DataSetSource implements BoundedSource {
     /** Default serial version UID. */
     private static final long serialVersionUID = -3740291007255450917L;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataSetSource.class);
+
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(DataSetSource.class);
+
     /** Configuration extracted from the input properties. */
     private RuntimeProperties runtimeProperties;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataPrepConnectionHandler.class);
 
     private transient Schema schema;
 
@@ -77,8 +81,9 @@ public class DataSetSource implements BoundedSource {
         try {
             getConnectionHandler().validate();
         } catch (IOException e) {
-            LOGGER.debug("Validation isn't passed. Reason: {}", e);
-            return new ValidationResult().setStatus(ValidationResult.Result.ERROR).setMessage(e.getMessage());
+            LOGGER.debug(messages.getMessage("error.validationFailed", e));
+            return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
+                    .setMessage(messages.getMessage("error.validationFailed", e));
         }
         return ValidationResult.OK;
     }
@@ -97,7 +102,7 @@ public class DataSetSource implements BoundedSource {
     public List<? extends BoundedSource> splitIntoBundles(long desiredBundleSizeBytes, RuntimeContainer adaptor)
             throws Exception {
         // There can be only one.
-        return Arrays.asList(this);
+        return Collections.singletonList(this);
     }
 
     @Override

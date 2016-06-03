@@ -35,7 +35,7 @@ import org.talend.daikon.properties.property.Property;
  * The {@link org.talend.daikon.properties.presentation.WidgetType#COMPONENT_REFERENCE} uses this class as its
  * properties and the Widget will populate these values.
  */
-public class ComponentReferenceProperties extends ComponentProperties {
+public class ComponentReferenceProperties extends ComponentPropertiesImpl {
 
     public enum ReferenceType {
         THIS_COMPONENT,

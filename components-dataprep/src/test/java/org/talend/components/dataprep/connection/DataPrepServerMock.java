@@ -84,6 +84,16 @@ public class DataPrepServerMock {
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
+    @RequestMapping(value = "/api/datasets/{id}", method = RequestMethod.PUT)
+    public ResponseEntity update(@PathVariable String id, InputStream inputStream) throws IOException {
+        checkNotNull(inputStream);
+        if (id.equals("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e")) {
+            byte[] buf = ByteStreams.toByteArray(inputStream);
+            return new ResponseEntity(HttpStatus.OK);
+        }
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    }
+
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public ResponseEntity createInLiveDataSet(InputStream inputStream) throws IOException {
         checkNotNull(inputStream);

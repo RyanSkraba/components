@@ -12,9 +12,9 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import com.sforce.async.AsyncApiException;
-import com.sforce.async.BulkConnection;
-import com.sforce.ws.ConnectionException;
+import java.io.IOException;
+import java.util.NoSuchElementException;
+
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +23,9 @@ import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResult
 import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResultSet;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
-import java.io.IOException;
-import java.util.NoSuchElementException;
+import com.sforce.async.AsyncApiException;
+import com.sforce.async.BulkConnection;
+import com.sforce.ws.ConnectionException;
 
 public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedRecord> {
 
