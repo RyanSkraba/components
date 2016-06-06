@@ -12,9 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
-import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
 
@@ -35,7 +33,7 @@ public final class SalesforceWriteOperation implements WriteOperation<WriterResu
     }
 
     @Override
-    public Sink getSink() {
+    public SalesforceSink getSink() {
         return ssink;
     }
 
@@ -45,7 +43,7 @@ public final class SalesforceWriteOperation implements WriteOperation<WriterResu
     }
 
     @Override
-    public Writer<WriterResult> createWriter(RuntimeContainer adaptor) {
+    public SalesforceWriter createWriter(RuntimeContainer adaptor) {
         return new SalesforceWriter(this, adaptor);
     }
 

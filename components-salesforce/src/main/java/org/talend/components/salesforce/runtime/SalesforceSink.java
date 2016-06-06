@@ -12,10 +12,13 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Sink;
-import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
@@ -46,7 +49,7 @@ public class SalesforceSink extends SalesforceSourceOrSink implements Sink {
     }
 
     @Override
-    public WriteOperation<?> createWriteOperation() {
+    public SalesforceWriteOperation createWriteOperation() {
         return new SalesforceWriteOperation(this);
     }
 
@@ -57,7 +60,6 @@ public class SalesforceSink extends SalesforceSourceOrSink implements Sink {
      * @return the properties
      */
     public TSalesforceOutputProperties getSalesforceOutputProperties() {
-        return (TSalesforceOutputProperties ) properties;
+        return (TSalesforceOutputProperties) properties;
     }
-
 }
