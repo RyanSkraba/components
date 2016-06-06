@@ -77,7 +77,10 @@ abstract class EntityParser {
     static List<Entity> getEntities(String json, final String fieldName) {
         
         if (fieldName != null) {
+            // cuts input JSON to parse only entities
             json = json.substring(json.indexOf(fieldName));
+            // cuts trailing '}' character
+            json = json.substring(0, json.lastIndexOf('}'));
         }
 
         List<Entity> entities = new LinkedList<Entity>();

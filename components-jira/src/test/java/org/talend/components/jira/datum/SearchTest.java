@@ -58,6 +58,7 @@ public class SearchTest {
     
     /**
      * Check {@link Search#getEntities()} handles json without errors, when there is no entities inside it
+     * See https://jira.talendforge.org/browse/TDI-36301 for bug details
      */
     @Test
     public void testGetEntitiesNoIssues() {
