@@ -67,4 +67,16 @@ public class SearchTest {
         List<Entity> entities = search.getEntities();
         assertEquals(0, entities.size());
     }
+    
+    /**
+     * Check {@link Search#getEntities()} correctly handle JSON with braces in strings
+     * See https://jira.talendforge.org/browse/TDI-36415 for bug details
+     */
+    @Test
+    public void testGetEntitiesBracesInString() {
+        Search search = new Search(JsonDataProvider.getHasBraceJson());
+
+        List<Entity> entities = search.getEntities();
+        assertEquals(1, entities.size());
+    }
 }

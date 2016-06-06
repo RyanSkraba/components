@@ -1,0 +1,1 @@
+{"issues":[{"expand":"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields","id":"10413","self":"http://localhost:8080/rest/api/2/issue/10413","key":"TP-41","fields":{"description":"task upd","summary":"Has brace \"}} in string \\\"{"}}]}
