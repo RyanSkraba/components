@@ -55,4 +55,15 @@ public class SearchTest {
         List<Entity> entities = search.getEntities();
         assertEquals(3, entities.size());
     }
+    
+    /**
+     * Check {@link Search#getEntities()} handles json without errors, when there is no entities inside it
+     */
+    @Test
+    public void testGetEntitiesNoIssues() {
+        Search search = new Search(JsonDataProvider.getNoIssuesJson());
+
+        List<Entity> entities = search.getEntities();
+        assertEquals(0, entities.size());
+    }
 }
