@@ -55,10 +55,14 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
     @Override
     public ComponentProperties getInputComponentProperties() {
         outputBulkProperties.init();
+        
         outputBulkProperties.schema.schema.setStoredValue(module.main.schema.getStoredValue());
         outputBulkProperties.schema.schema.setValueEvaluator(module.main.schema.getValueEvaluator());
+        
         outputBulkProperties.bulkFilePath.setStoredValue(bulkFilePath.getStoredValue());
+        outputBulkProperties.bulkFilePath.copyTaggedValues(bulkFilePath);
         outputBulkProperties.bulkFilePath.setValueEvaluator(bulkFilePath.getValueEvaluator());
+        
         // we need to pass also the possible values, only way from the studio to know it comes from a combo box (need to
         // add quotes for generation)
         outputBulkProperties.upsertRelationTable.columnName.setPossibleValues(upsertRelationTable.columnName.getPossibleValues());
@@ -85,6 +89,7 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
     @Override
     public ComponentProperties getOutputComponentProperties() {
         TSalesforceBulkExecProperties bulkExecProperties = new TSalesforceBulkExecProperties("bulkExecProperties");
+        
         bulkExecProperties.init();
         bulkExecProperties.copyValuesFrom(this, true, true);
         
