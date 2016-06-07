@@ -63,7 +63,7 @@ public class TSplunkEventCollectorWriterTestIT {
         assertEquals("1 record should have been written", 1, result.getDataCount());
 
         Integer lastErrorCode = (Integer) container.getComponentData(COMPONENT_ID,
-                "_" + TSplunkEventCollectorProperties.RESPONSE_CODE_NAME);
+                TSplunkEventCollectorProperties.RESPONSE_CODE_NAME);
         assertFalse("lastErrorCode shouldn't be null", lastErrorCode == null);
         assertEquals("Response code should be 0", 0, lastErrorCode.intValue());
         writer = null;
@@ -92,7 +92,7 @@ public class TSplunkEventCollectorWriterTestIT {
         assertEquals("5 records should have been written", 5, result1.getDataCount());
 
         Integer lastErrorCode1 = (Integer) container.getComponentData(COMPONENT_ID,
-                "_" + TSplunkEventCollectorProperties.RESPONSE_CODE_NAME);
+                TSplunkEventCollectorProperties.RESPONSE_CODE_NAME);
         assertFalse("lastErrorCode shouldn't be null", lastErrorCode1 == null);
         assertEquals("Response code should be 0", 0, lastErrorCode1.intValue());
         writer = null;
@@ -122,7 +122,7 @@ public class TSplunkEventCollectorWriterTestIT {
         assertEquals("No records should have been written", 0, result.getDataCount());
 
         Integer lastErrorCode1 = (Integer) container.getComponentData(COMPONENT_ID,
-                "_" + TSplunkEventCollectorProperties.RESPONSE_CODE_NAME);
+                TSplunkEventCollectorProperties.RESPONSE_CODE_NAME);
         assertFalse("lastErrorCode shouldn't be null", lastErrorCode1 == null);
         assertEquals("Response code should be 4 for wrong token", 4, lastErrorCode1.intValue());
     }

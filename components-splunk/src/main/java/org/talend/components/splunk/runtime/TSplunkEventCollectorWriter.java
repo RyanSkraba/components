@@ -175,9 +175,9 @@ public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
         LOGGER.debug("Closing.");
         LOGGER.debug("Sending " + splunkObjectsForBulk.size() + " elements left in queue.");
         doSend();
-        container.setComponentData(container.getCurrentComponentId(), "_" + TSplunkEventCollectorProperties.RESPONSE_CODE_NAME,
+        container.setComponentData(container.getCurrentComponentId(), TSplunkEventCollectorProperties.RESPONSE_CODE_NAME,
                 lastErrorCode);
-        container.setComponentData(container.getCurrentComponentId(), "_" + TSplunkEventCollectorProperties.ERROR_MESSAGE_NAME,
+        container.setComponentData(container.getCurrentComponentId(), TSplunkEventCollectorProperties.ERROR_MESSAGE_NAME,
                 lastErrorMessage);
         splunkConnection.close();
         splunkConnection = null;
