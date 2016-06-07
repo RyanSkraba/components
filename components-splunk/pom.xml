@@ -5,14 +5,14 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.12.0-SNAPSHOT</version>
+        <version>0.12.0</version>
         <relativePath>../components-parent/pom.xml</relativePath>        
     </parent>
 
     <name>Components - tSplunkEventCollector</name>
     <groupId>org.talend.components</groupId>
     <artifactId>components-splunk</artifactId>
-    <version>0.12.0-SNAPSHOT</version>
+    <version>0.12.0</version>
     <properties>
         <splunk.webui.port>8000</splunk.webui.port>
         <splunk.ec.port>8088</splunk.ec.port>
@@ -34,34 +34,34 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.12.0-SNAPSHOT</version>
+            <version>0.12.0</version>
         </dependency>
 
         <!-- Shared component properties such as Use/Password or Schema -->
         <dependency>
           <groupId>org.talend.components</groupId>
           <artifactId>components-common</artifactId>
-          <version>0.12.0-SNAPSHOT</version>
+          <version>0.12.0</version>
         </dependency>
         
         <!-- Jar containing Test utils methods -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.12.0-SNAPSHOT</version>
+            <version>0.12.0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service</artifactId>
-            <version>0.12.0-SNAPSHOT</version>
+            <version>0.12.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service</artifactId>
-            <version>0.12.0-SNAPSHOT</version>
+            <version>0.12.0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
