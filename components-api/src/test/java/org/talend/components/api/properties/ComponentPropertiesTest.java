@@ -13,6 +13,7 @@
 package org.talend.components.api.properties;
 
 import static org.junit.Assert.*;
+import static org.talend.components.api.properties.ComponentPropertyFactory.*;
 
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.junit.Before;

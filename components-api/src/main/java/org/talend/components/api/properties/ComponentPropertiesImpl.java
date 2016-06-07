@@ -30,17 +30,6 @@ import org.talend.daikon.properties.property.Property;
  */
 
 public class ComponentPropertiesImpl extends PropertiesImpl implements ComponentProperties {
-    
-    /**
-     * Return properties names
-     */
-    public static final String ERROR_MESSAGE_NAME = "ERROR_MESSAGE";
-
-    public static final String NB_LINE_NAME = "NB_LINE";
-
-    public static final String NB_SUCCESS_NAME = "NB_SUCCESS";
-
-    public static final String NB_REJECT_NAME = "NB_REJECT";
 
     /**
      * A special property for the values that a component returns. If this is used, this will be a {@link Property} that
