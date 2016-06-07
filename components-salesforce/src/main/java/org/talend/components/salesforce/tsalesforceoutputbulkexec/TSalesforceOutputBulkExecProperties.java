@@ -79,7 +79,7 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
     public ComponentProperties getOutputComponentProperties() {
         TSalesforceBulkExecProperties bulkExecProperties = new TSalesforceBulkExecProperties("bulkExecProperties");
         bulkExecProperties.copyValuesFrom(this);
-        
+
         // we need to pass also the possible values, only way from the studio to know it comes from a combo box (need to
         // add quotes for generation)
         bulkExecProperties.upsertRelationTable.columnName.setPossibleValues(upsertRelationTable.columnName.getPossibleValues());
