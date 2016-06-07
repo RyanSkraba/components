@@ -25,6 +25,7 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Set;
 
 /**
@@ -47,23 +48,24 @@ import java.util.Set;
  */
 public class TDataSetOutputProperties extends FixedConnectorsComponentProperties {
 
-    public Property<String> login = PropertyFactory.newString("login");
+    public final Property<String> url = PropertyFactory.newString("url").setRequired();
 
-    public Property<String> pass = PropertyFactory.newString("pass");
+    public final Property<String> login = PropertyFactory.newString("login").setRequired();
 
-    public Property<String> url = PropertyFactory.newString("url");
+    public final Property<String> pass = PropertyFactory.newString("pass").setRequired()
+            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
-    public Property<DataPrepOutputModes> mode = PropertyFactory.newEnum("mode", DataPrepOutputModes.class);
+    public final Property<DataPrepOutputModes> mode = PropertyFactory.newEnum("mode", DataPrepOutputModes.class);
 
-    public Property<String> dataSetName = PropertyFactory.newString("dataSetName");
+    public final Property<String> dataSetName = PropertyFactory.newString("dataSetName").setRequired();
 
-    public Property<String> dataSetId = PropertyFactory.newString("dataSetId");
+    public final Property<String> dataSetId = PropertyFactory.newString("dataSetId").setRequired();
 
-    public Property<Integer> limit = PropertyFactory.newInteger("limit", 100);
+    public final Property<Integer> limit = PropertyFactory.newInteger("limit", 100);
 
-    public SchemaProperties schema = new SchemaProperties("schema");
+    public final SchemaProperties schema = new SchemaProperties("schema");
 
-    protected transient PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
+    protected PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
     public TDataSetOutputProperties(String name) {
         super(name);
@@ -132,6 +134,9 @@ public class TDataSetOutputProperties extends FixedConnectorsComponentProperties
                     form.getWidget(pass.getName()).setHidden(true);
                     form.getWidget(dataSetName.getName()).setHidden(true);
                     form.getWidget(dataSetId.getName()).setHidden(true);
+                    break;
+                default:
+                    break;
             }
         }
     }

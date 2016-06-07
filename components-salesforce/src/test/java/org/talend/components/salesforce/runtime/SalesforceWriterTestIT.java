@@ -430,7 +430,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         // Check the values copied from the incoming record.
         for (int i = 0; i < r.getSchema().getFields().size(); i++) {
             assertThat(rejected.getSchema().getFields().get(i), is(r.getSchema().getFields().get(i)));
-            assertThat(rejected.get(0), is(r.get(0)));
+            assertThat(rejected.get(i), is(r.get(i)));
         }
 
         // The enriched fields.
