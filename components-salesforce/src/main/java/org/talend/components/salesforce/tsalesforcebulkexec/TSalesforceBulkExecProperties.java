@@ -137,5 +137,17 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
             return Collections.emptySet();
         }
     }
+    
+    @Override
+    public Set<PropertyPathConnector> getPossibleConnectors(boolean isOutputConnection) {
+        if (isOutputConnection) {
+            HashSet<PropertyPathConnector> connectors = new HashSet<>();
+            connectors.add(FLOW_CONNECTOR);
+            connectors.add(REJECT_CONNECTOR);
+            return connectors;
+        } else {
+            return Collections.singleton(MAIN_CONNECTOR);
+        }
+    }
 
 }
