@@ -15,8 +15,6 @@ package org.talend.components.salesforce.runtime;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.io.IOException;
-import java.util.List;
 import java.util.List;
 
 import org.apache.avro.Schema;
@@ -24,12 +22,16 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
 public class SalesforceInputReaderTestIT extends SalesforceTestBase {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceInputReaderTestIT.class);
 
     @Test
     public void testStartAdvanceGetCurrent() throws IOException {
@@ -146,18 +148,15 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         TSalesforceInputProperties props = createTSalesforceInputProperties(false, false);
         props.manualQuery.setValue(true);
         // Manual query with foreign key
-        props.module.main.schema.setValue(SchemaBuilder.builder().record("MakeRowRecord").fields()
-                .name("Id").type().nullable().stringType().noDefault()
-                .name("Name").type().nullable().stringType().noDefault()
-                .name("Owner_Name").type().nullable().stringType().noDefault()
-                .name("Owner_Id").type().nullable().stringType().noDefault().endRecord());
+        props.module.main.schema.setValue(SchemaBuilder.builder().record("MakeRowRecord").fields().name("Id").type().nullable()
+                .stringType().noDefault().name("Name").type().nullable().stringType().noDefault().name("Owner_Name").type()
+                .nullable().stringType().noDefault().name("Owner_Id").type().nullable().stringType().noDefault().endRecord());
         props.query.setValue("SELECT Id, Name, Owner.Name ,Owner.Id FROM Account");
         List<IndexedRecord> rowsWithForeignKey = readRows(props);
         // Manual query with foreign key
-        props.module.main.schema.setValue(SchemaBuilder.builder().record("MakeRowRecord").fields()
-                .name("Id").type().nullable().stringType().noDefault()
-                .name("Name").type().nullable().stringType().noDefault()
-                .name("OwnerId").type().nullable().stringType().noDefault().endRecord());
+        props.module.main.schema.setValue(SchemaBuilder.builder().record("MakeRowRecord").fields().name("Id").type().nullable()
+                .stringType().noDefault().name("Name").type().nullable().stringType().noDefault().name("OwnerId").type()
+                .nullable().stringType().noDefault().endRecord());
         props.query.setValue("SELECT Id, Name, OwnerId FROM Account");
         List<IndexedRecord> rowsCommon = readRows(props);
 
@@ -172,8 +171,64 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
             assertNotNull(schemaFK);
             assertNotNull(schemaCommon);
-            assertEquals(commonRecord.get(schemaCommon.getField("OwnerId").pos()), fkRecord.get(schemaFK.getField("Owner_Id").pos()));
+            assertEquals(commonRecord.get(schemaCommon.getField("OwnerId").pos()),
+                    fkRecord.get(schemaFK.getField("Owner_Id").pos()));
             System.out.println("Account records Owner id: " + fkRecord.get(schemaFK.getField("Owner_Id").pos()));
+        }
+    }
+
+    /*
+     * Test nested query of SOQL
+     */
+    @Test
+    public void testComplexSOQLQuery() throws Throwable {
+        TSalesforceInputProperties props = createTSalesforceInputProperties(false, false);
+        props.manualQuery.setValue(true);
+        // Manual query with foreign key
+        props.module.main.schema.setValue(SchemaBuilder.builder().record("MakeRowRecord").fields().name("Id").type().nullable()
+                .stringType().noDefault().name("Account_Id").type().nullable().stringType().noDefault().name("Name").type()
+                .nullable().stringType().noDefault().name("Account_Name").type().nullable().stringType().noDefault()
+                .name("Contacts_records_Id").type().nullable().stringType().noDefault().name("Account_Contacts_records_Id").type()
+                .nullable().stringType().noDefault().name("Contacts_records_Name").type().nullable().stringType().noDefault()
+                .name("Account_Contacts_records_Name").type().nullable().stringType().noDefault().endRecord());
+        props.query.setValue("Select Id, Name,(Select Id,Contact.Name from Contacts Limit 1) from Account Limit 10");
+        List<IndexedRecord> rows = readRows(props);
+
+        if (rows.size() > 0) {
+            boolean isSubQueryResultEmpty = true;
+            for (IndexedRecord row : rows) {
+                Schema schema = row.getSchema();
+                assertNotNull(schema.getField("Id"));
+                assertNotNull(schema.getField("Account_Id"));
+                assertNotNull(schema.getField("Name"));
+                assertNotNull(schema.getField("Account_Name"));
+                assertNotNull(schema.getField("Contacts_records_Id"));
+                assertNotNull(schema.getField("Account_Contacts_records_Id"));
+                assertNotNull(schema.getField("Contacts_records_Name"));
+                assertNotNull(schema.getField("Account_Contacts_records_Name"));
+
+                assertEquals(row.get(schema.getField("Id").pos()), row.get(schema.getField("Account_Id").pos()));
+                assertEquals(row.get(schema.getField("Name").pos()), row.get(schema.getField("Account_Name").pos()));
+                assertEquals(row.get(schema.getField("Contacts_records_Id").pos()),
+                        row.get(schema.getField("Account_Contacts_records_Id").pos()));
+                assertEquals(row.get(schema.getField("Contacts_records_Name").pos()),
+                        row.get(schema.getField("Account_Contacts_records_Name").pos()));
+                if (row.get(schema.getField("Contacts_records_Id").pos()) != null
+                        || row.get(schema.getField("Contacts_records_Name").pos()) != null) {
+                    isSubQueryResultEmpty = false;
+                }
+
+                LOGGER.debug("check: [Name && Account_Name]:" + row.get(schema.getField("Name").pos()) + " [Id && Account_Id]: "
+                        + row.get(schema.getField("Id").pos()) + " [Contacts_records_Id && Contacts_records_Id]: "
+                        + row.get(schema.getField("Contacts_records_Id").pos())
+                        + " [Account_Contacts_records_Name && Contacts_records_Name]: "
+                        + row.get(schema.getField("Account_Contacts_records_Name").pos()));
+            }
+            if (isSubQueryResultEmpty) {
+                LOGGER.warn("Nested query result is empty!");
+            }
+        } else {
+            LOGGER.warn("Query result is empty!");
         }
     }
 }
