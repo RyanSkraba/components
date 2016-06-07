@@ -13,6 +13,7 @@
 package org.talend.components.api.properties;
 
 import static org.junit.Assert.*;
+import static org.talend.components.api.properties.ComponentPropertyFactory.*;
 
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.junit.Before;
@@ -35,7 +36,7 @@ public class ComponentPropertiesTest {
         }
     }
 
-    private final class NestedProperty extends ComponentPropertiesImpl{
+    private final class NestedProperty extends ComponentPropertiesImpl {
 
         public Property three = PropertyFactory.newString("three");
 
@@ -50,7 +51,7 @@ public class ComponentPropertiesTest {
         }
     }
 
-    private final class ComponentPropertiesTestClass extends ComponentPropertiesImpl{
+    private final class ComponentPropertiesTestClass extends ComponentPropertiesImpl {
 
         public Property one = PropertyFactory.newString("one");
 
@@ -63,6 +64,25 @@ public class ComponentPropertiesTest {
         public ComponentPropertiesTestClass(String name) {
             super(name);
         }
+    }
+    
+    /**
+     * Test class for {@link ComponentPropertiesTest#testReturnPropertiesDisplayName()},
+     * which contains common returns properties
+     */
+    private final class WithCommonReturnsProperties extends ComponentPropertiesImpl {
+
+        public Property<Integer> NB_LINE = ComponentPropertyFactory.newReturnProperty(getReturns(), PropertyFactory.newInteger(NB_LINE_NAME));
+        
+        public Property<Integer> NB_SUCCESS = ComponentPropertyFactory.newReturnProperty(getReturns(), PropertyFactory.newInteger(NB_SUCCESS_NAME));
+        
+        public Property<Integer> NB_REJECT = ComponentPropertyFactory.newReturnProperty(getReturns(), PropertyFactory.newInteger(NB_REJECT_NAME));
+        
+        public Property<Integer> ERROR_MESSAGE = ComponentPropertyFactory.newReturnProperty(getReturns(), PropertyFactory.newInteger(ERROR_MESSAGE_NAME));
+        
+        public WithCommonReturnsProperties(String name) {
+            super(name);
+        }        
     }
 
     ComponentPropertiesTestClass foo;
@@ -100,5 +120,19 @@ public class ComponentPropertiesTest {
         assertEquals("XYZ", foo.two.four.value.getValue());
         // check that instance have not changed, that only the values have been copied
         assertEquals(oldProp, foo.two.four);
+    }
+    
+    /**
+     * Checks display names for common returns properties are correctly set in ComponentPropertiesImpl.properties
+     */
+    @Test
+    public void testReturnPropertiesDisplayName() {
+        WithCommonReturnsProperties properties = new WithCommonReturnsProperties("foo");
+        properties.init();
+
+        assertEquals("Number of line", properties.NB_LINE.getDisplayName());
+        assertEquals("Number of success", properties.NB_SUCCESS.getDisplayName());
+        assertEquals("Number of reject", properties.NB_REJECT.getDisplayName());
+        assertEquals("Error Message", properties.ERROR_MESSAGE.getDisplayName());
     }
 }

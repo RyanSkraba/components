@@ -29,6 +29,17 @@ public class ComponentPropertyFactory {
      * Name of the special Returns property.
      */
     public static final String RETURNS = "returns";
+    
+    /**
+     * Return properties names
+     */
+    public static final String ERROR_MESSAGE_NAME = "ERROR_MESSAGE";
+
+    public static final String NB_LINE_NAME = "NB_LINE";
+
+    public static final String NB_SUCCESS_NAME = "NB_SUCCESS";
+
+    public static final String NB_REJECT_NAME = "NB_REJECT";
 
     /**
      * Used if there are returns to set the "returns" property with a {@link Property} that contains the returns
