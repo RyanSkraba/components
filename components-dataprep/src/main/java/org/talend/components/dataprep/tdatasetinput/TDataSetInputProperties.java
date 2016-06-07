@@ -35,6 +35,7 @@ import org.talend.daikon.properties.property.PropertyFactory;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -63,13 +64,14 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
 
     public PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
-    public Property<String> url = PropertyFactory.newString("url");
+    public Property<String> url = PropertyFactory.newString("url").setRequired();
 
-    public Property<String> login = PropertyFactory.newString("login");
+    public Property<String> login = PropertyFactory.newString("login").setRequired();
 
-    public Property<String> pass = PropertyFactory.newString("pass");
+    public Property<String> pass = PropertyFactory.newString("pass").setRequired()
+            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
-    public Property<String> dataSetName = PropertyFactory.newString("dataSetName");
+    public Property<String> dataSetName = PropertyFactory.newString("dataSetName").setRequired();
 
     public PresentationItem fetchSchema = new PresentationItem("fetchSchema", "FetchSchema");
 
