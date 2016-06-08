@@ -35,6 +35,16 @@ public class JsonDataProvider {
      * JSON, which represents project JSON representation
      */
     private static String projectJson;
+    
+    /**
+     * JSON with no issues
+     */
+    private static String noIssuesJson;
+    
+    /**
+     * JSON, which has braces inside string
+     */
+    private static String hasBraceJson;
 
     /**
      * Provides JSON string, which contains total property
@@ -74,5 +84,30 @@ public class JsonDataProvider {
         }
         return projectJson;
     }
+    
+    /**
+     * Provides JSON string, which represents JSON with no issues inside
+     * 
+     * @return JSON string
+     * @throws IOException in case of I/O exception
+     */
+    static String getNoIssuesJson() {
+        if (noIssuesJson == null) {
+            noIssuesJson = Utils.readFile("src/test/resources/org/talend/components/jira/datum/noIssues.json");
+        }
+        return noIssuesJson;
+    }
 
+    /**
+     * Provides JSON string, which represents JSON, which has braces inside string
+     * 
+     * @return JSON string
+     * @throws IOException in case of I/O exception
+     */
+    static String getHasBraceJson() {
+        if (hasBraceJson == null) {
+            hasBraceJson = Utils.readFile("src/test/resources/org/talend/components/jira/datum/hasBrace.json");
+        }
+        return hasBraceJson;
+    }
 }
