@@ -100,8 +100,8 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
         bulkExecProperties.connection.referencedComponent.componentInstanceId.setTaggedValue(ADD_QUOTES, true);
         bulkExecProperties.module.connection.referencedComponent.componentInstanceId.setTaggedValue(ADD_QUOTES, true);
 
-        for (Form form : outputBulkProperties.getForms()) {
-            outputBulkProperties.refreshLayout(form);
+        for (Form form : bulkExecProperties.getForms()) {
+            bulkExecProperties.refreshLayout(form);
         }
         return bulkExecProperties;
     }
