@@ -2,10 +2,10 @@ package org.talend.components.common.runtime;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
-import org.talend.daikon.avro.AvroConverter;
-import org.talend.daikon.avro.IndexedRecordAdapterFactory;
+import org.talend.daikon.avro.converter.AvroConverter;
+import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
-public class GenericAdapterFactory implements IndexedRecordAdapterFactory<IndexedRecord, IndexedRecord> {
+public class GenericIndexedRecordConverter implements IndexedRecordConverter<IndexedRecord, IndexedRecord> {
 
     private Schema schema;
 
@@ -52,7 +52,7 @@ public class GenericAdapterFactory implements IndexedRecordAdapterFactory<Indexe
 
         @Override
         public Schema getSchema() {
-            return GenericAdapterFactory.this.getSchema();
+            return GenericIndexedRecordConverter.this.getSchema();
         }
 
         @Override

@@ -15,10 +15,10 @@ package org.talend.components.dataprep.runtime;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.dataprep.connection.DataPrepField;
-import org.talend.daikon.avro.AvroConverter;
-import org.talend.daikon.avro.IndexedRecordAdapterFactory;
+import org.talend.daikon.avro.converter.AvroConverter;
+import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
-public class DataPrepAdaptorFactory implements IndexedRecordAdapterFactory<DataPrepField[], IndexedRecord> {
+public class DataPrepAdaptorFactory implements IndexedRecordConverter<DataPrepField[], IndexedRecord> {
 
     private Schema schema;
 

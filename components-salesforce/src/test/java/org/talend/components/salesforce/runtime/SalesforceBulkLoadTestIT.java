@@ -31,8 +31,8 @@ import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecP
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkProperties;
 import org.talend.daikon.avro.AvroRegistry;
-import org.talend.daikon.avro.IndexedRecordAdapterFactory;
-import org.talend.daikon.talend6.Talend6OutgoingSchemaEnforcer;
+import org.talend.daikon.avro.converter.IndexedRecordConverter;
+import org.talend.daikon.di.DiOutgoingSchemaEnforcer;
 
 /**
  * Created by wwang on 2016-05-16.
@@ -66,9 +66,9 @@ public class SalesforceBulkLoadTestIT extends SalesforceTestBase {
 		List<String> ids = new ArrayList<String>();
 		List<String> sids = new ArrayList<String>();
 		try {
-			Talend6OutgoingSchemaEnforcer current = new Talend6OutgoingSchemaEnforcer(util.getTestSchema2(), false);
+			DiOutgoingSchemaEnforcer current = new DiOutgoingSchemaEnforcer(util.getTestSchema2(), false);
 
-			IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory = null;
+			IndexedRecordConverter<Object, ? extends IndexedRecord> factory = null;
 
 			final List<Map<String, String>> result = new ArrayList<Map<String, String>>();
 
@@ -139,9 +139,9 @@ public class SalesforceBulkLoadTestIT extends SalesforceTestBase {
 		modelProps.outputAction.setValue(TSalesforceBulkExecProperties.OutputAction.DELETE);
 
 		try {
-			Talend6OutgoingSchemaEnforcer current = new Talend6OutgoingSchemaEnforcer(util.getTestSchema3(), false);
+			DiOutgoingSchemaEnforcer current = new DiOutgoingSchemaEnforcer(util.getTestSchema3(), false);
 
-			IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory = null;
+			IndexedRecordConverter<Object, ? extends IndexedRecord> factory = null;
 
 			final List<Map<String, String>> result = new ArrayList<Map<String, String>>();
 
@@ -208,9 +208,9 @@ public class SalesforceBulkLoadTestIT extends SalesforceTestBase {
 		modelProps.outputAction.setValue(TSalesforceBulkExecProperties.OutputAction.UPDATE);
 
 		try {
-			Talend6OutgoingSchemaEnforcer current = new Talend6OutgoingSchemaEnforcer(util.getTestSchema2(), false);
+			DiOutgoingSchemaEnforcer current = new DiOutgoingSchemaEnforcer(util.getTestSchema2(), false);
 
-			IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory = null;
+			IndexedRecordConverter<Object, ? extends IndexedRecord> factory = null;
 
 			final List<Map<String, String>> result = new ArrayList<Map<String, String>>();
 
@@ -293,9 +293,9 @@ public class SalesforceBulkLoadTestIT extends SalesforceTestBase {
 		modelProps.upsertKeyColumn.setValue("Id");
 
 		try {
-			Talend6OutgoingSchemaEnforcer current = new Talend6OutgoingSchemaEnforcer(util.getTestSchema2(), false);
+			DiOutgoingSchemaEnforcer current = new DiOutgoingSchemaEnforcer(util.getTestSchema2(), false);
 
-			IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory = null;
+			IndexedRecordConverter<Object, ? extends IndexedRecord> factory = null;
 
 			final List<Map<String, String>> result = new ArrayList<Map<String, String>>();
 
@@ -330,12 +330,12 @@ public class SalesforceBulkLoadTestIT extends SalesforceTestBase {
 		}
 	}
 
-	private IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> initCurrentData(
-			Talend6OutgoingSchemaEnforcer current, IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory,
+	private IndexedRecordConverter<Object, ? extends IndexedRecord> initCurrentData(
+			DiOutgoingSchemaEnforcer current, IndexedRecordConverter<Object, ? extends IndexedRecord> factory,
 			Object data) {
 		if (factory == null) {
-			factory = (IndexedRecordAdapterFactory<Object, ? extends IndexedRecord>) new AvroRegistry()
-					.createAdapterFactory(data.getClass());
+			factory = (IndexedRecordConverter<Object, ? extends IndexedRecord>) new AvroRegistry()
+					.createIndexedRecordConverter(data.getClass());
 		}
 
 		IndexedRecord unenforced = factory.convertToAvro(data);

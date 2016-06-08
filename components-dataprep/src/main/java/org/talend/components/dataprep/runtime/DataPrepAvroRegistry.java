@@ -14,11 +14,10 @@ package org.talend.components.dataprep.runtime;
 
 import org.apache.avro.Schema;
 import org.talend.components.dataprep.connection.DataPrepField;
-import org.talend.daikon.avro.AvroConverter;
 import org.talend.daikon.avro.AvroRegistry;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
-import org.talend.daikon.avro.util.AvroTypes;
-import org.talend.daikon.avro.util.AvroUtils;
+import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.java8.SerializableFunction;
 
 import java.math.BigDecimal;
@@ -89,7 +88,7 @@ public class DataPrepAvroRegistry extends AvroRegistry {
             // forces a String type for all dataprep schemas because schema is not enforced by dataprep.
             // some data may not be of the right type.
             // TODO this makes most of this class not usefull and should be refactored
-            Schema.Field avroField = new Schema.Field(field.getColumnName(), AvroTypes._string(), null, field.getContent());
+            Schema.Field avroField = new Schema.Field(field.getColumnName(), AvroUtils._string(), null, field.getContent());
 
             switch (field.getType()) {
             case "date":
@@ -116,19 +115,19 @@ public class DataPrepAvroRegistry extends AvroRegistry {
         Schema base;
         switch (field.getType()) {
         case "boolean":
-            base = AvroTypes._boolean();
+            base = AvroUtils._boolean();
             break;
         case "double":
-            base = AvroTypes._double();
+            base = AvroUtils._double();
             break;
         case "integer":
-            base = AvroTypes._int();
+            base = AvroUtils._int();
             break;
         case "float":
-            base = AvroTypes._float();
+            base = AvroUtils._float();
             break;
         default:
-            base = AvroTypes._string();
+            base = AvroUtils._string();
             break;
         }
 
@@ -148,17 +147,17 @@ public class DataPrepAvroRegistry extends AvroRegistry {
         Schema fieldSchema = AvroUtils.unwrapIfNullable(f.schema());
         // FIXME use avro type to decide the converter is not correct if the user change the avro type, Date to String
         // for instance
-        if (AvroTypes.isSameType(fieldSchema, AvroTypes._boolean())) {
+        if (AvroUtils.isSameType(fieldSchema, AvroUtils._boolean())) {
             return new StringToBooleanConverter(f);
-        } else if (AvroTypes.isSameType(fieldSchema, AvroTypes._decimal())) {
+        } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._decimal())) {
             return new StringToDecimalConverter(f);
-        } else if (AvroTypes.isSameType(fieldSchema, AvroTypes._double())) {
+        } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._double())) {
             return new StringToDoubleConverter(f);
-        } else if (AvroTypes.isSameType(fieldSchema, AvroTypes._int())) {
+        } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._int())) {
             return new StringToIntegerConverter(f);
-        } else if (AvroTypes.isSameType(fieldSchema, AvroTypes._date())) {
+        } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._date())) {
             return new StringToDateConverter(f);
-        } else if (AvroTypes.isSameType(fieldSchema, AvroTypes._string())) {
+        } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._string())) {
             return super.getConverter(String.class);
         }
         throw new UnsupportedOperationException("The type " + fieldSchema.getType() + " is not supported."); //$NON-NLS-1$ //$NON-NLS-2$

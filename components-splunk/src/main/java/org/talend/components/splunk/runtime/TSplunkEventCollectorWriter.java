@@ -37,7 +37,7 @@ import org.talend.components.splunk.connection.TSplunkEventCollectorConnection;
 import org.talend.components.splunk.objects.SplunkJSONEvent;
 import org.talend.components.splunk.objects.SplunkJSONEventBuilder;
 import org.talend.daikon.avro.AvroRegistry;
-import org.talend.daikon.avro.IndexedRecordAdapterFactory;
+import org.talend.daikon.avro.converter.IndexedRecordConverter;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
@@ -59,7 +59,7 @@ public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
 
     private TSplunkEventCollectorConnection splunkConnection;
 
-    private IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory;
+    private IndexedRecordConverter<Object, ? extends IndexedRecord> factory;
 
     private int dataCount;
 
@@ -162,10 +162,10 @@ public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
         return request;
     }
 
-    public IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> getFactory(Object datum) {
+    public IndexedRecordConverter<Object, ? extends IndexedRecord> getFactory(Object datum) {
         if (null == factory) {
-            factory = (IndexedRecordAdapterFactory<Object, ? extends IndexedRecord>) new AvroRegistry()
-                    .createAdapterFactory(datum.getClass());
+            factory = (IndexedRecordConverter<Object, ? extends IndexedRecord>) new AvroRegistry()
+                    .createIndexedRecordConverter(datum.getClass());
         }
         return factory;
     }

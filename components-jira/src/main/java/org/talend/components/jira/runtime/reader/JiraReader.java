@@ -31,7 +31,7 @@ import org.talend.components.jira.avro.IssueIndexedRecord;
 import org.talend.components.jira.connection.Rest;
 import org.talend.components.jira.datum.Entity;
 import org.talend.components.jira.runtime.JiraSource;
-import org.talend.daikon.avro.IndexedRecordAdapterFactory;
+import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
 /**
  * Jira reader implementation
@@ -53,7 +53,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
     /**
      * Issue adaptor factory
      */
-    private IndexedRecordAdapterFactory<String, IssueIndexedRecord> factory;
+    private IndexedRecordConverter<String, IssueIndexedRecord> factory;
 
     /**
      * Jira resource to get

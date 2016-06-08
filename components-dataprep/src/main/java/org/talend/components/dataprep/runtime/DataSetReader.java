@@ -23,7 +23,7 @@ import org.talend.components.dataprep.connection.Column;
 import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 import org.talend.components.dataprep.connection.DataPrepField;
 import org.talend.components.dataprep.connection.DataPrepStreamMapper;
-import org.talend.daikon.avro.IndexedRecordAdapterFactory;
+import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
 import java.io.IOException;
 import java.util.List;
@@ -85,7 +85,7 @@ public class DataSetReader extends AbstractBoundedReader<IndexedRecord> {
         connectionHandler.logout();
     }
 
-    private IndexedRecordAdapterFactory<?, IndexedRecord> getFactory() {
+    private IndexedRecordConverter<?, IndexedRecord> getFactory() {
         DataPrepAdaptorFactory adaptorFactory = new DataPrepAdaptorFactory();
         adaptorFactory.setSchema(schema);
         return adaptorFactory;

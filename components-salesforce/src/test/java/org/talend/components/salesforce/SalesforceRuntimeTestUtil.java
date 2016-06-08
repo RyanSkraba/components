@@ -22,8 +22,8 @@ import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecD
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkProperties;
+import org.talend.daikon.di.DiIncomingSchemaEnforcer;
 import org.talend.daikon.properties.ValidationResult;
-import org.talend.daikon.talend6.Talend6IncomingSchemaEnforcer;
 
 import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.PartnerConnection;
@@ -219,7 +219,7 @@ public class SalesforceRuntimeTestUtil {
             Schema schema, List<Map<String, String>> rows) throws IOException {
         Writer writer = initWriter(definition, modelProperties);
 
-        Talend6IncomingSchemaEnforcer enforcer = new Talend6IncomingSchemaEnforcer(schema);
+        DiIncomingSchemaEnforcer enforcer = new DiIncomingSchemaEnforcer(schema);
 
         try {
             for (Map<String, String> row : rows) {

@@ -18,9 +18,10 @@ import org.talend.components.api.test.SpringApp;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputDefinition;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
 import org.talend.daikon.avro.AvroRegistry;
-import org.talend.daikon.avro.util.AvroUtils;
+import org.talend.daikon.avro.AvroUtils;
 
 import javax.inject.Inject;
+
 import java.io.IOException;
 
 @RunWith(SpringJUnit4ClassRunner.class)

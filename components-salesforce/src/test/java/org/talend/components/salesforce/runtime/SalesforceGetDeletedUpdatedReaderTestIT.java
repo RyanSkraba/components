@@ -12,7 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforcegetdeleted.TSalesforceGetDeletedProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
-import org.talend.daikon.avro.util.AvroTypes;
+import org.talend.daikon.avro.AvroUtils;
 
 import com.sforce.soap.partner.GetUpdatedResult;
 import com.sforce.ws.ConnectionException;
@@ -159,15 +160,15 @@ public class SalesforceGetDeletedUpdatedReaderTestIT extends SalesforceTestBase 
     @Override
     public Schema getMakeRowSchema(boolean isDynamic) {
         SchemaBuilder.FieldAssembler<Schema> fa = SchemaBuilder.builder().record("MakeRowRecord").fields() //
-                .name("Id").type(AvroTypes._string()).noDefault() //
-                .name("Name").type(AvroTypes._string()).noDefault() //
-                .name("ShippingStreet").type(AvroTypes._string()).noDefault() //
-                .name("ShippingPostalCode").type(AvroTypes._int()).noDefault() //
-                .name("BillingStreet").type(AvroTypes._string()).noDefault() //
-                .name("BillingState").type(AvroTypes._string()).noDefault() //
-                .name("BillingPostalCode").type(AvroTypes._string()).noDefault();
+                .name("Id").type(AvroUtils._string()).noDefault() //
+                .name("Name").type(AvroUtils._string()).noDefault() //
+                .name("ShippingStreet").type(AvroUtils._string()).noDefault() //
+                .name("ShippingPostalCode").type(AvroUtils._int()).noDefault() //
+                .name("BillingStreet").type(AvroUtils._string()).noDefault() //
+                .name("BillingState").type(AvroUtils._string()).noDefault() //
+                .name("BillingPostalCode").type(AvroUtils._string()).noDefault();
         if (isDynamic) {
-            fa = fa.name("ShippingState").type(AvroTypes._string()).noDefault();
+            fa = fa.name("ShippingState").type(AvroUtils._string()).noDefault();
         }
 
         return fa.endRecord();

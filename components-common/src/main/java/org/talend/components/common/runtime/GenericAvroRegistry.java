@@ -4,11 +4,11 @@ import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
 import org.apache.avro.generic.IndexedRecord;
-import org.talend.daikon.avro.AvroConverter;
 import org.talend.daikon.avro.AvroRegistry;
-import org.talend.daikon.avro.util.AvroUtils;
+import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.converter.AvroConverter;
+import org.talend.daikon.di.DiSchemaConstants;
 import org.talend.daikon.java8.SerializableFunction;
-import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -83,16 +83,16 @@ public class GenericAvroRegistry extends AvroRegistry {
         Schema fieldSchema = AvroUtils.unwrapIfNullable(f.schema());
 
         switch (fieldSchema.getType()) {
-            case LONG:
-                String pattern = f.getProp(Talend6SchemaConstants.TALEND6_COLUMN_PATTERN);
-                if (pattern != null) {
-                    fieldSchema.addProp(Talend6SchemaConstants.TALEND6_COLUMN_PATTERN, pattern);
-                    return new DateToStringConvert(fieldSchema);
-                } else {
-                    return super.getConverter(String.class);
-                }
-            default:
+        case LONG:
+            String pattern = f.getProp(DiSchemaConstants.TALEND6_COLUMN_PATTERN);
+            if (pattern != null) {
+                fieldSchema.addProp(DiSchemaConstants.TALEND6_COLUMN_PATTERN, pattern);
+                return new DateToStringConvert(fieldSchema);
+            } else {
                 return super.getConverter(String.class);
+            }
+        default:
+            return super.getConverter(String.class);
         }
     }
 
@@ -120,14 +120,13 @@ public class GenericAvroRegistry extends AvroRegistry {
         }
     }
 
-
     public static class DateToStringConvert extends AsStringConverter<Date> {
 
         private final SimpleDateFormat format;
 
         DateToStringConvert(Schema schema) {
             super(schema);
-            String pattern = schema.getProp(Talend6SchemaConstants.TALEND6_COLUMN_PATTERN);
+            String pattern = schema.getProp(DiSchemaConstants.TALEND6_COLUMN_PATTERN);
             // TODO: null handling
             format = new SimpleDateFormat(pattern);
         }
