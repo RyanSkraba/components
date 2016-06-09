@@ -7,16 +7,17 @@ import java.util.Map;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
-import org.talend.daikon.avro.AvroConverter;
-import org.talend.daikon.avro.IndexedRecordAdapterFactory;
+import org.talend.daikon.avro.converter.AvroConverter;
+import org.talend.daikon.avro.converter.IndexedRecordConverter;
+import org.talend.daikon.avro.converter.IndexedRecordConverter.UnmodifiableAdapterException;
 
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.bind.XmlObject;
 
 /**
- * Creates an {@link IndexedRecordAdapterFactory} that knows how to interpret Salesforce {@link SObject} objects.
+ * Creates an {@link IndexedRecordConverter} that knows how to interpret Salesforce {@link SObject} objects.
  */
-public class SObjectAdapterFactory implements IndexedRecordAdapterFactory<SObject, IndexedRecord> {
+public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, IndexedRecord> {
 
     private Schema schema;
 

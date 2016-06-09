@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcebulkexec;
 
-import static org.talend.daikon.properties.presentation.Widget.*;
-import static org.talend.daikon.properties.property.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -30,10 +30,10 @@ import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.salesforce.SalesforceBulkProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.daikon.avro.SchemaConstants;
+import org.talend.daikon.di.DiSchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
-import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
 
@@ -96,17 +96,17 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
 
         Schema inputSchema = module.main.schema.getValue();
         Schema mainOutputSchema = createRecordBuilderFromSchema(inputSchema, "output").name("salesforce_id")
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "false").prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "false").prop(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true")
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255").type().stringType().noDefault()
 
         .name("salesforce_created").prop(SchemaConstants.TALEND_IS_LOCKED, "false")
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")
+                .prop(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")
                 .type().stringType().noDefault().endRecord();
 
         schemaFlow.schema.setValue(mainOutputSchema);
 
         Schema rejectSchema = createRecordBuilderFromSchema(inputSchema, "rejectOutput").name("error")
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true").prop(SchemaConstants.TALEND_IS_LOCKED, "false")
+                .prop(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true").prop(SchemaConstants.TALEND_IS_LOCKED, "false")
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255").type().stringType().noDefault().endRecord();
 
         schemaReject.schema.setValue(rejectSchema);

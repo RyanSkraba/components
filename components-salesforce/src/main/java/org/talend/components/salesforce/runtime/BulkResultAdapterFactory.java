@@ -4,11 +4,12 @@ import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResult;
-import org.talend.daikon.avro.AvroConverter;
-import org.talend.daikon.avro.IndexedRecordAdapterFactory;
+import org.talend.daikon.avro.converter.AvroConverter;
+import org.talend.daikon.avro.converter.IndexedRecordConverter;
+import org.talend.daikon.avro.converter.IndexedRecordConverter.UnmodifiableAdapterException;
 
 
-public class BulkResultAdapterFactory implements IndexedRecordAdapterFactory<BulkResult, IndexedRecord> {
+public class BulkResultAdapterFactory implements IndexedRecordConverter<BulkResult, IndexedRecord> {
 
     private Schema schema;
 

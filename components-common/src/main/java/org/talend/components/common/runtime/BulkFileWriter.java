@@ -1,10 +1,6 @@
 package org.talend.components.common.runtime;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.List;
+import com.csvreader.CsvWriter;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -14,10 +10,14 @@ import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.BulkFileProperties;
-import org.talend.daikon.avro.IndexedRecordAdapterFactory;
-import org.talend.daikon.avro.util.AvroUtils;
+import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
-import com.csvreader.CsvWriter;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Generate bulk file
@@ -42,7 +42,7 @@ public class BulkFileWriter implements Writer<WriterResult> {
 
     private boolean isAppend;
 
-    private transient IndexedRecordAdapterFactory<IndexedRecord, IndexedRecord> factory;
+    private transient IndexedRecordConverter<IndexedRecord, IndexedRecord> factory;
 
     protected int dataCount;
 
@@ -132,9 +132,9 @@ public class BulkFileWriter implements Writer<WriterResult> {
         return values;
     }
 
-    public IndexedRecordAdapterFactory<IndexedRecord, IndexedRecord> getFactory(Object datum) {
+    public IndexedRecordConverter<IndexedRecord, IndexedRecord> getFactory(Object datum) {
         if (null == factory) {
-            factory = new GenericAdapterFactory();
+            factory = new GenericIndexedRecordConverter();
             factory.setSchema(((IndexedRecord) datum).getSchema());
         }
         return factory;

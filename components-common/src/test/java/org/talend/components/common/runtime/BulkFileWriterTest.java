@@ -1,5 +1,8 @@
 package org.talend.components.common.runtime;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
@@ -9,8 +12,8 @@ import org.junit.Test;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.common.BulkFileProperties;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
-import org.talend.daikon.avro.util.AvroTypes;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,10 +21,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 public class BulkFileWriterTest {
+
     @Test
     public void testBulkFileWriter() throws IOException {
         BulkFileProperties bfProperties = (BulkFileProperties) new BulkFileProperties("foo").init();
@@ -30,15 +31,15 @@ public class BulkFileWriterTest {
         bfProperties.bulkFilePath.setValue(filePath);
         bfProperties.schema.schema.setValue(getMakeRowSchema());
 
-        //  1.Generate a new file
+        // 1.Generate a new file
         testWriteFile(bfProperties);
 
-        //  2.Append file
+        // 2.Append file
         bfProperties.append.setValue(true);
         testWriteFile(bfProperties);
 
-        //  3.Delete bulk file
-//        deleteBulkFile(bfProperties);
+        // 3.Delete bulk file
+        // deleteBulkFile(bfProperties);
     }
 
     protected void testWriteFile(BulkFileProperties bfProperties) throws IOException {
@@ -71,7 +72,8 @@ public class BulkFileWriterTest {
                 .name("col_2").type().nullable().stringType().noDefault() //
                 .name("col_3").type().nullable().intType().noDefault() //
                 .name("col_4").type().nullable().doubleType().noDefault() //
-                .name("col_5").prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'").type(AvroTypes._date()).noDefault() //
+                .name("col_5").prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'").type(AvroUtils._date())
+                .noDefault() //
                 .name("col_6").type().nullable().stringType().noDefault();
         Schema schema = fa.endRecord();
         return schema;

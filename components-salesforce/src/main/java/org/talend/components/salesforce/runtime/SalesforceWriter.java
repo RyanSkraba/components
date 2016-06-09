@@ -26,11 +26,14 @@ import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
-import org.talend.daikon.avro.IndexedRecordAdapterFactory;
-import org.talend.daikon.avro.util.AvroUtils;
+import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
-import com.sforce.soap.partner.*;
+import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.Error;
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.SaveResult;
+import com.sforce.soap.partner.UpsertResult;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.bind.XmlObject;
@@ -71,7 +74,7 @@ final class SalesforceWriter implements WriterWithFeedback<WriterResult, Indexed
 
     private int deleteFieldId = -1;
 
-    private transient IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory;
+    private transient IndexedRecordConverter<Object, ? extends IndexedRecord> factory;
 
     private transient Schema schema;
 
@@ -122,8 +125,8 @@ final class SalesforceWriter implements WriterWithFeedback<WriterResult, Indexed
 
         // This is all we need to do in order to ensure that we can process the incoming value as an IndexedRecord.
         if (null == factory) {
-            factory = (IndexedRecordAdapterFactory<Object, ? extends IndexedRecord>) SalesforceAvroRegistry.get()
-                    .createAdapterFactory(datum.getClass());
+            factory = (IndexedRecordConverter<Object, ? extends IndexedRecord>) SalesforceAvroRegistry.get()
+                    .createIndexedRecordConverter(datum.getClass());
         }
         IndexedRecord input = factory.convertToAvro(datum);
 

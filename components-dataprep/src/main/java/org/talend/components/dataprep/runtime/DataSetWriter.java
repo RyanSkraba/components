@@ -21,7 +21,7 @@ import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 import org.talend.daikon.avro.AvroRegistry;
-import org.talend.daikon.avro.IndexedRecordAdapterFactory;
+import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,7 +30,7 @@ public class DataSetWriter implements Writer<WriterResult> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataSetWriter.class);
 
-    private IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory;
+    private IndexedRecordConverter<Object, ? extends IndexedRecord> factory;
 
     private int counter = 0;
 
@@ -128,10 +128,10 @@ public class DataSetWriter implements Writer<WriterResult> {
         return writeOperation;
     }
 
-    private IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> getFactory(Object datum) {
+    private IndexedRecordConverter<Object, ? extends IndexedRecord> getFactory(Object datum) {
         if (null == factory) {
-            factory = (IndexedRecordAdapterFactory<Object, ? extends IndexedRecord>) new AvroRegistry()
-                    .createAdapterFactory(datum.getClass());
+            factory = (IndexedRecordConverter<Object, ? extends IndexedRecord>) new AvroRegistry()
+                    .createIndexedRecordConverter(datum.getClass());
         }
         return factory;
     }
