@@ -72,7 +72,7 @@ public class JiraSourceOrSink implements SourceOrSink {
     private String userPassword;
 
     @Override
-    public Schema getSchema(RuntimeContainer arg0, String arg1) throws IOException {
+    public Schema getEndpointSchema(RuntimeContainer arg0, String arg1) throws IOException {
         return null;
     }
 

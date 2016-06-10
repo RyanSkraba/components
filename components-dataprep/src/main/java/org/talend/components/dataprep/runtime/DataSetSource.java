@@ -89,7 +89,7 @@ public class DataSetSource implements BoundedSource {
     }
 
     @Override
-    public Schema getSchema(RuntimeContainer container, String schemaName) throws IOException {
+    public Schema getEndpointSchema(RuntimeContainer container, String schemaName) throws IOException {
         return null;
     }
 

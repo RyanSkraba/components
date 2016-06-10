@@ -77,7 +77,7 @@ public class DataSetSink implements Sink {
     }
 
     @Override
-    public Schema getSchema(RuntimeContainer runtimeContainer, String s) throws IOException {
+    public Schema getEndpointSchema(RuntimeContainer runtimeContainer, String s) throws IOException {
         return null;
     }
 
