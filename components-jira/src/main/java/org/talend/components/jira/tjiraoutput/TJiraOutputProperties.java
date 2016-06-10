@@ -12,10 +12,11 @@
 // ============================================================================
 package org.talend.components.jira.tjiraoutput;
 
-import static org.talend.components.jira.Action.*;
-import static org.talend.components.jira.Mode.*;
-import static org.talend.components.jira.Resource.*;
-import static org.talend.daikon.avro.SchemaConstants.*;
+import static org.talend.components.jira.Action.DELETE;
+import static org.talend.components.jira.Action.INSERT;
+import static org.talend.components.jira.Mode.ADVANCED;
+import static org.talend.components.jira.Resource.ISSUE;
+import static org.talend.daikon.avro.SchemaConstants.TALEND_IS_LOCKED;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,7 +26,6 @@ import java.util.Set;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field.Order;
 import org.talend.components.api.component.PropertyPathConnector;
-import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.jira.Action;
 import org.talend.components.jira.JiraProperties;
 import org.talend.components.jira.Mode;
@@ -40,15 +40,6 @@ import org.talend.daikon.properties.property.PropertyFactory;
  * {@link Properties} for Jira output component.
  */
 public class TJiraOutputProperties extends JiraProperties {
-
-    /**
-     * Output result properties names
-     */
-    public static final String NB_LINE = "NB_LINE";
-
-    public static final String NB_SUCCESS = "NB_SUCCESS";
-
-    public static final String NB_REJECT = "NB_REJECT";
 
     /**
      * Corresponding schemas for each Action
@@ -116,10 +107,6 @@ public class TJiraOutputProperties extends JiraProperties {
         action.setValue(INSERT);
         deleteSubtasks.setValue(true);
         mode.setValue(ADVANCED);
-
-        ComponentPropertyFactory.newReturnProperty(getReturns(), PropertyFactory.newInteger(NB_LINE));
-        ComponentPropertyFactory.newReturnProperty(getReturns(), PropertyFactory.newInteger(NB_SUCCESS));
-        ComponentPropertyFactory.newReturnProperty(getReturns(), PropertyFactory.newInteger(NB_REJECT));
     }
 
     /**

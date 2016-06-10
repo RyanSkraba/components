@@ -24,6 +24,9 @@ import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.runtime.SalesforceSink;
 
 import aQute.bnd.annotation.component.Component;
+import org.talend.daikon.properties.property.Property;
+
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 /**
  * Component that can connect to a salesforce system and put some data into it.
@@ -66,6 +69,12 @@ public class TSalesforceOutputDefinition extends SalesforceDefinition implements
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return concatPropertiesClasses(super.getNestedCompatibleComponentPropertiesClass(),
                 new Class[] { SalesforceModuleProperties.class });
+    }
+
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[]{newProperty(RETURN_TOTAL_RECORD_COUNT), newProperty(RETURN_SUCCESS_RECORD_COUNT),
+                newProperty(RETURN_REJECT_RECORD_COUNT)};
     }
 
     @Override

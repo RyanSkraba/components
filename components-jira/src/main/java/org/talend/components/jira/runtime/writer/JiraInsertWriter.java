@@ -30,15 +30,15 @@ import org.talend.components.jira.runtime.JiraWriteOperation;
 /**
  * {@link JiraWriter} which inserts resources on Jira server formed from incoming data using REST API
  */
-public class JiraInsertWriter extends JiraWriter{
-    
+public class JiraInsertWriter extends JiraWriter {
+
     private static final Logger LOG = LoggerFactory.getLogger(JiraInsertWriter.class);
-    
+
     /**
      * Schema retrieved from incoming data
      */
     private Schema dataSchema;
-    
+
     /**
      * Position of json field in record schema
      */
@@ -64,12 +64,12 @@ public class JiraInsertWriter extends JiraWriter{
         if (!opened) {
             throw new IOException("Writer wasn't opened");
         }
-        dataCount++;
+        result.totalCount++;
         if (datum == null) {
             return;
         }
         IndexedRecord record = getFactory(datum).convertToAvro(datum);
-        
+
         if (dataSchema == null) {
             dataSchema = record.getSchema();
             Field jsonField = dataSchema.getField("json");
@@ -82,7 +82,7 @@ public class JiraInsertWriter extends JiraWriter{
         int statusCode = getConnection().post(resource, json);
         handleResponse(statusCode, json, record);
     }
-    
+
     /**
      * Handles response according status code
      * See Jira REST documentation for details
@@ -95,7 +95,7 @@ public class JiraInsertWriter extends JiraWriter{
         switch (statusCode) {
         case SC_CREATED: {
             LOG.debug("Successfully created {}", resourceToCreate);
-            successCount++;
+            result.successCount++;
             break;
         }
         case SC_BAD_REQUEST: {

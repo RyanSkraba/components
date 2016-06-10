@@ -21,14 +21,14 @@ import java.util.List;
 public class Projects extends Entity {
 
     /**
-     * Constructor sets Entity JSON representation 
+     * Constructor sets Entity JSON representation
      *
      * @param json Entity JSON representation
      */
     public Projects(String json) {
         super(json);
     }
-    
+
     /**
      * Returns a list of Projects included in this Project result
      * 

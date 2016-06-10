@@ -26,9 +26,9 @@ public class PaxExamOptions {
     /**
      * 
      */
-    private static final String DAIKON_VERSION = "0.11.0-SNAPSHOT";
+    private static final String DAIKON_VERSION = "0.12.0-SNAPSHOT";
 
-    private static final String COMPONENTS_VERSION = "0.12.0-SNAPSHOT";
+    private static final String COMPONENTS_VERSION = "0.13.0-SNAPSHOT";
 
     private static final String APACHE_KARAF_AID = "apache-karaf";
 
@@ -43,7 +43,7 @@ public class PaxExamOptions {
                 mavenBundle("org.slf4j", "log4j-over-slf4j").noStart(), mavenBundle("commons-lang", "commons-lang", "2.4"), //
                 mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-annotations"), //
                 mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-core"), //
-                mavenBundle().groupId("com.cedarsoftware").artifactId("json-io"), //
+                mavenBundle().groupId("com.cedarsoftware").artifactId("json-io").version("4.4.1-SNAPSHOT"), //
                 mavenBundle().groupId("commons-codec").artifactId("commons-codec"), //
                 mavenBundle().groupId("com.thoughtworks.paranamer").artifactId("paranamer"), //
                 mavenBundle().groupId("org.codehaus.jackson").artifactId("jackson-core-asl"), //

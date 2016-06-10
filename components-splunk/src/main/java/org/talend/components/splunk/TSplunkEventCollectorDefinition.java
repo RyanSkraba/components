@@ -23,6 +23,9 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.splunk.runtime.TSplunkEventCollectorSink;
 
 import aQute.bnd.annotation.component.Component;
+import org.talend.daikon.properties.property.Property;
+
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 /**
  * The tSplunkEventCollectorDefinition acts as an entry point for all of services that a component provides to integrate
@@ -31,6 +34,8 @@ import aQute.bnd.annotation.component.Component;
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSplunkEventCollectorDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSplunkEventCollectorDefinition extends AbstractComponentDefinition implements OutputComponentDefinition {
+
+    public static String RETURN_RESPONSE_CODE = "responseCode";
 
     public static final String COMPONENT_NAME = "tSplunkEventCollector"; //$NON-NLS-1$
 
@@ -42,6 +47,11 @@ public class TSplunkEventCollectorDefinition extends AbstractComponentDefinition
     @Override
     public String[] getFamilies() {
         return new String[] { "Business Intelligence/Splunk" }; //$NON-NLS-1$
+    }
+
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[] { newProperty(RETURN_RESPONSE_CODE), newProperty(RETURN_ERROR_MESSAGE), newProperty(RETURN_TOTAL_RECORD_COUNT) };
     }
 
     public String getMavenGroupId() {

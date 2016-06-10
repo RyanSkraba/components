@@ -31,27 +31,27 @@ import org.talend.daikon.properties.ValidationResult.Result;
  * Integration tests for {@link JiraSourceOrSink} class
  */
 public class JiraSourceOrSinkTestIT {
-    
+
     /**
      * Jira server host and port
      */
     private static final String CORRECT_HOST_PORT = "http://192.168.99.100:8080/";
-    
+
     /**
      * Incorrect host and port
      */
     private static final String INCORRECT_HOST_PORT = "http://incorrecthost.com/";
-    
+
     /**
      * {@link ComponentProperties} for {@link JiraSourceOrSink}
      */
     private TJiraOutputProperties outputProperties;
-    
+
     /**
      * JSON string, which describes {@link Schema}
      */
     private String schemaValue;
-    
+
     /**
      * Prepares required instances for tests
      */
@@ -66,7 +66,7 @@ public class JiraSourceOrSinkTestIT {
         outputProperties.schema.schema.setValue(new Schema.Parser().parse(schemaValue));
         outputProperties.action.setValue(Action.INSERT);
     }
-    
+
     /**
      * Checks {@link JiraSourceOrSink#validate(RuntimeContainer)} returns {@link ValidationResult.Result#OK} in case of
      * established connection
@@ -82,7 +82,7 @@ public class JiraSourceOrSinkTestIT {
 
         assertEquals(Result.OK, actualStatus);
     }
-    
+
     /**
      * Checks {@link JiraSourceOrSink#validate(RuntimeContainer)} returns {@link ValidationResult.Result#ERROR} and
      * {@link ValidationResult} contains correct message in case of connection wasn't established

@@ -14,6 +14,9 @@ package org.talend.components.salesforce;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.properties.property.Property;
+
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 public abstract class SalesforceDefinition extends AbstractComponentDefinition {
     
@@ -30,6 +33,12 @@ public abstract class SalesforceDefinition extends AbstractComponentDefinition {
     @Override
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return new Class[] { SalesforceConnectionProperties.class };
+    }
+
+    @Override
+    // Most of the components are on the input side, so put this here, the output definition will override this
+    public Property[] getReturnProperties() {
+        return new Property[] { newProperty(RETURN_TOTAL_RECORD_COUNT) };
     }
 
     @Override

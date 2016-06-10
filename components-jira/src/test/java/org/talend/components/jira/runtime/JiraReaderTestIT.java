@@ -64,19 +64,19 @@ public class JiraReaderTestIT {
      * Jira server user id
      */
     private static final String PASS = "123456";
-    
+
     private static ComponentService componentService;
 
     /**
      * Runtime container instance for tests
      */
     private RuntimeContainer container;
-    
+
     /**
      * {@link JiraSource} used for tests
      */
     private JiraSource source;
-    
+
     /**
      * Creates {@link ComponentService} for tests
      */
@@ -86,18 +86,18 @@ public class JiraReaderTestIT {
         registry.addComponent(TJiraInputDefinition.COMPONENT_NAME, new TJiraInputDefinition());
         componentService = new ComponentServiceImpl(registry);
     }
-    
+
     /**
      * Instantiates instances used for tests
      */
     private void beforeTestAnonymousUser() {
         container = new DefaultComponentRuntimeContainerImpl();
-        
+
         TJiraInputProperties properties = (TJiraInputProperties) componentService.getComponentProperties("tJIRAInput");
         properties.connection.hostUrl.setValue(HOST_PORT);
         properties.connection.basicAuthentication.userId.setValue(EMPTY_USER);
         properties.connection.basicAuthentication.password.setValue(PASS);
-        
+
         source = new JiraSource();
         source.initialize(container, properties);
     }
@@ -131,22 +131,22 @@ public class JiraReaderTestIT {
         assertThat(entities.get(0).toString(), containsString("Public Project 1"));
         assertThat(entities.get(1).toString(), containsString("Public Project 2"));
     }
-    
+
     /**
      * Instantiates instances used for tests
      */
     private void beforeReadProjectById() {
         container = new DefaultComponentRuntimeContainerImpl();
-        
+
         TJiraInputProperties properties = (TJiraInputProperties) componentService.getComponentProperties("tJIRAInput");
         properties.connection.hostUrl.setValue(HOST_PORT);
         properties.connection.basicAuthentication.userId.setValue(USER);
         properties.connection.basicAuthentication.password.setValue(PASS);
-        
+
         source = new JiraSource();
         source.initialize(container, properties);
     }
-    
+
     /**
      * Checks {@link JiraReader} supports read project by ID feature.
      * Jira server has 3 projects. This test checks only 1 project retrieved.

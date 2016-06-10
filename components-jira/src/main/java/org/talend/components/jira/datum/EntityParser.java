@@ -27,19 +27,19 @@ import com.fasterxml.jackson.core.JsonToken;
  * Utility class for retrieving certain values from Entity JSON representation
  */
 abstract class EntityParser {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(EntityParser.class);
-    
+
     /**
-     * Constant value, which means that positive integer value was not specified 
+     * Constant value, which means that positive integer value was not specified
      */
     static final int UNDEFINED = -1;
-    
+
     /**
      * Constant value, which is with by braceCounter, to specify end of JSON
      */
     private static final int END_JSON = 0;
-    
+
     /**
      * Parses JSON and searches for total property
      * 
@@ -52,7 +52,7 @@ abstract class EntityParser {
             JsonParser parser = factory.createParser(json);
 
             boolean totalFound = rewindToField(parser, "total");
-           
+
             if (!totalFound) {
                 return UNDEFINED;
             }
@@ -66,7 +66,7 @@ abstract class EntityParser {
         }
         return UNDEFINED;
     }
-    
+
     /**
      * Parses JSON and returns a {@link List} of {@link Entity}
      * 
@@ -75,7 +75,7 @@ abstract class EntityParser {
      * @return a {@link List} of {@link Entity}
      */
     static List<Entity> getEntities(String json, final String fieldName) {
-        
+
         if (fieldName != null) {
             // cuts input JSON to parse only entities
             json = json.substring(json.indexOf(fieldName));
@@ -95,7 +95,7 @@ abstract class EntityParser {
         char prev = ' ';
 
         for (char cur : json.toCharArray()) {
-            
+
             switch (currentState) {
             case INITIAL: {
                 if (cur == '[') {
@@ -145,14 +145,14 @@ abstract class EntityParser {
         }
         return entities;
     }
-    
+
     /**
      * Rewinds {@link JsonParser} to the value of specified field
      * 
      * @param parser JSON parser
      * @param fieldName name of field rewind to
      * @return true if field was found, false otherwise
-     * @throws IOException in case of exception during JSON parsing  
+     * @throws IOException in case of exception during JSON parsing
      */
     private static boolean rewindToField(JsonParser parser, final String fieldName) throws IOException {
 
@@ -161,7 +161,7 @@ abstract class EntityParser {
          * There is no special token, which denotes end of file, in Jackson.
          * This counter is used to define the end of file.
          * The counter counts '{' and '}'. It is increased, when meets '{' and
-         * decreased, when meets '}'. When braceCounter == 0 it means the end 
+         * decreased, when meets '}'. When braceCounter == 0 it means the end
          * of file was met
          */
         int braceCounter = 0;
@@ -178,10 +178,10 @@ abstract class EntityParser {
             }
             currentToken = parser.nextToken();
         } while (!fieldName.equals(currentField) && braceCounter != END_JSON);
-        
+
         return braceCounter != END_JSON;
     }
-    
+
     /**
      * Entity Parser state
      */
@@ -193,5 +193,3 @@ abstract class EntityParser {
     }
 
 }
-
-

@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.api.service.testcomponent;
 
+import aQute.bnd.annotation.component.Component;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentDefinition;
@@ -21,8 +22,9 @@ import org.talend.components.api.component.Trigger.TriggerType;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
+import org.talend.daikon.properties.property.Property;
 
-import aQute.bnd.annotation.component.Component;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX + TestComponentDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TestComponentDefinition extends AbstractComponentDefinition implements ComponentDefinition {
@@ -31,8 +33,8 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
 
     public TestComponentDefinition() {
         super(COMPONENT_NAME);
-        setTriggers(new Trigger(TriggerType.ITERATE, 1, 0), new Trigger(TriggerType.SUBJOB_OK, 1, 0),
-                new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
+        setTriggers(new Trigger(TriggerType.ITERATE, 1, 0), new Trigger(TriggerType.SUBJOB_OK, 1, 0), new Trigger(
+                TriggerType.SUBJOB_ERROR, 1, 0));
     }
 
     protected TestComponentProperties properties;
@@ -40,6 +42,13 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     @Override
     public String[] getFamilies() {
         return new String[] { "level1/level2", "newlevel1/newlevel2" };
+    }
+
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[] { newProperty("return1"), newProperty(RETURN_ERROR_MESSAGE),
+                newProperty(RETURN_TOTAL_RECORD_COUNT), newProperty(RETURN_SUCCESS_RECORD_COUNT),
+                newProperty(RETURN_REJECT_RECORD_COUNT) };
     }
 
     @Override

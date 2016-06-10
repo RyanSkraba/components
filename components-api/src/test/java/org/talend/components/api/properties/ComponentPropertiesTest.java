@@ -12,10 +12,9 @@
 // ============================================================================
 package org.talend.components.api.properties;
 
-import static org.junit.Assert.*;
-import static org.talend.components.api.properties.ComponentPropertyFactory.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-import org.apache.commons.lang3.reflect.TypeUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.daikon.properties.property.Property;
@@ -66,48 +65,11 @@ public class ComponentPropertiesTest {
         }
     }
     
-    /**
-     * Test class for {@link ComponentPropertiesTest#testReturnPropertiesDisplayName()},
-     * which contains common returns properties
-     */
-    private final class WithCommonReturnsProperties extends ComponentPropertiesImpl {
-
-        public Property<Integer> NB_LINE = ComponentPropertyFactory.newReturnProperty(getReturns(), PropertyFactory.newInteger(NB_LINE_NAME));
-        
-        public Property<Integer> NB_SUCCESS = ComponentPropertyFactory.newReturnProperty(getReturns(), PropertyFactory.newInteger(NB_SUCCESS_NAME));
-        
-        public Property<Integer> NB_REJECT = ComponentPropertyFactory.newReturnProperty(getReturns(), PropertyFactory.newInteger(NB_REJECT_NAME));
-        
-        public Property<Integer> ERROR_MESSAGE = ComponentPropertyFactory.newReturnProperty(getReturns(), PropertyFactory.newInteger(ERROR_MESSAGE_NAME));
-        
-        public WithCommonReturnsProperties(String name) {
-            super(name);
-        }        
-    }
-
     ComponentPropertiesTestClass foo;
 
     @Before
     public void init() {
         foo = (ComponentPropertiesTestClass) new ComponentPropertiesTestClass("foo").init();
-
-    }
-
-    @Test
-    public void testSetReturnsProperty() {
-        Property<String> element = ComponentPropertyFactory.newReturnsProperty();
-        assertEquals("returns", element.getName());
-        assertEquals(TypeUtils.toString(String.class), element.getType());
-    }
-
-    @Test
-    public void testNewReturnProperty() throws IllegalAccessException {
-        Property<String> element = ComponentPropertyFactory.newReturnsProperty();
-        Property<Boolean> returnProperty = ComponentPropertyFactory.newReturnProperty(element,
-                PropertyFactory.newBoolean("childName"));
-        assertEquals("childName", returnProperty.getName());
-        assertEquals(TypeUtils.toString(Boolean.class), returnProperty.getType());
-        assertEquals(returnProperty, element.getChild("childName"));
     }
 
     @Test
@@ -120,19 +82,5 @@ public class ComponentPropertiesTest {
         assertEquals("XYZ", foo.two.four.value.getValue());
         // check that instance have not changed, that only the values have been copied
         assertEquals(oldProp, foo.two.four);
-    }
-    
-    /**
-     * Checks display names for common returns properties are correctly set in ComponentPropertiesImpl.properties
-     */
-    @Test
-    public void testReturnPropertiesDisplayName() {
-        WithCommonReturnsProperties properties = new WithCommonReturnsProperties("foo");
-        properties.init();
-
-        assertEquals("Number of line", properties.NB_LINE.getDisplayName());
-        assertEquals("Number of success", properties.NB_SUCCESS.getDisplayName());
-        assertEquals("Number of reject", properties.NB_REJECT.getDisplayName());
-        assertEquals("Error Message", properties.ERROR_MESSAGE.getDisplayName());
     }
 }

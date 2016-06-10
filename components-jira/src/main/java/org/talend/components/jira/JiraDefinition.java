@@ -45,15 +45,15 @@ public abstract class JiraDefinition extends AbstractComponentDefinition {
     public String getMavenArtifactId() {
         return "components-jira";
     }
-    
+
     @Override
     public String[] getFamilies() {
         return new String[] { "Business/JIRA" };
     }
-    
+
     /**
      * Returns <code>true</code> to specify that data schema should be propagated to other component without prompt. <br>
-     * 
+     *
      * @return <code>true</code>
      */
     @Override

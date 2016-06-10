@@ -82,8 +82,7 @@ public class JiraSourceTest {
     }
 
     /**
-     * Checks {@link JiraSource#createReader(RuntimeContainer)} creates
-     * {@link JiraSearchReader}
+     * Checks {@link JiraSource#createReader(RuntimeContainer)} creates {@link JiraSearchReader}
      */
     @Test
     public void testCreateReaderSearch() {
@@ -96,8 +95,7 @@ public class JiraSourceTest {
     }
 
     /**
-     * Checks {@link JiraSource#createReader(RuntimeContainer)} creates
-     * {@link JiraProjectsReader}
+     * Checks {@link JiraSource#createReader(RuntimeContainer)} creates {@link JiraProjectsReader}
      */
     @Test
     public void testCreateReaderProjects() {
@@ -112,8 +110,7 @@ public class JiraSourceTest {
     }
 
     /**
-     * Checks {@link JiraSource#createReader(RuntimeContainer)} creates
-     * {@link JiraProjectIdReader}
+     * Checks {@link JiraSource#createReader(RuntimeContainer)} creates {@link JiraProjectIdReader}
      */
     @Test
     public void testCreateReaderProjectId() {

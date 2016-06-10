@@ -12,21 +12,25 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Assert;
 import org.junit.Test;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.salesforce.SalesforceBulkProperties.Concurrency;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
@@ -120,10 +124,11 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
         bfSink.initialize(null, outputBulkProperties);
 
         SalesforceBulkFileWriteOperation writeOperation = (SalesforceBulkFileWriteOperation) bfSink.createWriteOperation();
-        Writer<WriterResult> saleforceWriter = writeOperation.createWriter(null);
+        Writer<Result> saleforceWriter = writeOperation.createWriter(null);
 
-        WriterResult result = writeRows(saleforceWriter, rows);
-        Assert.assertEquals(result.getDataCount(), 10);
+        Result result = writeRows(saleforceWriter, rows);
+        Map<String, Object> resultMap = getConsolidatedResults(result, saleforceWriter);
+        Assert.assertEquals(10, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
     }
 
     /**

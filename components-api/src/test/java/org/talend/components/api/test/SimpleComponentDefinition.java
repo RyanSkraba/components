@@ -15,6 +15,7 @@ package org.talend.components.api.test;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.properties.property.Property;
 
 public class SimpleComponentDefinition extends AbstractComponentDefinition {
 
@@ -35,6 +36,11 @@ public class SimpleComponentDefinition extends AbstractComponentDefinition {
     private String name;
 
     private Class<? extends ComponentProperties> propertyClass;
+
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[0];
+    }
 
     @Override
     public String getPngImagePath(ComponentImageType imageType) {
