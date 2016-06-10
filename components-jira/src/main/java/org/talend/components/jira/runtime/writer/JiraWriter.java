@@ -22,7 +22,7 @@ import org.talend.components.api.exception.DataRejectException;
 import org.talend.components.jira.connection.Rest;
 import org.talend.components.jira.runtime.JiraWriteOperation;
 import org.talend.daikon.avro.AvroRegistry;
-import org.talend.daikon.avro.IndexedRecordAdapterFactory;
+import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -38,7 +38,7 @@ public class JiraWriter implements Writer<Result> {
     /**
      * IndexedRecord converter
      */
-    private IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory;
+    private IndexedRecordConverter<Object, ? extends IndexedRecord> factory;
 
     /**
      * Http connection
@@ -148,10 +148,10 @@ public class JiraWriter implements Writer<Result> {
      * @param datum data object
      * @return IndexedRecord converter
      */
-    protected IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> getFactory(Object datum) {
+    protected IndexedRecordConverter<Object, ? extends IndexedRecord> getFactory(Object datum) {
         if (null == factory) {
-            factory = (IndexedRecordAdapterFactory<Object, ? extends IndexedRecord>) new AvroRegistry()
-                    .createAdapterFactory(datum.getClass());
+            factory = (IndexedRecordConverter<Object, ? extends IndexedRecord>) new AvroRegistry()
+                    .createIndexedRecordConverter(datum.getClass());
         }
         return factory;
     }

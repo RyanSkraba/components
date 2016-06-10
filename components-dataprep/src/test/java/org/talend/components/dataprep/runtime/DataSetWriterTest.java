@@ -15,20 +15,21 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.test.SpringApp;
+import org.talend.components.api.test.SpringTestApp;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputDefinition;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
 import org.talend.daikon.avro.AvroRegistry;
-import org.talend.daikon.avro.util.AvroUtils;
+import org.talend.daikon.avro.AvroUtils;
 
 import javax.inject.Inject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SpringApp.class)
+@SpringApplicationConfiguration(classes = SpringTestApp.class)
 @WebIntegrationTest("server.port:0")
 public class DataSetWriterTest {
 

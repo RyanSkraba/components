@@ -24,10 +24,10 @@ import org.talend.daikon.spring.BndToSpringBeanNameGenerator;
  */
 @SpringBootApplication
 @ComponentScan(basePackages = "org.talend.components", nameGenerator = BndToSpringBeanNameGenerator.class, includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = aQute.bnd.annotation.component.Component.class) , excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = ".*Osgi") )
-public class SpringApp implements DisposableBean {
+public class SpringTestApp implements DisposableBean {
 
     public static void main(String[] args) {
-        SpringApplication.run(SpringApp.class, args);
+        SpringApplication.run(SpringTestApp.class, args);
     }
 
     @Override

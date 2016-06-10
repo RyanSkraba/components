@@ -24,7 +24,7 @@ import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.splunk.TSplunkEventCollectorDefinition;
 import org.talend.components.splunk.TSplunkEventCollectorProperties;
 import org.talend.daikon.avro.AvroRegistry;
-import org.talend.daikon.avro.util.AvroUtils;
+import org.talend.daikon.avro.AvroUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;

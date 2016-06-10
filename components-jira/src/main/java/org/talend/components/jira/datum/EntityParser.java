@@ -77,47 +77,71 @@ abstract class EntityParser {
     static List<Entity> getEntities(String json, final String fieldName) {
         
         if (fieldName != null) {
+            // cuts input JSON to parse only entities
             json = json.substring(json.indexOf(fieldName));
+            // cuts input JSON to array of entities
+            json = json.substring(json.indexOf('['));
+            json = json.substring(0, json.lastIndexOf(']') + 1);
         }
 
         List<Entity> entities = new LinkedList<Entity>();
         StringBuilder entityBuilder = null;
-        
-        State currentState = State.READ_JSON_ARRAY;
+        State currentState = State.INITIAL;
         /*
          * This counter counts braces '{' and '}'. It is used to define
          * start and end of JSON objects
          */
-        int braceCounter = 0;
+        int openedBraces = 0;
+        char prev = ' ';
 
-        for (char c : json.toCharArray()) {
-
-            switch (c) {
-            case '{': {
-                if (currentState == State.READ_JSON_ARRAY) {
+        for (char cur : json.toCharArray()) {
+            
+            switch (currentState) {
+            case INITIAL: {
+                if (cur == '[') {
+                    currentState = State.READ_JSON_ARRAY;
+                }
+                break;
+            }
+            case READ_JSON_ARRAY: {
+                if (cur == '{') {
                     currentState = State.READ_JSON_OBJECT;
                     entityBuilder = new StringBuilder();
+                    entityBuilder.append(cur);
+                    openedBraces++;
                 }
-                braceCounter++;
-                entityBuilder.append(c);
-                break;
-            }
-            case '}': {
-                entityBuilder.append(c);
-                braceCounter--;
-                if (braceCounter == 0) {
-                    currentState = State.READ_JSON_ARRAY;
-                    Entity entity = new Entity(entityBuilder.toString());
-                    entities.add(entity);
+                if (cur == ']') {
+                    currentState = State.INITIAL;
                 }
                 break;
             }
-            default: {
-                if (currentState == State.READ_JSON_OBJECT) {
-                    entityBuilder.append(c);
+            case READ_JSON_OBJECT: {
+                entityBuilder.append(cur);
+                if (cur == '{') {
+                    openedBraces++;
                 }
+                if (cur == '}') {
+                    openedBraces--;
+                    if (openedBraces == 0) {
+                        currentState = State.READ_JSON_ARRAY;
+                        Entity entity = new Entity(entityBuilder.toString());
+                        entities.add(entity);
+                    }
+                }
+                if (cur == '"') {
+                    currentState = State.READ_JSON_STRING;
+                }
+                break;
+            }
+            case READ_JSON_STRING: {
+                entityBuilder.append(cur);
+                if (cur == '"' && prev != '\\') {
+                    currentState = State.READ_JSON_OBJECT;
+                }
+                break;
             }
             }
+            prev = cur;
         }
         return entities;
     }
@@ -162,8 +186,10 @@ abstract class EntityParser {
      * Entity Parser state
      */
     private enum State {
+        INITIAL,
         READ_JSON_OBJECT,
         READ_JSON_ARRAY,
+        READ_JSON_STRING
     }
 
 }

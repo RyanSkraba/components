@@ -15,11 +15,7 @@ package org.talend.components.salesforce.runtime;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
@@ -29,8 +25,8 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
-import org.talend.daikon.avro.IndexedRecordAdapterFactory;
-import org.talend.daikon.avro.util.AvroUtils;
+import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
 import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.Error;
@@ -77,7 +73,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
 
     private int deleteFieldId = -1;
 
-    private transient IndexedRecordAdapterFactory<Object, ? extends IndexedRecord> factory;
+    private transient IndexedRecordConverter<Object, ? extends IndexedRecord> factory;
 
     private transient Schema schema;
 
@@ -90,13 +86,18 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
         this.container = container;
         sink = (SalesforceSink) salesforceWriteOperation.getSink();
         sprops = sink.getSalesforceOutputProperties();
-        commitLevel = 1;
+        if (sprops.extendInsert.getValue()) {
+            commitLevel = sprops.commitLevel.getValue();
+        } else {
+            commitLevel = 1;
+        }
         int arraySize = commitLevel * 2;
         deleteItems = new ArrayList<>(arraySize);
         insertItems = new ArrayList<>(arraySize);
         updateItems = new ArrayList<>(arraySize);
         upsertItems = new ArrayList<>(arraySize);
         upsertKeyColumn = "";
+        exceptionForErrors = sprops.ceaseForError.getValue();
     }
 
     @Override
@@ -123,8 +124,8 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
 
         // This is all we need to do in order to ensure that we can process the incoming value as an IndexedRecord.
         if (null == factory) {
-            factory = (IndexedRecordAdapterFactory<Object, ? extends IndexedRecord>) SalesforceAvroRegistry.get()
-                    .createAdapterFactory(datum.getClass());
+            factory = (IndexedRecordConverter<Object, ? extends IndexedRecord>) SalesforceAvroRegistry.get()
+                    .createIndexedRecordConverter(datum.getClass());
         }
         IndexedRecord input = factory.convertToAvro(datum);
 
@@ -203,11 +204,14 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
 
     private SaveResult[] insert(IndexedRecord input) throws IOException {
         insertItems.add(input);
-        return doInsert();
+        if (insertItems.size() >= commitLevel) {
+            return doInsert();
+        }
+        return null;
     }
 
     private SaveResult[] doInsert() throws IOException {
-        if (insertItems.size() >= commitLevel) {
+        if (insertItems.size() > 0) {
             SObject[] accs = new SObject[insertItems.size()];
             for (int i = 0; i < insertItems.size(); i++)
                 accs[i] = createSObject(insertItems.get(i));
@@ -236,11 +240,14 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
 
     private SaveResult[] update(IndexedRecord input) throws IOException {
         updateItems.add(input);
-        return doUpdate();
+        if (updateItems.size() >= commitLevel) {
+            return doUpdate();
+        }
+        return null;
     }
 
     private SaveResult[] doUpdate() throws IOException {
-        if (updateItems.size() >= commitLevel) {
+        if (updateItems.size() > 0) {
             SObject[] upds = new SObject[updateItems.size()];
             for (int i = 0; i < updateItems.size(); i++)
                 upds[i] = createSObject(updateItems.get(i));
@@ -273,11 +280,14 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
 
     private UpsertResult[] upsert(IndexedRecord input) throws IOException {
         upsertItems.add(input);
-        return doUpsert();
+        if (upsertItems.size() >= commitLevel) {
+            return doUpsert();
+        }
+        return null;
     }
 
     private UpsertResult[] doUpsert() throws IOException {
-        if (upsertItems.size() >= commitLevel) {
+        if (upsertItems.size() > 0) {
             SObject[] upds = new SObject[upsertItems.size()];
             for (int i = 0; i < upsertItems.size(); i++)
                 upds[i] = createSObjectForUpsert(upsertItems.get(i));
@@ -338,40 +348,47 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
 
     private void handleReject(IndexedRecord input, Error[] resultErrors, String[] changedItemKeys, int batchIdx)
             throws IOException {
-
-        rejectCount++;
-        Schema outSchema = sprops.schemaReject.schema.getValue();
-        if (outSchema == null || outSchema.getFields().size() == 0)
-            return;
-        if (input.getSchema().equals(outSchema)) {
-            rejectedWrites.add(input);
-        } else {
-            IndexedRecord reject = new GenericData.Record(outSchema);
-            for (Schema.Field outField : reject.getSchema().getFields()) {
-                Object outValue = null;
-                Schema.Field inField = input.getSchema().getField(outField.name());
-                if (inField != null)
-                    outValue = input.get(inField.pos());
-                else if (resultErrors.length > 0) {
-                    Error error = resultErrors[0];
-                    if (TSalesforceOutputProperties.FIELD_ERROR_CODE.equals(outField.name()))
-                        outValue = error.getStatusCode() != null ? error.getStatusCode().toString() : null;
-                    else if (TSalesforceOutputProperties.FIELD_ERROR_FIELDS.equals(outField.name())) {
-                        StringBuffer fields = new StringBuffer();
-                        for (String field : error.getFields()) {
-                            fields.append(field);
-                            fields.append(",");
-                        }
-                        if (fields.length() > 0) {
-                            fields.deleteCharAt(fields.length() - 1);
-                        }
-                        outValue = fields.toString();
-                    } else if (TSalesforceOutputProperties.FIELD_ERROR_MESSAGE.equals(outField.name()))
-                        outValue = error.getMessage();
-                }
-                reject.put(outField.pos(), outValue);
+        if (exceptionForErrors) {
+            StringBuilder errors = SalesforceRuntime.addLog(resultErrors,
+                    batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx] : "Batch index out of bounds", null);
+            if (errors.toString().length() > 0) {
+                throw new IOException(errors.toString());
             }
-            rejectedWrites.add(reject);
+        } else {
+            rejectCount++;
+            Schema outSchema = sprops.schemaReject.schema.getValue();
+            if (outSchema == null || outSchema.getFields().size() == 0)
+                return;
+            if (input.getSchema().equals(outSchema)) {
+                rejectedWrites.add(input);
+            } else {
+                IndexedRecord reject = new GenericData.Record(outSchema);
+                for (Schema.Field outField : reject.getSchema().getFields()) {
+                    Object outValue = null;
+                    Schema.Field inField = input.getSchema().getField(outField.name());
+                    if (inField != null)
+                        outValue = input.get(inField.pos());
+                    else if (resultErrors.length > 0) {
+                        Error error = resultErrors[0];
+                        if (TSalesforceOutputProperties.FIELD_ERROR_CODE.equals(outField.name()))
+                            outValue = error.getStatusCode() != null ? error.getStatusCode().toString() : null;
+                        else if (TSalesforceOutputProperties.FIELD_ERROR_FIELDS.equals(outField.name())) {
+                            StringBuffer fields = new StringBuffer();
+                            for (String field : error.getFields()) {
+                                fields.append(field);
+                                fields.append(",");
+                            }
+                            if (fields.length() > 0) {
+                                fields.deleteCharAt(fields.length() - 1);
+                            }
+                            outValue = fields.toString();
+                        } else if (TSalesforceOutputProperties.FIELD_ERROR_MESSAGE.equals(outField.name()))
+                            outValue = error.getMessage();
+                    }
+                    reject.put(outField.pos(), outValue);
+                }
+                rejectedWrites.add(reject);
+            }
         }
     }
 
@@ -386,15 +403,17 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
             deleteFieldId = idField.pos();
         }
         String id = (String) input.get(deleteFieldId);
-        if (id == null) {
-            return null;
+        if (id != null) {
+            deleteItems.add(input);
+            if (deleteItems.size() >= commitLevel) {
+                return doDelete();
+            }
         }
-        deleteItems.add(input);
-        return doDelete();
+        return null;
     }
 
     private DeleteResult[] doDelete() throws IOException {
-        if (deleteItems.size() >= commitLevel) {
+        if (deleteItems.size() > 0) {
             String[] delIDs = new String[deleteItems.size()];
             String[] changedItemKeys = new String[delIDs.length];
             for (int ix = 0; ix < delIDs.length; ++ix) {

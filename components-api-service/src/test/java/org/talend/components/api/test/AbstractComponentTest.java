@@ -10,11 +10,12 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.service;
+package org.talend.components.api.test;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ErrorCollector;
+import org.talend.components.api.service.ComponentService;
 import org.junit.rules.TestName;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.Result;
@@ -25,23 +26,26 @@ import java.util.Map;
 
 public abstract class AbstractComponentTest {
 
+    // for benchmarking the apis, one suggestion is to use http://openjdk.java.net/projects/code-tools/jmh/.
     @Rule
-    public TestName name = new TestName();
-
-    long startTime;
-
-    @Before
-    public void before() throws Exception {
-        startTime = System.currentTimeMillis();
-        System.out.println(">>>>> " + name.getMethodName());
-    }
-
-    @After
-    public void after() throws Exception {
-        System.out.println("<<<<< " + name.getMethodName() + " time: " + (System.currentTimeMillis() - startTime));
-    }
+    public ErrorCollector errorCollector = new ErrorCollector();
 
     abstract public ComponentService getComponentService();
+
+    @Test
+    public void testAlli18n() {
+        ComponentTestUtils.testAlli18n(getComponentService(), errorCollector);
+    }
+
+    @Test
+    public void testAllImages() {
+        ComponentTestUtils.testAllImages(getComponentService());
+    }
+
+    @Test
+    public void testAllRuntime() {
+        ComponentTestUtils.testAllRuntimeAvaialble(getComponentService());
+    }
 
     public static Map<String, Object> getConsolidatedResults(Result result, Writer writer) {
         List<Result> results = new ArrayList();

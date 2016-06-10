@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -23,13 +25,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.avro.Schema;
@@ -88,7 +84,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         props.module.afterModuleName();// to setup schema.
         return props;
     }
-    
+
     @AfterClass
     public static void cleanupAllRecords() throws NoSuchElementException, IOException {
         List<IndexedRecord> recordsToClean = new ArrayList<>();
@@ -290,6 +286,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         SalesforceTestBase.setupProps(sfProps.connection, false);
         sfProps.module.setValue("moduleName", "Account");
         sfProps.module.main.schema.setValue(SCHEMA_INSERT_ACCOUNT);
+        sfProps.ceaseForError.setValue(false);
         // Automatically generate the out schemas.
         sfProps.module.schemaListener.afterSchema();
 
@@ -314,6 +311,8 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         r.put(3, "deleteme");
         sfWriter.write(r);
 
+        sfWriter.close();
+
         assertThat(sfWriter.getRejectedWrites(), empty());
         assertThat(sfWriter.getSuccessfulWrites(), hasSize(1));
         assertThat(sfWriter.getSuccessfulWrites().get(0), is(r));
@@ -325,6 +324,8 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         r.put(2, "deleteme2");
         r.put(3, "deleteme2");
         sfWriter.write(r);
+
+        sfWriter.close();
 
         assertThat(sfWriter.getRejectedWrites(), empty());
         assertThat(sfWriter.getSuccessfulWrites(), hasSize(1));
@@ -347,6 +348,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         SalesforceTestBase.setupProps(sfProps.connection, false);
         sfProps.module.setValue("moduleName", "Account");
         sfProps.extendInsert.setValue(false);
+        sfProps.ceaseForError.setValue(false);
         sfProps.retrieveInsertId.setValue(true);
         sfProps.module.main.schema.setValue(SCHEMA_INSERT_ACCOUNT);
         // Automatically generate the out schemas.
@@ -407,6 +409,8 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         SalesforceTestBase.setupProps(sfProps.connection, false);
         sfProps.module.setValue("moduleName", "Account");
         sfProps.module.main.schema.setValue(SCHEMA_INSERT_ACCOUNT);
+        sfProps.extendInsert.setValue(false);
+        sfProps.ceaseForError.setValue(false);
         // Automatically generate the out schemas.
         sfProps.module.schemaListener.afterSchema();
 
@@ -462,6 +466,16 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
      */
     @Test
     public void testSinkWorkflow_updateRejected() throws Exception {
+        testUpdate(false);
+    }
+
+    @Test(expected = IOException.class)
+    public void testSinkWorkflow_updateCeaseForError() throws Exception {
+        testUpdate(true);
+    }
+
+    protected void testUpdate(boolean ceaseForError) throws Exception {
+
         // Component framework objects.
         ComponentDefinition sfDef = new TSalesforceOutputDefinition();
 
@@ -470,6 +484,8 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         sfProps.module.setValue("moduleName", "Account");
         sfProps.module.main.schema.setValue(SCHEMA_UPDATE_ACCOUNT);
         sfProps.outputAction.setValue(OutputAction.UPDATE);
+        sfProps.extendInsert.setValue(false);
+        sfProps.ceaseForError.setValue(ceaseForError);
         // Automatically generate the out schemas.
         sfProps.module.schemaListener.afterSchema();
 
@@ -493,31 +509,43 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         r.put(2, "deleteme");
         r.put(3, "deleteme");
         r.put(4, "deleteme");
-        sfWriter.write(r);
+        if (!ceaseForError) {
+            sfWriter.write(r);
 
-        assertThat(sfWriter.getSuccessfulWrites(), empty());
-        assertThat(sfWriter.getRejectedWrites(), hasSize(1));
+            assertThat(sfWriter.getSuccessfulWrites(), empty());
+            assertThat(sfWriter.getRejectedWrites(), hasSize(1));
 
-        // Check the rejected record.
-        IndexedRecord rejected = sfWriter.getRejectedWrites().get(0);
-        assertThat(rejected.getSchema().getFields(), hasSize(8));
+            // Check the rejected record.
+            IndexedRecord rejected = sfWriter.getRejectedWrites().get(0);
+            assertThat(rejected.getSchema().getFields(), hasSize(8));
 
-        // Check the values copied from the incoming record.
-        for (int i = 0; i < r.getSchema().getFields().size(); i++) {
-            assertThat(rejected.getSchema().getFields().get(i), is(r.getSchema().getFields().get(i)));
-            assertThat(rejected.get(0), is(r.get(0)));
+            // Check the values copied from the incoming record.
+            for (int i = 0; i < r.getSchema().getFields().size(); i++) {
+                assertThat(rejected.getSchema().getFields().get(i), is(r.getSchema().getFields().get(i)));
+                assertThat(rejected.get(0), is(r.get(0)));
+            }
+
+            // The enriched fields.
+            assertThat(rejected.getSchema().getFields().get(5).name(), is("errorCode"));
+            assertThat(rejected.getSchema().getFields().get(6).name(), is("errorFields"));
+            assertThat(rejected.getSchema().getFields().get(7).name(), is("errorMessage"));
+            assertThat(rejected.get(5), is((Object) "MALFORMED_ID"));
+            assertThat(rejected.get(6), is((Object) "Id"));
+            assertThat(rejected.get(7), is((Object) "Account ID: id value of incorrect type: bad id"));
+
+            // Finish the Writer, WriteOperation and Sink.
+            WriterResult wr1 = sfWriter.close();
+            sfWriteOp.finalize(Arrays.asList(wr1), container);
+        } else {
+            try {
+                sfWriter.write(r);
+                sfWriter.close();
+                fail("It should get error when insert data!");
+            }catch (IOException e){
+                assertThat(e.getMessage(), is((Object) "Account ID: id value of incorrect type: bad id\n"));
+                throw e;
+            }
         }
 
-        // The enriched fields.
-        assertThat(rejected.getSchema().getFields().get(5).name(), is("errorCode"));
-        assertThat(rejected.getSchema().getFields().get(6).name(), is("errorFields"));
-        assertThat(rejected.getSchema().getFields().get(7).name(), is("errorMessage"));
-        assertThat(rejected.get(5), is((Object) "MALFORMED_ID"));
-        assertThat(rejected.get(6), is((Object) "Id"));
-        assertThat(rejected.get(7), is((Object) "Account ID: id value of incorrect type: bad id"));
-
-        // Finish the Writer, WriteOperation and Sink.
-        Result wr1 = sfWriter.close();
-        sfWriteOp.finalize(Arrays.asList(wr1), container);
     }
 }

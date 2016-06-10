@@ -38,6 +38,7 @@ import org.talend.components.api.service.testcomponent.TestComponentProperties;
 import org.talend.components.api.service.testcomponent.TestComponentWizard;
 import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
+import org.talend.components.api.test.AbstractComponentTest;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.test.SimpleComponentRegistry;
 import org.talend.components.api.wizard.ComponentWizard;

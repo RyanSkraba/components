@@ -8,13 +8,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.test.SpringApp;
+import org.talend.components.api.test.SpringTestApp;
 
 import javax.inject.Inject;
 import java.util.Collections;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SpringApp.class)
+@SpringApplicationConfiguration(classes = SpringTestApp.class)
 public class TDataSetInputDefinitionAndPropertiesTest {
 
     @Inject

@@ -12,8 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
-import static org.talend.daikon.properties.presentation.Widget.*;
-import static org.talend.daikon.properties.property.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
+import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
+import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -24,10 +26,10 @@ import org.apache.avro.SchemaBuilder.RecordBuilder;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.daikon.avro.SchemaConstants;
+import org.talend.daikon.di.DiSchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
-import org.talend.daikon.talend6.Talend6SchemaConstants;
 
 public class TSalesforceOutputProperties extends SalesforceOutputProperties {
 
@@ -80,7 +82,7 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
         if (!extendInsert.getValue() && retrieveInsertId.getValue() && OutputAction.INSERT.equals(outputAction.getValue())) {
 
             Schema mainOutputSchema = createRecordBuilderFromSchema(inputSchema, "output").name(FIELD_SALESFORCE_ID)
-                    .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
+                    .prop(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
                     .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
                     .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
                     .type().stringType().noDefault().endRecord();
@@ -91,16 +93,16 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
         }
 
         Schema rejectSchema = createRecordBuilderFromSchema(inputSchema, "rejectOutput").name(FIELD_ERROR_CODE) //$NON-NLS-1$ //$NON-NLS-2$
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
+                .prop(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
                 // column set as non-read-only, to let the user edit the field if needed
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
                 .type().stringType().noDefault().name(FIELD_ERROR_FIELDS)// $NON-NLS-1$
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
+                .prop(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
                 .type().stringType().noDefault().name(FIELD_ERROR_MESSAGE)// $NON-NLS-1$
-                .prop(Talend6SchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
+                .prop(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
                 .type().stringType().noDefault().endRecord();

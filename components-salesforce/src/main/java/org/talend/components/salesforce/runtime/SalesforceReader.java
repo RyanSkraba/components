@@ -23,8 +23,8 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
-import org.talend.daikon.avro.IndexedRecordAdapterFactory;
-import org.talend.daikon.avro.util.AvroUtils;
+import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
 import com.sforce.soap.partner.PartnerConnection;
 
@@ -32,7 +32,7 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
 
     private transient PartnerConnection connection;
 
-    private transient IndexedRecordAdapterFactory<?, IndexedRecord> factory;
+    private transient IndexedRecordConverter<?, IndexedRecord> factory;
 
     protected transient Schema querySchema;
 
@@ -51,7 +51,7 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
         return connection;
     }
 
-    protected IndexedRecordAdapterFactory<?, IndexedRecord> getFactory() throws IOException {
+    protected IndexedRecordConverter<?, IndexedRecord> getFactory() throws IOException {
         if (null == factory) {
             boolean useBulkFactory = false;
             if (properties instanceof TSalesforceBulkExecProperties) {
