@@ -70,6 +70,6 @@ public class DataSetSinkTest {
 
     @Test
     public void testGetSchema() throws Exception {
-        Assert.assertNull(outputSink.getSchema(null, null));
+        Assert.assertNull(outputSink.getEndpointSchema(null, null));
     }
 }

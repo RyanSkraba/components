@@ -49,7 +49,7 @@ public class DataSetSourceTest {
 
     @Test
     public void testGetSchema() throws Exception {
-        Assert.assertNull(inputSource.getSchema(null, null));
+        Assert.assertNull(inputSource.getEndpointSchema(null, null));
     }
 
     @Test

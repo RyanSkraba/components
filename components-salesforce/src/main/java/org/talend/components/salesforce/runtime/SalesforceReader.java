@@ -78,7 +78,7 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
                 if (properties instanceof SalesforceConnectionModuleProperties) {
                     moduleName = properties.module.moduleName.getStringValue();
                 }
-                querySchema = ((SalesforceSourceOrSink) getCurrentSource()).getSchema(container, moduleName);
+                querySchema = ((SalesforceSourceOrSink) getCurrentSource()).getEndpointSchema(container, moduleName);
             }
         }
         return querySchema;

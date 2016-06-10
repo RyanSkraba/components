@@ -74,7 +74,7 @@ public class ${componentName}Source implements BoundedSource {
         return ValidationResult.OK;
     }
 
-    public Schema getSchema(RuntimeContainer container, String schemaName) throws IOException {
+    public Schema getEndpointSchema(RuntimeContainer container, String schemaName) throws IOException {
         return null;
     }
 
