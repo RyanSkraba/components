@@ -12,22 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
@@ -37,8 +21,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.Reader;
-import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.Result;
+import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
 import org.talend.components.salesforce.SalesforceTestBase;
@@ -47,6 +31,27 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputPropert
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.property.Property;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.concurrent.ThreadLocalRandom;
+
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SalesforceWriterTestIT extends SalesforceTestBase {
 
@@ -534,7 +539,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
             assertThat(rejected.get(7), is((Object) "Account ID: id value of incorrect type: bad id"));
 
             // Finish the Writer, WriteOperation and Sink.
-            WriterResult wr1 = sfWriter.close();
+            Result wr1 = sfWriter.close();
             sfWriteOp.finalize(Arrays.asList(wr1), container);
         } else {
             try {

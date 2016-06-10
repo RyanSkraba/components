@@ -90,6 +90,11 @@ public class DataSetReader extends AbstractBoundedReader<IndexedRecord> {
         connectionHandler.logout();
     }
 
+    @Override
+    public Map<String, Object> getReturnValues() {
+        return result.toMap();
+    }
+
     private IndexedRecordConverter<?, IndexedRecord> getFactory() {
         DataPrepAdaptorFactory adaptorFactory = new DataPrepAdaptorFactory();
         adaptorFactory.setSchema(schema);
