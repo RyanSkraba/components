@@ -28,17 +28,17 @@ import org.talend.components.jira.tjiraoutput.TJiraOutputProperties;
  * Unit-tests for {@link JiraSourceOrSink} class
  */
 public class JiraSourceOrSinkTest {
-    
+
     /**
      * {@link ComponentProperties} for {@link JiraSourceOrSink}
      */
     private TJiraOutputProperties outputProperties;
-    
+
     /**
      * JSON string, which describes {@link Schema}
      */
     private String schemaValue;
-    
+
     /**
      * Prepares required instances for tests
      */
@@ -53,7 +53,7 @@ public class JiraSourceOrSinkTest {
         outputProperties.schema.schema.setValue(new Schema.Parser().parse(schemaValue));
         outputProperties.action.setValue(Action.INSERT);
     }
-    
+
     /**
      * Checks {@link JiraSourceOrSink#initialize(RuntimeContainer, ComponentProperties)} sets required fields from
      * {@link ComponentProperties}
@@ -61,9 +61,9 @@ public class JiraSourceOrSinkTest {
     @Test
     public void testInitialize() {
         JiraSourceOrSink sourceOrSink = new JiraSourceOrSink();
-        
+
         sourceOrSink.initialize(null, outputProperties);
-        
+
         String hostPort = sourceOrSink.getHostPort();
         assertEquals("hostValue", hostPort);
         String userId = sourceOrSink.getUserId();

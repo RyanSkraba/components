@@ -24,6 +24,9 @@ import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecD
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
 
 import aQute.bnd.annotation.component.Component;
+import org.talend.daikon.properties.property.Property;
+
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceOutputBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
@@ -62,6 +65,12 @@ public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition im
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return concatPropertiesClasses(super.getNestedCompatibleComponentPropertiesClass(),
                 new Class[] { SalesforceModuleProperties.class });
+    }
+
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[]{newProperty(RETURN_TOTAL_RECORD_COUNT), newProperty(RETURN_SUCCESS_RECORD_COUNT),
+                newProperty(RETURN_REJECT_RECORD_COUNT)};
     }
 
     @Override

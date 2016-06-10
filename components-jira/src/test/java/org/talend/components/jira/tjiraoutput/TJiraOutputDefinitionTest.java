@@ -40,7 +40,7 @@ public class TJiraOutputDefinitionTest {
         String mavenGroupId = definition.getMavenGroupId();
         assertThat(mavenGroupId, equalTo("org.talend.components"));
     }
-    
+
     /**
      * Check {@link TJiraOutputDefinition#getMavenArtifactId()} returns "components-jira"
      */
@@ -50,7 +50,7 @@ public class TJiraOutputDefinitionTest {
         String mavenArtifactId = definition.getMavenArtifactId();
         assertThat(mavenArtifactId, equalTo("components-jira"));
     }
-    
+
     /**
      * Check {@link TJiraOutputDefinition#getFamilies()} returns string array, which contains "Business/JIRA"
      */
@@ -60,7 +60,7 @@ public class TJiraOutputDefinitionTest {
         String[] families = definition.getFamilies();
         assertThat(families, arrayContaining("Business/JIRA"));
     }
-    
+
     /**
      * Check {@link TJiraOutputDefinition#getName()} returns "tJIRAOutput"
      */
@@ -70,7 +70,7 @@ public class TJiraOutputDefinitionTest {
         String componentName = definition.getName();
         assertEquals(componentName, "tJIRAOutput");
     }
-    
+
     /**
      * Check {@link TJiraOutputDefinition#getPropertyClass()} returns class, which canonical name is
      * "org.talend.components.jira.tjiraoutput.TJiraOutputProperties"
@@ -82,7 +82,7 @@ public class TJiraOutputDefinitionTest {
         String canonicalName = propertyClass.getCanonicalName();
         assertThat(canonicalName, equalTo("org.talend.components.jira.tjiraoutput.TJiraOutputProperties"));
     }
-    
+
     /**
      * Check {@link TJiraOutputDefinition#getRuntime()} returns instance of {@link JiraSource}
      */
@@ -92,7 +92,7 @@ public class TJiraOutputDefinitionTest {
         Sink sink = definition.getRuntime();
         assertThat(sink, is(instanceOf(JiraSink.class)));
     }
-    
+
     /**
      * Check {@link TJiraOutputDefinition#isSchemaAutoPropagate()} returns <code>true</code>
      */

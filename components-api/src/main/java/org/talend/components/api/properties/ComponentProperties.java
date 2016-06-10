@@ -17,7 +17,6 @@ import java.util.Set;
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.daikon.properties.Properties;
-import org.talend.daikon.properties.property.Property;
 
 /**
  * for all details see {@link Properties}. This class adds a specific {@link ComponentProperties#returns} property which
@@ -80,12 +79,5 @@ public interface ComponentProperties extends Properties {
      */
     public boolean updateNestedProperties(final ComponentProperties nestedValues);
 
-    /**
-     * return the Returns property that shall be created using the name "returns", you can use
-     * {@link ComponentPropertyFactory#newReturnsProperty()} to create a new one. All Property children represent a
-     * Property that is one the possible returns.
-     * This API may change in the future because it is used for describing the COmponent possible returns and therfore may be
-     * moved to Component Definition.
-     */
-    public Property<String> getReturns();
+
 }

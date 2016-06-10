@@ -21,18 +21,19 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jira.Action;
-import org.talend.components.jira.runtime.result.DataCountResult;
 import org.talend.components.jira.runtime.writer.JiraDeleteWriter;
 import org.talend.components.jira.runtime.writer.JiraInsertWriter;
 import org.talend.components.jira.runtime.writer.JiraUpdateWriter;
 import org.talend.components.jira.runtime.writer.JiraWriter;
-import org.talend.components.jira.tjiraoutput.TJiraOutputProperties;
 
 /**
  * Unit-tests for {@link JiraWriteOperation} class
@@ -43,7 +44,7 @@ public class JiraWriteOperationTest {
      * Mocked instance of {@link JiraSink}
      */
     private JiraSink sink;
-    
+
     /**
      * Instance of {@link RuntimeContainer} used in tests
      */
@@ -52,9 +53,9 @@ public class JiraWriteOperationTest {
     @Before
     public void setupMocks() {
         sink = mock(JiraSink.class);
-        
+
         container = new DefaultComponentRuntimeContainerImpl() {
-            
+
             @Override
             public String getCurrentComponentId() {
                 return "tJIRAOutput";
@@ -75,7 +76,8 @@ public class JiraWriteOperationTest {
     }
 
     /**
-     * Checks {@link JiraWriteOperation#createWriter()} returns {@link JiraDeleteWriter}, when Delete action specified
+     * Checks {@link JiraWriteOperation#createWriter(RuntimeContainer)} returns {@link JiraDeleteWriter}, when Delete action
+     * specified
      */
     @Test
     public void testCreateWriterDelete() {
@@ -88,7 +90,8 @@ public class JiraWriteOperationTest {
     }
 
     /**
-     * Checks {@link JiraWriteOperation#createWriter()} returns {@link JiraInsertWriter}, when Insert action specified
+     * Checks {@link JiraWriteOperation#createWriter(RuntimeContainer)} returns {@link JiraInsertWriter}, when Insert action
+     * specified
      */
     @Test
     public void testCreateWriterInsert() {
@@ -101,7 +104,8 @@ public class JiraWriteOperationTest {
     }
 
     /**
-     * Checks {@link JiraWriteOperation#createWriter()} returns {@link JiraUpdateWriter}, when Update action specified
+     * Checks {@link JiraWriteOperation#createWriter(RuntimeContainer)} returns {@link JiraUpdateWriter}, when Update action
+     * specified
      */
     @Test
     public void testCreateWriterUpdate() {
@@ -112,21 +116,21 @@ public class JiraWriteOperationTest {
 
         assertThat(writer, is(instanceOf(JiraUpdateWriter.class)));
     }
-    
+
     /**
-     * Checks {@link JiraWriteOperation#finalize()} computes total of output results and set them to container
+     * Checks {@link JiraWriteOperation#finalize()} computes total of output results
      */
     @Test
     public void testFinalize() {
-        DataCountResult result1 = new DataCountResult("id-1", 15, 10, 5);
-        DataCountResult result2 = new DataCountResult("id-1", 25, 20, 5);
-        List<DataCountResult> results = Arrays.asList(result1, result2);
+        Result result1 = new Result("id-1", 15, 10, 5);
+        Result result2 = new Result("id-1", 25, 20, 5);
+        List<Result> results = Arrays.asList(result1, result2);
         JiraWriteOperation writeOperation = new JiraWriteOperation(sink);
 
-        writeOperation.finalize(results, container);
+        Map<String, Object> returnValues = writeOperation.finalize(results, container);
 
-        assertEquals(40, container.getComponentData("tJIRAOutput", TJiraOutputProperties.NB_LINE));
-        assertEquals(30, container.getComponentData("tJIRAOutput", TJiraOutputProperties.NB_SUCCESS));
-        assertEquals(10, container.getComponentData("tJIRAOutput", TJiraOutputProperties.NB_REJECT));
+        assertEquals(40, returnValues.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
+        assertEquals(30, returnValues.get(ComponentDefinition.RETURN_SUCCESS_RECORD_COUNT));
+        assertEquals(10, returnValues.get(ComponentDefinition.RETURN_REJECT_RECORD_COUNT));
     }
 }

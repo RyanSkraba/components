@@ -19,10 +19,10 @@ import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.DataRejectException;
 import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResult;
-import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 
 import com.sforce.async.AsyncApiException;
@@ -137,14 +137,16 @@ final class SalesforceBulkExecReader extends SalesforceReader {
 
     @Override
     public void close() throws IOException {
-        if (container != null) {
-            String currentComponent = container.getCurrentComponentId()
-                    .replace("_" + TSalesforceBulkExecDefinition.COMPONENT_NAME, "");
-            container.setComponentData(currentComponent, TSalesforceBulkExecProperties.NB_LINE_NAME, dataCount);
-            container.setComponentData(currentComponent, TSalesforceBulkExecProperties.NB_SUCCESS_NAME, successCount);
-            container.setComponentData(currentComponent, TSalesforceBulkExecProperties.NB_REJECT_NAME, rejectCount);
-        }
         bulkRuntime.close();
+    }
+
+    @Override
+    public Map<String, Object> getReturnValues() {
+        Result result = new Result();
+        result.totalCount = dataCount;
+        result.successCount = successCount;
+        result.rejectCount = rejectCount;
+        return result.toMap();
     }
 
     protected void countData() {

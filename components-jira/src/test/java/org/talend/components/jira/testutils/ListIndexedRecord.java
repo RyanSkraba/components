@@ -24,14 +24,14 @@ import org.apache.avro.generic.IndexedRecord;
 public class ListIndexedRecord implements IndexedRecord {
 
     private final Schema schema;
-    
+
     private List<Object> fields;
-    
+
     public ListIndexedRecord(Schema schema) {
         this.schema = schema;
         fields = new LinkedList<>();
     }
-    
+
     @Override
     public Schema getSchema() {
         return schema;

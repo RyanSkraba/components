@@ -9,8 +9,9 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Assert;
 import org.junit.Test;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.common.BulkFileProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class BulkFileWriterTest {
 
@@ -48,7 +50,7 @@ public class BulkFileWriterTest {
         bulkFileSink.initialize(null, bfProperties);
 
         BulkFileWriteOperation writeOperation = (BulkFileWriteOperation) bulkFileSink.createWriteOperation();
-        Writer<WriterResult> bfWriter = writeOperation.createWriter(null);
+        Writer<Result> bfWriter = writeOperation.createWriter(null);
 
         List<IndexedRecord> rows = makeRows(10);
         bfWriter.open("foo");
@@ -61,8 +63,11 @@ public class BulkFileWriterTest {
             e.printStackTrace();
             throw e;
         } finally {
-            WriterResult result = bfWriter.close();
-            Assert.assertEquals(result.getDataCount(), 10);
+            Result result = bfWriter.close();
+            List<Result> results = new ArrayList();
+            results.add(result);
+            Map<String, Object> resultMap = writeOperation.finalize(results, null);
+            Assert.assertEquals(10, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
         }
     }
 

@@ -12,15 +12,15 @@
 // ============================================================================
 package org.talend.components.api.component;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 import org.talend.components.api.service.testcomponent.TestComponentDefinition;
 import org.talend.components.api.service.testcomponent.TestComponentProperties;
+import org.talend.daikon.properties.property.Property;
 
-/**
- * created by sgandon on 11 janv. 2016
- */
 public class ComponentDefinitionTest {
 
     @Test
@@ -37,6 +37,22 @@ public class ComponentDefinitionTest {
         TestComponentDefinition tcd = new TestComponentDefinition();
         assertEquals("Test Component", tcd.getDisplayName());
         assertEquals("Ze Test Component Title", tcd.getTitle());
+    }
+
+    @Test
+    public void testReturnProperties() {
+        TestComponentDefinition tcd = new TestComponentDefinition();
+        Property[] props = tcd.getReturnProperties();
+        assertEquals("return1", props[0].getName());
+        assertEquals(5, props.length);
+
+        if (false) {
+            // Make sure i18N works
+            assertEquals("Error Message", props[1].getDisplayName());
+            assertEquals("Number of line", props[2].getDisplayName());
+            assertEquals("Number of success", props[3].getDisplayName());
+            assertEquals("Number of reject", props[4].getDisplayName());
+        }
     }
 
 }

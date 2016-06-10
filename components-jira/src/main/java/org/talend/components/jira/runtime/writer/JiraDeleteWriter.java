@@ -35,13 +35,13 @@ import org.talend.components.jira.runtime.JiraWriteOperation;
  * {@link JiraWriter} which deletes incoming data from Jira server
  */
 public class JiraDeleteWriter extends JiraWriter {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(JiraDeleteWriter.class);
-    
+
     /**
      * Stores http parameters which are shared between requests
      */
-    private final Map<String, Object> sharedParameters; 
+    private final Map<String, Object> sharedParameters;
 
     /**
      * Schema retrieved from incoming data
@@ -74,7 +74,7 @@ public class JiraDeleteWriter extends JiraWriter {
         if (!opened) {
             throw new IOException("Writer wasn't opened");
         }
-        dataCount++;
+        result.totalCount++;
         if (datum == null) {
             return;
         }
@@ -93,7 +93,7 @@ public class JiraDeleteWriter extends JiraWriter {
         int statusCode = getConnection().delete(resourceToDelete, sharedParameters);
         handleResponse(statusCode, resourceToDelete, record);
     }
-    
+
     /**
      * Handles response according status code See Jira REST documentation for details
      * 
@@ -106,7 +106,7 @@ public class JiraDeleteWriter extends JiraWriter {
         case SC_OK:
         case SC_NO_CONTENT: {
             LOG.debug("Successfully removed {}", resourceToDelete);
-            successCount++;
+            result.successCount++;
             break;
         }
         case SC_BAD_REQUEST: {
@@ -130,7 +130,7 @@ public class JiraDeleteWriter extends JiraWriter {
         }
         }
     }
-    
+
     /**
      * Creates and returns map with shared http query parameters
      * 
@@ -144,5 +144,5 @@ public class JiraDeleteWriter extends JiraWriter {
         }
         return sharedParameters;
     }
-    
+
 }

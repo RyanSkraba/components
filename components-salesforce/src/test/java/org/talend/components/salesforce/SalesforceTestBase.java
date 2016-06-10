@@ -35,7 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
@@ -401,7 +401,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
         salesforceSink.initialize(adaptor, props);
         salesforceSink.validate(adaptor);
         SalesforceWriteOperation writeOperation = (SalesforceWriteOperation) salesforceSink.createWriteOperation();
-        Writer<WriterResult> saleforceWriter = writeOperation.createWriter(adaptor);
+        Writer<Result> saleforceWriter = writeOperation.createWriter(adaptor);
         writeRows(saleforceWriter, outputRows);
     }
 

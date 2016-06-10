@@ -25,7 +25,7 @@ import org.talend.components.jira.runtime.JiraSource;
 public class JiraProjectsReader extends JiraNoPaginationReader {
 
     private static final String REST_RESOURCE = "rest/api/2/project";
-    
+
     /**
      * {@inheritDoc}
      */

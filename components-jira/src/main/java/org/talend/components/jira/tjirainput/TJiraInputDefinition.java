@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.jira.tjirainput;
 
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.InputComponentDefinition;
@@ -21,6 +23,7 @@ import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jira.JiraDefinition;
 import org.talend.components.jira.runtime.JiraSource;
+import org.talend.daikon.properties.property.Property;
 
 import aQute.bnd.annotation.component.Component;
 
@@ -34,14 +37,14 @@ public class TJiraInputDefinition extends JiraDefinition implements InputCompone
      * Jira input component name
      */
     public static final String COMPONENT_NAME = "tJIRAInput";
-    
+
     /**
      * Constructor sets component name
      */
     public TJiraInputDefinition() {
         super(COMPONENT_NAME);
-        setTriggers(new Trigger(TriggerType.ITERATE, 1, 1), new Trigger(TriggerType.SUBJOB_OK, 1, 0),
-                new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
+        setTriggers(new Trigger(TriggerType.ITERATE, 1, 1), new Trigger(TriggerType.SUBJOB_OK, 1, 0), new Trigger(
+                TriggerType.SUBJOB_ERROR, 1, 0));
     }
 
     /**
@@ -59,5 +62,9 @@ public class TJiraInputDefinition extends JiraDefinition implements InputCompone
     public Class<? extends ComponentProperties> getPropertyClass() {
         return TJiraInputProperties.class;
     }
-    
+
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[] { newProperty(RETURN_TOTAL_RECORD_COUNT) };
+    }
 }

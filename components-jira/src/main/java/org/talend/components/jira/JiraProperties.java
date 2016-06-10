@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.jira;
 
-import static org.talend.components.jira.Resource.*;
+import static org.talend.components.jira.Resource.ISSUE;
 
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;

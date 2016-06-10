@@ -10,6 +10,7 @@ import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
 
 import aQute.bnd.annotation.component.Component;
+import org.talend.daikon.properties.property.Property;
 
 /**
  * The FullExampleDefinition acts as an entry point for all of services that
@@ -28,6 +29,11 @@ public class FullExampleDefinition extends AbstractComponentDefinition implement
     @Override
     public String[] getFamilies() {
         return new String[] { "Examples" }; //$NON-NLS-1$
+    }
+
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[0];
     }
 
     @Override

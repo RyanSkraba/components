@@ -12,14 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcegetservertimestamp;
 
-import java.util.Collections;
-import java.util.Set;
-
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
-import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
@@ -27,8 +23,9 @@ import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
-import org.talend.daikon.properties.property.Property;
-import org.talend.daikon.properties.property.PropertyFactory;
+
+import java.util.Collections;
+import java.util.Set;
 
 public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComponentProperties
         implements SalesforceProvideConnectionProperties {
@@ -40,10 +37,6 @@ public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComp
 
     // Just holds the server timestamp
     public SchemaProperties schema = new SchemaProperties("schema");
-
-    public static final String NB_LINE_NAME = "NB_LINE";
-
-    public Property<Integer> NB_LINE = PropertyFactory.newInteger(NB_LINE_NAME);
 
     public TSalesforceGetServerTimestampProperties(String name) {
         super(name);
@@ -57,13 +50,6 @@ public class TSalesforceGetServerTimestampProperties extends FixedConnectorsComp
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "20")//$NON-NLS-1$
                 .type(AvroUtils._date()).noDefault().endRecord();
         schema.schema.setValue(s);
-
-        NB_LINE = ComponentPropertyFactory.newReturnProperty(getReturns(), NB_LINE);
-    }
-
-    @Override
-    public Property getReturns() {
-        return connection.getReturns();
     }
 
     @Override

@@ -15,8 +15,8 @@ package org.talend.components.jira.tjirainput;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -39,7 +39,7 @@ public class TJiraInputDefinitionTest {
         String mavenGroupId = definition.getMavenGroupId();
         assertThat(mavenGroupId, equalTo("org.talend.components"));
     }
-    
+
     /**
      * Check {@link TJiraInputDefinition#getMavenArtifactId()} returns "components-jira"
      */
@@ -49,7 +49,7 @@ public class TJiraInputDefinitionTest {
         String mavenArtifactId = definition.getMavenArtifactId();
         assertThat(mavenArtifactId, equalTo("components-jira"));
     }
-    
+
     /**
      * Check {@link TJiraInputDefinition#getFamilies()} returns string array, which contains "Business/JIRA"
      */
@@ -59,7 +59,7 @@ public class TJiraInputDefinitionTest {
         String[] families = definition.getFamilies();
         assertThat(families, arrayContaining("Business/JIRA"));
     }
-    
+
     /**
      * Check {@link TJiraInputDefinition#getName()} returns "tJIRAInput"
      */
@@ -69,7 +69,7 @@ public class TJiraInputDefinitionTest {
         String componentName = definition.getName();
         assertEquals(componentName, "tJIRAInput");
     }
-    
+
     /**
      * Check {@link TJiraInputDefinition#getPropertyClass()} returns class, which canonical name is
      * "org.talend.components.jira.tjirainput.TJiraInputProperties"
@@ -81,7 +81,7 @@ public class TJiraInputDefinitionTest {
         String canonicalName = propertyClass.getCanonicalName();
         assertThat(canonicalName, equalTo("org.talend.components.jira.tjirainput.TJiraInputProperties"));
     }
-    
+
     /**
      * Check {@link TJiraInputDefinition#getRuntime()} returns instance of {@link JiraSource}
      */
@@ -91,7 +91,7 @@ public class TJiraInputDefinitionTest {
         Source source = definition.getRuntime();
         assertThat(source, is(instanceOf(JiraSource.class)));
     }
-    
+
     /**
      * Check {@link TJiraInputDefinition#isSchemaAutoPropagate()} returns <code>true</code>
      */

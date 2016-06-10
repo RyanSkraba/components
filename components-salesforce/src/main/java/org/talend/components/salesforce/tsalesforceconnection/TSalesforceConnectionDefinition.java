@@ -24,6 +24,9 @@ import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 
 import aQute.bnd.annotation.component.Component;
+import org.talend.daikon.properties.property.Property;
+
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceConnectionDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
@@ -41,6 +44,11 @@ public class TSalesforceConnectionDefinition extends SalesforceDefinition implem
     @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return SalesforceConnectionProperties.class;
+    }
+
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[] { newProperty(RETURN_ERROR_MESSAGE) };
     }
 
     @Override

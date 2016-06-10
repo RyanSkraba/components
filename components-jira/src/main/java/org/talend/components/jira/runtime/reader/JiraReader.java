@@ -24,6 +24,7 @@ import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Reader;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jira.avro.IssueAdapterFactory;
@@ -37,7 +38,7 @@ import org.talend.daikon.avro.converter.IndexedRecordConverter;
  * Jira reader implementation
  */
 public abstract class JiraReader implements Reader<IndexedRecord> {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(JiraReader.class);
 
     /**
@@ -74,7 +75,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
      * Index of current Jira entity
      */
     private int entityIndex = 0;
-    
+
     /**
      * Number of Jira entities read
      */
@@ -84,21 +85,23 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
      * Stores http parameters which are shared between requests
      */
     private final Map<String, Object> sharedParameters;
-    
+
     /**
      * Runtime container
      */
     private final RuntimeContainer container;
-    
+
     /**
      * Denotes this {@link Reader} was started
      */
     private boolean started;
-    
+
     /**
      * Denotes this {@link Reader} has more records
      */
     private boolean hasMoreRecords;
+
+    private Result result;
 
     /**
      * Constructor sets required properties for http connection
@@ -112,6 +115,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
         this.resource = resource;
         this.sharedParameters = createSharedParameters();
         this.container = container;
+        this.result = new Result();
         rest = new Rest(source.getHostPort());
         String userId = source.getUserId();
         if (userId != null && !userId.isEmpty()) {
@@ -120,14 +124,15 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
         } else {
             LOG.debug("{} user is used", "Anonymous");
         }
-        
+
         factory = new IssueAdapterFactory();
         factory.setSchema(source.getSchema());
     }
 
     /**
      * {@inheritDoc}
-     * @throws IOException in case of exception during http connection 
+     * 
+     * @throws IOException in case of exception during http connection
      */
     @Override
     public boolean start() throws IOException {
@@ -138,6 +143,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
 
     /**
      * {@inheritDoc}
+     * 
      * @throws IOException in case {@link JiraReader#start()} wasn't invoked or
      * in case of exception during http connection
      */
@@ -157,7 +163,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
         }
         return hasMoreRecords;
     }
-    
+
     /**
      * Tries to get more records
      * 
@@ -176,7 +182,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
         if (!hasMoreRecords) {
             throw new NoSuchElementException("No records available");
         }
-        
+
         Entity entity = entities.get(entityIndex);
         String json = entity.getJson();
         return factory.convertToAvro(json);
@@ -184,7 +190,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
 
     /**
      * @return null
-     * @throws NoSuchElementException in case {@link JiraReader} wasn't started or 
+     * @throws NoSuchElementException in case {@link JiraReader} wasn't started or
      * there is no more records available
      */
     @Override
@@ -198,12 +204,6 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
         return null;
     }
 
-    @Override
-    public void close() throws IOException {
-        container.setComponentData(container.getCurrentComponentId(), "_numberOfRecords",
-                entityCounter);
-    }
-
     /**
      * Returns {@link Source} instance
      * 
@@ -212,6 +212,16 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
     @Override
     public Source getCurrentSource() {
         return source;
+    }
+
+    @Override
+    public void close() throws IOException {
+    }
+
+    @Override
+    public Map<String, Object> getReturnValues() {
+        result.totalCount = entityCounter;
+        return result.toMap();
     }
 
     /**
@@ -223,7 +233,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
         Map<String, Object> parameters = prepareParameters();
         response = rest.get(resource, parameters);
         entities = processResponse(response);
-        if(!entities.isEmpty()) {
+        if (!entities.isEmpty()) {
             hasMoreRecords = true;
             entityIndex = 0;
             entityCounter++;
@@ -248,7 +258,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
      * @return {@link List} of entities retrieved from response
      */
     protected abstract List<Entity> processResponse(String response);
-    
+
     /**
      * Creates and returns map with shared http query parameters
      * 
@@ -266,4 +276,5 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
         sharedParameters.put(maxResultsKey, batchSize);
         return Collections.unmodifiableMap(sharedParameters);
     }
+
 }
