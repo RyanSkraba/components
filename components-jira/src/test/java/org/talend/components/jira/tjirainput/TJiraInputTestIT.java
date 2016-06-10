@@ -31,7 +31,7 @@ import org.talend.components.api.test.SpringTestApp;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringTestApp.class)
 public class TJiraInputTestIT {
-    
+
     @Inject
     private ComponentService componentService;
 

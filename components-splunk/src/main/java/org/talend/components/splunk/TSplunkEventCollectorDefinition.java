@@ -29,6 +29,8 @@ import org.talend.components.splunk.runtime.TSplunkEventCollectorSink;
         + TSplunkEventCollectorDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSplunkEventCollectorDefinition extends AbstractComponentDefinition implements OutputComponentDefinition {
 
+    public static String RETURN_RESPONSE_CODE = "responseCode";
+
     public static final String COMPONENT_NAME = "tSplunkEventCollector"; //$NON-NLS-1$
 
     public TSplunkEventCollectorDefinition() {
@@ -38,6 +40,11 @@ public class TSplunkEventCollectorDefinition extends AbstractComponentDefinition
     @Override
     public String[] getFamilies() {
         return new String[] { "Business Intelligence/Splunk" }; //$NON-NLS-1$
+    }
+
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[] { newProperty(RETURN_RESPONSE_CODE), newProperty(RETURN_ERROR_MESSAGE), newProperty(RETURN_TOTAL_RECORD_COUNT) };
     }
 
     public String getMavenGroupId() {

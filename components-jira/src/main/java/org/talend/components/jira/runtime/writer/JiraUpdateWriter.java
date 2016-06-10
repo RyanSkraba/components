@@ -32,20 +32,20 @@ import org.talend.components.jira.runtime.JiraWriteOperation;
 /**
  * {@link JiraWriter} which updates Jira resources according incoming data
  */
-public class JiraUpdateWriter extends JiraWriter{
-    
+public class JiraUpdateWriter extends JiraWriter {
+
     private static final Logger LOG = LoggerFactory.getLogger(JiraUpdateWriter.class);
 
     /**
      * Schema retrieved from incoming data
      */
     private Schema dataSchema;
-    
+
     /**
      * Position of id field in record schema
      */
     private int idPos;
-    
+
     /**
      * Position of json field in record schema
      */
@@ -71,12 +71,12 @@ public class JiraUpdateWriter extends JiraWriter{
         if (!opened) {
             throw new IOException("Writer wasn't opened");
         }
-        dataCount++;
+        result.totalCount++;
         if (datum == null) {
             return;
         }
         IndexedRecord record = getFactory(datum).convertToAvro(datum);
-        
+
         if (dataSchema == null) {
             dataSchema = record.getSchema();
             Field idField = dataSchema.getField("id");
@@ -98,7 +98,7 @@ public class JiraUpdateWriter extends JiraWriter{
         int statusCode = getConnection().put(resourceToUpdate, json);
         handleResponse(statusCode, resourceToUpdate, record);
     }
-    
+
     /**
      * Handles response according status code
      * See Jira REST documentation for details
@@ -113,7 +113,7 @@ public class JiraUpdateWriter extends JiraWriter{
         case SC_CREATED:
         case SC_NO_CONTENT: {
             LOG.debug("Successfully updated {}", resourceToUpdate);
-            successCount++;
+            result.successCount++;
             break;
         }
         case SC_BAD_REQUEST: {

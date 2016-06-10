@@ -22,7 +22,7 @@ import org.junit.Test;
  * Unit-tests for {@link Projects} class
  */
 public class ProjectTest {
-    
+
     /**
      * Check {@link Projects#getEntities()} returns a list with correct number of entities inside it
      */

@@ -39,7 +39,7 @@ public class JiraConnectionPropertiesTest {
         String hostUrlValue = properties.hostUrl.getValue();
         assertThat(hostUrlValue, equalTo("https://jira.atlassian.com"));
     }
-    
+
     /**
      * Checks {@link JiraConnectionProperties#setupLayout()} creates Main form, which contain 3 widgets and checks
      * widgets names <br>

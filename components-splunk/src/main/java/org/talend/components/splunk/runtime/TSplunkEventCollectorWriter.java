@@ -12,11 +12,6 @@
 // ============================================================================
 package org.talend.components.splunk.runtime;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.http.HttpResponse;
@@ -30,9 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.api.component.runtime.WriterResult;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.splunk.TSplunkEventCollectorProperties;
 import org.talend.components.splunk.connection.TSplunkEventCollectorConnection;
 import org.talend.components.splunk.objects.SplunkJSONEvent;
 import org.talend.components.splunk.objects.SplunkJSONEventBuilder;
@@ -41,7 +34,12 @@ import org.talend.daikon.avro.converter.IndexedRecordConverter;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
-public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class TSplunkEventCollectorWriter implements Writer<SplunkWriterResult> {
 
     private transient static final Logger LOGGER = LoggerFactory.getLogger(TSplunkEventCollectorWriter.class);
 
@@ -171,24 +169,20 @@ public class TSplunkEventCollectorWriter implements Writer<WriterResult> {
     }
 
     @Override
-    public WriterResult close() throws IOException {
+    public SplunkWriterResult close() throws IOException {
         LOGGER.debug("Closing.");
         LOGGER.debug("Sending " + splunkObjectsForBulk.size() + " elements left in queue.");
         doSend();
-        container.setComponentData(container.getCurrentComponentId(), TSplunkEventCollectorProperties.RESPONSE_CODE_NAME,
-                lastErrorCode);
-        container.setComponentData(container.getCurrentComponentId(), TSplunkEventCollectorProperties.ERROR_MESSAGE_NAME,
-                lastErrorMessage);
         splunkConnection.close();
         splunkConnection = null;
         splunkObjectsForBulk.clear();
         splunkObjectsForBulk = null;
         LOGGER.debug("Closed.");
-        return new WriterResult(uid, dataCount);
+        return new SplunkWriterResult(uid, dataCount, lastErrorCode, lastErrorMessage);
     }
 
     @Override
-    public WriteOperation<WriterResult> getWriteOperation() {
+    public WriteOperation<SplunkWriterResult> getWriteOperation() {
         return writeOperation;
     }
 

@@ -12,10 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Sink;

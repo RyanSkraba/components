@@ -14,6 +14,8 @@ import org.talend.components.api.component.InputComponentDefinition;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
 
+import org.talend.daikon.properties.property.Property;
+
 import aQute.bnd.annotation.component.Component;
 
 /**
@@ -33,6 +35,11 @@ public class ${componentName}Definition extends AbstractComponentDefinition impl
     @Override
     public String[] getFamilies() {
         return new String[] { "File/Input" }; //$NON-NLS-1$
+    }
+
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[] { };
     }
 
     @Override

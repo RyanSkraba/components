@@ -20,6 +20,9 @@ import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
+import org.talend.daikon.properties.property.Property;
+
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX + TestComponentDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TestComponentDefinition extends AbstractComponentDefinition implements ComponentDefinition {
@@ -35,6 +38,13 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     @Override
     public String[] getFamilies() {
         return new String[] { "level1/level2", "newlevel1/newlevel2" };
+    }
+
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[] { newProperty("return1"), newProperty(RETURN_ERROR_MESSAGE),
+                newProperty(RETURN_TOTAL_RECORD_COUNT), newProperty(RETURN_SUCCESS_RECORD_COUNT),
+                newProperty(RETURN_REJECT_RECORD_COUNT) };
     }
 
     @Override

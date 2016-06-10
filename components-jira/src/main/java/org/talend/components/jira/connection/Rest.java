@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * @author ivan.honchar
  */
 public class Rest {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(Rest.class);
 
     /**
@@ -84,7 +84,7 @@ public class Rest {
         this.hostPort = hostPort;
         contentType = ContentType.create("application/json", StandardCharsets.UTF_8);
     }
-    
+
     /**
      * Checks connection to the host
      * 
@@ -100,7 +100,7 @@ public class Rest {
             }
         }
         return statusCode;
-    }   
+    }
 
     /**
      * Executes Http Get request
@@ -113,7 +113,7 @@ public class Rest {
     public String get(String resource) throws IOException {
         return get(resource, Collections.EMPTY_MAP);
     }
-    
+
     /**
      * Executes Http Get request
      * 
@@ -151,7 +151,7 @@ public class Rest {
     public int delete(String resource) throws IOException {
         return delete(resource, Collections.EMPTY_MAP);
     }
-    
+
     /**
      * Executes Http Delete request
      * 

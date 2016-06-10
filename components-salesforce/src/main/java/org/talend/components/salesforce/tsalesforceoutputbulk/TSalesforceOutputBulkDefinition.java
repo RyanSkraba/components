@@ -22,6 +22,11 @@ import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.runtime.SalesforceBulkFileSink;
 
+import aQute.bnd.annotation.component.Component;
+import org.talend.daikon.properties.property.Property;
+
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceOutputBulkDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceOutputBulkDefinition extends SalesforceDefinition implements OutputComponentDefinition {
@@ -52,6 +57,12 @@ public class TSalesforceOutputBulkDefinition extends SalesforceDefinition implem
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return concatPropertiesClasses(super.getNestedCompatibleComponentPropertiesClass(),
                 new Class[] { SchemaProperties.class });
+    }
+
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[]{newProperty(RETURN_TOTAL_RECORD_COUNT), newProperty(RETURN_SUCCESS_RECORD_COUNT),
+                newProperty(RETURN_REJECT_RECORD_COUNT)};
     }
 
     @Override

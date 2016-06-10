@@ -3,12 +3,13 @@ package org.talend.components.common.runtime;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 
-public class BulkFileWriteOperation implements WriteOperation<WriterResult> {
+import java.util.Map;
 
-    /** Default serial version UID. */
+public class BulkFileWriteOperation implements WriteOperation<Result> {
+
     private static final long serialVersionUID = 1L;
 
     private BulkFileSink fileSink;
@@ -19,7 +20,6 @@ public class BulkFileWriteOperation implements WriteOperation<WriterResult> {
 
     @Override
     public void initialize(RuntimeContainer adaptor) {
-        // Nothing to be done.
     }
 
     public Sink getSink() {
@@ -27,12 +27,12 @@ public class BulkFileWriteOperation implements WriteOperation<WriterResult> {
     }
 
     @Override
-    public void finalize(Iterable<WriterResult> writerResults, RuntimeContainer adaptor) {
-        // Nothing to be done.
+    public Map<String, Object> finalize(Iterable<Result> writerResults, RuntimeContainer adaptor) {
+        return Result.accumulateAndReturnMap(writerResults);
     }
 
     @Override
-    public Writer<WriterResult> createWriter(RuntimeContainer adaptor) {
+    public Writer<Result> createWriter(RuntimeContainer adaptor) {
         return new BulkFileWriter(this, fileSink.getBulkFileProperties(), adaptor);
     }
 

@@ -21,6 +21,11 @@ import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.dataprep.runtime.DataSetSink;
 
+import aQute.bnd.annotation.component.Component;
+import org.talend.daikon.properties.property.Property;
+
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+
 /**
  * The TDataSetOutputDefinition acts as an entry point for all of services that a component provides to integrate with
  * the Studio (at design-time) and other components (at run-time).
@@ -37,6 +42,11 @@ public class TDataSetOutputDefinition extends AbstractComponentDefinition implem
     @Override
     public String[] getFamilies() {
         return new String[] { "Talend Data Preparation" };
+    }
+
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[] { newProperty(RETURN_TOTAL_RECORD_COUNT) };
     }
 
     @Override

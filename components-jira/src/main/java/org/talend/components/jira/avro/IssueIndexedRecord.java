@@ -18,18 +18,18 @@ import org.apache.avro.generic.IndexedRecord;
 /**
  * Jira {@link IndexedRecord}
  */
-public class IssueIndexedRecord implements IndexedRecord{
-    
+public class IssueIndexedRecord implements IndexedRecord {
+
     /**
      * Avro schema of this {@link IndexedRecord}
      */
     private Schema schema;
-    
+
     /**
      * Jira JSON string
      */
     private String jsonString;
-    
+
     /**
      * Constructor sets JSON data and schema of this record
      * 
@@ -60,11 +60,10 @@ public class IssueIndexedRecord implements IndexedRecord{
      */
     @Override
     public void put(int index, Object json) {
-        if(index != 0) {
+        if (index != 0) {
             throw new IndexOutOfBoundsException("index argument should be 0");
         }
-        if(json instanceof String )
-        {
+        if (json instanceof String) {
             jsonString = (String) json;
         }
     }
@@ -78,7 +77,7 @@ public class IssueIndexedRecord implements IndexedRecord{
      */
     @Override
     public Object get(int index) {
-        if(index != 0) {
+        if (index != 0) {
             throw new IndexOutOfBoundsException("index argument should be 0");
         }
         return jsonString;

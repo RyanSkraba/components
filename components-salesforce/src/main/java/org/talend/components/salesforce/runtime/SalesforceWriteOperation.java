@@ -12,11 +12,13 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import java.util.Map;
+
 import org.talend.components.api.component.runtime.WriteOperation;
-import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 
-public final class SalesforceWriteOperation implements WriteOperation<WriterResult> {
+public final class SalesforceWriteOperation implements WriteOperation<Result> {
 
     /** Default serial version UID. */
     private static final long serialVersionUID = 1L;
@@ -38,8 +40,8 @@ public final class SalesforceWriteOperation implements WriteOperation<WriterResu
     }
 
     @Override
-    public void finalize(Iterable<WriterResult> writerResults, RuntimeContainer adaptor) {
-        // Nothing to be done.
+    public Map<String, Object> finalize(Iterable<Result> writerResults, RuntimeContainer adaptor) {
+        return Result.accumulateAndReturnMap(writerResults);
     }
 
     @Override

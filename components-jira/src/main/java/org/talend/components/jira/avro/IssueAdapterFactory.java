@@ -18,12 +18,12 @@ import org.talend.daikon.avro.converter.IndexedRecordConverter;
 /**
  * Jira {@link IndexedRecordAdapterFactory}
  */
-public class IssueAdapterFactory implements IndexedRecordConverter<String, IssueIndexedRecord>{
-    
+public class IssueAdapterFactory implements IndexedRecordConverter<String, IssueIndexedRecord> {
+
     /**
      * Data schema. Only static schema with 1 String column is allowed
      */
-    Schema schema;   
+    Schema schema;
 
     /**
      * {@inheritDoc}

@@ -18,7 +18,7 @@ import java.util.List;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.WriteOperation;
-import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.BulkFileProperties;
 import org.talend.components.common.runtime.BulkFileWriter;
@@ -29,8 +29,8 @@ import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputB
  */
 final class SalesforceBulkFileWriter extends BulkFileWriter {
 
-    public SalesforceBulkFileWriter(WriteOperation<WriterResult> writeOperation, BulkFileProperties bulkProperties,
-            RuntimeContainer adaptor) {
+    public SalesforceBulkFileWriter(WriteOperation<Result> writeOperation, BulkFileProperties bulkProperties,
+                                    RuntimeContainer adaptor) {
         super(writeOperation, bulkProperties, adaptor);
     }
 

@@ -15,10 +15,12 @@ package org.talend.components.dataprep.runtime;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 
-public class DataSetWriteOperation implements WriteOperation<WriterResult> {
+import java.util.Map;
+
+public class DataSetWriteOperation implements WriteOperation<Result> {
 
     private static final long serialVersionUID = 7572409371695331857L;
 
@@ -34,12 +36,12 @@ public class DataSetWriteOperation implements WriteOperation<WriterResult> {
     }
 
     @Override
-    public void finalize(Iterable<WriterResult> iterable, RuntimeContainer runtimeContainer) {
-        // Nothing to do here
+    public Map<String, Object> finalize(Iterable<Result> iterable, RuntimeContainer runtimeContainer) {
+        return Result.accumulateAndReturnMap(iterable);
     }
 
     @Override
-    public Writer<WriterResult> createWriter(RuntimeContainer runtimeContainer) {
+    public Writer<Result> createWriter(RuntimeContainer runtimeContainer) {
         return new DataSetWriter(this);
     }
 

@@ -12,8 +12,9 @@
 // ============================================================================
 package org.talend.components.api.properties;
 
-import static org.talend.daikon.properties.property.Property.Flags.*;
-import static org.talend.daikon.properties.property.PropertyFactory.*;
+import static org.talend.daikon.properties.property.Property.Flags.DESIGN_TIME_ONLY;
+import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 import java.lang.reflect.Field;
 import java.util.EnumSet;

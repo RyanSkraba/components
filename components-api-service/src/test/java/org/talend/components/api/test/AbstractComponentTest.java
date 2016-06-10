@@ -16,6 +16,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.talend.components.api.service.ComponentService;
+import org.junit.rules.TestName;
+import org.talend.components.api.component.runtime.Writer;
+import org.talend.components.api.component.runtime.Result;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractComponentTest {
 
@@ -23,11 +30,6 @@ public abstract class AbstractComponentTest {
     @Rule
     public ErrorCollector errorCollector = new ErrorCollector();
 
-    /**
-     * Getter for componentService.
-     * 
-     * @return the componentService
-     */
     abstract public ComponentService getComponentService();
 
     @Test
@@ -43,6 +45,13 @@ public abstract class AbstractComponentTest {
     @Test
     public void testAllRuntime() {
         ComponentTestUtils.testAllRuntimeAvaialble(getComponentService());
+    }
+
+    public static Map<String, Object> getConsolidatedResults(Result result, Writer writer) {
+        List<Result> results = new ArrayList();
+        results.add(result);
+        Map<String, Object> resultMap = writer.getWriteOperation().finalize(results, null);
+        return resultMap;
     }
 
 }

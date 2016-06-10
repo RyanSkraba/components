@@ -29,7 +29,7 @@ import org.talend.components.jira.tjirainput.TJiraInputProperties;
  */
 public class JiraSource extends JiraSourceOrSink implements Source {
 
-    private static final long serialVersionUID = 6087511765623929542L; 
+    private static final long serialVersionUID = 6087511765623929542L;
 
     /**
      * Jira REST API resource type.
