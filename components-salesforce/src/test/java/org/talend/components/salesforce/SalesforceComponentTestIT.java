@@ -12,15 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.IndexedRecord;
@@ -56,6 +47,21 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SalesforceComponentTestIT extends SalesforceTestBase {
 
@@ -598,8 +604,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
         String serialized = outputProps.toSerialized();
 
-        TSalesforceOutputProperties afterSerialized = Properties.Helper.fromSerialized(serialized,
-                TSalesforceOutputProperties.class).properties;
+        TSalesforceOutputProperties afterSerialized = Properties.Helper.fromSerializedPersistent(serialized,
+                TSalesforceOutputProperties.class).object;
         assertEquals(2, afterSerialized.getAvailableConnectors(null, true).size());
         for (Connector connector : afterSerialized.getAvailableConnectors(null, true)) {
             if (connector.getName().equals(Connector.MAIN_NAME)) {
@@ -634,8 +640,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
         String serialized = outputProps.toSerialized();
 
-        TSalesforceOutputProperties afterSerialized = Properties.Helper.fromSerialized(serialized,
-                TSalesforceOutputProperties.class).properties;
+        TSalesforceOutputProperties afterSerialized = Properties.Helper.fromSerializedPersistent(serialized,
+                TSalesforceOutputProperties.class).object;
 
         main2 = (Schema) afterSerialized.getValuedProperty("module.main.schema").getValue();
         reject2 = (Schema) afterSerialized.getValuedProperty("schemaReject.schema").getValue();
