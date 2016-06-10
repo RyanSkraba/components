@@ -12,17 +12,14 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcegetdeleted;
 
+import aQute.bnd.annotation.component.Component;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.InputComponentDefinition;
-import org.talend.components.api.component.Trigger;
-import org.talend.components.api.component.Trigger.TriggerType;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.runtime.SalesforceSource;
-
-import aQute.bnd.annotation.component.Component;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceGetDeletedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
@@ -32,8 +29,6 @@ public class TSalesforceGetDeletedDefinition extends SalesforceDefinition implem
 
     public TSalesforceGetDeletedDefinition() {
         super(COMPONENT_NAME);
-
-        setTriggers(new Trigger(TriggerType.SUBJOB_OK, 1, 0), new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
     }
 
     @Override

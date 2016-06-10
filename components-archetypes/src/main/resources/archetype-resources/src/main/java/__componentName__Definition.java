@@ -11,8 +11,6 @@ import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.InputComponentDefinition;
-import org.talend.components.api.component.Trigger;
-import org.talend.components.api.component.Trigger.TriggerType;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
 
@@ -28,11 +26,8 @@ public class ${componentName}Definition extends AbstractComponentDefinition impl
 
     public static final String COMPONENT_NAME = "${componentName}"; //$NON-NLS-1$
 
-
     public ${componentName}Definition() {
         super(COMPONENT_NAME);
-        setTriggers(new Trigger(TriggerType.ITERATE, 1, 1), new Trigger(TriggerType.SUBJOB_OK, 1, 0),
-                new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
     }
 
     @Override

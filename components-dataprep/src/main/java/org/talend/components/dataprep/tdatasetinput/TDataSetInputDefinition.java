@@ -12,16 +12,14 @@
 // ============================================================================
 package org.talend.components.dataprep.tdatasetinput;
 
+import aQute.bnd.annotation.component.Component;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.InputComponentDefinition;
-import org.talend.components.api.component.Trigger;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.dataprep.runtime.DataSetSource;
-
-import aQute.bnd.annotation.component.Component;
 
 /**
  * The TDataSetInputDefinition acts as an entry point for all of services that a component provides to integrate with
@@ -34,8 +32,6 @@ public class TDataSetInputDefinition extends AbstractComponentDefinition impleme
 
     public TDataSetInputDefinition() {
         super(COMPONENT_NAME);
-        setTriggers(new Trigger(Trigger.TriggerType.ITERATE, 1, 1), new Trigger(Trigger.TriggerType.SUBJOB_OK, 1, 0),
-                new Trigger(Trigger.TriggerType.SUBJOB_ERROR, 1, 0));
     }
 
     @Override
