@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
@@ -26,7 +26,7 @@ import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class DataSetWriter implements Writer<WriterResult> {
+public class DataSetWriter implements Writer<Result> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataSetWriter.class);
 
@@ -42,19 +42,22 @@ public class DataSetWriter implements Writer<WriterResult> {
 
     private boolean firstRow = true;
 
-    private WriteOperation<WriterResult> writeOperation;
+    private WriteOperation<Result> writeOperation;
 
     private int limit;
 
     private DataPrepOutputModes mode;
 
-    DataSetWriter(WriteOperation<WriterResult> writeOperation) {
+    private Result result;
+
+    DataSetWriter(WriteOperation<Result> writeOperation) {
         this.writeOperation = writeOperation;
     }
 
     @Override
     public void open(String uId) throws IOException {
         this.uId = uId;
+        this.result = new Result(uId);
         DataSetSink sink = (DataSetSink) getWriteOperation().getSink();
         RuntimeProperties runtimeProperties = sink.getRuntimeProperties();
         connectionHandler = new DataPrepConnectionHandler( //
@@ -75,7 +78,6 @@ public class DataSetWriter implements Writer<WriterResult> {
             if (mode.equals(DataPrepOutputModes.Update)) {
                 outputStream = connectionHandler.update();
             }
-
         }
     }
 
@@ -112,19 +114,20 @@ public class DataSetWriter implements Writer<WriterResult> {
         LOGGER.debug("Row data: {}", row);
         outputStream.write(row.toString().getBytes());
         outputStream.flush();
-        counter++;
+        result.totalCount++;
     }
 
     @Override
-    public WriterResult close() throws IOException {
+    public Result close() throws IOException {
         if (!isLiveDataSet()) {
             connectionHandler.logout();
         }
-        return new WriterResult(uId, counter);
+        result.successCount = result.totalCount;
+        return result;
     }
 
     @Override
-    public WriteOperation<WriterResult> getWriteOperation() {
+    public WriteOperation<Result> getWriteOperation() {
         return writeOperation;
     }
 

@@ -12,7 +12,6 @@
 // ============================================================================
 package org.talend.components.api.properties;
 
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -22,7 +21,6 @@ import org.talend.components.api.component.Connector;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.PropertiesVisitor;
-import org.talend.daikon.properties.property.Property;
 
 /**
  * for all details see {@link Properties}. This class adds a specific {@link ComponentPropertiesImpl#returns} property which
@@ -32,12 +30,6 @@ import org.talend.daikon.properties.property.Property;
 public class ComponentPropertiesImpl extends PropertiesImpl implements ComponentProperties {
 
     /**
-     * A special property for the values that a component returns. If this is used, this will be a {@link Property} that
-     * contains each of the values the component returns.
-     */
-    public final Property<String> returns = ComponentPropertyFactory.newReturnsProperty();
-
-    /**
      * named constructor to be used is these properties are nested in other properties. Do not subclass this method for
      * initialization, use {@link #init()} instead.
      * 
@@ -45,12 +37,6 @@ public class ComponentPropertiesImpl extends PropertiesImpl implements Component
      */
     public ComponentPropertiesImpl(String name) {
         super(name);
-    }
-
-    @Override
-    protected boolean acceptUninitializedField(Field f) {
-        // we accept that return field is not intialized after setupProperties.
-        return ComponentPropertyFactory.RETURNS.equals(f.getName());
     }
 
     /**
@@ -136,10 +122,5 @@ public class ComponentPropertiesImpl extends PropertiesImpl implements Component
 
         }, this);
         return isCopied.get();
-    }
-
-    @Override
-    public Property<String> getReturns() {
-        return returns;
     }
 }

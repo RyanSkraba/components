@@ -1,8 +1,12 @@
 package org.talend.components.salesforce.runtime;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.talend.daikon.avro.SchemaConstants.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.talend.daikon.avro.SchemaConstants.TALEND_COLUMN_DEFAULT;
 
 import java.math.BigDecimal;
 import java.util.Date;

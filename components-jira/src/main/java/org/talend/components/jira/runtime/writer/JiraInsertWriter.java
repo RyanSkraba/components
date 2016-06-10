@@ -12,13 +12,6 @@
 // ============================================================================
 package org.talend.components.jira.runtime.writer;
 
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_CREATED;
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
-import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
-
-import java.io.IOException;
-
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
@@ -26,6 +19,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.jira.runtime.JiraWriteOperation;
+
+import java.io.IOException;
+
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_CREATED;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
  * {@link JiraWriter} which inserts resources on Jira server formed from incoming data using REST API
@@ -64,7 +64,7 @@ public class JiraInsertWriter extends JiraWriter{
         if (!opened) {
             throw new IOException("Writer wasn't opened");
         }
-        dataCount++;
+        result.totalCount++;
         if (datum == null) {
             return;
         }
@@ -95,7 +95,7 @@ public class JiraInsertWriter extends JiraWriter{
         switch (statusCode) {
         case SC_CREATED: {
             LOG.debug("Successfully created {}", resourceToCreate);
-            successCount++;
+            result.successCount++;
             break;
         }
         case SC_BAD_REQUEST: {

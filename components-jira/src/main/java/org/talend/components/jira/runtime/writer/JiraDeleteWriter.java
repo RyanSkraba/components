@@ -12,17 +12,6 @@
 // ============================================================================
 package org.talend.components.jira.runtime.writer;
 
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
-import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
@@ -30,6 +19,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.jira.runtime.JiraWriteOperation;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
  * {@link JiraWriter} which deletes incoming data from Jira server
@@ -74,7 +74,7 @@ public class JiraDeleteWriter extends JiraWriter {
         if (!opened) {
             throw new IOException("Writer wasn't opened");
         }
-        dataCount++;
+        result.totalCount++;
         if (datum == null) {
             return;
         }
@@ -106,7 +106,7 @@ public class JiraDeleteWriter extends JiraWriter {
         case SC_OK:
         case SC_NO_CONTENT: {
             LOG.debug("Successfully removed {}", resourceToDelete);
-            successCount++;
+            result.successCount++;
             break;
         }
         case SC_BAD_REQUEST: {

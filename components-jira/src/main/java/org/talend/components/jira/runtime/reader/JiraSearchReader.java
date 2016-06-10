@@ -12,17 +12,17 @@
 // ============================================================================
 package org.talend.components.jira.runtime.reader;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jira.datum.Entity;
 import org.talend.components.jira.datum.Search;
 import org.talend.components.jira.runtime.JiraSource;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * {@link JiraReader} for rest/api/2/search Jira REST API resource

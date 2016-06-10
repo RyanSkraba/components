@@ -12,6 +12,14 @@
 // ============================================================================
 package org.talend.components.jira.runtime.writer;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.talend.components.api.component.runtime.WriteOperation;
+import org.talend.components.api.component.runtime.Result;
+import org.talend.components.jira.connection.Rest;
+import org.talend.components.jira.runtime.JiraSink;
+import org.talend.components.jira.runtime.JiraWriteOperation;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -20,15 +28,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.talend.components.api.component.runtime.WriteOperation;
-import org.talend.components.api.component.runtime.WriterResult;
-import org.talend.components.jira.connection.Rest;
-import org.talend.components.jira.runtime.JiraSink;
-import org.talend.components.jira.runtime.JiraWriteOperation;
-import org.talend.components.jira.runtime.result.DataCountResult;
 
 /**
  * Unit-tests for {@link JiraWriter} class
@@ -85,19 +84,19 @@ public class JiraWriterTest {
     }
     
     /**
-     * Checks {@link JiraWriter#close()} releases connection and returns {@link WriterResult}, with 0 data count
+     * Checks {@link JiraWriter#close()} releases connection and returns {@link Result}, with 0 data count
      */
     @Test
     public void testClose() {
         JiraWriter writer = new JiraWriter(writeOperation);
         writer.open("uId");
 
-        DataCountResult result = writer.close();
+        Result result = writer.close();
 
         assertThat(writer.getConnection(), is(nullValue()));
         assertFalse(writer.opened);
         assertEquals("uId", result.getuId());
-        assertEquals(0, result.getDataCount());
+        assertEquals(0, result.getTotalCount());
         assertEquals(0, result.getRejectCount());
         assertEquals(0, result.getSuccessCount());
     }

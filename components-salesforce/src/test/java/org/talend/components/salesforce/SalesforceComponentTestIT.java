@@ -12,15 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.IndexedRecord;
@@ -56,6 +47,21 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SalesforceComponentTestIT extends SalesforceTestBase {
 
@@ -104,9 +110,8 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
     public void testInputProps() throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputDefinition().createProperties();
         assertEquals(2, props.queryMode.getPossibleValues().size());
-        Property<String> returns = props.getReturns();
-        LOGGER.debug(returns.getChildren().toString());
-        assertEquals("NB_LINE", returns.getChildren().get(1).getName());
+        Property[] returns = new TSalesforceInputDefinition().getReturnProperties();
+        assertEquals(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT, returns[0].getName());
     }
 
     static class RepoProps {

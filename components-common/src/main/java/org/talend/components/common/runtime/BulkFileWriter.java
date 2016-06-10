@@ -1,32 +1,33 @@
 package org.talend.components.common.runtime;
 
+import com.csvreader.CsvWriter;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.IndexedRecord;
+import org.talend.components.api.component.runtime.Sink;
+import org.talend.components.api.component.runtime.WriteOperation;
+import org.talend.components.api.component.runtime.Writer;
+import org.talend.components.api.component.runtime.Result;
+import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.common.BulkFileProperties;
+import org.talend.daikon.avro.IndexedRecordAdapterFactory;
+import org.talend.daikon.avro.util.AvroUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.avro.Schema;
-import org.apache.avro.generic.IndexedRecord;
-import org.talend.components.api.component.runtime.Sink;
-import org.talend.components.api.component.runtime.WriteOperation;
-import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.api.component.runtime.WriterResult;
-import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.common.BulkFileProperties;
-import org.talend.daikon.avro.IndexedRecordAdapterFactory;
-import org.talend.daikon.avro.util.AvroUtils;
-
-import com.csvreader.CsvWriter;
-
 /**
  * Generate bulk file
  */
-public class BulkFileWriter implements Writer<WriterResult> {
+public class BulkFileWriter implements Writer<Result> {
 
     protected RuntimeContainer container;
 
-    private WriteOperation<WriterResult> writeOperation;
+    private WriteOperation<Result> writeOperation;
+
+    private Result result;
 
     private Sink sink;
 
@@ -44,10 +45,8 @@ public class BulkFileWriter implements Writer<WriterResult> {
 
     private transient IndexedRecordAdapterFactory<IndexedRecord, IndexedRecord> factory;
 
-    protected int dataCount;
-
-    public BulkFileWriter(WriteOperation<WriterResult> writeOperation, BulkFileProperties bulkProperties,
-            RuntimeContainer container) {
+    public BulkFileWriter(WriteOperation<Result> writeOperation, BulkFileProperties bulkProperties,
+                          RuntimeContainer container) {
         this.writeOperation = writeOperation;
         this.container = container;
         this.sink = writeOperation.getSink();
@@ -58,6 +57,7 @@ public class BulkFileWriter implements Writer<WriterResult> {
     @Override
     public void open(String uId) throws IOException {
         this.uId = uId;
+        this.result = new Result(uId);
         File file = new File(bulkProperties.bulkFilePath.getStringValue());
         file.getParentFile().mkdirs();
         csvWriter = new CsvWriter(new OutputStreamWriter(new java.io.FileOutputStream(file, isAppend), charset), separator);
@@ -89,7 +89,7 @@ public class BulkFileWriter implements Writer<WriterResult> {
 
         List<String> values = getValues(datum);
         csvWriter.writeRecord(values.toArray(new String[values.size()]));
-        dataCount++;
+        result.totalCount++;
     }
 
     public void flush() throws IOException {
@@ -97,17 +97,14 @@ public class BulkFileWriter implements Writer<WriterResult> {
     }
 
     @Override
-    public WriterResult close() throws IOException {
+    public Result close() throws IOException {
         flush();
         csvWriter.close();
-        if (container != null) {
-            container.setComponentData(container.getCurrentComponentId(), BulkFileProperties.NB_LINE_NAME, dataCount);
-        }
-        return new WriterResult(uId, dataCount);
+        return result;
     }
 
     @Override
-    public WriteOperation<WriterResult> getWriteOperation() {
+    public WriteOperation<Result> getWriteOperation() {
         return writeOperation;
     }
 

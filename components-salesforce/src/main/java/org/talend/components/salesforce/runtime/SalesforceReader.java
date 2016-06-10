@@ -13,10 +13,12 @@
 package org.talend.components.salesforce.runtime;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
@@ -114,8 +116,13 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
 
     @Override
     public void close() throws IOException {
-        if (container != null) {
-            container.setComponentData(container.getCurrentComponentId(), SalesforceConnectionModuleProperties.NB_LINE_NAME, dataCount);
-        }
     }
+
+    @Override
+    public Map<String, Object> getReturnValues() {
+        Result result = new Result();
+        result.totalCount = dataCount;
+        return result.toMap();
+    }
+
 }

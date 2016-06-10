@@ -17,7 +17,10 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,13 +42,10 @@ import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
-import org.talend.components.api.exception.DataRejectException;
-import org.talend.components.salesforce.SalesforceOutputProperties;
-import org.talend.components.salesforce.SalesforceRuntimeTestUtil;
-import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
+import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
@@ -73,11 +73,11 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
             .name("BillingCity").type().stringType().noDefault() //
             .name("BillingState").type().stringType().noDefault().endRecord();
 
-    public Writer<WriterResult> createSalesforceOutputWriter(TSalesforceOutputProperties props) {
+    public Writer<Result> createSalesforceOutputWriter(TSalesforceOutputProperties props) {
         SalesforceSink salesforceSink = new SalesforceSink();
         salesforceSink.initialize(adaptor, props);
         SalesforceWriteOperation writeOperation = (SalesforceWriteOperation) salesforceSink.createWriteOperation();
-        Writer<WriterResult> saleforceWriter = writeOperation.createWriter(adaptor);
+        Writer<Result> saleforceWriter = writeOperation.createWriter(adaptor);
         return saleforceWriter;
     }
 
@@ -143,7 +143,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
             SalesforceWriteOperation sfWriteOp = sfSink.createWriteOperation();
             sfWriteOp.initialize(container);
 
-            Writer<WriterResult> sfWriter = sfSink.createWriteOperation().createWriter(container);
+            Writer<Result> sfWriter = sfSink.createWriteOperation().createWriter(container);
             sfWriter.open("uid1");
 
             // Write one record.
@@ -151,7 +151,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
                 sfWriter.write(r);
 
             // Finish the Writer, WriteOperation and Sink.
-            WriterResult wr1 = sfWriter.close();
+            Result wr1 = sfWriter.close();
             sfWriteOp.finalize(Arrays.asList(wr1), container);
         }
     }
@@ -169,31 +169,41 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
     @Test
     public void testWriterOpenCloseWithEmptyData() throws Throwable {
         TSalesforceOutputProperties props = createSalesforceoutputProperties(EXISTING_MODULE_NAME);
+        Map<String, Object> resultMap;
+
+
         // this is mainly to check that open and close do not throw any exceptions.
         // insert
         props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
         props.afterOutputAction();
-        Writer<WriterResult> saleforceWriter = createSalesforceOutputWriter(props);
-        WriterResult writeResult = writeRows(saleforceWriter, Collections.EMPTY_LIST);
-        assertEquals(0, writeResult.getDataCount());
+        Writer<Result> saleforceWriter = createSalesforceOutputWriter(props);
+        Result writeResult = writeRows(saleforceWriter, Collections.EMPTY_LIST);
+        resultMap = getConsolidatedResults(writeResult, saleforceWriter);
+        assertEquals(0, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
+
         // deleted
         props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.DELETE);
         props.afterOutputAction();
         saleforceWriter = createSalesforceOutputWriter(props);
         writeResult = writeRows(saleforceWriter, Collections.EMPTY_LIST);
-        assertEquals(0, writeResult.getDataCount());
+        resultMap = getConsolidatedResults(writeResult, saleforceWriter);
+        assertEquals(0, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
+
         // update
         props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.UPDATE);
         props.afterOutputAction();
         saleforceWriter = createSalesforceOutputWriter(props);
         writeResult = writeRows(saleforceWriter, Collections.EMPTY_LIST);
-        assertEquals(0, writeResult.getDataCount());
+        resultMap = getConsolidatedResults(writeResult, saleforceWriter);
+        assertEquals(0, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
+
         // upsert
         props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.UPSERT);
         props.afterOutputAction();
         saleforceWriter = createSalesforceOutputWriter(props);
         writeResult = writeRows(saleforceWriter, Collections.EMPTY_LIST);
-        assertEquals(0, writeResult.getDataCount());
+        resultMap = getConsolidatedResults(writeResult, saleforceWriter);
+        assertEquals(0, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
     }
 
     @Ignore("test not finished")
@@ -206,7 +216,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         Property se = (Property) props.getProperty("upsertKeyColumn");
         assertTrue(se.getPossibleValues().size() > 10);
 
-        Writer<WriterResult> saleforceWriter = createSalesforceOutputWriter(props);
+        Writer<Result> saleforceWriter = createSalesforceOutputWriter(props);
 
         Map<String, Object> row = new HashMap<>();
         row.put("Name", "TestName");
@@ -232,15 +242,16 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
         props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
 
-        Writer<WriterResult> saleforceWriter = createSalesforceOutputWriter(props);
+        Writer<Result> saleforceWriter = createSalesforceOutputWriter(props);
 
         String random = createNewRandom();
         List<IndexedRecord> outputRows = makeRows(random, 10, isDynamic);
         List<IndexedRecord> inputRows = null;
         Exception firstException = null;
         try {
-            WriterResult writeResult = writeRows(saleforceWriter, outputRows);
-            assertEquals(outputRows.size(), writeResult.getDataCount());
+            Result writeResult = writeRows(saleforceWriter, outputRows);
+            Map<String, Object> resultMap = getConsolidatedResults(writeResult, saleforceWriter);
+            assertEquals(outputRows.size(), resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
             // create a new props for reading the data, the schema may be altered in the original output props
             TSalesforceOutputProperties readprops = createSalesforceoutputProperties(EXISTING_MODULE_NAME);
             setupProps(readprops.connection, !SalesforceTestBase.ADD_QUOTES);
@@ -320,7 +331,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         assertThat(sfWriter.getSuccessfulWrites().get(0), is(r));
 
         // Finish the Writer, WriteOperation and Sink.
-        WriterResult wr1 = sfWriter.close();
+        Result wr1 = sfWriter.close();
         sfWriteOp.finalize(Arrays.asList(wr1), container);
     }
 
@@ -380,7 +391,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         assertThat(main.get(4), not(nullValue()));
 
         // Finish the Writer, WriteOperation and Sink.
-        WriterResult wr1 = sfWriter.close();
+        Result wr1 = sfWriter.close();
         sfWriteOp.finalize(Arrays.asList(wr1), container);
     }
 
@@ -442,7 +453,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         assertThat(rejected.get(6), is((Object) "Required fields are missing: [Name]"));
 
         // Finish the Writer, WriteOperation and Sink.
-        WriterResult wr1 = sfWriter.close();
+        Result wr1 = sfWriter.close();
         sfWriteOp.finalize(Arrays.asList(wr1), container);
     }
 
@@ -506,7 +517,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         assertThat(rejected.get(7), is((Object) "Account ID: id value of incorrect type: bad id"));
 
         // Finish the Writer, WriteOperation and Sink.
-        WriterResult wr1 = sfWriter.close();
+        Result wr1 = sfWriter.close();
         sfWriteOp.finalize(Arrays.asList(wr1), container);
     }
 }

@@ -25,10 +25,9 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.WriteOperation;
-import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
 import org.talend.daikon.avro.util.AvroUtils;
@@ -42,7 +41,7 @@ import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.bind.XmlObject;
 
-final class SalesforceWriter implements WriterWithFeedback<WriterResult, IndexedRecord, IndexedRecord> {
+final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
     private final SalesforceWriteOperation salesforceWriteOperation;
 
@@ -424,17 +423,9 @@ final class SalesforceWriter implements WriterWithFeedback<WriterResult, Indexed
     }
 
     @Override
-    public WriterResult close() throws IOException {
+    public Result close() throws IOException {
         logout();
-        // this should be computed according to the result of the write I guess but I don't know yet how exceptions are
-        // handled by Beam.
-        if (container != null) {
-            container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_LINE_NAME, dataCount);
-            container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_SUCCESS_NAME,
-                    successCount);
-            container.setComponentData(container.getCurrentComponentId(), SalesforceOutputProperties.NB_REJECT_NAME, rejectCount);
-        }
-        return new WriterResult(uId, dataCount);
+        return new Result(uId, dataCount, successCount, rejectCount);
     }
 
     private void logout() throws IOException {
@@ -446,7 +437,7 @@ final class SalesforceWriter implements WriterWithFeedback<WriterResult, Indexed
     }
 
     @Override
-    public WriteOperation<WriterResult> getWriteOperation() {
+    public WriteOperation<Result> getWriteOperation() {
         return salesforceWriteOperation;
     }
 

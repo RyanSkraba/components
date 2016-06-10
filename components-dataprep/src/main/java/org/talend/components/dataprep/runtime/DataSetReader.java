@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.dataprep.connection.Column;
 import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
@@ -44,11 +45,14 @@ public class DataSetReader extends AbstractBoundedReader<IndexedRecord> {
 
     private DataPrepStreamMapper dataPrepStreamMapper;
 
+    private Result result;
+
     public DataSetReader(RuntimeContainer container, BoundedSource source, DataPrepConnectionHandler connectionHandler,
             Schema schema) {
         super(container, source);
         this.connectionHandler = connectionHandler;
         this.schema = schema;
+        result = new Result();
     }
 
     @Override
@@ -62,6 +66,7 @@ public class DataSetReader extends AbstractBoundedReader<IndexedRecord> {
 
     @Override
     public boolean advance() throws IOException {
+        result.totalCount++;
         return dataPrepStreamMapper.hasNextRecord();
     }
 
@@ -83,6 +88,11 @@ public class DataSetReader extends AbstractBoundedReader<IndexedRecord> {
         sourceSchema = null;
         dataPrepStreamMapper.close();
         connectionHandler.logout();
+    }
+
+    @Override
+    public Map<String, Object> getReturnValues() {
+        return result.toMap();
     }
 
     private IndexedRecordAdapterFactory<?, IndexedRecord> getFactory() {

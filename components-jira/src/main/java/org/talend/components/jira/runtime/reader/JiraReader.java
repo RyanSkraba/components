@@ -12,18 +12,12 @@
 // ============================================================================
 package org.talend.components.jira.runtime.reader;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-
 import org.apache.avro.generic.IndexedRecord;
 import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Reader;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jira.avro.IssueAdapterFactory;
@@ -32,6 +26,13 @@ import org.talend.components.jira.connection.Rest;
 import org.talend.components.jira.datum.Entity;
 import org.talend.components.jira.runtime.JiraSource;
 import org.talend.daikon.avro.IndexedRecordAdapterFactory;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * Jira reader implementation
@@ -100,6 +101,8 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
      */
     private boolean hasMoreRecords;
 
+    private Result result;
+
     /**
      * Constructor sets required properties for http connection
      * 
@@ -112,6 +115,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
         this.resource = resource;
         this.sharedParameters = createSharedParameters();
         this.container = container;
+        this.result = new Result();
         rest = new Rest(source.getHostPort());
         String userId = source.getUserId();
         if (userId != null && !userId.isEmpty()) {
@@ -198,12 +202,6 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
         return null;
     }
 
-    @Override
-    public void close() throws IOException {
-        container.setComponentData(container.getCurrentComponentId(), "_numberOfRecords",
-                entityCounter);
-    }
-
     /**
      * Returns {@link Source} instance
      * 
@@ -212,6 +210,17 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
     @Override
     public Source getCurrentSource() {
         return source;
+    }
+
+
+    @Override
+    public void close() throws IOException {
+    }
+
+    @Override
+    public Map<String, Object> getReturnValues() {
+        result.totalCount = entityCounter;
+        return result.toMap();
     }
 
     /**
@@ -266,4 +275,6 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
         sharedParameters.put(maxResultsKey, batchSize);
         return Collections.unmodifiableMap(sharedParameters);
     }
+
+
 }

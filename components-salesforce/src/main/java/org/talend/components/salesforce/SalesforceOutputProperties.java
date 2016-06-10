@@ -12,29 +12,25 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.presentation.Widget.*;
-import static org.talend.daikon.properties.property.PropertyFactory.*;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
-import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.SchemaProperties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
+import static org.talend.daikon.properties.property.PropertyFactory.newString;
+
 public class SalesforceOutputProperties extends SalesforceConnectionModuleProperties {
-
-    public static final String NB_SUCCESS_NAME = "NB_SUCCESS";
-
-    public static final String NB_REJECT_NAME = "NB_REJECT";
 
     public enum OutputAction {
         INSERT,
@@ -62,10 +58,6 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
     public SchemaProperties schemaFlow = new SchemaProperties("schemaFlow"); //$NON-NLS-1$
 
     public SchemaProperties schemaReject = new SchemaProperties("schemaReject"); //$NON-NLS-1$
-
-    public Property NB_SUCCESS = newInteger(NB_SUCCESS_NAME);
-
-    public Property NB_REJECT = newInteger(NB_REJECT_NAME);
 
     public SalesforceOutputProperties(String name) {
         super(name);
@@ -114,9 +106,6 @@ public class SalesforceOutputProperties extends SalesforceConnectionModuleProper
         super.setupProperties();
 
         outputAction.setValue(OutputAction.INSERT);
-
-        ComponentPropertyFactory.newReturnProperty(getReturns(), NB_SUCCESS);
-        ComponentPropertyFactory.newReturnProperty(getReturns(), NB_REJECT);
 
         setupRejectSchema();
 

@@ -16,6 +16,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
+import org.talend.components.api.component.runtime.Writer;
+import org.talend.components.api.component.runtime.Result;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractComponentTest {
 
@@ -35,11 +41,13 @@ public abstract class AbstractComponentTest {
         System.out.println("<<<<< " + name.getMethodName() + " time: " + (System.currentTimeMillis() - startTime));
     }
 
-    /**
-     * Getter for componentService.
-     * 
-     * @return the componentService
-     */
     abstract public ComponentService getComponentService();
+
+    public static Map<String, Object> getConsolidatedResults(Result result, Writer writer) {
+        List<Result> results = new ArrayList();
+        results.add(result);
+        Map<String, Object> resultMap = writer.getWriteOperation().finalize(results, null);
+        return resultMap;
+    }
 
 }

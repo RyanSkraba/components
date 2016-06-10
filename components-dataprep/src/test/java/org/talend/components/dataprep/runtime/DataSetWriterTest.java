@@ -12,7 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.talend.components.api.component.runtime.WriterResult;
+import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.SpringApp;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputDefinition;
@@ -22,6 +23,9 @@ import org.talend.daikon.avro.util.AvroUtils;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringApp.class)
@@ -45,7 +49,7 @@ public class DataSetWriterTest {
         TDataSetOutputDefinition definition = (TDataSetOutputDefinition) componentService
                 .getComponentDefinition("tDatasetOutput");
         properties = (TDataSetOutputProperties) definition.createProperties();
-        properties.url.setValue("http://localhost:"+serverPort);
+        properties.url.setValue("http://localhost:" + serverPort);
         properties.login.setValue("vincent@dataprep.com");
         properties.pass.setValue("vincent");
         properties.limit.setValue(10);
@@ -58,15 +62,20 @@ public class DataSetWriterTest {
         properties.mode.setValue(DataPrepOutputModes.Create);
 
         sink.initialize(null, properties);
-        writer = (DataSetWriter) sink.createWriteOperation().createWriter(null);
+        DataSetWriteOperation writeOperation = (DataSetWriteOperation) sink.createWriteOperation();
+        writer = (DataSetWriter) writeOperation.createWriter(null);
 
         IndexedRecord record = createIndexedRecord();
         writer.open("test");
         for (int i = 0; i < 15; i++) {
             writer.write(record);
         }
-        WriterResult result = writer.close();
-        Assert.assertEquals(10, result.getDataCount());
+        Result result = writer.close();
+        List<Result> results = new ArrayList();
+        results.add(result);
+        Map<String, Object> resultMap = writeOperation.finalize(results, null);
+        Assert.assertEquals(15, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
+        Assert.assertEquals(15, resultMap.get(ComponentDefinition.RETURN_SUCCESS_RECORD_COUNT));
     }
 
     @Test
@@ -76,15 +85,21 @@ public class DataSetWriterTest {
         properties.mode.setValue(DataPrepOutputModes.LiveDataset);
 
         sink.initialize(null, properties);
-        writer = (DataSetWriter) sink.createWriteOperation().createWriter(null);
+        DataSetWriteOperation writeOperation = (DataSetWriteOperation) sink.createWriteOperation();
+        writer = (DataSetWriter) writeOperation.createWriter(null);
 
         IndexedRecord record = createIndexedRecord();
         writer.open("testLiveDataSet");
         for (int i = 0; i < 15; i++) {
             writer.write(record);
         }
-        WriterResult result = writer.close();
-        Assert.assertEquals(10, result.getDataCount());
+
+        Result result = writer.close();
+        List<Result> results = new ArrayList();
+        results.add(result);
+        Map<String, Object> resultMap = writeOperation.finalize(results, null);
+        Assert.assertEquals(15, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
+        Assert.assertEquals(15, resultMap.get(ComponentDefinition.RETURN_SUCCESS_RECORD_COUNT));
     }
 
     private IndexedRecord createIndexedRecord() {
@@ -104,8 +119,8 @@ public class DataSetWriterTest {
         return defaultSchema;
     }
 
-    private SchemaBuilder.FieldAssembler<Schema> addField(SchemaBuilder.FieldAssembler<Schema> record, String name, Class<?> type,
-            AvroRegistry avroReg) {
+    private SchemaBuilder.FieldAssembler<Schema> addField(SchemaBuilder.FieldAssembler<Schema> record, String name,
+            Class<?> type, AvroRegistry avroReg) {
         Schema base = avroReg.getConverter(type).getSchema();
         SchemaBuilder.FieldBuilder<Schema> fieldBuilder = record.name(name);
         fieldBuilder.type(AvroUtils.wrapAsNullable(base)).noDefault();
