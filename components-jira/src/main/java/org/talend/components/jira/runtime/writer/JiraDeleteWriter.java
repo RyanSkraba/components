@@ -12,6 +12,17 @@
 // ============================================================================
 package org.talend.components.jira.runtime.writer;
 
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
@@ -20,28 +31,17 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.jira.runtime.JiraWriteOperation;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
-import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
-
 /**
  * {@link JiraWriter} which deletes incoming data from Jira server
  */
 public class JiraDeleteWriter extends JiraWriter {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(JiraDeleteWriter.class);
-    
+
     /**
      * Stores http parameters which are shared between requests
      */
-    private final Map<String, Object> sharedParameters; 
+    private final Map<String, Object> sharedParameters;
 
     /**
      * Schema retrieved from incoming data
@@ -93,7 +93,7 @@ public class JiraDeleteWriter extends JiraWriter {
         int statusCode = getConnection().delete(resourceToDelete, sharedParameters);
         handleResponse(statusCode, resourceToDelete, record);
     }
-    
+
     /**
      * Handles response according status code See Jira REST documentation for details
      * 
@@ -130,7 +130,7 @@ public class JiraDeleteWriter extends JiraWriter {
         }
         }
     }
-    
+
     /**
      * Creates and returns map with shared http query parameters
      * 
@@ -144,5 +144,5 @@ public class JiraDeleteWriter extends JiraWriter {
         }
         return sharedParameters;
     }
-    
+
 }

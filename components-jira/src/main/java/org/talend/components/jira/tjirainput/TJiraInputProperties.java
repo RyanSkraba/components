@@ -12,6 +12,11 @@
 // ============================================================================
 package org.talend.components.jira.tjirainput;
 
+import static org.talend.daikon.avro.SchemaConstants.TALEND_IS_LOCKED;
+
+import java.util.Collections;
+import java.util.Set;
+
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field.Order;
 import org.talend.components.api.component.PropertyPathConnector;
@@ -22,11 +27,6 @@ import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
-
-import java.util.Collections;
-import java.util.Set;
-
-import static org.talend.daikon.avro.SchemaConstants.TALEND_IS_LOCKED;
 
 /**
  * {@link Properties} for Jira input component.

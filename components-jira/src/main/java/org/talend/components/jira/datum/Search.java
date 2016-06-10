@@ -18,10 +18,10 @@ import java.util.List;
  * Jira entity class, which represents /rest/api/2/search result.
  * It contains pure JSON string and provides methods to get certain values from it
  */
-public class Search extends Entity{
-    
+public class Search extends Entity {
+
     /**
-     * Constructor sets Entity JSON representation 
+     * Constructor sets Entity JSON representation
      *
      * @param json Entity JSON representation
      */
@@ -38,7 +38,7 @@ public class Search extends Entity{
         List<Entity> entities = EntityParser.getEntities(getJson(), "issues");
         return entities;
     }
-    
+
     /**
      * Returns total property value of this {@link Entity}
      * 

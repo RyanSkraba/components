@@ -12,6 +12,15 @@
 // ============================================================================
 package org.talend.components.jira.runtime.writer;
 
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_CREATED;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+
+import java.io.IOException;
+
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
@@ -20,32 +29,23 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.jira.runtime.JiraWriteOperation;
 
-import java.io.IOException;
-
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_CREATED;
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
-import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
-
 /**
  * {@link JiraWriter} which updates Jira resources according incoming data
  */
-public class JiraUpdateWriter extends JiraWriter{
-    
+public class JiraUpdateWriter extends JiraWriter {
+
     private static final Logger LOG = LoggerFactory.getLogger(JiraUpdateWriter.class);
 
     /**
      * Schema retrieved from incoming data
      */
     private Schema dataSchema;
-    
+
     /**
      * Position of id field in record schema
      */
     private int idPos;
-    
+
     /**
      * Position of json field in record schema
      */
@@ -76,7 +76,7 @@ public class JiraUpdateWriter extends JiraWriter{
             return;
         }
         IndexedRecord record = getFactory(datum).convertToAvro(datum);
-        
+
         if (dataSchema == null) {
             dataSchema = record.getSchema();
             Field idField = dataSchema.getField("id");
@@ -98,7 +98,7 @@ public class JiraUpdateWriter extends JiraWriter{
         int statusCode = getConnection().put(resourceToUpdate, json);
         handleResponse(statusCode, resourceToUpdate, record);
     }
-    
+
     /**
      * Handles response according status code
      * See Jira REST documentation for details

@@ -17,14 +17,14 @@ package org.talend.components.jira.datum;
  * Each {@link Entity} represents separate Jira REST API resource
  */
 public class Entity {
-    
+
     /**
      * JSON representation of this {@link Entity}
      */
     private String json;
-    
+
     /**
-     * Constructor sets Entity JSON representation 
+     * Constructor sets Entity JSON representation
      *
      * @param json Entity JSON representation
      */
@@ -40,5 +40,5 @@ public class Entity {
     public String getJson() {
         return json;
     }
-    
+
 }

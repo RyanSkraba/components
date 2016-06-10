@@ -93,13 +93,13 @@ public class TJiraOutputPropertiesTest {
         // TJiraOutputProperties widgets
         Widget actionWidget = main.getWidget("action");
         assertThat(actionWidget, notNullValue());
-        
+
         Collection<Widget> advancedWidgets = advanced.getWidgets();
         assertThat(advancedWidgets, hasSize(1));
         Widget deleteSubtasksWidget = advanced.getWidget("deleteSubtasks");
         assertThat(deleteSubtasksWidget, notNullValue());
     }
-    
+
     /**
      * Checks {@link TJiraOutputProperties#refreshLayout(Form)} hides deleteSubtasks check-box in initial state
      */
@@ -113,7 +113,7 @@ public class TJiraOutputPropertiesTest {
         boolean deleteSubtasksHidden = properties.getForm(Form.ADVANCED).getWidget("deleteSubtasks").isHidden();
         assertTrue(deleteSubtasksHidden);
     }
-    
+
     /**
      * Checks {@link TJiraOutputProperties#afterAction()} hides deleteSubtasks widget and sets correct schema for Insert
      * action, if Insert action chosen
@@ -134,7 +134,7 @@ public class TJiraOutputPropertiesTest {
         String expectedSchema = Utils.readFile("src/test/resources/org/talend/components/jira/tjirainput/schema.json");
         assertThat(actualSchema, equalTo(expectedSchema));
     }
-    
+
     /**
      * Checks {@link TJiraOutputProperties#afterAction()} hides deleteSubtasks widget and sets correct schema for Update
      * action, if Update action chosen
@@ -155,7 +155,7 @@ public class TJiraOutputPropertiesTest {
         String expectedSchema = Utils.readFile("src/test/resources/org/talend/components/jira/tjiraoutput/updateSchema.json");
         assertThat(actualSchema, equalTo(expectedSchema));
     }
-    
+
     /**
      * Checks {@link TJiraOutputProperties#afterAction()} sets correct schema for Delete
      * action, if Delete action is chosen
@@ -165,7 +165,7 @@ public class TJiraOutputPropertiesTest {
         TJiraOutputProperties properties = new TJiraOutputProperties("root");
         properties.init();
         properties.action.setValue(Action.DELETE);
-        
+
         properties.afterAction();
 
         Schema schema = (Schema) properties.schema.schema.getValue();
@@ -173,7 +173,7 @@ public class TJiraOutputPropertiesTest {
         String expectedSchema = Utils.readFile("src/test/resources/org/talend/components/jira/tjiraoutput/deleteSchema.json");
         assertThat(actualSchema, equalTo(expectedSchema));
     }
-    
+
     /**
      * Checks {@link TJiraOutputProperties#afterAction()} shows deleteSubtasks widget, if Delete action and
      * Issue resource are chosen
@@ -184,13 +184,13 @@ public class TJiraOutputPropertiesTest {
         properties.init();
         properties.action.setValue(Action.DELETE);
         properties.resource.setValue(Resource.ISSUE);
-        
+
         properties.afterAction();
 
         boolean deleteSubtasksIsHidden = properties.getForm(Form.ADVANCED).getWidget("deleteSubtasks").isHidden();
         assertFalse(deleteSubtasksIsHidden);
     }
-    
+
     /**
      * Checks {@link TJiraOutputProperties#afterAction()} hides deleteSubtasks widget, if Delete action and
      * Project resource are chosen
@@ -201,7 +201,7 @@ public class TJiraOutputPropertiesTest {
         properties.init();
         properties.action.setValue(Action.DELETE);
         properties.resource.setValue(Resource.PROJECT);
-        
+
         properties.afterAction();
 
         boolean deleteSubtasksIsHidden = properties.getForm(Form.ADVANCED).getWidget("deleteSubtasks").isHidden();

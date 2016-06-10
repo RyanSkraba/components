@@ -35,12 +35,12 @@ public class JsonDataProvider {
      * JSON, which represents project JSON representation
      */
     private static String projectJson;
-    
+
     /**
      * JSON with no issues
      */
     private static String noIssuesJson;
-    
+
     /**
      * JSON, which has braces inside string
      */
@@ -84,7 +84,7 @@ public class JsonDataProvider {
         }
         return projectJson;
     }
-    
+
     /**
      * Provides JSON string, which represents JSON with no issues inside
      * 

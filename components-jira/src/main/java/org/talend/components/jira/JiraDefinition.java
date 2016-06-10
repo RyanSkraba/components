@@ -61,5 +61,4 @@ public abstract class JiraDefinition extends AbstractComponentDefinition {
         return true;
     }
 
-
 }

@@ -12,18 +12,18 @@
 // ============================================================================
 package org.talend.components.jira.runtime;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Result;
+import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jira.Action;
 import org.talend.components.jira.runtime.writer.JiraDeleteWriter;
 import org.talend.components.jira.runtime.writer.JiraInsertWriter;
 import org.talend.components.jira.runtime.writer.JiraUpdateWriter;
 import org.talend.components.jira.runtime.writer.JiraWriter;
-
-import java.util.Map;
 
 /**
  * Jira {@link WriteOperation}
@@ -69,26 +69,26 @@ public class JiraWriteOperation implements WriteOperation<Result> {
 
         Action action = sink.getAction();
         switch (action) {
-            case DELETE: {
-                return new JiraDeleteWriter(this);
-            }
-            case INSERT: {
-                return new JiraInsertWriter(this);
-            }
-            case UPDATE: {
-                return new JiraUpdateWriter(this);
-            }
-            default: {
-                LOG.debug("Impossible action retrieved from Jira sink");
-                return null;
-            }
+        case DELETE: {
+            return new JiraDeleteWriter(this);
+        }
+        case INSERT: {
+            return new JiraInsertWriter(this);
+        }
+        case UPDATE: {
+            return new JiraUpdateWriter(this);
+        }
+        default: {
+            LOG.debug("Impossible action retrieved from Jira sink");
+            return null;
+        }
         }
     }
 
     /**
      * Computes total of output results and sets output data
      *
-     * @param results   {@link Iterable} of output results
+     * @param results {@link Iterable} of output results
      * @param container {@link RuntimeContainer} instance
      */
     @Override

@@ -36,18 +36,18 @@ import org.talend.daikon.properties.ValidationResult.Result;
  * Jira Server {@link SourceOrSink}
  */
 public class JiraSourceOrSink implements SourceOrSink {
-    
+
     private static final long serialVersionUID = -3064243115746389073L;
 
     private static final Logger LOG = LoggerFactory.getLogger(JiraSourceOrSink.class);
-    
+
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(JiraSourceOrSink.class);
-    
+
     /**
      * Data schema
      */
     private Schema schema;
-    
+
     /**
      * Jira REST resource path. It is composed of 2 parts: <br>
      * 1. REST API part, which also contains API version. E.g. rest/api/2 <br>
@@ -55,17 +55,17 @@ public class JiraSourceOrSink implements SourceOrSink {
      * Example of full resource: rest/api/2/issue
      */
     private Resource resource;
-    
+
     /**
      * Host and port of Jira server. E.g. "http://localhost:8080"
      */
     private String hostPort;
-    
+
     /**
      * Jira user ID, which is used in requests
      */
     private String userId;
-    
+
     /**
      * Jira user password, which is used in requests
      */
@@ -94,7 +94,7 @@ public class JiraSourceOrSink implements SourceOrSink {
         userId = jiraProperties.connection.basicAuthentication.userId.getValue();
         userPassword = jiraProperties.connection.basicAuthentication.password.getValue();
         resource = jiraProperties.resource.getValue();
-        schema = (Schema) jiraProperties.schema.schema.getValue();        
+        schema = (Schema) jiraProperties.schema.schema.getValue();
     }
 
     /**
@@ -146,7 +146,7 @@ public class JiraSourceOrSink implements SourceOrSink {
     public String getResource() {
         return resource.getUrl();
     }
-    
+
     /**
      * Returns Jira server host and port value resource
      * 
@@ -173,5 +173,5 @@ public class JiraSourceOrSink implements SourceOrSink {
     public String getUserPassword() {
         return userPassword;
     }
-    
+
 }

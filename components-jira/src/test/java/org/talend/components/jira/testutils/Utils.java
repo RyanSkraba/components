@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * Contains utility methods for tests
  */
 public class Utils {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
 
     /**
@@ -38,7 +38,7 @@ public class Utils {
     public static String readFile(String path) {
         return readFile(path, StandardCharsets.UTF_8);
     }
-    
+
     /**
      * Read file content to String and returns it
      * 

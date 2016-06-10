@@ -23,7 +23,7 @@ import org.talend.components.jira.runtime.JiraSource;
  * {@link JiraReader} for /rest/api/2/project/{projectIdOrKey} Jira REST API resource
  */
 public class JiraProjectIdReader extends JiraNoPaginationReader {
-    
+
     private static final String REST_RESOURCE = "rest/api/2/project";
 
     /**

@@ -12,6 +12,17 @@
 // ============================================================================
 package org.talend.components.jira.runtime;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
@@ -23,17 +34,6 @@ import org.talend.components.jira.runtime.writer.JiraDeleteWriter;
 import org.talend.components.jira.runtime.writer.JiraInsertWriter;
 import org.talend.components.jira.runtime.writer.JiraUpdateWriter;
 import org.talend.components.jira.runtime.writer.JiraWriter;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit-tests for {@link JiraWriteOperation} class

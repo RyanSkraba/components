@@ -12,21 +12,21 @@
 // ============================================================================
 package org.talend.components.jira.runtime.writer;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.exception.DataRejectException;
 import org.talend.components.jira.connection.Rest;
 import org.talend.components.jira.runtime.JiraWriteOperation;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Jira server {@link Writer}
@@ -34,7 +34,7 @@ import java.util.Map;
 public class JiraWriter implements Writer<Result> {
 
     private static final Logger LOG = LoggerFactory.getLogger(JiraWriter.class);
-    
+
     /**
      * IndexedRecord converter
      */
@@ -141,7 +141,7 @@ public class JiraWriter implements Writer<Result> {
     protected Rest getConnection() {
         return rest;
     }
-    
+
     /**
      * Returns IndexedRecord converter
      * 
@@ -155,8 +155,7 @@ public class JiraWriter implements Writer<Result> {
         }
         return factory;
     }
-    
-    
+
     /**
      * Throws {@link DataRejectException} with specified error message
      * 

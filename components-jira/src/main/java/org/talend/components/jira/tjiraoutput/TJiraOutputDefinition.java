@@ -12,7 +12,8 @@
 // ============================================================================
 package org.talend.components.jira.tjiraoutput;
 
-import aQute.bnd.annotation.component.Component;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.OutputComponentDefinition;
@@ -24,7 +25,7 @@ import org.talend.components.jira.JiraDefinition;
 import org.talend.components.jira.runtime.JiraSink;
 import org.talend.daikon.properties.property.Property;
 
-import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+import aQute.bnd.annotation.component.Component;
 
 /**
  * Jira output component definition
@@ -42,8 +43,8 @@ public class TJiraOutputDefinition extends JiraDefinition implements OutputCompo
      */
     public TJiraOutputDefinition() {
         super(COMPONENT_NAME);
-        setTriggers(new Trigger(TriggerType.ITERATE, 1, 1), new Trigger(TriggerType.SUBJOB_OK, 1, 0),
-                new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
+        setTriggers(new Trigger(TriggerType.ITERATE, 1, 1), new Trigger(TriggerType.SUBJOB_OK, 1, 0), new Trigger(
+                TriggerType.SUBJOB_ERROR, 1, 0));
     }
 
     /**
@@ -64,8 +65,8 @@ public class TJiraOutputDefinition extends JiraDefinition implements OutputCompo
 
     @Override
     public Property[] getReturnProperties() {
-        return new Property[]{newProperty(RETURN_TOTAL_RECORD_COUNT), newProperty(RETURN_SUCCESS_RECORD_COUNT),
-                newProperty(RETURN_REJECT_RECORD_COUNT)};
+        return new Property[] { newProperty(RETURN_TOTAL_RECORD_COUNT), newProperty(RETURN_SUCCESS_RECORD_COUNT),
+                newProperty(RETURN_REJECT_RECORD_COUNT) };
     }
 
 }

@@ -12,7 +12,8 @@
 // ============================================================================
 package org.talend.components.jira.tjirainput;
 
-import aQute.bnd.annotation.component.Component;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.InputComponentDefinition;
@@ -24,7 +25,7 @@ import org.talend.components.jira.JiraDefinition;
 import org.talend.components.jira.runtime.JiraSource;
 import org.talend.daikon.properties.property.Property;
 
-import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+import aQute.bnd.annotation.component.Component;
 
 /**
  * Jira input component definition

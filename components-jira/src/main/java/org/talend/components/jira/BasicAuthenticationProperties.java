@@ -28,10 +28,10 @@ public class BasicAuthenticationProperties extends UserPasswordProperties {
     public BasicAuthenticationProperties(String name) {
         super(name);
     }
-    
+
     /**
      * Returns value for Http Authorization header. For example, for "user" userId and "pass" password
-     * it returns "Basic dXNlcjpwYXNz" 
+     * it returns "Basic dXNlcjpwYXNz"
      * 
      * @return value for Http Authorization header
      */
@@ -41,7 +41,7 @@ public class BasicAuthenticationProperties extends UserPasswordProperties {
         String authorizationValue = "Basic " + encodedCredentials;
         return authorizationValue;
     }
-    
+
     /**
      * Encodes specified string to base64 and returns result
      * 
