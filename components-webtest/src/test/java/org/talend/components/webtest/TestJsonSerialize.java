@@ -12,10 +12,6 @@
 // ============================================================================
 package org.talend.components.webtest;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +22,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.properties.Properties;
+
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = TestApplication.class)
@@ -42,8 +43,8 @@ public class TestJsonSerialize {
         // jsonio
         String jsonioString = tsip.toSerialized();
         System.out.println("jsonio:" + FileUtils.byteCountToDisplaySize(jsonioString.getBytes().length));
-        TSalesforceInputProperties salesforceInputProperties = Properties.Helper.fromSerialized(jsonioString,
-                TSalesforceInputProperties.class).properties;
+        TSalesforceInputProperties salesforceInputProperties = Properties.Helper.fromSerializedPersistent(jsonioString,
+                TSalesforceInputProperties.class).object;
         assertNull(salesforceInputProperties.connection.proxy.host.getValue());
         assertEquals("foooo", tsip.connection.userPassword.userId.getValue());
     }
