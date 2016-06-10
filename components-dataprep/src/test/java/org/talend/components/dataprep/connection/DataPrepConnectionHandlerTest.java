@@ -17,6 +17,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
@@ -29,6 +30,9 @@ import java.io.IOException;
 @SpringApplicationConfiguration(classes = SpringTestApp.class)
 @WebIntegrationTest("server.port:0")
 public class DataPrepConnectionHandlerTest {
+
+    @Autowired
+    DataPrepServerMock dataPrepServerMock;
 
     private DataPrepConnectionHandler connectionHandler;
 
@@ -46,6 +50,7 @@ public class DataPrepConnectionHandlerTest {
     @Before
     public void setConnectionHandler() {
         connectionHandler = new DataPrepConnectionHandler(URL+serverPort, LOGIN, PASS, ID);
+        dataPrepServerMock.clear();
     }
 
     @Test
@@ -120,6 +125,8 @@ public class DataPrepConnectionHandlerTest {
         //Exception shouldn't be thrown.
         connectionHandler.create().write("Hello".getBytes());
         Assert.assertEquals(200, returnStatusCode(connectionHandler.logout()));
+        Assert.assertEquals("components", dataPrepServerMock.getLastTag());
+        Assert.assertEquals("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e", dataPrepServerMock.getLastName());
     }
 
     @Test

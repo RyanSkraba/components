@@ -141,7 +141,7 @@ public class DataPrepConnectionHandler {
         try {
             URL localUrl = new URL(url);
             uri = new URI(localUrl.getProtocol(), null, localUrl.getHost(), localUrl.getPort(), "/api/datasets",
-                    "name=" + dataSetName, null);
+                    "name=" + dataSetName + "&tag=components", null);
             LOGGER.debug("Request is: {}", uri);
         } catch (MalformedURLException | URISyntaxException e) {
             LOGGER.debug(messages.getMessage("error.wrongInputParameters", e));
