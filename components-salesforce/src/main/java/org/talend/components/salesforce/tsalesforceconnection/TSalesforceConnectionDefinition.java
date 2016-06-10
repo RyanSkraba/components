@@ -12,11 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceconnection;
 
+import aQute.bnd.annotation.component.Component;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.EndpointComponentDefinition;
-import org.talend.components.api.component.Trigger;
-import org.talend.components.api.component.Trigger.TriggerType;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
@@ -36,9 +35,6 @@ public class TSalesforceConnectionDefinition extends SalesforceDefinition implem
 
     public TSalesforceConnectionDefinition() {
         super(COMPONENT_NAME);
-        // no connector this is a component that other refect to it.
-        setTriggers(new Trigger(TriggerType.ITERATE, 1, 0), new Trigger(TriggerType.SUBJOB_OK, 1, 0),
-                new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
     }
 
     @Override

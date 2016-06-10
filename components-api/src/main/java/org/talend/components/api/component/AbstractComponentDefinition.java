@@ -12,16 +12,16 @@
 // ============================================================================
 package org.talend.components.api.component;
 
+import org.talend.components.api.AbstractTopLevelDefinition;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.exception.TalendRuntimeException;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import org.talend.components.api.AbstractTopLevelDefinition;
-import org.talend.components.api.properties.ComponentProperties;
-import org.talend.daikon.exception.TalendRuntimeException;
 
 public abstract class AbstractComponentDefinition extends AbstractTopLevelDefinition implements ComponentDefinition {
     
@@ -32,8 +32,6 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
      */
     private String componentName;
 
-    private Trigger[] triggers;
-    
     /**
      * Constructor sets component name
      * 
@@ -41,10 +39,6 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
      */
     public AbstractComponentDefinition(String componentName) {
         this.componentName = componentName;
-    }
-
-    public void setTriggers(Trigger... conns) {
-        this.triggers = conns;
     }
 
     /**
@@ -73,11 +67,6 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
     public String[] getFamilies() {
         // Subclass me
         return new String[] {};
-    }
-
-    @Override
-    public Trigger[] getTriggers() {
-        return triggers;
     }
 
     @Override

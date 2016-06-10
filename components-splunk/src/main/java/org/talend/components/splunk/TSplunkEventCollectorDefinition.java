@@ -12,20 +12,18 @@
 // ============================================================================
 package org.talend.components.splunk;
 
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.OutputComponentDefinition;
-import org.talend.components.api.component.Trigger;
-import org.talend.components.api.component.Trigger.TriggerType;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.splunk.runtime.TSplunkEventCollectorSink;
-
-import aQute.bnd.annotation.component.Component;
 import org.talend.daikon.properties.property.Property;
 
-import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+import aQute.bnd.annotation.component.Component;
 
 /**
  * The tSplunkEventCollectorDefinition acts as an entry point for all of services that a component provides to integrate
@@ -41,17 +39,16 @@ public class TSplunkEventCollectorDefinition extends AbstractComponentDefinition
 
     public TSplunkEventCollectorDefinition() {
         super(COMPONENT_NAME);
-        setTriggers(new Trigger(TriggerType.SUBJOB_OK, 1, 1), new Trigger(TriggerType.SUBJOB_ERROR, 1, 1));
     }
 
     @Override
     public String[] getFamilies() {
-        return new String[] { "Business Intelligence/Splunk" }; //$NON-NLS-1$
+        return new String[]{"Business Intelligence/Splunk"}; //$NON-NLS-1$
     }
 
     @Override
     public Property[] getReturnProperties() {
-        return new Property[] { newProperty(RETURN_RESPONSE_CODE), newProperty(RETURN_ERROR_MESSAGE), newProperty(RETURN_TOTAL_RECORD_COUNT) };
+        return new Property[]{newProperty(RETURN_RESPONSE_CODE), newProperty(RETURN_ERROR_MESSAGE), newProperty(RETURN_TOTAL_RECORD_COUNT)};
     }
 
     public String getMavenGroupId() {

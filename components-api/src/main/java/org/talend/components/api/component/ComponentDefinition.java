@@ -44,13 +44,6 @@ public interface ComponentDefinition extends TopLevelDefinition {
     public ComponentProperties createRuntimeProperties();
 
     /**
-     * Returns the types of {@link Trigger} objects supported by this component.
-     *
-     * A trigger is a link between two components that schedule the different subjobs.
-     */
-    public Trigger[] getTriggers();
-
-    /**
      * Common return properties names
      */
     public static final String RETURN_ERROR_MESSAGE = "errorMessage";

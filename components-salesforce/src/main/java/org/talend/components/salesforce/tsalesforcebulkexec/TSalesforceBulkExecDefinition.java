@@ -12,11 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcebulkexec;
 
+import aQute.bnd.annotation.component.Component;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.InputComponentDefinition;
-import org.talend.components.api.component.Trigger;
-import org.talend.components.api.component.Trigger.TriggerType;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
@@ -36,8 +35,6 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition implemen
 
     public TSalesforceBulkExecDefinition() {
         super(COMPONENT_NAME);
-        // no input connector this is an starting component
-        setTriggers(new Trigger(TriggerType.SUBJOB_OK, 1, 0), new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
     }
 
     @Override
