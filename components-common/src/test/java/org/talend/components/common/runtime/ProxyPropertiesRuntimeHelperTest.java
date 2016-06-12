@@ -1,10 +1,10 @@
 package org.talend.components.common.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import org.junit.Test;
 import org.talend.components.common.ProxyProperties;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class ProxyPropertiesRuntimeHelperTest {
 
@@ -48,6 +48,15 @@ public class ProxyPropertiesRuntimeHelperTest {
             assertEquals("192.168.32.162", System.getProperty("socksProxyHost"));
             assertEquals("1080", System.getProperty("socksProxyPort"));
             assertEquals("talend", System.getProperty("java.net.socks.username"));
+            assertNull(System.getProperty("java.net.socks.password"));
+
+            proxyProperties.useProxy.setValue(false);
+            ProxyPropertiesRuntimeHelper.setProxy(proxyProperties, ProxyProperties.ProxyType.SOCKS);
+
+            assertNull(System.getProperty("socksProxySet"));
+            assertNull(System.getProperty("socksProxyHost"));
+            assertNull(System.getProperty("socksProxyPort"));
+            assertNull(System.getProperty("java.net.socks.username"));
             assertNull(System.getProperty("java.net.socks.password"));
         } finally {
             // Revert the modification about the Socks proxy during the test
