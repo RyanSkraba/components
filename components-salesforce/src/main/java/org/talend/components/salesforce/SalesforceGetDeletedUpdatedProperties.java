@@ -14,8 +14,8 @@ package org.talend.components.salesforce;
 
 import static org.talend.daikon.properties.property.PropertyFactory.*;
 
-import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Set;
 
 import org.apache.commons.lang3.reflect.TypeLiteral;
@@ -28,13 +28,13 @@ public class SalesforceGetDeletedUpdatedProperties extends SalesforceConnectionM
     /**
      * 
      */
-    private static final TypeLiteral<Calendar> CALENDAR_TYPE_LITERAL = new TypeLiteral<Calendar>() {
+    private static final TypeLiteral<Date> DATE_TYPE_LITERAL = new TypeLiteral<Date>() {
         // empty on purpose
     };
 
-    public Property<Calendar> startDate = newProperty(CALENDAR_TYPE_LITERAL, "startDate").setRequired();
+    public Property<Date> startDate = newProperty(DATE_TYPE_LITERAL, "startDate").setRequired();
 
-    public Property<Calendar> endDate = newProperty(CALENDAR_TYPE_LITERAL, "endDate").setRequired();
+    public Property<Date> endDate = newProperty(DATE_TYPE_LITERAL, "endDate").setRequired();
 
     public SalesforceGetDeletedUpdatedProperties(String name) {
         super(name);
