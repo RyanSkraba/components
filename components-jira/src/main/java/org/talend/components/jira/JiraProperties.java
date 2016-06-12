@@ -27,17 +27,6 @@ import org.talend.daikon.properties.property.PropertyFactory;
  * Common Jira components {@link Properties}
  */
 public abstract class JiraProperties extends FixedConnectorsComponentProperties {
-
-    /**
-     * Return properties names
-     */
-    public static final String ERROR_MESSAGE_NAME = "ERROR_MESSAGE";
-    
-    public static final String NB_LINE_NAME = "NB_LINE";
-    
-    public static final String NB_SUCCESS_NAME = "NB_SUCCESS";
-
-    public static final String NB_REJECT_NAME = "NB_REJECT";
     
     /**
      * Property path connector
