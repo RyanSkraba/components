@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jira.datum.Entity;
 import org.talend.components.jira.datum.Search;
 import org.talend.components.jira.runtime.JiraSource;
@@ -52,8 +51,8 @@ public class JiraSearchReader extends JiraReader {
     /**
      * {@inheritDoc}
      */
-    public JiraSearchReader(JiraSource source, RuntimeContainer container) {
-        super(source, REST_RESOURCE, container);
+    public JiraSearchReader(JiraSource source) {
+        super(source, REST_RESOURCE);
         // TODO check if user specify blank batch size
         maxResults = source.getBatchSize();
     }

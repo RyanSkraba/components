@@ -27,7 +27,7 @@ import org.talend.daikon.properties.property.PropertyFactory;
  * Common Jira components {@link Properties}
  */
 public abstract class JiraProperties extends FixedConnectorsComponentProperties {
-
+    
     /**
      * Property path connector
      */
@@ -83,6 +83,7 @@ public abstract class JiraProperties extends FixedConnectorsComponentProperties 
      */
     public void afterResource() {
         refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(Form.ADVANCED));
     }
 
 }

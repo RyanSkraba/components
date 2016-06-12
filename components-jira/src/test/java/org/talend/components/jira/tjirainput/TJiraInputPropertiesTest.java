@@ -39,7 +39,7 @@ import org.talend.daikon.properties.presentation.Widget;
 public class TJiraInputPropertiesTest {
 
     /**
-     * Checks {@link TJiraInputProperties#afterResource()} hides jql widget, if project resource chosen
+     * Checks {@link TJiraInputProperties#afterResource()} hides jql and batchSize widgets, shows projectId widget if project resource chosen
      */
     @Test
     public void testAfterResourceProject() {
@@ -51,8 +51,29 @@ public class TJiraInputPropertiesTest {
 
         boolean jqlIsHidden = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
         boolean projectIdIsHidden = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
+        boolean batchIsHidden = properties.getForm(Form.ADVANCED).getWidget("batchSize").isHidden();
         assertTrue(jqlIsHidden);
         assertFalse(projectIdIsHidden);
+        assertTrue(batchIsHidden);
+    }
+    
+    /**
+     * Checks {@link TJiraInputProperties#afterResource()} shows jql and batchSize widgets, hides projectId widget if issue resource chosen
+     */
+    @Test
+    public void testAfterResourceIssue() {
+        TJiraInputProperties properties = new TJiraInputProperties("root");
+        properties.init();
+        properties.resource.setValue(Resource.ISSUE);
+
+        properties.afterResource();
+
+        boolean jqlIsHidden = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
+        boolean projectIdIsHidden = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
+        boolean batchIsHidden = properties.getForm(Form.ADVANCED).getWidget("batchSize").isHidden();
+        assertFalse(jqlIsHidden);
+        assertTrue(projectIdIsHidden);
+        assertFalse(batchIsHidden);
     }
 
     /**
@@ -98,15 +119,18 @@ public class TJiraInputPropertiesTest {
         properties.init();
 
         properties.refreshLayout(properties.getForm(Form.MAIN));
+        properties.refreshLayout(properties.getForm(Form.ADVANCED));
 
         boolean jqlIsHidden = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
         boolean projectIdIsHidden = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
+        boolean batchIsHidden = properties.getForm(Form.ADVANCED).getWidget("batchSize").isHidden();
         assertFalse(jqlIsHidden);
         assertTrue(projectIdIsHidden);
+        assertFalse(batchIsHidden);
     }
 
     /**
-     * Checks {@link TJiraInputProperties#refreshLayout(Form)} doesn't refresh anything if not main form passed as
+     * Checks {@link TJiraInputProperties#refreshLayout(Form)} doesn't refresh anything if non-existent form passed as
      * parameter
      */
     @Test
@@ -116,30 +140,16 @@ public class TJiraInputPropertiesTest {
 
         boolean jqlExpected = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
         boolean projectIdExpected = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
+        boolean batchSizeExpected = properties.getForm(Form.ADVANCED).getWidget("batchSize").isHidden();
 
         properties.refreshLayout(new Form(properties, "NotMain"));
 
         boolean jqlActual = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
         boolean projectIdActual = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
+        boolean batchSizeActual = properties.getForm(Form.ADVANCED).getWidget("batchSize").isHidden();
         assertEquals(jqlExpected, jqlActual);
         assertEquals(projectIdExpected, projectIdActual);
-    }
-
-    /**
-     * Checks {@link TJiraInputProperties#refreshLayout(Form)} hides jql widget, if project resource chosen
-     */
-    @Test
-    public void testRefreshLayoutProject() {
-        TJiraInputProperties properties = new TJiraInputProperties("root");
-        properties.init();
-        properties.resource.setValue(Resource.PROJECT);
-
-        properties.refreshLayout(properties.getForm(Form.MAIN));
-
-        boolean jqlIsHidden = properties.getForm(Form.MAIN).getWidget("jql").isHidden();
-        boolean projectIdIsHidden = properties.getForm(Form.MAIN).getWidget("projectId").isHidden();
-        assertTrue(jqlIsHidden);
-        assertFalse(projectIdIsHidden);
+        assertEquals(batchSizeExpected, batchSizeActual);
     }
 
     /**

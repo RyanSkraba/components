@@ -116,7 +116,7 @@ public class JiraSourceOrSink implements SourceOrSink {
                 LOG.debug(errorMessage);
             }
         } catch (IOException e) {
-            errorMessage = messages.getMessage("error.connectionException", e.getMessage());
+            errorMessage = messages.getMessage("error.connectionException", e);
             LOG.debug(errorMessage);
         }
         String validationFailed = messages.getMessage("error.hostNotValidated", hostPort);

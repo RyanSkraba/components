@@ -27,7 +27,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
@@ -91,8 +90,6 @@ public class JiraReaderTestIT {
      * Instantiates instances used for tests
      */
     private void beforeTestAnonymousUser() {
-        container = new DefaultComponentRuntimeContainerImpl();
-
         TJiraInputProperties properties = (TJiraInputProperties) componentService.getComponentProperties("tJIRAInput");
         properties.connection.hostUrl.setValue(HOST_PORT);
         properties.connection.basicAuthentication.userId.setValue(EMPTY_USER);
@@ -116,7 +113,7 @@ public class JiraReaderTestIT {
     @Test
     public void testAnonymousUser() throws IOException {
         beforeTestAnonymousUser();
-        JiraProjectsReader jiraReader = new JiraProjectsReader(source, container);
+        JiraProjectsReader jiraReader = new JiraProjectsReader(source);
 
         List<Object> entities = new ArrayList<>();
         for (boolean hasNext = jiraReader.start(); hasNext; hasNext = jiraReader.advance()) {
@@ -136,8 +133,6 @@ public class JiraReaderTestIT {
      * Instantiates instances used for tests
      */
     private void beforeReadProjectById() {
-        container = new DefaultComponentRuntimeContainerImpl();
-
         TJiraInputProperties properties = (TJiraInputProperties) componentService.getComponentProperties("tJIRAInput");
         properties.connection.hostUrl.setValue(HOST_PORT);
         properties.connection.basicAuthentication.userId.setValue(USER);
@@ -159,7 +154,7 @@ public class JiraReaderTestIT {
         beforeReadProjectById();
         String id = "TP";
 
-        JiraProjectIdReader jiraReader = new JiraProjectIdReader(source, container, id);
+        JiraProjectIdReader jiraReader = new JiraProjectIdReader(source, id);
 
         List<Object> entities = new ArrayList<>();
         for (boolean hasNext = jiraReader.start(); hasNext; hasNext = jiraReader.advance()) {

@@ -30,7 +30,7 @@ import org.talend.components.jira.runtime.writer.JiraWriter;
  */
 public class JiraWriteOperation implements WriteOperation<Result> {
 
-    private static final long serialVersionUID = -2928519020311179621L;
+    private static final long serialVersionUID = -6843438752047094372L;
 
     private static final Logger LOG = LoggerFactory.getLogger(JiraWriteOperation.class);
 

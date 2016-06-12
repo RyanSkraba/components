@@ -61,7 +61,7 @@ public class TJiraOutputDefinition extends JiraDefinition implements OutputCompo
     @Override
     public Property[] getReturnProperties() {
         return new Property[] { newProperty(RETURN_TOTAL_RECORD_COUNT), newProperty(RETURN_SUCCESS_RECORD_COUNT),
-                newProperty(RETURN_REJECT_RECORD_COUNT) };
+                newProperty(RETURN_REJECT_RECORD_COUNT), newProperty(RETURN_ERROR_MESSAGE) };
     }
 
 }

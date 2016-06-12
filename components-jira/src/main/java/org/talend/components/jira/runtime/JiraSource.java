@@ -77,19 +77,19 @@ public class JiraSource extends JiraSourceOrSink implements Source {
         JiraReader reader = null;
         switch (resourceType) {
         case ISSUE: {
-            reader = new JiraSearchReader(this, container);
+            reader = new JiraSearchReader(this);
             break;
         }
         case PROJECT: {
             if (projectId != null && !projectId.isEmpty()) {
-                reader = new JiraProjectIdReader(this, container, projectId);
+                reader = new JiraProjectIdReader(this, projectId);
             } else {
-                reader = new JiraProjectsReader(this, container);
+                reader = new JiraProjectsReader(this);
             }
             break;
         }
         default: {
-            reader = new JiraSearchReader(this, container);
+            reader = new JiraSearchReader(this);
             break;
         }
         }

@@ -60,6 +60,6 @@ public class TJiraInputDefinition extends JiraDefinition implements InputCompone
 
     @Override
     public Property[] getReturnProperties() {
-        return new Property[] { newProperty(RETURN_TOTAL_RECORD_COUNT) };
+        return new Property[] { newProperty(RETURN_TOTAL_RECORD_COUNT), newProperty(RETURN_ERROR_MESSAGE) };
     }
 }
