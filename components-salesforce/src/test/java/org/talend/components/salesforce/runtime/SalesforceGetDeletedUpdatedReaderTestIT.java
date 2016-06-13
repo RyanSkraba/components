@@ -88,6 +88,8 @@ public class SalesforceGetDeletedUpdatedReaderTestIT extends SalesforceTestBase 
             props.module.moduleName.setValue(EXISTING_MODULE_NAME);
             props.module.main.schema.setValue(getMakeRowSchema(false));
         }
+        props.startDate.setValue(Calendar.getInstance().getTime());
+        props.endDate.setValue(Calendar.getInstance().getTime());
 
         ComponentTestUtils.checkSerialize(props, errorCollector);
 
@@ -138,8 +140,8 @@ public class SalesforceGetDeletedUpdatedReaderTestIT extends SalesforceTestBase 
         // }
         endDate.setTimeInMillis(endDate.getTimeInMillis() + 180000);
         System.out.println(endDate.getTimeInMillis() - startDate.getTimeInMillis());
-        sgduProperties.startDate.setValue(startDate);
-        sgduProperties.endDate.setValue(endDate);
+        sgduProperties.startDate.setValue(startDate.getTime());
+        sgduProperties.endDate.setValue(endDate.getTime());
 
         // Test get deleted records
         TSalesforceGetDeletedProperties sgdProperties = new TSalesforceGetDeletedProperties("foo");
