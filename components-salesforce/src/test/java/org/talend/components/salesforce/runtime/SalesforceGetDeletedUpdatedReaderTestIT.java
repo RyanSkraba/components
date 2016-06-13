@@ -181,6 +181,7 @@ public class SalesforceGetDeletedUpdatedReaderTestIT extends SalesforceTestBase 
         TSalesforceOutputProperties outputProps = new TSalesforceOutputProperties("output"); //$NON-NLS-1$
         outputProps.copyValuesFrom(props);
         outputProps.outputAction.setValue(action);
+        outputProps.ignoreNull.setValue(true);
         doWriteRows(outputProps, outputRows);
         List<IndexedRecord> inputRows = readRows(props);
         return checkRows(random, inputRows, outputRows.size());

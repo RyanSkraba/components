@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import static org.talend.components.salesforce.SalesforceOutputProperties.OutputAction.*;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -28,11 +30,8 @@ import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputPrope
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
-import com.sforce.soap.partner.DeleteResult;
+import com.sforce.soap.partner.*;
 import com.sforce.soap.partner.Error;
-import com.sforce.soap.partner.PartnerConnection;
-import com.sforce.soap.partner.SaveResult;
-import com.sforce.soap.partner.UpsertResult;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.bind.XmlObject;
@@ -80,6 +79,8 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
     private final List<IndexedRecord> successfulWrites = new ArrayList<>();
 
     private final List<IndexedRecord> rejectedWrites = new ArrayList<>();
+
+    private final List<String> nullValueFields = new ArrayList<>();
 
     public SalesforceWriter(SalesforceWriteOperation salesforceWriteOperation, RuntimeContainer container) {
         this.salesforceWriteOperation = salesforceWriteOperation;
@@ -151,15 +152,21 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
     private SObject createSObject(IndexedRecord input) {
         SObject so = new SObject();
         so.setType(sprops.module.moduleName.getStringValue());
+        nullValueFields.clear();
         for (Schema.Field f : input.getSchema().getFields()) {
             Object value = input.get(f.pos());
-            if (value != null) {
+            if (value != null && !"".equals(value.toString())) {
                 Schema.Field se = schema.getField(f.name());
                 if (se != null) {
                     addSObjectField(so, se.schema().getType(), se.name(), value);
                 }
+            } else {
+                if (!sprops.ignoreNull.getValue() && UPDATE.equals(sprops.outputAction.getValue())) {
+                    nullValueFields.add(f.name());
+                }
             }
         }
+        so.setFieldsToNull(nullValueFields.toArray(new String[0]));
         return so;
     }
 
@@ -167,24 +174,29 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
         SObject so = new SObject();
         so.setType(sprops.module.moduleName.getStringValue());
         Map<String, Map<String, String>> referenceFieldsMap = getReferenceFieldsMap();
+        nullValueFields.clear();
         for (Schema.Field f : input.getSchema().getFields()) {
             Object value = input.get(f.pos());
-            if (value != null) {
-                Schema.Field se = schema.getField(f.name());
-                if (se != null) {
-                    if (referenceFieldsMap != null && referenceFieldsMap.get(se.name()) != null) {
-                        Map<String, String> relationMap = referenceFieldsMap.get(se.name());
-                        String lookupFieldName = relationMap.get("lookupFieldName");
-                        so.setField(lookupFieldName, null);
-                        so.getChild(lookupFieldName).setField("type", relationMap.get("lookupFieldModuleName"));
-                        addSObjectField(so.getChild(lookupFieldName), se.schema().getType(),
-                                relationMap.get("lookupFieldExternalIdName"), value);
-                    } else {
-                        addSObjectField(so, se.schema().getType(), se.name(), value);
-                    }
+            Schema.Field se = schema.getField(f.name());
+            if (value != null && !"".equals(value.toString()) && se != null) {
+                if (referenceFieldsMap != null && referenceFieldsMap.get(se.name()) != null) {
+                    Map<String, String> relationMap = referenceFieldsMap.get(se.name());
+                    String lookupFieldName = relationMap.get("lookupFieldName");
+                    so.setField(lookupFieldName, null);
+                    so.getChild(lookupFieldName).setField("type", relationMap.get("lookupFieldModuleName"));
+                    addSObjectField(so.getChild(lookupFieldName), se.schema().getType(),
+                            relationMap.get("lookupFieldExternalIdName"), value);
+                } else {
+                    addSObjectField(so, se.schema().getType(), se.name(), value);
+                }
+            } else {
+                if (!sprops.ignoreNull.getValue() && se != null
+                        && !("Id".equals(se.name()) || se.name().equals(sprops.upsertKeyColumn.getValue()))) {
+                    nullValueFields.add(se.name());
                 }
             }
         }
+        so.setFieldsToNull(nullValueFields.toArray(new String[0]));
         return so;
     }
 
@@ -461,19 +473,19 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
     }
 
     private Map<String, Map<String, String>> getReferenceFieldsMap() {
-        List<String> columns = sprops.upsertRelationTable.columnName.getValue();
+        Object columns = sprops.upsertRelationTable.columnName.getValue();
         Map<String, Map<String, String>> referenceFieldsMap = null;
-        if (columns != null) {
+        if (columns != null && columns instanceof List) {
             referenceFieldsMap = new HashMap<>();
             List<String> lookupFieldModuleNames = sprops.upsertRelationTable.lookupFieldModuleName.getValue();
             List<String> lookupFieldNames = sprops.upsertRelationTable.lookupFieldName.getValue();
             List<String> externalIdFromLookupFields = sprops.upsertRelationTable.lookupFieldExternalIdName.getValue();
-            for (int index = 0; index < columns.size(); index++) {
+            for (int index = 0; index < ((List) columns).size(); index++) {
                 Map<String, String> relationMap = new HashMap<>();
                 relationMap.put("lookupFieldModuleName", lookupFieldModuleNames.get(index));
                 relationMap.put("lookupFieldName", lookupFieldNames.get(index));
                 relationMap.put("lookupFieldExternalIdName", externalIdFromLookupFields.get(index));
-                referenceFieldsMap.put(columns.get(index), relationMap);
+                referenceFieldsMap.put(((List<String>) columns).get(index), relationMap);
             }
         }
         return referenceFieldsMap;
