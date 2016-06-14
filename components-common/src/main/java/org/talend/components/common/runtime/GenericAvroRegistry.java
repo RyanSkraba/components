@@ -85,7 +85,7 @@ public class GenericAvroRegistry extends AvroRegistry {
         switch (fieldSchema.getType()) {
         case LONG:
             String pattern = f.getProp(DiSchemaConstants.TALEND6_COLUMN_PATTERN);
-            if (pattern != null) {
+            if (pattern != null && !pattern.isEmpty()) {
                 fieldSchema.addProp(DiSchemaConstants.TALEND6_COLUMN_PATTERN, pattern);
                 return new DateToStringConvert(fieldSchema);
             } else {
