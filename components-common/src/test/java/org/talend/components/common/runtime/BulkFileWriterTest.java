@@ -44,7 +44,7 @@ public class BulkFileWriterTest {
         // deleteBulkFile(bfProperties);
     }
 
-    protected void testWriteFile(BulkFileProperties bfProperties) throws IOException {
+    private void testWriteFile(BulkFileProperties bfProperties) throws IOException {
 
         BulkFileSink bulkFileSink = new BulkFileSink();
         bulkFileSink.initialize(null, bfProperties);
@@ -71,20 +71,21 @@ public class BulkFileWriterTest {
         }
     }
 
-    public Schema getMakeRowSchema() {
+    private Schema getMakeRowSchema() {
         SchemaBuilder.FieldAssembler<Schema> fa = SchemaBuilder.builder().record("MakeRowRecord").fields() //
                 .name("col_1").type().nullable().stringType().noDefault() //
                 .name("col_2").type().nullable().stringType().noDefault() //
                 .name("col_3").type().nullable().intType().noDefault() //
                 .name("col_4").type().nullable().doubleType().noDefault() //
-                .name("col_5").prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'").type(AvroUtils._date())
-                .noDefault() //
-                .name("col_6").type().nullable().stringType().noDefault();
+                .name("col_5").prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'").type(AvroUtils._date()).noDefault() //
+                .name("col_6").type().nullable().stringType().noDefault()
+                //the UI model may pass a empty string as the pattern, please see MetadataToolAvroHelper
+                .name("col_7").prop(SchemaConstants.TALEND_COLUMN_PATTERN, "").type().nullable().longType().noDefault();
         Schema schema = fa.endRecord();
         return schema;
     }
 
-    public List<IndexedRecord> makeRows(int count) {
+    private List<IndexedRecord> makeRows(int count) {
         List<IndexedRecord> outputRows = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             GenericData.Record row = new GenericData.Record(getMakeRowSchema());
@@ -94,19 +95,22 @@ public class BulkFileWriterTest {
             row.put("col_4", 76543.5 + i);
             row.put("col_5", new Date());
             row.put("col_6", "ddd_333" + i);
+            row.put("col_7", 123456l);
+            
             System.out.println("Row to write: " //
                     + " col_1: " + row.get("col_1") //
                     + " col_2: " + row.get("col_2") //
                     + " col_3: " + row.get("col_3") //
                     + " col_4: " + row.get("col_4") //
                     + " col_5: " + row.get("col_5") //
-                    + " col_6: " + row.get("col_6"));
+                    + " col_6: " + row.get("col_6")
+                    + " col_7: " + row.get("col_7"));
             outputRows.add(row);
         }
         return outputRows;
     }
 
-    protected static void deleteBulkFile(BulkFileProperties outputBulkProperties) {
+    private static void deleteBulkFile(BulkFileProperties outputBulkProperties) {
         File file = new File(outputBulkProperties.bulkFilePath.getStringValue());
 
         assertTrue(file.exists());
