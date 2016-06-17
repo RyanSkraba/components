@@ -14,22 +14,27 @@ package org.talend.components.salesforce.runtime;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 import org.talend.daikon.exception.TalendRuntimeException;
 
-import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.Error;
-import com.sforce.soap.partner.SaveResult;
-import com.sforce.soap.partner.UpsertResult;
+import com.sforce.ws.bind.CalendarCodec;
+import com.sforce.ws.bind.DateCodec;
 
 /**
  * Contains only runtime helper classes, mainly to do with logging.
  */
 public class SalesforceRuntime {
 
-    private SalesforceRuntime() {}
+    private static CalendarCodec calendarCodec = new CalendarCodec();
+
+    private static DateCodec dateCodec = new DateCodec();
+
+    private SalesforceRuntime() {
+    }
 
     public static StringBuilder addLog(Error[] resultErrors, String row_key, BufferedWriter logWriter) {
         StringBuilder errors = new StringBuilder("");
@@ -75,68 +80,15 @@ public class SalesforceRuntime {
         return errors;
     }
 
-    public static void populateResultMessage(Map<String, String> resultMessage, Error[] errors) {
-        for (Error error : errors) {
-            if (error.getStatusCode() != null) {
-                resultMessage.put("StatusCode", error.getStatusCode().toString());
-            }
-            if (error.getFields() != null) {
-                StringBuilder fields = new StringBuilder();
-                for (String field : error.getFields()) {
-                    fields.append(field);
-                    fields.append(",");
-                }
-                if (fields.length() > 0) {
-                    fields.deleteCharAt(fields.length() - 1);
-                }
-                resultMessage.put("Fields", fields.toString());
-            }
-            resultMessage.put("Message", error.getMessage());
+    public static Calendar convertDateToCalendar(Date date) {
+        if (date != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeZone(TimeZone.getTimeZone("GMT"));
+            cal.setTime(date);
+            return cal;
+        } else {
+            return null;
         }
-    }
-
-    // FIXME - not sure what this is used for
-    public static Map<String, String> readResult(Object[] results) throws Exception {
-        Map<String, String> resultMessage = null;
-        if (results instanceof SaveResult[]) {
-            for (SaveResult result : (SaveResult[]) results) {
-                resultMessage = new HashMap<>();
-                if (result.getId() != null) {
-                    resultMessage.put("id", result.getId());
-                }
-                resultMessage.put("success", String.valueOf(result.getSuccess()));
-                if (!result.getSuccess()) {
-                    populateResultMessage(resultMessage, result.getErrors());
-                }
-            }
-            return resultMessage;
-        } else if (results instanceof DeleteResult[]) {
-            for (DeleteResult result : (DeleteResult[]) results) {
-                resultMessage = new HashMap<>();
-                if (result.getId() != null) {
-                    resultMessage.put("id", result.getId());
-                }
-                resultMessage.put("success", String.valueOf(result.getSuccess()));
-                if (!result.getSuccess()) {
-                    populateResultMessage(resultMessage, result.getErrors());
-                }
-            }
-            return resultMessage;
-        } else if (results instanceof UpsertResult[]) {
-            for (UpsertResult result : (UpsertResult[]) results) {
-                resultMessage = new HashMap<>();
-                if (result.getId() != null) {
-                    resultMessage.put("id", result.getId());
-                }
-                resultMessage.put("success", String.valueOf(result.getSuccess()));
-                resultMessage.put("created", String.valueOf(result.getCreated()));
-                if (!result.getSuccess()) {
-                    populateResultMessage(resultMessage, result.getErrors());
-                }
-            }
-            return resultMessage;
-        }
-        return null;
     }
 
 }

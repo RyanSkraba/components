@@ -74,6 +74,25 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
             .name("BillingCity").type().stringType().noDefault() //
             .name("BillingState").type().stringType().noDefault().endRecord();
 
+    public static Schema SCHEMA_INSERT_EVENT = SchemaBuilder.builder().record("Schema").fields() //
+            .name("StartDateTime").type().stringType().noDefault() // Actual type:dateTime
+            .name("EndDateTime").type().stringType().noDefault() // Actual type:dateTime
+            .name("ActivityDate").type().stringType().noDefault() // Actual type:date
+            .name("DurationInMinutes").type().stringType().noDefault() // Actual type:int
+            .name("IsPrivate").type().stringType().noDefault() // Actual type:boolean
+            .name("Subject").type().stringType().noDefault() // Actual type:boolean
+            .endRecord();
+
+    public static Schema SCHEMA_INPUT_AND_DELETE_EVENT = SchemaBuilder.builder().record("Schema").fields() //
+            .name("Id").type().stringType().noDefault() //
+            .name("StartDateTime").type().stringType().noDefault() // Actual type:dateTime
+            .name("EndDateTime").type().stringType().noDefault() // Actual type:dateTime
+            .name("ActivityDate").type().stringType().noDefault() // Actual type:date
+            .name("DurationInMinutes").type().stringType().noDefault() // Actual type:int
+            .name("IsPrivate").type().stringType().noDefault() // Actual type:boolean
+            .name("Subject").type().stringType().noDefault() // Actual type:boolean
+            .endRecord();
+
     public Writer<Result> createSalesforceOutputWriter(TSalesforceOutputProperties props) {
         SalesforceSink salesforceSink = new SalesforceSink();
         salesforceSink.initialize(adaptor, props);
@@ -546,11 +565,82 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
                 sfWriter.write(r);
                 sfWriter.close();
                 fail("It should get error when insert data!");
-            }catch (IOException e){
+            } catch (IOException e) {
                 assertThat(e.getMessage(), is((Object) "Account ID: id value of incorrect type: bad id\n"));
                 throw e;
             }
         }
 
     }
+
+    /*
+     * With current API like date/datetime/int/.... string value can't be write to server side
+     * So we need convert the field value type.
+     */
+    @Test
+    public void testSinkAllWithStringValue() throws Exception {
+        // Component framework objects.
+        ComponentDefinition sfDef = new TSalesforceOutputDefinition();
+
+        TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
+        SalesforceTestBase.setupProps(sfProps.connection, false);
+        sfProps.module.setValue("moduleName", "Event");
+        sfProps.module.main.schema.setValue(SCHEMA_INSERT_EVENT);
+        sfProps.ceaseForError.setValue(true);
+        // Automatically generate the out schemas.
+        sfProps.module.schemaListener.afterSchema();
+
+        DefaultComponentRuntimeContainerImpl container = new DefaultComponentRuntimeContainerImpl();
+
+        List records = new ArrayList<IndexedRecord>();
+        String random = String.valueOf(Integer.parseInt(createNewRandom()) % 1000);
+        IndexedRecord r1 = new GenericData.Record(SCHEMA_INSERT_EVENT);
+        r1.put(0, "2011-02-02T02:02:02");
+        r1.put(1, "2011-02-02T22:02:02.000Z");
+        r1.put(2, "2011-02-02");
+        r1.put(3, "1200");
+        r1.put(4, "true");
+        r1.put(5, random);
+        // Rejected and successful writes are reset on the next record.
+        IndexedRecord r2 = new GenericData.Record(SCHEMA_INSERT_EVENT);
+        r2.put(0, "2016-02-02T02:02:02.000Z");
+        r2.put(1, "2016-02-02T12:02:02");
+        r2.put(2, "2016-02-02");
+        r2.put(3, "600");
+        r2.put(4, "0");
+        r2.put(5, random);
+
+        records.add(r1);
+        records.add(r2);
+        doWriteRows(sfProps, records);
+
+        ComponentDefinition sfInputDef = new TSalesforceInputDefinition();
+        TSalesforceInputProperties sfInputProps = (TSalesforceInputProperties) sfInputDef.createRuntimeProperties();
+        sfInputProps.copyValuesFrom(sfProps);
+        sfInputProps.condition.setValue("Subject = '" + random + "'");
+
+        sfInputProps.module.main.schema.setValue(SCHEMA_INPUT_AND_DELETE_EVENT);
+        List<IndexedRecord> inpuRecords = readRows(sfInputProps);
+        try {
+            assertEquals(2, inpuRecords.size());
+            IndexedRecord inputRecords_1 = inpuRecords.get(0);
+            IndexedRecord inputRecords_2 = inpuRecords.get(1);
+            assertEquals(random, inputRecords_1.get(6));
+            assertEquals(random, inputRecords_2.get(6));
+            assertEquals("2011-02-02T02:02:02.000Z", inputRecords_1.get(1));
+            assertEquals("2016-02-02T02:02:02.000Z", inputRecords_2.get(1));
+            assertEquals("2011-02-02T22:02:02.000Z", inputRecords_1.get(2));
+            assertEquals("2016-02-02T12:02:02.000Z", inputRecords_2.get(2));
+            assertEquals("2011-02-02", inputRecords_1.get(3));
+            assertEquals("2016-02-02", inputRecords_2.get(3));
+            assertEquals("1200", inputRecords_1.get(4));
+            assertEquals("600", inputRecords_2.get(4));
+            assertEquals("true", inputRecords_1.get(5));
+            assertEquals("false", inputRecords_2.get(5));
+
+        } finally {
+            deleteRows(inpuRecords, sfInputProps);
+        }
+    }
+
 }

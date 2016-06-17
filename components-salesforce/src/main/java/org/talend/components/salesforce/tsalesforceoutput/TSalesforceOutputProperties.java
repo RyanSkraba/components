@@ -156,9 +156,9 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
             form.getChildForm(connection.getName()).getWidget(connection.httpTraceMessage.getName()).setHidden(true);
             form.getWidget("commitLevel").setHidden(!extendInsert.getValue());
             form.getWidget("retrieveInsertId")
-                    .setHidden(extendInsert.getValue() && OutputAction.INSERT.equals(outputAction.getValue()));
+                    .setHidden(extendInsert.getValue() || !OutputAction.INSERT.equals(outputAction.getValue()));
             form.getWidget("ignoreNull").setHidden(
-                    !OutputAction.UPDATE.equals(outputAction.getValue()) || OutputAction.UPSERT.equals(outputAction.getValue()));
+                    !(OutputAction.UPDATE.equals(outputAction.getValue()) || OutputAction.UPSERT.equals(outputAction.getValue())));
         }
     }
 

@@ -102,12 +102,12 @@ public class SalesforceAvroRegistry extends AvroRegistry {
                     avroField.addProp(SchemaConstants.TALEND_COLUMN_SCALE, String.valueOf(field.getScale()));
                 }
             }
-            
-            if(field.getReferenceTo()!=null && field.getReferenceTo().length > 0 && field.getRelationshipName()!=null){
-            	avroField.addProp(SalesforceSchemaConstants.REF_MODULE_NAME, field.getReferenceTo()[0]);
-            	avroField.addProp(SalesforceSchemaConstants.REF_FIELD_NAME, field.getRelationshipName());
-	    	}
-            
+
+            if (field.getReferenceTo() != null && field.getReferenceTo().length > 0 && field.getRelationshipName() != null) {
+                avroField.addProp(SalesforceSchemaConstants.REF_MODULE_NAME, field.getReferenceTo()[0]);
+                avroField.addProp(SalesforceSchemaConstants.REF_FIELD_NAME, field.getRelationshipName());
+            }
+
             // pattern will be removed when we have db type for salesforce
             switch (field.getType()) {
             case date:
@@ -115,6 +115,9 @@ public class SalesforceAvroRegistry extends AvroRegistry {
                 break;
             case datetime:
                 avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'");
+                break;
+            case time:
+                avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "HH:mm:ss.SSS'Z'");
                 break;
             default:
                 break;
