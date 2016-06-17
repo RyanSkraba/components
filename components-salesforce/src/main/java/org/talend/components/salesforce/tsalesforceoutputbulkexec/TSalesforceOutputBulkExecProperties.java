@@ -55,14 +55,14 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
     @Override
     public ComponentProperties getInputComponentProperties() {
         outputBulkProperties.init();
-        
+
         outputBulkProperties.schema.schema.setStoredValue(module.main.schema.getStoredValue());
         outputBulkProperties.schema.schema.setValueEvaluator(module.main.schema.getValueEvaluator());
-        
+
         outputBulkProperties.bulkFilePath.setStoredValue(bulkFilePath.getStoredValue());
         outputBulkProperties.bulkFilePath.copyTaggedValues(bulkFilePath);
         outputBulkProperties.bulkFilePath.setValueEvaluator(bulkFilePath.getValueEvaluator());
-        
+
         // we need to pass also the possible values, only way from the studio to know it comes from a combo box (need to
         // add quotes for generation)
         outputBulkProperties.upsertRelationTable.columnName.setPossibleValues(upsertRelationTable.columnName.getPossibleValues());
@@ -70,14 +70,19 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
         outputBulkProperties.upsertRelationTable.columnName.setValueEvaluator(upsertRelationTable.columnName.getValueEvaluator());
         outputBulkProperties.upsertRelationTable.lookupFieldExternalIdName
                 .setStoredValue(upsertRelationTable.lookupFieldExternalIdName.getStoredValue());
-        outputBulkProperties.upsertRelationTable.lookupFieldExternalIdName.setValueEvaluator(upsertRelationTable.lookupFieldExternalIdName.getValueEvaluator());
-        outputBulkProperties.upsertRelationTable.lookupFieldName.setStoredValue(upsertRelationTable.lookupFieldName.getStoredValue());
-        outputBulkProperties.upsertRelationTable.lookupFieldName.setValueEvaluator(upsertRelationTable.lookupFieldName.getValueEvaluator());
+        outputBulkProperties.upsertRelationTable.lookupFieldExternalIdName
+                .setValueEvaluator(upsertRelationTable.lookupFieldExternalIdName.getValueEvaluator());
+        outputBulkProperties.upsertRelationTable.lookupRelationshipFieldName
+                .setStoredValue(upsertRelationTable.lookupRelationshipFieldName.getStoredValue());
+        outputBulkProperties.upsertRelationTable.lookupRelationshipFieldName
+                .setValueEvaluator(upsertRelationTable.lookupRelationshipFieldName.getValueEvaluator());
         outputBulkProperties.upsertRelationTable.lookupFieldModuleName
                 .setStoredValue(upsertRelationTable.lookupFieldModuleName.getStoredValue());
-        outputBulkProperties.upsertRelationTable.lookupFieldModuleName.setValueEvaluator(upsertRelationTable.lookupFieldModuleName.getValueEvaluator());
+        outputBulkProperties.upsertRelationTable.lookupFieldModuleName
+                .setValueEvaluator(upsertRelationTable.lookupFieldModuleName.getValueEvaluator());
         outputBulkProperties.upsertRelationTable.polymorphic.setStoredValue(upsertRelationTable.polymorphic.getStoredValue());
-        outputBulkProperties.upsertRelationTable.polymorphic.setValueEvaluator(upsertRelationTable.polymorphic.getValueEvaluator());
+        outputBulkProperties.upsertRelationTable.polymorphic
+                .setValueEvaluator(upsertRelationTable.polymorphic.getValueEvaluator());
         for (Form form : outputBulkProperties.getForms()) {
             outputBulkProperties.refreshLayout(form);
         }
@@ -89,10 +94,10 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
     @Override
     public ComponentProperties getOutputComponentProperties() {
         TSalesforceBulkExecProperties bulkExecProperties = new TSalesforceBulkExecProperties("bulkExecProperties");
-        
+
         bulkExecProperties.init();
         bulkExecProperties.copyValuesFrom(this, true, true);
-        
+
         // we need to pass also the possible values, only way from the studio to know it comes from a combo box (need to
         // add quotes for generation)
         bulkExecProperties.upsertRelationTable.columnName.setPossibleValues(upsertRelationTable.columnName.getPossibleValues());
