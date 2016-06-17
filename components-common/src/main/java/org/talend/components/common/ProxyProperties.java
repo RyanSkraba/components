@@ -46,6 +46,13 @@ public class ProxyProperties extends PropertiesImpl {
     }
 
     @Override
+    public void setupProperties() {
+        super.setupProperties();
+        userPassword.userId.setOccurMinTimes(0);
+        userPassword.password.setOccurMinTimes(0);
+    }
+
+    @Override
     public void setupLayout() {
         super.setupLayout();
         Form form = Form.create(this, Form.MAIN);

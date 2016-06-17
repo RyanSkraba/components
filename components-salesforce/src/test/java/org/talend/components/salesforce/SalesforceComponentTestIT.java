@@ -12,14 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -99,6 +95,19 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
         assertTrue(mainForm.getWidget(SalesforceUserPasswordProperties.class).isHidden());
         assertFalse(mainForm.getWidget(OauthProperties.class).isHidden());
+    }
+
+    @Test
+    public void testConnectionProps() throws Throwable {
+        SalesforceConnectionProperties props = (SalesforceConnectionProperties) new TSalesforceConnectionDefinition()
+                .createProperties();
+        assertTrue(props.userPassword.userId.isRequired());
+        assertTrue(props.userPassword.password.isRequired());
+        assertFalse(props.userPassword.securityKey.isRequired());
+
+        assertFalse(props.proxy.userPassword.userId.isRequired());
+        assertFalse(props.proxy.userPassword.password.isRequired());
+
     }
 
     @Test
