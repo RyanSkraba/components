@@ -15,16 +15,14 @@ package org.talend.components.salesforce.tsalesforcebulkexec;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.avro.Schema;
-import org.apache.avro.Schema.Field;
-import org.apache.avro.SchemaBuilder;
-import org.apache.avro.SchemaBuilder.FieldAssembler;
-import org.apache.avro.SchemaBuilder.FieldBuilder;
-import org.apache.avro.SchemaBuilder.RecordBuilder;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.salesforce.SalesforceBulkProperties;
@@ -93,37 +91,61 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
     }
 
     private void updateOutputSchemas() {
+        final Schema inputSchema = module.main.schema.getValue();
 
-        Schema inputSchema = module.main.schema.getValue();
-        Schema mainOutputSchema = createRecordBuilderFromSchema(inputSchema, "output").name("salesforce_id")
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "false").prop(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true")
-                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255").type().stringType().noDefault()
+        Schema.Field field = null;
 
-        .name("salesforce_created").prop(SchemaConstants.TALEND_IS_LOCKED, "false")
-                .prop(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")
-                .type().stringType().noDefault().endRecord();
+        final List<Schema.Field> additionalMainFields = new ArrayList<Schema.Field>();
 
+        field = new Schema.Field("salesforce_id", Schema.create(Schema.Type.STRING), (String) null, (Object) null);
+        field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
+        field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
+        field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
+        additionalMainFields.add(field);
+
+        field = new Schema.Field("salesforce_created", Schema.create(Schema.Type.STRING), (String) null, (Object) null);
+        field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
+        field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
+        field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
+        additionalMainFields.add(field);
+
+        Schema mainOutputSchema = newSchema(inputSchema, "output", additionalMainFields);
         schemaFlow.schema.setValue(mainOutputSchema);
 
-        Schema rejectSchema = createRecordBuilderFromSchema(inputSchema, "rejectOutput").name("error")
-                .prop(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true").prop(SchemaConstants.TALEND_IS_LOCKED, "false")
-                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255").type().stringType().noDefault().endRecord();
+        final List<Schema.Field> additionalRejectFields = new ArrayList<Schema.Field>();
 
+        field = new Schema.Field("error", Schema.create(Schema.Type.STRING), (String) null, (Object) null);
+        field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
+        field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
+        field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
+        additionalRejectFields.add(field);
+
+        Schema rejectSchema = newSchema(inputSchema, "rejectOutput", additionalRejectFields);
         schemaReject.schema.setValue(rejectSchema);
-
     }
 
-    private FieldAssembler<Schema> createRecordBuilderFromSchema(Schema inputSchema, String newSchemaName) {
-        RecordBuilder<Schema> recordBuilder = SchemaBuilder.record(newSchemaName);
-        FieldAssembler<Schema> fieldAssembler = recordBuilder.fields();
-        for (Field field : inputSchema.getFields()) {
-            FieldBuilder<Schema> fieldBuilder = fieldAssembler.name(field.name());
-            for (String propName : field.getObjectProps().keySet()) {
-                fieldBuilder.prop(propName, field.getObjectProps().get(propName).toString());
+    private Schema newSchema(Schema metadataSchema, String newSchemaName, List<Schema.Field> moreFields) {
+        Schema newSchema = Schema.createRecord(newSchemaName, metadataSchema.getDoc(), metadataSchema.getNamespace(),
+                metadataSchema.isError());
+
+        List<Schema.Field> copyFieldList = new ArrayList<>();
+        for (Schema.Field se : metadataSchema.getFields()) {
+            Schema.Field field = new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal(), se.order());
+            field.getObjectProps().putAll(se.getObjectProps());
+            for (Map.Entry<String,Object> entry : se.getObjectProps().entrySet()) {
+                field.addProp(entry.getKey(), entry.getValue());
             }
-            fieldAssembler = fieldBuilder.type().stringType().noDefault();
+            copyFieldList.add(field);
         }
-        return fieldAssembler;
+
+        copyFieldList.addAll(moreFields);
+
+        newSchema.setFields(copyFieldList);
+        for (Map.Entry<String,Object> entry : metadataSchema.getObjectProps().entrySet()) {
+            newSchema.addProp(entry.getKey(), entry.getValue());
+        }
+
+        return newSchema;
     }
 
     @Override

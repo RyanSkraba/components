@@ -60,8 +60,14 @@ final class SalesforceBulkFileWriter extends BulkFileWriter {
                         List<String> lookupFieldNames = salesforceBulkProperties.upsertRelationTable.lookupFieldName.getValue();
                         List<String> externalIdFromLookupFields = salesforceBulkProperties.upsertRelationTable.lookupFieldExternalIdName
                                 .getValue();
-
-                        if (polymorphics.get(index)) {
+                        
+                        Object polymorphic = polymorphics.get(index);
+                        boolean poly = false;
+                        if(polymorphic!=null && polymorphic instanceof Boolean) {
+                            poly = (Boolean)polymorphic;
+                        }
+                        
+                        if (poly) {
                             sbuilder.append(lookupFieldModuleNames.get(index)).append(":");
                         }
                         sbuilder.append(lookupFieldNames.get(index)).append(".").append(externalIdFromLookupFields.get(index));
