@@ -14,11 +14,11 @@
 		<module>components-api-service</module>
 		<module>components-common</module>
 		<module>components-common-oauth</module>
-		<module>components-archetypes</module>
+		<module>components-api-archetypes</module>
 		<module>components-salesforce</module>
 		<module>components-webtest</module>
 		<module>components-osgitest</module>
-		<module>components-proptester</module>
+		<module>components-api-proptester</module>
 		<module>components-splunk</module>
 		<module>components-jira</module>
 		<module>components-dataprep</module>
