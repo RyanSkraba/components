@@ -17,12 +17,11 @@ import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.avro.Schema;
-import org.apache.avro.Schema.Field;
-import org.apache.avro.SchemaBuilder;
-import org.apache.avro.SchemaBuilder.FieldAssembler;
-import org.apache.avro.SchemaBuilder.FieldBuilder;
-import org.apache.avro.SchemaBuilder.RecordBuilder;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.daikon.avro.SchemaConstants;
@@ -75,52 +74,74 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
             }
         });
     }
-
+    
     private void updateOutputSchemas() {
-        // get the main schema (input one)
         Schema inputSchema = module.main.schema.getValue();
+        
+        Schema.Field field = null;
+        
         if (!extendInsert.getValue() && retrieveInsertId.getValue() && OutputAction.INSERT.equals(outputAction.getValue())) {
-
-            Schema mainOutputSchema = createRecordBuilderFromSchema(inputSchema, "output").name(FIELD_SALESFORCE_ID)
-                    .prop(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
-                    .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
-                    .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
-                    .type().stringType().noDefault().endRecord();
-
+            final List<Schema.Field> additionalMainFields = new ArrayList<Schema.Field>();
+            
+            field = new Schema.Field(FIELD_SALESFORCE_ID, Schema.create(Schema.Type.STRING), (String) null, (Object) null);
+            field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
+            field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
+            field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
+            additionalMainFields.add(field);
+            
+            Schema mainOutputSchema = newSchema(inputSchema, "output", additionalMainFields);
             schemaFlow.schema.setValue(mainOutputSchema);
         } else {
             schemaFlow.schema.setValue(inputSchema);
         }
 
-        Schema rejectSchema = createRecordBuilderFromSchema(inputSchema, "rejectOutput").name(FIELD_ERROR_CODE) //$NON-NLS-1$ //$NON-NLS-2$
-                .prop(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
-                // column set as non-read-only, to let the user edit the field if needed
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
-                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
-                .type().stringType().noDefault().name(FIELD_ERROR_FIELDS)// $NON-NLS-1$
-                .prop(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
-                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
-                .type().stringType().noDefault().name(FIELD_ERROR_MESSAGE)// $NON-NLS-1$
-                .prop(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true")//$NON-NLS-1$
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "false")//$NON-NLS-1$
-                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//$NON-NLS-1$
-                .type().stringType().noDefault().endRecord();
+        final List<Schema.Field> additionalRejectFields = new ArrayList<Schema.Field>();
 
+        field = new Schema.Field(FIELD_ERROR_CODE, Schema.create(Schema.Type.STRING), (String) null, (Object) null);
+        field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
+        field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
+        field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
+        additionalRejectFields.add(field);
+        
+        field = new Schema.Field(FIELD_ERROR_FIELDS, Schema.create(Schema.Type.STRING), (String) null, (Object) null);
+        field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
+        field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
+        field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
+        additionalRejectFields.add(field);
+        
+        field = new Schema.Field(FIELD_ERROR_MESSAGE, Schema.create(Schema.Type.STRING), (String) null, (Object) null);
+        field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
+        field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
+        field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
+        additionalRejectFields.add(field);
+        
+        Schema rejectSchema = newSchema(inputSchema, "rejectOutput", additionalRejectFields);
+        
         schemaReject.schema.setValue(rejectSchema);
     }
 
-    private FieldAssembler<Schema> createRecordBuilderFromSchema(Schema inputSchema, String newSchemaName) {
-        RecordBuilder<Schema> recordBuilder = SchemaBuilder.record(newSchemaName);
-        FieldAssembler<Schema> fieldAssembler = recordBuilder.fields();
-        for (Field field : inputSchema.getFields()) {
-            FieldBuilder<Schema> fieldBuilder = fieldAssembler.name(field.name());
-            for (String propName : field.getObjectProps().keySet()) {
-                fieldBuilder.prop(propName, field.getObjectProps().get(propName).toString());
+    private Schema newSchema(Schema metadataSchema, String newSchemaName, List<Schema.Field> moreFields) {
+        Schema newSchema = Schema.createRecord(newSchemaName, metadataSchema.getDoc(), metadataSchema.getNamespace(),
+                metadataSchema.isError());
+
+        List<Schema.Field> copyFieldList = new ArrayList<>();
+        for (Schema.Field se : metadataSchema.getFields()) {
+            Schema.Field field = new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal(), se.order());
+            field.getObjectProps().putAll(se.getObjectProps());
+            for (Map.Entry<String,Object> entry : se.getObjectProps().entrySet()) {
+                field.addProp(entry.getKey(), entry.getValue());
             }
-            fieldAssembler = fieldBuilder.type().stringType().noDefault();
+            copyFieldList.add(field);
         }
-        return fieldAssembler;
+
+        copyFieldList.addAll(moreFields);
+
+        newSchema.setFields(copyFieldList);
+        for (Map.Entry<String,Object> entry : metadataSchema.getObjectProps().entrySet()) {
+            newSchema.addProp(entry.getKey(), entry.getValue());
+        }
+
+        return newSchema;
     }
 
     @Override
