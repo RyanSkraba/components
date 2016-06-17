@@ -24,9 +24,9 @@ import org.talend.daikon.properties.property.Property;
 
 public class UserPasswordProperties extends PropertiesImpl {
 
-    public Property<String> userId = newProperty("userId").setRequired(true); //$NON-NLS-1$
+    public Property<String> userId = newProperty("userId").setRequired(); //$NON-NLS-1$
 
-    public Property<String> password = newProperty("password").setRequired(true)
+    public Property<String> password = newProperty("password").setRequired()
             .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
     public UserPasswordProperties(String name) {
