@@ -25,7 +25,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.TopLevelDefinition;
+import org.talend.components.api.AbstractTopLevelDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.Connector;
@@ -36,6 +36,7 @@ import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
+import org.talend.daikon.NamedThing;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.service.Repository;
@@ -73,7 +74,7 @@ public class ComponentServiceOsgi implements ComponentService {
 
         private Map<String, ComponentWizardDefinition> componentWizards;
 
-        protected <T extends TopLevelDefinition> Map<String, T> populateMap(Class<T> cls) {
+        protected <T extends NamedThing> Map<String, T> populateMap(Class<T> cls) {
             Map<String, T> map = new HashMap<>();
             try {
                 String typeCanonicalName = cls.getCanonicalName();

@@ -60,7 +60,6 @@ import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.Constants;
-import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.Connector;
@@ -71,6 +70,7 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
+import org.talend.daikon.NamedThing;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.properties.service.PropertiesServiceImpl;
 
@@ -206,7 +206,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
      * @param definition, must not be null
      * @return the stream or null if no image was defined for th component or the path is wrong
      */
-    private InputStream getImageStream(TopLevelDefinition definition, String pngIconPath) {
+    private InputStream getImageStream(NamedThing definition, String pngIconPath) {
         InputStream result = null;
         if (pngIconPath != null && !"".equals(pngIconPath)) { //$NON-NLS-1$
             InputStream resourceAsStream = definition.getClass().getResourceAsStream(pngIconPath);

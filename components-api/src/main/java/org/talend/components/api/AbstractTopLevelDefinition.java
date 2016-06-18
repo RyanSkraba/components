@@ -12,10 +12,11 @@
 // ============================================================================
 package org.talend.components.api;
 
+import org.talend.daikon.NamedThing;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.TranslatableImpl;
 
-public abstract class AbstractTopLevelDefinition extends TranslatableImpl implements TopLevelDefinition {
+public abstract class AbstractTopLevelDefinition extends TranslatableImpl implements NamedThing {
 
     private static final String I18N_DISPLAY_NAME_SUFFIX = ".displayName"; //$NON-NLS-1$
 

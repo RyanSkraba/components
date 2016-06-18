@@ -12,10 +12,10 @@
 // ============================================================================
 package org.talend.components.api.component;
 
-import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.property.Property;
 
 /**
@@ -25,7 +25,7 @@ import org.talend.daikon.properties.property.Property;
  * {@link org.talend.components.api.service.ComponentService} to allow components to be discovered.
  */
 
-public interface ComponentDefinition extends TopLevelDefinition {
+public interface ComponentDefinition extends NamedThing {
 
     /**
      * Returns an array of paths that represent the categories of the component.

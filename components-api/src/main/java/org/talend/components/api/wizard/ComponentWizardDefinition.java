@@ -12,15 +12,15 @@
 // ============================================================================
 package org.talend.components.api.wizard;
 
-import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.NamedThing;
 
 /**
  */
 /**
  * created by sgandon on 8 févr. 2016
  */
-public interface ComponentWizardDefinition extends TopLevelDefinition {
+public interface ComponentWizardDefinition extends NamedThing {
 
     public String getMenuItemName();
 
