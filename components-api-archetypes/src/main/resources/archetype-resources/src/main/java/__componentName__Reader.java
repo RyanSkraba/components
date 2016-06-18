@@ -26,6 +26,8 @@ public class ${componentName}Reader extends AbstractBoundedReader<String> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(${componentName}Definition.class);
 
+    private RuntimeContainer container;
+
     private final String filename;
 
     private boolean started = false;
@@ -35,7 +37,8 @@ public class ${componentName}Reader extends AbstractBoundedReader<String> {
     private transient String current;
 
     public ${componentName}Reader(RuntimeContainer container, BoundedSource source, String filename) {
-        super(container, source);
+        super(source);
+        this.container = container;
         this.filename = filename;
     }
 
