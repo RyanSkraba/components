@@ -122,7 +122,7 @@ public interface ComponentService extends PropertiesService<Properties> {
      * @param nestedValues the ComponentProperties which properties will be copied inot the targetProperties.
      * @return true if the copy was done and false if the targetProperties does not accept the nestedValues type.
      */
-    boolean setNestedPropertiesValues(ComponentProperties targetProperties, ComponentProperties nestedValues);
+    boolean setNestedPropertiesValues(ComponentProperties targetProperties, Properties nestedValues);
 
     /**
      * Return the png image related to the given wizard

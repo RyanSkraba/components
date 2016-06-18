@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.avro.Schema;
@@ -72,6 +71,7 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.exception.ExceptionContext;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.service.PropertiesServiceImpl;
 
 /**
@@ -171,7 +171,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
     }
 
     @Override
-    public boolean setNestedPropertiesValues(ComponentProperties targetProperties, ComponentProperties nestedValues) {
+    public boolean setNestedPropertiesValues(ComponentProperties targetProperties, Properties nestedValues) {
         return targetProperties.updateNestedProperties(nestedValues);
     }
 
@@ -460,8 +460,8 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
         return builtModel.getEffectiveModel();
     }
 
-    private Properties toProperties(Map<String, String> dominant, Map<String, String> recessive) {
-        Properties props = new Properties();
+    private java.util.Properties toProperties(Map<String, String> dominant, Map<String, String> recessive) {
+        java.util.Properties props = new java.util.Properties();
         if (recessive != null) {
             props.putAll(recessive);
         }

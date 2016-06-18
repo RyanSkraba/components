@@ -77,7 +77,7 @@ public interface ComponentProperties extends Properties {
      * @param nestedValues values to be used update this current ComponentProperties nested Properties.
      * @return true if the copy was done and false if the targetProperties does not accept the nestedValues type.
      */
-    public boolean updateNestedProperties(final ComponentProperties nestedValues);
+    public boolean updateNestedProperties(final Properties nestedValues);
 
 
 }

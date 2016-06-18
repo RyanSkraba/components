@@ -105,7 +105,7 @@ public class ComponentPropertiesImpl extends PropertiesImpl implements Component
      * @return true if the copy was done and false if the targetProperties does not accept the nestedValues type.
      */
     @Override
-    public boolean updateNestedProperties(final ComponentProperties nestedValues) {
+    public boolean updateNestedProperties(final Properties nestedValues) {
         if (nestedValues == null) {
             return false;
         } // else not null so perfect
