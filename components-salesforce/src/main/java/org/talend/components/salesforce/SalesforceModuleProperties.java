@@ -65,7 +65,7 @@ public class SalesforceModuleProperties extends ComponentPropertiesImpl implemen
         refreshLayout(moduleForm);
 
         Form moduleRefForm = Form.create(this, Form.REFERENCE);
-        moduleRefForm.addRow(widget(moduleName).setWidgetType(Widget.NAME_SELECTION_REFERENCE_WIDGET_TYPE));
+        moduleRefForm.addRow(widget(moduleName).setWidgetType(Widget.NAME_SELECTION_REFERENCE_WIDGET_TYPE).setLongRunning(true));
 
         moduleRefForm.addRow(main.getForm(Form.REFERENCE));
         refreshLayout(moduleRefForm);
