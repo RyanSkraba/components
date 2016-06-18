@@ -187,7 +187,7 @@ public class Rest {
      * @throws ClientProtocolException
      * @throws IOException
      */
-    public int post(String resource, String body) throws ClientProtocolException, IOException {
+    public int post(String resource, String body) throws IOException {
         Request post = Request.Post(hostPort + resource).bodyString(body, contentType);
         for (Header header : headers) {
             post.addHeader(header);
@@ -204,7 +204,7 @@ public class Rest {
      * @throws ClientProtocolException
      * @throws IOException
      */
-    public int put(String resource, String body) throws ClientProtocolException, IOException {
+    public int put(String resource, String body) throws IOException {
         Request put = Request.Put(hostPort + resource).bodyString(body, contentType);
         for (Header header : headers) {
             put.addHeader(header);

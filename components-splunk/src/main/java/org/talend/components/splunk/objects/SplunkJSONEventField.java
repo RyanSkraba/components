@@ -31,7 +31,7 @@ public enum SplunkJSONEventField {
 
     private static List<SplunkJSONEventField> metadataFields;
 
-    private SplunkJSONEventField(String name, Class<?> dataType) {
+    SplunkJSONEventField(String name, Class<?> dataType) {
         this.name = name;
         this.dataType = dataType;
     }

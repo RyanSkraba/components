@@ -116,7 +116,7 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
                 while (xos.hasNext()) {
                     XmlObject objectValue = xos.next();
                     if (objectValue != null) {
-                        XmlObject xmlObject = (XmlObject) objectValue;
+                        XmlObject xmlObject = objectValue;
 
                         if ("type".equals(xmlObject.getName().getLocalPart()) && typeCount == 0) {
                             typeCount++;

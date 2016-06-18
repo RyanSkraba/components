@@ -25,7 +25,7 @@ public class ProxyProperties extends PropertiesImpl {
         HTTPS,
         SOCKS,
         FTP
-    };
+    }
 
     public Property<Boolean> useProxy = newBoolean("useProxy").setRequired(); //$NON-NLS-1$
 

@@ -10,11 +10,11 @@ public interface VirtualComponentProperties {
     /**
      *  Get input part component properties
      */
-    public ComponentProperties getInputComponentProperties();
+    ComponentProperties getInputComponentProperties();
 
     /**
      *  Get output part component properties
      */
-    public ComponentProperties getOutputComponentProperties();
+    ComponentProperties getOutputComponentProperties();
 
 }

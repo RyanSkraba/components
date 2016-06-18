@@ -40,10 +40,7 @@ public class SalesforceConnectionWizard extends ComponentWizard {
     }
 
     public boolean supportsProperties(ComponentProperties properties) {
-        if (properties instanceof SalesforceConnectionProperties) {
-            return true;
-        }
-        return false;
+        return properties instanceof SalesforceConnectionProperties;
     }
 
     public void setupProperties(SalesforceConnectionProperties cPropsOther) {

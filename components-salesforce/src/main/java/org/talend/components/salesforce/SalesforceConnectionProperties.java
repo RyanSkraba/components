@@ -51,7 +51,7 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl impl
 
     public enum LoginType {
         Basic,
-        OAuth;
+        OAuth
     }
 
     public Property<LoginType> loginType = newEnum("loginType", LoginType.class).setRequired();

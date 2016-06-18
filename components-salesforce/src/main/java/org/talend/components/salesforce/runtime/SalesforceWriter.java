@@ -95,7 +95,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
     public SalesforceWriter(SalesforceWriteOperation salesforceWriteOperation, RuntimeContainer container) {
         this.salesforceWriteOperation = salesforceWriteOperation;
         this.container = container;
-        sink = (SalesforceSink) salesforceWriteOperation.getSink();
+        sink = salesforceWriteOperation.getSink();
         sprops = sink.getSalesforceOutputProperties();
         if (sprops.extendInsert.getValue()) {
             commitLevel = sprops.commitLevel.getValue();

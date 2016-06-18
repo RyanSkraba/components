@@ -36,15 +36,13 @@ import org.talend.daikon.avro.AvroRegistry;
 public interface WriterWithFeedback<WriteT, MainT, RejectT> extends Writer<WriteT> {
 
     /**
-     * @return The list of records immediately after a write operation that were successfully written to the
-     * {@link Sink}.
+     * @return The list of records immediately after a write operation that were successfully written to the {@link Sink}.
      */
-    public Iterable<MainT> getSuccessfulWrites();
+    Iterable<MainT> getSuccessfulWrites();
 
     /**
-     * @return The list of records immediately after a write operation that were not successfully written to the
-     * {@link Sink}.
+     * @return The list of records immediately after a write operation that were not successfully written to the {@link Sink}.
      */
-    public Iterable<RejectT> getRejectedWrites();
+    Iterable<RejectT> getRejectedWrites();
 
 }

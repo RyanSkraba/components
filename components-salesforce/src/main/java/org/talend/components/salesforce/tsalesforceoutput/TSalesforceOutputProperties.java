@@ -83,7 +83,7 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
         if (!extendInsert.getValue() && retrieveInsertId.getValue() && OutputAction.INSERT.equals(outputAction.getValue())) {
             final List<Schema.Field> additionalMainFields = new ArrayList<Schema.Field>();
             
-            field = new Schema.Field(FIELD_SALESFORCE_ID, Schema.create(Schema.Type.STRING), (String) null, (Object) null);
+            field = new Schema.Field(FIELD_SALESFORCE_ID, Schema.create(Schema.Type.STRING), null, (Object) null);
             field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
             field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
             field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
@@ -97,19 +97,19 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
 
         final List<Schema.Field> additionalRejectFields = new ArrayList<Schema.Field>();
 
-        field = new Schema.Field(FIELD_ERROR_CODE, Schema.create(Schema.Type.STRING), (String) null, (Object) null);
+        field = new Schema.Field(FIELD_ERROR_CODE, Schema.create(Schema.Type.STRING), null, (Object) null);
         field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
         field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
         field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
         additionalRejectFields.add(field);
         
-        field = new Schema.Field(FIELD_ERROR_FIELDS, Schema.create(Schema.Type.STRING), (String) null, (Object) null);
+        field = new Schema.Field(FIELD_ERROR_FIELDS, Schema.create(Schema.Type.STRING), null, (Object) null);
         field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
         field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
         field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
         additionalRejectFields.add(field);
         
-        field = new Schema.Field(FIELD_ERROR_MESSAGE, Schema.create(Schema.Type.STRING), (String) null, (Object) null);
+        field = new Schema.Field(FIELD_ERROR_MESSAGE, Schema.create(Schema.Type.STRING), null, (Object) null);
         field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
         field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
         field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");

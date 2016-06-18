@@ -50,7 +50,7 @@ public class FullExampleProperties extends ComponentPropertiesImpl {
 
         enum ColEnum {
             FOO,
-            BAR;
+            BAR
         }
 
         public final Property<String> colString = newString("colString");

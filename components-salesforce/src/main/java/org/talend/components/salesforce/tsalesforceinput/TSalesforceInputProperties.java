@@ -28,7 +28,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
     public enum QueryMode {
         Query,
-        Bulk;
+        Bulk
     }
 
     public Property<QueryMode> queryMode = newEnum("queryMode", QueryMode.class);

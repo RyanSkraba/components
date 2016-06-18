@@ -96,7 +96,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
     public Writer<Result> createSalesforceOutputWriter(TSalesforceOutputProperties props) {
         SalesforceSink salesforceSink = new SalesforceSink();
         salesforceSink.initialize(adaptor, props);
-        SalesforceWriteOperation writeOperation = (SalesforceWriteOperation) salesforceSink.createWriteOperation();
+        SalesforceWriteOperation writeOperation = salesforceSink.createWriteOperation();
         Writer<Result> saleforceWriter = writeOperation.createWriter(adaptor);
         return saleforceWriter;
     }
@@ -258,7 +258,6 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
         props.module.main.schema.setValue(getMakeRowSchema(isDynamic));
-        ;
 
         props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
 

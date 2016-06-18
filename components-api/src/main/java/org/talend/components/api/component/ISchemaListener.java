@@ -20,5 +20,5 @@ package org.talend.components.api.component;
  */
 public interface ISchemaListener {
 
-    public void afterSchema();
+    void afterSchema();
 }

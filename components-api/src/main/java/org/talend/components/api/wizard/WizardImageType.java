@@ -17,5 +17,5 @@ package org.talend.components.api.wizard;
  */
 public enum WizardImageType {
                              TREE_ICON_16X16,
-                             WIZARD_BANNER_75X66;
+                             WIZARD_BANNER_75X66
 }

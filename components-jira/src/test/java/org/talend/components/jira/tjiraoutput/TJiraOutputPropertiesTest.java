@@ -52,7 +52,7 @@ public class TJiraOutputPropertiesTest {
         boolean deleteSubtasksValue = properties.deleteSubtasks.getValue();
         Mode modeValue = properties.mode.getValue();
 
-        Schema schema = (Schema) properties.schema.schema.getValue();
+        Schema schema = properties.schema.schema.getValue();
         String actualSchema = schema.toString();
         String expectedSchema = Utils.readFile("src/test/resources/org/talend/components/jira/tjirainput/schema.json");
 
@@ -129,7 +129,7 @@ public class TJiraOutputPropertiesTest {
         boolean deleteSubtasksHidden = properties.getForm(Form.ADVANCED).getWidget("deleteSubtasks").isHidden();
         assertTrue(deleteSubtasksHidden);
 
-        Schema schema = (Schema) properties.schema.schema.getValue();
+        Schema schema = properties.schema.schema.getValue();
         String actualSchema = schema.toString();
         String expectedSchema = Utils.readFile("src/test/resources/org/talend/components/jira/tjirainput/schema.json");
         assertThat(actualSchema, equalTo(expectedSchema));
@@ -150,7 +150,7 @@ public class TJiraOutputPropertiesTest {
         boolean deleteSubtasksHidden = properties.getForm(Form.ADVANCED).getWidget("deleteSubtasks").isHidden();
         assertTrue(deleteSubtasksHidden);
 
-        Schema schema = (Schema) properties.schema.schema.getValue();
+        Schema schema = properties.schema.schema.getValue();
         String actualSchema = schema.toString();
         String expectedSchema = Utils.readFile("src/test/resources/org/talend/components/jira/tjiraoutput/updateSchema.json");
         assertThat(actualSchema, equalTo(expectedSchema));
@@ -168,7 +168,7 @@ public class TJiraOutputPropertiesTest {
 
         properties.afterAction();
 
-        Schema schema = (Schema) properties.schema.schema.getValue();
+        Schema schema = properties.schema.schema.getValue();
         String actualSchema = schema.toString();
         String expectedSchema = Utils.readFile("src/test/resources/org/talend/components/jira/tjiraoutput/deleteSchema.json");
         assertThat(actualSchema, equalTo(expectedSchema));

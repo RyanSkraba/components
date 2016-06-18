@@ -39,10 +39,7 @@ public class SalesforceModuleWizardDefinition extends AbstractComponentWizardDef
 
     @Override
     public boolean supportsProperties(Class<? extends ComponentProperties> propertiesClass) {
-        if (propertiesClass.isAssignableFrom(SalesforceConnectionProperties.class)) {
-            return true;
-        }
-        return false;
+        return propertiesClass.isAssignableFrom(SalesforceConnectionProperties.class);
     }
 
     @Override

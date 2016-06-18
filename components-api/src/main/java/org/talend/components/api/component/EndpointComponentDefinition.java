@@ -12,5 +12,5 @@ public interface EndpointComponentDefinition {
      * Returns the {@link SourceOrSink} if this is a runnable component but not either input or output (a connection for
      * example).
      */
-    public SourceOrSink getRuntime();
+    SourceOrSink getRuntime();
 }

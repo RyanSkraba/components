@@ -18,5 +18,5 @@ package org.talend.components.jira;
 public enum Action {
     INSERT,
     UPDATE,
-    DELETE;
+    DELETE
 }

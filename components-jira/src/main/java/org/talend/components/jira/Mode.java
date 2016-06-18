@@ -17,5 +17,5 @@ package org.talend.components.jira;
  */
 public enum Mode {
     BASIC,
-    ADVANCED;
+    ADVANCED
 }

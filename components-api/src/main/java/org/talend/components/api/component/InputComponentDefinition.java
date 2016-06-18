@@ -10,5 +10,5 @@ public interface InputComponentDefinition extends EndpointComponentDefinition {
     /**
      * Returns the runtime {@link Source} for input components.
      */
-    public Source getRuntime();
+    Source getRuntime();
 }

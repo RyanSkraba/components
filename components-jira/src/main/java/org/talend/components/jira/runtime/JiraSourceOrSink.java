@@ -94,7 +94,7 @@ public class JiraSourceOrSink implements SourceOrSink {
         userId = jiraProperties.connection.basicAuthentication.userId.getValue();
         userPassword = jiraProperties.connection.basicAuthentication.password.getValue();
         resource = jiraProperties.resource.getValue();
-        schema = (Schema) jiraProperties.schema.schema.getValue();
+        schema = jiraProperties.schema.schema.getValue();
     }
 
     /**

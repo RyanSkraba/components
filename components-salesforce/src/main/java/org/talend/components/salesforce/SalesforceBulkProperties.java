@@ -22,7 +22,7 @@ public class SalesforceBulkProperties extends ComponentPropertiesImpl {
 
     public enum Concurrency {
         Parallel,
-        Serial;
+        Serial
     }
 
     public Property<Concurrency> concurrencyMode = newEnum("concurrencyMode", Concurrency.class);
