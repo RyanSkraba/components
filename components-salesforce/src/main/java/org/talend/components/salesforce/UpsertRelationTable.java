@@ -1,6 +1,6 @@
 package org.talend.components.salesforce;
 
-import static org.talend.daikon.properties.property.PropertyFactory.*;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 import java.util.List;
 
@@ -26,6 +26,8 @@ public class UpsertRelationTable extends ComponentPropertiesImpl {
 
     private boolean usePolymorphic;
 
+    private boolean useLookupFieldName;
+
     /**
      * named constructor to be used is these properties are nested in other properties. Do not subclass this method for
      * initialization, use {@link #init()} instead.
@@ -40,6 +42,8 @@ public class UpsertRelationTable extends ComponentPropertiesImpl {
 
     public Property<List<String>> lookupFieldName = newProperty(LIST_STRING_TYPE, "lookupFieldName");
 
+    public Property<List<String>> lookupRelationshipFieldName = newProperty(LIST_STRING_TYPE, "lookupRelationshipFieldName");
+
     public Property<List<String>> lookupFieldModuleName = newProperty(LIST_STRING_TYPE, "lookupFieldModuleName");
 
     public Property<List<String>> lookupFieldExternalIdName = newProperty(LIST_STRING_TYPE, "lookupFieldExternalIdName");
@@ -51,12 +55,25 @@ public class UpsertRelationTable extends ComponentPropertiesImpl {
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addColumn(new Widget(columnName).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
-        mainForm.addColumn(lookupFieldName);
+        if (useLookupFieldName) {
+            mainForm.addColumn(lookupFieldName);
+        }
+        mainForm.addColumn(lookupRelationshipFieldName);
         mainForm.addColumn(lookupFieldModuleName);
         if (usePolymorphic) {
             mainForm.addColumn(polymorphic);
         }
         mainForm.addColumn(lookupFieldExternalIdName);
+    }
+
+    @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+        if (form != null && Form.MAIN.equals(form.getName())) {
+            if (form.getWidget(lookupFieldName.getName()) != null) {
+                form.getWidget(lookupFieldName.getName()).setHidden(!useLookupFieldName);
+            }
+        }
     }
 
     /**
@@ -75,5 +92,13 @@ public class UpsertRelationTable extends ComponentPropertiesImpl {
      */
     public void setUsePolymorphic(boolean usePolymorphic) {
         this.usePolymorphic = usePolymorphic;
+    }
+
+    public boolean isUseLookupFieldName() {
+        return useLookupFieldName;
+    }
+
+    public void setUseLookupFieldName(boolean useLookupFieldName) {
+        this.useLookupFieldName = useLookupFieldName;
     }
 }
