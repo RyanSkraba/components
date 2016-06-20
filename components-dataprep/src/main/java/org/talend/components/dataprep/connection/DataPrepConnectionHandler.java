@@ -56,6 +56,7 @@ public class DataPrepConnectionHandler {
         this.login = login;
         this.pass = pass;
         this.dataSetName = dataSetName;
+        LOGGER.debug("Url: {}", url);
     }
 
     public HttpResponse connect() throws IOException {
@@ -122,6 +123,7 @@ public class DataPrepConnectionHandler {
         urlConnection.setRequestMethod("POST");
         urlConnection.setRequestProperty(CONTENT_TYPE, TEXT_PLAIN);
         urlConnection.setDoOutput(true);
+        urlConnection.connect();
         return urlConnection.getOutputStream();
     }
 
@@ -178,5 +180,22 @@ public class DataPrepConnectionHandler {
         }
 
         return metaData.getColumns();
+    }
+
+    /**
+     * Close the resources used to send data to Data Prep server. This method also performs all necessary flush calls.
+     */
+    public void close() {
+        try {
+            LOGGER.debug("urlConnection = " + urlConnection);
+            LOGGER.debug("Response code: {} ", urlConnection.getResponseCode());
+            LOGGER.debug("Response message: {} ", urlConnection.getResponseMessage());
+            urlConnection.disconnect();
+            final OutputStream outputStream = urlConnection.getOutputStream();
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException e) {
+            LOGGER.error("Unable to close connection to {}.", url, e);
+        }
     }
 }

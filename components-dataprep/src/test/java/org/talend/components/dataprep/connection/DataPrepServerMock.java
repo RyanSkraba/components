@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,8 +25,11 @@ public class DataPrepServerMock {
     private String lastTag;
 
     private String lastName;
+    
+    private String lastReceivedLiveDataSetContent;
 
     public void clear() {
+        lastReceivedLiveDataSetContent = null;
         lastTag = null;
         lastName = null;
     }
@@ -103,8 +107,12 @@ public class DataPrepServerMock {
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public ResponseEntity createInLiveDataSet(InputStream inputStream) throws IOException {
         checkNotNull(inputStream);
-        ByteStreams.toByteArray(inputStream);
+        lastReceivedLiveDataSetContent = IOUtils.toString(inputStream);
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    String getLastReceivedLiveDataSetContent() {
+        return lastReceivedLiveDataSetContent;
     }
 
     String getLastTag() {
