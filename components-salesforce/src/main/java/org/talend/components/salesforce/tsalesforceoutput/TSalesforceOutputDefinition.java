@@ -26,6 +26,7 @@ import aQute.bnd.annotation.component.Component;
 import org.talend.daikon.properties.property.Property;
 
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 
 /**
  * Component that can connect to a salesforce system and put some data into it.
@@ -70,8 +71,8 @@ public class TSalesforceOutputDefinition extends SalesforceDefinition implements
 
     @Override
     public Property[] getReturnProperties() {
-        return new Property[]{newProperty(RETURN_TOTAL_RECORD_COUNT), newProperty(RETURN_SUCCESS_RECORD_COUNT),
-                newProperty(RETURN_REJECT_RECORD_COUNT)};
+        return new Property[]{newInteger(RETURN_TOTAL_RECORD_COUNT), newInteger(RETURN_SUCCESS_RECORD_COUNT),
+                newInteger(RETURN_REJECT_RECORD_COUNT)};
     }
 
     @Override
