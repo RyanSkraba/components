@@ -48,8 +48,8 @@ public class ProxyProperties extends PropertiesImpl {
     @Override
     public void setupProperties() {
         super.setupProperties();
-        userPassword.userId.setOccurMinTimes(0);
-        userPassword.password.setOccurMinTimes(0);
+        userPassword.userId.setRequired(false);
+        userPassword.password.setRequired(false);
     }
 
     @Override
