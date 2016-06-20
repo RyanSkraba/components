@@ -113,7 +113,6 @@ public class DataSetWriter implements Writer<Result> {
         row.append("\n");
         LOGGER.debug("Row data: {}", row);
         outputStream.write(row.toString().getBytes());
-        outputStream.flush();
         result.totalCount++;
     }
 
@@ -122,6 +121,7 @@ public class DataSetWriter implements Writer<Result> {
         if (!isLiveDataSet()) {
             connectionHandler.logout();
         }
+        connectionHandler.close();
         result.successCount = result.totalCount;
         return result;
     }

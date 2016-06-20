@@ -32,7 +32,7 @@ import java.io.IOException;
 public class DataPrepConnectionHandlerTest {
 
     @Autowired
-    DataPrepServerMock dataPrepServerMock;
+    private DataPrepServerMock dataPrepServerMock;
 
     private DataPrepConnectionHandler connectionHandler;
 
@@ -117,6 +117,7 @@ public class DataPrepConnectionHandlerTest {
         //Exception shouldn't be thrown.
         connectionHandler.createInLiveDataSetMode().write("Hello".getBytes());
         Assert.assertEquals(200, returnStatusCode(connectionHandler.logout()));
+        Assert.assertEquals("Hello", dataPrepServerMock.getLastReceivedLiveDataSetContent());
     }
 
     @Test
