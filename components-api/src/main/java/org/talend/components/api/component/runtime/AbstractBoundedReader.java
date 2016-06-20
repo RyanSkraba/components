@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.joda.time.Instant;
-import org.talend.components.api.container.RuntimeContainer;
 
 /**
  * Basic implementation of {@link BoundedReader}, useful for those readers that don't require sharding.
@@ -13,11 +12,8 @@ public abstract class AbstractBoundedReader<T> implements BoundedReader<T> {
 
     private final BoundedSource source;
 
-    protected RuntimeContainer container;
-
-    protected AbstractBoundedReader(RuntimeContainer container, BoundedSource source) {
+    protected AbstractBoundedReader(BoundedSource source) {
         this.source = source;
-        this.container = container;
     }
 
     @Override

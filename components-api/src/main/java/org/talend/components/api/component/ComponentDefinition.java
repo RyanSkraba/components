@@ -12,10 +12,10 @@
 // ============================================================================
 package org.talend.components.api.component;
 
-import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.property.Property;
 
 /**
@@ -25,34 +25,34 @@ import org.talend.daikon.properties.property.Property;
  * {@link org.talend.components.api.service.ComponentService} to allow components to be discovered.
  */
 
-public interface ComponentDefinition extends TopLevelDefinition {
+public interface ComponentDefinition extends NamedThing {
 
     /**
      * Returns an array of paths that represent the categories of the component.
      */
-    public String[] getFamilies();
+    String[] getFamilies();
 
     /**
      * Create and initialize a suitable {@link ComponentProperties} which configures an instance of this component.
      */
-    public ComponentProperties createProperties();
+    ComponentProperties createProperties();
 
     /**
      * FIXME - is this really necessary? create the ComponentProperties and initialize it's properties only and not the
      * UI Layout not usefull for runtime
      */
-    public ComponentProperties createRuntimeProperties();
+    ComponentProperties createRuntimeProperties();
 
     /**
      * Common return properties names
      */
-    public static final String RETURN_ERROR_MESSAGE = "errorMessage";
+    String RETURN_ERROR_MESSAGE = "errorMessage";
 
-    public static final String RETURN_TOTAL_RECORD_COUNT = "totalRecordCount";
+    String RETURN_TOTAL_RECORD_COUNT = "totalRecordCount";
 
-    public static final String RETURN_SUCCESS_RECORD_COUNT = "successRecordCount";
+    String RETURN_SUCCESS_RECORD_COUNT = "successRecordCount";
 
-    public static final String RETURN_REJECT_RECORD_COUNT = "rejectRecordCount";
+    String RETURN_REJECT_RECORD_COUNT = "rejectRecordCount";
 
     /**
      * Returns a list of the properties that the component returns at runtime.
@@ -62,12 +62,12 @@ public interface ComponentDefinition extends TopLevelDefinition {
      *
      * @return a list of {@link Property} objects, one for each return property.
      */
-    public Property[] getReturnProperties();
+    Property[] getReturnProperties();
 
     /**
      * Returns true if this {@code ComponentDefinition} will work with the specified list of {@link ComponentProperties}
      */
-    public boolean supportsProperties(ComponentProperties... properties);
+    boolean supportsProperties(ComponentProperties... properties);
 
     /**
      * A path relative to the current Component definition, ideally is should just be the name of the png image if
@@ -84,35 +84,35 @@ public interface ComponentDefinition extends TopLevelDefinition {
      * @param imageType the type of image requested
      * @return the path to the png resource or null if an image is not required.
      */
-    public String getPngImagePath(ComponentImageType imageType);
+    String getPngImagePath(ComponentImageType imageType);
 
     //
     // FIXME - DI flags - do we need all of these?
     //
 
-    public boolean isSchemaAutoPropagate();
+    boolean isSchemaAutoPropagate();
 
-    public boolean isDataAutoPropagate();
+    boolean isDataAutoPropagate();
 
-    public boolean isConditionalInputs();
+    boolean isConditionalInputs();
 
-    public boolean isStartable();
+    boolean isStartable();
 
     // FIXME - An ENUM perhaps?
-    public String getPartitioning();
+    String getPartitioning();
 
     /**
      * Used for computing the dependencies by finding the pom.xml and dependencies.properties in the META-INF/ folder
      * 
      * @return the maven Group Id of the component family
      */
-    public String getMavenGroupId();
+    String getMavenGroupId();
 
     /**
      * Used for computing the dependencies by finding the pom.xml and dependencies.properties in the META-INF/ folder
      * 
      * @return the maven Artifact Id of the component family
      */
-    public String getMavenArtifactId();
+    String getMavenArtifactId();
 
 }

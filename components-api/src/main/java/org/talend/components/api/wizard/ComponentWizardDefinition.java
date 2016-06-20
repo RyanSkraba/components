@@ -12,17 +12,17 @@
 // ============================================================================
 package org.talend.components.api.wizard;
 
-import org.talend.components.api.TopLevelDefinition;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.NamedThing;
 
 /**
  */
 /**
  * created by sgandon on 8 févr. 2016
  */
-public interface ComponentWizardDefinition extends TopLevelDefinition {
+public interface ComponentWizardDefinition extends NamedThing {
 
-    public String getMenuItemName();
+    String getMenuItemName();
 
     /**
      * Creates an empty {@link ComponentWizard} based on the this definition.
@@ -64,7 +64,7 @@ public interface ComponentWizardDefinition extends TopLevelDefinition {
      * @param imageType the type of image requested
      * @return the path to the png resource
      */
-    public abstract String getPngImagePath(WizardImageType imageType);
+    String getPngImagePath(WizardImageType imageType);
 
     /**
      * tell whether this Wizard is allowed to edit the given properties.
@@ -72,7 +72,7 @@ public interface ComponentWizardDefinition extends TopLevelDefinition {
      * @param propertiesClass, the class to be checked upon.
      * @return true is this wizard can handle the specific properties.
      */
-    public boolean supportsProperties(Class<? extends ComponentProperties> propertiesClass);
+    boolean supportsProperties(Class<? extends ComponentProperties> propertiesClass);
 
     /**
      * This tell the client whether this wizard is of type connector instead of specific input/output data specification
@@ -80,6 +80,6 @@ public interface ComponentWizardDefinition extends TopLevelDefinition {
      * 
      * @return true is the wizard edits top level connections.
      */
-    public boolean isTopLevel();
+    boolean isTopLevel();
 
 }

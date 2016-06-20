@@ -13,5 +13,5 @@
 package org.talend.components.api.component;
 
 public enum ComponentImageType {
-                                PALLETE_ICON_32X32;
+                                PALLETE_ICON_32X32
 }

@@ -89,7 +89,7 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
                 return null;// TODO throw an exception
             } // else keep going
             Constructor<?> c = propertyClass.getConstructor(String.class);
-            compProp = (ComponentProperties) c.newInstance(new Object[] { "root" });
+            compProp = (ComponentProperties) c.newInstance("root");
         } catch (Exception e) {
             TalendRuntimeException.unexpectedException(e);
         }
@@ -135,10 +135,7 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
 
     @Override
     public boolean isStartable() {
-        if (this instanceof InputComponentDefinition) {
-            return true;
-        }
-        return false;
+        return this instanceof InputComponentDefinition;
     }
 
     public static final String AUTO = "Auto";

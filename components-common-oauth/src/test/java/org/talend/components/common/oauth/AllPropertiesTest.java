@@ -25,7 +25,6 @@ public class AllPropertiesTest {
     @Test
     public void testAlli18n() {
         ComponentTestUtils.checkAllI18N(new OauthProperties(null).init(), errorCollector);
-        ;
     }
 
 }

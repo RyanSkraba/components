@@ -31,9 +31,12 @@ public class SalesforceServerTimeStampReader extends AbstractBoundedReader<Long>
 
     protected int dataCount;
 
+    protected RuntimeContainer container;
+
     public SalesforceServerTimeStampReader(RuntimeContainer container, SalesforceSource source,
                                            TSalesforceGetServerTimestampProperties props) {
-        super(container, source);
+        super(source);
+        this.container = container;
     }
 
     @Override

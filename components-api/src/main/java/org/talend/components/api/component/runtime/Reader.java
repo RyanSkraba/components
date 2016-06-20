@@ -1,11 +1,11 @@
 package org.talend.components.api.component.runtime;
 
-import org.joda.time.Instant;
-import org.talend.components.api.component.ComponentDefinition;
-
 import java.io.IOException;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
+import org.joda.time.Instant;
+import org.talend.components.api.component.ComponentDefinition;
 
 /**
  * The interface that readers of custom input sources must implement.

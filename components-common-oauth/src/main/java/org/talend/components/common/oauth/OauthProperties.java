@@ -24,16 +24,16 @@ import org.talend.daikon.properties.property.Property;
 
 public class OauthProperties extends ComponentPropertiesImpl {
 
-    public Property<String> clientId = newProperty("clientId").setRequired(true); //$NON-NLS-1$
+    public Property<String> clientId = newProperty("clientId").setRequired(); //$NON-NLS-1$
 
-    public Property<String> clientSecret = newProperty("clientSecret").setRequired(true)
-            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));;
+    public Property<String> clientSecret = newProperty("clientSecret").setRequired()
+            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
-    public Property<String> callbackHost = newProperty("callbackHost").setRequired(true); //$NON-NLS-1$
+    public Property<String> callbackHost = newProperty("callbackHost").setRequired(); //$NON-NLS-1$
 
-    public Property<Integer> callbackPort = newInteger("callbackPort").setRequired(true); //$NON-NLS-1$
+    public Property<Integer> callbackPort = newInteger("callbackPort").setRequired(); //$NON-NLS-1$
 
-    public Property<String> tokenFile = newProperty("tokenFile").setRequired(true); //$NON-NLS-1$
+    public Property<String> tokenFile = newProperty("tokenFile").setRequired(); //$NON-NLS-1$
 
     public OauthProperties(String name) {
         super(name);

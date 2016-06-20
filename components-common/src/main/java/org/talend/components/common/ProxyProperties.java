@@ -25,17 +25,17 @@ public class ProxyProperties extends PropertiesImpl {
         HTTPS,
         SOCKS,
         FTP
-    };
+    }
 
-    public Property<Boolean> useProxy = newBoolean("useProxy").setRequired(true); //$NON-NLS-1$
+    public Property<Boolean> useProxy = newBoolean("useProxy").setRequired(); //$NON-NLS-1$
 
     private static final String HOST = "host";
 
-    public Property<String> host = newProperty(HOST).setRequired(true);
+    public Property<String> host = newProperty(HOST).setRequired();
 
     private static final String PORT = "port";
 
-    public Property<Integer> port = newInteger(PORT).setRequired(true);
+    public Property<Integer> port = newInteger(PORT).setRequired();
 
     private static final String USERPASSWORD = "userPassword";
 

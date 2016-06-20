@@ -400,7 +400,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
         SalesforceSink salesforceSink = new SalesforceSink();
         salesforceSink.initialize(adaptor, props);
         salesforceSink.validate(adaptor);
-        SalesforceWriteOperation writeOperation = (SalesforceWriteOperation) salesforceSink.createWriteOperation();
+        SalesforceWriteOperation writeOperation = salesforceSink.createWriteOperation();
         Writer<Result> saleforceWriter = writeOperation.createWriter(adaptor);
         writeRows(saleforceWriter, outputRows);
     }
@@ -445,7 +445,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
 
     }
 
-    public static void deleteAllAccountTestRows() throws ConnectionException, AsyncApiException, Exception {
+    public static void deleteAllAccountTestRows() throws Exception {
         BoundedReader salesforceInputReader = new SalesforceTestBase()
                 .createSalesforceInputReaderFromModule(EXISTING_MODULE_NAME);
         // getting all rows

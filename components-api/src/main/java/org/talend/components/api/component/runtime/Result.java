@@ -12,13 +12,13 @@
 // ============================================================================
 package org.talend.components.api.component.runtime;
 
-import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.container.RuntimeContainer;
-import org.talend.daikon.exception.TalendRuntimeException;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.container.RuntimeContainer;
+import org.talend.daikon.exception.TalendRuntimeException;
 
 /**
  * A suggested implementation of the result of a series of writes which is returned by {@link Writer#close()} and

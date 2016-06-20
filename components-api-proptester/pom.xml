@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <name>Component Command Line Property Tester</name>
-    <artifactId>components-proptester</artifactId>
+    <artifactId>components-api-proptester</artifactId>
     <version>0.13.0-SNAPSHOT</version>
 
     <dependencies>

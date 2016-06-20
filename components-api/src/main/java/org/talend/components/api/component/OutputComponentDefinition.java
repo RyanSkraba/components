@@ -10,5 +10,5 @@ public interface OutputComponentDefinition extends EndpointComponentDefinition {
     /**
      * Returns the runtime {@link Sink} for output components.
      */
-    public Sink getRuntime();
+    Sink getRuntime();
 }

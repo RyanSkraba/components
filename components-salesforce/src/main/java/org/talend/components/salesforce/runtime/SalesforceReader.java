@@ -40,8 +40,11 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
 
     protected int dataCount;
 
+    protected RuntimeContainer container;
+
     public SalesforceReader(RuntimeContainer container, SalesforceSource source) {
-        super(container, source);
+        super(source);
+        this.container = container;
     }
 
     protected PartnerConnection getConnection() throws IOException {
@@ -80,7 +83,7 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
                 if (properties instanceof SalesforceConnectionModuleProperties) {
                     moduleName = properties.module.moduleName.getStringValue();
                 }
-                querySchema = ((SalesforceSourceOrSink) getCurrentSource()).getEndpointSchema(container, moduleName);
+                querySchema = getCurrentSource().getEndpointSchema(container, moduleName);
             }
         }
         return querySchema;

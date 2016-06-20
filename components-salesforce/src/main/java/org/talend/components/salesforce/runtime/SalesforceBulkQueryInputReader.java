@@ -92,7 +92,7 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
 
     // FIXME some duplicate code
     protected void executeSalesforceBulkQuery() throws IOException, ConnectionException {
-        String queryText = getQueryString((TSalesforceInputProperties)properties);
+        String queryText = getQueryString(properties);
         bulkRuntime =new SalesforceBulkRuntime((SalesforceSource) getCurrentSource(),container);
         try {
             bulkRuntime.doBulkQuery(properties.module.moduleName.getStringValue(), queryText, 30);

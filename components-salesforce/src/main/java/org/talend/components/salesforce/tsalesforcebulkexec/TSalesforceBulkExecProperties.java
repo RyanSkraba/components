@@ -97,13 +97,13 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
 
         final List<Schema.Field> additionalMainFields = new ArrayList<Schema.Field>();
 
-        field = new Schema.Field("salesforce_id", Schema.create(Schema.Type.STRING), (String) null, (Object) null);
+        field = new Schema.Field("salesforce_id", Schema.create(Schema.Type.STRING), null, (Object) null);
         field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
         field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
         field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
         additionalMainFields.add(field);
 
-        field = new Schema.Field("salesforce_created", Schema.create(Schema.Type.STRING), (String) null, (Object) null);
+        field = new Schema.Field("salesforce_created", Schema.create(Schema.Type.STRING), null, (Object) null);
         field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
         field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
         field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
@@ -114,7 +114,7 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
 
         final List<Schema.Field> additionalRejectFields = new ArrayList<Schema.Field>();
 
-        field = new Schema.Field("error", Schema.create(Schema.Type.STRING), (String) null, (Object) null);
+        field = new Schema.Field("error", Schema.create(Schema.Type.STRING), null, (Object) null);
         field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
         field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
         field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");

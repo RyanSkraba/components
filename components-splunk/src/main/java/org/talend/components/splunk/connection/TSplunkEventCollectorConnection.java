@@ -51,7 +51,7 @@ public class TSplunkEventCollectorConnection {
      * @throws IOException
      */
     public HttpResponse sendRequest(String schema, String uri, int portNumber, HttpPost request)
-            throws ClientProtocolException, IOException {
+            throws IOException {
         HttpHost target = new HttpHost(uri, portNumber, schema);
         LOGGER.debug("Sending POST request to " + schema + "://" + uri + ":" + portNumber);
         LOGGER.debug("Available headers:");
@@ -69,7 +69,7 @@ public class TSplunkEventCollectorConnection {
      * @throws ClientProtocolException
      * @throws IOException
      */
-    public HttpResponse sendRequest(HttpPost request) throws ClientProtocolException, IOException {
+    public HttpResponse sendRequest(HttpPost request) throws IOException {
         LOGGER.debug("Sending POST request to " + request.getURI());
         LOGGER.debug("Available headers:");
         for (Header header : request.getAllHeaders()) {

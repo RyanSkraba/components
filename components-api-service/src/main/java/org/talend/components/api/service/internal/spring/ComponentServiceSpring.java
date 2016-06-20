@@ -352,7 +352,7 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
-    public boolean setNestedPropertiesValues(ComponentProperties targetProperties, ComponentProperties nestedValues) {
+    public boolean setNestedPropertiesValues(ComponentProperties targetProperties, Properties nestedValues) {
         return componentServiceDelegate.setNestedPropertiesValues(targetProperties, nestedValues);
     }
 

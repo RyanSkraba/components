@@ -37,6 +37,8 @@ public class DataSetReader extends AbstractBoundedReader<IndexedRecord> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataSetReader.class);
 
+    private RuntimeContainer container;
+
     private List<Column> sourceSchema;
 
     private Schema schema;
@@ -51,7 +53,8 @@ public class DataSetReader extends AbstractBoundedReader<IndexedRecord> {
 
     public DataSetReader(RuntimeContainer container, BoundedSource source, DataPrepConnectionHandler connectionHandler,
             Schema schema) {
-        super(container, source);
+        super(source);
+        this.container = container;
         this.connectionHandler = connectionHandler;
         this.schema = schema;
         result = new Result();
