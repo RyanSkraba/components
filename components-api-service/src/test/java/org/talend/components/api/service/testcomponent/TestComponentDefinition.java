@@ -23,6 +23,7 @@ import org.talend.components.api.service.testcomponent.nestedprop.inherited.Inhe
 import org.talend.daikon.properties.property.Property;
 
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX + TestComponentDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TestComponentDefinition extends AbstractComponentDefinition implements ComponentDefinition {
@@ -43,8 +44,8 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     @Override
     public Property[] getReturnProperties() {
         return new Property[] { newProperty("return1"), newProperty(RETURN_ERROR_MESSAGE),
-                newProperty(RETURN_TOTAL_RECORD_COUNT), newProperty(RETURN_SUCCESS_RECORD_COUNT),
-                newProperty(RETURN_REJECT_RECORD_COUNT) };
+                newInteger(RETURN_TOTAL_RECORD_COUNT), newInteger(RETURN_SUCCESS_RECORD_COUNT),
+                newInteger(RETURN_REJECT_RECORD_COUNT) };
     }
 
     @Override
