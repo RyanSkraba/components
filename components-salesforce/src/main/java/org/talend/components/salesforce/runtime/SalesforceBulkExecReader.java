@@ -21,6 +21,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.DataRejectException;
 import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResult;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
@@ -110,7 +111,7 @@ final class SalesforceBulkExecReader extends SalesforceReader {
         try {
             record = ((BulkResultAdapterFactory) getFactory()).convertToAvro(result);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ComponentException(e);
         }
 
         if ("true".equalsIgnoreCase((String) result.getValue("Success"))) {

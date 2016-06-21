@@ -23,10 +23,11 @@ import java.util.*;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
-import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Result;
+import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -454,7 +455,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
             String ID = "Id";
             Schema.Field idField = input.getSchema().getField(ID);
             if (null == idField)
-                throw new RuntimeException(ID + " not found");
+                throw new ComponentException(new Throwable(ID + " not found"));
             deleteFieldId = idField.pos();
         }
         String id = (String) input.get(deleteFieldId);

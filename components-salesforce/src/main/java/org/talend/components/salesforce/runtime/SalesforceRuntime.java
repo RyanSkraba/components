@@ -18,7 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.components.api.exception.ComponentException;
 
 import com.sforce.soap.partner.Error;
 import com.sforce.ws.bind.CalendarCodec;
@@ -72,7 +72,7 @@ public class SalesforceRuntime {
                         logWriter.newLine();
                         logWriter.newLine();
                     } catch (IOException ex) {
-                        TalendRuntimeException.unexpectedException(ex);
+                        ComponentException.unexpectedException(ex);
                     }
                 }
             }

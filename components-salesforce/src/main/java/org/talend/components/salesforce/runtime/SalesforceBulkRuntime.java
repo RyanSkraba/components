@@ -1,39 +1,14 @@
 package org.talend.components.salesforce.runtime;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.salesforce.SalesforceBulkProperties.Concurrency;
 import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
 
-import com.sforce.async.AsyncApiException;
-import com.sforce.async.AsyncExceptionCode;
-import com.sforce.async.BatchInfo;
-import com.sforce.async.BatchInfoList;
-import com.sforce.async.BatchStateEnum;
-import com.sforce.async.BulkConnection;
-import com.sforce.async.CSVReader;
-import com.sforce.async.ConcurrencyMode;
-import com.sforce.async.ContentType;
-import com.sforce.async.JobInfo;
-import com.sforce.async.JobStateEnum;
-import com.sforce.async.OperationEnum;
-import com.sforce.async.QueryResultList;
+import com.sforce.async.*;
 import com.sforce.ws.ConnectionException;
 
 /**
@@ -376,14 +351,14 @@ public class SalesforceBulkRuntime {
             resultInfo = new BulkResult();
             resultInfo.copyValues(getBaseFileRow());
             for (int i = 0; i < resultCols; i++) {
-            	String header = resultHeader.get(i);
-        		resultInfo.setValue(header, row.get(i));
-            	
-            	if("Created".equals(header)) {
-            		resultInfo.setValue("salesforce_created", row.get(i));
-            	} else if("Id".equals(header)) {
-            		resultInfo.setValue("salesforce_id", row.get(i));
-            	}
+                String header = resultHeader.get(i);
+                resultInfo.setValue(header, row.get(i));
+
+                if ("Created".equals(header)) {
+                    resultInfo.setValue("salesforce_created", row.get(i));
+                } else if ("Id".equals(header)) {
+                    resultInfo.setValue("salesforce_id", row.get(i));
+                }
             }
             resultInfoList.add(resultInfo);
         }
@@ -421,7 +396,7 @@ public class SalesforceBulkRuntime {
                 queryResultIDs = new HashSet<String>(Arrays.asList(list.getResult())).iterator();
                 break;
             } else if (info.getState() == BatchStateEnum.Failed) {
-                throw new RuntimeException("-------------- failed ----------" + info);
+                throw new ComponentException(new Throwable("-------------- failed ----------" + info));
             } else {
                 System.out.println("-------------- waiting ----------" + info);
             }
@@ -645,11 +620,11 @@ public class SalesforceBulkRuntime {
                 return;
             } else {
                 for (String key : result.values.keySet()) {
-                	Object value = result.values.get(key);
-                	if("#N/A".equals(value)) {
-                		value = null;
-                	}
-                    values.put(key,value);
+                    Object value = result.values.get(key);
+                    if ("#N/A".equals(value)) {
+                        value = null;
+                    }
+                    values.put(key, value);
                 }
             }
         }
