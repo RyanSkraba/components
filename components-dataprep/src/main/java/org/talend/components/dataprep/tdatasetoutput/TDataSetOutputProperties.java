@@ -12,20 +12,17 @@
 // ============================================================================
 package org.talend.components.dataprep.tdatasetoutput;
 
-import org.apache.avro.Schema;
-import org.talend.components.api.component.Connector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.PropertyPathConnector;
-import org.talend.components.common.FixedConnectorsComponentProperties;
-import org.talend.components.common.SchemaProperties;
+import org.talend.components.dataprep.DataPrepProperties;
 import org.talend.components.dataprep.runtime.DataPrepOutputModes;
 import org.talend.components.dataprep.runtime.RuntimeProperties;
 import org.talend.daikon.properties.presentation.Form;
-import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.Set;
 
 /**
@@ -46,14 +43,9 @@ import java.util.Set;
  * <li>{code schema}, an embedded property referring to a Schema.</li>
  * </ol>
  */
-public class TDataSetOutputProperties extends FixedConnectorsComponentProperties {
+public class TDataSetOutputProperties extends DataPrepProperties {
 
-    public final Property<String> url = PropertyFactory.newString("url").setRequired();
-
-    public final Property<String> login = PropertyFactory.newString("login").setRequired();
-
-    public final Property<String> pass = PropertyFactory.newString("pass").setRequired()
-            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
+    private static final Logger LOG = LoggerFactory.getLogger(TDataSetOutputProperties.class);
 
     public final Property<DataPrepOutputModes> mode = PropertyFactory.newEnum("mode", DataPrepOutputModes.class);
 
@@ -62,10 +54,6 @@ public class TDataSetOutputProperties extends FixedConnectorsComponentProperties
     public final Property<String> dataSetId = PropertyFactory.newString("dataSetId").setRequired();
 
     public final Property<Integer> limit = PropertyFactory.newInteger("limit", 100);
-
-    public final SchemaProperties schema = new SchemaProperties("schema");
-
-    protected PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
     public TDataSetOutputProperties(String name) {
         super(name);
@@ -83,11 +71,7 @@ public class TDataSetOutputProperties extends FixedConnectorsComponentProperties
     @Override
     public void setupLayout() {
         super.setupLayout();
-        Form form = new Form(this, Form.MAIN);
-        form.addRow(schema.getForm(Form.REFERENCE));
-        form.addRow(url);
-        form.addRow(login);
-        form.addRow(Widget.widget(pass).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
+        Form form = getForm(Form.MAIN);
         form.addRow(mode);
         form.addRow(dataSetName);
         form.addRow(dataSetId);
@@ -139,10 +123,6 @@ public class TDataSetOutputProperties extends FixedConnectorsComponentProperties
                     break;
             }
         }
-    }
-
-    public Schema getSchema() {
-        return schema.schema.getValue();
     }
 
     public RuntimeProperties getRuntimeProperties() {

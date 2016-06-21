@@ -12,13 +12,10 @@
 // ============================================================================
 package org.talend.components.dataprep.tdatasetinput;
 
-import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
-import org.talend.components.common.FixedConnectorsComponentProperties;
-import org.talend.components.common.SchemaProperties;
+import org.talend.components.dataprep.DataPrepProperties;
 import org.talend.components.dataprep.connection.Column;
 import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 import org.talend.components.dataprep.connection.DataPrepField;
@@ -35,7 +32,6 @@ import org.talend.daikon.properties.property.PropertyFactory;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -56,24 +52,13 @@ import java.util.Set;
  * <li>{code schema}, an embedded property referring to a Schema.</li>
  * </ol>
  */
-public class TDataSetInputProperties extends FixedConnectorsComponentProperties {
+public class TDataSetInputProperties extends DataPrepProperties {
 
     private static final Logger LOG = LoggerFactory.getLogger(TDataSetInputProperties.class);
 
-    public SchemaProperties schema = new SchemaProperties("schema");
+    public final Property<String> dataSetName = PropertyFactory.newString("dataSetName").setRequired();
 
-    public PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
-
-    public Property<String> url = PropertyFactory.newString("url").setRequired();
-
-    public Property<String> login = PropertyFactory.newString("login").setRequired();
-
-    public Property<String> pass = PropertyFactory.newString("pass").setRequired()
-            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
-
-    public Property<String> dataSetName = PropertyFactory.newString("dataSetName").setRequired();
-
-    public PresentationItem fetchSchema = new PresentationItem("fetchSchema", "FetchSchema");
+    public final PresentationItem fetchSchema = new PresentationItem("fetchSchema", "FetchSchema");
 
     public TDataSetInputProperties(String name) {
         super(name);
@@ -89,11 +74,8 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
 
     @Override
     public void setupLayout() {
-        Form form = new Form(this, Form.MAIN);
-        form.addRow(schema.getForm(Form.REFERENCE));
-        form.addRow(url);
-        form.addRow(login);
-        form.addRow(Widget.widget(pass).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
+        super.setupLayout();
+        Form form = getForm(Form.MAIN);
         form.addRow(dataSetName);
         form.addRow(Widget.widget(fetchSchema).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
     }
@@ -145,12 +127,10 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
     }
 
     private boolean isRequiredFieldRight() {
-        return !isNotNullAndNotEmpty(url.getStringValue()) && !isNotNullAndNotEmpty(login.getStringValue())
-                && !isNotNullAndNotEmpty(pass.getStringValue()) && !isNotNullAndNotEmpty(dataSetName.getStringValue());
-    }
-
-    private boolean isNotNullAndNotEmpty(String propertyStringValue) {
-        return propertyStringValue == null || propertyStringValue.isEmpty();
+        return !isNotNullAndNotEmpty(url.getStringValue())
+                && !isNotNullAndNotEmpty(login.getStringValue())
+                && !isNotNullAndNotEmpty(pass.getStringValue())
+                && !isNotNullAndNotEmpty(dataSetName.getStringValue());
     }
 
     public RuntimeProperties getRuntimeProperties() {
@@ -161,9 +141,5 @@ public class TDataSetInputProperties extends FixedConnectorsComponentProperties 
         runtimeProperties.setDataSetName(dataSetName.getStringValue());
         runtimeProperties.setSchema(schema.schema.getStringValue());
         return runtimeProperties;
-    }
-
-    public Schema getSchema() {
-        return schema.schema.getValue();
     }
 }
