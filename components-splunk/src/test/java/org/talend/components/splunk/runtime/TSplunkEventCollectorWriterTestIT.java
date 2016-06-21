@@ -12,6 +12,14 @@
 // ============================================================================
 package org.talend.components.splunk.runtime;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
@@ -20,19 +28,12 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.splunk.TSplunkEventCollectorDefinition;
 import org.talend.components.splunk.TSplunkEventCollectorProperties;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 public class TSplunkEventCollectorWriterTestIT {
 
@@ -69,9 +70,9 @@ public class TSplunkEventCollectorWriterTestIT {
         for (int i = 0; i < recordCount; i++) {
             writer.write(record);
         }
-        SplunkWriterResult result = writer.close();
+        Result result = writer.close();
 
-        List<SplunkWriterResult> results = new ArrayList();
+        List<Result> results = new ArrayList();
         results.add(result);
         Map<String, Object> resultMap = writeOperation.finalize(results, null);
 
@@ -114,9 +115,9 @@ public class TSplunkEventCollectorWriterTestIT {
             writer.write(record);
         } catch (IOException e) {
         }
-        SplunkWriterResult result = writer.close();
+        Result result = writer.close();
 
-        List<SplunkWriterResult> results = new ArrayList();
+        List<Result> results = new ArrayList();
         results.add(result);
         Map<String, Object> resultMap = writeOperation.finalize(results, null);
 
