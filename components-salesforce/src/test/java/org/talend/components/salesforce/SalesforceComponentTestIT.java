@@ -13,9 +13,19 @@
 package org.talend.components.salesforce;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -101,7 +111,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputDefinition().createProperties();
         assertEquals(2, props.queryMode.getPossibleValues().size());
         Property[] returns = new TSalesforceInputDefinition().getReturnProperties();
-        assertEquals(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT, returns[0].getName());
+        assertEquals(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT, returns[1].getName());
 
         // Default query mode
         Form queryAdvancedForm = props.getForm(Form.ADVANCED);
