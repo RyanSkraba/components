@@ -12,15 +12,15 @@
 // ============================================================================
 package org.talend.components.splunk.runtime;
 
+import java.util.Map;
+
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 
-import java.util.Map;
-
-public class TSplunkEventCollectorWriteOperation implements WriteOperation<SplunkWriterResult> {
+public class TSplunkEventCollectorWriteOperation implements WriteOperation<Result> {
 
     private static final long serialVersionUID = 939083892871460237L;
 
@@ -35,13 +35,13 @@ public class TSplunkEventCollectorWriteOperation implements WriteOperation<Splun
     }
 
     @Override
-    public Map<String, Object> finalize(Iterable<SplunkWriterResult> writerResults, RuntimeContainer adaptor) {
+    public Map<String, Object> finalize(Iterable<Result> writerResults, RuntimeContainer adaptor) {
         System.out.println("weriterREsults: " + writerResults);
         return Result.accumulateAndReturnMap(writerResults);
     }
 
     @Override
-    public Writer<SplunkWriterResult> createWriter(RuntimeContainer adaptor) {
+    public Writer<Result> createWriter(RuntimeContainer adaptor) {
         return new TSplunkEventCollectorWriter(this, sink.getServerUrl(), sink.getToken(), sink.getEventsBatchSize(), adaptor);
     }
 
