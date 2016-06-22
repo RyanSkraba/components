@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.component.runtime.Result;
-import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.dataprep.connection.Column;
 import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 import org.talend.components.dataprep.connection.DataPrepField;
@@ -37,8 +36,6 @@ public class DataSetReader extends AbstractBoundedReader<IndexedRecord> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataSetReader.class);
 
-    private RuntimeContainer container;
-
     private List<Column> sourceSchema;
 
     private Schema schema;
@@ -51,12 +48,15 @@ public class DataSetReader extends AbstractBoundedReader<IndexedRecord> {
 
     private Result result;
 
-    public DataSetReader(RuntimeContainer container, BoundedSource source, DataPrepConnectionHandler connectionHandler,
-            Schema schema) {
+    public DataSetReader(BoundedSource source) {
         super(source);
-        this.container = container;
-        this.connectionHandler = connectionHandler;
-        this.schema = schema;
+        RuntimeProperties runtimeProperties = ((DataSetSource) getCurrentSource()).getRuntimeProperties();
+        this.connectionHandler = new DataPrepConnectionHandler( //
+                runtimeProperties.getUrl(), //
+                runtimeProperties.getLogin(), //
+                runtimeProperties.getPass(), //
+                runtimeProperties.getDataSetName());
+        this.schema = ((DataSetSource) getCurrentSource()).getSchema();
         result = new Result();
     }
 

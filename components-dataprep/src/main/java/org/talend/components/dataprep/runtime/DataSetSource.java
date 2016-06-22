@@ -13,20 +13,12 @@
 package org.talend.components.dataprep.runtime;
 
 import org.apache.avro.Schema;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 import org.talend.components.dataprep.tdatasetinput.TDataSetInputProperties;
-import org.talend.daikon.NamedThing;
-import org.talend.daikon.i18n.GlobalI18N;
-import org.talend.daikon.i18n.I18nMessages;
-import org.talend.daikon.properties.ValidationResult;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,59 +35,26 @@ import java.util.List;
  * <li>the simplified logic for reading is found in the {@link DataSetReader}, and</li>
  * </ul>
  */
-public class DataSetSource implements BoundedSource {
+public class DataSetSource extends DataSetSourceOrSink implements BoundedSource {
 
     /** Default serial version UID. */
     private static final long serialVersionUID = -3740291007255450917L;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataSetSource.class);
-
-    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
-            .getI18nMessages(DataSetSource.class);
-
-    /** Configuration extracted from the input properties. */
-    private RuntimeProperties runtimeProperties;
 
     private transient Schema schema;
 
     @Override
     public void initialize(RuntimeContainer container, ComponentProperties properties) {
-        this.runtimeProperties = ((TDataSetInputProperties) properties).getRuntimeProperties();
+        runtimeProperties = ((TDataSetInputProperties) properties).getRuntimeProperties();
         schema = new Schema.Parser().parse(runtimeProperties.getSchema());
+    }
+
+    public Schema getSchema() {
+        return schema;
     }
 
     @Override
     public BoundedReader createReader(RuntimeContainer container) {
-        return new DataSetReader(container, this, getConnectionHandler(), this.schema);
-    }
-
-    private DataPrepConnectionHandler getConnectionHandler() {
-        return new DataPrepConnectionHandler(runtimeProperties.getUrl(), //
-                runtimeProperties.getLogin(), //
-                runtimeProperties.getPass(), //
-                runtimeProperties.getDataSetName());
-    }
-
-    @Override
-    public ValidationResult validate(RuntimeContainer container) {
-        try {
-            getConnectionHandler().validate();
-        } catch (IOException e) {
-            LOGGER.debug(messages.getMessage("error.validationFailed", e));
-            return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
-                    .setMessage(messages.getMessage("error.validationFailed", e));
-        }
-        return ValidationResult.OK;
-    }
-
-    @Override
-    public Schema getEndpointSchema(RuntimeContainer container, String schemaName) throws IOException {
-        return null;
-    }
-
-    @Override
-    public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
-        return Collections.emptyList();
+        return new DataSetReader(this);
     }
 
     @Override

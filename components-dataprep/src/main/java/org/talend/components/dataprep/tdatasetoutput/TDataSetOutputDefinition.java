@@ -13,15 +13,13 @@
 package org.talend.components.dataprep.tdatasetoutput;
 
 import org.talend.components.api.Constants;
-import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.OutputComponentDefinition;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.dataprep.DataPrepDefinition;
 import org.talend.components.dataprep.runtime.DataSetSink;
-import org.talend.daikon.properties.property.Property;
 
-import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Component;
 
 /**
@@ -29,37 +27,12 @@ import aQute.bnd.annotation.component.Component;
  * the Studio (at design-time) and other components (at run-time).
  */
 @Component(name = Constants.COMPONENT_BEAN_PREFIX + TDataSetOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TDataSetOutputDefinition extends AbstractComponentDefinition implements OutputComponentDefinition {
+public class TDataSetOutputDefinition extends DataPrepDefinition implements OutputComponentDefinition {
 
     public static final String COMPONENT_NAME = "tDatasetOutput";
 
     public TDataSetOutputDefinition() {
         super(COMPONENT_NAME);
-    }
-
-    @Override
-    public String[] getFamilies() {
-        return new String[] { "Talend Data Preparation" };
-    }
-
-    @Override
-    public Property[] getReturnProperties() {
-        return new Property[] { RETURN_TOTAL_RECORD_COUNT_PROP };
-    }
-
-    @Override
-    public String getMavenGroupId() {
-        return "org.talend.components";
-    }
-
-    @Override
-    public String getMavenArtifactId() {
-        return "components-dataprep";
-    }
-
-    @Override
-    public String getName() {
-        return COMPONENT_NAME;
     }
 
     @Override
@@ -70,10 +43,5 @@ public class TDataSetOutputDefinition extends AbstractComponentDefinition implem
     @Override
     public Sink getRuntime() {
         return new DataSetSink();
-    }
-
-    @Override
-    public boolean isSchemaAutoPropagate() {
-        return true;
     }
 }
