@@ -35,6 +35,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 /**
  * The ComponentProperties subclass provided by a component stores the configuration of a component and is used for:
  * 
@@ -127,10 +129,10 @@ public class TDataSetInputProperties extends DataPrepProperties {
     }
 
     private boolean isRequiredFieldRight() {
-        return !isNotNullAndNotEmpty(url.getStringValue())
-                && !isNotNullAndNotEmpty(login.getStringValue())
-                && !isNotNullAndNotEmpty(pass.getStringValue())
-                && !isNotNullAndNotEmpty(dataSetName.getStringValue());
+        return !isEmpty(url.getStringValue())
+                && !isEmpty(login.getStringValue())
+                && !isEmpty(pass.getStringValue())
+                && !isEmpty(dataSetName.getStringValue());
     }
 
     public RuntimeProperties getRuntimeProperties() {

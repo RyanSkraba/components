@@ -98,10 +98,6 @@ public abstract class DataPrepProperties extends FixedConnectorsComponentPropert
         return ValidationResult.OK;
     }
 
-    protected boolean isNotNullAndNotEmpty(String propertyStringValue) {
-        return propertyStringValue == null || propertyStringValue.isEmpty();
-    }
-
     public Schema getSchema() {
         return schema.schema.getValue();
     }
