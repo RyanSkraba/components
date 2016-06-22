@@ -17,6 +17,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.dataprep.runtime.DataPrepOutputModes;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
@@ -47,6 +48,8 @@ public class DataPrepConnectionHandler {
 
     private final String dataSetName;
 
+    private DataPrepOutputModes mode;
+
     private HttpURLConnection urlConnection;
 
     private Header authorisationHeader;
@@ -74,8 +77,23 @@ public class DataPrepConnectionHandler {
         HttpResponse response;
         try {
             if (urlConnection != null) {
+                LOGGER.debug("urlConnection = " + urlConnection);
                 int responseCode = urlConnection.getResponseCode();
                 LOGGER.debug("Url connection response code: {}", responseCode);
+                if (mode != null && responseCode !=HttpServletResponse.SC_OK) {
+                    switch (mode) {
+                        case Create:
+                            urlConnection.disconnect();
+                            throw new IOException("Dataset exist on Dataprep server. Response code: "+ responseCode);
+                        case Update:
+                            urlConnection.disconnect();
+                            throw new IOException("Wrong DatasetID. Response code: "+ responseCode);
+                        case LiveDataset:
+                            urlConnection.disconnect();
+                            throw new IOException("Wrong url. Response code: "+ responseCode);
+                    }
+
+                }
                 urlConnection.disconnect();
             }
         } finally {
@@ -113,32 +131,31 @@ public class DataPrepConnectionHandler {
         return new DataPrepStreamMapper(response.getEntity().getContent());
     }
 
-    public OutputStream createInLiveDataSetMode() throws IOException {
+    public OutputStream write(DataPrepOutputModes mode) throws IOException {
+        this.mode = mode;
+        switch(mode) {
+            case Create:
+                return create();
+            case Update:
+                return writeToServer("PUT", url + API_DATASETS + dataSetName);
+            case LiveDataset:
+                return writeToServer("POST", url);
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
 
-        LOGGER.debug("DataSet name: " + dataSetName);
-
-        // in live dataset, the request is a simple post to the livedataset url
-        URL connectionUrl = new URL(url);
+    private OutputStream writeToServer(String requestMethod, String request) throws IOException {
+        URL connectionUrl = new URL(request);
         urlConnection = (HttpURLConnection) connectionUrl.openConnection();
-        urlConnection.setRequestMethod("POST");
+        urlConnection.setRequestMethod(requestMethod);
         urlConnection.setRequestProperty(CONTENT_TYPE, TEXT_PLAIN);
         urlConnection.setDoOutput(true);
         urlConnection.connect();
         return urlConnection.getOutputStream();
     }
 
-    public OutputStream update() throws IOException {
-        URL connectionUrl = new URL(url + API_DATASETS + dataSetName);
-        LOGGER.debug("Request is {}", connectionUrl);
-        urlConnection = (HttpURLConnection) connectionUrl.openConnection();
-        urlConnection.setRequestMethod("PUT");
-        urlConnection.setRequestProperty(authorisationHeader.getName(), authorisationHeader.getValue());
-        urlConnection.setRequestProperty(CONTENT_TYPE, TEXT_PLAIN);
-        urlConnection.setDoOutput(true);
-        return urlConnection.getOutputStream();
-    }
-
-    public OutputStream create() throws IOException {
+    private OutputStream create() throws IOException {
         URI uri;
         try {
             URL localUrl = new URL(url);
@@ -180,22 +197,5 @@ public class DataPrepConnectionHandler {
         }
 
         return metaData.getColumns();
-    }
-
-    /**
-     * Close the resources used to send data to Data Prep server. This method also performs all necessary flush calls.
-     */
-    public void close() {
-        try {
-            LOGGER.debug("urlConnection = " + urlConnection);
-            LOGGER.debug("Response code: {} ", urlConnection.getResponseCode());
-            LOGGER.debug("Response message: {} ", urlConnection.getResponseMessage());
-            urlConnection.disconnect();
-            final OutputStream outputStream = urlConnection.getOutputStream();
-            outputStream.flush();
-            outputStream.close();
-        } catch (IOException e) {
-            LOGGER.error("Unable to close connection to {}.", url, e);
-        }
     }
 }

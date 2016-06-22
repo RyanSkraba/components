@@ -34,8 +34,6 @@ public class DataSetWriter implements Writer<Result> {
 
     private int counter = 0;
 
-    private String uId;
-
     private DataPrepConnectionHandler connectionHandler;
 
     private OutputStream outputStream;
@@ -56,7 +54,6 @@ public class DataSetWriter implements Writer<Result> {
 
     @Override
     public void open(String uId) throws IOException {
-        this.uId = uId;
         this.result = new Result(uId);
         DataSetSink sink = (DataSetSink) getWriteOperation().getSink();
         RuntimeProperties runtimeProperties = sink.getRuntimeProperties();
@@ -68,16 +65,20 @@ public class DataSetWriter implements Writer<Result> {
         limit = Integer.valueOf(runtimeProperties.getLimit());
         mode = runtimeProperties.getMode();
 
-        if (isLiveDataSet()) {
-            outputStream = connectionHandler.createInLiveDataSetMode();
-        } else {
-            connectionHandler.connect();
-            if (mode.equals(DataPrepOutputModes.Create)) {
-                outputStream = connectionHandler.create();
-            }
-            if (mode.equals(DataPrepOutputModes.Update)) {
-                outputStream = connectionHandler.update();
-            }
+        switch (mode) {
+            case Create:
+                connectionHandler.connect();
+                outputStream = connectionHandler.write(DataPrepOutputModes.Create);
+                break;
+            case Update:
+                connectionHandler.connect();
+                outputStream = connectionHandler.write(DataPrepOutputModes.Update);
+                break;
+            case LiveDataset:
+                outputStream = connectionHandler.write(DataPrepOutputModes.LiveDataset);
+                break;
+            default:
+                break;
         }
     }
 
@@ -118,10 +119,10 @@ public class DataSetWriter implements Writer<Result> {
 
     @Override
     public Result close() throws IOException {
-        if (!isLiveDataSet()) {
-            connectionHandler.logout();
-        }
-        connectionHandler.close();
+        outputStream.flush();
+
+        connectionHandler.logout();
+
         result.successCount = result.totalCount;
         return result;
     }
@@ -139,7 +140,7 @@ public class DataSetWriter implements Writer<Result> {
         return factory;
     }
 
-    private boolean isLiveDataSet() {
-        return DataPrepOutputModes.LiveDataset.equals(mode);
-    }
+//    private boolean isLiveDataSet() {
+//        return DataPrepOutputModes.LiveDataset.equals(mode);
+//    }
 }
