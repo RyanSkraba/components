@@ -48,6 +48,6 @@ public abstract class DataPrepDefinition extends AbstractComponentDefinition {
 
     @Override
     public Property[] getReturnProperties() {
-        return new Property[] { newInteger(RETURN_TOTAL_RECORD_COUNT) };
+        return new Property[] { RETURN_TOTAL_RECORD_COUNT_PROP };
     }
 }
