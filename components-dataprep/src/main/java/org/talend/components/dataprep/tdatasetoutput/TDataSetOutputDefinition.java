@@ -25,6 +25,7 @@ import aQute.bnd.annotation.component.Component;
 import org.talend.daikon.properties.property.Property;
 
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 
 /**
  * The TDataSetOutputDefinition acts as an entry point for all of services that a component provides to integrate with
@@ -46,7 +47,7 @@ public class TDataSetOutputDefinition extends AbstractComponentDefinition implem
 
     @Override
     public Property[] getReturnProperties() {
-        return new Property[] { newProperty(RETURN_TOTAL_RECORD_COUNT) };
+        return new Property[] { newInteger(RETURN_TOTAL_RECORD_COUNT) };
     }
 
     @Override

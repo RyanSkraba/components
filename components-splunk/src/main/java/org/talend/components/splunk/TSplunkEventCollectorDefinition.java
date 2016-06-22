@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.splunk;
 
+import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 import org.talend.components.api.Constants;
@@ -48,7 +49,7 @@ public class TSplunkEventCollectorDefinition extends AbstractComponentDefinition
 
     @Override
     public Property[] getReturnProperties() {
-        return new Property[]{newProperty(RETURN_RESPONSE_CODE), newProperty(RETURN_ERROR_MESSAGE), newProperty(RETURN_TOTAL_RECORD_COUNT)};
+        return new Property[]{newInteger(RETURN_RESPONSE_CODE), newProperty(RETURN_ERROR_MESSAGE), newInteger(RETURN_TOTAL_RECORD_COUNT)};
     }
 
     public String getMavenGroupId() {

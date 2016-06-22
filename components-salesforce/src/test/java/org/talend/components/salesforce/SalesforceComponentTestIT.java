@@ -52,7 +52,6 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
-import org.talend.daikon.serialize.SerializerDeserializer.Deserialized;
 
 public class SalesforceComponentTestIT extends SalesforceTestBase {
 
@@ -115,7 +114,31 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputDefinition().createProperties();
         assertEquals(2, props.queryMode.getPossibleValues().size());
         Property[] returns = new TSalesforceInputDefinition().getReturnProperties();
-        assertEquals(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT, returns[0].getName());
+        assertEquals(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT, returns[1].getName());
+
+        // Default query mode
+        Form queryAdvancedForm = props.getForm(Form.ADVANCED);
+        assertTrue(queryAdvancedForm.getChildForm(props.connection.getName()).getWidget(props.connection.bulkConnection.getName())
+                .isHidden());
+        assertFalse(queryAdvancedForm.getWidget(props.normalizeDelimiter.getName()).isHidden());
+        assertFalse(queryAdvancedForm.getWidget(props.columnNameDelimiter.getName()).isHidden());
+        assertFalse(queryAdvancedForm.getChildForm(props.connection.getName()).getWidget(props.connection.httpChunked.getName())
+                .isHidden());
+        assertTrue(queryAdvancedForm.getChildForm(props.connection.getName())
+                .getWidget(props.connection.httpTraceMessage.getName()).isHidden());
+        // Change to bulk query mode
+        props.queryMode.setValue(TSalesforceInputProperties.QueryMode.Bulk);
+        props.afterQueryMode();
+
+        Form bulkQueryAdvancedForm = props.getForm(Form.ADVANCED);
+        assertTrue(bulkQueryAdvancedForm.getWidget(props.normalizeDelimiter.getName()).isHidden());
+        assertTrue(bulkQueryAdvancedForm.getWidget(props.columnNameDelimiter.getName()).isHidden());
+        assertTrue(bulkQueryAdvancedForm.getChildForm(props.connection.getName())
+                .getWidget(props.connection.httpChunked.getName()).isHidden());
+        assertFalse(bulkQueryAdvancedForm.getChildForm(props.connection.getName())
+                .getWidget(props.connection.httpTraceMessage.getName()).isHidden());
+        assertTrue(bulkQueryAdvancedForm.getChildForm(props.connection.getName())
+                .getWidget(props.connection.bulkConnection.getName()).isHidden());
     }
 
     static class RepoProps {

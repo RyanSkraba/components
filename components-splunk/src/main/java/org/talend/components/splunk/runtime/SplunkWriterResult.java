@@ -12,11 +12,11 @@
 // ============================================================================
 package org.talend.components.splunk.runtime;
 
+import java.util.Map;
+
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.splunk.TSplunkEventCollectorDefinition;
-
-import java.util.Map;
 
 public class SplunkWriterResult extends Result {
 

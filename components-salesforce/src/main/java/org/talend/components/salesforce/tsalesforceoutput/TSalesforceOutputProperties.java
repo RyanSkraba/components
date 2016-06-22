@@ -64,6 +64,7 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
     public void setupProperties() {
         super.setupProperties();
 
+        upsertRelationTable.setUseLookupFieldName(true);
         module.setSchemaListener(new ISchemaListener() {
 
             @Override
@@ -178,8 +179,8 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
             form.getWidget("commitLevel").setHidden(!extendInsert.getValue());
             form.getWidget("retrieveInsertId")
                     .setHidden(extendInsert.getValue() || !OutputAction.INSERT.equals(outputAction.getValue()));
-            form.getWidget("ignoreNull").setHidden(
-                    !(OutputAction.UPDATE.equals(outputAction.getValue()) || OutputAction.UPSERT.equals(outputAction.getValue())));
+            form.getWidget("ignoreNull").setHidden(!(OutputAction.UPDATE.equals(outputAction.getValue())
+                    || OutputAction.UPSERT.equals(outputAction.getValue())));
         }
     }
 

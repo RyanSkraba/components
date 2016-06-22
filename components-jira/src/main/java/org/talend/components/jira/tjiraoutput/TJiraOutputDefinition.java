@@ -14,6 +14,7 @@ package org.talend.components.jira.tjiraoutput;
 
 import aQute.bnd.annotation.component.Component;
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
@@ -60,8 +61,8 @@ public class TJiraOutputDefinition extends JiraDefinition implements OutputCompo
 
     @Override
     public Property[] getReturnProperties() {
-        return new Property[] { newProperty(RETURN_TOTAL_RECORD_COUNT), newProperty(RETURN_SUCCESS_RECORD_COUNT),
-                newProperty(RETURN_REJECT_RECORD_COUNT), newProperty(RETURN_ERROR_MESSAGE) };
+        return new Property[] { newInteger(RETURN_TOTAL_RECORD_COUNT), newInteger(RETURN_SUCCESS_RECORD_COUNT),
+                newInteger(RETURN_REJECT_RECORD_COUNT), newProperty(RETURN_ERROR_MESSAGE) };
     }
 
 }

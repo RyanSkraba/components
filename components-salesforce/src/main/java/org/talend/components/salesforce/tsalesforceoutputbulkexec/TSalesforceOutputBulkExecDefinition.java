@@ -12,7 +12,8 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutputbulkexec;
 
-import aQute.bnd.annotation.component.Component;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.VirtualComponentDefinition;
@@ -21,11 +22,9 @@ import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
-
-import aQute.bnd.annotation.component.Component;
 import org.talend.daikon.properties.property.Property;
 
-import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+import aQute.bnd.annotation.component.Component;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceOutputBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
@@ -36,7 +35,7 @@ public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition im
     public TSalesforceOutputBulkExecDefinition() {
         super(COMPONENT_NAME);
     }
-    
+
     @Override
     public boolean isSchemaAutoPropagate() {
         return false;
@@ -66,8 +65,7 @@ public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition im
 
     @Override
     public Property[] getReturnProperties() {
-        return new Property[]{newProperty(RETURN_TOTAL_RECORD_COUNT), newProperty(RETURN_SUCCESS_RECORD_COUNT),
-                newProperty(RETURN_REJECT_RECORD_COUNT)};
+        return new Property[] { newProperty(RETURN_ERROR_MESSAGE) };
     }
 
     @Override
