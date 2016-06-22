@@ -12,9 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
-import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
-import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
-
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.OutputComponentDefinition;
@@ -70,8 +67,8 @@ public class TSalesforceOutputDefinition extends SalesforceDefinition implements
 
     @Override
     public Property[] getReturnProperties() {
-        return new Property[] { newProperty(RETURN_ERROR_MESSAGE), newInteger(RETURN_TOTAL_RECORD_COUNT),
-                newInteger(RETURN_SUCCESS_RECORD_COUNT), newInteger(RETURN_REJECT_RECORD_COUNT) };
+        return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP, RETURN_SUCCESS_RECORD_COUNT_PROP,
+                RETURN_REJECT_RECORD_COUNT_PROP };
     }
 
     @Override

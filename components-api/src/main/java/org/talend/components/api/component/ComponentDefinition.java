@@ -17,6 +17,7 @@ import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 /**
  * Defines a component.
@@ -46,13 +47,21 @@ public interface ComponentDefinition extends NamedThing {
     /**
      * Common return properties names
      */
-    String RETURN_ERROR_MESSAGE = "errorMessage";
+    static final String RETURN_ERROR_MESSAGE = "errorMessage";
 
-    String RETURN_TOTAL_RECORD_COUNT = "totalRecordCount";
+    static final String RETURN_TOTAL_RECORD_COUNT = "totalRecordCount";
 
-    String RETURN_SUCCESS_RECORD_COUNT = "successRecordCount";
+    static final String RETURN_SUCCESS_RECORD_COUNT = "successRecordCount";
 
-    String RETURN_REJECT_RECORD_COUNT = "rejectRecordCount";
+    static final String RETURN_REJECT_RECORD_COUNT = "rejectRecordCount";
+
+    static final Property<String> RETURN_ERROR_MESSAGE_PROP = PropertyFactory.newString(RETURN_ERROR_MESSAGE);
+
+    static final Property<Integer> RETURN_TOTAL_RECORD_COUNT_PROP = PropertyFactory.newInteger(RETURN_TOTAL_RECORD_COUNT);
+
+    static final Property<Integer> RETURN_SUCCESS_RECORD_COUNT_PROP = PropertyFactory.newInteger(RETURN_SUCCESS_RECORD_COUNT);
+
+    static final Property<Integer> RETURN_REJECT_RECORD_COUNT_PROP = PropertyFactory.newInteger(RETURN_REJECT_RECORD_COUNT);
 
     /**
      * Returns a list of the properties that the component returns at runtime.

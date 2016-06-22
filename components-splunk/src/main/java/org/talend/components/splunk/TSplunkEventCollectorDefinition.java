@@ -12,8 +12,7 @@
 // ============================================================================
 package org.talend.components.splunk;
 
-import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
-import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+import static org.talend.daikon.properties.property.PropertyFactory.*;
 
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
@@ -36,22 +35,26 @@ public class TSplunkEventCollectorDefinition extends AbstractComponentDefinition
 
     public static String RETURN_RESPONSE_CODE = "responseCode";
 
+    public static Property<Integer> RETURN_RESPONSE_CODE_PROP = newInteger(RETURN_RESPONSE_CODE);
+
     public static final String COMPONENT_NAME = "tSplunkEventCollector"; //$NON-NLS-1$
 
     public TSplunkEventCollectorDefinition() {
         super(COMPONENT_NAME);
+        setupI18N(new Property<?>[] { RETURN_RESPONSE_CODE_PROP });
     }
 
     @Override
     public String[] getFamilies() {
-        return new String[]{"Business Intelligence/Splunk"}; //$NON-NLS-1$
+        return new String[] { "Business Intelligence/Splunk" }; //$NON-NLS-1$
     }
 
     @Override
     public Property[] getReturnProperties() {
-        return new Property[]{newInteger(RETURN_RESPONSE_CODE), newProperty(RETURN_ERROR_MESSAGE), newInteger(RETURN_TOTAL_RECORD_COUNT)};
+        return new Property[] { RETURN_RESPONSE_CODE_PROP, RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP };
     }
 
+    @Override
     public String getMavenGroupId() {
         return "org.talend.components";
     }

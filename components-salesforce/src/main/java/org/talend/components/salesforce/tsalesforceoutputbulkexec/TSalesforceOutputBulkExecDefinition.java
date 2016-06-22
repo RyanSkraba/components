@@ -12,8 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutputbulkexec;
 
-import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
-
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.VirtualComponentDefinition;
@@ -65,7 +63,7 @@ public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition im
 
     @Override
     public Property[] getReturnProperties() {
-        return new Property[] { newProperty(RETURN_ERROR_MESSAGE) };
+        return new Property[] { RETURN_ERROR_MESSAGE_PROP };
     }
 
     @Override
