@@ -25,7 +25,6 @@ import org.apache.avro.Schema;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.daikon.avro.SchemaConstants;
-import org.talend.daikon.di.DiSchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
@@ -86,7 +85,7 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
             
             field = new Schema.Field(FIELD_SALESFORCE_ID, Schema.create(Schema.Type.STRING), null, (Object) null);
             field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
-            field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
+            field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
             field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
             additionalMainFields.add(field);
             
@@ -100,19 +99,19 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
 
         field = new Schema.Field(FIELD_ERROR_CODE, Schema.create(Schema.Type.STRING), null, (Object) null);
         field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
-        field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
+        field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
         field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
         additionalRejectFields.add(field);
         
         field = new Schema.Field(FIELD_ERROR_FIELDS, Schema.create(Schema.Type.STRING), null, (Object) null);
         field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
-        field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
+        field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
         field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
         additionalRejectFields.add(field);
         
         field = new Schema.Field(FIELD_ERROR_MESSAGE, Schema.create(Schema.Type.STRING), null, (Object) null);
         field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
-        field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
+        field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
         field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
         additionalRejectFields.add(field);
         

@@ -1,18 +1,18 @@
 package org.talend.components.common.runtime;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.AvroConverter;
-import org.talend.daikon.di.DiSchemaConstants;
 import org.talend.daikon.java8.SerializableFunction;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  *
@@ -84,9 +84,9 @@ public class GenericAvroRegistry extends AvroRegistry {
 
         switch (fieldSchema.getType()) {
         case LONG:
-            String pattern = f.getProp(DiSchemaConstants.TALEND6_COLUMN_PATTERN);
+            String pattern = f.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
             if (pattern != null && !pattern.isEmpty()) {
-                fieldSchema.addProp(DiSchemaConstants.TALEND6_COLUMN_PATTERN, pattern);
+                fieldSchema.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, pattern);
                 return new DateToStringConvert(fieldSchema);
             } else {
                 return super.getConverter(String.class);
@@ -126,7 +126,7 @@ public class GenericAvroRegistry extends AvroRegistry {
 
         DateToStringConvert(Schema schema) {
             super(schema);
-            String pattern = schema.getProp(DiSchemaConstants.TALEND6_COLUMN_PATTERN);
+            String pattern = schema.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
             // TODO: null handling
             format = new SimpleDateFormat(pattern);
         }

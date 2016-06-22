@@ -28,7 +28,6 @@ import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.salesforce.SalesforceBulkProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.daikon.avro.SchemaConstants;
-import org.talend.daikon.di.DiSchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
@@ -99,13 +98,13 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
 
         field = new Schema.Field("salesforce_id", Schema.create(Schema.Type.STRING), null, (Object) null);
         field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
-        field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
+        field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
         field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
         additionalMainFields.add(field);
 
         field = new Schema.Field("salesforce_created", Schema.create(Schema.Type.STRING), null, (Object) null);
         field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
-        field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
+        field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
         field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
         additionalMainFields.add(field);
 
@@ -116,7 +115,7 @@ public class TSalesforceBulkExecProperties extends SalesforceOutputProperties {
 
         field = new Schema.Field("error", Schema.create(Schema.Type.STRING), null, (Object) null);
         field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
-        field.addProp(DiSchemaConstants.TALEND6_COLUMN_CUSTOM, "true");
+        field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
         field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
         additionalRejectFields.add(field);
 
