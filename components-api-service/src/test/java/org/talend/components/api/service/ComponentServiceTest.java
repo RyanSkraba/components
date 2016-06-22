@@ -49,11 +49,6 @@ public class ComponentServiceTest extends AbstractComponentTest {
 
     static class NotExistingComponentProperties extends ComponentPropertiesImpl {
 
-        /**
-         * DOC sgandon NotExistingComponentProperties constructor comment.
-         * 
-         * @param name
-         */
         public NotExistingComponentProperties() {
             super("foo");
         }
@@ -186,25 +181,20 @@ public class ComponentServiceTest extends AbstractComponentTest {
 
             @Override
             public String getDisplayName() {
-                // TODO Auto-generated method stub
                 return null;
             }
 
             @Override
             public String getTitle() {
-                // TODO Auto-generated method stub
                 return null;
             }
 
             @Override
-            public void setI18nMessageFormater(I18nMessages i18nMessages) {
-                // TODO Auto-generated method stub
-
+            public void setI18nMessageFormatter(I18nMessages i18nMessages) {
             }
 
             @Override
             public String getI18nMessage(String key, Object... arguments) {
-                // TODO Auto-generated method stub
                 return null;
             }
 

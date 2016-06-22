@@ -42,7 +42,7 @@ public class AbstractTopLevelDefinitionTest {
         AbstractTopLevelDefinition atld = new TestingAbstractTopLevelDefinition();
         assertEquals("TestName", atld.getName());
         assertEquals("TestPrefix", atld.getI18nPrefix());
-        assertEquals("TestPrefixTestName", atld.getI18nMessageFormater());
+        assertEquals("TestPrefixTestName", atld.getI18nMessageFormatter());
         assertEquals("TestPrefixTestName", atld.getDisplayName());
         assertEquals("TestPrefixTestName", atld.getTitle());
     }

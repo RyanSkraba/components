@@ -184,11 +184,11 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
     }
 
     /**
-     * this will configure all i18n message formater of the namedThings to the one associated with this instance.
+     * this will configure all i18n message formatter of the namedThings to the one associated with this instance.
      */
     public <T extends NamedThing> T[] setupI18N(T[] namedThings) {
         for (NamedThing nt : namedThings) {
-            nt.setI18nMessageFormater(getI18nMessageFormater());
+            nt.setI18nMessageFormatter(getI18nMessageFormatter());
         }
         return namedThings;
     }

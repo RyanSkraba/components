@@ -45,7 +45,7 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     @Override
     public Property[] getReturnProperties() {
         StringProperty return1 = newProperty("return1");
-        return1.setI18nMessageFormater(getI18nMessageFormater());
+        return1.setI18nMessageFormatter(getI18nMessageFormatter());
         return new Property[] { return1, RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP,
                 RETURN_SUCCESS_RECORD_COUNT_PROP, RETURN_REJECT_RECORD_COUNT_PROP };
     }
