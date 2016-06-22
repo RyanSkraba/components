@@ -113,7 +113,7 @@ public class DataSetWriter implements Writer<Result> {
         }
         row.append("\n");
         LOGGER.debug("Row data: {}", row);
-        outputStream.write(row.toString().getBytes());
+        outputStream.write(row.toString().getBytes("UTF-8"));
         result.totalCount++;
     }
 

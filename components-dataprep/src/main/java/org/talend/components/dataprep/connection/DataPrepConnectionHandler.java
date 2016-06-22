@@ -63,7 +63,7 @@ public class DataPrepConnectionHandler {
     }
 
     public HttpResponse connect() throws IOException {
-        Request request = Request.Post(url + "/login?username=" + login + "&password=" + pass + "&client-app=studio");
+        Request request = Request.Post(url + "/login?username=" + login + "&password=" + pass + "&client-app=STUDIO");
         HttpResponse response = request.execute().returnResponse();
         authorisationHeader = response.getFirstHeader("Authorization");
         if (returnStatusCode(response) != HttpServletResponse.SC_OK && authorisationHeader == null) {
