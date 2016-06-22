@@ -119,9 +119,16 @@ public class DataSetWriter implements Writer<Result> {
 
     @Override
     public Result close() throws IOException {
-        outputStream.flush();
+        if (outputStream != null) {
+            outputStream.flush();
+            outputStream.close();
+            outputStream = null;
+        }
 
-        connectionHandler.logout();
+        if (connectionHandler != null) {
+            connectionHandler.logout();
+            connectionHandler = null;
+        }
 
         result.successCount = result.totalCount;
         return result;
@@ -139,8 +146,4 @@ public class DataSetWriter implements Writer<Result> {
         }
         return factory;
     }
-
-//    private boolean isLiveDataSet() {
-//        return DataPrepOutputModes.LiveDataset.equals(mode);
-//    }
 }
