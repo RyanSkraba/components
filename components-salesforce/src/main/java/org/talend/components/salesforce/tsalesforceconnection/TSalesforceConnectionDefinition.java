@@ -12,7 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceconnection;
 
-import aQute.bnd.annotation.component.Component;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.EndpointComponentDefinition;
@@ -21,11 +20,10 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
-
-import aQute.bnd.annotation.component.Component;
 import org.talend.daikon.properties.property.Property;
 
-import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+import aQute.bnd.annotation.component.Component;
+import aQute.bnd.annotation.component.Component;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceConnectionDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
@@ -44,7 +42,7 @@ public class TSalesforceConnectionDefinition extends SalesforceDefinition implem
 
     @Override
     public Property[] getReturnProperties() {
-        return new Property[] { newProperty(RETURN_ERROR_MESSAGE) };
+        return new Property[] { RETURN_ERROR_MESSAGE_PROP };
     }
 
     @Override

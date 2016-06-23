@@ -12,7 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforcebulkexec;
 
-import aQute.bnd.annotation.component.Component;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.InputComponentDefinition;
@@ -21,12 +20,9 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.runtime.SalesforceSource;
-
-import aQute.bnd.annotation.component.Component;
 import org.talend.daikon.properties.property.Property;
 
-import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
-import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
+import aQute.bnd.annotation.component.Component;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
@@ -42,12 +38,12 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition implemen
     public boolean isSchemaAutoPropagate() {
         return false;
     }
-    
+
     @Override
     public boolean isConditionalInputs() {
         return true;
     }
-    
+
     @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return TSalesforceBulkExecProperties.class;
@@ -62,8 +58,8 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition implemen
 
     @Override
     public Property[] getReturnProperties() {
-        return new Property[]{newInteger(RETURN_TOTAL_RECORD_COUNT), newInteger(RETURN_SUCCESS_RECORD_COUNT),
-                newInteger(RETURN_REJECT_RECORD_COUNT)};
+        return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP, RETURN_SUCCESS_RECORD_COUNT_PROP,
+                RETURN_REJECT_RECORD_COUNT_PROP };
     }
 
     @Override

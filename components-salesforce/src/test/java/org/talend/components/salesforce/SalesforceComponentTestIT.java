@@ -97,11 +97,24 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
     }
 
     @Test
+    public void testConnectionProps() throws Throwable {
+        SalesforceConnectionProperties props = (SalesforceConnectionProperties) new TSalesforceConnectionDefinition()
+                .createProperties();
+        assertTrue(props.userPassword.userId.isRequired());
+        assertTrue(props.userPassword.password.isRequired());
+        assertFalse(props.userPassword.securityKey.isRequired());
+
+        assertFalse(props.proxy.userPassword.userId.isRequired());
+        assertFalse(props.proxy.userPassword.password.isRequired());
+
+    }
+
+    @Test
     public void testInputProps() throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputDefinition().createProperties();
         assertEquals(2, props.queryMode.getPossibleValues().size());
         Property[] returns = new TSalesforceInputDefinition().getReturnProperties();
-        assertEquals(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT, returns[0].getName());
+        assertEquals(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT, returns[1].getName());
 
         // Default query mode
         Form queryAdvancedForm = props.getForm(Form.ADVANCED);

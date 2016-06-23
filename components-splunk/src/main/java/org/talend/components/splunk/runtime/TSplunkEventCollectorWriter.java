@@ -12,6 +12,11 @@
 // ============================================================================
 package org.talend.components.splunk.runtime;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.http.HttpResponse;
@@ -23,6 +28,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.RuntimeContainer;
@@ -34,12 +40,7 @@ import org.talend.daikon.avro.converter.IndexedRecordConverter;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-
-public class TSplunkEventCollectorWriter implements Writer<SplunkWriterResult> {
+public class TSplunkEventCollectorWriter implements Writer<Result> {
 
     private transient static final Logger LOGGER = LoggerFactory.getLogger(TSplunkEventCollectorWriter.class);
 
@@ -169,7 +170,7 @@ public class TSplunkEventCollectorWriter implements Writer<SplunkWriterResult> {
     }
 
     @Override
-    public SplunkWriterResult close() throws IOException {
+    public Result close() throws IOException {
         LOGGER.debug("Closing.");
         LOGGER.debug("Sending " + splunkObjectsForBulk.size() + " elements left in queue.");
         doSend();
@@ -182,7 +183,7 @@ public class TSplunkEventCollectorWriter implements Writer<SplunkWriterResult> {
     }
 
     @Override
-    public WriteOperation<SplunkWriterResult> getWriteOperation() {
+    public WriteOperation<Result> getWriteOperation() {
         return writeOperation;
     }
 

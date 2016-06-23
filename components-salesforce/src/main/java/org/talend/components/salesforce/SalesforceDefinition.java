@@ -16,11 +16,8 @@ import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.property.Property;
 
-import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
-import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
-
 public abstract class SalesforceDefinition extends AbstractComponentDefinition {
-    
+
     public SalesforceDefinition(String componentName) {
         super(componentName);
     }
@@ -39,7 +36,7 @@ public abstract class SalesforceDefinition extends AbstractComponentDefinition {
     @Override
     // Most of the components are on the input side, so put this here, the output definition will override this
     public Property[] getReturnProperties() {
-        return new Property[] { newInteger(RETURN_TOTAL_RECORD_COUNT) };
+        return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP };
     }
 
     @Override

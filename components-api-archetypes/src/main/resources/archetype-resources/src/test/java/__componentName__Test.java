@@ -86,47 +86,4 @@ public class ${componentName}Test {
         }
     }
 
-    @Ignore("To revisit.  The spec should be validated by the time it gets to the runtime.")
-    @Test
-    public void test${componentName}RuntimeException() {
-        ${componentName}Definition def = (${componentName}Definition) getComponentService().getComponentDefinition("${componentName}");
-        ${componentName}Properties props = (${componentName}Properties) getComponentService().getComponentProperties("${componentName}");
-
-        // check empty schema exception
-        props.schema.schema.setChildren(Collections.EMPTY_LIST);
-        BoundedSource source = (BoundedSource) def.getRuntime();
-        source.initialize(null, props);
-        Reader<?> reader;
-        reader = source.createReader(null);
-        try {
-            reader.start();
-            fail("Should have thrown an exception");
-        } catch (Exception e) {
-            if (!(e instanceof TalendRuntimeException && ((TalendRuntimeException) e).getCode() == ComponentsErrorCode.SCHEMA_MISSING)) {
-                StringWriter stack = new StringWriter();
-                e.printStackTrace(new PrintWriter(stack));
-                fail("wrong exception caught :" + stack.toString());
-            }
-        }
-
-        // check wrong schema exception
-        // props.schema.schema.setChildren(new ArrayList<SchemaElement>());
-        // props.schema.schema.addChild(SchemaFactory.newSchemaElement(Type.INT, "line"));
-
-        source = (BoundedSource) def.getRuntime();
-        source.initialize(null, props);
-        reader = source.createReader(null);
-
-        try {
-            reader.start();
-            fail("Should have thrown an exception");
-        } catch (Exception e) {
-            if (!(e instanceof TalendRuntimeException && ((TalendRuntimeException) e).getCode() == ComponentsErrorCode.SCHEMA_TYPE_MISMATCH)) {
-                StringWriter stack = new StringWriter();
-                e.printStackTrace(new PrintWriter(stack));
-                fail("wrong exception caught :" + stack.toString());
-            }
-        }
-    }
-
 }

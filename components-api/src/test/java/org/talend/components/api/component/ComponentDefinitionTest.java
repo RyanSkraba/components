@@ -12,9 +12,7 @@
 // ============================================================================
 package org.talend.components.api.component;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.talend.components.api.service.testcomponent.TestComponentDefinition;
@@ -46,13 +44,11 @@ public class ComponentDefinitionTest {
         assertEquals("return1", props[0].getName());
         assertEquals(5, props.length);
 
-        if (false) {
-            // Make sure i18N works
-            assertEquals("Error Message", props[1].getDisplayName());
-            assertEquals("Number of line", props[2].getDisplayName());
-            assertEquals("Number of success", props[3].getDisplayName());
-            assertEquals("Number of reject", props[4].getDisplayName());
-        }
+        // Make sure i18N works
+        assertEquals("Error Message", props[1].getDisplayName());
+        assertEquals("Number of line", props[2].getDisplayName());
+        assertEquals("Number of success", props[3].getDisplayName());
+        assertEquals("Number of reject", props[4].getDisplayName());
     }
 
 }

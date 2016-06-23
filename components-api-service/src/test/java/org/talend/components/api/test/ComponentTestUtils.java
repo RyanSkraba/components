@@ -31,6 +31,7 @@ import org.talend.components.api.service.testcomponent.TestComponentDefinition;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.properties.Properties;
+import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
 
 // import static org.hamcrest.Matchers.*;
@@ -46,7 +47,7 @@ public class ComponentTestUtils {
      * 
      * @param componentService where to get all the components
      * @param errorCollector used to collect all errors at once. @see
-     * <a href="http://junit.org/apidocs/org/junit/rules/ErrorCollector.html">ErrorCollector</a>
+     *            <a href="http://junit.org/apidocs/org/junit/rules/ErrorCollector.html">ErrorCollector</a>
      */
     static public void testAlli18n(ComponentService componentService, ErrorCollector errorCollector) {
         Set<ComponentDefinition> allComponents = componentService.getAllComponents();
@@ -58,9 +59,19 @@ public class ComponentTestUtils {
             } else {
                 System.out.println("No properties to check fo I18n for :" + cd.getName());
             }
-            // check component properties title
+            // check component definition title
             errorCollector.checkThat("missing I18n property :" + cd.getTitle(), cd.getTitle().contains("component."), is(false));
+            // check return properties i18n
+            checkAllPropertyI18n(cd.getReturnProperties(), cd, errorCollector);
         }
+    }
+
+    public static void checkAllPropertyI18n(Property<?>[] propertyArray, Object parent, ErrorCollector errorCollector) {
+        if (propertyArray != null) {
+            for (Property<?> prop : propertyArray) {
+                PropertiesTestUtils.chekProperty(errorCollector, prop, parent);
+            }
+        } // else no property to check so ignore.
     }
 
     static public void checkAllI18N(Properties checkedProps, ErrorCollector errorCollector) {
