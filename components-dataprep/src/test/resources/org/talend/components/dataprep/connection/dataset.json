@@ -1,5 +1,25 @@
 {
-  "metadata": null,
+  "metadata": {
+    "id": "32fe335d-c3bf-4b0e-ba8b-9023d5509680",
+    "sharedDataSet": false,
+    "owner": null,
+    "roles": [],
+    "tag": null,
+    "records": 1000,
+    "nbLinesHeader": 1,
+    "nbLinesFooter": 0,
+    "type": "text/csv",
+    "name": "employees",
+    "author": "7",
+    "created": 1466519899151,
+    "lastModificationDate": 1466602426295,
+    "sheetName": null,
+    "app-version": "1.2.0.rc-SNAPSHOT",
+    "draft": false,
+    "schemaParserResult": null,
+    "favorite": false,
+    "encoding": "UTF-8"
+  },
   "records": [
     {
       "0000": "771396",

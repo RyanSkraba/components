@@ -36,7 +36,7 @@ public class DataPrepStreamMapperTest {
     public void testRowDataSetIterator() throws IOException {
         InputStream inputStream = DataPrepStreamMapperTest.class.getResourceAsStream("dataset.json");
         DataPrepStreamMapper streamMapper = new DataPrepStreamMapper(inputStream);
-        streamMapper.initIterator();
+        assertTrue(streamMapper.initIterator());
         assertTrue(streamMapper.hasNextRecord());
         while (streamMapper.hasNextRecord()) {
             Map<String, String> nextRecord = streamMapper.nextRecord();
