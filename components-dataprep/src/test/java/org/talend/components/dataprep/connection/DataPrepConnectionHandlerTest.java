@@ -23,7 +23,6 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.test.SpringTestApp;
-import org.talend.components.dataprep.runtime.DataPrepOutputModes;
 
 import java.io.IOException;
 
@@ -116,7 +115,7 @@ public class DataPrepConnectionHandlerTest {
     public void testCreateInLiveDataSetMode() throws IOException {
         Assert.assertEquals(200, returnStatusCode(connectionHandler.connect()));
         //Exception shouldn't be thrown.
-        connectionHandler.write(DataPrepOutputModes.LiveDataset).write("Hello".getBytes());
+        connectionHandler.createInLiveDataSetMode().write("Hello".getBytes());
         Assert.assertEquals(200, returnStatusCode(connectionHandler.logout()));
         Assert.assertEquals("Hello", dataPrepServerMock.getLastReceivedLiveDataSetContent());
     }
@@ -125,7 +124,7 @@ public class DataPrepConnectionHandlerTest {
     public void testCreate() throws IOException {
         Assert.assertEquals(200, returnStatusCode(connectionHandler.connect()));
         //Exception shouldn't be thrown.
-        connectionHandler.write(DataPrepOutputModes.Create).write("Hello".getBytes());
+        connectionHandler.create().write("Hello".getBytes());
         Assert.assertEquals(200, returnStatusCode(connectionHandler.logout()));
         Assert.assertEquals("components", dataPrepServerMock.getLastTag());
         Assert.assertEquals("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e", dataPrepServerMock.getLastName());
@@ -136,7 +135,7 @@ public class DataPrepConnectionHandlerTest {
         connectionHandler = new DataPrepConnectionHandler(URL + serverPort, LOGIN, PASS, "??Hello world");
         Assert.assertEquals(200, returnStatusCode(connectionHandler.connect()));
         //Exception shouldn't be thrown.
-        connectionHandler.write(DataPrepOutputModes.Create).write("Hello".getBytes());
+        connectionHandler.create().write("Hello".getBytes());
         Assert.assertEquals(200, returnStatusCode(connectionHandler.logout()));
     }
 
@@ -144,7 +143,7 @@ public class DataPrepConnectionHandlerTest {
     public void testUpdate() throws IOException {
         Assert.assertEquals(200, returnStatusCode(connectionHandler.connect()));
         //Exception shouldn't be thrown.
-        connectionHandler.write(DataPrepOutputModes.Update).write("Hello".getBytes());
+        connectionHandler.update().write("Hello".getBytes());
         Assert.assertEquals(200, returnStatusCode(connectionHandler.logout()));
     }
 
