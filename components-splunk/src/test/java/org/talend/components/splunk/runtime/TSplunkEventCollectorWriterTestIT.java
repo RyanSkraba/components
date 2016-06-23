@@ -78,6 +78,9 @@ public class TSplunkEventCollectorWriterTestIT {
 
         assertEquals(recordCount + " record should have been written", recordCount,
                 resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
+        assertEquals(recordCount + " record should have been written", recordCount,
+                resultMap.get(ComponentDefinition.RETURN_SUCCESS_RECORD_COUNT));
+        assertEquals("There should be no rejected records.", 0, resultMap.get(ComponentDefinition.RETURN_REJECT_RECORD_COUNT));
 
         Integer lastErrorCode = (Integer) resultMap.get(TSplunkEventCollectorDefinition.RETURN_RESPONSE_CODE);
         assertFalse("lastErrorCode shouldn't be null", lastErrorCode == null);
@@ -121,7 +124,9 @@ public class TSplunkEventCollectorWriterTestIT {
         results.add(result);
         Map<String, Object> resultMap = writeOperation.finalize(results, null);
 
-        assertEquals("0 record should have been written", 0, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
+        assertEquals("1 record should have been sent", 1, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
+        assertEquals("1 record should have been rejected", 1, resultMap.get(ComponentDefinition.RETURN_REJECT_RECORD_COUNT));
+        assertEquals("0 record should have been written", 0, resultMap.get(ComponentDefinition.RETURN_SUCCESS_RECORD_COUNT));
 
         Integer lastErrorCode = (Integer) resultMap.get(TSplunkEventCollectorDefinition.RETURN_RESPONSE_CODE);
         assertFalse("lastErrorCode shouldn't be null", lastErrorCode == null);
