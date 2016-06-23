@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -62,6 +63,10 @@ public class TSplunkEventCollectorWriter implements Writer<Result> {
 
     private int dataCount;
 
+    private int successCount;
+
+    private int rejectCount;
+
     private int lastErrorCode;
 
     private String lastErrorMessage;
@@ -71,6 +76,8 @@ public class TSplunkEventCollectorWriter implements Writer<Result> {
     private List<SplunkJSONEvent> splunkObjectsForBulk;
 
     private I18nMessages messageFormatter;
+
+    private AtomicBoolean closed = new AtomicBoolean(false);
 
     public TSplunkEventCollectorWriter(TSplunkEventCollectorWriteOperation writeOperation, String serverUrl, String token,
             int eventsBatchSize, RuntimeContainer container) {
@@ -83,6 +90,7 @@ public class TSplunkEventCollectorWriter implements Writer<Result> {
 
     @Override
     public void open(String uId) throws IOException {
+        closed.set(false);
         this.uid = uId;
         if (splunkConnection == null) {
             splunkConnection = new TSplunkEventCollectorConnection();
@@ -119,6 +127,7 @@ public class TSplunkEventCollectorWriter implements Writer<Result> {
         if (splunkObjectsForBulk.isEmpty()) {
             return;
         }
+        dataCount += splunkObjectsForBulk.size();
         HttpPost request = createRequest(splunkObjectsForBulk);
 
         HttpResponse response = splunkConnection.sendRequest(request);
@@ -126,6 +135,9 @@ public class TSplunkEventCollectorWriter implements Writer<Result> {
         String jsonResponseString = EntityUtils.toString(response.getEntity());
         try {
             handleResponse(jsonResponseString);
+        } catch (Exception e) {
+            rejectCount += splunkObjectsForBulk.size();
+            throw e;
         } finally {
             splunkObjectsForBulk.clear();
         }
@@ -144,7 +156,7 @@ public class TSplunkEventCollectorWriter implements Writer<Result> {
             if (lastErrorCode != 0) {
                 throw new IOException(getMessage("error.codeMessage", lastErrorCode, lastErrorMessage));
             }
-            dataCount += splunkObjectsForBulk.size();
+            successCount += splunkObjectsForBulk.size();
         } catch (ParseException e) {
             throw new IOException(getMessage("error.responseParseException", e.getMessage()));
         }
@@ -171,15 +183,32 @@ public class TSplunkEventCollectorWriter implements Writer<Result> {
 
     @Override
     public Result close() throws IOException {
-        LOGGER.debug("Closing.");
-        LOGGER.debug("Sending " + splunkObjectsForBulk.size() + " elements left in queue.");
-        doSend();
-        splunkConnection.close();
-        splunkConnection = null;
-        splunkObjectsForBulk.clear();
-        splunkObjectsForBulk = null;
-        LOGGER.debug("Closed.");
-        return new SplunkWriterResult(uid, dataCount, lastErrorCode, lastErrorMessage);
+        if (closed.getAndSet(true)) {
+            LOGGER.debug("Already Closed.");
+        } else {
+            LOGGER.debug("Closing.");
+            LOGGER.debug("Sending " + splunkObjectsForBulk.size() + " elements left in queue.");
+            try {
+                if (splunkObjectsForBulk != null) {
+                    doSend();
+                }
+            } finally {
+                releaseResources();
+                LOGGER.debug("Closed.");
+            }
+        }
+        return new SplunkWriterResult(uid, dataCount, successCount, rejectCount, lastErrorCode, lastErrorMessage);
+    }
+
+    private void releaseResources() {
+        if (splunkConnection != null) {
+            splunkConnection.close();
+            splunkConnection = null;
+        }
+        if (splunkObjectsForBulk != null) {
+            splunkObjectsForBulk.clear();
+            splunkObjectsForBulk = null;
+        }
     }
 
     @Override
