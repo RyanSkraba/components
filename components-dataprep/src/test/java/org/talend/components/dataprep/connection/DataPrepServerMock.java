@@ -1,5 +1,10 @@
 package org.talend.components.dataprep.connection;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -8,10 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.io.ByteStreams;
 
 @RestController
 public class DataPrepServerMock {
@@ -85,8 +87,8 @@ public class DataPrepServerMock {
         checkNotNull(inputStream);
         lastTag = tag;
         lastName = name;
-        if (name.equals("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e")|| name.equals("??Hello world")) {
-            lastReceivedLiveDataSetContent = IOUtils.toString(inputStream);
+        if (name.equals("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e")) {
+            byte[] buf = ByteStreams.toByteArray(inputStream);
             return new ResponseEntity(HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -96,7 +98,7 @@ public class DataPrepServerMock {
     public ResponseEntity update(@PathVariable String id, InputStream inputStream) throws IOException {
         checkNotNull(inputStream);
         if (id.equals("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e")) {
-            lastReceivedLiveDataSetContent = IOUtils.toString(inputStream);
+            byte[] buf = ByteStreams.toByteArray(inputStream);
             return new ResponseEntity(HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);

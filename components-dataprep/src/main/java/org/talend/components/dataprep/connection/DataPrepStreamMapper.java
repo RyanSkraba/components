@@ -12,19 +12,18 @@
 // ============================================================================
 package org.talend.components.dataprep.connection;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-
-import com.fasterxml.jackson.core.JsonToken;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 
 public class DataPrepStreamMapper {
 
@@ -46,38 +45,15 @@ public class DataPrepStreamMapper {
     }
 
     public boolean initIterator() throws IOException {
-        boolean hasMetRecords = false;
-        int level = 0;
-        while (!hasMetRecords) {
-            final JsonToken currentToken = jsonParser.nextToken();
-            if (currentToken == null) {
-                return false; // EOF
-            }
-            switch (currentToken) {
-                case START_OBJECT:
-                    level++;
-                    break;
-                case END_OBJECT:
-                    level--;
-                    break;
-                case FIELD_NAME:
-                    if ("records".equals(jsonParser.getText()) && level == 1) {
-                        hasMetRecords = true;
-                    }
-                    break;
-            }
-        }
-        // Create iterator to the records in "records" element
-        if ("records".equals(jsonParser.getText())) {
-            jsonParser.nextToken(); // Field
-            jsonParser.nextToken(); // Start object
-            if (jsonParser.getCurrentToken() == JsonToken.START_OBJECT) {
+        JsonToken currentToken;
+        while ((currentToken = jsonParser.nextToken()) != JsonToken.END_OBJECT) {
+            if (currentToken == JsonToken.START_ARRAY) {
+                jsonParser.nextToken();
                 this.iterator = objectMapper.readValues(jsonParser, new TypeReference<Map<String, String>>() {
                 });
                 return true;
             }
         }
-
         return false;
     }
 
