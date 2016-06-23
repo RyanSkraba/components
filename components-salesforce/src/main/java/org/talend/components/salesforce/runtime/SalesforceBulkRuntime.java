@@ -3,10 +3,14 @@ package org.talend.components.salesforce.runtime;
 import java.io.*;
 import java.util.*;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.salesforce.SalesforceBulkProperties.Concurrency;
 import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
+import org.talend.daikon.exception.ExceptionContext;
+import org.talend.daikon.exception.error.DefaultErrorCode;
 
 import com.sforce.async.*;
 import com.sforce.ws.ConnectionException;
@@ -396,7 +400,8 @@ public class SalesforceBulkRuntime {
                 queryResultIDs = new HashSet<String>(Arrays.asList(list.getResult())).iterator();
                 break;
             } else if (info.getState() == BatchStateEnum.Failed) {
-                throw new ComponentException(new Throwable("-------------- failed ----------" + info));
+                throw new ComponentException(new DefaultErrorCode(HttpServletResponse.SC_BAD_REQUEST, "failedBatch"),
+                        ExceptionContext.build().put("failedBatch", info));
             } else {
                 System.out.println("-------------- waiting ----------" + info);
             }

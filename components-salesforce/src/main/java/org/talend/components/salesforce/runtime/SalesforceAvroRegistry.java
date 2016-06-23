@@ -283,8 +283,6 @@ public class SalesforceAvroRegistry extends AvroRegistry {
             try {
                 return value == null ? null : format.parse(value).getTime();
             } catch (ParseException e) {
-                // TODO: error handling
-                e.printStackTrace();
                 throw new ComponentException(e);
             }
         }
