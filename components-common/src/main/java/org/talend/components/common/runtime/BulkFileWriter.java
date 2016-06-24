@@ -1,24 +1,23 @@
 package org.talend.components.common.runtime;
 
-import com.csvreader.CsvWriter;
-
-import com.csvreader.CsvWriter;
-import org.apache.avro.Schema;
-import org.apache.avro.generic.IndexedRecord;
-import org.talend.components.api.component.runtime.Sink;
-import org.talend.components.api.component.runtime.WriteOperation;
-import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.api.component.runtime.Result;
-import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.common.BulkFileProperties;
-import org.talend.daikon.avro.AvroUtils;
-import org.talend.daikon.avro.converter.IndexedRecordConverter;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.avro.Schema;
+import org.apache.avro.generic.IndexedRecord;
+import org.talend.components.api.component.runtime.Result;
+import org.talend.components.api.component.runtime.Sink;
+import org.talend.components.api.component.runtime.WriteOperation;
+import org.talend.components.api.component.runtime.Writer;
+import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.common.BulkFileProperties;
+import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.converter.IndexedRecordConverter;
+
+import com.csvreader.CsvWriter;
 
 /**
  * Generate bulk file
@@ -47,8 +46,7 @@ public class BulkFileWriter implements Writer<Result> {
 
     private transient IndexedRecordConverter<IndexedRecord, IndexedRecord> factory;
 
-    public BulkFileWriter(WriteOperation<Result> writeOperation, BulkFileProperties bulkProperties,
-                          RuntimeContainer container) {
+    public BulkFileWriter(WriteOperation<Result> writeOperation, BulkFileProperties bulkProperties, RuntimeContainer container) {
         this.writeOperation = writeOperation;
         this.container = container;
         this.sink = writeOperation.getSink();
@@ -60,6 +58,10 @@ public class BulkFileWriter implements Writer<Result> {
     public void open(String uId) throws IOException {
         this.uId = uId;
         this.result = new Result(uId);
+        String filepath = bulkProperties.bulkFilePath.getStringValue();
+        if (filepath == null || filepath.isEmpty()) {
+            throw new RuntimeException("Please set a valid value for \"Bulk File Path\" field.");
+        }
         File file = new File(bulkProperties.bulkFilePath.getStringValue());
         file.getParentFile().mkdirs();
         csvWriter = new CsvWriter(new OutputStreamWriter(new java.io.FileOutputStream(file, isAppend), charset), separator);

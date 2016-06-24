@@ -101,4 +101,12 @@ public class UpsertRelationTable extends ComponentPropertiesImpl {
     public void setUseLookupFieldName(boolean useLookupFieldName) {
         this.useLookupFieldName = useLookupFieldName;
     }
+
+    public static final String ADD_QUOTES = "ADD_QUOTES";
+
+    @Override
+    public void setupProperties() {
+        super.setupProperties();
+        columnName.setTaggedValue(ADD_QUOTES, true);
+    }
 }

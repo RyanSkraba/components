@@ -18,6 +18,7 @@ import java.util.Set;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.VirtualComponentProperties;
+import org.talend.components.salesforce.UpsertRelationTable;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkProperties;
 import org.talend.daikon.properties.presentation.Form;
@@ -89,8 +90,6 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
         return outputBulkProperties;
     }
 
-    private static final String ADD_QUOTES = "ADD_QUOTES";
-
     @Override
     public ComponentProperties getOutputComponentProperties() {
         TSalesforceBulkExecProperties bulkExecProperties = new TSalesforceBulkExecProperties("bulkExecProperties");
@@ -102,8 +101,10 @@ public class TSalesforceOutputBulkExecProperties extends TSalesforceBulkExecProp
         // add quotes for generation)
         bulkExecProperties.upsertRelationTable.columnName.setPossibleValues(upsertRelationTable.columnName.getPossibleValues());
 
-        bulkExecProperties.connection.referencedComponent.componentInstanceId.setTaggedValue(ADD_QUOTES, true);
-        bulkExecProperties.module.connection.referencedComponent.componentInstanceId.setTaggedValue(ADD_QUOTES, true);
+        bulkExecProperties.connection.referencedComponent.componentInstanceId.setTaggedValue(UpsertRelationTable.ADD_QUOTES,
+                true);
+        bulkExecProperties.module.connection.referencedComponent.componentInstanceId
+                .setTaggedValue(UpsertRelationTable.ADD_QUOTES, true);
 
         for (Form form : bulkExecProperties.getForms()) {
             bulkExecProperties.refreshLayout(form);
