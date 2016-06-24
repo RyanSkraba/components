@@ -15,8 +15,6 @@ package org.talend.components.dataprep;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.daikon.properties.property.Property;
 
-import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
-
 /**
  * DataPrep definition common class. It contains some common definition implementation for all DataPrep components
  */

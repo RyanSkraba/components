@@ -1,15 +1,15 @@
 package org.talend.components.dataprep.connection;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class DataPrepStreamMapperTest {
     // datasetid=7fa267c6-87c8-4ba2-9b24-fe300bf2f163

@@ -12,6 +12,13 @@
 // ============================================================================
 package org.talend.components.dataprep.runtime;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.avro.Schema;
 import org.talend.components.dataprep.connection.DataPrepField;
 import org.talend.daikon.avro.AvroRegistry;
@@ -19,13 +26,6 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.java8.SerializableFunction;
-
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 public class DataPrepAvroRegistry extends AvroRegistry {
 

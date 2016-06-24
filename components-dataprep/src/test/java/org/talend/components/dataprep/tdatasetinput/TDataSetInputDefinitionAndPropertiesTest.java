@@ -1,5 +1,9 @@
 package org.talend.components.dataprep.tdatasetinput;
 
+import java.util.Collections;
+
+import javax.inject.Inject;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,9 +13,6 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.SpringTestApp;
-
-import javax.inject.Inject;
-import java.util.Collections;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringTestApp.class)

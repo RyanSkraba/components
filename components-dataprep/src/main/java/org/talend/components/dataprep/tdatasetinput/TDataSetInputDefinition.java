@@ -19,9 +19,7 @@ import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.dataprep.DataPrepDefinition;
 import org.talend.components.dataprep.runtime.DataSetSource;
-import org.talend.daikon.properties.property.Property;
 
-import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Component;
 
 /**

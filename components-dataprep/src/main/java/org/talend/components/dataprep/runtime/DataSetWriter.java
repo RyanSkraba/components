@@ -12,19 +12,19 @@
 // ============================================================================
 package org.talend.components.dataprep.runtime;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.api.component.runtime.Result;
 import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
-
-import java.io.IOException;
-import java.io.OutputStream;
 
 public class DataSetWriter implements Writer<Result> {
 

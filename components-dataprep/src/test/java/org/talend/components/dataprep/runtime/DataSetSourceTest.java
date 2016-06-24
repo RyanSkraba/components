@@ -1,5 +1,10 @@
 package org.talend.components.dataprep.runtime;
 
+import java.util.Arrays;
+import java.util.Collections;
+
+import javax.inject.Inject;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,10 +15,6 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.SpringTestApp;
 import org.talend.components.dataprep.tdatasetinput.TDataSetInputDefinition;
 import org.talend.components.dataprep.tdatasetinput.TDataSetInputProperties;
-
-import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.Collections;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringTestApp.class)

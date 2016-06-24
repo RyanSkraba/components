@@ -1,5 +1,12 @@
 package org.talend.components.dataprep.runtime;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
@@ -20,13 +27,6 @@ import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputDefinition;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
-
-import javax.inject.Inject;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringTestApp.class)

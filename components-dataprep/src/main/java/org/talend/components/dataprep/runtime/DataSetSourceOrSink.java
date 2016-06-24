@@ -12,6 +12,10 @@
 // ============================================================================
 package org.talend.components.dataprep.runtime;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +26,6 @@ import org.talend.daikon.NamedThing;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 abstract class DataSetSourceOrSink implements SourceOrSink {
 
