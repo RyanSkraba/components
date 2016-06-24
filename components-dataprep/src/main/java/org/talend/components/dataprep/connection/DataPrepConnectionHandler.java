@@ -12,6 +12,17 @@
 // ============================================================================
 package org.talend.components.dataprep.connection;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -21,12 +32,6 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.dataprep.runtime.DataPrepOutputModes;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.*;
-import java.util.List;
 
 public class DataPrepConnectionHandler {
 

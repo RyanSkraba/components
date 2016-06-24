@@ -12,6 +12,11 @@
 // ============================================================================ 
 package org.talend.components.dataprep;
 
+import java.io.IOException;
+import java.util.EnumSet;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.avro.Schema;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -27,10 +32,6 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.EnumSet;
 
 public abstract class DataPrepProperties extends FixedConnectorsComponentProperties {
 

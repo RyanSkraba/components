@@ -12,15 +12,15 @@
 // ============================================================================
 package org.talend.components.dataprep.runtime;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.dataprep.tdatasetinput.TDataSetInputProperties;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * The TDataSetInputSource provides the mechanism to supply data to other components at run-time.

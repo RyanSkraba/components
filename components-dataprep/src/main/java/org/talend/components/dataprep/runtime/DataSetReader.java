@@ -12,6 +12,10 @@
 // ============================================================================
 package org.talend.components.dataprep.runtime;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
@@ -24,10 +28,6 @@ import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 import org.talend.components.dataprep.connection.DataPrepField;
 import org.talend.components.dataprep.connection.DataPrepStreamMapper;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Simple implementation of a reader.

@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.dataprep.connection;
 
+import java.io.IOException;
+
 import org.apache.http.HttpResponse;
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,8 +26,6 @@ import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.test.SpringTestApp;
 import org.talend.components.dataprep.runtime.DataPrepOutputModes;
-
-import java.io.IOException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringTestApp.class)

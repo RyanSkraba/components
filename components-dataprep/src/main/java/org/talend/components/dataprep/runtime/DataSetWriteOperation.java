@@ -12,13 +12,13 @@
 // ============================================================================
 package org.talend.components.dataprep.runtime;
 
+import java.util.Map;
+
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
-
-import java.util.Map;
 
 public class DataSetWriteOperation implements WriteOperation<Result> {
 
