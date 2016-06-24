@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.salesforce.SalesforceGetDeletedUpdatedProperties;
 
 import com.sforce.soap.partner.QueryResult;
@@ -142,7 +143,7 @@ public abstract class SalesforceGetDeletedUpdatedReader<ResultT> extends Salesfo
         try {
             return ((SObjectAdapterFactory) getFactory()).convertToAvro(inputRecords[inputRecordsIndex]);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ComponentException(e);
         }
     }
 

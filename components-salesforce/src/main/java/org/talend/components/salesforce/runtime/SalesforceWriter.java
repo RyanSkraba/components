@@ -20,17 +20,22 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.*;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
-import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Result;
+import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
+import org.talend.daikon.exception.ExceptionContext;
+import org.talend.daikon.exception.error.DefaultErrorCode;
 
 import com.sforce.soap.partner.*;
 import com.sforce.soap.partner.Error;
@@ -453,8 +458,10 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
         if (deleteFieldId == -1) {
             String ID = "Id";
             Schema.Field idField = input.getSchema().getField(ID);
-            if (null == idField)
-                throw new RuntimeException(ID + " not found");
+            if (null == idField) {
+                throw new ComponentException(new DefaultErrorCode(HttpServletResponse.SC_BAD_REQUEST, "message"),
+                        ExceptionContext.build().put("message", ID + " not found"));
+            }
             deleteFieldId = idField.pos();
         }
         String id = (String) input.get(deleteFieldId);

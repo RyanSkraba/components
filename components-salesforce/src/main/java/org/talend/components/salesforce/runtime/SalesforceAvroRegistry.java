@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.avro.Schema;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -282,9 +283,7 @@ public class SalesforceAvroRegistry extends AvroRegistry {
             try {
                 return value == null ? null : format.parse(value).getTime();
             } catch (ParseException e) {
-                // TODO: error handling
-                e.printStackTrace();
-                throw new RuntimeException(e);
+                throw new ComponentException(e);
             }
         }
 

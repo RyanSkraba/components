@@ -24,6 +24,7 @@ import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.avro.AvroUtils;
 
@@ -144,7 +145,7 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
         try {
             return ((SObjectAdapterFactory) getFactory()).convertToAvro(getCurrentSObject());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ComponentException(e);
         }
     }
 }

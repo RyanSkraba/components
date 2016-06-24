@@ -1,39 +1,18 @@
 package org.talend.components.salesforce.runtime;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.salesforce.SalesforceBulkProperties.Concurrency;
 import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
+import org.talend.daikon.exception.ExceptionContext;
+import org.talend.daikon.exception.error.DefaultErrorCode;
 
-import com.sforce.async.AsyncApiException;
-import com.sforce.async.AsyncExceptionCode;
-import com.sforce.async.BatchInfo;
-import com.sforce.async.BatchInfoList;
-import com.sforce.async.BatchStateEnum;
-import com.sforce.async.BulkConnection;
-import com.sforce.async.CSVReader;
-import com.sforce.async.ConcurrencyMode;
-import com.sforce.async.ContentType;
-import com.sforce.async.JobInfo;
-import com.sforce.async.JobStateEnum;
-import com.sforce.async.OperationEnum;
-import com.sforce.async.QueryResultList;
+import com.sforce.async.*;
 import com.sforce.ws.ConnectionException;
 
 /**
@@ -425,7 +404,8 @@ public class SalesforceBulkRuntime {
                 queryResultIDs = new HashSet<String>(Arrays.asList(list.getResult())).iterator();
                 break;
             } else if (info.getState() == BatchStateEnum.Failed) {
-                throw new RuntimeException("-------------- failed ----------" + info);
+                throw new ComponentException(new DefaultErrorCode(HttpServletResponse.SC_BAD_REQUEST, "failedBatch"),
+                        ExceptionContext.build().put("failedBatch", info));
             } else {
                 System.out.println("-------------- waiting ----------" + info);
             }

@@ -12,6 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.*;
+
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
@@ -25,14 +29,8 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
-import static org.talend.daikon.properties.presentation.Widget.widget;
-import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
-import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
-import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
-import static org.talend.daikon.properties.property.PropertyFactory.newString;
-
-public class SalesforceConnectionProperties extends ComponentPropertiesImpl implements SalesforceProvideConnectionProperties,
-        ComponentReferencePropertiesEnclosing {
+public class SalesforceConnectionProperties extends ComponentPropertiesImpl
+        implements SalesforceProvideConnectionProperties, ComponentReferencePropertiesEnclosing {
 
     public static final String URL = "https://www.salesforce.com/services/Soap/u/34.0";
 
@@ -200,7 +198,7 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl impl
                     break;
 
                 default:
-                    throw new RuntimeException("Enum value should be handled :" + loginType.getValue());
+                    throw new ComponentException(new Throwable("Enum value should be handled :" + loginType.getValue()));
                 }
             }
         }
