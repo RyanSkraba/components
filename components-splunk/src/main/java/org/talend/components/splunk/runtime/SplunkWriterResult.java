@@ -28,8 +28,11 @@ public class SplunkWriterResult extends Result {
         super();
     }
 
-    public SplunkWriterResult(String uId, int totalRecords, int errorCode, String errorMessage) {
+    public SplunkWriterResult(String uId, int totalRecords, int successCount, int rejectCount, int errorCode,
+            String errorMessage) {
         super(uId, totalRecords);
+        this.successCount = successCount;
+        this.rejectCount = rejectCount;
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }
@@ -46,7 +49,8 @@ public class SplunkWriterResult extends Result {
     public void add(Result result) {
         super.add(result);
         SplunkWriterResult sresult = (SplunkWriterResult) result;
-        // FIXME - for now just take the last one, but need to figure out how to properly accumulate these if there are multiples.
+        // FIXME - for now just take the last one, but need to figure out how to properly accumulate these if there are
+        // multiples.
         if (sresult.errorCode > 0)
             errorCode = sresult.errorCode;
         if (sresult.errorMessage != null)
