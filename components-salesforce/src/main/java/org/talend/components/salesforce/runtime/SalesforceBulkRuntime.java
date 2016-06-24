@@ -84,6 +84,10 @@ public class SalesforceBulkRuntime {
     public SalesforceBulkRuntime(SalesforceSource sfSource, RuntimeContainer container) throws IOException {
         this.sfSource = sfSource;
         this.bulkConnection = sfSource.connect(container).bulkConnection;
+        if (this.bulkConnection == null) {
+            throw new RuntimeException(
+                    "Please check \"Bulk Connection\" checkbox in the setting of the referenced tSalesforceConnection.");
+        }
     }
 
     private void setBulkOperation(String sObjectType, OutputAction userOperation, String externalIdFieldName,
@@ -376,14 +380,14 @@ public class SalesforceBulkRuntime {
             resultInfo = new BulkResult();
             resultInfo.copyValues(getBaseFileRow());
             for (int i = 0; i < resultCols; i++) {
-            	String header = resultHeader.get(i);
-        		resultInfo.setValue(header, row.get(i));
-            	
-            	if("Created".equals(header)) {
-            		resultInfo.setValue("salesforce_created", row.get(i));
-            	} else if("Id".equals(header)) {
-            		resultInfo.setValue("salesforce_id", row.get(i));
-            	}
+                String header = resultHeader.get(i);
+                resultInfo.setValue(header, row.get(i));
+
+                if ("Created".equals(header)) {
+                    resultInfo.setValue("salesforce_created", row.get(i));
+                } else if ("Id".equals(header)) {
+                    resultInfo.setValue("salesforce_id", row.get(i));
+                }
             }
             resultInfoList.add(resultInfo);
         }
@@ -645,11 +649,11 @@ public class SalesforceBulkRuntime {
                 return;
             } else {
                 for (String key : result.values.keySet()) {
-                	Object value = result.values.get(key);
-                	if("#N/A".equals(value)) {
-                		value = null;
-                	}
-                    values.put(key,value);
+                    Object value = result.values.get(key);
+                    if ("#N/A".equals(value)) {
+                        value = null;
+                    }
+                    values.put(key, value);
                 }
             }
         }
