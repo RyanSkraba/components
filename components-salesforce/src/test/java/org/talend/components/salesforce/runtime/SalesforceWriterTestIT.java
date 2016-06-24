@@ -611,7 +611,22 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
         records.add(r1);
         records.add(r2);
-        doWriteRows(sfProps, records);
+
+        SalesforceSink salesforceSink = new SalesforceSink();
+        salesforceSink.initialize(adaptor, sfProps);
+        salesforceSink.validate(adaptor);
+        Writer<Result> batchWriter = salesforceSink.createWriteOperation().createWriter(adaptor);
+        writeRows(batchWriter, records);
+
+        assertEquals(2,((SalesforceWriter)batchWriter).getSuccessfulWrites().size());
+
+        sfProps.extendInsert.setValue(false);
+        salesforceSink.initialize(adaptor, sfProps);
+        salesforceSink.validate(adaptor);
+        Writer<Result> noBatchWriter = salesforceSink.createWriteOperation().createWriter(adaptor);
+        writeRows(noBatchWriter, records);
+
+        assertEquals(1,((SalesforceWriter)noBatchWriter).getSuccessfulWrites().size());
 
         ComponentDefinition sfInputDef = new TSalesforceInputDefinition();
         TSalesforceInputProperties sfInputProps = (TSalesforceInputProperties) sfInputDef.createRuntimeProperties();
@@ -621,7 +636,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         sfInputProps.module.main.schema.setValue(SCHEMA_INPUT_AND_DELETE_EVENT);
         List<IndexedRecord> inpuRecords = readRows(sfInputProps);
         try {
-            assertEquals(2, inpuRecords.size());
+            assertEquals(4, inpuRecords.size());
             IndexedRecord inputRecords_1 = inpuRecords.get(0);
             IndexedRecord inputRecords_2 = inpuRecords.get(1);
             assertEquals(random, inputRecords_1.get(6));
