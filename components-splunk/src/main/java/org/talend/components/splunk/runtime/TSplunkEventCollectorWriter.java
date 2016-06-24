@@ -135,7 +135,7 @@ public class TSplunkEventCollectorWriter implements Writer<Result> {
         String jsonResponseString = EntityUtils.toString(response.getEntity());
         try {
             handleResponse(jsonResponseString);
-        } catch (Exception e) {
+        } catch (IOException e) {
             rejectCount += splunkObjectsForBulk.size();
             throw e;
         } finally {
