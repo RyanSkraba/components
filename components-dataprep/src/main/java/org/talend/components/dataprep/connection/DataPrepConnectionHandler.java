@@ -12,7 +12,10 @@
 // ============================================================================
 package org.talend.components.dataprep.connection;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -79,8 +82,9 @@ public class DataPrepConnectionHandler {
         HttpResponse response = request.execute().returnResponse();
         authorisationHeader = response.getFirstHeader("Authorization");
         if (returnStatusCode(response) != HttpServletResponse.SC_OK && authorisationHeader == null) {
-            LOGGER.error(messages.getMessage("error.loginFailed", response.getStatusLine()));
-            throw new IOException(messages.getMessage("error.loginFailed", response.getStatusLine()));
+            String moreInformation = extractResponseInformationAndConsumeResponse(response);
+            LOGGER.error(messages.getMessage("error.loginFailed", moreInformation));
+            throw new IOException(messages.getMessage("error.loginFailed", moreInformation));
         }
         return response;
     }
@@ -95,7 +99,7 @@ public class DataPrepConnectionHandler {
             Request request = Request.Post(url + "/logout?client-app=STUDIO").addHeader(authorisationHeader);
             response = request.execute().returnResponse();
             if (returnStatusCode(response) != HttpServletResponse.SC_OK && authorisationHeader != null) {
-                LOGGER.error(messages.getMessage("error.logoutFailed", response.getStatusLine()));
+                LOGGER.error(messages.getMessage("error.logoutFailed", extractResponseInformationAndConsumeResponse(response)));
             }
         }
         return response;
@@ -106,16 +110,19 @@ public class DataPrepConnectionHandler {
         int responseCode = urlConnection.getResponseCode();
         LOGGER.debug("Url connection response code: {}", responseCode);
         if (mode != null && responseCode != HttpServletResponse.SC_OK) {
+            String errorMessage = extractResponseInformationAndConsumeResponse(urlConnection);
+
+            // TODO adjust the exception information
             switch (mode) {
             case Create:
                 urlConnection.disconnect();
-                throw new IOException("Dataset exist on Dataprep server. Response code: " + responseCode);
+                throw new IOException("Dataset exist on Dataprep server. Response code: " + errorMessage);
             case Update:
                 urlConnection.disconnect();
-                throw new IOException("Wrong DatasetID. Response code: " + responseCode);
+                throw new IOException("Wrong DatasetID. Response code: " + errorMessage);
             case LiveDataset:
                 urlConnection.disconnect();
-                throw new IOException("Wrong url. Response code: " + responseCode);
+                throw new IOException("Wrong url. Response code: " + errorMessage);
             default:
                 throw new UnsupportedOperationException();
             }
@@ -142,8 +149,9 @@ public class DataPrepConnectionHandler {
         Request request = Request.Get(url + API_DATASETS + dataSetName + "?metadata=false").addHeader(authorisationHeader);
         HttpResponse response = request.execute().returnResponse();
         if (returnStatusCode(response) != HttpServletResponse.SC_OK) {
-            LOGGER.error(messages.getMessage("error.retrieveDatasetFailed", returnStatusCode(response)));
-            throw new IOException(messages.getMessage("error.retrieveDatasetFailed", returnStatusCode(response)));
+            String moreInformation = extractResponseInformationAndConsumeResponse(response);
+            LOGGER.error(messages.getMessage("error.retrieveDatasetFailed", moreInformation));
+            throw new IOException(messages.getMessage("error.retrieveDatasetFailed", moreInformation));
         }
         LOGGER.debug("Read DataSet Response: {} ", response);
         return new DataPrepStreamMapper(response.getEntity().getContent());
@@ -181,6 +189,9 @@ public class DataPrepConnectionHandler {
         URL connectionUrl = new URL(request);
         urlConnection = (HttpURLConnection) connectionUrl.openConnection();
         urlConnection.setRequestMethod(requestMethod);
+        if (authorisationHeader != null) {
+            urlConnection.setRequestProperty(authorisationHeader.getName(), authorisationHeader.getValue());
+        }
         urlConnection.setRequestProperty(CONTENT_TYPE, TEXT_PLAIN);
         urlConnection.setDoOutput(true);
         urlConnection.connect();
@@ -197,8 +208,9 @@ public class DataPrepConnectionHandler {
         try {
             HttpResponse response = request.execute().returnResponse();
             if (returnStatusCode(response) != HttpServletResponse.SC_OK) {
-                LOGGER.error(messages.getMessage("error.retrieveSchemaFailed", returnStatusCode(response)));
-                throw new IOException(messages.getMessage("error.retrieveSchemaFailed", returnStatusCode(response)));
+                String moreInformation = extractResponseInformationAndConsumeResponse(response);
+                LOGGER.error(messages.getMessage("error.retrieveSchemaFailed", moreInformation));
+                throw new IOException(messages.getMessage("error.retrieveSchemaFailed", moreInformation));
             }
             dataPrepStreamMapper = new DataPrepStreamMapper(response.getEntity().getContent());
             metaData = dataPrepStreamMapper.getMetaData();
@@ -209,5 +221,40 @@ public class DataPrepConnectionHandler {
         }
 
         return metaData.getColumns();
+    }
+
+    private String extractResponseInformationAndConsumeResponse(HttpResponse response) throws IllegalStateException, IOException {
+        InputStream is = response.getEntity().getContent();
+        return extractResponseInformationAndConsumeResponse(is);
+    }
+
+    private String extractResponseInformationAndConsumeResponse(HttpURLConnection connection) throws IOException {
+        InputStream is = null;
+        try {
+            is = connection.getInputStream();
+        } catch (IOException e) {
+            is = connection.getErrorStream();
+        }
+        return extractResponseInformationAndConsumeResponse(is);
+    }
+
+    private String extractResponseInformationAndConsumeResponse(InputStream is) throws IOException {
+        if (is == null) {
+            return null;
+        }
+        InputStreamReader reader = new InputStreamReader(is);
+        BufferedReader sr = new BufferedReader(reader);
+        StringBuilder sb = new StringBuilder();
+        try {
+            String line = null;
+            while ((line = sr.readLine()) != null) {
+                sb.append(line);
+            }
+        } finally {
+            is.close();
+        }
+
+        // TODO in fact, it's a json string, we should extract it
+        return sb.toString();
     }
 }
