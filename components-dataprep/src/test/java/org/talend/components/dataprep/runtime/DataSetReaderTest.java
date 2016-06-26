@@ -32,10 +32,10 @@ public class DataSetReaderTest {
     public void setReader() {
         TDataSetInputDefinition definition = (TDataSetInputDefinition) componentService.getComponentDefinition("tDatasetInput");
         TDataSetInputProperties properties = (TDataSetInputProperties) definition.createProperties();
-        properties.url.setValue("http://localhost:"+serverPort);
+        properties.url.setValue("http://localhost:" + serverPort);
         properties.login.setValue("vincent@dataprep.com");
         properties.pass.setValue("vincent");
-        properties.dataSetName.setValue("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
+        properties.dataSetId.setValue("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
         DataSetSource source = (DataSetSource) definition.getRuntime();
         source.initialize(null, properties);
         reader = (DataSetReader) source.createReader(null);

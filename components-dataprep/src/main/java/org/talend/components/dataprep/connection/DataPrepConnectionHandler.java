@@ -57,16 +57,19 @@ public class DataPrepConnectionHandler {
 
     private final String dataSetName;
 
+    private final String dataSetId;
+
     private DataPrepOutputModes mode;
 
     private HttpURLConnection urlConnection;
 
     private Header authorisationHeader;
 
-    public DataPrepConnectionHandler(String url, String login, String pass, String dataSetName) {
+    public DataPrepConnectionHandler(String url, String login, String pass, String dataSetId, String dataSetName) {
         this.url = url;
         this.login = login;
         this.pass = pass;
+        this.dataSetId = dataSetId;
         this.dataSetName = dataSetName;
         LOGGER.debug("Url: {}", url);
     }
@@ -116,13 +119,13 @@ public class DataPrepConnectionHandler {
             switch (mode) {
             case Create:
                 urlConnection.disconnect();
-                throw new IOException("Dataset exist on Dataprep server. Response code: " + errorMessage);
+                throw new IOException("Dataset exist on Dataprep server. Response information: " + errorMessage);
             case Update:
                 urlConnection.disconnect();
-                throw new IOException("Wrong DatasetID. Response code: " + errorMessage);
+                throw new IOException("Wrong DatasetID. Response information: " + errorMessage);
             case LiveDataset:
                 urlConnection.disconnect();
-                throw new IOException("Wrong url. Response code: " + errorMessage);
+                throw new IOException("Wrong url. Response information: " + errorMessage);
             default:
                 throw new UnsupportedOperationException();
             }
@@ -146,7 +149,7 @@ public class DataPrepConnectionHandler {
     }
 
     public DataPrepStreamMapper readDataSetIterator() throws IOException {
-        Request request = Request.Get(url + API_DATASETS + dataSetName + "?metadata=false").addHeader(authorisationHeader);
+        Request request = Request.Get(url + API_DATASETS + dataSetId + "?metadata=false").addHeader(authorisationHeader);
         HttpResponse response = request.execute().returnResponse();
         if (returnStatusCode(response) != HttpServletResponse.SC_OK) {
             String moreInformation = extractResponseInformationAndConsumeResponse(response);
@@ -163,7 +166,7 @@ public class DataPrepConnectionHandler {
         case Create:
             return writeToServer("POST", requestEncoding());
         case Update:
-            return writeToServer("PUT", url + API_DATASETS + dataSetName);
+            return writeToServer("PUT", url + API_DATASETS + dataSetId);
         case LiveDataset:
             return writeToServer("POST", url);
         default:
@@ -199,7 +202,7 @@ public class DataPrepConnectionHandler {
     }
 
     public List<Column> readSourceSchema() throws IOException {
-        Request request = Request.Get(url + API_DATASETS + dataSetName + "/metadata");
+        Request request = Request.Get(url + API_DATASETS + dataSetId + "/metadata");
         request.addHeader(authorisationHeader);
 
         DataPrepStreamMapper dataPrepStreamMapper = null;

@@ -32,6 +32,8 @@ public class RuntimeProperties implements Serializable {
 
     private String limit;
 
+    private String dataSetId;
+
     public String getUrl() {
         return url;
     }
@@ -68,6 +70,10 @@ public class RuntimeProperties implements Serializable {
         this.dataSetName = dataSetName;
     }
 
+    public void setDataSetId(String dataSetId) {
+        this.dataSetId = dataSetId;
+    }
+
     public void setMode(DataPrepOutputModes mode) {
         this.mode = mode;
     }
@@ -86,5 +92,9 @@ public class RuntimeProperties implements Serializable {
 
     public void setLimit(String limit) {
         this.limit = limit;
+    }
+
+    public String getDataSetId() {
+        return dataSetId;
     }
 }

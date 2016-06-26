@@ -55,7 +55,7 @@ public class DataSetReader extends AbstractBoundedReader<IndexedRecord> {
                 runtimeProperties.getUrl(), //
                 runtimeProperties.getLogin(), //
                 runtimeProperties.getPass(), //
-                runtimeProperties.getDataSetName());
+                runtimeProperties.getDataSetId(), runtimeProperties.getDataSetName());
         this.schema = ((DataSetSource) getCurrentSource()).getSchema();
         result = new Result();
     }
