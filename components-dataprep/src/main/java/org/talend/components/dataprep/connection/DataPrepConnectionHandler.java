@@ -181,6 +181,9 @@ public class DataPrepConnectionHandler {
         URL connectionUrl = new URL(request);
         urlConnection = (HttpURLConnection) connectionUrl.openConnection();
         urlConnection.setRequestMethod(requestMethod);
+        if (authorisationHeader != null) {
+            urlConnection.setRequestProperty(authorisationHeader.getName(), authorisationHeader.getValue());
+        }
         urlConnection.setRequestProperty(CONTENT_TYPE, TEXT_PLAIN);
         urlConnection.setDoOutput(true);
         urlConnection.connect();
