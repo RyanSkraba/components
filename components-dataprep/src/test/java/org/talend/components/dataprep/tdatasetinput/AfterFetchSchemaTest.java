@@ -15,6 +15,7 @@ import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.SpringTestApp;
+import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
 import org.talend.daikon.properties.ValidationResult;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -35,10 +36,24 @@ public class AfterFetchSchemaTest {
     public void testAfterFetchSchema() {
         TDataSetInputProperties properties = (TDataSetInputProperties) componentService.getComponentDefinition("tDatasetInput")
                 .createProperties();
-        properties.url.setValue("http://localhost:"+serverPort);
+        properties.url.setValue("http://localhost:" + serverPort);
         properties.login.setValue("vincent@dataprep.com");
         properties.pass.setValue("vincent");
-        properties.dataSetName.setValue("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
+        properties.dataSetName.setValue("mydataset");
+        properties.dataSetId.setValue("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
+        Assert.assertEquals(ValidationResult.OK, properties.afterFetchSchema());
+    }
+
+    // TODO should remove the duplicated code for afterFetchSchema
+    @Test
+    public void testAfterFetchSchemaForOutput() {
+        TDataSetOutputProperties properties = (TDataSetOutputProperties) componentService.getComponentDefinition("tDatasetOutput")
+                .createProperties();
+        properties.url.setValue("http://localhost:" + serverPort);
+        properties.login.setValue("vincent@dataprep.com");
+        properties.pass.setValue("vincent");
+        properties.dataSetName.setValue("mydataset");
+        properties.dataSetId.setValue("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
         Assert.assertEquals(ValidationResult.OK, properties.afterFetchSchema());
     }
 
@@ -46,10 +61,10 @@ public class AfterFetchSchemaTest {
     public void testAfterFetchSchemaFailed() {
         TDataSetInputProperties properties = (TDataSetInputProperties) componentService.getComponentDefinition("tDatasetInput")
                 .createProperties();
-        properties.url.setValue("http://localhost:"+serverPort);
+        properties.url.setValue("http://localhost:" + serverPort);
         properties.login.setValue("vincent@dataprep.com");
         properties.pass.setValue("wrong");
-        properties.dataSetName.setValue("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
+        properties.dataSetId.setValue("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
         Assert.assertEquals(ValidationResult.Result.ERROR, properties.afterFetchSchema().getStatus());
     }
 
@@ -64,6 +79,6 @@ public class AfterFetchSchemaTest {
         collector.checkThat(properties.afterFetchSchema().getStatus(), equalTo(ValidationResult.Result.ERROR));
         properties.pass.setValue("wrong");
         collector.checkThat(properties.afterFetchSchema().getStatus(), equalTo(ValidationResult.Result.ERROR));
-        properties.dataSetName.setValue("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
+        properties.dataSetId.setValue("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
     }
 }

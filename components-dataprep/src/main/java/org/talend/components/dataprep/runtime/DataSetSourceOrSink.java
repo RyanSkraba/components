@@ -33,8 +33,7 @@ abstract class DataSetSourceOrSink implements SourceOrSink {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataSetSourceOrSink.class);
 
-        private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
-            .getI18nMessages(DataSetSink.class);
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(DataSetSink.class);
 
     protected RuntimeProperties runtimeProperties;
 
@@ -44,7 +43,7 @@ abstract class DataSetSourceOrSink implements SourceOrSink {
                 runtimeProperties.getUrl(), //
                 runtimeProperties.getLogin(), //
                 runtimeProperties.getPass(), //
-                runtimeProperties.getDataSetName());
+                runtimeProperties.getDataSetId(), runtimeProperties.getDataSetName());
         if (DataPrepOutputModes.LiveDataset.equals(runtimeProperties.getMode())) {
             return ValidationResult.OK;
         }

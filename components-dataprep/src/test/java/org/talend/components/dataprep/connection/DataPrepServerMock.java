@@ -97,7 +97,7 @@ public class DataPrepServerMock {
         checkNotNull(inputStream);
         lastTag = tag;
         lastName = name;
-        if (name.equals("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e") || name.equals("??Hello world")) {
+        if (name.equals("mydataset") || name.equals("??Hello world")) {
             lastReceivedLiveDataSetContent = IOUtils.toString(inputStream);
             return new ResponseEntity(HttpStatus.OK);
         }

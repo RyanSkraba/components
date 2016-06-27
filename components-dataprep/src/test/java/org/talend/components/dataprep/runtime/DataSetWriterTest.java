@@ -59,7 +59,7 @@ public class DataSetWriterTest {
 
     @Test
     public void testWriter() throws IOException {
-        properties.dataSetName.setValue("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
+        properties.dataSetNameForCreateMode.setValue("mydataset");
         properties.mode.setValue(DataPrepOutputModes.Create);
 
         sink.initialize(null, properties);
@@ -120,8 +120,8 @@ public class DataSetWriterTest {
         return defaultSchema;
     }
 
-    private SchemaBuilder.FieldAssembler<Schema> addField(SchemaBuilder.FieldAssembler<Schema> record, String name,
-            Class<?> type, AvroRegistry avroReg) {
+    private SchemaBuilder.FieldAssembler<Schema> addField(SchemaBuilder.FieldAssembler<Schema> record, String name, Class<?> type,
+            AvroRegistry avroReg) {
         Schema base = avroReg.getConverter(type).getSchema();
         SchemaBuilder.FieldBuilder<Schema> fieldBuilder = record.name(name);
         fieldBuilder.type(AvroUtils.wrapAsNullable(base)).noDefault();

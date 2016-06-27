@@ -58,6 +58,8 @@ public class TDataSetInputProperties extends DataPrepProperties {
 
     private static final Logger LOG = LoggerFactory.getLogger(TDataSetInputProperties.class);
 
+    public Property<String> dataSetId = PropertyFactory.newString("dataSetId").setRequired();
+
     public final Property<String> dataSetName = PropertyFactory.newString("dataSetName").setRequired();
 
     public final PresentationItem fetchSchema = new PresentationItem("fetchSchema", "FetchSchema");
@@ -78,8 +80,19 @@ public class TDataSetInputProperties extends DataPrepProperties {
     public void setupLayout() {
         super.setupLayout();
         Form form = getForm(Form.MAIN);
-        form.addRow(dataSetName);
+        form.addRow(Widget.widget(this.dataSetName).setWidgetType("widget.type.dataset.selection"));
         form.addRow(Widget.widget(fetchSchema).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
+
+        Form advancedForm = new Form(this, Form.ADVANCED);
+        advancedForm.addRow(dataSetId);
+    }
+
+    public static final String ADD_QUOTES = "ADD_QUOTES";
+
+    @Override
+    public void setupProperties() {
+        super.setupProperties();
+        dataSetName.setTaggedValue(ADD_QUOTES, true);
     }
 
     public ValidationResult afterFetchSchema() {
@@ -88,7 +101,7 @@ public class TDataSetInputProperties extends DataPrepProperties {
                     .setMessage(getI18nMessage("error.allFieldsIsRequired"));
         } else {
             DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(url.getStringValue(),
-                    login.getStringValue(), pass.getStringValue(), dataSetName.getStringValue());
+                    login.getStringValue(), pass.getStringValue(), dataSetId.getStringValue(), dataSetName.getStringValue());
             List<Column> columnList = null;
             boolean wasProblem = false;
             ValidationResult validationResult = ValidationResult.OK;
@@ -129,10 +142,8 @@ public class TDataSetInputProperties extends DataPrepProperties {
     }
 
     private boolean isRequiredFieldRight() {
-        return !isEmpty(url.getStringValue())
-                && !isEmpty(login.getStringValue())
-                && !isEmpty(pass.getStringValue())
-                && !isEmpty(dataSetName.getStringValue());
+        return !isEmpty(url.getStringValue()) && !isEmpty(login.getStringValue()) && !isEmpty(pass.getStringValue())
+                && !isEmpty(dataSetName.getStringValue()) && !isEmpty(dataSetId.getStringValue());
     }
 
     public RuntimeProperties getRuntimeProperties() {
@@ -141,6 +152,7 @@ public class TDataSetInputProperties extends DataPrepProperties {
         runtimeProperties.setLogin(login.getStringValue());
         runtimeProperties.setPass(pass.getStringValue());
         runtimeProperties.setDataSetName(dataSetName.getStringValue());
+        runtimeProperties.setDataSetId(dataSetId.getStringValue());
         runtimeProperties.setSchema(schema.schema.getStringValue());
         return runtimeProperties;
     }

@@ -12,16 +12,30 @@
 // ============================================================================
 package org.talend.components.dataprep.tdatasetoutput;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
+import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.dataprep.DataPrepProperties;
+import org.talend.components.dataprep.connection.Column;
+import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
+import org.talend.components.dataprep.connection.DataPrepField;
+import org.talend.components.dataprep.runtime.DataPrepAvroRegistry;
 import org.talend.components.dataprep.runtime.DataPrepOutputModes;
 import org.talend.components.dataprep.runtime.RuntimeProperties;
+import org.talend.components.dataprep.tdatasetinput.TDataSetInputProperties;
+import org.talend.daikon.avro.AvroRegistry;
+import org.talend.daikon.properties.PresentationItem;
+import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
@@ -49,9 +63,13 @@ public class TDataSetOutputProperties extends DataPrepProperties {
 
     public final Property<DataPrepOutputModes> mode = PropertyFactory.newEnum("mode", DataPrepOutputModes.class);
 
-    public final Property<String> dataSetName = PropertyFactory.newString("dataSetName").setRequired();
+    public final Property<String> dataSetNameForCreateMode = PropertyFactory.newString("dataSetNameForCreateMode");
 
-    public final Property<String> dataSetId = PropertyFactory.newString("dataSetId").setRequired();
+    public final Property<String> dataSetName = PropertyFactory.newString("dataSetName");
+
+    public final Property<String> dataSetId = PropertyFactory.newString("dataSetId");
+
+    public final PresentationItem fetchSchema = new PresentationItem("fetchSchema", "FetchSchema");
 
     public final Property<Integer> limit = PropertyFactory.newInteger("limit", 100);
 
@@ -73,13 +91,17 @@ public class TDataSetOutputProperties extends DataPrepProperties {
         super.setupLayout();
         Form form = getForm(Form.MAIN);
         form.addRow(mode);
-        form.addRow(dataSetName);
-        form.addRow(dataSetId);
-        form.addRow(limit);
-    }
 
-    public void afterMode() {
-        refreshLayout(getForm(Form.MAIN));
+        // create mode
+        form.addRow(dataSetNameForCreateMode);
+
+        // update mode
+        form.addRow(Widget.widget(this.dataSetName).setWidgetType("widget.type.dataset.selection"));
+        form.addRow(Widget.widget(fetchSchema).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
+        Form advancedForm = new Form(this, Form.ADVANCED);
+        advancedForm.addRow(dataSetId);
+
+        form.addRow(limit);
     }
 
     /**
@@ -89,6 +111,12 @@ public class TDataSetOutputProperties extends DataPrepProperties {
     public void setupProperties() {
         super.setupProperties();
         mode.setValue(DataPrepOutputModes.Create);
+
+        dataSetName.setTaggedValue(TDataSetInputProperties.ADD_QUOTES, true);
+    }
+
+    public void afterMode() {
+        refreshLayout(getForm(Form.MAIN));
     }
 
     /**
@@ -101,26 +129,46 @@ public class TDataSetOutputProperties extends DataPrepProperties {
         if (form.getName().equals(Form.MAIN)) {
             DataPrepOutputModes localMode = mode.getValue();
             switch (localMode) {
-                case Create:
-                    form.getWidget(login.getName()).setHidden(false);
-                    form.getWidget(pass.getName()).setHidden(false);
-                    form.getWidget(dataSetName.getName()).setHidden(false);
-                    form.getWidget(dataSetId.getName()).setHidden(true);
-                    break;
-                case Update:
-                    form.getWidget(login.getName()).setHidden(false);
-                    form.getWidget(pass.getName()).setHidden(false);
-                    form.getWidget(dataSetId.getName()).setHidden(false);
-                    form.getWidget(dataSetName.getName()).setHidden(true);
-                    break;
-                case LiveDataset:
-                    form.getWidget(login.getName()).setHidden(true);
-                    form.getWidget(pass.getName()).setHidden(true);
-                    form.getWidget(dataSetName.getName()).setHidden(true);
-                    form.getWidget(dataSetId.getName()).setHidden(true);
-                    break;
-                default:
-                    break;
+            case Create:
+                form.getWidget(login.getName()).setHidden(false);
+                form.getWidget(pass.getName()).setHidden(false);
+                form.getWidget(dataSetNameForCreateMode.getName()).setHidden(false);
+                form.getWidget(dataSetName.getName()).setHidden(true);
+                form.getWidget(fetchSchema.getName()).setHidden(true);
+                break;
+            case Update:
+                form.getWidget(login.getName()).setHidden(false);
+                form.getWidget(pass.getName()).setHidden(false);
+                form.getWidget(dataSetNameForCreateMode.getName()).setHidden(true);
+                form.getWidget(dataSetName.getName()).setHidden(false);
+                form.getWidget(fetchSchema.getName()).setHidden(false);
+                break;
+            case LiveDataset:
+                form.getWidget(login.getName()).setHidden(true);
+                form.getWidget(pass.getName()).setHidden(true);
+                form.getWidget(dataSetNameForCreateMode.getName()).setHidden(true);
+                form.getWidget(dataSetName.getName()).setHidden(true);
+                form.getWidget(fetchSchema.getName()).setHidden(true);
+                break;
+            default:
+                break;
+            }
+        }
+
+        if (form.getName().equals(Form.ADVANCED)) {
+            DataPrepOutputModes localMode = mode.getValue();
+            switch (localMode) {
+            case Create:
+                form.getWidget(dataSetId.getName()).setHidden(true);
+                break;
+            case Update:
+                form.getWidget(dataSetId.getName()).setHidden(false);
+                break;
+            case LiveDataset:
+                form.getWidget(dataSetId.getName()).setHidden(true);
+                break;
+            default:
+                break;
             }
         }
     }
@@ -132,11 +180,62 @@ public class TDataSetOutputProperties extends DataPrepProperties {
         runtimeProperties.setPass(pass.getStringValue());
         runtimeProperties.setMode(mode.getValue());
         if (mode.getValue().equals(DataPrepOutputModes.Create)) {
-            runtimeProperties.setDataSetName(dataSetName.getStringValue());
+            runtimeProperties.setDataSetName(dataSetNameForCreateMode.getStringValue());
         } else {
-            runtimeProperties.setDataSetName(dataSetId.getStringValue());
+            runtimeProperties.setDataSetId(dataSetId.getStringValue());
         }
         runtimeProperties.setLimit(limit.getStringValue());
         return runtimeProperties;
+    }
+
+    public ValidationResult afterFetchSchema() {
+        if (!isRequiredFieldRight()) {
+            return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
+                    .setMessage(getI18nMessage("error.allFieldsIsRequired"));
+        } else {
+            DataPrepConnectionHandler connectionHandler = new DataPrepConnectionHandler(url.getStringValue(),
+                    login.getStringValue(), pass.getStringValue(), dataSetId.getStringValue(), dataSetName.getStringValue());
+            List<Column> columnList = null;
+            boolean wasProblem = false;
+            ValidationResult validationResult = ValidationResult.OK;
+            try {
+                connectionHandler.connect();
+                columnList = connectionHandler.readSourceSchema();
+            } catch (IOException e) {
+                LOG.debug(getI18nMessage("error.schemaIsNotFetched", e));
+                wasProblem = true;
+                validationResult = new ValidationResult().setStatus(Result.ERROR)
+                        .setMessage(getI18nMessage("error.schemaIsNotFetched", e.getMessage()));
+            } finally {
+                try {
+                    connectionHandler.logout();
+                } catch (IOException e) {
+                    LOG.debug(getI18nMessage("error.failedToLogout", e));
+                    wasProblem = true;
+                    validationResult = new ValidationResult().setStatus(Result.ERROR)
+                            .setMessage(getI18nMessage("error.failedToLogout", e.getMessage()));
+                }
+            }
+
+            if (wasProblem) {
+                return validationResult;
+            }
+
+            DataPrepField[] schemaRow = new DataPrepField[columnList.size()];
+            int i = 0;
+            for (Column column : columnList) {
+                schemaRow[i] = new DataPrepField(column.getName(), column.getType(), null);
+                i++;
+            }
+            AvroRegistry avroRegistry = DataPrepAvroRegistry.getDataPrepInstance();
+            schema.schema.setValue(avroRegistry.inferSchema(schemaRow));
+
+            return validationResult;
+        }
+    }
+
+    private boolean isRequiredFieldRight() {
+        return !isEmpty(url.getStringValue()) && !isEmpty(login.getStringValue()) && !isEmpty(pass.getStringValue())
+                && !isEmpty(dataSetName.getStringValue()) && !isEmpty(dataSetId.getStringValue());
     }
 }

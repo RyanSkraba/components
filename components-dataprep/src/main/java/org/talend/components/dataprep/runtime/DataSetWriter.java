@@ -61,24 +61,24 @@ public class DataSetWriter implements Writer<Result> {
                 runtimeProperties.getUrl(), //
                 runtimeProperties.getLogin(), //
                 runtimeProperties.getPass(), //
-                runtimeProperties.getDataSetName());
+                runtimeProperties.getDataSetId(), runtimeProperties.getDataSetName());
         limit = Integer.valueOf(runtimeProperties.getLimit());
         mode = runtimeProperties.getMode();
 
         switch (mode) {
-            case Create:
-                connectionHandler.connect();
-                outputStream = connectionHandler.write(DataPrepOutputModes.Create);
-                break;
-            case Update:
-                connectionHandler.connect();
-                outputStream = connectionHandler.write(DataPrepOutputModes.Update);
-                break;
-            case LiveDataset:
-                outputStream = connectionHandler.write(DataPrepOutputModes.LiveDataset);
-                break;
-            default:
-                break;
+        case Create:
+            connectionHandler.connect();
+            outputStream = connectionHandler.write(DataPrepOutputModes.Create);
+            break;
+        case Update:
+            connectionHandler.connect();
+            outputStream = connectionHandler.write(DataPrepOutputModes.Update);
+            break;
+        case LiveDataset:
+            outputStream = connectionHandler.write(DataPrepOutputModes.LiveDataset);
+            break;
+        default:
+            break;
         }
     }
 
