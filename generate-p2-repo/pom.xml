@@ -5,7 +5,7 @@
 
     <groupId>org.talend.repo</groupId>
     <artifactId>generate-p2-repo</artifactId>
-    <version>0.3.0-BUILD-SNAPSHOT</version>
+    <version>0.3.0</version>
     <packaging>pom</packaging>
 
     <dependencies>
@@ -13,38 +13,38 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-salesforce</artifactId>
-            <version>0.13.0-SNAPSHOT</version>
+            <version>0.13.0</version>
             <classifier>bundle</classifier>
         </dependency>
 <!-- bundles -->        
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.13.0-SNAPSHOT</version>
+            <version>0.13.0</version>
             <classifier>bundle</classifier>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service</artifactId>
-            <version>0.13.0-SNAPSHOT</version>
+            <version>0.13.0</version>
             <classifier>bundle</classifier>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
-            <version>0.13.0-SNAPSHOT</version>
+            <version>0.13.0</version>
             <classifier>bundle</classifier>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common-oauth</artifactId>
-            <version>0.13.0-SNAPSHOT</version>
+            <version>0.13.0</version>
             <classifier>bundle</classifier>
         </dependency>
         <dependency>
             <groupId>org.talend.daikon</groupId>
             <artifactId>daikon</artifactId>
-            <version>0.11.0-SNAPSHOT</version>
+            <version>0.12.0</version>
             <classifier>bundle</classifier>
         </dependency>
 
@@ -52,25 +52,25 @@
         <dependency>
             <groupId>org.talend.daikon</groupId>
             <artifactId>daikon</artifactId>
-            <version>0.11.0-SNAPSHOT</version>
+            <version>0.12.0</version>
             <classifier>tests</classifier>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.13.0-SNAPSHOT</version>
+            <version>0.13.0</version>
             <classifier>tests</classifier>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
-            <version>0.13.0-SNAPSHOT</version>
+            <version>0.13.0</version>
             <classifier>tests</classifier>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-salesforce</artifactId>
-            <version>0.13.0-SNAPSHOT</version>
+            <version>0.13.0</version>
             <classifier>tests</classifier>
         </dependency>
         <!-- to avoid updatin the complete eclipse target platform we add these single dependencies -->
