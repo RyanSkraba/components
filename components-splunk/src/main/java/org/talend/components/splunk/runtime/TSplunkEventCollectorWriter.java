@@ -19,6 +19,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
+import org.apache.avro.SchemaBuilder;
+import org.apache.avro.SchemaBuilder.FieldAssembler;
+import org.apache.avro.SchemaBuilder.FieldBuilder;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -33,10 +37,14 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.common.runtime.GenericAvroRegistry;
 import org.talend.components.splunk.connection.TSplunkEventCollectorConnection;
 import org.talend.components.splunk.objects.SplunkJSONEvent;
 import org.talend.components.splunk.objects.SplunkJSONEventBuilder;
+import org.talend.components.splunk.objects.SplunkJSONEventField;
 import org.talend.daikon.avro.AvroRegistry;
+import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
@@ -79,13 +87,49 @@ public class TSplunkEventCollectorWriter implements Writer<Result> {
 
     private AtomicBoolean closed = new AtomicBoolean(false);
 
+    private Schema defaultSchema;
+
     public TSplunkEventCollectorWriter(TSplunkEventCollectorWriteOperation writeOperation, String serverUrl, String token,
-            int eventsBatchSize, RuntimeContainer container) {
+            int eventsBatchSize, Schema designSchema, RuntimeContainer container) {
         this.writeOperation = writeOperation;
         this.fullRequestUrl = serverUrl.endsWith("/") ? (serverUrl + servicesSuffix) : (serverUrl + "/" + servicesSuffix);
         this.token = token;
         this.eventsBatchSize = eventsBatchSize;
         this.container = container;
+        setSchema(designSchema);
+    }
+
+    private void setSchema(Schema designSchema) {
+        if (designSchema != null && AvroUtils.isIncludeAllFields(designSchema)) {
+            this.defaultSchema = initDefaultSchema(designSchema);
+        } else {
+            this.defaultSchema = designSchema;
+        }
+    }
+
+    private Schema initDefaultSchema(Schema designSchema) {
+        AvroRegistry avroReg = new AvroRegistry();
+        FieldAssembler<Schema> record = SchemaBuilder.record("Main").fields();
+        for (SplunkJSONEventField metadataField : SplunkJSONEventField.getMetadataFields()) {
+            Schema base = avroReg.getConverter(metadataField.getDataType()).getSchema();
+            FieldBuilder<Schema> fieldBuilder = record.name(metadataField.getName());
+            if (metadataField.getName().equals(SplunkJSONEventField.TIME.getName())) {
+                String datePattern;
+                Field designField = designSchema.getField(metadataField.getName());
+                if (designField != null) {
+                    datePattern = designField.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
+                } else {
+                    datePattern = designSchema.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
+                }
+                if (datePattern == null || datePattern.isEmpty()) {
+                    datePattern = "dd-MM-yyyy";
+                }
+                fieldBuilder.prop(SchemaConstants.TALEND_COLUMN_PATTERN, datePattern);
+            }
+            fieldBuilder.type(AvroUtils.wrapAsNullable(base)).noDefault();
+        }
+        Schema defaultSchema = record.endRecord();
+        return defaultSchema;
     }
 
     @Override
@@ -111,8 +155,17 @@ public class TSplunkEventCollectorWriter implements Writer<Result> {
         SplunkJSONEvent event = SplunkJSONEventBuilder.createEvent();
 
         for (Schema.Field f : input.getSchema().getFields()) {
-            if (input.get(f.pos()) != null) {
-                SplunkJSONEventBuilder.setField(event, f.name(), input.get(f.pos()), true);
+            Schema.Field defaultField = null;
+            if (defaultSchema != null) {
+                defaultField = defaultSchema.getField(f.name());
+            }
+            Object inputValue = input.get(f.pos());
+            if (defaultField != null && defaultField.name().equals(SplunkJSONEventField.TIME.getName()) && inputValue != null
+                    && inputValue instanceof String) {
+                Object value = GenericAvroRegistry.get().convertToString(defaultField).convertToAvro((String) inputValue);
+                SplunkJSONEventBuilder.setField(event, f.name(), value, true);
+            } else if (inputValue != null) {
+                SplunkJSONEventBuilder.setField(event, f.name(), inputValue, true);
             }
         }
         LOGGER.debug("Added event to bulk queue." + String.valueOf(event));

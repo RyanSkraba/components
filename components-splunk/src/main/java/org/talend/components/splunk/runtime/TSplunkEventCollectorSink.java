@@ -45,6 +45,8 @@ public class TSplunkEventCollectorSink implements Sink {
 
     private int eventsBatchSize;
 
+    private Schema schema;
+
     private I18nMessages messageFormatter;
 
     @Override
@@ -53,6 +55,7 @@ public class TSplunkEventCollectorSink implements Sink {
         this.serverUrl = props.fullUrl.getStringValue();
         this.token = props.token.getStringValue();
         this.eventsBatchSize = props.getBatchSize();
+        this.schema = props.getSchema();
     }
 
     @Override
@@ -100,6 +103,10 @@ public class TSplunkEventCollectorSink implements Sink {
             messageFormatter = GlobalI18N.getI18nMessageProvider().getI18nMessages(this.getClass());
         }
         return messageFormatter.getMessage(key, arguments);
+    }
+
+    public Schema getSchema() {
+        return schema;
     }
 
 }
