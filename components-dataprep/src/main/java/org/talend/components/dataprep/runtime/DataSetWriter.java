@@ -104,10 +104,11 @@ public class DataSetWriter implements Writer<Result> {
             firstRow = false;
         }
         for (Schema.Field f : input.getSchema().getFields()) {
+            if (f.pos() != 0) {
+                row.append(",");
+            }
+
             if (input.get(f.pos()) != null) {
-                if (f.pos() != 0) {
-                    row.append(",");
-                }
                 row.append(String.valueOf(input.get(f.pos())));
             }
         }
