@@ -26,9 +26,9 @@ public class PaxExamOptions {
     /**
      * 
      */
-    private static final String DAIKON_VERSION = "0.12.0";
+    private static final String DAIKON_VERSION = "0.13.0-SNAPSHOT";
 
-    private static final String COMPONENTS_VERSION = "0.13.0";
+    private static final String COMPONENTS_VERSION = "0.14.0-SNAPSHOT";
 
     private static final String APACHE_KARAF_AID = "apache-karaf";
 

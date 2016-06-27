@@ -7,13 +7,13 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.13.0</version>
+        <version>0.14.0-SNAPSHOT</version>
         <relativePath>../components-parent/pom.xml</relativePath>
     </parent>
 
     <name>Components - Shared Component Parts</name>
     <artifactId>components-common</artifactId>
-    <version>0.13.0</version>
+    <version>0.14.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.13.0</version>
+            <version>0.14.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>biz.aQute.bnd</groupId>
@@ -35,20 +35,20 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service</artifactId>
-            <version>0.13.0</version>
+            <version>0.14.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service</artifactId>
-            <version>0.13.0</version>
+            <version>0.14.0-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.13.0</version>
+            <version>0.13.0-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

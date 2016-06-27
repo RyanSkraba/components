@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
-		<version>0.13.0</version>
+		<version>0.14.0-SNAPSHOT</version>
 		<relativePath>../components-parent/pom.xml</relativePath>
 	</parent>
 
@@ -12,7 +12,7 @@
 
 	<name>Component Web Test Service</name>
 	<artifactId>components-webtest</artifactId>
-	<version>0.13.0</version>
+	<version>0.14.0-SNAPSHOT</version>
 
 	<properties>
 		<cxf.version>3.1.6</cxf.version>
@@ -57,13 +57,13 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>0.13.0</version>
+			<version>0.14.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-salesforce</artifactId>
-			<version>0.13.0</version>
+			<version>0.14.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
