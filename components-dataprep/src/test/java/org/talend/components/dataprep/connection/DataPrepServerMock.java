@@ -87,8 +87,13 @@ public class DataPrepServerMock {
     }
 
     @RequestMapping(value = "/api/datasets", method = RequestMethod.POST)
-    public ResponseEntity create(@RequestParam(value = "name") String name, @RequestParam(value = "tag") String tag,
-            InputStream inputStream) throws IOException {
+    public ResponseEntity create(@RequestHeader(value = "Authorization") String authorization,
+            @RequestParam(value = "name") String name, @RequestParam(value = "tag") String tag, InputStream inputStream)
+            throws IOException {
+        if (!TOKEN.equals(authorization)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
         checkNotNull(inputStream);
         lastTag = tag;
         lastName = name;
@@ -100,7 +105,12 @@ public class DataPrepServerMock {
     }
 
     @RequestMapping(value = "/api/datasets/{id}", method = RequestMethod.PUT)
-    public ResponseEntity update(@PathVariable String id, InputStream inputStream) throws IOException {
+    public ResponseEntity update(@RequestHeader(value = "Authorization") String authorization, @PathVariable String id,
+            InputStream inputStream) throws IOException {
+        if (!TOKEN.equals(authorization)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
         checkNotNull(inputStream);
         if (id.equals("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e")) {
             lastReceivedLiveDataSetContent = IOUtils.toString(inputStream);
