@@ -227,18 +227,31 @@ public class DataPrepConnectionHandler {
     }
 
     private String extractResponseInformationAndConsumeResponse(HttpResponse response) throws IllegalStateException, IOException {
-        InputStream is = response.getEntity().getContent();
-        return extractResponseInformationAndConsumeResponse(is);
+        InputStream is = null;
+        try {
+            is = response.getEntity().getContent();
+            return extractResponseInformationAndConsumeResponse(is);
+        } finally {
+            if (is != null) {
+                is.close();
+            }
+        }
     }
 
     private String extractResponseInformationAndConsumeResponse(HttpURLConnection connection) throws IOException {
         InputStream is = null;
         try {
-            is = connection.getInputStream();
-        } catch (IOException e) {
-            is = connection.getErrorStream();
+            try {
+                is = connection.getInputStream();
+            } catch (IOException e) {
+                is = connection.getErrorStream();
+            }
+            return extractResponseInformationAndConsumeResponse(is);
+        } finally {
+            if (is != null) {
+                is.close();
+            }
         }
-        return extractResponseInformationAndConsumeResponse(is);
     }
 
     private String extractResponseInformationAndConsumeResponse(InputStream is) throws IOException {
@@ -248,13 +261,10 @@ public class DataPrepConnectionHandler {
         InputStreamReader reader = new InputStreamReader(is);
         BufferedReader sr = new BufferedReader(reader);
         StringBuilder sb = new StringBuilder();
-        try {
-            String line = null;
-            while ((line = sr.readLine()) != null) {
-                sb.append(line);
-            }
-        } finally {
-            is.close();
+
+        String line = null;
+        while ((line = sr.readLine()) != null) {
+            sb.append(line);
         }
 
         // TODO in fact, it's a json string, we should extract it
