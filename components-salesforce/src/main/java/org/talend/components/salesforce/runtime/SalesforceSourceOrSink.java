@@ -111,7 +111,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         // This should only be false when doing debugging.
         bulkConfig.setCompression(connProps.needCompression.getValue());
         bulkConfig.setTraceMessage(connProps.httpTraceMessage.getValue());
-
+        bulkConfig.setValidateSchema(false);
         try {
             return new BulkConnection(bulkConfig);
         } catch (AsyncApiException e) {
@@ -210,6 +210,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             config.setTraceMessage(true);
         }
         config.setUseChunkedPost(connProps.httpChunked.getValue());
+        config.setValidateSchema(false);
 
         try {
             ch.connection = doConnection(config);

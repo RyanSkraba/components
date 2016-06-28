@@ -461,8 +461,21 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
 
     @Test
     public void testSchema() throws Throwable {
+        testSchemaWithAPIVersion("34.0");
+        testSchemaWithAPIVersion("29.0");
+        testSchemaWithAPIVersion("25.0");
+        testSchemaWithAPIVersion("24.0");
+        testSchemaWithAPIVersion("21.0");
+        testSchemaWithAPIVersion("19.0");
+        testSchemaWithAPIVersion("18.0");
+        testSchemaWithAPIVersion("15.0");
+        testSchemaWithAPIVersion("10.0");
+    }
+
+    protected void testSchemaWithAPIVersion(String version) throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
+        props.connection.endpoint.setValue("https://login.salesforce.com/services/Soap/u/" + version);
         setupProps(props.connection, !ADD_QUOTES);
 
         Form f = props.module.getForm(Form.REFERENCE);
@@ -477,7 +490,9 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
             LOGGER.debug(child.name());
         }
         assertEquals("Id", schema.getFields().get(0).name());
-        assertTrue(schema.getFields().size() > 50);
+        LOGGER.debug("Endpoint:" + props.connection.endpoint.getValue());
+        LOGGER.debug("Module \"Account\" column size:" + schema.getFields().size());
+         assertTrue(schema.getFields().size() > 40);
     }
 
     @Test
