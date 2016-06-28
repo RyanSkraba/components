@@ -13,9 +13,11 @@
 package org.talend.components.dataprep.tdatasetinput;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.talend.daikon.properties.property.Property.Flags.DESIGN_TIME_ONLY;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -60,7 +62,8 @@ public class TDataSetInputProperties extends DataPrepProperties {
 
     public Property<String> dataSetId = PropertyFactory.newString("dataSetId").setRequired();
 
-    public final Property<String> dataSetName = PropertyFactory.newString("dataSetName").setRequired();
+    public final Property<String> dataSetName = PropertyFactory.newString("dataSetName").setRequired()
+            .setFlags(EnumSet.of(DESIGN_TIME_ONLY));
 
     public final PresentationItem fetchSchema = new PresentationItem("fetchSchema", "FetchSchema");
 
@@ -87,12 +90,9 @@ public class TDataSetInputProperties extends DataPrepProperties {
         advancedForm.addRow(dataSetId);
     }
 
-    public static final String ADD_QUOTES = "ADD_QUOTES";
-
     @Override
     public void setupProperties() {
         super.setupProperties();
-        dataSetName.setTaggedValue(ADD_QUOTES, true);
     }
 
     public ValidationResult afterFetchSchema() {

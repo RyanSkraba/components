@@ -59,6 +59,21 @@ public class DataSetWriterTest {
 
     @Test
     public void testWriter() throws IOException {
+        properties.limit.setValue(100);
+        Map<String, Object> resultMap = createAction();
+        Assert.assertEquals(15, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
+        Assert.assertEquals(15, resultMap.get(ComponentDefinition.RETURN_SUCCESS_RECORD_COUNT));
+    }
+
+    @Test
+    public void testWriterWithLimit() throws IOException {
+        properties.limit.setValue(10);
+        Map<String, Object> resultMap = createAction();
+        Assert.assertEquals(10, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
+        Assert.assertEquals(10, resultMap.get(ComponentDefinition.RETURN_SUCCESS_RECORD_COUNT));
+    }
+
+    private Map<String, Object> createAction() throws IOException {
         properties.dataSetNameForCreateMode.setValue("mydataset");
         properties.mode.setValue(DataPrepOutputModes.Create);
 
@@ -75,12 +90,13 @@ public class DataSetWriterTest {
         List<Result> results = new ArrayList();
         results.add(result);
         Map<String, Object> resultMap = writeOperation.finalize(results, null);
-        Assert.assertEquals(15, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
-        Assert.assertEquals(15, resultMap.get(ComponentDefinition.RETURN_SUCCESS_RECORD_COUNT));
+        return resultMap;
     }
 
     @Test
     public void testWriteLiveDataSet() throws IOException {
+        properties.limit.setValue(100);
+
         properties.login.setValue("");
         properties.pass.setValue("");
         properties.mode.setValue(DataPrepOutputModes.LiveDataset);

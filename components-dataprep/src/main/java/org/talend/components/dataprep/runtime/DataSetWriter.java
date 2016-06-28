@@ -84,7 +84,8 @@ public class DataSetWriter implements Writer<Result> {
 
     @Override
     public void write(Object datum) throws IOException {
-        if (datum == null || counter >= limit) {
+        counter++;
+        if (datum == null || counter > limit) {
             LOGGER.debug("Datum: {}", datum);
             return;
         } // else handle the data.

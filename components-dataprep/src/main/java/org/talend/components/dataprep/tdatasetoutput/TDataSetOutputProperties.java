@@ -13,9 +13,11 @@
 package org.talend.components.dataprep.tdatasetoutput;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.talend.daikon.properties.property.Property.Flags.DESIGN_TIME_ONLY;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -29,7 +31,6 @@ import org.talend.components.dataprep.connection.DataPrepField;
 import org.talend.components.dataprep.runtime.DataPrepAvroRegistry;
 import org.talend.components.dataprep.runtime.DataPrepOutputModes;
 import org.talend.components.dataprep.runtime.RuntimeProperties;
-import org.talend.components.dataprep.tdatasetinput.TDataSetInputProperties;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.ValidationResult;
@@ -65,7 +66,7 @@ public class TDataSetOutputProperties extends DataPrepProperties {
 
     public final Property<String> dataSetNameForCreateMode = PropertyFactory.newString("dataSetNameForCreateMode");
 
-    public final Property<String> dataSetName = PropertyFactory.newString("dataSetName");
+    public final Property<String> dataSetName = PropertyFactory.newString("dataSetName").setFlags(EnumSet.of(DESIGN_TIME_ONLY));
 
     public final Property<String> dataSetId = PropertyFactory.newString("dataSetId");
 
@@ -111,8 +112,6 @@ public class TDataSetOutputProperties extends DataPrepProperties {
     public void setupProperties() {
         super.setupProperties();
         mode.setValue(DataPrepOutputModes.Create);
-
-        dataSetName.setTaggedValue(TDataSetInputProperties.ADD_QUOTES, true);
     }
 
     public void afterMode() {
