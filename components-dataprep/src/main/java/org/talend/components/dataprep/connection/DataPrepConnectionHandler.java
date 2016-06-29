@@ -26,7 +26,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -71,12 +70,6 @@ public class DataPrepConnectionHandler {
     }
 
     public HttpResponse connect() throws IOException {
-        UrlValidator validator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
-        if (!validator.isValid(url)) {
-            LOGGER.error(messages.getMessage("error.urlIsWrong"));
-            throw new IOException(messages.getMessage("error.urlIsWrong"));
-        }
-
         Request request = Request.Post(url + "/login?username=" + login + "&password=" + pass + "&client-app=studio");
         HttpResponse response = request.execute().returnResponse();
         authorisationHeader = response.getFirstHeader("Authorization");
