@@ -45,10 +45,6 @@ public class DataPrepConnectionHandler {
 
     public static final String API_DATASETS = "/api/datasets/";
 
-    public static final String CONTENT_TYPE = "Content-Type";
-
-    public static final String TEXT_PLAIN = "text/plain";
-
     private final String url;
 
     private final String login;
@@ -195,7 +191,8 @@ public class DataPrepConnectionHandler {
         if (authorisationHeader != null) {
             urlConnection.setRequestProperty(authorisationHeader.getName(), authorisationHeader.getValue());
         }
-        urlConnection.setRequestProperty(CONTENT_TYPE, TEXT_PLAIN);
+        urlConnection.setRequestProperty("Content-Type", "text/plain");
+        urlConnection.setRequestProperty("Accept", "application/json, text/plain");
         urlConnection.setDoOutput(true);
         urlConnection.connect();
         return urlConnection.getOutputStream();

@@ -116,6 +116,7 @@ public class TDataSetOutputProperties extends DataPrepProperties {
 
     public void afterMode() {
         refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(Form.ADVANCED));
     }
 
     /**
