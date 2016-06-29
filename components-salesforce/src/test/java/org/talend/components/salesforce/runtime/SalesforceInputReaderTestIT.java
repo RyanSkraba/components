@@ -12,9 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -146,6 +144,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
     }
 
     @Test
+    @Ignore("need to be reworked cause data may be writen in salesforce between the 2 queries.")
     public void testManualQuery() throws Throwable {
         TSalesforceInputProperties props = createTSalesforceInputProperties(false, false);
         props.manualQuery.setValue(true);
