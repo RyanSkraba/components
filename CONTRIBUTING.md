@@ -22,7 +22,7 @@ Here is the workflow for pull requests.
    
    The first green check indicates that the branch build is fine, the label "Merged build passed" indicates that the merge to master build is fine. 
 2. If you receive an email notification that there is a build issue please fix it. No PR will be reviewed if the build has failed.
-3. The components owners will then identify who is going to do the review and then assign it. The reviewer will revieve an automatic mail notification.
+3. The components owners will then identify who is going to do the review and then assign it. The reviewer will recieve an automatic mail notification.
 4. Once the reviewer starts the review, he/she should set the label *Reviewing*.
 5. Once the review is done, the reviewer has 3 alternatives states:
   * **Can be merged**, the reviewer is happy with the PR so the PR can be merged. The reviewer should set the label *Can be Merged* and then Merge and Squash the PR.
