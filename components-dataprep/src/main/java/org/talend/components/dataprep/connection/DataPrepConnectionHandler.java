@@ -26,7 +26,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -44,10 +43,6 @@ public class DataPrepConnectionHandler {
             .getI18nMessages(DataPrepConnectionHandler.class);
 
     public static final String API_DATASETS = "/api/datasets/";
-
-    public static final String CONTENT_TYPE = "Content-Type";
-
-    public static final String TEXT_PLAIN = "text/plain";
 
     private final String url;
 
@@ -75,12 +70,6 @@ public class DataPrepConnectionHandler {
     }
 
     public HttpResponse connect() throws IOException {
-        UrlValidator validator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
-        if (!validator.isValid(url)) {
-            LOGGER.error(messages.getMessage("error.urlIsWrong"));
-            throw new IOException(messages.getMessage("error.urlIsWrong"));
-        }
-
         Request request = Request.Post(url + "/login?username=" + login + "&password=" + pass + "&client-app=studio");
         HttpResponse response = request.execute().returnResponse();
         authorisationHeader = response.getFirstHeader("Authorization");
@@ -195,7 +184,8 @@ public class DataPrepConnectionHandler {
         if (authorisationHeader != null) {
             urlConnection.setRequestProperty(authorisationHeader.getName(), authorisationHeader.getValue());
         }
-        urlConnection.setRequestProperty(CONTENT_TYPE, TEXT_PLAIN);
+        urlConnection.setRequestProperty("Content-Type", "text/plain");
+        urlConnection.setRequestProperty("Accept", "application/json, text/plain");
         urlConnection.setDoOutput(true);
         urlConnection.connect();
         return urlConnection.getOutputStream();

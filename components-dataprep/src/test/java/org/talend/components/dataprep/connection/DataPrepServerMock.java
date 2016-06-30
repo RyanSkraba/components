@@ -25,6 +25,8 @@ public class DataPrepServerMock {
 
     private static final String TOKEN = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZW1vdGVTZXNzaW9uSWQiOiI5MzI0NjhiZS1mMWVhLTQ2YzctYTBhMC1jZTgyZWFhYWU4OWIiLCJyb2xlcyI6WyJBRE1JTklTVFJBVE9SIiwiREFUQV9DVVJBVE9SIiwiREFUQV9TQ0lFTlRJU1QiXSwiaXNzIjoiZGF0YS1wcmVwIiwiZXhwIjoxNDYxODUwMzI2LCJpYXQiOjE0NjE4NDY3MjYsInVzZXJJZCI6InZpbmNlbnRAZGF0YXByZXAuY29tIiwianRpIjoiNThmODY1OWQtOWRjOC00YTUyLTk5ZmUtMTNiOTU0MTgzMjhhIn0.k14tGLc0mKPX73WAdfZSBQO8Ac47yRxF1HmQUMNS2XI";
 
+    private static final String ACCEPT = "application/json, text/plain";
+
     HttpHeaders headers;
 
     private String lastTag;
@@ -88,10 +90,14 @@ public class DataPrepServerMock {
 
     @RequestMapping(value = "/api/datasets", method = RequestMethod.POST)
     public ResponseEntity create(@RequestHeader(value = "Authorization") String authorization,
-            @RequestParam(value = "name") String name, @RequestParam(value = "tag") String tag, InputStream inputStream)
-            throws IOException {
+            @RequestHeader(value = "Accept") String accept, @RequestParam(value = "name") String name,
+            @RequestParam(value = "tag") String tag, InputStream inputStream) throws IOException {
         if (!TOKEN.equals(authorization)) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
+        if (!ACCEPT.equals(accept)) {
+            return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
         }
 
         checkNotNull(inputStream);
@@ -105,10 +111,14 @@ public class DataPrepServerMock {
     }
 
     @RequestMapping(value = "/api/datasets/{id}", method = RequestMethod.PUT)
-    public ResponseEntity update(@RequestHeader(value = "Authorization") String authorization, @PathVariable String id,
-            InputStream inputStream) throws IOException {
+    public ResponseEntity update(@RequestHeader(value = "Authorization") String authorization,
+            @RequestHeader(value = "Accept") String accept, @PathVariable String id, InputStream inputStream) throws IOException {
         if (!TOKEN.equals(authorization)) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
+        if (!ACCEPT.equals(accept)) {
+            return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
         }
 
         checkNotNull(inputStream);
@@ -120,7 +130,12 @@ public class DataPrepServerMock {
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
-    public ResponseEntity createInLiveDataSet(InputStream inputStream) throws IOException {
+    public ResponseEntity createInLiveDataSet(@RequestHeader(value = "Accept") String accept, InputStream inputStream)
+            throws IOException {
+        if (!ACCEPT.equals(accept)) {
+            return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+        }
+
         checkNotNull(inputStream);
         lastReceivedLiveDataSetContent = IOUtils.toString(inputStream);
         return new ResponseEntity(HttpStatus.OK);
