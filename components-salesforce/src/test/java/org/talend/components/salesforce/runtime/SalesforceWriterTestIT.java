@@ -191,7 +191,6 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         TSalesforceOutputProperties props = createSalesforceoutputProperties(EXISTING_MODULE_NAME);
         Map<String, Object> resultMap;
 
-
         // this is mainly to check that open and close do not throw any exceptions.
         // insert
         props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
@@ -592,7 +591,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         DefaultComponentRuntimeContainerImpl container = new DefaultComponentRuntimeContainerImpl();
 
         List records = new ArrayList<IndexedRecord>();
-        String random = String.valueOf(Integer.parseInt(createNewRandom()) % 1000);
+        String random = String.valueOf(createNewRandom());
         IndexedRecord r1 = new GenericData.Record(SCHEMA_INSERT_EVENT);
         r1.put(0, "2011-02-02T02:02:02");
         r1.put(1, "2011-02-02T22:02:02.000Z");
@@ -618,7 +617,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         Writer<Result> batchWriter = salesforceSink.createWriteOperation().createWriter(adaptor);
         writeRows(batchWriter, records);
 
-        assertEquals(2,((SalesforceWriter)batchWriter).getSuccessfulWrites().size());
+        assertEquals(2, ((SalesforceWriter) batchWriter).getSuccessfulWrites().size());
 
         sfProps.extendInsert.setValue(false);
         salesforceSink.initialize(adaptor, sfProps);
@@ -626,7 +625,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         Writer<Result> noBatchWriter = salesforceSink.createWriteOperation().createWriter(adaptor);
         writeRows(noBatchWriter, records);
 
-        assertEquals(1,((SalesforceWriter)noBatchWriter).getSuccessfulWrites().size());
+        assertEquals(1, ((SalesforceWriter) noBatchWriter).getSuccessfulWrites().size());
 
         ComponentDefinition sfInputDef = new TSalesforceInputDefinition();
         TSalesforceInputProperties sfInputProps = (TSalesforceInputProperties) sfInputDef.createRuntimeProperties();

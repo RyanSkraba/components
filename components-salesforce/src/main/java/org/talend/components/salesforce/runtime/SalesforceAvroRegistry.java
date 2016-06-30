@@ -88,7 +88,16 @@ public class SalesforceAvroRegistry extends AvroRegistry {
 
             Schema.Field avroField = new Schema.Field(field.getName(), inferSchema(field), null, field.getDefaultValueFormula());
             // Add some Talend6 custom properties to the schema.
-            if (AvroUtils.isSameType(avroField.schema(), AvroUtils._string())) {
+            Schema avroFieldSchema = avroField.schema();
+            if (avroFieldSchema.getType() == Schema.Type.UNION) {
+                for (Schema schema : avroFieldSchema.getTypes()) {
+                    if (avroFieldSchema.getType() != Schema.Type.NULL) {
+                        avroFieldSchema = schema;
+                        break;
+                    }
+                }
+            }
+            if (AvroUtils.isSameType(avroFieldSchema, AvroUtils._string())) {
                 if (field.getLength() != 0) {
                     avroField.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, String.valueOf(field.getLength()));
                 }
@@ -97,10 +106,10 @@ public class SalesforceAvroRegistry extends AvroRegistry {
                 }
             } else {
                 if (field.getPrecision() != 0) {
-                    avroField.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, String.valueOf(field.getPrecision()));
+                    avroField.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, String.valueOf(field.getPrecision()));
                 }
                 if (field.getScale() != 0) {
-                    avroField.addProp(SchemaConstants.TALEND_COLUMN_SCALE, String.valueOf(field.getScale()));
+                    avroField.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, String.valueOf(field.getScale()));
                 }
             }
 
