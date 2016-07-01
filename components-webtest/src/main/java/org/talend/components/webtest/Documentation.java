@@ -12,29 +12,44 @@
 // ============================================================================
 package org.talend.components.webtest;
 
-import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@ConditionalOnProperty(name = "service.documentation", havingValue = "true", matchIfMissing = true)
+import com.mangofactory.swagger.configuration.SpringSwaggerConfig;
+import com.mangofactory.swagger.models.dto.ApiInfo;
+import com.mangofactory.swagger.plugin.EnableSwagger;
+import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
+
 @Configuration
+@ConditionalOnProperty(name = "service.documentation", havingValue = "true", matchIfMissing = true)
+@EnableSwagger
 public class Documentation {
+
+    @Value("${service.documentation.name}")
+    private String serviceDisplayName;
 
     @Value("${service.documentation.description}")
     private String serviceDescription;
 
-    @Value("${service.basepath}")
-    private String serviceBasePath;
+    @Value("#{'${service.documentation.path}'.split(',')}")
+    private String[] servicePaths;
+
+    private SpringSwaggerConfig springSwaggerConfig;
+
+    @Autowired
+    public void setSpringSwaggerConfig(SpringSwaggerConfig springSwaggerConfig) {
+        this.springSwaggerConfig = springSwaggerConfig;
+    }
 
     @Bean
-    public Swagger2Feature swaggerFeature(ApplicationContext context) {
-        Swagger2Feature feature = new Swagger2Feature();
-        feature.setBasePath(serviceBasePath);
-        feature.setDescription(serviceDescription);
-        feature.setRunAsFilter(true);
-        return feature;
+    public SwaggerSpringMvcPlugin customImplementation() {
+        ApiInfo apiInfo = new ApiInfo(serviceDisplayName, serviceDescription, StringUtils.EMPTY, StringUtils.EMPTY,
+                StringUtils.EMPTY, StringUtils.EMPTY);
+        return new SwaggerSpringMvcPlugin(springSwaggerConfig).apiInfo(apiInfo).includePatterns(servicePaths);
     }
+
 }

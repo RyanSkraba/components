@@ -58,12 +58,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<!-- SWAGGER DEPENDENCIES -->
-		<dependency>
-			<groupId>io.swagger</groupId>
-			<artifactId>swagger-annotations</artifactId>
-			<version>1.5.4</version>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>com.mangofactory</groupId>
+            <artifactId>swagger-springmvc</artifactId>
+            <version>1.0.2</version>
+            <scope>provided</scope>
+        </dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>

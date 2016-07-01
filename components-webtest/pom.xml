@@ -14,12 +14,6 @@
 	<artifactId>components-webtest</artifactId>
 	<version>0.14.0-SNAPSHOT</version>
 
-	<properties>
-		<cxf.version>3.1.6</cxf.version>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<swagger-ui.version>2.1.0</swagger-ui.version>
-	</properties>
 
 	<repositories>
 		<repository>
@@ -59,6 +53,11 @@
 			<artifactId>components-api</artifactId>
 			<version>0.14.0-SNAPSHOT</version>
 		</dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api-service</artifactId>
+            <version>0.14.0-SNAPSHOT</version>
+        </dependency>
 
 		<dependency>
 			<groupId>org.talend.components</groupId>
@@ -78,49 +77,17 @@
 			<version>1.2.5.RELEASE</version>
 		</dependency>
 		<dependency>
+			<groupId>com.mangofactory</groupId>
+			<artifactId>swagger-springmvc</artifactId>
+			<version>1.0.2</version>
+		</dependency>
+		<dependency>
 			<groupId>org.talend.daikon</groupId>
 			<artifactId>daikon-spring</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-frontend-jaxrs</artifactId>
-			<version>${cxf.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-rs-client</artifactId>
-			<version>${cxf.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-transports-http</artifactId>
-			<version>${cxf.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-rs-service-description</artifactId>
-			<version>${cxf.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.swagger</groupId>
-			<artifactId>swagger-jaxrs</artifactId>
-			<version>1.5.4</version>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.ws.rs</groupId>
-					<artifactId>jsr311-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>swagger-ui</artifactId>
-			<version>${swagger-ui.version}</version>
-			<scope>provided</scope>
-		</dependency>
 	</dependencies>
 
-	<build>
+<!--	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -138,7 +105,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
+ 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
@@ -162,7 +129,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
+ 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
 				<executions>
@@ -177,10 +144,6 @@
 							<resources>
 								<resource>
 									<directory>${project.build.directory}/swagger-ui/META-INF/resources/webjars/swagger-ui/${swagger-ui.version}</directory>
-									<!-- <excludes> -->
-									<!-- <exclude>index.html</exclude> -->
-									<!-- <exclude>swagger-ui.min.js</exclude> -->
-									<!-- </excludes> -->
 								</resource>
 							</resources>
 						</configuration>
@@ -189,6 +152,6 @@
 			</plugin>
 		</plugins>
 	</build>
-
+-->
 
 </project>
