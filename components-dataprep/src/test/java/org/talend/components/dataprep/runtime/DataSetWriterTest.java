@@ -15,6 +15,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
@@ -23,6 +24,7 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.SpringTestApp;
+import org.talend.components.dataprep.connection.DataPrepServerMock;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputDefinition;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
 import org.talend.daikon.avro.AvroRegistry;
@@ -32,6 +34,9 @@ import org.talend.daikon.avro.AvroUtils;
 @SpringApplicationConfiguration(classes = SpringTestApp.class)
 @WebIntegrationTest("server.port:0")
 public class DataSetWriterTest {
+
+    @Autowired
+    private DataPrepServerMock mock;
 
     @Inject
     private ComponentService componentService;
@@ -55,6 +60,34 @@ public class DataSetWriterTest {
         properties.pass.setValue("vincent");
         properties.limit.setValue(10);
         sink = (DataSetSink) definition.getRuntime();
+    }
+
+    @Test
+    public void testWriterEscaping() throws IOException {
+        properties.dataSetNameForCreateMode.setValue("mydataset");
+        properties.mode.setValue(DataPrepOutputModes.Create);
+
+        sink.initialize(null, properties);
+        DataSetWriteOperation writeOperation = (DataSetWriteOperation) sink.createWriteOperation();
+        writer = (DataSetWriter) writeOperation.createWriter(null);
+
+        AvroRegistry avroReg = new AvroRegistry();
+        SchemaBuilder.FieldAssembler<Schema> schemaRecord = SchemaBuilder.record("Main").fields();
+        addField(schemaRecord, "FieldString0", String.class, avroReg);
+        addField(schemaRecord, "FieldString1", String.class, avroReg);
+        Schema schema = schemaRecord.endRecord();
+
+        IndexedRecord record = new GenericData.Record(schema);
+        record.put(schema.getField("FieldString0").pos(), "String\nString");
+
+        writer.open("test");
+        writer.write(record);
+        writer.close();
+
+        final String content = mock.getLastReceivedLiveDataSetContent();
+        Assert.assertEquals("FieldString0;FieldString1\n" +
+                "\"String\n" +
+                "String\";\n", content);
     }
 
     @Test

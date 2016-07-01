@@ -14,9 +14,11 @@ package org.talend.components.dataprep.runtime;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Result;
@@ -25,6 +27,11 @@ import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
+import org.talend.daikon.exception.ExceptionContext;
+import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.exception.error.CommonErrorCodes;
+
+import com.csvreader.CsvWriter;
 
 public class DataSetWriter implements Writer<Result> {
 
@@ -36,8 +43,6 @@ public class DataSetWriter implements Writer<Result> {
 
     private DataPrepConnectionHandler connectionHandler;
 
-    private OutputStream outputStream;
-
     private boolean firstRow = true;
 
     private WriteOperation<Result> writeOperation;
@@ -47,6 +52,8 @@ public class DataSetWriter implements Writer<Result> {
     private DataPrepOutputModes mode;
 
     private Result result;
+
+    private CsvWriter writer;
 
     DataSetWriter(WriteOperation<Result> writeOperation) {
         this.writeOperation = writeOperation;
@@ -65,6 +72,7 @@ public class DataSetWriter implements Writer<Result> {
         limit = Integer.valueOf(runtimeProperties.getLimit());
         mode = runtimeProperties.getMode();
 
+        final OutputStream outputStream;
         switch (mode) {
         case Create:
             connectionHandler.connect();
@@ -78,8 +86,11 @@ public class DataSetWriter implements Writer<Result> {
             outputStream = connectionHandler.write(DataPrepOutputModes.LiveDataset);
             break;
         default:
-            break;
+            throw new TalendRuntimeException(CommonErrorCodes.UNEXPECTED_EXCEPTION,
+                    ExceptionContext.build().put("message", "Mode '" + mode + "' is not supported."));
         }
+        // Use a CSV writer iso. output stream
+        writer = new CsvWriter(new OutputStreamWriter(outputStream), ';');
     }
 
     @Override
@@ -92,39 +103,34 @@ public class DataSetWriter implements Writer<Result> {
 
         LOGGER.debug("Datum: {}", datum);
         IndexedRecord input = getFactory(datum).convertToAvro(datum);
-        StringBuilder row = new StringBuilder();
         if (firstRow) {
             for (Schema.Field f : input.getSchema().getFields()) {
-                if (f.pos() != 0) {
-                    row.append(",");
-                }
-                row.append(String.valueOf(f.name()));
+                writer.write(String.valueOf(String.valueOf(f.name())));
             }
-            row.append("\n");
-            LOGGER.debug("Column names: {}", row);
+            writer.endRecord();
             firstRow = false;
         }
         for (Schema.Field f : input.getSchema().getFields()) {
-            if (f.pos() != 0) {
-                row.append(",");
-            }
-
-            if (input.get(f.pos()) != null) {
-                row.append(String.valueOf(input.get(f.pos())));
+            final Object value = input.get(f.pos());
+            if (value == null) {
+                writer.write(StringUtils.EMPTY);
+            } else {
+                writer.write(String.valueOf(value));
             }
         }
-        row.append("\n");
-        LOGGER.debug("Row data: {}", row);
-        outputStream.write(row.toString().getBytes("UTF-8"));
+        writer.endRecord();
         result.totalCount++;
     }
 
     @Override
     public Result close() throws IOException {
-        if (outputStream != null) {
-            outputStream.flush();
-            outputStream.close();
-            outputStream = null;
+        if (writer != null) {
+            try {
+                writer.flush();
+                writer.close();
+            } finally {
+                writer = null;
+            }
         }
 
         if (connectionHandler != null) {

@@ -141,7 +141,7 @@ public class DataPrepServerMock {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    String getLastReceivedLiveDataSetContent() {
+    public String getLastReceivedLiveDataSetContent() {
         return lastReceivedLiveDataSetContent;
     }
 
