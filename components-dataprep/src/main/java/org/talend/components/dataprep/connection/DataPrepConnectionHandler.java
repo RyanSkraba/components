@@ -138,7 +138,7 @@ public class DataPrepConnectionHandler {
     }
 
     public DataPrepStreamMapper readDataSetIterator() throws IOException {
-        Request request = Request.Get(url + API_DATASETS + dataSetId + "?metadata=false").addHeader(authorisationHeader);
+        Request request = Request.Get(url + API_DATASETS + dataSetId + "?fullContent=true").addHeader(authorisationHeader);
         HttpResponse response = request.execute().returnResponse();
         if (returnStatusCode(response) != HttpServletResponse.SC_OK) {
             String moreInformation = extractResponseInformationAndConsumeResponse(response);

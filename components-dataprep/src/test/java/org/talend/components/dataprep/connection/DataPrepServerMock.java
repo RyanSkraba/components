@@ -11,14 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class DataPrepServerMock {
@@ -68,8 +61,8 @@ public class DataPrepServerMock {
     @RequestMapping(value = "/api/datasets/{id}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<InputStreamResource> readDataSet(@PathVariable String id,
-            @RequestParam(value = "metadata") boolean withMetadata) {
-        if (id.equals("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e") && !withMetadata) {
+                                                           @RequestParam(value = "fullContent") boolean fullContent) {
+        if (id.equals("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e") && fullContent) {
             InputStreamResource inputStream = new InputStreamResource(
                     DataPrepServerMock.class.getResourceAsStream("dataset.json"));
             return new ResponseEntity<InputStreamResource>(inputStream, HttpStatus.OK);
