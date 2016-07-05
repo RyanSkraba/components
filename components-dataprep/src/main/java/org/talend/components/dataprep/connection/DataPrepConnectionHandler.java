@@ -12,16 +12,8 @@
 // ============================================================================
 package org.talend.components.dataprep.connection;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.*;
+import java.net.*;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.dataprep.runtime.DataPrepOutputModes;
@@ -138,14 +132,22 @@ public class DataPrepConnectionHandler {
     }
 
     public DataPrepStreamMapper readDataSetIterator() throws IOException {
-        Request request = Request.Get(url + API_DATASETS + dataSetId + "?fullContent=true").addHeader(authorisationHeader);
-        HttpResponse response = request.execute().returnResponse();
+
+        // apache hc-fluent cannot be used here are it does not support streaming
+        final HttpGet httpGet = new HttpGet(url + API_DATASETS + dataSetId + "?fullContent=true");
+        LOGGER.debug("getting dataset content from {}", httpGet.getURI());
+        httpGet.addHeader(authorisationHeader);
+
+        DefaultHttpClient client = new DefaultHttpClient();
+        final HttpResponse response = client.execute(httpGet);
+        LOGGER.debug("response is {}", response.getStatusLine());
+
         if (returnStatusCode(response) != HttpServletResponse.SC_OK) {
             String moreInformation = extractResponseInformationAndConsumeResponse(response);
             LOGGER.error(messages.getMessage("error.retrieveDatasetFailed", moreInformation));
             throw new IOException(messages.getMessage("error.retrieveDatasetFailed", moreInformation));
         }
-        LOGGER.debug("Read DataSet Response: {} ", response);
+
         return new DataPrepStreamMapper(response.getEntity().getContent());
     }
 

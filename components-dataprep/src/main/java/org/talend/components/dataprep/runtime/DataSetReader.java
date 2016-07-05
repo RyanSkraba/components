@@ -78,7 +78,7 @@ public class DataSetReader extends AbstractBoundedReader<IndexedRecord> {
     @Override
     public IndexedRecord getCurrent() {
         Map<String, String> recordMap = dataPrepStreamMapper.nextRecord();
-        LOGGER.debug("Record from data set: {}", recordMap);
+        LOGGER.trace("Record from data set: {}", recordMap);
         DataPrepField[] record = new DataPrepField[sourceSchema.size()];
         int i = 0;
         for (Column column : sourceSchema) {

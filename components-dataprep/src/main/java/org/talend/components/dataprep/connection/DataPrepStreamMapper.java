@@ -68,7 +68,7 @@ public class DataPrepStreamMapper {
             }
         }
         // Create iterator to the records in "records" element
-        if ("records".equals(jsonParser.getText())) {
+        if (hasMetRecords) {
             jsonParser.nextToken(); // Field
             jsonParser.nextToken(); // Start object
             if (jsonParser.getCurrentToken() == JsonToken.START_OBJECT) {
@@ -84,7 +84,7 @@ public class DataPrepStreamMapper {
     public Map<String, String> nextRecord() {
         Map<String, String> record = iterator.next();
         record.remove("tdpId");
-        LOGGER.debug("Record is : {}", record);
+        LOGGER.trace("Record is : {}", record);
         return record;
     }
 
