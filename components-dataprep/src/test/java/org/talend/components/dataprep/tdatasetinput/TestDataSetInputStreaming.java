@@ -1,5 +1,6 @@
 package org.talend.components.dataprep.tdatasetinput;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.dataprep.connection.DataPrepConnectionHandler;
 import org.talend.components.dataprep.connection.DataPrepStreamMapper;
@@ -23,6 +24,7 @@ public class TestDataSetInputStreaming {
     }
 
     @Test
+    @Ignore
     public void shouldStreamDataSetContent() throws IOException {
         connectionHandler.connect();
         final DataPrepStreamMapper dataPrepStreamMapper = connectionHandler.readDataSetIterator();
