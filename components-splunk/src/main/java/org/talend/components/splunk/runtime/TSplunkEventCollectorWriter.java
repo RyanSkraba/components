@@ -79,8 +79,6 @@ public class TSplunkEventCollectorWriter implements Writer<Result> {
 
     private String lastErrorMessage;
 
-    private final RuntimeContainer container;
-
     private List<SplunkJSONEvent> splunkObjectsForBulk;
 
     private I18nMessages messageFormatter;
@@ -95,7 +93,6 @@ public class TSplunkEventCollectorWriter implements Writer<Result> {
         this.fullRequestUrl = serverUrl.endsWith("/") ? (serverUrl + servicesSuffix) : (serverUrl + "/" + servicesSuffix);
         this.token = token;
         this.eventsBatchSize = eventsBatchSize;
-        this.container = container;
         setSchema(designSchema);
     }
 

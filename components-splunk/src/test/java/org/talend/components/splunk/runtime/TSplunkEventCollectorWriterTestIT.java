@@ -16,7 +16,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,11 +32,11 @@ import org.apache.avro.generic.IndexedRecord;
 import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.Result;
-import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.splunk.TSplunkEventCollectorDefinition;
 import org.talend.components.splunk.TSplunkEventCollectorProperties;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.SchemaConstants;
 
 public class TSplunkEventCollectorWriterTestIT {
 
@@ -43,10 +46,16 @@ public class TSplunkEventCollectorWriterTestIT {
 
     private final static String TOKEN = "ED45DA1C-DCFB-467F-982A-E2612B3A0C44";
 
-    private final static String COMPONENT_ID = "Splunk_test";
+    private final static String DATE_PATTERN = "dd-MM-yyyy";
 
-    public void testWritingRecords(int recordCount) throws IOException {
-        DefaultComponentRuntimeContainerImpl container = new TestingRuntimeContainer(COMPONENT_ID);
+    public void testWritingRecords(int recordCount, IndexedRecord record) throws IOException {
+        testWritingRecords(recordCount, record, null);
+    }
+
+    /**
+     * Test writing defined amount of records with correct authorization token.
+     */
+    public void testWritingRecords(int recordCount, IndexedRecord record, Schema schema) throws IOException {
         TSplunkEventCollectorProperties props = (TSplunkEventCollectorProperties) new TSplunkEventCollectorDefinition()
                 .createProperties();
         if (recordCount > 1) {
@@ -58,21 +67,24 @@ public class TSplunkEventCollectorWriterTestIT {
             props.extendedOutput.setValue(false);
         }
 
+        if (schema != null) {
+            props.schema.schema.setValue(schema);
+        }
+
         props.fullUrl.setValue(URL);
         props.token.setValue(TOKEN);
         TSplunkEventCollectorSink sink = new TSplunkEventCollectorSink();
-        sink.initialize(container, props);
+        sink.initialize(null, props);
         TSplunkEventCollectorWriteOperation writeOperation = new TSplunkEventCollectorWriteOperation(sink);
-        TSplunkEventCollectorWriter writer = (TSplunkEventCollectorWriter) writeOperation.createWriter(container);
+        TSplunkEventCollectorWriter writer = (TSplunkEventCollectorWriter) writeOperation.createWriter(null);
 
-        IndexedRecord record = createIndexedRecord();
         writer.open("test");
         for (int i = 0; i < recordCount; i++) {
             writer.write(record);
         }
         Result result = writer.close();
 
-        List<Result> results = new ArrayList();
+        List<Result> results = new ArrayList<>();
         results.add(result);
         Map<String, Object> resultMap = writeOperation.finalize(results, null);
 
@@ -87,19 +99,38 @@ public class TSplunkEventCollectorWriterTestIT {
         assertEquals("Response code should be 0", 0, lastErrorCode.intValue());
     }
 
+    /**
+     * Test writing one record with correct authorization token.
+     */
     @Test
-    public void testWriting1() throws IOException {
-        testWritingRecords(1);
+    public void testWritingOneRecord() throws IOException {
+        testWritingRecords(1, createIndexedRecord());
     }
 
+    /**
+     * Test writing five records with correct authorization token.
+     */
     @Test
-    public void testWriting5() throws IOException {
-        testWritingRecords(5);
+    public void testWritingFiveRecords() throws IOException {
+        testWritingRecords(5, createIndexedRecord());
     }
 
+    /**
+     * Test writing one record with correct authorization token using dynamic schema. Indexed record can contain Date
+     * presented as String with some predefined date format. It should be parsed to a Date object. This behavior is
+     * tested with this test.
+     */
+    @Test
+    public void testWritingOneRecordWithDateDynamicColumn() throws IOException {
+        testWritingRecords(1, createIndexedRecordWithTimeAsString(), createDynamicSchemaWithDatePattern());
+    }
+
+    /**
+     * Test writing one record with wrong authorization token. Wrong authorization token should result in an error
+     * response from the server.
+     */
     @Test
     public void testWritingOneRecordWithWrongToken() throws IOException {
-        TestingRuntimeContainer container = new TestingRuntimeContainer(COMPONENT_ID);
         TSplunkEventCollectorProperties props = (TSplunkEventCollectorProperties) new TSplunkEventCollectorDefinition()
                 .createProperties();
         // We will try to write one event at a time.
@@ -107,10 +138,10 @@ public class TSplunkEventCollectorWriterTestIT {
         props.fullUrl.setValue(URL);
         props.token.setValue(WRONG_TOKEN);
         TSplunkEventCollectorSink sink = new TSplunkEventCollectorSink();
-        sink.initialize(container, props);
+        sink.initialize(null, props);
 
         TSplunkEventCollectorWriteOperation writeOperation = new TSplunkEventCollectorWriteOperation(sink);
-        TSplunkEventCollectorWriter writer = (TSplunkEventCollectorWriter) writeOperation.createWriter(container);
+        TSplunkEventCollectorWriter writer = (TSplunkEventCollectorWriter) writeOperation.createWriter(null);
 
         IndexedRecord record = createIndexedRecord();
         writer.open("test");
@@ -120,7 +151,7 @@ public class TSplunkEventCollectorWriterTestIT {
         }
         Result result = writer.close();
 
-        List<Result> results = new ArrayList();
+        List<Result> results = new ArrayList<>();
         results.add(result);
         Map<String, Object> resultMap = writeOperation.finalize(results, null);
 
@@ -133,14 +164,9 @@ public class TSplunkEventCollectorWriterTestIT {
         assertEquals("Response code should be 4", 4, lastErrorCode.intValue());
     }
 
-    private IndexedRecord createIndexedRecord() {
-        Schema schema = createSchema();
-        IndexedRecord record = new GenericData.Record(schema);
-        record.put(schema.getField("FieldString").pos(), "String");
-        record.put(schema.getField("FieldInt").pos(), 12);
-        return record;
-    }
-
+    /**
+     * Create default static schema for indexed record.
+     */
     private Schema createSchema() {
         AvroRegistry avroReg = new AvroRegistry();
         FieldAssembler<Schema> record = SchemaBuilder.record("Main").fields();
@@ -150,6 +176,48 @@ public class TSplunkEventCollectorWriterTestIT {
         return defaultSchema;
     }
 
+    /**
+     * Create indexed record with default static schema.
+     */
+    private IndexedRecord createIndexedRecord() {
+        Schema schema = createSchema();
+        IndexedRecord record = new GenericData.Record(schema);
+        record.put(schema.getField("FieldString").pos(), "String");
+        record.put(schema.getField("FieldInt").pos(), 12);
+        return record;
+    }
+
+    /**
+     * create indexed record with Date presented as String.
+     */
+    private IndexedRecord createIndexedRecordWithTimeAsString() {
+        Schema schema = createSchemaWithTimeAsString();
+        DateFormat format = new SimpleDateFormat(DATE_PATTERN);
+        IndexedRecord record = new GenericData.Record(schema);
+        record.put(schema.getField("FieldString").pos(), "String");
+        record.put(schema.getField("FieldInt").pos(), 12);
+        record.put(schema.getField("Description").pos(), "Dynamic time column test.");
+        record.put(schema.getField("time").pos(), format.format(new Date()));
+        return record;
+    }
+
+    /**
+     * create schema for indexed record with Date presented as String.
+     */
+    private Schema createSchemaWithTimeAsString() {
+        AvroRegistry avroReg = new AvroRegistry();
+        FieldAssembler<Schema> record = SchemaBuilder.record("Main").fields();
+        addField(record, "FieldString", String.class, avroReg);
+        addField(record, "FieldInt", Integer.class, avroReg);
+        addField(record, "Description", String.class, avroReg);
+        addField(record, "time", String.class, avroReg);
+        Schema defaultSchema = record.endRecord();
+        return defaultSchema;
+    }
+
+    /**
+     * add field to Schema.
+     */
     private FieldAssembler<Schema> addField(FieldAssembler<Schema> record, String name, Class<?> type, AvroRegistry avroReg) {
         Schema base = avroReg.getConverter(type).getSchema();
         FieldBuilder<Schema> fieldBuilder = record.name(name);
@@ -157,19 +225,15 @@ public class TSplunkEventCollectorWriterTestIT {
         return record;
     }
 
-    private static final class TestingRuntimeContainer extends DefaultComponentRuntimeContainerImpl {
-
-        private final String currentComponentId;
-
-        public TestingRuntimeContainer(String componentId) {
-            this.currentComponentId = componentId;
-        }
-
-        @Override
-        public String getCurrentComponentId() {
-            return currentComponentId;
-        }
-
+    /**
+     * Create dynamic schema with date pattern in dynamic column. Required to test parsing of Date presented as String.
+     */
+    private Schema createDynamicSchemaWithDatePattern() {
+        FieldAssembler<Schema> record = SchemaBuilder.record("Main").fields();
+        Schema defaultSchema = record.endRecord();
+        AvroUtils.setIncludeAllFields(defaultSchema, true);
+        AvroUtils.setProperty(defaultSchema, SchemaConstants.TALEND_COLUMN_PATTERN, DATE_PATTERN);
+        return defaultSchema;
     }
 
 }
