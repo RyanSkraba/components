@@ -69,7 +69,7 @@ public class DataSetWriter implements Writer<Result> {
                 runtimeProperties.getLogin(), //
                 runtimeProperties.getPass(), //
                 runtimeProperties.getDataSetId(), runtimeProperties.getDataSetName());
-        limit = runtimeProperties.getLimit() != null ? Integer.valueOf(runtimeProperties.getLimit()) : Integer.MAX_VALUE;
+        limit = Integer.valueOf(runtimeProperties.getLimit());
         mode = runtimeProperties.getMode();
 
         final OutputStream outputStream;
