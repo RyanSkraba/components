@@ -43,7 +43,7 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
     /**
      * {@link Source} instance, which had created this {@link Reader}
      */
-    private JiraSource source;
+    private final JiraSource source;
 
     /**
      * Apache Http components library wrapper, which provides connection methods
@@ -202,12 +202,12 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
     }
 
     /**
-     * Returns {@link Source} instance
+     * Returns {@link JiraSource} instance
      * 
-     * @return {@link Source} instance, which had created this {@link Reader}
+     * @return {@link JiraSource} instance, which had created this {@link Reader}
      */
     @Override
-    public Source getCurrentSource() {
+    public JiraSource getCurrentSource() {
         return source;
     }
 

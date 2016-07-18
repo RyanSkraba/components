@@ -28,7 +28,14 @@ public class SearchTest {
      */
     @Test
     public void testGetTotal() {
-        Search search = new Search(JsonDataProvider.getPaginationJson());
+    	String paginationJson = "{\"expand\":\"schema,names\",\"startAt\":0,\"maxResults\":50,\"total\":37,\"issues\":["
+				+ "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10413\","
+				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10413\",\"key\":\"TP-41\",\"fields\":{\"description\":\"task upd\",\"summary\":\"Updated 37\",}},"
+				+ "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10412\","
+				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10412\",\"key\":\"TP-40\",\"fields\":{\"description\":\"Task updated\",\"summary\":\"TP 38 updated\",}},"
+				+ "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10411\","
+				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10411\",\"key\":\"TP-39\",\"fields\":{\"description\":null,\"summary\":\"115\",}}]}";
+        Search search = new Search(paginationJson);
 
         int actual = search.getTotal();
         assertEquals(37, actual);
@@ -39,7 +46,13 @@ public class SearchTest {
      */
     @Test
     public void testGetTotalUndefined() {
-        Search search = new Search(JsonDataProvider.getNoPaginationJson());
+    	String noPaginationJson = "{\"issues\":[{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10413\","
+    			+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10413\",\"key\":\"TP-41\",\"fields\":{\"description\":\"task upd\",\"summary\":\"Updated 37\"}},"
+    			+ "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10412\","
+    			+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10412\",\"key\":\"TP-40\",\"fields\":{\"description\":\"Task updated\",\"summary\":\"TP 38 updated\"}},"
+    			+ "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10411\","
+    			+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10411\",\"key\":\"TP-39\",\"fields\":{\"description\":null,\"summary\":\"115\"}}]}";
+        Search search = new Search(noPaginationJson);
 
         int actual = search.getTotal();
         assertEquals(-1, actual);
@@ -50,7 +63,14 @@ public class SearchTest {
      */
     @Test
     public void testGetEntities() {
-        Search search = new Search(JsonDataProvider.getPaginationJson());
+    	String paginationJson = "{\"expand\":\"schema,names\",\"startAt\":0,\"maxResults\":50,\"total\":37,\"issues\":["
+				+ "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10413\","
+				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10413\",\"key\":\"TP-41\",\"fields\":{\"description\":\"task upd\",\"summary\":\"Updated 37\",}},"
+				+ "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10412\","
+				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10412\",\"key\":\"TP-40\",\"fields\":{\"description\":\"Task updated\",\"summary\":\"TP 38 updated\",}},"
+				+ "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10411\","
+				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10411\",\"key\":\"TP-39\",\"fields\":{\"description\":null,\"summary\":\"115\",}}]}";
+        Search search = new Search(paginationJson);
 
         List<Entity> entities = search.getEntities();
         assertEquals(3, entities.size());
@@ -62,7 +82,8 @@ public class SearchTest {
      */
     @Test
     public void testGetEntitiesNoIssues() {
-        Search search = new Search(JsonDataProvider.getNoIssuesJson());
+    	String noIssuesJson = "{\"startAt\":0,\"maxResults\":2,\"total\":1,\"issues\":[]}";
+        Search search = new Search(noIssuesJson);
 
         List<Entity> entities = search.getEntities();
         assertEquals(0, entities.size());
@@ -74,7 +95,8 @@ public class SearchTest {
      */
     @Test
     public void testGetEntitiesBracesInString() {
-        Search search = new Search(JsonDataProvider.getHasBraceJson());
+    	String hasBraceJson = "{\"issues\":[{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10413\",\"self\":\"http://localhost:8080/rest/api/2/issue/10413\",\"key\":\"TP-41\",\"fields\":{\"description\":\"task upd\",\"summary\":\"Has brace \\\"}} in string \\\\\"{\"}}]}";
+        Search search = new Search(hasBraceJson);
 
         List<Entity> entities = search.getEntities();
         assertEquals(1, entities.size());

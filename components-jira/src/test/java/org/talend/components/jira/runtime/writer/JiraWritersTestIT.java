@@ -12,18 +12,9 @@
 // ============================================================================
 package org.talend.components.jira.runtime.writer;
 
-import static org.talend.daikon.avro.SchemaConstants.TALEND_IS_LOCKED;
-
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
-import org.apache.avro.Schema;
-import org.apache.avro.Schema.Field.Order;
 import org.apache.avro.generic.IndexedRecord;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
@@ -32,56 +23,15 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.exception.DataRejectException;
 import org.talend.components.jira.Action;
 import org.talend.components.jira.Resource;
-import org.talend.components.jira.runtime.JiraSink;
-import org.talend.components.jira.runtime.JiraWriteOperation;
 import org.talend.components.jira.testutils.ListIndexedRecord;
-import org.talend.components.jira.testutils.Utils;
-import org.talend.components.jira.tjiraoutput.TJiraOutputProperties;
-import org.talend.daikon.avro.AvroRegistry;
 
 /**
  * Integration tests for {@link JiraDeleteWriter}, {@link JiraInsertWriter} and {@link JiraUpdateWriter} Covered Issue and Project
  * resources
  */
-public class JiraWritersTestIT {
+public class JiraWritersTestIT extends JiraWriterTestBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(JiraWritersTestIT.class);
-
-    /**
-     * Constants, which describes values to connect real Jira server
-     */
-    private static final String HOST = "http://192.168.99.100:8080/";
-
-    private static final String USER = "root";
-
-    private static final String PASS = "123456";
-
-    /**
-     * Instance used in this test
-     */
-    private TJiraOutputProperties properties;
-
-    private JiraSink sink;
-
-    private JiraWriteOperation writeOperation;
-
-    /**
-     * Schemas
-     */
-    private Schema deleteSchema;
-
-    private Schema insertSchema;
-
-    private Schema updateSchema;
-
-    /**
-     * Project IndexedRecords
-     */
-    private IndexedRecord insertProjectRecord;
-
-    private IndexedRecord updateProjectRecord;
-
-    private IndexedRecord deleteProjectRecord;
 
     /**
      * Issue IndexedRecords
@@ -101,15 +51,6 @@ public class JiraWritersTestIT {
     @Rule
     public ErrorCollector collector = new ErrorCollector();
 
-    @Before
-    public void setup() {
-        setupProperties();
-        setupSink();
-        setupWriteOperation();
-        setupSchemas();
-        setupIndexedRecords();
-    }
-
     /**
      * Checks following scenario: <br>
      * 1. Create project "Test Project"
@@ -121,7 +62,6 @@ public class JiraWritersTestIT {
      * 
      * @throws IOException
      */
-    @Ignore
     @Test
     public void testWrite() throws IOException {
         // 1. Create project "Test Project"
@@ -260,74 +200,25 @@ public class JiraWritersTestIT {
         }
     }
 
-    private void setupProperties() {
-        properties = new TJiraOutputProperties("root");
-        properties.init();
-        properties.connection.hostUrl.setValue(HOST);
-        properties.connection.basicAuthentication.userId.setValue(USER);
-        properties.connection.basicAuthentication.password.setValue(PASS);
-        properties.resource.setValue(Resource.PROJECT);
-        properties.action.setValue(Action.INSERT);
-    }
-
-    private void setupSink() {
-        sink = new JiraSink();
-        sink.initialize(null, properties);
-    }
-
-    private void setupWriteOperation() {
-        writeOperation = (JiraWriteOperation) sink.createWriteOperation();
-        writeOperation.initialize(null);
-    }
-
-    private void setupSchemas() {
-        AvroRegistry registry = new AvroRegistry();
-        Schema stringSchema = registry.getConverter(String.class).getSchema();
-
-        Schema.Field deleteIdField = new Schema.Field("id", stringSchema, null, null, Order.ASCENDING);
-        deleteSchema = Schema.createRecord("jira", null, null, false, Collections.singletonList(deleteIdField));
-        deleteSchema.addProp(TALEND_IS_LOCKED, "true");
-
-        Schema.Field insertJsonField = new Schema.Field("json", stringSchema, null, null, Order.ASCENDING);
-        insertSchema = Schema.createRecord("jira", null, null, false, Collections.singletonList(insertJsonField));
-        insertSchema.addProp(TALEND_IS_LOCKED, "true");
-
-        Schema.Field updateIdField = new Schema.Field("id", stringSchema, null, null, Order.ASCENDING);
-        Schema.Field updateJsonField = new Schema.Field("json", stringSchema, null, null, Order.ASCENDING);
-        List<Schema.Field> fields = Arrays.asList(updateIdField, updateJsonField);
-        updateSchema = Schema.createRecord("jira", null, null, false, fields);
-        updateSchema.addProp(TALEND_IS_LOCKED, "true");
-    }
-
-    private void setupIndexedRecords() {
-        insertProjectRecord = new ListIndexedRecord(insertSchema);
-        String insertProject = Utils.readFile("src/test/resources/org/talend/components/jira/runtime/writer/insertProject.json");
-        insertProject = insertProject.replace("UserID", USER);
-        insertProjectRecord.put(0, insertProject);
-
-        deleteProjectRecord = new ListIndexedRecord(deleteSchema);
-        deleteProjectRecord.put(0, "ITP");
-
-        updateProjectRecord = new ListIndexedRecord(updateSchema);
-        String updateProject = Utils.readFile("src/test/resources/org/talend/components/jira/runtime/writer/updateProject.json");
-        updateProjectRecord.put(0, "ITP");
-        updateProjectRecord.put(1, updateProject);
+    @Override
+    protected void setupIndexedRecords() {
+        super.setupIndexedRecords();
 
         insertIssueRecord1 = new ListIndexedRecord(insertSchema);
-        String insertIssue1 = Utils.readFile("src/test/resources/org/talend/components/jira/runtime/writer/insertIssue1.json");
+        String insertIssue1 = "{\"fields\":{\"project\":{\"key\":\"ITP\"},\"summary\":\"Integration test issue 1\",\"issuetype\":{\"id\":\"10000\"}}}";
         insertIssueRecord1.put(0, insertIssue1);
 
         insertIssueRecord2 = new ListIndexedRecord(insertSchema);
-        String insertIssue2 = Utils.readFile("src/test/resources/org/talend/components/jira/runtime/writer/insertIssue2.json");
+        String insertIssue2 = "{\"fields\":{\"project\":{\"key\":\"ITP\"},\"summary\":\"Integration test issue 2\",\"issuetype\":{\"id\":\"10000\"}}}";
         insertIssueRecord2.put(0, insertIssue2);
 
         updateIssueRecord1 = new ListIndexedRecord(updateSchema);
-        String updateIssue1 = Utils.readFile("src/test/resources/org/talend/components/jira/runtime/writer/updateIssue1.json");
+        String updateIssue1 = "{\"fields\":{\"summary\":\"Updated test issue 1\"}}";
         updateIssueRecord1.put(0, "ITP-1");
         updateIssueRecord1.put(1, updateIssue1);
 
         updateIssueRecord2 = new ListIndexedRecord(insertSchema);
-        String updateIssue2 = Utils.readFile("src/test/resources/org/talend/components/jira/runtime/writer/updateIssue2.json");
+        String updateIssue2 = "{\"fields\":{\"summary\":\"Updated test issue 2\"}}";
         updateIssueRecord2.put(0, "ITP-2");
         updateIssueRecord2.put(1, updateIssue2);
 
@@ -338,15 +229,4 @@ public class JiraWritersTestIT {
         deleteIssueRecord2.put(0, "ITP-2");
     }
 
-    private void changeResourceTo(Resource resource) {
-        properties.resource.setValue(resource);
-        setupSink();
-        setupWriteOperation();
-    }
-
-    private void changeActionTo(Action action) {
-        properties.action.setValue(action);
-        setupSink();
-        setupWriteOperation();
-    }
 }

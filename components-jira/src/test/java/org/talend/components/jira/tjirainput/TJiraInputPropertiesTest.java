@@ -21,15 +21,18 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.talend.daikon.avro.SchemaConstants.TALEND_IS_LOCKED;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field.Order;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.jira.Resource;
-import org.talend.components.jira.testutils.Utils;
+import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 
@@ -100,14 +103,18 @@ public class TJiraInputPropertiesTest {
      */
     @Test
     public void testSetupSchema() {
+        AvroRegistry registry = new AvroRegistry();
+        Schema stringSchema = registry.getConverter(String.class).getSchema();
+        Schema.Field jsonField = new Schema.Field("json", stringSchema, null, null, Order.ASCENDING);
+        Schema expectedSchema = Schema.createRecord("jira", null, null, false, Collections.singletonList(jsonField));
+        expectedSchema.addProp(TALEND_IS_LOCKED, "true");
+    	
         TJiraInputProperties properties = new TJiraInputProperties("root");
         properties.setupSchema();
 
         Schema schema = properties.schema.schema.getValue();
-        String actualSchema = schema.toString();
-        String expectedSchema = Utils.readFile("src/test/resources/org/talend/components/jira/tjirainput/schema.json");
 
-        assertThat(actualSchema, equalTo(expectedSchema));
+        assertThat(schema, equalTo(expectedSchema));
     }
 
     /**

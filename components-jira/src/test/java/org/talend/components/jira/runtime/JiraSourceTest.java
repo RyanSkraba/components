@@ -16,8 +16,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.talend.daikon.avro.SchemaConstants.TALEND_IS_LOCKED;
+
+import java.util.Collections;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field.Order;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,8 +32,8 @@ import org.talend.components.jira.Resource;
 import org.talend.components.jira.runtime.reader.JiraProjectIdReader;
 import org.talend.components.jira.runtime.reader.JiraProjectsReader;
 import org.talend.components.jira.runtime.reader.JiraSearchReader;
-import org.talend.components.jira.testutils.Utils;
 import org.talend.components.jira.tjirainput.TJiraInputProperties;
+import org.talend.daikon.avro.AvroRegistry;
 
 /**
  * Unit-tests for {@link JiraSource} class
@@ -42,22 +46,28 @@ public class JiraSourceTest {
     private TJiraInputProperties inputProperties;
 
     /**
-     * JSON string, which describes {@link Schema}
+     * {@link Schema}
      */
-    private String schemaValue;
+    private Schema schema;
 
     /**
      * Prepares required instances for tests
      */
     @Before
     public void setUp() {
+        AvroRegistry registry = new AvroRegistry();
+        Schema stringSchema = registry.getConverter(String.class).getSchema();
+        Schema.Field jsonField = new Schema.Field("json", stringSchema, null, null, Order.ASCENDING);
+        schema = Schema.createRecord("jira", null, null, false, Collections.singletonList(jsonField));
+        schema.addProp(TALEND_IS_LOCKED, "true");
+    	
         inputProperties = new TJiraInputProperties("root");
         inputProperties.connection.hostUrl.setValue("hostValue");
         inputProperties.connection.basicAuthentication.userId.setValue("userIdValue");
         inputProperties.connection.basicAuthentication.password.setValue("passwordValue");
         inputProperties.resource.setValue(Resource.ISSUE);
-        schemaValue = Utils.readFile("src/test/resources/org/talend/components/jira/tjirainput/schema.json");
-        inputProperties.schema.schema.setValue(new Schema.Parser().parse(schemaValue));
+       
+        inputProperties.schema.schema.setValue(schema);
         inputProperties.jql.setValue("jqlValue");
         inputProperties.batchSize.setValue(50);
         inputProperties.projectId.setValue("projectIdValue");

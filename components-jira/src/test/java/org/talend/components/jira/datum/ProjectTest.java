@@ -28,7 +28,11 @@ public class ProjectTest {
      */
     @Test
     public void testGetEntities() {
-        Projects project = new Projects(JsonDataProvider.getProjectJson());
+    	String projectJson = "[{\"expand\":\"description,lead,url,projectKeys\",\"self\":\"http://localhost:8080/rest/api/2/project/10100\",\"id\":\"10100\","
+    			+ "\"key\":\"AN\",\"name\":\"AnotherProject\",\"projectTypeKey\":\"software\"},"
+    			+ "{\"expand\":\"description,lead,url,projectKeys\",\"self\":\"http://localhost:8080/rest/api/2/project/10000\",\"id\":\"10000\","
+    			+ "\"key\":\"TP\",\"name\":\"Test Project\",\"projectTypeKey\":\"software\"}]";
+        Projects project = new Projects(projectJson);
         List<Entity> entities = project.getEntities();
         assertEquals(2, entities.size());
     }

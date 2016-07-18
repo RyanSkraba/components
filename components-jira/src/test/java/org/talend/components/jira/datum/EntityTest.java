@@ -21,15 +21,22 @@ import org.junit.Test;
  */
 public class EntityTest {
 
-    /**
-     * Check {@link Entity#getJson()} returns JSON representation without changes
-     */
-    @Test
-    public void testGetJson() {
-        String json = JsonDataProvider.getPaginationJson();
-        Entity entity = new Entity(json);
+	/**
+	 * Check {@link Entity#getJson()} returns JSON representation without
+	 * changes
+	 */
+	@Test
+	public void testGetJson() {
+		String json = "{\"expand\":\"schema,names\",\"startAt\":0,\"maxResults\":50,\"total\":37,\"issues\":["
+				+ "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10413\","
+				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10413\",\"key\":\"TP-41\",\"fields\":{\"description\":\"task upd\",\"summary\":\"Updated 37\",}},"
+				+ "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10412\","
+				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10412\",\"key\":\"TP-40\",\"fields\":{\"description\":\"Task updated\",\"summary\":\"TP 38 updated\",}},"
+				+ "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10411\","
+				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10411\",\"key\":\"TP-39\",\"fields\":{\"description\":null,\"summary\":\"115\",}}]}";
+		Entity entity = new Entity(json);
 
-        String actual = entity.getJson();
-        assertEquals(json, actual);
-    }
+		String actual = entity.getJson();
+		assertEquals(json, actual);
+	}
 }

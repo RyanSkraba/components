@@ -49,12 +49,13 @@ public class JiraWriteOperation implements WriteOperation<Result> {
     }
 
     /**
-     * Resets output results values
+     * Does nothing
      *
      * @param container {@link RuntimeContainer} instance
      */
     @Override
     public void initialize(RuntimeContainer container) {
+        // nothing to be done here
     }
 
     /**

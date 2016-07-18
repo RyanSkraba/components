@@ -1,1 +1,0 @@
-{"type":"record","name":"jira","fields":[{"name":"id","type":"string"},{"name":"json","type":"string"}],"talend.isLocked":"true"}

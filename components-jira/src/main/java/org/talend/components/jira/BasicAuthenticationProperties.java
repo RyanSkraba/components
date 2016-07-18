@@ -36,7 +36,7 @@ public class BasicAuthenticationProperties extends UserPasswordProperties {
      * @return value for Http Authorization header
      */
     public String getAuthorizationValue() {
-        String credentials = userId + ":" + password;
+        String credentials = userId.getValue() + ":" + password.getValue();
         String encodedCredentials = base64(credentials);
         String authorizationValue = "Basic " + encodedCredentials;
         return authorizationValue;

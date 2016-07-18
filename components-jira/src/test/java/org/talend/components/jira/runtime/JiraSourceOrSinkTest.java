@@ -13,16 +13,20 @@
 package org.talend.components.jira.runtime;
 
 import static org.junit.Assert.assertEquals;
+import static org.talend.daikon.avro.SchemaConstants.TALEND_IS_LOCKED;
+
+import java.util.Collections;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field.Order;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jira.Action;
 import org.talend.components.jira.Resource;
-import org.talend.components.jira.testutils.Utils;
 import org.talend.components.jira.tjiraoutput.TJiraOutputProperties;
+import org.talend.daikon.avro.AvroRegistry;
 
 /**
  * Unit-tests for {@link JiraSourceOrSink} class
@@ -35,22 +39,27 @@ public class JiraSourceOrSinkTest {
     private TJiraOutputProperties outputProperties;
 
     /**
-     * JSON string, which describes {@link Schema}
+     * {@link Schema}
      */
-    private String schemaValue;
+    private Schema schema;
 
     /**
      * Prepares required instances for tests
      */
     @Before
     public void setUp() {
+        AvroRegistry registry = new AvroRegistry();
+        Schema stringSchema = registry.getConverter(String.class).getSchema();
+        Schema.Field jsonField = new Schema.Field("json", stringSchema, null, null, Order.ASCENDING);
+        schema = Schema.createRecord("jira", null, null, false, Collections.singletonList(jsonField));
+        schema.addProp(TALEND_IS_LOCKED, "true");
+    	
         outputProperties = new TJiraOutputProperties("root");
         outputProperties.connection.hostUrl.setValue("hostValue");
         outputProperties.connection.basicAuthentication.userId.setValue("userIdValue");
         outputProperties.connection.basicAuthentication.password.setValue("passwordValue");
         outputProperties.resource.setValue(Resource.ISSUE);
-        schemaValue = Utils.readFile("src/test/resources/org/talend/components/jira/tjirainput/schema.json");
-        outputProperties.schema.schema.setValue(new Schema.Parser().parse(schemaValue));
+        outputProperties.schema.schema.setValue(schema);
         outputProperties.action.setValue(Action.INSERT);
     }
 
@@ -72,8 +81,8 @@ public class JiraSourceOrSinkTest {
         assertEquals("passwordValue", password);
         String resource = sourceOrSink.getResource();
         assertEquals("rest/api/2/issue", resource);
-        Schema schema = sourceOrSink.getSchema();
-        assertEquals(schemaValue, schema.toString());
+        Schema actualSchema = sourceOrSink.getSchema();
+        assertEquals(schema, actualSchema);
     }
 
 }

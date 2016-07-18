@@ -20,17 +20,22 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.talend.daikon.avro.SchemaConstants.TALEND_IS_LOCKED;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field.Order;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.jira.Action;
 import org.talend.components.jira.Mode;
 import org.talend.components.jira.Resource;
-import org.talend.components.jira.testutils.Utils;
+import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 
@@ -44,6 +49,12 @@ public class TJiraOutputPropertiesTest {
      */
     @Test
     public void testSetupProperties() {
+        AvroRegistry registry = new AvroRegistry();
+        Schema stringSchema = registry.getConverter(String.class).getSchema();
+        Schema.Field jsonField = new Schema.Field("json", stringSchema, null, null, Order.ASCENDING);
+        Schema expectedSchema = Schema.createRecord("jira", null, null, false, Collections.singletonList(jsonField));
+        expectedSchema.addProp(TALEND_IS_LOCKED, "true");
+    	
         TJiraOutputProperties properties = new TJiraOutputProperties("root");
         properties.setupProperties();
 
@@ -53,14 +64,12 @@ public class TJiraOutputPropertiesTest {
         Mode modeValue = properties.mode.getValue();
 
         Schema schema = properties.schema.schema.getValue();
-        String actualSchema = schema.toString();
-        String expectedSchema = Utils.readFile("src/test/resources/org/talend/components/jira/tjirainput/schema.json");
 
         assertThat(actionValue, equalTo(Action.INSERT));
         assertThat(resourceValue, equalTo(Resource.ISSUE));
         assertThat(deleteSubtasksValue, equalTo(true));
         assertThat(modeValue, equalTo(Mode.ADVANCED));
-        assertThat(actualSchema, equalTo(expectedSchema));
+        assertThat(schema, equalTo(expectedSchema));
     }
 
     /**
@@ -120,6 +129,12 @@ public class TJiraOutputPropertiesTest {
      */
     @Test
     public void testAfterActionInsert() {
+        AvroRegistry registry = new AvroRegistry();
+        Schema stringSchema = registry.getConverter(String.class).getSchema();
+        Schema.Field jsonField = new Schema.Field("json", stringSchema, null, null, Order.ASCENDING);
+        Schema expectedSchema = Schema.createRecord("jira", null, null, false, Collections.singletonList(jsonField));
+        expectedSchema.addProp(TALEND_IS_LOCKED, "true");
+    	
         TJiraOutputProperties properties = new TJiraOutputProperties("root");
         properties.init();
         properties.action.setValue(Action.INSERT);
@@ -130,9 +145,8 @@ public class TJiraOutputPropertiesTest {
         assertTrue(deleteSubtasksHidden);
 
         Schema schema = properties.schema.schema.getValue();
-        String actualSchema = schema.toString();
-        String expectedSchema = Utils.readFile("src/test/resources/org/talend/components/jira/tjirainput/schema.json");
-        assertThat(actualSchema, equalTo(expectedSchema));
+
+        assertThat(schema, equalTo(expectedSchema));
     }
 
     /**
@@ -141,6 +155,14 @@ public class TJiraOutputPropertiesTest {
      */
     @Test
     public void testAfterActionUpdate() {
+        AvroRegistry registry = new AvroRegistry();
+        Schema stringSchema = registry.getConverter(String.class).getSchema();
+        Schema.Field idField = new Schema.Field("id", stringSchema, null, null, Order.ASCENDING);
+        Schema.Field jsonField = new Schema.Field("json", stringSchema, null, null, Order.ASCENDING);
+        List<Schema.Field> fields = Arrays.asList(idField, jsonField);
+        Schema expectedSchema = Schema.createRecord("jira", null, null, false, fields);
+        expectedSchema.addProp(TALEND_IS_LOCKED, "true");
+    	
         TJiraOutputProperties properties = new TJiraOutputProperties("root");
         properties.init();
         properties.action.setValue(Action.UPDATE);
@@ -151,9 +173,8 @@ public class TJiraOutputPropertiesTest {
         assertTrue(deleteSubtasksHidden);
 
         Schema schema = properties.schema.schema.getValue();
-        String actualSchema = schema.toString();
-        String expectedSchema = Utils.readFile("src/test/resources/org/talend/components/jira/tjiraoutput/updateSchema.json");
-        assertThat(actualSchema, equalTo(expectedSchema));
+
+        assertThat(schema, equalTo(expectedSchema));
     }
 
     /**
@@ -162,6 +183,12 @@ public class TJiraOutputPropertiesTest {
      */
     @Test
     public void testAfterActionDelete() {
+        AvroRegistry registry = new AvroRegistry();
+        Schema stringSchema = registry.getConverter(String.class).getSchema();
+        Schema.Field idField = new Schema.Field("id", stringSchema, null, null, Order.ASCENDING);
+        Schema expectedSchema = Schema.createRecord("jira", null, null, false, Collections.singletonList(idField));
+        expectedSchema.addProp(TALEND_IS_LOCKED, "true");
+    	
         TJiraOutputProperties properties = new TJiraOutputProperties("root");
         properties.init();
         properties.action.setValue(Action.DELETE);
@@ -169,9 +196,8 @@ public class TJiraOutputPropertiesTest {
         properties.afterAction();
 
         Schema schema = properties.schema.schema.getValue();
-        String actualSchema = schema.toString();
-        String expectedSchema = Utils.readFile("src/test/resources/org/talend/components/jira/tjiraoutput/deleteSchema.json");
-        assertThat(actualSchema, equalTo(expectedSchema));
+
+        assertThat(schema, equalTo(expectedSchema));
     }
 
     /**

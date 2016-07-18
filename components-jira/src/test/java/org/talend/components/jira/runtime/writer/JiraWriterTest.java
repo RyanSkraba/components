@@ -43,7 +43,7 @@ public class JiraWriterTest {
      * {@link JiraWriteOperation} mock
      */
     private JiraWriteOperation writeOperation;
-    
+
     /**
      * Sets up mocks used in tests
      */

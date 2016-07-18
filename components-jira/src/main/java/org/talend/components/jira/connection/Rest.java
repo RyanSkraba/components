@@ -24,11 +24,13 @@ import java.util.Map;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
@@ -65,6 +67,11 @@ public class Rest {
     private ContentType contentType;
 
     /**
+     * Request executor
+     */
+    private Executor executor;
+
+    /**
      * Constructor
      */
     public Rest() {
@@ -83,6 +90,8 @@ public class Rest {
         }
         this.hostPort = hostPort;
         contentType = ContentType.create("application/json", StandardCharsets.UTF_8);
+        executor = Executor.newInstance();
+        executor.use(new BasicCookieStore());
     }
 
     /**
@@ -133,7 +142,8 @@ public class Rest {
             for (Header header : headers) {
                 get.addHeader(header);
             }
-            return get.execute().returnContent().asString();
+            executor.clearCookies();
+            return executor.execute(get).returnContent().asString();
         } catch (URISyntaxException e) {
             LOG.debug("Wrong URI. {}", e.getMessage());
             throw new IOException("Wrong URI", e);
@@ -171,7 +181,8 @@ public class Rest {
             for (Header header : headers) {
                 delete.addHeader(header);
             }
-            return delete.execute().returnResponse().getStatusLine().getStatusCode();
+            executor.clearCookies();
+            return executor.execute(delete).returnResponse().getStatusLine().getStatusCode();
         } catch (URISyntaxException e) {
             LOG.debug("Wrong URI. {}", e.getMessage());
             throw new IOException("Wrong URI", e);
@@ -192,7 +203,8 @@ public class Rest {
         for (Header header : headers) {
             post.addHeader(header);
         }
-        return post.execute().returnResponse().getStatusLine().getStatusCode();
+        executor.clearCookies();
+        return executor.execute(post).returnResponse().getStatusLine().getStatusCode();
     }
 
     /**
@@ -209,7 +221,8 @@ public class Rest {
         for (Header header : headers) {
             put.addHeader(header);
         }
-        return put.execute().returnResponse().getStatusLine().getStatusCode();
+        executor.clearCookies();
+        return executor.execute(put).returnResponse().getStatusLine().getStatusCode();
     }
 
     public Rest setAuthorizationType(String type) {

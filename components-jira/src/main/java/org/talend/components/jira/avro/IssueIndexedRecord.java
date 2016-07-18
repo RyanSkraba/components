@@ -23,7 +23,7 @@ public class IssueIndexedRecord implements IndexedRecord {
     /**
      * Avro schema of this {@link IndexedRecord}
      */
-    private Schema schema;
+    private final Schema schema;
 
     /**
      * Jira JSON string

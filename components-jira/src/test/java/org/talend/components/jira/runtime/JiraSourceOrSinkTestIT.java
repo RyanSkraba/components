@@ -12,18 +12,25 @@
 // ============================================================================
 package org.talend.components.jira.runtime;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.talend.components.jira.testutils.JiraTestConstants.HOST_PORT;
+import static org.talend.components.jira.testutils.JiraTestConstants.INCORRECT_HOST_PORT;
+import static org.talend.daikon.avro.SchemaConstants.TALEND_IS_LOCKED;
+
+import java.util.Collections;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field.Order;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jira.Action;
 import org.talend.components.jira.Resource;
-import org.talend.components.jira.testutils.Utils;
 import org.talend.components.jira.tjiraoutput.TJiraOutputProperties;
+import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
@@ -33,37 +40,32 @@ import org.talend.daikon.properties.ValidationResult.Result;
 public class JiraSourceOrSinkTestIT {
 
     /**
-     * Jira server host and port
-     */
-    private static final String CORRECT_HOST_PORT = "http://192.168.99.100:8080/";
-
-    /**
-     * Incorrect host and port
-     */
-    private static final String INCORRECT_HOST_PORT = "http://incorrecthost.com/";
-
-    /**
      * {@link ComponentProperties} for {@link JiraSourceOrSink}
      */
     private TJiraOutputProperties outputProperties;
 
     /**
-     * JSON string, which describes {@link Schema}
+     * {@link Schema}
      */
-    private String schemaValue;
+    private Schema schema;
 
     /**
      * Prepares required instances for tests
      */
     @Before
     public void setUp() {
+        AvroRegistry registry = new AvroRegistry();
+        Schema stringSchema = registry.getConverter(String.class).getSchema();
+        Schema.Field jsonField = new Schema.Field("json", stringSchema, null, null, Order.ASCENDING);
+        schema = Schema.createRecord("jira", null, null, false, Collections.singletonList(jsonField));
+        schema.addProp(TALEND_IS_LOCKED, "true");
+    	
         outputProperties = new TJiraOutputProperties("root");
-        outputProperties.connection.hostUrl.setValue(CORRECT_HOST_PORT);
+        outputProperties.connection.hostUrl.setValue(HOST_PORT);
         outputProperties.connection.basicAuthentication.userId.setValue("userIdValue");
         outputProperties.connection.basicAuthentication.password.setValue("passwordValue");
         outputProperties.resource.setValue(Resource.ISSUE);
-        schemaValue = Utils.readFile("src/test/resources/org/talend/components/jira/tjirainput/schema.json");
-        outputProperties.schema.schema.setValue(new Schema.Parser().parse(schemaValue));
+        outputProperties.schema.schema.setValue(schema);
         outputProperties.action.setValue(Action.INSERT);
     }
 
@@ -71,7 +73,6 @@ public class JiraSourceOrSinkTestIT {
      * Checks {@link JiraSourceOrSink#validate(RuntimeContainer)} returns {@link ValidationResult.Result#OK} in case of
      * established connection
      */
-    @Ignore
     @Test
     public void testValidateOk() {
         JiraSourceOrSink sourceOrSink = new JiraSourceOrSink();
@@ -87,7 +88,6 @@ public class JiraSourceOrSinkTestIT {
      * Checks {@link JiraSourceOrSink#validate(RuntimeContainer)} returns {@link ValidationResult.Result#ERROR} and
      * {@link ValidationResult} contains correct message in case of connection wasn't established
      */
-    @Ignore
     @Test
     public void testValidateError() {
         JiraSourceOrSink sourceOrSink = new JiraSourceOrSink();
@@ -99,7 +99,30 @@ public class JiraSourceOrSinkTestIT {
         String actualMessage = result.getMessage();
 
         assertEquals(Result.ERROR, actualStatus);
-        assertEquals("Wrong host URL: " + INCORRECT_HOST_PORT + " or host is unreachable", actualMessage);
+        assertThat(actualMessage, containsString("Host validation failed for URL: " + INCORRECT_HOST_PORT));
+        assertThat(actualMessage, containsString("Exception during connection: "));
+    }
+
+    /**
+     * Checks {@link JiraSourceOrSink#validate(RuntimeContainer)} returns {@link ValidationResult.Result#ERROR} and
+     * {@link ValidationResult} contains correct message in case of connection was established, but there is no such resource
+     * on server
+     */
+    @Test
+    public void testValidateWrongStatus() {
+        String expectedMessage = "Host validation failed for URL: " + HOST_PORT + "notFoundPage" + System.lineSeparator()
+                + "Connection is established, but status code is 404";
+
+        JiraSourceOrSink sourceOrSink = new JiraSourceOrSink();
+        outputProperties.connection.hostUrl.setValue(HOST_PORT + "notFoundPage");
+        sourceOrSink.initialize(null, outputProperties);
+
+        ValidationResult result = sourceOrSink.validate(null);
+        Result actualStatus = result.getStatus();
+        String actualMessage = result.getMessage();
+
+        assertEquals(Result.ERROR, actualStatus);
+        assertEquals(expectedMessage, actualMessage);
     }
 
 }
