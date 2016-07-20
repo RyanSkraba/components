@@ -13,6 +13,7 @@
 package org.talend.components.splunk.objects;
 
 import java.util.Date;
+import java.util.Locale;
 
 public class SplunkJSONEventBuilder {
 
@@ -35,7 +36,7 @@ public class SplunkJSONEventBuilder {
     private static Object convertData(String fieldName, Object value) {
         if (SplunkJSONEventField.TIME.getName().equals(fieldName) && value instanceof Date) {
             double newValue = ((Date) value).getTime() / 1000.0;
-            return String.format("%.3f", newValue);
+            return String.format(Locale.ROOT, "%.3f", newValue);
         }
         return value;
     }
