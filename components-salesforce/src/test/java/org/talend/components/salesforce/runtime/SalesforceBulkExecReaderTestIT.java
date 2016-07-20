@@ -26,11 +26,12 @@ import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.BoundedReader;
-import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.Result;
+import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.salesforce.SalesforceBulkProperties.Concurrency;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
@@ -47,16 +48,25 @@ import org.talend.components.salesforce.tsalesforceoutputbulkexec.TSalesforceOut
  */
 public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
 
+    @Test
+    @Ignore("because of 5M data storage limitation")
+    public void testBulkLimitation() throws Throwable {
+        testOutputBulkExec(5055);
+    }
+
+    @Test
+    public void testOutputBulkExec() throws Throwable {
+        testOutputBulkExec(10);
+    }
+
     /**
      * This test for tSalesforceOutputBulk and tSalesforceBulkExec The runtime of tSalesforceOutputBulkExec should be
      * work like this.
      *
      */
-    @Test
-    public void testOutputBulkExec() throws Throwable {
+    private void testOutputBulkExec(int count) throws Throwable {
 
         String random = createNewRandom();
-        int count = 10;
 
         List<IndexedRecord> rows = makeRows(random, count, false);
 
@@ -128,7 +138,7 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
 
         Result result = writeRows(saleforceWriter, rows);
         Map<String, Object> resultMap = getConsolidatedResults(result, saleforceWriter);
-        Assert.assertEquals(10, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
+        Assert.assertEquals(rows.size(), resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
     }
 
     /**
@@ -138,7 +148,7 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
         TSalesforceOutputBulkExecProperties props = (TSalesforceOutputBulkExecProperties) new TSalesforceOutputBulkExecProperties(
                 "foo").init();
 
-        props.connection.timeout.setValue(120000);
+        props.connection.timeout.setValue(1200000);
         props.connection.bulkConnection.setValue(true);
         props.outputAction.setValue(SalesforceOutputProperties.OutputAction.INSERT);
         String bulkFilePath = this.getClass().getResource("").getPath() + "/test_outputbulk_1.csv";

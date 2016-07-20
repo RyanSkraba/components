@@ -44,7 +44,7 @@ public class SalesforceBulkRuntime {
 
     private JobInfo job;
 
-    private CSVReader baseFileReader;
+    private com.csvreader.CsvReader baseFileReader;
 
     private List<String> baseFileHeader;
 
@@ -117,8 +117,10 @@ public class SalesforceBulkRuntime {
 
     private void prepareLog() throws IOException {
         br = new BufferedReader(new InputStreamReader(new FileInputStream(bulkFileName), FILE_ENCODING));
-        baseFileReader = new CSVReader(br, ',');
-        baseFileHeader = baseFileReader.nextRecord();
+        baseFileReader = new com.csvreader.CsvReader(br, ',');
+        if (baseFileReader.readRecord()) {
+            baseFileHeader = Arrays.asList(baseFileReader.getValues());
+        }
         baseFileHeaderSize = baseFileHeader.size();
     }
 
@@ -327,8 +329,8 @@ public class SalesforceBulkRuntime {
      */
     private BulkResult getBaseFileRow() throws IOException {
         BulkResult dataInfo = new BulkResult();
-        List<String> row = null;
-        if ((row = baseFileReader.nextRecord()) != null) {
+        if (baseFileReader.readRecord()) {
+            List<String> row = Arrays.asList(baseFileReader.getValues());
             for (int i = 0; i < row.size(); i++) {
                 dataInfo.setValue(baseFileHeader.get(i), row.get(i));
             }
@@ -422,14 +424,15 @@ public class SalesforceBulkRuntime {
         // batchInfoList was populated when batches were created and submitted
         List<Map<String, String>> resultInfoList = new ArrayList<Map<String, String>>();
         Map<String, String> resultInfo;
-        baseFileReader = new CSVReader(new BufferedReader(
-                new InputStreamReader(getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId), FILE_ENCODING)),
-                ',');
+        baseFileReader = new com.csvreader.CsvReader(new java.io.BufferedReader(new java.io.InputStreamReader(
+                getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId), FILE_ENCODING)), ',');
 
-        baseFileHeader = baseFileReader.nextRecord();
+        if (baseFileReader.readRecord()) {
+            baseFileHeader = Arrays.asList(baseFileReader.getValues());
+        }
         baseFileHeaderSize = baseFileHeader.size();
         List<String> row = null;
-        while ((row = baseFileReader.nextRecord()) != null) {
+        while (baseFileReader.readRecord()) {
             resultInfo = new HashMap<String, String>();
             for (int i = 0; i < baseFileHeaderSize; i++) {
                 resultInfo.put(baseFileHeader.get(i), row.get(i));
@@ -440,11 +443,12 @@ public class SalesforceBulkRuntime {
     }
 
     public BulkResultSet getQueryResultSet(String resultId) throws AsyncApiException, IOException, ConnectionException {
-        baseFileReader = new CSVReader(new BufferedReader(
-                new InputStreamReader(getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId), FILE_ENCODING)),
-                ',');
+        baseFileReader = new com.csvreader.CsvReader(new java.io.BufferedReader(new java.io.InputStreamReader(
+                getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId), FILE_ENCODING)), ',');
 
-        baseFileHeader = baseFileReader.nextRecord();
+        if (baseFileReader.readRecord()) {
+            baseFileHeader = Arrays.asList(baseFileReader.getValues());
+        }
         baseFileHeaderSize = baseFileHeader.size();
         return new BulkResultSet(baseFileReader, baseFileHeader);
     }
@@ -574,32 +578,49 @@ public class SalesforceBulkRuntime {
 
     class BulkResultSet {
 
-        CSVReader reader;
+        com.csvreader.CsvReader reader;
 
         List<String> header;
 
         boolean hashNext = true;
 
-        public BulkResultSet(CSVReader reader, List<String> header) {
+        public BulkResultSet(com.csvreader.CsvReader reader, List<String> header) {
             this.reader = reader;
             this.header = header;
         }
 
         public BulkResult next() throws IOException {
 
-            BulkResult result = null;
-            List<String> row = null;
+            boolean hasNext = false;
+            try {
+                hasNext = reader.readRecord();
+            } catch (IOException e) {
+                if (this.reader != null) {
+                    this.reader.close();
+                }
+                throw e;
+            }
 
-            if ((row = reader.nextRecord()) != null) {
-                result = new BulkResult();
-                for (int i = 0; i < this.header.size(); i++) {
-                    result.setValue(header.get(i), row.get(i));
+            BulkResult result = null;
+            String[] row;
+
+            if (hasNext) {
+                if ((row = reader.getValues()) != null) {
+                    result = new BulkResult();
+                    for (int i = 0; i < this.header.size(); i++) {
+                        result.setValue(header.get(i), row[i]);
+                    }
+                    return result;
+                } else {
+                    return next();
+                }
+            } else {
+                if (this.reader != null) {
+                    this.reader.close();
                 }
             }
-            if (result == null) {
-                hashNext = false;
-            }
-            return result;
+            return null;
+
         }
 
         public boolean hasNext() {
