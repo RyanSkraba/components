@@ -1,105 +1,72 @@
 package org.talend.components.common.runtime;
 
-import org.talend.components.common.ProxyProperties;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.SocketAddress;
 
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
+import org.talend.components.common.ProxyProperties;
 
 public class ProxyPropertiesRuntimeHelper {
 
-    /**
-     * Set proxy configuration with ProxyProperties type and Proxy type
-     */
-    public static void setProxy(final ProxyProperties properties, ProxyProperties.ProxyType type) {
-        if (properties.useProxy.getValue()) {
-            setProxyProperties(properties, type);
-        } else {
-            removeProxyProperties(type);
+    private String proxyHost;
+
+    private String proxyPort;
+
+    private String proxyUser;
+
+    private String proxyPwd;
+
+    private Proxy socketProxy;
+
+    public ProxyPropertiesRuntimeHelper(ProxyProperties proxySetting) {
+        if (proxySetting.useProxy.getValue()) {// proxy setting from component setting
+            proxyHost = proxySetting.host.getStringValue();
+            proxyPort = proxySetting.port.getStringValue();
+            proxyUser = proxySetting.userPassword.userId.getStringValue();
+            proxyPwd = proxySetting.userPassword.password.getStringValue();
+
+            // use socks as default like before
+            SocketAddress addr = new InetSocketAddress(proxyHost, Integer.parseInt(proxyPort));
+            socketProxy = new Proxy(Proxy.Type.SOCKS, addr);
+        } else if (System.getProperty("https.proxyHost") != null) {// set by other components like tSetProxy
+            proxyHost = System.getProperty("https.proxyHost");
+            proxyPort = System.getProperty("https.proxyPort");
+            proxyUser = System.getProperty("https.proxyUser");
+            proxyPwd = System.getProperty("https.proxyPassword");
+        } else if (System.getProperty("http.proxyHost") != null) {
+            proxyHost = System.getProperty("http.proxyHost");
+            proxyPort = System.getProperty("http.proxyPort");
+            proxyUser = System.getProperty("http.proxyUser");
+            proxyPwd = System.getProperty("http.proxyPassword");
+        } else if (System.getProperty("socksProxyHost") != null) {
+            proxyHost = System.getProperty("socksProxyHost");
+            proxyPort = System.getProperty("socksProxyPort");
+            proxyUser = System.getProperty("java.net.socks.username");
+            proxyPwd = System.getProperty("java.net.socks.password");
+
+            SocketAddress addr = new InetSocketAddress(proxyHost, Integer.parseInt(proxyPort));
+            socketProxy = new Proxy(Proxy.Type.SOCKS, addr);
         }
     }
 
-    private static void setProxyProperties(ProxyProperties properties, ProxyProperties.ProxyType type) {
-        Authenticator authenticator = new ProxyAuth(properties.userPassword.userId.getStringValue(), properties.userPassword.password.getStringValue());
-        if (ProxyProperties.ProxyType.HTTP.equals(type)) {
-            setPropertyValue("http.proxySet", "true");
-            setPropertyValue("http.proxyHost", properties.host.getStringValue());
-            setPropertyValue("http.proxyPort", properties.port.getStringValue());
-            setPropertyValue("http.nonProxyHosts", "192.168.0.* | localhost");
-            setPropertyValue("http.proxyUser", properties.userPassword.userId.getStringValue());
-            setPropertyValue("http.proxyPassword", properties.userPassword.password.getStringValue());
-            Authenticator.setDefault(authenticator);
-        } else if (ProxyProperties.ProxyType.SOCKS.equals(type)) {
-            setPropertyValue("socksProxySet", "true");
-            setPropertyValue("socksProxyHost", properties.host.getStringValue());
-            setPropertyValue("socksProxyPort", properties.port.getStringValue());
-            setPropertyValue("java.net.socks.username", properties.userPassword.userId.getStringValue());
-            setPropertyValue("java.net.socks.password", properties.userPassword.password.getStringValue());
-            Authenticator.setDefault(authenticator);
-        } else if (ProxyProperties.ProxyType.HTTPS.equals(type)) {
-            setPropertyValue("https.proxyHost", properties.host.getStringValue());
-            setPropertyValue("https.proxyPort", properties.port.getStringValue());
-        } else if (ProxyProperties.ProxyType.FTP.equals(type)) {
-            setPropertyValue("ftpProxySet", "true");
-            setPropertyValue("ftp.proxyHost", properties.host.getStringValue());
-            setPropertyValue("ftp.proxyPort", properties.port.getStringValue());
-            setPropertyValue("ftp.nonProxyHosts", "192.168.0.* | localhost");
-        }
+    public String getProxyHost() {
+        return proxyHost;
     }
 
-    private static void removeProxyProperties(ProxyProperties.ProxyType type) {
-        if (ProxyProperties.ProxyType.HTTP.equals(type)) {
-            removeProperty("http.proxySet");
-            removeProperty("http.proxyHost");
-            removeProperty("http.proxyPort");
-            removeProperty("http.nonProxyHosts");
-            removeProperty("http.proxyUser");
-            removeProperty("http.proxyPassword");
-            Authenticator.setDefault(null);
-        } else if (ProxyProperties.ProxyType.SOCKS.equals(type)) {
-            removeProperty("socksProxySet");
-            removeProperty("socksProxyHost");
-            removeProperty("socksProxyPort");
-            removeProperty("java.net.socks.username");
-            removeProperty("java.net.socks.password");
-            Authenticator.setDefault(null);
-        } else if (ProxyProperties.ProxyType.HTTPS.equals(type)) {
-            removeProperty("https.proxyHost");
-            removeProperty("https.proxyPort");
-        } else if (ProxyProperties.ProxyType.FTP.equals(type)) {
-            removeProperty("ftpProxySet");
-            removeProperty("ftp.proxyHost");
-            removeProperty("ftp.proxyPort");
-            removeProperty("ftp.nonProxyHosts");
-        }
+    public String getProxyPort() {
+        return proxyPort;
     }
 
-    public static void setPropertyValue(String name, String value) {
-        if (name != null && value != null) {
-            System.setProperty(name, value);
-        }
+    public String getProxyUser() {
+        return proxyUser;
     }
 
-    public static String removeProperty(String name) {
-        String value = null;
-        if (name != null) {
-            value = System.getProperty(name);
-            System.clearProperty(name);
-        }
-        return value;
+    public String getProxyPwd() {
+        return proxyPwd;
     }
 
-    static class ProxyAuth extends Authenticator {
-
-        private PasswordAuthentication auth;
-
-        private ProxyAuth(String userName, String password) {
-            auth = new PasswordAuthentication(userName, password == null ? new char[]{} : password.toCharArray());
-        }
-
-        @Override
-        protected PasswordAuthentication getPasswordAuthentication() {
-            return auth;
-        }
+    public Proxy getSocketProxy() {
+        return socketProxy;
     }
 
 }
