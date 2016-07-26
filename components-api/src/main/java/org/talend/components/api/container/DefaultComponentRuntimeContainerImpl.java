@@ -36,4 +36,9 @@ public class DefaultComponentRuntimeContainerImpl implements RuntimeContainer {
     public String getCurrentComponentId() {
         return null;
     }
+
+    @Override
+    public Object getGlobalData(String key) {
+        return map.get(key);
+    }
 }

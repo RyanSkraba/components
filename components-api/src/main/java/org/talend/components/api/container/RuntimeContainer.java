@@ -17,7 +17,7 @@ public interface RuntimeContainer {
      * communication between components with a container.
      *
      * @param componentId the identifier of the component within the container (as related to the calling component).
-     * @param key an identifier fo the type of data required (for example the connection information).
+     * @param key an identifier for the type of data required (for example the connection information).
      * @return an Object, the context for the component.
      */
     Object getComponentData(String componentId, String key);
@@ -36,5 +36,10 @@ public interface RuntimeContainer {
      * Return the id of the currently execution component.
      */
     String getCurrentComponentId();
+
+    /**
+     * Return a data value applicable for a component with the given key
+     */
+    Object getGlobalData(String key);
 
 }
