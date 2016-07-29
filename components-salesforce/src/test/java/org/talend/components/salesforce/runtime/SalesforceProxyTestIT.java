@@ -21,9 +21,9 @@ public class SalesforceProxyTestIT extends SalesforceTestBase {
 
     private static HttpProxyServer server;
 
-    private static final String proxyUsername = "talend";
+    private static final String proxyUsername = "talend_username";
 
-    private static final String proxyPassword = "talend";
+    private static final String proxyPassword = "talend_password";
 
     private static final int proxyPort = 9999;
 

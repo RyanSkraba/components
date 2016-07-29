@@ -314,7 +314,8 @@ public class SalesforceSourceOrSink implements SourceOrSink {
 
                         @Override
                         public PasswordAuthentication getPasswordAuthentication() {
-                            return new PasswordAuthentication(proxyHelper.getProxyPwd(), proxyHelper.getProxyPwd().toCharArray());
+                            return new PasswordAuthentication(proxyHelper.getProxyUser(),
+                                    proxyHelper.getProxyPwd().toCharArray());
                         }
 
                     });
