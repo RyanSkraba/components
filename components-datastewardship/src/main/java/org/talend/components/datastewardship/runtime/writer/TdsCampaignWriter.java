@@ -50,6 +50,8 @@ public class TdsCampaignWriter extends TdsWriter {
             throw new IOException("Writer wasn't opened"); //$NON-NLS-1$
         }
         
+        result.totalCount++;
+        
         if (datum == null) {
             return;
         }

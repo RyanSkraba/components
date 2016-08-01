@@ -1,0 +1,55 @@
+{
+  'campaign': {
+    'createdBy': 'admin',
+    'creationDate': 0,
+    'endDate': 0,
+    'id': '1',
+    'label': 'A',
+    'lastUpdateDate': 0,
+    'lastUpdatedBy': 'admin',
+    'name': 'TEST',
+    'owner': 'admin',
+    'recordStructure': {
+      'fields': [
+        {
+          'mandatory': true,
+          'name': 'TEST',
+          'type': 'TDS_DATE'
+        }
+      ],
+      'name': 'TEST'
+    },
+    'startDate': 0,
+    'status': 'NOT_STARTED',
+    'taskType': 'GROUPING',
+    'workflow': {
+      'createdBy': 'admin',
+      'creationDate': 0,
+      'id': '1',
+      'lastUpdateDate': 0,
+      'lastUpdatedBy': 'admin',
+      'name': 'TEST',
+      'states': [
+        {
+          'allowedRoles': [
+            'TEST'
+          ],
+          'name': 'TEST',
+          'transitionQuestion': 'TEST',
+          'transitions': [
+            {
+              'allowedRoles': [
+                'TEST'
+              ],
+              'name': 'TEST',
+              'targetStateName': 'TEST'
+            }
+          ],
+          'translations': {}
+        }
+      ],
+      'tenantId': 'TEST'
+    }
+  },
+  'participants': {}
+}
