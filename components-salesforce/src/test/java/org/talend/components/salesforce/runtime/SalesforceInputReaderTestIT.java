@@ -12,8 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.junit.Assert.*;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -24,14 +22,32 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.test.ComponentTestUtils;
+import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceTestBase;
+import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
+import org.talend.daikon.avro.AvroUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceInputReaderTestIT.class);
+
+    public static Schema SCHEMA_QUERY_ACCOUNT = SchemaBuilder.builder().record("Schema").fields() //
+            .name("Id").type().stringType().noDefault() //
+            .name("Name").type().stringType().noDefault() //
+            .name("BillingStreet").type().stringType().noDefault() //
+            .name("BillingCity").type().stringType().noDefault() //
+            .name("BillingState").type().stringType().noDefault() //
+            .name("NumberOfEmployees").type().intType().noDefault() //
+            .name("AnnualRevenue").type(AvroUtils._decimal()).noDefault().endRecord();
 
     @Test
     public void testStartAdvanceGetCurrent() throws IOException {
@@ -121,6 +137,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         try {
             List<IndexedRecord> rows = readRows(props);
             checkRows(random, rows, count);
+            testBulkQueryNullValue(props, random);
         } finally {
             deleteRows(outputRows, props);
         }
@@ -230,6 +247,22 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
             }
         } else {
             LOGGER.warn("Query result is empty!");
+        }
+    }
+
+    protected void testBulkQueryNullValue(SalesforceConnectionModuleProperties props, String random) throws Throwable {
+        ComponentDefinition sfInputDef = new TSalesforceInputDefinition();
+        TSalesforceInputProperties sfInputProps = (TSalesforceInputProperties) sfInputDef.createRuntimeProperties();
+        sfInputProps.copyValuesFrom(props);
+        sfInputProps.manualQuery.setValue(false);
+        sfInputProps.module.main.schema.setValue(SCHEMA_QUERY_ACCOUNT);
+        sfInputProps.queryMode.setValue(TSalesforceInputProperties.QueryMode.Bulk);
+        sfInputProps.condition.setValue("BillingPostalCode = '" + random + "'");
+
+        List<IndexedRecord> inpuRecords = readRows(sfInputProps);
+        for (IndexedRecord record : inpuRecords) {
+            assertNull(record.get(5));
+            assertNull(record.get(6));
         }
     }
 }
