@@ -15,7 +15,6 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.java8.SerializableFunction;
-
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
 
@@ -179,6 +178,9 @@ public class SalesforceAvroRegistry extends AvroRegistry {
         case datetime:
             base = AvroUtils._date();
             break;
+        case base64:
+            base = AvroUtils._bytes();
+            break;
         default:
             base = AvroUtils._string();
             break;
@@ -209,6 +211,8 @@ public class SalesforceAvroRegistry extends AvroRegistry {
             return new StringToIntegerConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._date())) {
             return new StringToDateConverter(f);
+        } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._bytes())) {
+            return new StringToBytesConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._string())) {
             return super.getConverter(String.class);
         }
@@ -250,6 +254,18 @@ public class SalesforceAvroRegistry extends AvroRegistry {
         @Override
         public Boolean convertToAvro(String value) {
             return StringUtils.isEmpty(value) ? null : Boolean.parseBoolean(value);
+        }
+    }
+
+    public static class StringToBytesConverter extends AsStringConverter<byte[]> {
+
+        StringToBytesConverter(Schema.Field field) {
+            super(field);
+        }
+
+        @Override
+        public byte[] convertToAvro(String value) {
+            return value == null ? null : value.getBytes();
         }
     }
 

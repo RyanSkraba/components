@@ -12,14 +12,13 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.talend.components.salesforce.SalesforceOutputProperties.OutputAction.UPDATE;
-import static org.talend.components.salesforce.SalesforceOutputProperties.OutputAction.UPSERT;
-
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.avro.Schema;
@@ -36,15 +35,21 @@ import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.error.DefaultErrorCode;
-
-import com.sforce.soap.partner.*;
+import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.Error;
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.SaveResult;
+import com.sforce.soap.partner.UpsertResult;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.bind.CalendarCodec;
 import com.sforce.ws.bind.DateCodec;
 import com.sforce.ws.bind.XmlObject;
 import com.sforce.ws.types.Time;
+import com.sforce.ws.util.Base64;
+
+import static org.talend.components.salesforce.SalesforceOutputProperties.OutputAction.UPDATE;
+import static org.talend.components.salesforce.SalesforceOutputProperties.OutputAction.UPSERT;
 
 final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
@@ -168,7 +173,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
         nullValueFields.clear();
         for (Schema.Field f : input.getSchema().getFields()) {
             Object value = input.get(f.pos());
-            Schema.Field se = mainSchema.getField(f.name());
+            Schema.Field se = moduleSchema.getField(f.name());
             if (se != null) {
                 if (value != null && !value.toString().isEmpty()) {
                     addSObjectField(so, se.schema().getType(), se.name(), value);
@@ -192,7 +197,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
         nullValueFields.clear();
         for (Schema.Field f : input.getSchema().getFields()) {
             Object value = input.get(f.pos());
-            Schema.Field se = mainSchema.getField(f.name());
+            Schema.Field se = moduleSchema.getField(f.name());
             if (value != null && !"".equals(value.toString()) && se != null) {
                 if (referenceFieldsMap != null && referenceFieldsMap.get(se.name()) != null) {
                     Map<String, String> relationMap = referenceFieldsMap.get(se.name());
@@ -228,8 +233,18 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
         // Convert stuff here
         switch (expected) {
         case BYTES:
-            valueToAdd = Charset.defaultCharset().decode(ByteBuffer.wrap((byte[]) value)).toString();
-            break;
+            if ((value instanceof String) || (value instanceof byte[])) {
+                byte[] base64Data = null;
+                if (value instanceof byte[]) {
+                    base64Data = (byte[]) value;
+                } else {
+                    base64Data = ((String) value).getBytes();
+                }
+                if (Base64.isBase64(new String(base64Data))) {
+                    valueToAdd = Base64.decode(base64Data);
+                    break;
+                }
+            }
         default:
             valueToAdd = value;
             break;
@@ -559,7 +574,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
         return Collections.unmodifiableList(rejectedWrites);
     }
 
-    private void cleanFeedbackRecords(){
+    private void cleanFeedbackRecords() {
         successfulWrites.clear();
         rejectedWrites.clear();
     }
