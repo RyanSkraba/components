@@ -15,6 +15,7 @@ package org.talend.components.datastewardship.runtime.writer;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 import java.io.IOException;
@@ -22,14 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.avro.generic.IndexedRecord;
-import org.json.simple.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.exception.DataRejectException;
-import org.talend.components.datastewardship.connection.Rest;
+import org.talend.components.datastewardship.connection.TdsConnection;
 import org.talend.components.datastewardship.runtime.TdsWriteOperation;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
@@ -49,7 +49,7 @@ public abstract class TdsWriter implements Writer<Result> {
     /**
      * Http connection
      */
-    protected Rest rest;
+    protected TdsConnection tdsConn;
 
     /**
      * {@link WriteOperation} of this {@link Writer}
@@ -92,8 +92,8 @@ public abstract class TdsWriter implements Writer<Result> {
         String username = writeOperation.getSink().getUsername();
         String password = writeOperation.getSink().getPassword();
 
-        rest = new Rest(url);
-        rest.setCredentials(username, password);
+        tdsConn = new TdsConnection(url);
+        tdsConn.setCredentials(username, password);
         opened = true;
     }
 
@@ -101,7 +101,7 @@ public abstract class TdsWriter implements Writer<Result> {
      * Closes connection and resets instance to initial state Successors should also reset data counter
      * 
      * @return {@link Result} with {@link Writer} ID and number of data written
-     * @throws IOException 
+     * @throws IOException
      */
     @Override
     public Result close() throws IOException {
@@ -110,7 +110,7 @@ public abstract class TdsWriter implements Writer<Result> {
         }
 
         // Rest connection doesn't require closing
-        rest = null;
+        tdsConn = null;
         opened = false;
         return result;
     }
@@ -126,10 +126,10 @@ public abstract class TdsWriter implements Writer<Result> {
     /**
      * Returns connection of this {@link Writer}
      * 
-     * @return {@link Rest} connection instance
+     * @return {@link TdsConnection} connection instance
      */
-    protected Rest getConnection() {
-        return rest;
+    protected TdsConnection getConnection() {
+        return tdsConn;
     }
 
     /**
@@ -171,6 +171,11 @@ public abstract class TdsWriter implements Writer<Result> {
      */
     protected void handleResponse(int statusCode, String resourceToCreate, String json) {
         switch (statusCode) {
+            case SC_OK: {
+                LOG.debug("Successfully processed {}", resourceToCreate);
+                result.successCount++;
+                break;
+            }
             case SC_CREATED: {
                 LOG.debug("Successfully created {}", resourceToCreate);
                 result.successCount++;

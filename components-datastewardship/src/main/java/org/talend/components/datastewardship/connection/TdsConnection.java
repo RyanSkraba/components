@@ -15,7 +15,6 @@ package org.talend.components.datastewardship.connection;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,11 +22,13 @@ import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.params.AuthPolicy;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.BasicCookieStore;
@@ -37,14 +38,11 @@ import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Apache Http components library wrapper. It uses Basic authentification by default
- * 
- * @author ivan.honchar
- */
-public class Rest {
+public class TdsConnection {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Rest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TdsConnection.class);
+
+    public static final String API_VERSION = "v1"; //$NON-NLS-1$
 
     /**
      * A list of common headers
@@ -57,14 +55,9 @@ public class Rest {
     private String hostPort;
 
     /**
-     * Http authorization type. It is used to set Http Authorization header
+     * Content type
      */
-    private String authorizationType = "Basic";
-
-    /**
-     * 
-     */
-    private ContentType contentType;
+    private ContentType contentType = ContentType.APPLICATION_JSON;
 
     /**
      * Request executor
@@ -74,7 +67,7 @@ public class Rest {
     /**
      * Constructor
      */
-    public Rest() {
+    public TdsConnection() {
         this(null);
     }
 
@@ -83,13 +76,12 @@ public class Rest {
      * 
      * @param hostPort URL
      */
-    public Rest(String hostPort) {
+    public TdsConnection(String hostPort) {
         headers = new LinkedList<Header>();
-        if (!hostPort.endsWith("/")) {
-            hostPort = hostPort + "/";
+        if (!hostPort.endsWith("/")) { //$NON-NLS-1$
+            hostPort = hostPort + "/"; //$NON-NLS-1$
         }
         this.hostPort = hostPort;
-        contentType = ContentType.create("application/json", StandardCharsets.UTF_8);
         executor = Executor.newInstance();
         executor.use(new BasicCookieStore());
     }
@@ -145,8 +137,8 @@ public class Rest {
             executor.clearCookies();
             return executor.execute(get).returnContent().asString();
         } catch (URISyntaxException e) {
-            LOG.debug("Wrong URI. {}", e.getMessage());
-            throw new IOException("Wrong URI", e);
+            LOG.debug("Wrong URI. {}", e.getMessage()); //$NON-NLS-1$
+            throw new IOException("Wrong URI", e); //$NON-NLS-1$
         }
     }
 
@@ -184,8 +176,8 @@ public class Rest {
             executor.clearCookies();
             return executor.execute(delete).returnResponse().getStatusLine().getStatusCode();
         } catch (URISyntaxException e) {
-            LOG.debug("Wrong URI. {}", e.getMessage());
-            throw new IOException("Wrong URI", e);
+            LOG.debug("Wrong URI. {}", e.getMessage()); //$NON-NLS-1$
+            throw new IOException("Wrong URI", e); //$NON-NLS-1$
         }
     }
 
@@ -225,20 +217,15 @@ public class Rest {
         return executor.execute(put).returnResponse().getStatusLine().getStatusCode();
     }
 
-    public Rest setAuthorizationType(String type) {
-        this.authorizationType = type;
-        return this;
-    }
-
-    public Rest setCredentials(String username, String password) {
-        String credentials = username + ":" + password;
+    public TdsConnection setCredentials(String username, String password) {
+        String credentials = username + ":" + password; //$NON-NLS-1$
         String encodedCredentials = base64(credentials);
-        Header authorization = new BasicHeader("Authorization", authorizationType + " " + encodedCredentials);
+        Header authorization = new BasicHeader(HttpHeaders.AUTHORIZATION, AuthPolicy.BASIC + " " + encodedCredentials); //$NON-NLS-1$
         headers.add(authorization);
         return this;
     }
 
-    public Rest setUrl(String url) {
+    public TdsConnection setUrl(String url) {
         this.hostPort = url;
         return this;
     }

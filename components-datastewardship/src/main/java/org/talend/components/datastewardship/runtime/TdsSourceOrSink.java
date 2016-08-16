@@ -24,7 +24,7 @@ import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.datastewardship.TdsProperties;
-import org.talend.components.datastewardship.connection.Rest;
+import org.talend.components.datastewardship.connection.TdsConnection;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
@@ -89,7 +89,7 @@ public class TdsSourceOrSink implements SourceOrSink {
      */
     @Override
     public ValidationResult validate(RuntimeContainer container) {
-        Rest rest = new Rest(url);
+        TdsConnection rest = new TdsConnection(url);
         String errorMessage;
         try {
             int statusCode = rest.checkConnection();
