@@ -41,7 +41,7 @@ public class TdsCampaignPropertiesTest {
         assertThat(main, notNullValue());
 
         Collection<Widget> mainWidgets = main.getWidgets();
-        assertThat(mainWidgets, hasSize(2));
+        assertThat(mainWidgets, hasSize(3));
         Widget campaignNameWidget = main.getWidget("campaignName"); //$NON-NLS-1$
         assertThat(campaignNameWidget, notNullValue());
         Widget campaignTypeWidget = main.getWidget("campaignType"); //$NON-NLS-1$

@@ -17,6 +17,7 @@ import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.EnumProperty;
 import org.talend.daikon.properties.property.Property;
 
@@ -41,11 +42,6 @@ public class TdsCampaignProperties extends PropertiesImpl {
     public EnumProperty<CampaignType> campaignType = new EnumProperty<CampaignType>(CampaignType.class, "campaignType"); //$NON-NLS-1$
 
     /**
-     * Campaign structure
-     */
-    public Property<String> campaignStructure = newProperty("campaignStructure"); //$NON-NLS-1$
-
-    /**
      * @param name
      */
     public TdsCampaignProperties(String name) {
@@ -59,12 +55,9 @@ public class TdsCampaignProperties extends PropertiesImpl {
     public void setupLayout() {
         super.setupLayout();
         Form mainForm = Form.create(this, Form.MAIN);
-        mainForm.addRow(campaignName);
-        mainForm.addColumn(campaignType);
-        /*
+        mainForm.addRow(Widget.widget(campaignName).setWidgetType("widget.type.campaign.chooser")); //$NON-NLS-1$
         mainForm.addRow(campaignLabel);
-        mainForm.addRow(campaignStructure);
-        */
+        mainForm.addColumn(campaignType);
     }
 
 }

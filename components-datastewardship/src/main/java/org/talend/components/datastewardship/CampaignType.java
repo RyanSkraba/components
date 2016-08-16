@@ -13,18 +13,8 @@
 package org.talend.components.datastewardship;
 
 public enum CampaignType {
-    Arbitration("ARBITRATION"), //$NON-NLS-1$
-    Resolution("RESOLUTION"), //$NON-NLS-1$
-    Merging("MERGING"), //$NON-NLS-1$
-    Grouping("GROUPING"); //$NON-NLS-1$
-
-    private String value;
-
-    private CampaignType(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
+    ARBITRATION,
+    RESOLUTION,
+    MERGING,
+    GROUPING;
 }

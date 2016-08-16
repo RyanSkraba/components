@@ -67,9 +67,4 @@ public class TDataStewardshipCampaignCreateProperties extends TdsProperties {
         return Collections.singleton(MAIN_CONNECTOR);
     }
 
-    private boolean isRequiredFieldRight() {
-        return !isEmpty(connection.url.getStringValue()) && !isEmpty(connection.username.getStringValue())
-                && !isEmpty(connection.password.getStringValue());
-    }
-
 }

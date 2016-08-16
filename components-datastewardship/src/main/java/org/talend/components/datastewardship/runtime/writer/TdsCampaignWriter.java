@@ -64,7 +64,7 @@ public class TdsCampaignWriter extends TdsWriter {
         
         int statusCode = getConnection().post(resourceToCreate, campaignSchema);
         
-        handleResponse(statusCode, resourceToCreate, record);       
+        handleResponse(statusCode, resourceToCreate, campaignSchema);       
     }
 
 }

@@ -45,6 +45,7 @@ import org.talend.daikon.avro.AvroUtils;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringTestApp.class)
 @WebIntegrationTest("server.port:0")
+@SuppressWarnings("nls")
 public class TdsTaskWriterTest {
 
     @Inject
@@ -67,13 +68,14 @@ public class TdsTaskWriterTest {
         properties.connection.url.setValue("http://localhost:" + serverPort);
         properties.connection.username.setValue("owner1");
         properties.connection.password.setValue("owner1");
+        properties.campaign.campaignName.setValue("perf-review-resolution");
+        properties.batchSize.setValue(0);
         sink = (TdsTaskSink) definition.getRuntime();
     }
 
     @Test
     public void testWrite() throws IOException {
-        properties.campaign.campaignName.setValue("perf-review-resolution");
-        properties.campaign.campaignType.setValue(CampaignType.Resolution);
+        properties.campaign.campaignType.setValue(CampaignType.RESOLUTION);
 
         sink.initialize(null, properties);
         TdsTaskWriteOperation writeOperation = (TdsTaskWriteOperation) sink.createWriteOperation();
@@ -112,7 +114,7 @@ public class TdsTaskWriterTest {
         record.put(schema.getField("Salary").pos(), "20000");
         return record;
     }
-
+    
     private Schema createSchema() {
         AvroRegistry avroReg = new AvroRegistry();
         SchemaBuilder.FieldAssembler<Schema> record = SchemaBuilder.record("Main").fields();
@@ -130,6 +132,66 @@ public class TdsTaskWriterTest {
         addField(record, "Joined", String.class, avroReg);
         addField(record, "Experience", String.class, avroReg);
         addField(record, "Salary", String.class, avroReg);
+        Schema defaultSchema = record.endRecord();
+        return defaultSchema;
+    }
+    
+    @Test
+    public void testWriteMergingTasks() throws IOException {       
+        properties.campaign.campaignType.setValue(CampaignType.MERGING);
+        properties.advancedMappings.groupIdColumn.setValue("groupId");
+        properties.advancedMappings.sourceColumn.setValue("source");
+        properties.advancedMappings.masterColumn.setValue("master");
+        properties.advancedMappings.scoreColumn.setValue("score");
+
+        sink.initialize(null, properties);
+        TdsTaskWriteOperation writeOperation = (TdsTaskWriteOperation) sink.createWriteOperation();
+        writer = (TdsTaskWriter) writeOperation.createWriter(null);
+
+        List<IndexedRecord> records = createMergingTasksRecords();
+        writer.open("testWrite");
+        for (IndexedRecord record : records) {
+            writer.write(record);
+        }
+
+        Result result = writer.close();
+        List<Result> results = new ArrayList();
+        results.add(result);
+        Map<String, Object> resultMap = writeOperation.finalize(results, null);
+        Assert.assertEquals(2, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
+        Assert.assertEquals(1, resultMap.get(ComponentDefinition.RETURN_SUCCESS_RECORD_COUNT));
+    }
+    
+    private List<IndexedRecord> createMergingTasksRecords() {
+        List<IndexedRecord> records = new ArrayList<>();
+        Schema schema = createMergingTasksSchema();
+        IndexedRecord record = new GenericData.Record(schema);
+        record.put(schema.getField("Id").pos(), "10001");  
+        record.put(schema.getField("groupId").pos(), "1");
+        record.put(schema.getField("source").pos(), "");
+        record.put(schema.getField("master").pos(), true);
+        record.put(schema.getField("score").pos(), "200");
+        records.add(record);
+        IndexedRecord record1 = new GenericData.Record(schema);
+        record1.put(schema.getField("Id").pos(), "10002");  
+        record1.put(schema.getField("groupId").pos(), "1");
+        record1.put(schema.getField("source").pos(), "");
+        record1.put(schema.getField("master").pos(), false);
+        record1.put(schema.getField("score").pos(), "200");
+        records.add(record1);
+           
+        return records;
+    }
+    
+    private Schema createMergingTasksSchema() {
+        AvroRegistry avroReg = new AvroRegistry();
+        SchemaBuilder.FieldAssembler<Schema> record = SchemaBuilder.record("Main").fields();
+        addField(record, "Id", String.class, avroReg);
+    
+        addField(record, "groupId", String.class, avroReg);
+        addField(record, "source", String.class, avroReg);
+        addField(record, "master", String.class, avroReg);
+        addField(record, "score", String.class, avroReg);
         Schema defaultSchema = record.endRecord();
         return defaultSchema;
     }

@@ -34,6 +34,7 @@ import org.talend.daikon.avro.AvroRegistry;
 /**
  * Unit-tests for {@link TdsTaskSink} class
  */
+@SuppressWarnings("nls")
 public class TdsTaskSinkTest {
 
     /**
@@ -54,16 +55,21 @@ public class TdsTaskSinkTest {
     public void setUp() {
         AvroRegistry registry = new AvroRegistry();
         Schema stringSchema = registry.getConverter(String.class).getSchema();
-        Schema.Field testField = new Schema.Field("test", stringSchema, null, null, Order.ASCENDING); //$NON-NLS-1$
+        Schema.Field testField = new Schema.Field("test", stringSchema, null, null, Order.ASCENDING);
         schema = Schema.createRecord("task", null, null, false, Collections.singletonList(testField));
-        schema.addProp(TALEND_IS_LOCKED, "true"); //$NON-NLS-1$
+        schema.addProp(TALEND_IS_LOCKED, "true");
         
-        outputProperties = new TDataStewardshipTaskOutputProperties("root"); //$NON-NLS-1$
-        outputProperties.connection.url.setValue("urlValue"); //$NON-NLS-1$
-        outputProperties.connection.username.setValue("usernameValue"); //$NON-NLS-1$
-        outputProperties.connection.password.setValue("passwordValue"); //$NON-NLS-1$
-        outputProperties.campaign.campaignName.setValue("campaignNameValue"); //$NON-NLS-1$
-        outputProperties.campaign.campaignType.setValue(CampaignType.Arbitration);
+        outputProperties = new TDataStewardshipTaskOutputProperties("root");
+        outputProperties.connection.url.setValue("urlValue");
+        outputProperties.connection.username.setValue("usernameValue");
+        outputProperties.connection.password.setValue("passwordValue");
+        outputProperties.campaign.campaignName.setValue("campaignNameValue");
+        outputProperties.campaign.campaignType.setValue(CampaignType.MERGING);
+        outputProperties.batchSize.setValue(0);
+        outputProperties.advancedMappings.groupIdColumn.setValue("groupIdColumn");
+        outputProperties.advancedMappings.sourceColumn.setValue("sourceColumn");
+        outputProperties.advancedMappings.masterColumn.setValue("masterColumn");
+        outputProperties.advancedMappings.scoreColumn.setValue("scoreColumn");        
     }
 
     /**
@@ -75,11 +81,15 @@ public class TdsTaskSinkTest {
         TdsTaskSink sink = new TdsTaskSink();
         sink.initialize(null, outputProperties);
         
-        assertEquals("urlValue", sink.getUrl()); //$NON-NLS-1$
-        assertEquals("usernameValue", sink.getUsername()); //$NON-NLS-1$
-        assertEquals("passwordValue", sink.getPassword()); //$NON-NLS-1$
-        assertEquals("campaignNameValue", sink.getCampaignName()); //$NON-NLS-1$
-        assertEquals(CampaignType.Arbitration.getValue(), sink.getCampaignType());
+        assertEquals("urlValue", sink.getUrl());
+        assertEquals("usernameValue", sink.getUsername());
+        assertEquals("passwordValue", sink.getPassword());
+        assertEquals("campaignNameValue", sink.getCampaignName());
+        assertEquals(CampaignType.MERGING.toString(), sink.getCampaignType());
+        assertEquals("groupIdColumn", sink.getGroupIdColumn());
+        assertEquals("sourceColumn", sink.getSourceColumn());
+        assertEquals("masterColumn", sink.getMasterColumn());
+        assertEquals("scoreColumn", sink.getScoreColumn());        
     }
 
     /**

@@ -17,10 +17,12 @@ import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.avro.generic.IndexedRecord;
+import org.json.simple.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Result;
@@ -99,9 +101,10 @@ public abstract class TdsWriter implements Writer<Result> {
      * Closes connection and resets instance to initial state Successors should also reset data counter
      * 
      * @return {@link Result} with {@link Writer} ID and number of data written
+     * @throws IOException 
      */
     @Override
-    public Result close() {
+    public Result close() throws IOException {
         if (!opened) {
             LOG.debug("Writer closed without opening");
         }
@@ -151,11 +154,11 @@ public abstract class TdsWriter implements Writer<Result> {
      * @param record current {@link IndexedRecord}
      * @throws DataRejectException with specified error and current {@link IndexedRecord}
      */
-    protected void handleReject(String error, IndexedRecord record) {
+    protected void handleReject(String error, String json) {
         result.rejectCount++;
         Map<String, Object> info = new HashMap<String, Object>();
         info.put("error", error);
-        info.put("talend_record", record);
+        info.put("talend_record", json);
         throw new DataRejectException(info);
     }
 
@@ -166,7 +169,7 @@ public abstract class TdsWriter implements Writer<Result> {
      * @param resourceToCreate JSON of resource to be created
      * @param record current {@link IndexedRecord}
      */
-    protected void handleResponse(int statusCode, String resourceToCreate, IndexedRecord record) {
+    protected void handleResponse(int statusCode, String resourceToCreate, String json) {
         switch (statusCode) {
             case SC_CREATED: {
                 LOG.debug("Successfully created {}", resourceToCreate);
@@ -175,15 +178,15 @@ public abstract class TdsWriter implements Writer<Result> {
             }
             case SC_BAD_REQUEST: {
                 LOG.debug("Input is invalid {}", resourceToCreate);
-                handleReject("Record is invalid", record);
+                handleReject("Record is invalid", json);
             }
             case SC_UNAUTHORIZED: {
                 LOG.debug("User is not authenticated. {} wasn't inserted", resourceToCreate);
-                handleReject("User is not authenticated. Record wasn't inserted", record);
+                handleReject("User is not authenticated. Record wasn't inserted", json);
             }
             case SC_FORBIDDEN: {
                 LOG.debug("User does not have permission to create {}", resourceToCreate);
-                handleReject("User does not have permission to create record", record);
+                handleReject("User does not have permission to create record", json);
             }
             default: {
                 LOG.debug("Unexpected status code");

@@ -49,6 +49,8 @@ public class TdsServerMock {
 
         if (taskJson.containsKey("record") && taskJson.containsKey("type") && taskJson.containsValue("RESOLUTION")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             return new ResponseEntity(HttpStatus.OK);
+        } else if (taskJson.containsValue("MERGING") && taskJson.containsKey("record") && taskJson.containsKey("sourceRecords")) {
+            return new ResponseEntity(HttpStatus.CREATED);
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
