@@ -98,6 +98,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
          * stored in the ConnectorConfig instance. Use this key to initialize a BulkConnection:
          */
         ConnectorConfig bulkConfig = new ConnectorConfig();
+        setProxy(bulkConfig);
         bulkConfig.setSessionId(config.getSessionId());
         /*
          * The endpoint for the Bulk API service is the same as for the normal SOAP uri until the /Soap/ part. From here
