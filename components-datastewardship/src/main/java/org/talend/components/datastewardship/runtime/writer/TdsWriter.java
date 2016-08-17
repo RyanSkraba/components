@@ -92,8 +92,7 @@ public abstract class TdsWriter implements Writer<Result> {
         String username = writeOperation.getSink().getUsername();
         String password = writeOperation.getSink().getPassword();
 
-        tdsConn = new TdsConnection(url);
-        tdsConn.setCredentials(username, password);
+        tdsConn = new TdsConnection(url, username, password);
         opened = true;
     }
 

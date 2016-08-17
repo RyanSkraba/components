@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
@@ -45,12 +43,12 @@ public class TdsConnection {
     public static final String API_VERSION = "v1"; //$NON-NLS-1$
 
     /**
-     * A list of common headers
+     * Authorization header
      */
-    private List<Header> headers;
+    private Header authorization;
 
     /**
-     * Schema, host and port of REST API location
+     * TDS URL
      */
     private String hostPort;
 
@@ -65,25 +63,17 @@ public class TdsConnection {
     private Executor executor;
 
     /**
-     * Constructor
-     */
-    public TdsConnection() {
-        this(null);
-    }
-
-    /**
      * Constructor sets schema(http or https), host(google.com) and port number(8080) using one hostPort parameter
      * 
-     * @param hostPort URL
+     * @param hostPort
+     * @param username
+     * @param password
      */
-    public TdsConnection(String hostPort) {
-        headers = new LinkedList<Header>();
-        if (!hostPort.endsWith("/")) { //$NON-NLS-1$
-            hostPort = hostPort + "/"; //$NON-NLS-1$
-        }
-        this.hostPort = hostPort;
-        executor = Executor.newInstance();
-        executor.use(new BasicCookieStore());
+    public TdsConnection(String hostPort, String username, String password) {
+        this.hostPort = !hostPort.endsWith("/") ? hostPort + "/" : hostPort; //$NON-NLS-1$ //$NON-NLS-2$
+        String encodedCredentials = Base64.encodeBase64String((username + ":" + password).getBytes()); //$NON-NLS-1$
+        authorization = new BasicHeader(HttpHeaders.AUTHORIZATION, AuthPolicy.BASIC + " " + encodedCredentials); //$NON-NLS-1$
+        executor = Executor.newInstance().use(new BasicCookieStore());
     }
 
     /**
@@ -130,11 +120,7 @@ public class TdsConnection {
                 builder.addParameter(entry.getKey(), entry.getValue().toString());
             }
             URI uri = builder.build();
-            Request get = Request.Get(uri);
-            for (Header header : headers) {
-                get.addHeader(header);
-            }
-            executor.clearCookies();
+            Request get = Request.Get(uri).addHeader(authorization);
             return executor.execute(get).returnContent().asString();
         } catch (URISyntaxException e) {
             LOG.debug("Wrong URI. {}", e.getMessage()); //$NON-NLS-1$
@@ -169,11 +155,7 @@ public class TdsConnection {
                 builder.addParameter(entry.getKey(), entry.getValue().toString());
             }
             URI uri = builder.build();
-            Request delete = Request.Delete(uri);
-            for (Header header : headers) {
-                delete.addHeader(header);
-            }
-            executor.clearCookies();
+            Request delete = Request.Delete(uri).addHeader(authorization);
             return executor.execute(delete).returnResponse().getStatusLine().getStatusCode();
         } catch (URISyntaxException e) {
             LOG.debug("Wrong URI. {}", e.getMessage()); //$NON-NLS-1$
@@ -191,11 +173,7 @@ public class TdsConnection {
      * @throws IOException
      */
     public int post(String resource, String body) throws IOException {
-        Request post = Request.Post(hostPort + resource).bodyString(body, contentType);
-        for (Header header : headers) {
-            post.addHeader(header);
-        }
-        executor.clearCookies();
+        Request post = Request.Post(hostPort + resource).addHeader(authorization).bodyString(body, contentType);
         return executor.execute(post).returnResponse().getStatusLine().getStatusCode();
     }
 
@@ -209,28 +187,7 @@ public class TdsConnection {
      * @throws IOException
      */
     public int put(String resource, String body) throws IOException {
-        Request put = Request.Put(hostPort + resource).bodyString(body, contentType);
-        for (Header header : headers) {
-            put.addHeader(header);
-        }
-        executor.clearCookies();
+        Request put = Request.Put(hostPort + resource).addHeader(authorization).bodyString(body, contentType);
         return executor.execute(put).returnResponse().getStatusLine().getStatusCode();
-    }
-
-    public TdsConnection setCredentials(String username, String password) {
-        String credentials = username + ":" + password; //$NON-NLS-1$
-        String encodedCredentials = base64(credentials);
-        Header authorization = new BasicHeader(HttpHeaders.AUTHORIZATION, AuthPolicy.BASIC + " " + encodedCredentials); //$NON-NLS-1$
-        headers.add(authorization);
-        return this;
-    }
-
-    public TdsConnection setUrl(String url) {
-        this.hostPort = url;
-        return this;
-    }
-
-    private String base64(String str) {
-        return Base64.encodeBase64String(str.getBytes());
     }
 }

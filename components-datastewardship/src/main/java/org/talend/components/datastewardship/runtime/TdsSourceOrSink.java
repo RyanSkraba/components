@@ -89,21 +89,21 @@ public class TdsSourceOrSink implements SourceOrSink {
      */
     @Override
     public ValidationResult validate(RuntimeContainer container) {
-        TdsConnection rest = new TdsConnection(url);
+        TdsConnection tdsConn = new TdsConnection(url, username, password);
         String errorMessage;
         try {
-            int statusCode = rest.checkConnection();
+            int statusCode = tdsConn.checkConnection();
             if (statusCode == SC_OK) {
                 return ValidationResult.OK;
             } else {
-                errorMessage = messages.getMessage("error.wrongStatusCode", statusCode);
+                errorMessage = messages.getMessage("error.wrongStatusCode", statusCode); //$NON-NLS-1$
                 LOG.debug(errorMessage);
             }
         } catch (IOException e) {
-            errorMessage = messages.getMessage("error.connectionException", e);
+            errorMessage = messages.getMessage("error.connectionException", e); //$NON-NLS-1$
             LOG.debug(errorMessage);
         }
-        String validationFailed = messages.getMessage("error.hostNotValidated", url);
+        String validationFailed = messages.getMessage("error.hostNotValidated", url); //$NON-NLS-1$
         StringBuilder sb = new StringBuilder(validationFailed);
         sb.append(System.lineSeparator());
         sb.append(errorMessage);

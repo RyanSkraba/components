@@ -12,7 +12,6 @@
 // ============================================================================
 package org.talend.components.datastewardship.tdatastewardshipcampaigncreate;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import java.util.Collections;
 import java.util.Set;
 
