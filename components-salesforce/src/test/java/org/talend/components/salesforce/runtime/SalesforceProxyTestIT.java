@@ -10,11 +10,16 @@ import org.junit.Test;
 import org.littleshoot.proxy.HttpProxyServer;
 import org.littleshoot.proxy.ProxyAuthenticator;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
-import org.talend.components.api.component.EndpointComponentDefinition;
+import org.talend.components.api.component.runtime.Reader;
+import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.SalesforceRuntimeTestUtil;
 import org.talend.components.salesforce.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
+import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
+import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
+import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties.QueryMode;
 import org.talend.daikon.properties.ValidationResult;
 
 public class SalesforceProxyTestIT extends SalesforceTestBase {
@@ -47,20 +52,68 @@ public class SalesforceProxyTestIT extends SalesforceTestBase {
         setProxySettingForClient();
     }
 
+    @AfterClass
+    public static void closeProxy() {
+        removeProxySettingForClient();
+
+        if (server != null) {
+            server.stop();
+        }
+        server = null;
+    }
+
     @Test
     public void testProxy() {
         TSalesforceConnectionDefinition definition = (TSalesforceConnectionDefinition) getComponentService()
                 .getComponentDefinition(TSalesforceConnectionDefinition.COMPONENT_NAME);
         SalesforceConnectionProperties properties = (SalesforceConnectionProperties) definition.createRuntimeProperties();
 
+        properties.bulkConnection.setValue(true);
         properties.userPassword.userId.setValue(userId);
         properties.userPassword.password.setValue(password);
         properties.userPassword.securityKey.setValue(securityKey);
 
-        SourceOrSink sourceOrSink = ((EndpointComponentDefinition) definition).getRuntime();
+        SourceOrSink sourceOrSink = definition.getRuntime();
         sourceOrSink.initialize(null, properties);
         org.talend.daikon.properties.ValidationResult vr = sourceOrSink.validate(null);
         Assert.assertEquals(ValidationResult.Result.OK, vr.getStatus());
+    }
+
+    @Test
+    public void testProxyWithBulkQuery() {
+        TSalesforceInputDefinition definition = (TSalesforceInputDefinition) getComponentService()
+                .getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
+        TSalesforceInputProperties properties = (TSalesforceInputProperties) definition.createRuntimeProperties();
+
+        properties.connection.bulkConnection.setValue(true);
+        properties.queryMode.setValue(QueryMode.Bulk);
+
+        SalesforceRuntimeTestUtil util = new SalesforceRuntimeTestUtil();
+        properties.module.moduleName.setValue(util.getTestModuleName());
+        properties.module.main.schema.setValue(util.getTestSchema1());
+
+        properties.connection.userPassword.userId.setValue(userId);
+        properties.connection.userPassword.password.setValue(password);
+        properties.connection.userPassword.securityKey.setValue(securityKey);
+
+        Source source = definition.getRuntime();
+        source.initialize(null, properties);
+        org.talend.daikon.properties.ValidationResult vr = source.validate(null);
+        Assert.assertEquals(ValidationResult.Result.OK, vr.getStatus());
+
+        Reader reader = source.createReader(null);
+
+        try {
+            reader.start();
+
+            do {
+                reader.getCurrent();
+            } while (reader.advance());
+
+            reader.close();
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        }
     }
 
     private static void setProxySettingForClient() {
@@ -87,13 +140,4 @@ public class SalesforceProxyTestIT extends SalesforceTestBase {
         System.clearProperty("http.proxyPassword");
     }
 
-    @AfterClass
-    public static void closeProxy() {
-        removeProxySettingForClient();
-
-        if (server != null) {
-            server.stop();
-        }
-        server = null;
-    }
 }
