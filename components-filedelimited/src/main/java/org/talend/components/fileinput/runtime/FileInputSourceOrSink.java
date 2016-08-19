@@ -15,43 +15,43 @@ import org.talend.daikon.properties.ValidationResult;
 
 public class FileInputSourceOrSink implements SourceOrSink {
 
-	/** Default serial version UID. */
-	private static final long serialVersionUID = 1L;
+    /** Default serial version UID. */
+    private static final long serialVersionUID = 1L;
 
-	/** Configuration extracted from the input properties. */
-	protected TFileInputDelimitedProperties properties;
+    /** Configuration extracted from the input properties. */
+    protected TFileInputDelimitedProperties properties;
 
-	private transient Schema schema;
+    private transient Schema schema;
 
-	public void initialize(RuntimeContainer container, ComponentProperties properties) {
-		this.properties = (TFileInputDelimitedProperties) properties;
-		// FIXME - this should be moved to the properties setup
-		schema = new Schema.Parser().parse(this.properties.schema.schema.getStringValue());
-	}
+    public void initialize(RuntimeContainer container, ComponentProperties properties) {
+        this.properties = (TFileInputDelimitedProperties) properties;
+        // FIXME - this should be moved to the properties setup
+        schema = new Schema.Parser().parse(this.properties.schema.schema.getStringValue());
+    }
 
-	public ValidationResult validate(RuntimeContainer adaptor) {
-		// Check that the file exists.
-		File f = new File(this.properties.filename.getStringValue());
-		if (!f.exists()) {
-			ValidationResult vr = new ValidationResult();
-			vr.setMessage("The file '" + f.getPath() + "' does not exist."); //$NON-NLS-1$//$NON-NLS-2$
-			vr.setStatus(ValidationResult.Result.ERROR);
-			return vr;
-		}
+    public ValidationResult validate(RuntimeContainer adaptor) {
+        // Check that the file exists.
+        File f = new File(this.properties.filename.getStringValue());
+        if (!f.exists()) {
+            ValidationResult vr = new ValidationResult();
+            vr.setMessage("The file '" + f.getPath() + "' does not exist."); //$NON-NLS-1$//$NON-NLS-2$
+            vr.setStatus(ValidationResult.Result.ERROR);
+            return vr;
+        }
 
-		return ValidationResult.OK;
-	}
+        return ValidationResult.OK;
+    }
 
-	@Override
-	public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
-		// TODO Auto-generated method stub
-		return Collections.emptyList();
-	}
+    @Override
+    public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
+        // TODO Auto-generated method stub
+        return Collections.emptyList();
+    }
 
-	@Override
-	public Schema getEndpointSchema(RuntimeContainer container, String schemaName) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Schema getEndpointSchema(RuntimeContainer container, String schemaName) throws IOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }

@@ -1,7 +1,5 @@
 package org.talend.components.fileinput;
 
-import static org.talend.daikon.properties.presentation.Widget.widget;
-
 import java.util.Collections;
 import java.util.Set;
 
@@ -13,6 +11,8 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
+
+import static org.talend.daikon.properties.presentation.Widget.widget;
 
 /**
  * The ComponentProperties subclass provided by a component stores the
@@ -36,43 +36,43 @@ import org.talend.daikon.properties.property.PropertyFactory;
  */
 public class FileInputProperties extends FixedConnectorsComponentProperties {
 
-	public Property<String> filename = PropertyFactory.newString("filename"); //$NON-NLS-1$
-	public SchemaProperties schema = new SchemaProperties("schema"); //$NON-NLS-1$
+    public Property<String> filename = PropertyFactory.newString("filename"); //$NON-NLS-1$
 
-	protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
+    public SchemaProperties schema = new SchemaProperties("schema"); //$NON-NLS-1$
 
-	/*
-	 * protected transient PropertyPathConnector FLOW_CONNECTOR = new
-	 * PropertyPathConnector(Connector.MAIN_NAME, "schemaFlow");
-	 */
+    protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
-	protected transient PropertyPathConnector REJECT_CONNECTOR = new PropertyPathConnector(Connector.REJECT_NAME,
-			"schemaReject");
+    /*
+     * protected transient PropertyPathConnector FLOW_CONNECTOR = new
+     * PropertyPathConnector(Connector.MAIN_NAME, "schemaFlow");
+     */
 
-	public FileInputProperties(String name) {
-		super(name);
-	}
+    protected transient PropertyPathConnector REJECT_CONNECTOR = new PropertyPathConnector(Connector.REJECT_NAME, "schemaReject");
 
-	@Override
-	public void setupProperties() {
-		super.setupProperties();
-		// Code for property initialization goes here
-	}
+    public FileInputProperties(String name) {
+        super(name);
+    }
 
-	@Override
-	public void setupLayout() {
-		super.setupLayout();
-		Form form = Form.create(this, Form.MAIN);
-		form.addRow(schema.getForm(Form.REFERENCE));
-		form.addRow(widget(filename).setWidgetType(Widget.FILE_WIDGET_TYPE));
-	}
+    @Override
+    public void setupProperties() {
+        super.setupProperties();
+        // Code for property initialization goes here
+    }
 
-	@Override
-	protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputComponent) {
-		if (isOutputComponent) {
-			return Collections.singleton(MAIN_CONNECTOR);
-		}
-		return Collections.emptySet();
-	}
+    @Override
+    public void setupLayout() {
+        super.setupLayout();
+        Form form = Form.create(this, Form.MAIN);
+        form.addRow(schema.getForm(Form.REFERENCE));
+        form.addRow(widget(filename).setWidgetType(Widget.FILE_WIDGET_TYPE));
+    }
+
+    @Override
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputComponent) {
+        if (isOutputComponent) {
+            return Collections.singleton(MAIN_CONNECTOR);
+        }
+        return Collections.emptySet();
+    }
 
 }

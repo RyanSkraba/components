@@ -12,37 +12,37 @@ import org.talend.daikon.properties.property.Property;
  */
 public class FileInputDefinition extends AbstractComponentDefinition {
 
-	public FileInputDefinition(String componentName) {
-		super(componentName);
-	}
+    public FileInputDefinition(String componentName) {
+        super(componentName);
+    }
 
-	@Override
-	public String[] getFamilies() {
-		return new String[] { "File/Input" }; //$NON-NLS-1$
-	}
+    @Override
+    public String[] getFamilies() {
+        return new String[] { "File/Input" }; //$NON-NLS-1$
+    }
 
-	@Override
-	public Property[] getReturnProperties() {
-		return new Property[] {};
-	}
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[] {};
+    }
 
-	public String getMavenGroupId() {
-		return "org.talend.components";
-	}
+    public String getMavenGroupId() {
+        return "org.talend.components";
+    }
 
-	@Override
-	public String getMavenArtifactId() {
-		return "file-input";
-	}
+    @Override
+    public String getMavenArtifactId() {
+        return "file-input";
+    }
 
-	@Override
-	public Class<? extends ComponentProperties> getPropertyClass() {
-		return FileInputProperties.class;
-	}
+    @Override
+    public Class<? extends ComponentProperties> getPropertyClass() {
+        return FileInputProperties.class;
+    }
 
-	@Override
-	public boolean isSchemaAutoPropagate() {
-		return true;
-	}
+    @Override
+    public boolean isSchemaAutoPropagate() {
+        return true;
+    }
 
 }

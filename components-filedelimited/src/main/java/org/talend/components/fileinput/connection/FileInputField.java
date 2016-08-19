@@ -1,27 +1,28 @@
 package org.talend.components.fileinput.connection;
 
 public class FileInputField {
-	 	private final String columnName;
 
-	    private final String type;
+    private final String columnName;
 
-	    private final String content;
+    private final String type;
 
-	    public FileInputField(String columnName, String type, String content) {
-	        this.columnName = columnName;
-	        this.type = type;
-	        this.content = content;
-	    }
+    private final String content;
 
-	    public String getColumnName() {
-	        return columnName;
-	    }
+    public FileInputField(String columnName, String type, String content) {
+        this.columnName = columnName;
+        this.type = type;
+        this.content = content;
+    }
 
-	    public String getType() {
-	        return type;
-	    }
+    public String getColumnName() {
+        return columnName;
+    }
 
-	    public String getContent() {
-	        return content;
-	    }
+    public String getType() {
+        return type;
+    }
+
+    public String getContent() {
+        return content;
+    }
 }

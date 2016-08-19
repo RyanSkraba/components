@@ -13,24 +13,24 @@ import org.talend.daikon.NamedThing;
 
 public class FileOutputSink extends FileInputSourceOrSink implements Sink {
 
-	@Override
-	public WriteOperation<?> createWriteOperation() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public WriteOperation<?> createWriteOperation() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public void initialize(RuntimeContainer runtimeContainer, ComponentProperties componentProperties) {
+    @Override
+    public void initialize(RuntimeContainer runtimeContainer, ComponentProperties componentProperties) {
 
-	}
+    }
 
-	@Override
-	public List<NamedThing> getSchemaNames(RuntimeContainer runtimeContainer) throws IOException {
-		return Collections.emptyList();
-	}
+    @Override
+    public List<NamedThing> getSchemaNames(RuntimeContainer runtimeContainer) throws IOException {
+        return Collections.emptyList();
+    }
 
-	@Override
-	public Schema getEndpointSchema(RuntimeContainer runtimeContainer, String s) throws IOException {
-		return null;
-	}
+    @Override
+    public Schema getEndpointSchema(RuntimeContainer runtimeContainer, String s) throws IOException {
+        return null;
+    }
 }

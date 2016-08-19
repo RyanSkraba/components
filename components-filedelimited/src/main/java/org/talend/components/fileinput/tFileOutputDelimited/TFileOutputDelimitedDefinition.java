@@ -11,24 +11,24 @@ import org.talend.components.fileinput.runtime.FileOutputSink;
 import aQute.bnd.annotation.component.Component;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
-		+ TFileOutputDelimitedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+        + TFileOutputDelimitedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TFileOutputDelimitedDefinition extends FileInputDefinition implements OutputComponentDefinition {
 
-	public static final String COMPONENT_NAME = "tFileOutputDelimitedNew"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tFileOutputDelimitedNew"; //$NON-NLS-1$
 
-	public TFileOutputDelimitedDefinition() {
-		super(COMPONENT_NAME);
-	}
+    public TFileOutputDelimitedDefinition() {
+        super(COMPONENT_NAME);
+    }
 
-	@Override
-	public Class<? extends ComponentProperties> getPropertyClass() {
-		return TFileOutputDelimitedProperties.class;
-	}
+    @Override
+    public Class<? extends ComponentProperties> getPropertyClass() {
+        return TFileOutputDelimitedProperties.class;
+    }
 
-	@Override
-	public Sink getRuntime() {
-		// TODO Auto-generated method stub
-		return new FileOutputSink();
-	}
+    @Override
+    public Sink getRuntime() {
+        // TODO Auto-generated method stub
+        return new FileOutputSink();
+    }
 
 }

@@ -11,24 +11,24 @@ import org.talend.components.fileinput.runtime.FileInputSource;
 import aQute.bnd.annotation.component.Component;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
-		+ TFileInputDelimitedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+        + TFileInputDelimitedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TFileInputDelimitedDefinition extends FileInputDefinition implements InputComponentDefinition {
 
-	public static final String COMPONENT_NAME = "tFileInputDelimitedNew"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tFileInputDelimitedNew"; //$NON-NLS-1$
 
-	public TFileInputDelimitedDefinition() {
-		super(COMPONENT_NAME);
-	}
+    public TFileInputDelimitedDefinition() {
+        super(COMPONENT_NAME);
+    }
 
-	@Override
-	public Class<? extends ComponentProperties> getPropertyClass() {
-		return TFileInputDelimitedProperties.class;
-	}
+    @Override
+    public Class<? extends ComponentProperties> getPropertyClass() {
+        return TFileInputDelimitedProperties.class;
+    }
 
-	@Override
-	public Source getRuntime() {
-		// TODO Auto-generated method stub
-		return new FileInputSource();
-	}
+    @Override
+    public Source getRuntime() {
+        // TODO Auto-generated method stub
+        return new FileInputSource();
+    }
 
 }

@@ -10,34 +10,34 @@ import org.talend.components.api.container.RuntimeContainer;
 
 public class FileOutputWriteOperation implements WriteOperation<Result> {
 
-	private Sink sink;
+    private Sink sink;
 
-	public FileOutputWriteOperation() {
-		this.sink = sink;
-	}
+    public FileOutputWriteOperation() {
+        this.sink = sink;
+    }
 
-	@Override
-	public void initialize(RuntimeContainer adaptor) {
-		// TODO Auto-generated method stub
+    @Override
+    public void initialize(RuntimeContainer adaptor) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public Map<String, Object> finalize(Iterable<Result> writerResults, RuntimeContainer adaptor) {
-		// TODO Auto-generated method stub
-		return Result.accumulateAndReturnMap(writerResults);
-	}
+    @Override
+    public Map<String, Object> finalize(Iterable<Result> writerResults, RuntimeContainer adaptor) {
+        // TODO Auto-generated method stub
+        return Result.accumulateAndReturnMap(writerResults);
+    }
 
-	@Override
-	public Writer<Result> createWriter(RuntimeContainer adaptor) {
-		// TODO Auto-generated method stub
-		return new FileOutputWriter(this);
-	}
+    @Override
+    public Writer<Result> createWriter(RuntimeContainer adaptor) {
+        // TODO Auto-generated method stub
+        return new FileOutputWriter(this);
+    }
 
-	@Override
-	public Sink getSink() {
-		// TODO Auto-generated method stub
-		return sink;
-	}
+    @Override
+    public Sink getSink() {
+        // TODO Auto-generated method stub
+        return sink;
+    }
 
 }

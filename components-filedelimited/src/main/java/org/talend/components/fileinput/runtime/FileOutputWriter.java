@@ -18,87 +18,87 @@ import com.csvreader.CsvWriter;
 
 public class FileOutputWriter implements Writer<Result> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(FileOutputWriter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileOutputWriter.class);
 
-	private IndexedRecordConverter<Object, ? extends IndexedRecord> factory;
+    private IndexedRecordConverter<Object, ? extends IndexedRecord> factory;
 
-	private int counter = 0;
+    private int counter = 0;
 
-	private boolean firstRow = true;
+    private boolean firstRow = true;
 
-	private WriteOperation<Result> writeOperation;
+    private WriteOperation<Result> writeOperation;
 
-	private int limit;
+    private int limit;
 
-	private Result result;
+    private Result result;
 
-	private CsvWriter writer;
+    private CsvWriter writer;
 
-	FileOutputWriter(WriteOperation<Result> writeOperation) {
-		this.writeOperation = writeOperation;
-	}
+    FileOutputWriter(WriteOperation<Result> writeOperation) {
+        this.writeOperation = writeOperation;
+    }
 
-	@Override
-	public void open(String uId) throws IOException {
-		this.result = new Result(uId);
-		FileOutputSink sink = (FileOutputSink) getWriteOperation().getSink();
-		final OutputStream outputStream;
-	}
+    @Override
+    public void open(String uId) throws IOException {
+        this.result = new Result(uId);
+        FileOutputSink sink = (FileOutputSink) getWriteOperation().getSink();
+        final OutputStream outputStream;
+    }
 
-	@Override
-	public void write(Object datum) throws IOException {
-		counter++;
-		if (datum == null || counter > limit) {
-			LOGGER.debug("Datum: {}", datum);
-			return;
-		} // else handle the data.
+    @Override
+    public void write(Object datum) throws IOException {
+        counter++;
+        if (datum == null || counter > limit) {
+            LOGGER.debug("Datum: {}", datum);
+            return;
+        } // else handle the data.
 
-		LOGGER.debug("Datum: {}", datum);
-		IndexedRecord input = getFactory(datum).convertToAvro(datum);
-		if (firstRow) {
-			for (Schema.Field f : input.getSchema().getFields()) {
-				writer.write(String.valueOf(String.valueOf(f.name())));
-			}
-			writer.endRecord();
-			firstRow = false;
-		}
-		for (Schema.Field f : input.getSchema().getFields()) {
-			final Object value = input.get(f.pos());
-			if (value == null) {
-				writer.write(StringUtils.EMPTY);
-			} else {
-				writer.write(String.valueOf(value));
-			}
-		}
-		writer.endRecord();
-		result.totalCount++;
-	}
+        LOGGER.debug("Datum: {}", datum);
+        IndexedRecord input = getFactory(datum).convertToAvro(datum);
+        if (firstRow) {
+            for (Schema.Field f : input.getSchema().getFields()) {
+                writer.write(String.valueOf(String.valueOf(f.name())));
+            }
+            writer.endRecord();
+            firstRow = false;
+        }
+        for (Schema.Field f : input.getSchema().getFields()) {
+            final Object value = input.get(f.pos());
+            if (value == null) {
+                writer.write(StringUtils.EMPTY);
+            } else {
+                writer.write(String.valueOf(value));
+            }
+        }
+        writer.endRecord();
+        result.totalCount++;
+    }
 
-	@Override
-	public Result close() throws IOException {
-		if (writer != null) {
-			try {
-				writer.flush();
-				writer.close();
-			} finally {
-				writer = null;
-			}
-		}
-		result.successCount = result.totalCount;
-		return result;
-	}
+    @Override
+    public Result close() throws IOException {
+        if (writer != null) {
+            try {
+                writer.flush();
+                writer.close();
+            } finally {
+                writer = null;
+            }
+        }
+        result.successCount = result.totalCount;
+        return result;
+    }
 
-	@Override
-	public WriteOperation<Result> getWriteOperation() {
-		return writeOperation;
-	}
+    @Override
+    public WriteOperation<Result> getWriteOperation() {
+        return writeOperation;
+    }
 
-	private IndexedRecordConverter<Object, ? extends IndexedRecord> getFactory(Object datum) {
-		if (null == factory) {
-			factory = (IndexedRecordConverter<Object, ? extends IndexedRecord>) new AvroRegistry()
-					.createIndexedRecordConverter(datum.getClass());
-		}
-		return factory;
-	}
+    private IndexedRecordConverter<Object, ? extends IndexedRecord> getFactory(Object datum) {
+        if (null == factory) {
+            factory = (IndexedRecordConverter<Object, ? extends IndexedRecord>) new AvroRegistry()
+                    .createIndexedRecordConverter(datum.getClass());
+        }
+        return factory;
+    }
 
 }
