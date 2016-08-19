@@ -19,11 +19,10 @@
 		<module>components-webtest</module>
 		<module>components-osgitest</module>
 		<module>components-api-proptester</module>
-		<module>components-splunk</module>
-		<module>components-jira</module>
+		
 		<module>components-dataprep</module>
-        <module>components-api-full-example</module>
-        <module>components-datastewardship</module>
+       
+        <module>components-fileinput</module>
   </modules>
 	<profiles>
 		<profile>
