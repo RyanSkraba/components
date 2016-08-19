@@ -688,13 +688,13 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         String parentId = getFirstCreatedAccountRecordId();
         LOGGER.debug("ParentId for attachments is:" + parentId);
         IndexedRecord r1 = new GenericData.Record(SCHEMA_ATTACHMENT);
-        r1.put(0, random + ".txt");
+        r1.put(0, "attachment_1_"+random + ".txt");
         r1.put(1, "VGhpcyBpcyBhIHRlc3QgZmlsZSAxICE=");
         r1.put(2, "text/plain");
         r1.put(3, parentId);
 
         IndexedRecord r2 = new GenericData.Record(SCHEMA_ATTACHMENT);
-        r2.put(0, random + ".txt");
+        r2.put(0, "attachment_2_"+random + ".txt");
         r2.put(1,
                 "QmFzZSA2NC1lbmNvZGVkIGJpbmFyeSBkYXRhLiBGaWVsZHMgb2YgdGhpcyB0eXBlIGFyZSB1c2VkIGZvciBzdG9yaW5"
                         + "nIGJpbmFyeSBmaWxlcyBpbiBBdHRhY2htZW50IHJlY29yZHMsIERvY3VtZW50IHJlY29yZHMsIGFuZCBTY2"
@@ -722,16 +722,23 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         ComponentDefinition sfInputDef = new TSalesforceInputDefinition();
         TSalesforceInputProperties sfInputProps = (TSalesforceInputProperties) sfInputDef.createRuntimeProperties();
         sfInputProps.copyValuesFrom(sfProps);
-        sfInputProps.condition.setValue("Name = '" + random + ".txt'");
+        sfInputProps.condition.setValue("Name = 'attachment_1_"+ random + ".txt' or Name = 'attachment_2_"+ random + ".txt'");
 
         sfInputProps.module.main.schema.setValue(SCHEMA_ATTACHMENT);
         List<IndexedRecord> inpuRecords = readRows(sfInputProps);
         try {
             assertEquals(2, inpuRecords.size());
-            IndexedRecord inputRecords_1 = inpuRecords.get(0);
-            IndexedRecord inputRecords_2 = inpuRecords.get(1);
-            assertEquals(random + ".txt", inputRecords_1.get(0));
-            assertEquals(random + ".txt", inputRecords_2.get(0));
+            IndexedRecord inputRecords_1 = null;
+            IndexedRecord inputRecords_2 = null;
+            if(("attachment_1_"+random + ".txt").equals(String.valueOf(inpuRecords.get(0).get(0)))){
+                inputRecords_1 = inpuRecords.get(0);
+                inputRecords_2 = inpuRecords.get(1);
+            }else {
+                inputRecords_1 = inpuRecords.get(1);
+                inputRecords_2 = inpuRecords.get(0);
+            }
+            assertEquals("attachment_1_"+random + ".txt", inputRecords_1.get(0));
+            assertEquals("attachment_2_"+random + ".txt", inputRecords_2.get(0));
             assertEquals("VGhpcyBpcyBhIHRlc3QgZmlsZSAxICE=", inputRecords_1.get(1));
             assertEquals(
                     "Base 64-encoded binary data. Fields of this type are used for storing binary files in Attachment "
