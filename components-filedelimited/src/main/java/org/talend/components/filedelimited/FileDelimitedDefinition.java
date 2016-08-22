@@ -1,0 +1,38 @@
+
+package org.talend.components.filedelimited;
+
+import org.talend.components.api.component.AbstractComponentDefinition;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.properties.property.Property;
+
+public class FileDelimitedDefinition extends AbstractComponentDefinition {
+
+    public FileDelimitedDefinition(String componentName) {
+        super(componentName);
+    }
+
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[] {};
+    }
+
+    public String getMavenGroupId() {
+        return "org.talend.components";
+    }
+
+    @Override
+    public String getMavenArtifactId() {
+        return "components-filedelimited";
+    }
+
+    @Override
+    public Class<? extends ComponentProperties> getPropertyClass() {
+        return FileDelimitedProperties.class;
+    }
+
+    @Override
+    public boolean isSchemaAutoPropagate() {
+        return true;
+    }
+
+}

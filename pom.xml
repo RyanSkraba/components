@@ -19,10 +19,8 @@
 		<module>components-webtest</module>
 		<module>components-osgitest</module>
 		<module>components-api-proptester</module>
-		
 		<module>components-dataprep</module>
-       
-        <module>components-fileinput</module>
+        <module>components-filedelimited</module>
   </modules>
 	<profiles>
 		<profile>

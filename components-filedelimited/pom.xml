@@ -10,7 +10,7 @@
 
     <name>Components - File Delimited</name>
     <groupId>org.talend.components</groupId>
-    <artifactId>file-input</artifactId>
+    <artifactId>components-filedelimited</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <repositories>
@@ -37,9 +37,15 @@
         </dependency>
         
         <dependency>
-			<groupId>org.talend.libraries</groupId>
-			<artifactId>talend_file_enhanced_20070724</artifactId>
-			<version>6.0.0-SNAPSHOT</version>
+            <groupId>org.talend.libraries</groupId>
+            <artifactId>talend-csv</artifactId>
+            <version>1.0-20160822</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.talend.libraries</groupId>
+            <artifactId>talend-file-enhanced</artifactId>
+            <version>1.0-20160822</version>
         </dependency>
 
         <!-- Shared component properties such as Use/Password or Schema -->
@@ -90,9 +96,9 @@
                         </goals>
                         <configuration>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.fileinput.lib</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>org.talend.components.filedelimited.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
-                                <Include-Resource>{maven-resources},META-INF/maven/org.talend.components/file-input/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
+                                <Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
                                 <Service-Component>*</Service-Component>                                
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                             </instructions>
@@ -109,9 +115,9 @@
                             <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
                             <instructions>
                                 <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*</Import-Package>
-                                <Bundle-SymbolicName>org.talend.components.fileinput.test</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>org.talend.components.filedelimited.test</Bundle-SymbolicName>
                                 <Bundle-Name>Test Fragment for ${project.name}</Bundle-Name>
-                                <Fragment-Host>org.talend.components.fileinput</Fragment-Host>
+                                <Fragment-Host>org.talend.components.filedelimited</Fragment-Host>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                                 <DynamicImport-Package>*</DynamicImport-Package>
                                 <Embed-Dependency></Embed-Dependency>
@@ -129,11 +135,11 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.fileinput</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>org.talend.components.filedelimited</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
-                                <Import-Package>*,aQute.bnd.annotation.component</Import-Package>
+                                <Import-Package>!sun.security.*,*,aQute.bnd.annotation.component</Import-Package>
                                 <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*</Embed-Dependency>
-                                <Include-Resource>{maven-resources},META-INF/maven/org.talend.components/file-input/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
+                                <Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                             </instructions>
                         </configuration>
