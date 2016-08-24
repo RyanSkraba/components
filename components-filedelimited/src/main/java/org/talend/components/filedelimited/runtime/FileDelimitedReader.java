@@ -47,7 +47,7 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
         this.container = container;
         this.properties = properties;
         factory = new FileDelimitedAdaptorFactory();
-        factory.setSchema(properties.schema.schema.getValue());
+        factory.setSchema(properties.main.schema.getValue());
 
     }
 

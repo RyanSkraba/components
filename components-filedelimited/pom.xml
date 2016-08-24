@@ -38,14 +38,14 @@
         
         <dependency>
             <groupId>org.talend.libraries</groupId>
-            <artifactId>talend-csv</artifactId>
-            <version>1.0-20160822</version>
+            <artifactId>talendcsv</artifactId>
+            <version>6.0.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.talend.libraries</groupId>
-            <artifactId>talend-file-enhanced</artifactId>
-            <version>1.0-20160822</version>
+            <artifactId>talend_file_enhanced_20070724</artifactId>
+            <version>6.0.0</version>
         </dependency>
 
         <!-- Shared component properties such as Use/Password or Schema -->

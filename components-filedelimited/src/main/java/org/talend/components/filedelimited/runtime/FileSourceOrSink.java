@@ -26,7 +26,7 @@ public class FileSourceOrSink implements SourceOrSink {
     public void initialize(RuntimeContainer container, ComponentProperties properties) {
         this.properties = (TFileInputDelimitedProperties) properties;
         // FIXME - this should be moved to the properties setup
-        schema = new Schema.Parser().parse(this.properties.schema.schema.getStringValue());
+        schema = new Schema.Parser().parse(this.properties.main.schema.getStringValue());
     }
 
     public ValidationResult validate(RuntimeContainer adaptor) {

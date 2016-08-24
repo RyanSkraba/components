@@ -59,7 +59,7 @@ public class TFileOutputDelimitedProperties extends FileDelimitedProperties {
         mainForm.addRow(csvOptions);
         mainForm.addRow(useOsRowSeparator);
         mainForm.addRow(rowSeparator);
-        mainForm.addRow(csvRowSeparator);
+        mainForm.addColumn(csvRowSeparator);
         mainForm.addColumn(fieldSeparator);
         mainForm.addRow(escapeChar);
         mainForm.addColumn(textEnclosure);

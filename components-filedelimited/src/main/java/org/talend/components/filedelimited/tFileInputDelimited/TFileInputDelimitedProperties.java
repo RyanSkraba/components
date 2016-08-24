@@ -1,10 +1,15 @@
 package org.talend.components.filedelimited.tFileInputDelimited;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
+import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.common.ValuesTrimPropertis;
 import org.talend.components.filedelimited.FileDelimitedProperties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
@@ -33,9 +38,7 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
 
     public Property<Integer> nbRandom = PropertyFactory.newInteger("nbRandom");
 
-    public Property<Boolean> trimall = PropertyFactory.newBoolean("trimall");
-
-    // TODO add table "TRIMSELECT"
+    public ValuesTrimPropertis trimColumns = new ValuesTrimPropertis("trimColumns");
 
     public Property<Boolean> checkFieldsNum = PropertyFactory.newBoolean("checkFieldsNum");
 
@@ -55,6 +58,16 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
         header.setValue(0);
         footer.setValue(0);
         nbRandom.setValue(10);
+        setSchemaListener(new ISchemaListener() {
+
+            @Override
+            public void afterSchema() {
+                List<String> fieldsName=getFieldNames(main.schema);
+                trimColumns.setFieldNames(fieldsName);
+                trimColumns.beforeTrimTable();
+//                beforeUpsertRelationTable();
+            }
+        });
     }
 
     @Override
@@ -63,7 +76,7 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(csvOptions);
         mainForm.addRow(rowSeparator);
-        mainForm.addRow(csvRowSeparator);
+        mainForm.addColumn(csvRowSeparator);
         mainForm.addColumn(fieldSeparator);
         mainForm.addRow(escapeChar);
         mainForm.addColumn(textEnclosure);
@@ -78,7 +91,7 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
 
         advancedForm.addRow(random);
         advancedForm.addColumn(nbRandom);
-        advancedForm.addRow(trimall);
+        advancedForm.addRow(trimColumns.getForm(Form.MAIN));
         // TODO add table "TRIMSELECT"
         advancedForm.addRow(checkFieldsNum);
         advancedForm.addRow(checkDate);
@@ -119,5 +132,14 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
         } else {
             return Collections.EMPTY_SET;
         }
+    }
+
+    protected List<String> getFieldNames(Property schema) {
+        Schema s = (Schema) schema.getValue();
+        List<String> fieldNames = new ArrayList<>();
+        for (Schema.Field f : s.getFields()) {
+            fieldNames.add(f.name());
+        }
+        return fieldNames;
     }
 }

@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.EncodingTypeProperties;
 import org.talend.components.common.FixedConnectorsComponentProperties;
@@ -20,7 +21,16 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
 
     public Property<String> fileName = PropertyFactory.newString("fileName");
 
-    public SchemaProperties schema = new SchemaProperties("schema");
+    public ISchemaListener schemaListener;
+
+    public SchemaProperties main = new SchemaProperties("main") {
+
+        public void afterSchema() {
+            if (schemaListener != null) {
+                schemaListener.afterSchema();
+            }
+        }
+    };
 
     public Property<Boolean> csvOptions = PropertyFactory.newBoolean("csvOptions");
 
@@ -48,7 +58,7 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
 
     public EncodingTypeProperties encodingType = new EncodingTypeProperties("encodingType");
 
-    protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
+    protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "main");
 
     public FileDelimitedProperties(String name) {
         super(name);
@@ -64,13 +74,14 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
         thousandsSeparator.setValue(",");
         decimalSeparator.setValue(".");
         encodingType.encodingType.setPossibleValues(encodingType.getDefaultEncodings());
+
     }
 
     @Override
     public void setupLayout() {
         super.setupLayout();
         Form mainForm = Form.create(this, Form.MAIN);
-        mainForm.addRow(schema.getForm(Form.REFERENCE));
+        mainForm.addRow(main.getForm(Form.REFERENCE));
         mainForm.addRow(widget(fileName).setWidgetType(Widget.FILE_WIDGET_TYPE));
 
         Form advancedForm = Form.create(this, Form.ADVANCED);
@@ -110,6 +121,10 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
 
     public void afterAdvancedSeparator() {
         refreshLayout(getForm(Form.ADVANCED));
+    }
+
+    public void setSchemaListener(ISchemaListener schemaListener) {
+        this.schemaListener = schemaListener;
     }
 
 }
