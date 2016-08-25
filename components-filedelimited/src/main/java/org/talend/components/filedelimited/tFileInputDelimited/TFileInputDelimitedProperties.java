@@ -10,10 +10,14 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.ValuesTrimPropertis;
+import org.talend.components.filedelimited.DecodeTable;
 import org.talend.components.filedelimited.FileDelimitedProperties;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
+
+import static org.talend.daikon.properties.presentation.Widget.widget;
 
 public class TFileInputDelimitedProperties extends FileDelimitedProperties {
 
@@ -48,7 +52,7 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
 
     public Property<Boolean> enableDecode = PropertyFactory.newBoolean("enableDecode");
 
-    // TODO add table "DECODE_COLS"
+    public DecodeTable decodeTable = new DecodeTable("decodeTable");
 
     protected transient PropertyPathConnector REJECT_CONNECTOR = new PropertyPathConnector(Connector.REJECT_NAME, "schemaReject");
 
@@ -62,10 +66,10 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
 
             @Override
             public void afterSchema() {
-                List<String> fieldsName=getFieldNames(main.schema);
+                List<String> fieldsName = getFieldNames(main.schema);
                 trimColumns.setFieldNames(fieldsName);
                 trimColumns.beforeTrimTable();
-//                beforeUpsertRelationTable();
+                beforeDecodeTable();
             }
         });
     }
@@ -92,12 +96,11 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
         advancedForm.addRow(random);
         advancedForm.addColumn(nbRandom);
         advancedForm.addRow(trimColumns.getForm(Form.MAIN));
-        // TODO add table "TRIMSELECT"
         advancedForm.addRow(checkFieldsNum);
         advancedForm.addRow(checkDate);
         advancedForm.addRow(splitRecord);
         advancedForm.addRow(enableDecode);
-        // TODO add table "DECODE_COLS"
+        advancedForm.addRow(widget(decodeTable).setWidgetType(Widget.TABLE_WIDGET_TYPE));
 
     }
 
@@ -107,6 +110,10 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
     }
 
     public void afterRandom() {
+        refreshLayout(getForm(Form.ADVANCED));
+    }
+
+    public void afterEnableDecode() {
         refreshLayout(getForm(Form.ADVANCED));
     }
 
@@ -121,7 +128,7 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
             form.getWidget(nbRandom.getName()).setHidden(csvOptions.getValue() || uncompress.getValue() || !random.getValue());
             // TODO add table "TRIMSELECT"
             form.getWidget(splitRecord.getName()).setHidden(csvOptions.getValue());
-            // TODO add table "DECODE_COLS"
+            form.getWidget(decodeTable.getName()).setHidden(!enableDecode.getValue());
         }
     }
 
@@ -141,5 +148,17 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
             fieldNames.add(f.name());
         }
         return fieldNames;
+    }
+
+    public void beforeDecodeTable() {
+        List<String> fieldNames = trimColumns.getFieldNames();
+        if (fieldNames != null && fieldNames.size() > 0) {
+            decodeTable.columnName.setValue(fieldNames);
+            List<Boolean> decodeValueList = new ArrayList<>();
+            for (int i = fieldNames.size(); i > 0; i--) {
+                decodeValueList.add(Boolean.FALSE);
+            }
+            decodeTable.decode.setValue(decodeValueList);
+        }
     }
 }
