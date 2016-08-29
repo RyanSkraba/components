@@ -41,17 +41,17 @@ public class TdsTasksMetadataPropertiesTest {
         assertThat(main, notNullValue());
 
         Collection<Widget> mainWidgets = main.getWidgets();
-        assertThat(mainWidgets, hasSize(5));
-        Widget taskPriorityWidget = main.getWidget("taskPriority"); //$NON-NLS-1$
+        assertThat(mainWidgets, hasSize(2));
+        /*Widget taskPriorityWidget = main.getWidget("taskPriority"); //$NON-NLS-1$
         assertThat(taskPriorityWidget, notNullValue());
         Widget taskTagsWidget = main.getWidget("taskTags"); //$NON-NLS-1$
-        assertThat(taskTagsWidget, notNullValue());
+        assertThat(taskTagsWidget, notNullValue());*/
         Widget taskStateWidget = main.getWidget("taskState"); //$NON-NLS-1$
         assertThat(taskStateWidget, notNullValue());
         Widget taskAssigneeWidget = main.getWidget("taskAssignee"); //$NON-NLS-1$
         assertThat(taskAssigneeWidget, notNullValue());
-        Widget taskCommentWidget = main.getWidget("taskComment"); //$NON-NLS-1$
-        assertThat(taskCommentWidget, notNullValue());
+        /*Widget taskCommentWidget = main.getWidget("taskComment"); //$NON-NLS-1$
+        assertThat(taskCommentWidget, notNullValue());*/
     }
 
 }

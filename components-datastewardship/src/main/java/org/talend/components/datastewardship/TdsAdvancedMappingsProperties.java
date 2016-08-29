@@ -12,9 +12,12 @@
 // ============================================================================
 package org.talend.components.datastewardship;
 
+import static org.talend.daikon.properties.presentation.Widget.widget;
+
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.StringProperty;
 
 /**
@@ -66,9 +69,9 @@ public class TdsAdvancedMappingsProperties extends PropertiesImpl {
     public void setupLayout() {
         super.setupLayout();
         Form form = Form.create(this, Form.ADVANCED);
-        form.addRow(groupIdColumn);
-        form.addColumn(masterColumn);
-        form.addRow(sourceColumn);
-        form.addColumn(scoreColumn);
+        form.addRow(widget(groupIdColumn).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
+        form.addColumn(widget(masterColumn).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
+        form.addRow(widget(sourceColumn).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
+        form.addColumn(widget(scoreColumn).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
     }
 }

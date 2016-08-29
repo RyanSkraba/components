@@ -20,41 +20,41 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.StringProperty;
 
 /**
- * Tasks metadata {@link Properties}
+ * Search Criteria {@link Properties}
  */
-public class TdsTasksMetadataProperties extends PropertiesImpl {
+public class TdsSearchCriteriaProperties extends PropertiesImpl {
 
     /**
-     * Task Priority
+     * State
+     */
+    public StringProperty taskState = new StringProperty("taskState"); //$NON-NLS-1$
+    
+    /**
+     * Assignee
+     */
+    public StringProperty taskAssignee  = new StringProperty("taskAssignee"); //$NON-NLS-1$
+    
+    /**
+     * Priority 
      */
     public StringProperty taskPriority = new StringProperty("taskPriority"); //$NON-NLS-1$
-
+    
     /**
-     * Task Tags
+     * Tags
      */
     public StringProperty taskTags = new StringProperty("taskTags"); //$NON-NLS-1$
 
     /**
-     * Task State
+     * Query
      */
-    public StringProperty taskState = new StringProperty("taskState"); //$NON-NLS-1$
-
-    /**
-     * Task Assignee
-     */
-    public StringProperty taskAssignee = new StringProperty("taskAssignee"); //$NON-NLS-1$
-
-    /**
-     * Task Comment
-     */
-    public StringProperty taskComment = new StringProperty("taskComment"); //$NON-NLS-1$
+    public StringProperty searchQuery = new StringProperty("searchQuery"); //$NON-NLS-1$
 
     /**
      * Constructor sets properties name
      * 
      * @param name properties name
      */
-    public TdsTasksMetadataProperties(String name) {
+    public TdsSearchCriteriaProperties(String name) {
         super(name);
     }
 
@@ -74,10 +74,10 @@ public class TdsTasksMetadataProperties extends PropertiesImpl {
     public void setupLayout() {
         super.setupLayout();
         Form mainForm = Form.create(this, Form.MAIN);
-        // mainForm.addRow(Widget.widget(taskPriority).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
-        // mainForm.addColumn(taskTags);
         mainForm.addRow(Widget.widget(taskState).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
-        mainForm.addColumn(taskAssignee);
-        // mainForm.addRow(taskComment);
+//        mainForm.addColumn(taskAssignee);
+//        mainForm.addRow(Widget.widget(taskPriority).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
+//        mainForm.addColumn(taskTags);
+        mainForm.addRow(searchQuery);
     }
 }

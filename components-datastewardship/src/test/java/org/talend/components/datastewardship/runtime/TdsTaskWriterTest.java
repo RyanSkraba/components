@@ -35,7 +35,8 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.SpringTestApp;
-import org.talend.components.datastewardship.CampaignType;
+import org.talend.components.datastewardship.common.CampaignType;
+import org.talend.components.datastewardship.common.TdsConstants;
 import org.talend.components.datastewardship.runtime.writer.TdsTaskWriter;
 import org.talend.components.datastewardship.tdatastewardshiptaskoutput.TDataStewardshipTaskOutputDefinition;
 import org.talend.components.datastewardship.tdatastewardshiptaskoutput.TDataStewardshipTaskOutputProperties;
@@ -68,14 +69,19 @@ public class TdsTaskWriterTest {
         properties.connection.url.setValue("http://localhost:" + serverPort);
         properties.connection.username.setValue("owner1");
         properties.connection.password.setValue("owner1");
-        properties.campaign.campaignName.setValue("perf-review-resolution");
+        properties.campaignName.setValue("perf-review-resolution");
+        properties.tasksMetadata.taskPriority.setValue(TdsConstants.PRIORITY_MEDIUM);
+        properties.tasksMetadata.taskTags.setValue("tagValue");
+        properties.tasksMetadata.taskState.setValue("Performance_review_request");
+        properties.tasksMetadata.taskAssignee.setValue("user1");
+        properties.tasksMetadata.taskComment.setValue("comment");
         properties.batchSize.setValue(0);
         sink = (TdsTaskSink) definition.getRuntime();
     }
 
     @Test
     public void testWrite() throws IOException {
-        properties.campaign.campaignType.setValue(CampaignType.RESOLUTION);
+        properties.campaignType.setValue(CampaignType.RESOLUTION);
 
         sink.initialize(null, properties);
         TdsTaskWriteOperation writeOperation = (TdsTaskWriteOperation) sink.createWriteOperation();
@@ -88,7 +94,7 @@ public class TdsTaskWriterTest {
         }
 
         Result result = writer.close();
-        List<Result> results = new ArrayList();
+        List<Result> results = new ArrayList<>();
         results.add(result);
         Map<String, Object> resultMap = writeOperation.finalize(results, null);
         Assert.assertEquals(10, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
@@ -102,43 +108,43 @@ public class TdsTaskWriterTest {
         record.put(schema.getField("SocialSecurityId").pos(), random);
         record.put(schema.getField("FirstName").pos(), "Dev" + random);
         record.put(schema.getField("LastName").pos(), "Lee");
-        record.put(schema.getField("BirthDate").pos(), "1982-05-07");
+        record.put(schema.getField("BirthDate").pos(), 19820507);
         record.put(schema.getField("Team").pos(), "Team");
         record.put(schema.getField("Manager").pos(), "Manager");
-        record.put(schema.getField("SelfScore").pos(), "80");
-        record.put(schema.getField("ManagerScore").pos(), "85");
-        record.put(schema.getField("HRScore").pos(), "90");
+        record.put(schema.getField("SelfScore").pos(), 80);
+        record.put(schema.getField("ManagerScore").pos(), 85);
+        record.put(schema.getField("HRScore").pos(), 90);
         record.put(schema.getField("Position").pos(), "Enginer");
-        record.put(schema.getField("Joined").pos(), "2014-05-02");
+        record.put(schema.getField("Joined").pos(), 20140502);
         record.put(schema.getField("Experience").pos(), "10 Years");
         record.put(schema.getField("Salary").pos(), "20000");
         return record;
     }
     
-    private Schema createSchema() {
+    public static Schema createSchema() {
         AvroRegistry avroReg = new AvroRegistry();
         SchemaBuilder.FieldAssembler<Schema> record = SchemaBuilder.record("Main").fields();
         addField(record, "CampanyId", String.class, avroReg);
-        addField(record, "SocialSecurityId", String.class, avroReg);
+        addField(record, "SocialSecurityId", Integer.class, avroReg);
         addField(record, "FirstName", String.class, avroReg);
         addField(record, "LastName", String.class, avroReg);
-        addField(record, "BirthDate", String.class, avroReg);
+        addField(record, "BirthDate", Long.class, avroReg);
         addField(record, "Team", String.class, avroReg);
         addField(record, "Manager", String.class, avroReg);
-        addField(record, "SelfScore", String.class, avroReg);
-        addField(record, "ManagerScore", String.class, avroReg);
-        addField(record, "HRScore", String.class, avroReg);
+        addField(record, "SelfScore", Integer.class, avroReg);
+        addField(record, "ManagerScore", Integer.class, avroReg);
+        addField(record, "HRScore", Integer.class, avroReg);
         addField(record, "Position", String.class, avroReg);
-        addField(record, "Joined", String.class, avroReg);
+        addField(record, "Joined", Long.class, avroReg);
         addField(record, "Experience", String.class, avroReg);
-        addField(record, "Salary", String.class, avroReg);
+        addField(record, "Salary", Integer.class, avroReg);
         Schema defaultSchema = record.endRecord();
         return defaultSchema;
     }
     
     @Test
     public void testWriteMergingTasks() throws IOException {       
-        properties.campaign.campaignType.setValue(CampaignType.MERGING);
+        properties.campaignType.setValue(CampaignType.MERGING);
         properties.advancedMappings.groupIdColumn.setValue("groupId");
         properties.advancedMappings.sourceColumn.setValue("source");
         properties.advancedMappings.masterColumn.setValue("master");
@@ -155,7 +161,7 @@ public class TdsTaskWriterTest {
         }
 
         Result result = writer.close();
-        List<Result> results = new ArrayList();
+        List<Result> results = new ArrayList<>();
         results.add(result);
         Map<String, Object> resultMap = writeOperation.finalize(results, null);
         Assert.assertEquals(2, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
@@ -166,14 +172,26 @@ public class TdsTaskWriterTest {
         List<IndexedRecord> records = new ArrayList<>();
         Schema schema = createMergingTasksSchema();
         IndexedRecord record = new GenericData.Record(schema);
-        record.put(schema.getField("Id").pos(), "10001");  
+        record.put(schema.getField("Id").pos(), "10001");
+        record.put(schema.getField("FirstName").pos(), "Dev");
+        record.put(schema.getField("LastName").pos(), "Lee");
+        record.put(schema.getField("BirthDate").pos(), 19820507);
+        record.put(schema.getField("Salary").pos(), "20000");
+        record.put(schema.getField("BankAccount").pos(), "123456789");
+        
         record.put(schema.getField("groupId").pos(), "1");
         record.put(schema.getField("source").pos(), "");
         record.put(schema.getField("master").pos(), true);
         record.put(schema.getField("score").pos(), "200");
         records.add(record);
         IndexedRecord record1 = new GenericData.Record(schema);
-        record1.put(schema.getField("Id").pos(), "10002");  
+        record.put(schema.getField("Id").pos(), "10002");
+        record.put(schema.getField("FirstName").pos(), "Dev");
+        record.put(schema.getField("LastName").pos(), "Lee");
+        record.put(schema.getField("BirthDate").pos(), 19820507);
+        record.put(schema.getField("Salary").pos(), "20000");
+        record.put(schema.getField("BankAccount").pos(), "123456789");
+        
         record1.put(schema.getField("groupId").pos(), "1");
         record1.put(schema.getField("source").pos(), "");
         record1.put(schema.getField("master").pos(), false);
@@ -183,10 +201,16 @@ public class TdsTaskWriterTest {
         return records;
     }
     
-    private Schema createMergingTasksSchema() {
+    public static Schema createMergingTasksSchema() {
         AvroRegistry avroReg = new AvroRegistry();
         SchemaBuilder.FieldAssembler<Schema> record = SchemaBuilder.record("Main").fields();
-        addField(record, "Id", String.class, avroReg);
+        addField(record, "Id", Integer.class, avroReg);
+        addField(record, "SocialSecurityId", Integer.class, avroReg);
+        addField(record, "FirstName", String.class, avroReg);
+        addField(record, "LastName", String.class, avroReg);
+        addField(record, "BirthDate", Long.class, avroReg);
+        addField(record, "Salary", Integer.class, avroReg);
+        addField(record, "BankAccount", String.class, avroReg);
     
         addField(record, "groupId", String.class, avroReg);
         addField(record, "source", String.class, avroReg);
@@ -196,7 +220,7 @@ public class TdsTaskWriterTest {
         return defaultSchema;
     }
 
-    private SchemaBuilder.FieldAssembler<Schema> addField(SchemaBuilder.FieldAssembler<Schema> record, String name, Class<?> type,
+    private static SchemaBuilder.FieldAssembler<Schema> addField(SchemaBuilder.FieldAssembler<Schema> record, String name, Class<?> type,
             AvroRegistry avroReg) {
         Schema base = avroReg.getConverter(type).getSchema();
         SchemaBuilder.FieldBuilder<Schema> fieldBuilder = record.name(name);

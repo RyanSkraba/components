@@ -13,6 +13,7 @@
 package org.talend.components.datastewardship;
 
 import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
@@ -26,10 +27,21 @@ public abstract class TdsProperties extends FixedConnectorsComponentProperties {
     
     protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schema"); //$NON-NLS-1$
 
-    /**
-     * Schema
-     */
-    public SchemaProperties schema = new SchemaProperties("schema"); //$NON-NLS-1$
+    public ISchemaListener schemaListener;
+
+    public SchemaProperties schema = new SchemaProperties("schema") { //$NON-NLS-1$
+
+        public void afterSchema() {
+            if (schemaListener != null) {
+                schemaListener.afterSchema();
+            }
+        }
+
+    };
+
+    public void setSchemaListener(ISchemaListener schemaListener) {
+        this.schemaListener = schemaListener;
+    }
 
     /**
      * {@link TdsConnectionProperties}, which describe connection to TDS server

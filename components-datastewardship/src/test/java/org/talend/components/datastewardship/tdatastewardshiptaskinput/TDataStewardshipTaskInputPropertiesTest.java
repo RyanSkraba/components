@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.datastewardship.tdatastewardshiptaskoutput;
+package org.talend.components.datastewardship.tdatastewardshiptaskinput;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -35,25 +35,29 @@ import org.talend.daikon.properties.presentation.Widget;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringTestApp.class)
-public class TDataStewardshipTaskOutputPropertiesTest {
+public class TDataStewardshipTaskInputPropertiesTest {
 
     @Inject
     private ComponentService componentService;
 
     @Test
-    public void testTDataStewardshipTaskOutputProperties() {
-        TDataStewardshipTaskOutputProperties properties = (TDataStewardshipTaskOutputProperties) componentService
-                .getComponentProperties("tDataStewardshipTaskOutput"); //$NON-NLS-1$
+    public void testTDataStewardshipTaskInputProperties() {
+        TDataStewardshipTaskInputProperties properties = (TDataStewardshipTaskInputProperties) componentService
+                .getComponentProperties("tDataStewardshipTaskInput"); //$NON-NLS-1$
         PropertyPathConnector connector = new PropertyPathConnector(Connector.MAIN_NAME, "schema"); //$NON-NLS-1$
 
         Assert.assertNotNull(properties.schema);
-        Assert.assertEquals(Collections.emptySet(), properties.getAllSchemaPropertiesConnectors(true));
-        Assert.assertEquals(Collections.singleton(connector), properties.getAllSchemaPropertiesConnectors(false));
+        Assert.assertEquals(Collections.emptySet(), properties.getAllSchemaPropertiesConnectors(false));
+        Assert.assertEquals(Collections.singleton(connector), properties.getAllSchemaPropertiesConnectors(true));
     }
 
+    /**
+     * Checks {@link TDataStewardshipTaskInputProperties#setupLayout()}
+     */
     @Test
     public void testSetupLayout() {
-        TDataStewardshipTaskOutputProperties properties = new TDataStewardshipTaskOutputProperties("root"); //$NON-NLS-1$
+        TDataStewardshipTaskInputProperties properties = (TDataStewardshipTaskInputProperties) componentService
+                .getComponentProperties("tDataStewardshipTaskInput"); //$NON-NLS-1$
         properties.init();
         properties.setupLayout();
 
@@ -61,7 +65,8 @@ public class TDataStewardshipTaskOutputPropertiesTest {
         assertThat(main, notNullValue());
 
         Collection<Widget> mainWidgets = main.getWidgets();
-        assertThat(mainWidgets, hasSize(6));
+        assertThat(mainWidgets, hasSize(7));
+
         Widget schemaWidget = main.getWidget("schema"); //$NON-NLS-1$
         assertThat(schemaWidget, notNullValue());
         Widget connectionWidget = main.getWidget("connection"); //$NON-NLS-1$
@@ -72,17 +77,17 @@ public class TDataStewardshipTaskOutputPropertiesTest {
         assertThat(campaignLabelWidget, notNullValue());
         Widget campaignTypeWidget = main.getWidget("campaignType"); //$NON-NLS-1$
         assertThat(campaignTypeWidget, notNullValue());
-        Widget tasksMetadataWidget = main.getWidget("tasksMetadata"); //$NON-NLS-1$
-        assertThat(tasksMetadataWidget, notNullValue());
+        Widget searchCriteriaWidget = main.getWidget("searchCriteria"); //$NON-NLS-1$
+        assertThat(searchCriteriaWidget, notNullValue());
+        Widget goldenOnlyWidget = main.getWidget("goldenOnly"); //$NON-NLS-1$
+        assertThat(goldenOnlyWidget, notNullValue());
 
         Form advanced = properties.getForm(Form.ADVANCED);
         assertThat(advanced, notNullValue());
 
         Collection<Widget> advancedWidgets = advanced.getWidgets();
-        assertThat(advancedWidgets, hasSize(2));
+        assertThat(advancedWidgets, hasSize(1));
 
-        Widget advancedMappingsWidget = advanced.getWidget("advancedMappings"); //$NON-NLS-1$
-        assertThat(advancedMappingsWidget, notNullValue());
         Widget batchSizeWidget = advanced.getWidget("batchSize"); //$NON-NLS-1$
         assertThat(batchSizeWidget, notNullValue());
     }

@@ -13,10 +13,11 @@
 package org.talend.components.datastewardship.runtime.writer;
 
 import java.io.IOException;
+
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.datastewardship.connection.TdsConnection;
+import org.talend.components.datastewardship.common.TdsUtils;
 import org.talend.components.datastewardship.runtime.TdsCampaignWriteOperation;
 
 /**
@@ -62,7 +63,7 @@ public class TdsCampaignWriter extends TdsWriter {
 
         String campaignSchema = record.get(0).toString().replaceAll("'", "\""); //$NON-NLS-1$//$NON-NLS-2$
 
-        String resourceToCreate = "api/" + TdsConnection.API_VERSION + "/campaigns/owned/"; //$NON-NLS-1$
+        String resourceToCreate = TdsUtils.getCampaignResource(); //$NON-NLS-1$
 
         int statusCode = getConnection().post(resourceToCreate, campaignSchema);
 

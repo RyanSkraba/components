@@ -13,7 +13,6 @@
 package org.talend.components.datastewardship.connection;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.List;
 import java.util.Map;
 
@@ -66,16 +65,21 @@ public class TdsServerMock {
 
         if (name.equals("perf-review-resolution")) { //$NON-NLS-1$
             InputStreamResource inputStream = new InputStreamResource(
-                    TdsServerMock.class.getResourceAsStream("perf-review-resolution.json")); //$NON-NLS-1$
+                    TdsServerMock.class.getResourceAsStream("../campaign-resolution.json")); //$NON-NLS-1$
+            return new ResponseEntity<InputStreamResource>(inputStream, HttpStatus.OK);
+        }
+        if (name.equals("campaign1")) { //$NON-NLS-1$
+            InputStreamResource inputStream = new InputStreamResource(
+                    TdsServerMock.class.getResourceAsStream("../runtime/campaign-merging.json")); //$NON-NLS-1$
             return new ResponseEntity<InputStreamResource>(inputStream, HttpStatus.OK);
         }
         return new ResponseEntity<InputStreamResource>(HttpStatus.BAD_REQUEST);
     }
     
     @SuppressWarnings("rawtypes")
-    @RequestMapping(value = "/api/v1/campaigns/owned/", method = RequestMethod.POST, consumes = {
-            MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity createCampaign(@RequestHeader(value = "Authorization") String authorization,  @RequestBody Object request) throws Exception {
+    @RequestMapping(value = "/api/v1/campaigns/owned/", method = RequestMethod.POST, produces = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity createCampaign(@RequestHeader(value = "Authorization") String authorization, 
+            @RequestBody Object request) throws Exception {
         if (!AUTHORIZATION.equals(authorization)) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
@@ -87,6 +91,28 @@ public class TdsServerMock {
             return new ResponseEntity(HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    }
+    
+    @SuppressWarnings("rawtypes")    
+    @RequestMapping(value = "/api/v1/campaigns/owned/{campaignName}/tasks/{state}", method = RequestMethod.GET, produces = { //$NON-NLS-1$
+            MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity getTasks(@RequestHeader(value = "Authorization") String authorization,  
+            @PathVariable String campaignName, @PathVariable String state) throws Exception {
+        if (!AUTHORIZATION.equals(authorization)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
+        if (campaignName.equals("perf-review-resolution") && state.equals("Performance_review_request")) { //$NON-NLS-1$ //$NON-NLS-2$
+            InputStreamResource inputStream = new InputStreamResource(
+                    TdsServerMock.class.getResourceAsStream("resolution-tasks.json")); //$NON-NLS-1$
+            return new ResponseEntity<InputStreamResource>(inputStream, HttpStatus.OK);
+        } 
+        if (campaignName.equals("campaign1") && state.equals("HR_review_requested")) { //$NON-NLS-1$ //$NON-NLS-2$
+            InputStreamResource inputStream = new InputStreamResource(
+                    TdsServerMock.class.getResourceAsStream("merging-tasks.json")); //$NON-NLS-1$
+            return new ResponseEntity<InputStreamResource>(inputStream, HttpStatus.OK);
+        }
+        return new ResponseEntity<InputStreamResource>(HttpStatus.BAD_REQUEST);
     }
 
 }

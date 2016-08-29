@@ -1,55 +1,118 @@
 {
-  'campaign': {
-    'createdBy': 'admin',
-    'creationDate': 0,
-    'endDate': 0,
-    'id': '2',
-    'label': 'B',
-    'lastUpdateDate': 0,
-    'lastUpdatedBy': 'admin',
-    'name': 'TEST',
-    'owner': 'admin',
-    'recordStructure': {
-      'fields': [
+  "id": "campaign1",
+  "createdBy": "admin",
+  "lastUpdatedBy": "admin",
+  "creationDate": 1449273600000,
+  "lastUpdateDate": 1449273600000,
+  "name": "campaign1",
+  "label": "Simple merge campaign",
+  "owner": "owner1",
+  "status": "STARTED",
+  "startDate": 1449273600000,
+  "endDate": 1483142400000,
+  "taskType": "MERGING",
+  "states": [
+    {
+      "name": "HR_review_requested",
+      "transitionQuestion": null,
+      "transitions": [
         {
-          'mandatory': true,
-          'name': 'TEST',
-          'type': 'TDS_DATE'
+          "name": "HR_review_done",
+          "targetStateName": "Accounting_review_request",
+          "allowedRoles": [
+            "hr"
+          ]
         }
       ],
-      'name': 'TEST'
+      "allowedRoles": [],
+      "translations": {}
     },
-    'startDate': 0,
-    'status': 'NOT_STARTED',
-    'taskType': 'MERGING',
-    'workflow': {
-      'createdBy': 'admin',
-      'creationDate': 0,
-      'id': '1',
-      'lastUpdateDate': 0,
-      'lastUpdatedBy': 'admin',
-      'name': 'TEST',
-      'states': [
+    {
+      "name": "Accounting_review_request",
+      "transitionQuestion": null,
+      "transitions": [
         {
-          'allowedRoles': [
-            'TEST'
-          ],
-          'name': 'TEST',
-          'transitionQuestion': 'TEST',
-          'transitions': [
-            {
-              'allowedRoles': [
-                'TEST'
-              ],
-              'name': 'TEST',
-              'targetStateName': 'TEST'
-            }
-          ],
-          'translations': {}
+          "name": "Accounting_review_done",
+          "targetStateName": "Resolved",
+          "allowedRoles": [
+            "accountant"
+          ]
         }
       ],
-      'tenantId': 'TEST'
+      "allowedRoles": [],
+      "translations": {}
+    },
+    {
+      "name": "Resolved",
+      "transitionQuestion": null,
+      "transitions": [],
+      "allowedRoles": [],
+      "translations": {}
     }
+  ],
+  "recordStructure": {
+    "name": "employee",
+    "fields": [
+      {
+        "name": "Id",
+        "type": {
+          "frontType": "integer",
+          "dqDataType": "INTEGER"
+        },
+        "mandatory": true
+      },
+      {
+        "name": "SocialSecurityId",
+        "type": {
+          "frontType": "integer",
+          "dqDataType": "INTEGER"
+        },
+        "mandatory": false
+      },
+      {
+        "name": "FirstName",
+        "type": {
+          "frontType": "text",
+          "dqDataType": "STRING"
+        },
+        "mandatory": false
+      },
+      {
+        "name": "LastName",
+        "type": {
+          "frontType": "text",
+          "dqDataType": "STRING"
+        },
+        "mandatory": false
+      },
+      {
+        "name": "BirthDate",
+        "type": {
+          "frontType": "date",
+          "dqDataType": "DATE"
+        },
+        "mandatory": false
+      },
+      {
+        "name": "Salary",
+        "type": {
+          "frontType": "integer",
+          "dqDataType": "INTEGER"
+        },
+        "mandatory": false
+      },
+      {
+        "name": "BankAccount",
+        "type": {
+          "frontType": "text",
+          "dqDataType": "STRING"
+        },
+        "mandatory": false
+      }
+    ]
   },
-  'participants': {}
+  "sourcesConfiguration": {
+    "sources": {},
+    "rejectUnknownSources": false
+  }
 }

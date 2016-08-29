@@ -12,12 +12,12 @@
 // ============================================================================
 package org.talend.components.datastewardship.runtime;
 
-import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.datastewardship.CampaignType;
+import org.talend.components.datastewardship.common.CampaignType;
+import org.talend.components.datastewardship.common.TdsUtils;
 import org.talend.components.datastewardship.tdatastewardshiptaskoutput.TDataStewardshipTaskOutputProperties;
 
 /**
@@ -26,11 +26,6 @@ import org.talend.components.datastewardship.tdatastewardshiptaskoutput.TDataSte
 public class TdsTaskSink extends TdsSink {
 
     private static final long serialVersionUID = -7153395345785814016L;
-
-    /**
-     * Data schema
-     */
-    private Schema schema;
 
     /**
      * Campaign name
@@ -102,16 +97,15 @@ public class TdsTaskSink extends TdsSink {
     public void initialize(RuntimeContainer container, ComponentProperties properties) {
         super.initialize(container, properties);
         TDataStewardshipTaskOutputProperties outputProperties = (TDataStewardshipTaskOutputProperties) properties;
-        schema = outputProperties.schema.schema.getValue();
-        campaignName = outputProperties.campaign.campaignName.getValue();
-        campaignType = outputProperties.campaign.campaignType.getValue().toString();
-        /*
-        taskPriority = outputProperties.tasksMetadata.taskPriority.getValue().getValue();
+        campaignName = outputProperties.campaignName.getValue();
+        campaignType = outputProperties.campaignType.getValue().toString();
+
+        taskPriority = TdsUtils.getTaskPriority(outputProperties.tasksMetadata.taskPriority.getValue());
         taskTags = outputProperties.tasksMetadata.taskTags.getValue();
         taskState = outputProperties.tasksMetadata.taskState.getValue();
         taskAssignee = outputProperties.tasksMetadata.taskAssignee.getValue();
         taskComment = outputProperties.tasksMetadata.taskComment.getValue();
-        */
+        
         if (outputProperties.batchSize.getValue() != null) {
             batchSize = outputProperties.batchSize.getValue();
         }
@@ -131,16 +125,7 @@ public class TdsTaskSink extends TdsSink {
     public WriteOperation<?> createWriteOperation() {
         return new TdsTaskWriteOperation(this);
     }
-
-    /**
-     * Returns data schema
-     * 
-     * @return data schema
-     */
-    public Schema getSchema() {
-        return schema;
-    }
-
+    
     /**
      * Getter for campaignName.
      * 

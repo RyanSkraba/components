@@ -1,0 +1,527 @@
+[
+  {
+    "type": "MERGING",
+    "id": "task1-1",
+    "createdBy": "admin",
+    "creationDate": 1447841456430,
+    "lastUpdateDate": 1447841456430,
+    "tenantId": null,
+    "version": 0,
+    "campaignId": "campaign1",
+    "currentState": "HR_review_requested",
+    "allowedRoles": [
+      "hr"
+    ],
+    "assignee": null,
+    "record": {
+      "CampanyId": "TLND-1000",
+      "SocialSecurityId": 1223344555000,
+      "FirstName": "Jaen",
+      "LastName": "Dubois",
+      "BirthDate": "1988-04-28",
+      "Team": "Sales",
+      "Manager": "Jean Menard",
+      "SelfScore": 74,
+      "ManagerScore": 78,
+      "HRScore": "87",
+      "Position": "Intern",
+      "Joined": "2005-02-26",
+      "Experience": "5 years",
+      "Salary": 42000
+    },
+    "targetTransition": null,
+    "availableTransitions": [],
+    "completed": false,
+    "fieldsOrigin": {},
+    "expectedVersion": null,
+    "sourceRecords": [
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {
+	      "CampanyId": "TLND-1000",
+	      "SocialSecurityId": 1223344555000,
+	      "FirstName": "Jaen",
+	      "LastName": "Dubois",
+	      "BirthDate": "1988-04-28",
+	      "Team": "Sales",
+	      "Manager": "Jean Menard",
+	      "SelfScore": 74,
+	      "ManagerScore": 78,
+	      "HRScore": "87",
+	      "Position": "Intern",
+	      "Joined": "2005-02-26",
+	      "Experience": "5 years",
+	      "Salary": 42000
+	    }
+      },
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      }
+    ],
+    "mergeResults": {}
+  },
+  {
+    "type": "MERGING",
+    "id": "task1-10",
+    "createdBy": "admin",
+    "creationDate": 1447841456430,
+    "lastUpdateDate": 1447841456430,
+    "tenantId": null,
+    "version": 0,
+    "campaignId": "campaign1",
+    "currentState": "HR_review_requested",
+    "allowedRoles": [
+      "hr"
+    ],
+    "assignee": "user1",
+    "record": {
+      "CampanyId": "TLND-1000",
+      "SocialSecurityId": 1223344555000,
+      "FirstName": "Jaen",
+      "LastName": "Dubois",
+      "BirthDate": "1988-04-28",
+      "Team": "Sales",
+      "Manager": "Jean Menard",
+      "SelfScore": 74,
+      "ManagerScore": 78,
+      "HRScore": "87",
+      "Position": "Intern",
+      "Joined": "2005-02-26",
+      "Experience": "5 years",
+      "Salary": 42000
+    },
+    "targetTransition": null,
+    "availableTransitions": [],
+    "completed": false,
+    "fieldsOrigin": {},
+    "expectedVersion": null,
+    "sourceRecords": [
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      },
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      }
+    ],
+    "mergeResults": {}
+  },
+  {
+    "type": "MERGING",
+    "id": "task1-2",
+    "createdBy": "admin",
+    "creationDate": 1447841456430,
+    "lastUpdateDate": 1447841456430,
+    "tenantId": null,
+    "version": 0,
+    "campaignId": "campaign1",
+    "currentState": "HR_review_requested",
+    "allowedRoles": [
+      "hr"
+    ],
+    "assignee": null,
+    "record": {
+      "CampanyId": "TLND-1000",
+      "SocialSecurityId": 1223344555000,
+      "FirstName": "Jaen",
+      "LastName": "Dubois",
+      "BirthDate": "1988-04-28",
+      "Team": "Sales",
+      "Manager": "Jean Menard",
+      "SelfScore": 74,
+      "ManagerScore": 78,
+      "HRScore": "87",
+      "Position": "Intern",
+      "Joined": "2005-02-26",
+      "Experience": "5 years",
+      "Salary": 42000
+    },
+    "targetTransition": null,
+    "availableTransitions": [],
+    "completed": false,
+    "fieldsOrigin": {},
+    "expectedVersion": null,
+    "sourceRecords": [
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      },
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      }
+    ],
+    "mergeResults": {}
+  },
+  {
+    "type": "MERGING",
+    "id": "task1-3",
+    "createdBy": "admin",
+    "creationDate": 1447841456430,
+    "lastUpdateDate": 1447841456430,
+    "tenantId": null,
+    "version": 0,
+    "campaignId": "campaign1",
+    "currentState": "HR_review_requested",
+    "allowedRoles": [
+      "hr"
+    ],
+    "assignee": null,
+    "record": {
+      "CampanyId": "TLND-1000",
+      "SocialSecurityId": 1223344555000,
+      "FirstName": "Jaen",
+      "LastName": "Dubois",
+      "BirthDate": "1988-04-28",
+      "Team": "Sales",
+      "Manager": "Jean Menard",
+      "SelfScore": 74,
+      "ManagerScore": 78,
+      "HRScore": "87",
+      "Position": "Intern",
+      "Joined": "2005-02-26",
+      "Experience": "5 years",
+      "Salary": 42000
+    },
+    "targetTransition": null,
+    "availableTransitions": [],
+    "completed": false,
+    "fieldsOrigin": {},
+    "expectedVersion": null,
+    "sourceRecords": [
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      },
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      }
+    ],
+    "mergeResults": {}
+  },
+  {
+    "type": "MERGING",
+    "id": "task1-4",
+    "createdBy": "admin",
+    "creationDate": 1447841456430,
+    "lastUpdateDate": 1447841456430,
+    "tenantId": null,
+    "version": 0,
+    "campaignId": "campaign1",
+    "currentState": "HR_review_requested",
+    "allowedRoles": [
+      "hr"
+    ],
+    "assignee": null,
+    "record": {
+      "CampanyId": "TLND-1000",
+      "SocialSecurityId": 1223344555000,
+      "FirstName": "Jaen",
+      "LastName": "Dubois",
+      "BirthDate": "1988-04-28",
+      "Team": "Sales",
+      "Manager": "Jean Menard",
+      "SelfScore": 74,
+      "ManagerScore": 78,
+      "HRScore": "87",
+      "Position": "Intern",
+      "Joined": "2005-02-26",
+      "Experience": "5 years",
+      "Salary": 42000
+    },
+    "targetTransition": null,
+    "availableTransitions": [],
+    "completed": false,
+    "fieldsOrigin": {},
+    "expectedVersion": null,
+    "sourceRecords": [
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      },
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      }
+    ],
+    "mergeResults": {}
+  },
+  {
+    "type": "MERGING",
+    "id": "task1-5",
+    "createdBy": "admin",
+    "creationDate": 1447841456430,
+    "lastUpdateDate": 1447841456430,
+    "tenantId": null,
+    "version": 0,
+    "campaignId": "campaign1",
+    "currentState": "HR_review_requested",
+    "allowedRoles": [
+      "hr"
+    ],
+    "assignee": null,
+    "record": {
+      "CampanyId": "TLND-1000",
+      "SocialSecurityId": 1223344555000,
+      "FirstName": "Jaen",
+      "LastName": "Dubois",
+      "BirthDate": "1988-04-28",
+      "Team": "Sales",
+      "Manager": "Jean Menard",
+      "SelfScore": 74,
+      "ManagerScore": 78,
+      "HRScore": "87",
+      "Position": "Intern",
+      "Joined": "2005-02-26",
+      "Experience": "5 years",
+      "Salary": 42000
+    },
+    "targetTransition": null,
+    "availableTransitions": [],
+    "completed": false,
+    "fieldsOrigin": {},
+    "expectedVersion": null,
+    "sourceRecords": [
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      },
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      }
+    ],
+    "mergeResults": {}
+  },
+  {
+    "type": "MERGING",
+    "id": "task1-6",
+    "createdBy": "admin",
+    "creationDate": 1447841456430,
+    "lastUpdateDate": 1447841456430,
+    "tenantId": null,
+    "version": 0,
+    "campaignId": "campaign1",
+    "currentState": "HR_review_requested",
+    "allowedRoles": [
+      "hr"
+    ],
+    "assignee": "user1",
+    "record": {
+      "CampanyId": "TLND-1000",
+      "SocialSecurityId": 1223344555000,
+      "FirstName": "Jaen",
+      "LastName": "Dubois",
+      "BirthDate": "1988-04-28",
+      "Team": "Sales",
+      "Manager": "Jean Menard",
+      "SelfScore": 74,
+      "ManagerScore": 78,
+      "HRScore": "87",
+      "Position": "Intern",
+      "Joined": "2005-02-26",
+      "Experience": "5 years",
+      "Salary": 42000
+    },
+    "targetTransition": null,
+    "availableTransitions": [],
+    "completed": false,
+    "fieldsOrigin": {},
+    "expectedVersion": null,
+    "sourceRecords": [
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      },
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      }
+    ],
+    "mergeResults": {}
+  },
+  {
+    "type": "MERGING",
+    "id": "task1-7",
+    "createdBy": "admin",
+    "creationDate": 1447841456430,
+    "lastUpdateDate": 1447841456430,
+    "tenantId": null,
+    "version": 0,
+    "campaignId": "campaign1",
+    "currentState": "HR_review_requested",
+    "allowedRoles": [
+      "hr"
+    ],
+    "assignee": "user1",
+    "record": {
+      "CampanyId": "TLND-1000",
+      "SocialSecurityId": 1223344555000,
+      "FirstName": "Jaen",
+      "LastName": "Dubois",
+      "BirthDate": "1988-04-28",
+      "Team": "Sales",
+      "Manager": "Jean Menard",
+      "SelfScore": 74,
+      "ManagerScore": 78,
+      "HRScore": "87",
+      "Position": "Intern",
+      "Joined": "2005-02-26",
+      "Experience": "5 years",
+      "Salary": 42000
+    },
+    "targetTransition": null,
+    "availableTransitions": [],
+    "completed": false,
+    "fieldsOrigin": {},
+    "expectedVersion": null,
+    "sourceRecords": [
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      },
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      }
+    ],
+    "mergeResults": {}
+  },
+  {
+    "type": "MERGING",
+    "id": "task1-8",
+    "createdBy": "admin",
+    "creationDate": 1447841456430,
+    "lastUpdateDate": 1447841456430,
+    "tenantId": null,
+    "version": 0,
+    "campaignId": "campaign1",
+    "currentState": "HR_review_requested",
+    "allowedRoles": [
+      "hr"
+    ],
+    "assignee": "user1",
+    "record": {
+      "CampanyId": "TLND-1000",
+      "SocialSecurityId": 1223344555000,
+      "FirstName": "Jaen",
+      "LastName": "Dubois",
+      "BirthDate": "1988-04-28",
+      "Team": "Sales",
+      "Manager": "Jean Menard",
+      "SelfScore": 74,
+      "ManagerScore": 78,
+      "HRScore": "87",
+      "Position": "Intern",
+      "Joined": "2005-02-26",
+      "Experience": "5 years",
+      "Salary": 42000
+    },
+    "targetTransition": null,
+    "availableTransitions": [],
+    "completed": false,
+    "fieldsOrigin": {},
+    "expectedVersion": null,
+    "sourceRecords": [
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      },
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      }
+    ],
+    "mergeResults": {}
+  },
+  {
+    "type": "MERGING",
+    "id": "task1-9",
+    "createdBy": "admin",
+    "creationDate": 1447841456430,
+    "lastUpdateDate": 1447841456430,
+    "tenantId": null,
+    "version": 0,
+    "campaignId": "campaign1",
+    "currentState": "HR_review_requested",
+    "allowedRoles": [
+      "hr"
+    ],
+    "assignee": "user1",
+    "record": {
+      "CampanyId": "TLND-1000",
+      "SocialSecurityId": 1223344555000,
+      "FirstName": "Jaen",
+      "LastName": "Dubois",
+      "BirthDate": "1988-04-28",
+      "Team": "Sales",
+      "Manager": "Jean Menard",
+      "SelfScore": 74,
+      "ManagerScore": 78,
+      "HRScore": "87",
+      "Position": "Intern",
+      "Joined": "2005-02-26",
+      "Experience": "5 years",
+      "Salary": 42000
+    },
+    "targetTransition": null,
+    "availableTransitions": [],
+    "completed": false,
+    "fieldsOrigin": {},
+    "expectedVersion": null,
+    "sourceRecords": [
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      },
+      {
+        "creationDate": 0,
+        "lastUpdateDate": 0,
+        "source": null,
+        "record": {}
+      }
+    ],
+    "mergeResults": {}
+  }
+]

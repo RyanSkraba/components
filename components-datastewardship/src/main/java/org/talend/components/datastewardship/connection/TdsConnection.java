@@ -40,8 +40,6 @@ public class TdsConnection {
 
     private static final Logger LOG = LoggerFactory.getLogger(TdsConnection.class);
 
-    public static final String API_VERSION = "v1"; //$NON-NLS-1$
-
     /**
      * Authorization header
      */
