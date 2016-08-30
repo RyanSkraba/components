@@ -14,7 +14,6 @@ package org.talend.components.datastewardship.avro;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +96,7 @@ public class TaskAdapterFactory implements IndexedRecordConverter<JSONObject, In
                         return Double.parseDouble(value.toString());
                     }
                 } catch (NumberFormatException e) {
-                    LOG.warn(value + " cannot be casted.", e); //$NON-NLS-1$
+                    LOG.warn("Value of \"" + value + "\" for field \""+ field.name() +"\" cannot be casted.", e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     return null;
                 }
             }
