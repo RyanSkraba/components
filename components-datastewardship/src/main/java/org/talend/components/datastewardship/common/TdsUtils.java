@@ -117,7 +117,7 @@ public class TdsUtils {
         return fields;
     }
 
-    public static List<RecordField> getMetadataFieldsForInput(boolean goldenOnly) {
+    public static List<RecordField> getMetadataFieldsForInput(boolean isMerging, boolean goldenOnly) {
         List<RecordField> fields = new ArrayList<RecordField>();
         fields.add(new RecordField(TdsConstants.META_ID, "text", true, true)); //$NON-NLS-1$
         fields.add(new RecordField(TdsConstants.META_STATE, "text", true, true)); //$NON-NLS-1$
@@ -126,7 +126,7 @@ public class TdsUtils {
         fields.add(new RecordField(TdsConstants.META_LAST_UPDATED_BY, "text", false, true)); //$NON-NLS-1$
         fields.add(new RecordField(TdsConstants.META_PRIORITY, "integer", false, true)); //$NON-NLS-1$
         fields.add(new RecordField(TdsConstants.META_TAGS, "text", false, true)); //$NON-NLS-1$
-        if (!goldenOnly) {
+        if (isMerging && !goldenOnly) {
             fields.add(new RecordField(TdsConstants.META_MASTER, "boolean", true, true)); //$NON-NLS-1$
             fields.add(new RecordField(TdsConstants.META_SOURCE, "text", true, true)); //$NON-NLS-1$
         }

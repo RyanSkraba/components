@@ -24,14 +24,10 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.params.AuthPolicy;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +67,7 @@ public class TdsConnection {
         this.hostPort = !hostPort.endsWith("/") ? hostPort + "/" : hostPort; //$NON-NLS-1$ //$NON-NLS-2$
         String encodedCredentials = Base64.encodeBase64String((username + ":" + password).getBytes()); //$NON-NLS-1$
         authorization = new BasicHeader(HttpHeaders.AUTHORIZATION, AuthPolicy.BASIC + " " + encodedCredentials); //$NON-NLS-1$
-        executor = Executor.newInstance().use(new BasicCookieStore());
+        executor = Executor.newInstance().cookieStore(new BasicCookieStore());
     }
 
     /**
@@ -81,14 +77,8 @@ public class TdsConnection {
      * @throws IOException if host is unreachable
      */
     public int checkConnection() throws IOException {
-        int statusCode = 0;
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpHead httpHead = new HttpHead(hostPort);
-            try (CloseableHttpResponse response = httpClient.execute(httpHead)) {
-                statusCode = response.getStatusLine().getStatusCode();
-            }
-        }
-        return statusCode;
+        Request head = Request.Head(hostPort);
+        return executor.execute(head).returnResponse().getStatusLine().getStatusCode();
     }
 
     /**

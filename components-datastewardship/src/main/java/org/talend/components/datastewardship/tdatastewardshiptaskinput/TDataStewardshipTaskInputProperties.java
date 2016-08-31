@@ -158,7 +158,7 @@ public class TDataStewardshipTaskInputProperties extends TdsCampaignProperties {
     protected RecordField[] getSchemaFields(CampaignDetail campaign) {
         List<RecordField> allFields = new ArrayList<RecordField>();
         allFields.addAll(campaign.getFields());
-        allFields.addAll(TdsUtils.getMetadataFieldsForInput(goldenOnly.getValue()));
+        allFields.addAll(TdsUtils.getMetadataFieldsForInput(campaign.isMerging(), goldenOnly.getValue()));
         return allFields.toArray(new RecordField[allFields.size()]);
     }
 
