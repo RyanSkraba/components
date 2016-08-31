@@ -56,6 +56,7 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
 
     protected transient PropertyPathConnector REJECT_CONNECTOR = new PropertyPathConnector(Connector.REJECT_NAME, "schemaReject");
 
+
     @Override
     public void setupProperties() {
         super.setupProperties();

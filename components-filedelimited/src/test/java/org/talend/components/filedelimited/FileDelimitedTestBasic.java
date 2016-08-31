@@ -11,6 +11,7 @@ import org.talend.components.api.test.AbstractComponentTest;
 import org.talend.components.api.test.SimpleComponentRegistry;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedDefinition;
 import org.talend.components.filedelimited.tFileOutputDelimited.TFileOutputDelimitedDefinition;
+import org.talend.components.filedelimited.wizard.FileDelimitedWizardDefinition;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 
@@ -37,9 +38,11 @@ public class FileDelimitedTestBasic extends AbstractComponentTest {
             SimpleComponentRegistry testComponentRegistry = new SimpleComponentRegistry();
 
             testComponentRegistry.addComponent(TFileInputDelimitedDefinition.COMPONENT_NAME, new TFileInputDelimitedDefinition());
-            testComponentRegistry.addComponent(TFileInputDelimitedDefinition.COMPONENT_NAME,
+            testComponentRegistry.addComponent(TFileOutputDelimitedDefinition.COMPONENT_NAME,
                     new TFileOutputDelimitedDefinition());
 
+            FileDelimitedWizardDefinition wizardDefinition = new FileDelimitedWizardDefinition();
+            testComponentRegistry.addWizard(FileDelimitedWizardDefinition.COMPONENT_WIZARD_NAME, wizardDefinition);
             componentService = new ComponentServiceImpl(testComponentRegistry);
         }
         return componentService;

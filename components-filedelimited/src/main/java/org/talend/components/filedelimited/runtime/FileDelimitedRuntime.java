@@ -42,7 +42,7 @@ public class FileDelimitedRuntime {
 
     boolean removeEmptyRow = properties.removeEmptyRow.getValue();
 
-    String encoding = properties.encodingType.encodingType.getValue();
+    String encoding = properties.encoding.encodingType.getValue();
 
     Integer nbRandom = -1;
 

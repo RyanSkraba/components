@@ -19,6 +19,8 @@ import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 
 public class FileDelimitedProperties extends FixedConnectorsComponentProperties {
 
+    public static final String FORM_WIZARD = "Wizard";
+
     public Property<String> fileName = PropertyFactory.newString("fileName");
 
     public ISchemaListener schemaListener;
@@ -56,7 +58,7 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
 
     public Property<String> decimalSeparator = PropertyFactory.newString("decimalSeparator");
 
-    public EncodingTypeProperties encodingType = new EncodingTypeProperties("encodingType");
+    public EncodingTypeProperties encoding = new EncodingTypeProperties("encoding");
 
     protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "main");
 
@@ -73,7 +75,7 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
         textEnclosure.setValue("\"\"");
         thousandsSeparator.setValue(",");
         decimalSeparator.setValue(".");
-        encodingType.encodingType.setPossibleValues(encodingType.getDefaultEncodings());
+        encoding.encodingType.setPossibleValues(encoding.getDefaultEncodings());
 
     }
 
@@ -88,7 +90,7 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
         advancedForm.addRow(advancedSeparator);
         advancedForm.addRow(thousandsSeparator);
         advancedForm.addColumn(decimalSeparator);
-        advancedForm.addRow(encodingType.getForm(Form.MAIN));
+        advancedForm.addRow(encoding.getForm(Form.MAIN));
     }
 
     @Override
@@ -97,6 +99,15 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
         if (form.getName().equals(Form.MAIN)) {
             form.getWidget(rowSeparator.getName()).setHidden(csvOptions.getValue());
             form.getWidget(csvRowSeparator.getName()).setHidden(!csvOptions.getValue());
+        }
+        if (FORM_WIZARD.equals(form.getName())) {
+            Form encodingForm = form.getChildForm(encoding.getName());
+            if (encodingForm != null) {
+                boolean custom = EncodingTypeProperties.ENCODING_TYPE_CUSTOM.equals(encoding.encodingType.getValue());
+                encodingForm.getWidget(encoding.customEncoding.getName()).setHidden(!custom);
+            }
+        }
+        if (Form.MAIN.equals(form.getName()) || FORM_WIZARD.equals(form.getName())) {
             form.getWidget(escapeChar.getName()).setHidden(!csvOptions.getValue());
             form.getWidget(textEnclosure.getName()).setHidden(!csvOptions.getValue());
         }
@@ -117,6 +128,7 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
     public void afterCsvOptions() {
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(Form.ADVANCED));
+        refreshLayout(getForm(FORM_WIZARD));
     }
 
     public void afterAdvancedSeparator() {
