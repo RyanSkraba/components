@@ -21,7 +21,7 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
 
     public static final String FORM_WIZARD = "Wizard";
 
-    public Property<String> fileName = PropertyFactory.newString("fileName");
+    public Property<Object> fileName = PropertyFactory.newProperty(Object.class, "fileName");
 
     public ISchemaListener schemaListener;
 
