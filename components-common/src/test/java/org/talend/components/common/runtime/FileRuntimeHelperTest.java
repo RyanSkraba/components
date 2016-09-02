@@ -26,8 +26,8 @@ public class FileRuntimeHelperTest {
         Assert.assertTrue(FileRuntimeHelper.compareInBinaryMode(srcFile, refFile));
 
         // Text content are same and Binary is different
-        srcFile = resources + "/source.csv";
-        refFile = resources + "/bin_diff_ref.csv";
+        srcFile = resources + "/prenoms_fr2.csv.short.dos";
+        refFile = resources + "/prenoms_fr2.csv.short.linux";
         Assert.assertTrue(FileRuntimeHelper.compareInTextMode(srcFile, refFile, "UTF-8"));
         Assert.assertFalse(FileRuntimeHelper.compareInBinaryMode(srcFile, refFile));
 
