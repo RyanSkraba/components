@@ -41,7 +41,12 @@ public class TdsSourceOrSink implements SourceOrSink {
     private static final Logger LOG = LoggerFactory.getLogger(TdsSourceOrSink.class);
 
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(TdsSourceOrSink.class);
-    
+
+    /**
+     * Data schema
+     */
+    private Schema schema;
+
     /**
      * Host and port of TDS server. E.g. "http://localhost:8080"
      */
@@ -79,6 +84,7 @@ public class TdsSourceOrSink implements SourceOrSink {
         url = tdsProperties.connection.url.getValue();
         username = tdsProperties.connection.username.getValue();
         password = tdsProperties.connection.password.getValue();
+        schema = tdsProperties.schema.schema.getValue();
     }
 
     /**
@@ -138,6 +144,15 @@ public class TdsSourceOrSink implements SourceOrSink {
      */
     public String getPassword() {
         return password;
+    }
+
+    /**
+     * Getter for schema.
+     * 
+     * @return the schema
+     */
+    public Schema getSchema() {
+        return schema;
     }
 
 }

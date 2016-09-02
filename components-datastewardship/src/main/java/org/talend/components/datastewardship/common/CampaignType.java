@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.datastewardship;
+package org.talend.components.datastewardship.common;
 
 public enum CampaignType {
     ARBITRATION,

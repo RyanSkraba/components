@@ -20,8 +20,11 @@
 		<module>components-osgitest</module>
 		<module>components-api-proptester</module>
 		<module>components-dataprep</module>
-        <module>components-filedelimited</module>
-  </modules>
+		<module>components-api-full-example</module>
+		<module>components-datastewardship</module>
+		<module>components-jdbc</module>
+		<module>components-filedelimited</module>
+	</modules>
 	<profiles>
 		<profile>
 			<id>eclipse</id>

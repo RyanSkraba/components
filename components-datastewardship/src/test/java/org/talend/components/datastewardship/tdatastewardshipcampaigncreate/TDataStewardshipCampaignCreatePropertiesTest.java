@@ -12,6 +12,11 @@
 // ============================================================================
 package org.talend.components.datastewardship.tdatastewardshipcampaigncreate;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
+
+import java.util.Collection;
 import java.util.Collections;
 
 import javax.inject.Inject;
@@ -25,6 +30,8 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.SpringTestApp;
+import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 
 @SuppressWarnings("nls")
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -43,5 +50,27 @@ public class TDataStewardshipCampaignCreatePropertiesTest {
         Assert.assertNotNull(properties.schema);
         Assert.assertEquals(Collections.emptySet(), properties.getAllSchemaPropertiesConnectors(true));
         Assert.assertEquals(Collections.singleton(connector), properties.getAllSchemaPropertiesConnectors(false));
+    }
+    
+    /**
+     * Checks {@link TDataStewardshipCampaignCreateProperties#setupLayout()}
+     */
+    @Test
+    public void testSetupLayout() {
+        TDataStewardshipCampaignCreateProperties properties = (TDataStewardshipCampaignCreateProperties) componentService
+                .getComponentProperties("tDataStewardshipCampaignCreate"); //$NON-NLS-1$           
+        properties.init();
+        properties.setupLayout();
+
+        Form main = properties.getForm(Form.MAIN);
+        assertThat(main, notNullValue());
+
+        Collection<Widget> mainWidgets = main.getWidgets();
+        assertThat(mainWidgets, hasSize(2));
+
+        Widget schemaWidget = main.getWidget("schema"); //$NON-NLS-1$
+        assertThat(schemaWidget, notNullValue());
+        Widget connectionWidget = main.getWidget("connection"); //$NON-NLS-1$
+        assertThat(connectionWidget, notNullValue());       
     }
 }

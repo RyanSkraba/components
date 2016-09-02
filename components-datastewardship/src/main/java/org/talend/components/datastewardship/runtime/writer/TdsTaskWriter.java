@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.datastewardship.CampaignType;
-import org.talend.components.datastewardship.connection.TdsConnection;
+import org.talend.components.datastewardship.common.CampaignType;
+import org.talend.components.datastewardship.common.TdsUtils;
 import org.talend.components.datastewardship.runtime.TdsTaskSink;
 import org.talend.components.datastewardship.runtime.TdsTaskWriteOperation;
 
@@ -93,6 +93,9 @@ public class TdsTaskWriter extends TdsWriter {
             dataSchema = record.getSchema();
         }
         taskObj = new HashMap<String, Object>();
+        taskObj.put("type", sink.getCampaignType()); //$NON-NLS-1$
+        taskObj.put("currentState", sink.getTaskState()); //$NON-NLS-1$
+        taskObj.put("assignee", sink.getTaskAssignee()); //$NON-NLS-1$
         if (sink.getCampaignType().equals(CampaignType.MERGING.toString())) {
             createMergingTasks(record);
         } else {
@@ -101,7 +104,6 @@ public class TdsTaskWriter extends TdsWriter {
                 Object value = record.get(f.pos());
                 recordObj.put(f.name(), value);
             }
-            taskObj.put("type", sink.getCampaignType()); //$NON-NLS-1$
             taskObj.put("record", recordObj); //$NON-NLS-1$
             taskObjs.add(taskObj);
             if (taskObjs.size() == batchSize) {
@@ -132,7 +134,6 @@ public class TdsTaskWriter extends TdsWriter {
                 submit();
             }
             groupId = (String) record.get(groupIdField.pos());
-            taskObj.put("type", CampaignType.MERGING.toString()); //$NON-NLS-1$
         }
 
         boolean master = (boolean) record.get(masterField.pos());
@@ -173,7 +174,7 @@ public class TdsTaskWriter extends TdsWriter {
     }
 
     private void submit() throws IOException {
-        String resourceToCreate = "api/" + TdsConnection.API_VERSION + "/campaigns/owned/" + sink.getCampaignName() + "/tasks"; //$NON-NLS-1$ //$NON-NLS-2$
+        String resourceToCreate = TdsUtils.getTaskResource(sink.getCampaignName());
         int statusCode = getConnection().post(resourceToCreate, taskObjs.toJSONString());
         handleResponse(statusCode, resourceToCreate, taskObjs.toJSONString());
         LOG.debug("Commit : " + taskObjs); //$NON-NLS-1$

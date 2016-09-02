@@ -10,22 +10,18 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.datastewardship;
+package org.talend.components.jdbc.runtime;
 
-public enum TaskPriority {
-    Very_Low(0),
-    Low(1),
-    Medium(2),
-    High(3),
-    Very_High(4);
-    
-    private Integer value;
-    
-    private TaskPriority(Integer value) {
-        this.value = value;
+import org.talend.components.api.component.runtime.Sink;
+import org.talend.components.api.component.runtime.WriteOperation;
+
+public class JDBCSink extends JDBCSourceOrSink implements Sink {
+
+    private static final long serialVersionUID = 3228265006313531905L;
+
+    @Override
+    public WriteOperation<?> createWriteOperation() {
+        return new JDBCWriteOperation(this);
     }
-    
-    public Integer getValue(){
-        return this.value;
-    }
+
 }

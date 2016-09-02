@@ -27,7 +27,8 @@ import org.junit.Test;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.datastewardship.CampaignType;
+import org.talend.components.datastewardship.common.CampaignType;
+import org.talend.components.datastewardship.common.TdsConstants;
 import org.talend.components.datastewardship.tdatastewardshiptaskoutput.TDataStewardshipTaskOutputProperties;
 import org.talend.daikon.avro.AvroRegistry;
 
@@ -63,8 +64,15 @@ public class TdsTaskSinkTest {
         outputProperties.connection.url.setValue("urlValue");
         outputProperties.connection.username.setValue("usernameValue");
         outputProperties.connection.password.setValue("passwordValue");
-        outputProperties.campaign.campaignName.setValue("campaignNameValue");
-        outputProperties.campaign.campaignType.setValue(CampaignType.MERGING);
+        outputProperties.campaignName.setValue("campaignNameValue");
+        outputProperties.campaignType.setValue(CampaignType.MERGING);
+        
+        outputProperties.tasksMetadata.taskPriority.setValue(TdsConstants.PRIORITY_MEDIUM);
+        outputProperties.tasksMetadata.taskTags.setValue("tagValue");
+        outputProperties.tasksMetadata.taskState.setValue("stateValue");
+        outputProperties.tasksMetadata.taskAssignee.setValue("user1");
+        outputProperties.tasksMetadata.taskComment.setValue("comment");
+        
         outputProperties.batchSize.setValue(0);
         outputProperties.advancedMappings.groupIdColumn.setValue("groupIdColumn");
         outputProperties.advancedMappings.sourceColumn.setValue("sourceColumn");
@@ -86,10 +94,12 @@ public class TdsTaskSinkTest {
         assertEquals("passwordValue", sink.getPassword());
         assertEquals("campaignNameValue", sink.getCampaignName());
         assertEquals(CampaignType.MERGING.toString(), sink.getCampaignType());
+        assertEquals("stateValue", sink.getTaskState());
+        assertEquals("user1", sink.getTaskAssignee());
         assertEquals("groupIdColumn", sink.getGroupIdColumn());
         assertEquals("sourceColumn", sink.getSourceColumn());
         assertEquals("masterColumn", sink.getMasterColumn());
-        assertEquals("scoreColumn", sink.getScoreColumn());        
+        assertEquals("scoreColumn", sink.getScoreColumn());      
     }
 
     /**

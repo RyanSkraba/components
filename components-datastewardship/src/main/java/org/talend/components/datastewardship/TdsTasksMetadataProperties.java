@@ -12,10 +12,11 @@
 // ============================================================================
 package org.talend.components.datastewardship;
 
+import org.talend.components.datastewardship.common.TdsConstants;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.presentation.Form;
-import org.talend.daikon.properties.property.EnumProperty;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.StringProperty;
 
 /**
@@ -26,7 +27,7 @@ public class TdsTasksMetadataProperties extends PropertiesImpl {
     /**
      * Task Priority
      */
-    public EnumProperty<TaskPriority> taskPriority = new EnumProperty<TaskPriority>(TaskPriority.class, "taskPriority"); //$NON-NLS-1$
+    public StringProperty taskPriority = new StringProperty("taskPriority"); //$NON-NLS-1$
 
     /**
      * Task Tags
@@ -63,6 +64,7 @@ public class TdsTasksMetadataProperties extends PropertiesImpl {
     @Override
     public void setupProperties() {
         super.setupProperties();
+        taskPriority.setPossibleValues(TdsConstants.PRIORITY_LIST);
     }
 
     /**
@@ -72,10 +74,10 @@ public class TdsTasksMetadataProperties extends PropertiesImpl {
     public void setupLayout() {
         super.setupLayout();
         Form mainForm = Form.create(this, Form.MAIN);
-        mainForm.addRow(taskPriority);
-        mainForm.addColumn(taskTags);
-        mainForm.addRow(taskState);
+        // mainForm.addRow(Widget.widget(taskPriority).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
+        // mainForm.addColumn(taskTags);
+        mainForm.addRow(Widget.widget(taskState).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
         mainForm.addColumn(taskAssignee);
-        mainForm.addRow(taskComment);
+        // mainForm.addRow(taskComment);
     }
 }
