@@ -12,10 +12,14 @@
 // ============================================================================
 package org.talend.components.api.component;
 
+import java.util.Set;
+
 import org.talend.components.api.component.runtime.Reader;
+import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.NamedThing;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
@@ -111,17 +115,23 @@ public interface ComponentDefinition extends NamedThing {
     String getPartitioning();
 
     /**
-     * Used for computing the dependencies by finding the pom.xml and dependencies.properties in the META-INF/ folder
+     * this will create the runtime the information required for running the component. They can depend an the given
+     * <code>properties</code> parameter and the connector topology. The <code>connectorTopology</code> shall be one of
+     * supported topologies returned by {@link #getSupportedConnectorTopologies()}
      * 
-     * @return the maven Group Id of the component family
+     * @param properties may be used to compute the runtime dependencies or class, may be null.
+     * @param connectorTopology the topology of connectors you want to get the Runtime from.
+     * 
+     * @return the runtime information related to this component and <code>connectorTopology</code>. Should return null if the
+     *         <code>componentType</code> is not par of the supported types returned by {@link #getSupportedConnectorTopologies()}
      */
-    String getMavenGroupId();
+    RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology);
 
     /**
-     * Used for computing the dependencies by finding the pom.xml and dependencies.properties in the META-INF/ folder
+     * This will returns a set connectors topologies that this component supports.
      * 
-     * @return the maven Artifact Id of the component family
+     * @return all the type this component provides.
      */
-    String getMavenArtifactId();
+    Set<ConnectorTopology> getSupportedConnectorTopologies();
 
 }

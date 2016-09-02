@@ -1,8 +1,6 @@
 package org.talend.components.splunk;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,12 +99,6 @@ public class TSplunkEventCollectorTestIT {
     }
 
     @Test
-    // this is an integration test to check that the dependencies file is properly generated.
-    public void testDependencies() {
-        ComponentTestUtils.testAllDesignDependenciesPresent(getComponentService(), errorCollector);
-    }
-
-    @Test
     public void testAlli18n() {
         ComponentTestUtils.testAlli18n(getComponentService(), errorCollector);
     }
@@ -114,11 +106,6 @@ public class TSplunkEventCollectorTestIT {
     @Test
     public void testAllImagePath() {
         ComponentTestUtils.testAllImages(getComponentService());
-    }
-
-    @Test
-    public void testAllRuntimes() {
-        ComponentTestUtils.testAllRuntimeAvaialble(getComponentService());
     }
 
     protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props) throws Throwable {

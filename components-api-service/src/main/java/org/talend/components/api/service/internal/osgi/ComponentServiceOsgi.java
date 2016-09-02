@@ -25,10 +25,11 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.AbstractTopLevelDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
+import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentRegistry;
@@ -239,11 +240,6 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
-    public Set<String> getMavenUriDependencies(String componentName) {
-        return componentServiceDelegate.getMavenUriDependencies(componentName);
-    }
-
-    @Override
     public Schema getSchema(ComponentProperties componentProperties, Connector connector, boolean isOuput) {
         return componentServiceDelegate.getSchema(componentProperties, connector, isOuput);
     }
@@ -262,6 +258,11 @@ public class ComponentServiceOsgi implements ComponentService {
     @Override
     public boolean setNestedPropertiesValues(ComponentProperties targetProperties, Properties nestedValues) {
         return componentServiceDelegate.setNestedPropertiesValues(targetProperties, nestedValues);
+    }
+
+    @Override
+    public RuntimeInfo getRuntimeInfo(String componentName, Properties properties, ConnectorTopology componentType) {
+        return componentServiceDelegate.getRuntimeInfo(componentName, properties, componentType);
     }
 
 }

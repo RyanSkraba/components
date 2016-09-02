@@ -12,9 +12,14 @@
 // ============================================================================
 package org.talend.components.api.test;
 
+import java.util.Set;
+
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 
 public class SimpleComponentDefinition extends AbstractComponentDefinition {
@@ -45,16 +50,6 @@ public class SimpleComponentDefinition extends AbstractComponentDefinition {
     @Override
     public String getPngImagePath(ComponentImageType imageType) {
         return imagePath;
-    }
-
-    @Override
-    public String getMavenGroupId() {
-        return mavenGroupId;
-    }
-
-    @Override
-    public String getMavenArtifactId() {
-        return mavenArtifactId;
     }
 
     @Override
@@ -110,6 +105,16 @@ public class SimpleComponentDefinition extends AbstractComponentDefinition {
      */
     public void setPropertyClass(Class<? extends ComponentProperties> propertyClass) {
         this.propertyClass = propertyClass;
+    }
+
+    @Override
+    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology componentType) {
+        return null;
+    }
+
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return null;
     }
 
 }

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.talend.components</groupId>
-	<version>0.14.0-SNAPSHOT</version>
+	<version>0.15.0-SNAPSHOT</version>
 	<artifactId>components</artifactId>
 	<packaging>pom</packaging>
 
@@ -12,6 +12,7 @@
 		<module>components-parent</module>
 		<module>components-api</module>
 		<module>components-api-service</module>
+        <module>components-api-runtime-service</module>
 		<module>components-common</module>
 		<module>components-common-oauth</module>
 		<module>components-api-archetypes</module>

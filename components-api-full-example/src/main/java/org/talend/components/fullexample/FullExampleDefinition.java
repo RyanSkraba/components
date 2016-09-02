@@ -1,16 +1,20 @@
 
 package org.talend.components.fullexample;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
-import org.talend.components.api.component.InputComponentDefinition;
-import org.talend.components.api.component.runtime.Source;
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.properties.Properties;
+import org.talend.daikon.properties.property.Property;
 
 import aQute.bnd.annotation.component.Component;
-import org.talend.daikon.properties.property.Property;
 
 /**
  * The FullExampleDefinition acts as an entry point for all of services that
@@ -18,7 +22,7 @@ import org.talend.daikon.properties.property.Property;
  * components (at run-time).
  */
 @Component(name = Constants.COMPONENT_BEAN_PREFIX + FullExampleDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class FullExampleDefinition extends AbstractComponentDefinition implements InputComponentDefinition {
+public class FullExampleDefinition extends AbstractComponentDefinition {
 
     public static final String COMPONENT_NAME = "FullExample"; //$NON-NLS-1$
 
@@ -47,22 +51,18 @@ public class FullExampleDefinition extends AbstractComponentDefinition implement
     }
 
     @Override
-    public String getMavenGroupId() {
-        return "org.talend.components";
-    }
-
-    @Override
-    public String getMavenArtifactId() {
-        return "components-full-example";
-    }
-
-    @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return FullExampleProperties.class;
     }
 
     @Override
-    public Source getRuntime() {
+    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology compType) {
         return null;
     }
+
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return Collections.emptySet();
+    }
+
 }

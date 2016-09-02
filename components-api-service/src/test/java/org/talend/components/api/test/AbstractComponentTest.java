@@ -12,17 +12,16 @@
 // ============================================================================
 package org.talend.components.api.test;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ErrorCollector;
-import org.talend.components.api.service.ComponentService;
-import org.junit.rules.TestName;
-import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.api.component.runtime.Result;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ErrorCollector;
+import org.talend.components.api.component.runtime.Result;
+import org.talend.components.api.component.runtime.Writer;
+import org.talend.components.api.service.ComponentService;
 
 public abstract class AbstractComponentTest {
 
@@ -40,11 +39,6 @@ public abstract class AbstractComponentTest {
     @Test
     public void testAllImages() {
         ComponentTestUtils.testAllImages(getComponentService());
-    }
-
-    @Test
-    public void testAllRuntime() {
-        ComponentTestUtils.testAllRuntimeAvaialble(getComponentService());
     }
 
     public static Map<String, Object> getConsolidatedResults(Result result, Writer writer) {

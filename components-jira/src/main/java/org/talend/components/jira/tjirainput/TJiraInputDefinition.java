@@ -12,13 +12,18 @@
 // ============================================================================
 package org.talend.components.jira.tjirainput;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.InputComponentDefinition;
-import org.talend.components.api.component.runtime.Source;
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.RuntimeInfo;
+import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jira.JiraDefinition;
 import org.talend.components.jira.runtime.JiraSource;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 
 import aQute.bnd.annotation.component.Component;
@@ -27,7 +32,7 @@ import aQute.bnd.annotation.component.Component;
  * Jira input component definition
  */
 @Component(name = Constants.COMPONENT_BEAN_PREFIX + TJiraInputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TJiraInputDefinition extends JiraDefinition implements InputComponentDefinition {
+public class TJiraInputDefinition extends JiraDefinition {
 
     /**
      * Jira input component name
@@ -45,14 +50,6 @@ public class TJiraInputDefinition extends JiraDefinition implements InputCompone
      * {@inheritDoc}
      */
     @Override
-    public Source getRuntime() {
-        return new JiraSource();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return TJiraInputProperties.class;
     }
@@ -60,5 +57,20 @@ public class TJiraInputDefinition extends JiraDefinition implements InputCompone
     @Override
     public Property[] getReturnProperties() {
         return new Property[] { RETURN_TOTAL_RECORD_COUNT_PROP, RETURN_ERROR_MESSAGE_PROP };
+    }
+
+    @Override
+    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology componentType) {
+        if (componentType == ConnectorTopology.OUTGOING) {
+            return new SimpleRuntimeInfo(this.getClass().getClassLoader(), "org.talend.components", "components-jira",
+                    JiraSource.class.getCanonicalName());
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return EnumSet.of(ConnectorTopology.OUTGOING);
     }
 }

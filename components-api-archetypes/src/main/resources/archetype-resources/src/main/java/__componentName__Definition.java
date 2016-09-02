@@ -5,15 +5,19 @@
 package ${package};
 
 import java.io.InputStream;
+import java.util.EnumSet;
+import java.util.Set;
 
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
-import org.talend.components.api.component.InputComponentDefinition;
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.RuntimeInfo;
+import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;
-
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 
 import aQute.bnd.annotation.component.Component;
@@ -24,8 +28,7 @@ import aQute.bnd.annotation.component.Component;
  * components (at run-time).
  */
 @Component(name = Constants.COMPONENT_BEAN_PREFIX + ${componentName}Definition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class ${componentName}Definition extends AbstractComponentDefinition implements InputComponentDefinition {
-
+public class ${componentName}Definition extends AbstractComponentDefinition {
     public static final String COMPONENT_NAME = "${componentName}"; //$NON-NLS-1$
 
     public ${componentName}Definition() {
@@ -51,23 +54,25 @@ public class ${componentName}Definition extends AbstractComponentDefinition impl
             return "fileReader_icon32.png"; //$NON-NLS-1$
         }
     }
-
-    public String getMavenGroupId() {
-        return "${groupId}";
-    }
-
-    @Override
-    public String getMavenArtifactId() {
-        return "${artifactId}";
-    }
     
     @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return ${componentName}Properties.class;
     }
 
+    
     @Override
-    public Source getRuntime() {
-        return new ${componentName}Source();
+    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology componentType) {
+        if (componentType == ConnectorTopology.OUTGOING) {
+            return new SimpleRuntimeInfo(this.getClass().getClassLoader(), "${groupId}", "${artifactId}", ${componentName}Source.class.getCanonicalName());
+        } else {
+            return null;
+        }
     }
+
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return EnumSet.of(ConnectorTopology.OUTGOING);
+    } 
+    
 }

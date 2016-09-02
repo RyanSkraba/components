@@ -23,12 +23,5 @@ public class Spring${componentName}TestIT extends AbstractComponentTest{
         return componentService;
     }
     
-    @Test
-    // this is an integration test to check that the dependencies file is properly generated.
-    public void testDependencies() {
-        ComponentTestUtils.testAllDesignDependenciesPresent(componentService, errorCollector);
-    }
-
-    
     
 }

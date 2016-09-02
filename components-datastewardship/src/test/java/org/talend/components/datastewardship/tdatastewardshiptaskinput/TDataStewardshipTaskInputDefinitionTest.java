@@ -34,8 +34,6 @@ public class TDataStewardshipTaskInputDefinitionTest {
         TDataStewardshipTaskInputDefinition inputDefinition = (TDataStewardshipTaskInputDefinition) componentService
                 .getComponentDefinition("tDataStewardshipTaskInput"); //$NON-NLS-1$
         Assert.assertArrayEquals(new String[] { "Talend Data Stewardship" }, inputDefinition.getFamilies()); //$NON-NLS-1$
-        Assert.assertEquals("org.talend.components", inputDefinition.getMavenGroupId()); //$NON-NLS-1$
-        Assert.assertEquals("components-datastewardship", inputDefinition.getMavenArtifactId()); //$NON-NLS-1$
         Assert.assertTrue(inputDefinition.isSchemaAutoPropagate());
     }
 

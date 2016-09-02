@@ -29,7 +29,7 @@ public class DataSetSinkTest {
     @Before
     public void setInputSource() {
         definition = (TDataSetOutputDefinition) (componentService.getComponentDefinition("tDatasetOutput"));
-        outputSink = (DataSetSink) definition.getRuntime();
+        outputSink = new DataSetSink();
     }
 
     @Test

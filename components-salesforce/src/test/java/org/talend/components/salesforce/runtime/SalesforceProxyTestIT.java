@@ -73,7 +73,7 @@ public class SalesforceProxyTestIT extends SalesforceTestBase {
         properties.userPassword.password.setValue(password);
         properties.userPassword.securityKey.setValue(securityKey);
 
-        SourceOrSink sourceOrSink = definition.getRuntime();
+        SourceOrSink sourceOrSink = new SalesforceSourceOrSink();
         sourceOrSink.initialize(null, properties);
         org.talend.daikon.properties.ValidationResult vr = sourceOrSink.validate(null);
         Assert.assertEquals(ValidationResult.Result.OK, vr.getStatus());
@@ -96,7 +96,7 @@ public class SalesforceProxyTestIT extends SalesforceTestBase {
         properties.connection.userPassword.password.setValue(password);
         properties.connection.userPassword.securityKey.setValue(securityKey);
 
-        Source source = definition.getRuntime();
+        Source source = new SalesforceSource();
         source.initialize(null, properties);
         org.talend.daikon.properties.ValidationResult vr = source.validate(null);
         Assert.assertEquals(ValidationResult.Result.OK, vr.getStatus());
@@ -125,6 +125,7 @@ public class SalesforceProxyTestIT extends SalesforceTestBase {
 
         Authenticator.setDefault(new Authenticator() {
 
+            @Override
             public PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(proxyUsername, proxyPassword.toCharArray());
             }

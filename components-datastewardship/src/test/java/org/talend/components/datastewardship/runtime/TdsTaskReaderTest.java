@@ -63,31 +63,31 @@ public class TdsTaskReaderTest {
         properties.schema.schema.setValue(TdsTaskWriterTest.createSchema());
         properties.batchSize.setValue(0);
         properties.goldenOnly.setValue(true);
-        source = (TdsTaskSource) definition.getRuntime();
+        source = new TdsTaskSource();
     }
 
     @Test
-    public void testRead() throws IOException { 
-        //query resolution tasks
+    public void testRead() throws IOException {
+        // query resolution tasks
         source.initialize(null, properties);
-        reader = (TdsTaskReader) source.createReader(null);
+        reader = source.createReader(null);
         reader.start();
-        Assert.assertEquals(100, reader.getReturnValues().get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));       
-        //query merging tasks and goldenOnly = true
+        Assert.assertEquals(100, reader.getReturnValues().get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
+        // query merging tasks and goldenOnly = true
         properties.campaignName.setValue("campaign1");
         properties.searchCriteria.taskState.setValue("HR_review_requested");
         properties.campaignType.setValue(CampaignType.MERGING);
-        properties.schema.schema.setValue(TdsTaskWriterTest.createMergingTasksSchema());       
+        properties.schema.schema.setValue(TdsTaskWriterTest.createMergingTasksSchema());
         source.initialize(null, properties);
-        reader = (TdsTaskReader) source.createReader(null);
-        reader.start();     
+        reader = source.createReader(null);
+        reader.start();
         Assert.assertEquals(10, reader.getReturnValues().get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
-        //query merging tasks and goldenOnly = false
+        // query merging tasks and goldenOnly = false
         properties.goldenOnly.setValue(false);
         source.initialize(null, properties);
-        reader = (TdsTaskReader) source.createReader(null);
+        reader = source.createReader(null);
         reader.start();
-        Assert.assertEquals(30, reader.getReturnValues().get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));        
-    }       
-    
+        Assert.assertEquals(30, reader.getReturnValues().get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
+    }
+
 }

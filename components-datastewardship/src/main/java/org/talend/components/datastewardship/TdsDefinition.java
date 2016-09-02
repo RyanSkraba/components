@@ -30,22 +30,6 @@ public abstract class TdsDefinition extends AbstractComponentDefinition {
         super(componentName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getMavenGroupId() {
-        return "org.talend.components"; //$NON-NLS-1$
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getMavenArtifactId() {
-        return "components-datastewardship"; //$NON-NLS-1$
-    }
-
     @Override
     public String[] getFamilies() {
         return new String[] { "Talend Data Stewardship" }; //$NON-NLS-1$

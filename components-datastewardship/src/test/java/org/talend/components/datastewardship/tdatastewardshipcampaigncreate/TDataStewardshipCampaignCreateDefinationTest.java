@@ -29,14 +29,12 @@ public class TDataStewardshipCampaignCreateDefinationTest {
 
     @Inject
     private ComponentService componentService;
-    
+
     @Test
     public void testTDataStewardshipCampaignCreateDefinition() {
         TDataStewardshipCampaignCreateDefinition outputDefinition = (TDataStewardshipCampaignCreateDefinition) componentService
-                .getComponentDefinition("tDataStewardshipCampaignCreate"); 
+                .getComponentDefinition("tDataStewardshipCampaignCreate");
         Assert.assertArrayEquals(new String[] { "Talend Data Stewardship" }, outputDefinition.getFamilies());
-        Assert.assertEquals("org.talend.components", outputDefinition.getMavenGroupId());
-        Assert.assertEquals("components-datastewardship", outputDefinition.getMavenArtifactId());
         Assert.assertTrue(outputDefinition.isSchemaAutoPropagate());
     }
 

@@ -15,7 +15,6 @@ package org.talend.components.fullexample;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.AbstractComponentTest;
@@ -88,10 +87,4 @@ public class FullExamplePropertiesTest extends AbstractComponentTest {
         getComponentService().validateProperty(prop.getName(), cp);
     }
 
-    @Ignore
-    @Test
-    @Override
-    public void testAllRuntime() {
-        // do nothing cause there is not runtime for this sample example.
-    }
 }

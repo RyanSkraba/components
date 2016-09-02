@@ -12,15 +12,21 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceinput;
 
-import aQute.bnd.annotation.component.Component;
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.InputComponentDefinition;
-import org.talend.components.api.component.runtime.Source;
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.RuntimeInfo;
+import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.runtime.SalesforceSource;
+import org.talend.daikon.properties.Properties;
+
+import aQute.bnd.annotation.component.Component;
 
 /**
  * Component that can connect to a salesforce system and get some data out of it.
@@ -28,7 +34,7 @@ import org.talend.components.salesforce.runtime.SalesforceSource;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TSalesforceInputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TSalesforceInputDefinition extends SalesforceDefinition implements InputComponentDefinition {
+public class TSalesforceInputDefinition extends SalesforceDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceInput"; //$NON-NLS-1$
 
@@ -54,8 +60,18 @@ public class TSalesforceInputDefinition extends SalesforceDefinition implements 
     }
 
     @Override
-    public Source getRuntime() {
-        return new SalesforceSource();
+    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology componentType) {
+        if (componentType == ConnectorTopology.OUTGOING) {
+            return new SimpleRuntimeInfo(this.getClass().getClassLoader(), getMavenGroupId(), getMavenArtifactId(),
+                    SalesforceSource.class.getCanonicalName());
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return EnumSet.of(ConnectorTopology.OUTGOING);
     }
 
 }

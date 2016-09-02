@@ -36,7 +36,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
+import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
@@ -103,14 +105,6 @@ public class ComponentServiceSpring implements ComponentService {
     public @ResponseBody ComponentDefinition getComponentDefinition(
             @PathVariable(value = "name") @ApiParam(name = "name", value = "Name of the component") String name) {
         return componentServiceDelegate.getComponentDefinition(name);
-    }
-
-    @Override
-    @RequestMapping(value = BASE_PATH
-            + "/dependencies/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody Set<String> getMavenUriDependencies(
-            @PathVariable(value = "name") @ApiParam(name = "name", value = "Name of the component") String name) {
-        return componentServiceDelegate.getMavenUriDependencies(name);
     }
 
     @Override
@@ -346,6 +340,11 @@ public class ComponentServiceSpring implements ComponentService {
     @Override
     public boolean setNestedPropertiesValues(ComponentProperties targetProperties, Properties nestedValues) {
         return componentServiceDelegate.setNestedPropertiesValues(targetProperties, nestedValues);
+    }
+
+    @Override
+    public RuntimeInfo getRuntimeInfo(String componentName, Properties properties, ConnectorTopology componentType) {
+        return componentServiceDelegate.getRuntimeInfo(componentName, properties, componentType);
     }
 
 }

@@ -12,13 +12,18 @@
 // ============================================================================
 package org.talend.components.datastewardship.tdatastewardshiptaskoutput;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.OutputComponentDefinition;
-import org.talend.components.api.component.runtime.Sink;
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.RuntimeInfo;
+import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.datastewardship.TdsDefinition;
 import org.talend.components.datastewardship.runtime.TdsTaskSink;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 
 import aQute.bnd.annotation.component.Component;
@@ -26,27 +31,20 @@ import aQute.bnd.annotation.component.Component;
 /**
  * Data Stewardship Task output component definition
  */
-@Component(name = Constants.COMPONENT_BEAN_PREFIX + TDataStewardshipTaskOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TDataStewardshipTaskOutputDefinition extends TdsDefinition implements OutputComponentDefinition {
+@Component(name = Constants.COMPONENT_BEAN_PREFIX
+        + TDataStewardshipTaskOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+public class TDataStewardshipTaskOutputDefinition extends TdsDefinition {
 
     /**
      * Component name
      */
-    public static final String COMPONENT_NAME = "tDataStewardshipTaskOutput";  //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tDataStewardshipTaskOutput"; //$NON-NLS-1$
 
     /**
      * Constructor sets component name
      */
     public TDataStewardshipTaskOutputDefinition() {
         super(COMPONENT_NAME);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Sink getRuntime() {
-        return new TdsTaskSink();
     }
 
     /**
@@ -64,4 +62,18 @@ public class TDataStewardshipTaskOutputDefinition extends TdsDefinition implemen
                 RETURN_ERROR_MESSAGE_PROP };
     }
 
+    @Override
+    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology componentType) {
+        if (componentType == ConnectorTopology.INCOMING) {
+            return new SimpleRuntimeInfo(this.getClass().getClassLoader(), "org.talend.components", "components-datastewardship",
+                    TdsTaskSink.class.getCanonicalName());
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return EnumSet.of(ConnectorTopology.INCOMING);
+    }
 }

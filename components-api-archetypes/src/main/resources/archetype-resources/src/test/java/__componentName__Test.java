@@ -54,7 +54,6 @@ public class ${componentName}Test {
 
     @Test
     public void test${componentName}Runtime() throws Exception {
-        ${componentName}Definition def = (${componentName}Definition) getComponentService().getComponentDefinition("${componentName}");
         ${componentName}Properties props = (${componentName}Properties) getComponentService().getComponentProperties("${componentName}");
 
         // Set up the test schema - not really used for anything now
@@ -69,7 +68,7 @@ public class ${componentName}Test {
             writer.close();
 
             props.filename.setValue(temp.getAbsolutePath());
-            Source source = def.getRuntime();
+            Source source = new ${componentName}Source();
             source.initialize(null, props);
             assertThat(source, instanceOf(${componentName}Source.class));
 

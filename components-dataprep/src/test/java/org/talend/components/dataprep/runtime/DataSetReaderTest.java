@@ -36,7 +36,7 @@ public class DataSetReaderTest {
         properties.login.setValue("vincent@dataprep.com");
         properties.pass.setValue("vincent");
         properties.dataSetId.setValue("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
-        DataSetSource source = (DataSetSource) definition.getRuntime();
+        DataSetSource source = new DataSetSource();
         source.initialize(null, properties);
         reader = (DataSetReader) source.createReader(null);
     }

@@ -26,8 +26,6 @@ public class TDataSetInputDefinitionAndPropertiesTest {
         TDataSetInputDefinition inputDefinition = (TDataSetInputDefinition) componentService
                 .getComponentDefinition("tDatasetInput");
         Assert.assertArrayEquals(new String[] { "Talend Data Preparation" }, inputDefinition.getFamilies());
-        Assert.assertEquals("components-dataprep", inputDefinition.getMavenArtifactId());
-        Assert.assertEquals("org.talend.components", inputDefinition.getMavenGroupId());
         Assert.assertTrue(inputDefinition.isSchemaAutoPropagate());
     }
 

@@ -76,7 +76,7 @@ public class TdsTaskWriterTest {
         properties.tasksMetadata.taskAssignee.setValue("user1");
         properties.tasksMetadata.taskComment.setValue("comment");
         properties.batchSize.setValue(0);
-        sink = (TdsTaskSink) definition.getRuntime();
+        sink = new TdsTaskSink();
     }
 
     @Test
@@ -85,7 +85,7 @@ public class TdsTaskWriterTest {
 
         sink.initialize(null, properties);
         TdsTaskWriteOperation writeOperation = (TdsTaskWriteOperation) sink.createWriteOperation();
-        writer = (TdsTaskWriter) writeOperation.createWriter(null);
+        writer = writeOperation.createWriter(null);
 
         IndexedRecord record = createIndexedRecord();
         writer.open("testWrite");
@@ -99,9 +99,9 @@ public class TdsTaskWriterTest {
         Map<String, Object> resultMap = writeOperation.finalize(results, null);
         Assert.assertEquals(10, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
     }
- 
+
     private IndexedRecord createIndexedRecord() {
-        Integer random = (int)(Math.random() * 10000);
+        Integer random = (int) (Math.random() * 10000);
         Schema schema = createSchema();
         IndexedRecord record = new GenericData.Record(schema);
         record.put(schema.getField("CampanyId").pos(), "10001");
@@ -120,7 +120,7 @@ public class TdsTaskWriterTest {
         record.put(schema.getField("Salary").pos(), "20000");
         return record;
     }
-    
+
     public static Schema createSchema() {
         AvroRegistry avroReg = new AvroRegistry();
         SchemaBuilder.FieldAssembler<Schema> record = SchemaBuilder.record("Main").fields();
@@ -141,9 +141,9 @@ public class TdsTaskWriterTest {
         Schema defaultSchema = record.endRecord();
         return defaultSchema;
     }
-    
+
     @Test
-    public void testWriteMergingTasks() throws IOException {       
+    public void testWriteMergingTasks() throws IOException {
         properties.campaignType.setValue(CampaignType.MERGING);
         properties.advancedMappings.groupIdColumn.setValue("groupId");
         properties.advancedMappings.sourceColumn.setValue("source");
@@ -152,7 +152,7 @@ public class TdsTaskWriterTest {
 
         sink.initialize(null, properties);
         TdsTaskWriteOperation writeOperation = (TdsTaskWriteOperation) sink.createWriteOperation();
-        writer = (TdsTaskWriter) writeOperation.createWriter(null);
+        writer = writeOperation.createWriter(null);
 
         List<IndexedRecord> records = createMergingTasksRecords();
         writer.open("testWrite");
@@ -167,7 +167,7 @@ public class TdsTaskWriterTest {
         Assert.assertEquals(2, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
         Assert.assertEquals(1, resultMap.get(ComponentDefinition.RETURN_SUCCESS_RECORD_COUNT));
     }
-    
+
     private List<IndexedRecord> createMergingTasksRecords() {
         List<IndexedRecord> records = new ArrayList<>();
         Schema schema = createMergingTasksSchema();
@@ -197,10 +197,10 @@ public class TdsTaskWriterTest {
         record1.put(schema.getField("master").pos(), false);
         record1.put(schema.getField("score").pos(), "200");
         records.add(record1);
-           
+
         return records;
     }
-    
+
     public static Schema createMergingTasksSchema() {
         AvroRegistry avroReg = new AvroRegistry();
         SchemaBuilder.FieldAssembler<Schema> record = SchemaBuilder.record("Main").fields();
@@ -211,7 +211,7 @@ public class TdsTaskWriterTest {
         addField(record, "BirthDate", Long.class, avroReg);
         addField(record, "Salary", Integer.class, avroReg);
         addField(record, "BankAccount", String.class, avroReg);
-    
+
         addField(record, "groupId", String.class, avroReg);
         addField(record, "source", String.class, avroReg);
         addField(record, "master", String.class, avroReg);

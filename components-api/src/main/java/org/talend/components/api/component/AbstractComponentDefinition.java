@@ -139,7 +139,7 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
 
     @Override
     public boolean isStartable() {
-        return this instanceof InputComponentDefinition;
+        return getSupportedConnectorTopologies().contains(ConnectorTopology.OUTGOING);
     }
 
     public static final String AUTO = "Auto";
@@ -192,4 +192,5 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
         }
         return namedThings;
     }
+
 }

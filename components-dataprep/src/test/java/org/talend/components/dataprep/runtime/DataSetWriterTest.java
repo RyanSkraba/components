@@ -59,7 +59,7 @@ public class DataSetWriterTest {
         properties.login.setValue("vincent@dataprep.com");
         properties.pass.setValue("vincent");
         properties.limit.setValue(10);
-        sink = (DataSetSink) definition.getRuntime();
+        sink = new DataSetSink();
     }
 
     @Test
@@ -85,9 +85,7 @@ public class DataSetWriterTest {
         writer.close();
 
         final String content = mock.getLastReceivedLiveDataSetContent();
-        Assert.assertEquals("FieldString0;FieldString1\n" +
-                "\"String\n" +
-                "String\";\n", content);
+        Assert.assertEquals("FieldString0;FieldString1\n" + "\"String\n" + "String\";\n", content);
     }
 
     @Test

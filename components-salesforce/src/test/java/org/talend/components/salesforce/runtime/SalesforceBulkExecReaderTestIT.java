@@ -12,9 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,10 +27,13 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.Result;
+import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.test.ComponentTestUtils;
+import org.talend.components.runtimeservice.RuntimeUtil;
 import org.talend.components.salesforce.SalesforceBulkProperties.Concurrency;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceOutputProperties;
@@ -42,6 +43,7 @@ import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecP
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkProperties;
 import org.talend.components.salesforce.tsalesforceoutputbulkexec.TSalesforceOutputBulkExecProperties;
+import org.talend.daikon.sandbox.SandboxedInstance;
 
 /**
  * Created by jzhao on 2016-03-09.
@@ -107,20 +109,24 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
 
         TSalesforceBulkExecDefinition definition = (TSalesforceBulkExecDefinition) getComponentService()
                 .getComponentDefinition(TSalesforceBulkExecDefinition.COMPONENT_NAME);
-        SalesforceSource boundedSource = (SalesforceSource) definition.getRuntime();
-        boundedSource.initialize(null, bulkExecProperties);
-        BoundedReader boundedReader = boundedSource.createReader(null);
+        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(bulkExecProperties, ConnectorTopology.OUTGOING);
+        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo,
+                definition.getClass().getClassLoader())) {
+            SalesforceSource boundedSource = (SalesforceSource) sandboxedInstance.getInstance();
+            boundedSource.initialize(null, bulkExecProperties);
+            BoundedReader boundedReader = boundedSource.createReader(null);
 
-        try {
-            boolean hasRecord = boundedReader.start();
-            List<IndexedRecord> rows = new ArrayList<>();
-            while (hasRecord) {
-                rows.add((IndexedRecord) boundedReader.getCurrent());
-                hasRecord = boundedReader.advance();
+            try {
+                boolean hasRecord = boundedReader.start();
+                List<IndexedRecord> rows = new ArrayList<>();
+                while (hasRecord) {
+                    rows.add((IndexedRecord) boundedReader.getCurrent());
+                    hasRecord = boundedReader.advance();
+                }
+                checkRows(random, rows, count);
+            } finally {
+                boundedReader.close();
             }
-            checkRows(random, rows, count);
-        } finally {
-            boundedReader.close();
         }
     }
 

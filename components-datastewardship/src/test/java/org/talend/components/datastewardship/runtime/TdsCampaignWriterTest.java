@@ -69,7 +69,7 @@ public class TdsCampaignWriterTest {
         properties.connection.url.setValue("http://localhost:" + serverPort);
         properties.connection.username.setValue("owner1");
         properties.connection.password.setValue("owner1");
-        sink = (TdsCampaignSink) definition.getRuntime();
+        sink = new TdsCampaignSink();
     }
 
     @Test
@@ -79,7 +79,7 @@ public class TdsCampaignWriterTest {
         writer = (TdsCampaignWriter) writeOperation.createWriter(null);
 
         writer.open("testWrite");
-        
+
         writer.write(createIndexedRecord("arbitration"));
         writer.write(createIndexedRecord("grouping"));
         writer.write(createIndexedRecord("merging"));
@@ -95,19 +95,19 @@ public class TdsCampaignWriterTest {
     private IndexedRecord createIndexedRecord(String type) throws IOException {
         Schema schema = createSchema();
         IndexedRecord record = new GenericData.Record(schema);
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         InputStream is = this.getClass().getResourceAsStream("campaign-" + type + ".json");
-        int i=-1; 
-        while((i=is.read())!=-1){ 
+        int i = -1;
+        while ((i = is.read()) != -1) {
             baos.write(i);
-        } 
-       
+        }
+
         record.put(schema.getField("campaign").pos(), baos.toString());
 
         return record;
     }
-    
+
     private Schema createSchema() {
         AvroRegistry avroReg = new AvroRegistry();
         SchemaBuilder.FieldAssembler<Schema> record = SchemaBuilder.record("Main").fields();
