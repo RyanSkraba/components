@@ -15,13 +15,12 @@ import org.talend.components.api.test.AbstractComponentTest;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringTestApp.class)
-public class Spring${componentName}TestIT extends AbstractComponentTest{
+public class Spring${componentName}TestIT extends AbstractComponentTest {
     @Inject
     private ComponentService componentService;
 
     public ComponentService getComponentService(){
         return componentService;
     }
-    
     
 }

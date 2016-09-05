@@ -32,7 +32,6 @@ import org.talend.daikon.properties.property.StringProperty;
 
 import aQute.bnd.annotation.component.Component;
 
-@Component(name = Constants.COMPONENT_BEAN_PREFIX + TestComponentDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TestComponentDefinition extends AbstractComponentDefinition implements ComponentDefinition {
 
     public static final String COMPONENT_NAME = "TestComponent"; //$NON-NLS-1$

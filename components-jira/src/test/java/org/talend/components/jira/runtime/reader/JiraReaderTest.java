@@ -13,21 +13,21 @@
 package org.talend.components.jira.runtime.reader;
 
 import static org.junit.Assert.assertEquals;
-import static org.talend.components.jira.testutils.JiraTestConstants.INCORRECT_HOST_PORT;
-import static org.talend.components.jira.testutils.JiraTestConstants.PASS;
-import static org.talend.components.jira.testutils.JiraTestConstants.USER;
+import static org.talend.components.jira.testutils.JiraTestConstants.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.service.internal.ComponentRegistry;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
-import org.talend.components.api.test.SimpleComponentRegistry;
 import org.talend.components.jira.runtime.JiraSource;
 import org.talend.components.jira.tjirainput.TJiraInputDefinition;
 import org.talend.components.jira.tjirainput.TJiraInputProperties;
@@ -56,8 +56,8 @@ public class JiraReaderTest {
      */
     @BeforeClass
     public static void setupService() {
-        SimpleComponentRegistry registry = new SimpleComponentRegistry();
-        registry.addComponent(TJiraInputDefinition.COMPONENT_NAME, new TJiraInputDefinition());
+        ComponentRegistry registry = new ComponentRegistry();
+        registry.registerComponentDefinition(Arrays.asList((ComponentDefinition) new TJiraInputDefinition()));
         componentService = new ComponentServiceImpl(registry);
     }
 

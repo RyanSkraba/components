@@ -34,31 +34,22 @@ import org.junit.rules.ErrorCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedReader;
-import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.Result;
+import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.service.internal.ComponentRegistry;
+import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.test.AbstractComponentTest;
-import org.talend.components.api.test.SimpleComponentRegistry;
-import org.talend.components.api.test.SimpleComponentService;
 import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
 import org.talend.components.salesforce.runtime.SalesforceSink;
 import org.talend.components.salesforce.runtime.SalesforceSource;
 import org.talend.components.salesforce.runtime.SalesforceWriteOperation;
 import org.talend.components.salesforce.runtime.SalesforceWriterTestIT;
-import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
-import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
-import org.talend.components.salesforce.tsalesforcegetdeleted.TSalesforceGetDeletedDefinition;
-import org.talend.components.salesforce.tsalesforcegetservertimestamp.TSalesforceGetServerTimestampDefinition;
-import org.talend.components.salesforce.tsalesforcegetupdated.TSalesforceGetUpdatedDefinition;
-import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
-import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
-import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
-import org.talend.components.salesforce.tsalesforceoutputbulkexec.TSalesforceOutputBulkExecDefinition;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.Properties;
@@ -66,9 +57,6 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
-
-import com.sforce.async.AsyncApiException;
-import com.sforce.ws.ConnectionException;
 
 @SuppressWarnings("nls")
 public class SalesforceTestBase extends AbstractComponentTest {
@@ -108,44 +96,10 @@ public class SalesforceTestBase extends AbstractComponentTest {
     @Override
     public ComponentService getComponentService() {
         if (componentService == null) {
-            SimpleComponentRegistry testComponentRegistry = new SimpleComponentRegistry();
-
+            ComponentRegistry testComponentRegistry = new ComponentRegistry();
             // register component
-            testComponentRegistry.addComponent(TSalesforceConnectionDefinition.COMPONENT_NAME,
-                    new TSalesforceConnectionDefinition());
-
-            testComponentRegistry.addComponent(TSalesforceInputDefinition.COMPONENT_NAME, new TSalesforceInputDefinition());
-
-            testComponentRegistry.addComponent(TSalesforceOutputDefinition.COMPONENT_NAME, new TSalesforceOutputDefinition());
-
-            testComponentRegistry.addComponent(TSalesforceGetDeletedDefinition.COMPONENT_NAME,
-                    new TSalesforceGetDeletedDefinition());
-
-            testComponentRegistry.addComponent(TSalesforceGetUpdatedDefinition.COMPONENT_NAME,
-                    new TSalesforceGetUpdatedDefinition());
-
-            testComponentRegistry.addComponent(TSalesforceGetServerTimestampDefinition.COMPONENT_NAME,
-                    new TSalesforceGetServerTimestampDefinition());
-
-            testComponentRegistry.addComponent(TSalesforceOutputBulkDefinition.COMPONENT_NAME,
-                    new TSalesforceOutputBulkDefinition());
-
-            testComponentRegistry.addComponent(TSalesforceBulkExecDefinition.COMPONENT_NAME, new TSalesforceBulkExecDefinition());
-
-            testComponentRegistry.addComponent(TSalesforceOutputBulkExecDefinition.COMPONENT_NAME,
-                    new TSalesforceOutputBulkExecDefinition());
-
-            // register wizard
-            SalesforceConnectionWizardDefinition scwd = new SalesforceConnectionWizardDefinition();
-            testComponentRegistry.addWizard(SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, scwd);
-
-            testComponentRegistry.addWizard(SalesforceModuleWizardDefinition.COMPONENT_WIZARD_NAME,
-                    new SalesforceModuleWizardDefinition());
-
-            testComponentRegistry.addWizard(SalesforceConnectionEditWizardDefinition.COMPONENT_WIZARD_NAME,
-                    new SalesforceConnectionEditWizardDefinition());
-
-            componentService = new SimpleComponentService(testComponentRegistry);
+            testComponentRegistry.registerComponentFamilyDefinition(new SalesforceFamilyDefinition());
+            componentService = new ComponentServiceImpl(testComponentRegistry);
         }
         return componentService;
     }

@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
@@ -74,21 +75,12 @@ public class ComponentServiceSpring implements ComponentService {
 
     @Autowired
     public ComponentServiceSpring(final ApplicationContext context) {
-        this.componentServiceDelegate = new ComponentServiceImpl(new ComponentRegistry() {
-
-            @Override
-            public Map<String, ComponentDefinition> getComponents() {
-                Map<String, ComponentDefinition> compDefs = context.getBeansOfType(ComponentDefinition.class);
-                return compDefs;
-            }
-
-            @Override
-            public Map<String, ComponentWizardDefinition> getComponentWizards() {
-                Map<String, ComponentWizardDefinition> wizardDefs = context.getBeansOfType(ComponentWizardDefinition.class);
-                return wizardDefs;
-            }
-
-        });
+        ComponentRegistry registry = new ComponentRegistry();
+        Map<String, ComponentInstaller> installers = context.getBeansOfType(ComponentInstaller.class);
+        for (ComponentInstaller installer : installers.values())
+            installer.install(registry);
+        registry.lock();
+        this.componentServiceDelegate = new ComponentServiceImpl(registry);
     }
 
     @Override

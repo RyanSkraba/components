@@ -15,8 +15,6 @@ package org.talend.components.datastewardship.tdatastewardshiptaskoutput;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.talend.components.api.Constants;
-import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
@@ -26,13 +24,9 @@ import org.talend.components.datastewardship.runtime.TdsTaskSink;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
  * Data Stewardship Task output component definition
  */
-@Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TDataStewardshipTaskOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TDataStewardshipTaskOutputDefinition extends TdsDefinition {
 
     /**

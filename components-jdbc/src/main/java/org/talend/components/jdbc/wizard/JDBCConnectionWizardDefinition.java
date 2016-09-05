@@ -12,17 +12,11 @@
 // ============================================================================
 package org.talend.components.jdbc.wizard;
 
-import org.talend.components.api.Constants;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.wizard.AbstractComponentWizardDefintion;
 import org.talend.components.api.wizard.ComponentWizard;
-import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 
-import aQute.bnd.annotation.component.Component;
-
-@Component(name = Constants.COMPONENT_WIZARD_BEAN_PREFIX
-        + JDBCConnectionWizardDefinition.COMPONENT_WIZARD_NAME, provide = ComponentWizardDefinition.class)
 public class JDBCConnectionWizardDefinition extends AbstractComponentWizardDefintion {
 
     public static final String COMPONENT_WIZARD_NAME = "JDBC";

@@ -12,14 +12,12 @@
 // ============================================================================
 package org.talend.components.splunk;
 
-import static org.talend.daikon.properties.property.PropertyFactory.*;
+import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
-import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
@@ -28,14 +26,10 @@ import org.talend.components.splunk.runtime.TSplunkEventCollectorSink;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
  * The tSplunkEventCollectorDefinition acts as an entry point for all of services that a component provides to integrate
  * with the Studio (at design-time) and other components (at run-time).
  */
-@Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TSplunkEventCollectorDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSplunkEventCollectorDefinition extends AbstractComponentDefinition {
 
     public static String RETURN_RESPONSE_CODE = "responseCode";

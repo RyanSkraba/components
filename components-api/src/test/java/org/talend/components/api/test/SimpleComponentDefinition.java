@@ -38,8 +38,6 @@ public class SimpleComponentDefinition extends AbstractComponentDefinition {
 
     private String mavenArtifactId;
 
-    private String name;
-
     private Class<? extends ComponentProperties> propertyClass;
 
     @Override
@@ -50,11 +48,6 @@ public class SimpleComponentDefinition extends AbstractComponentDefinition {
     @Override
     public String getPngImagePath(ComponentImageType imageType) {
         return imagePath;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     @Override
@@ -87,15 +80,6 @@ public class SimpleComponentDefinition extends AbstractComponentDefinition {
      */
     public void setMavenArtifactId(String mavenArtifactId) {
         this.mavenArtifactId = mavenArtifactId;
-    }
-
-    /**
-     * Sets the name.
-     * 
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
     }
 
     /**

@@ -15,8 +15,6 @@ package org.talend.components.salesforce.tsalesforcegetservertimestamp;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.talend.components.api.Constants;
-import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
@@ -25,10 +23,6 @@ import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.runtime.SalesforceSource;
 import org.talend.daikon.properties.Properties;
 
-import aQute.bnd.annotation.component.Component;
-
-@Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TSalesforceGetServerTimestampDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceGetServerTimestamp"; //$NON-NLS-1$

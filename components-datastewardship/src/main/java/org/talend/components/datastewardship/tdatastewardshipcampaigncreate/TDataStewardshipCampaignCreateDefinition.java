@@ -15,8 +15,6 @@ package org.talend.components.datastewardship.tdatastewardshipcampaigncreate;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.talend.components.api.Constants;
-import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
@@ -26,13 +24,9 @@ import org.talend.components.datastewardship.runtime.TdsCampaignSink;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
  * Data Stewardship Campaign output component definition
  */
-@Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TDataStewardshipCampaignCreateDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TDataStewardshipCampaignCreateDefinition extends TdsDefinition {
 
     /**

@@ -30,8 +30,6 @@ import org.talend.daikon.properties.property.Property;
 
 import aQute.bnd.annotation.component.Component;
 
-@Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TSalesforceOutputBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition implements VirtualComponentDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceOutputBulkExec"; //$NON-NLS-1$

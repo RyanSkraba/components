@@ -3,15 +3,9 @@ package org.talend.components.multiruntime;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
-import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.RuntimeInfo;
@@ -22,15 +16,11 @@ import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
  * The MultiRuntimeComponentDefinition acts as an entry point for all of services that
  * a component provides to integrate with the Studio (at design-time) and other
  * components (at run-time).
  */
-@Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + MultiRuntimeComponentDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class MultiRuntimeComponentDefinition extends AbstractComponentDefinition {
 
     public static final String COMPONENT_NAME = "MultiRuntimeComponent"; //$NON-NLS-1$

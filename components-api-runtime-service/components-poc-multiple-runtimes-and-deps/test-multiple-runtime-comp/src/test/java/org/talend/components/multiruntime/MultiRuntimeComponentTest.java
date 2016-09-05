@@ -1,11 +1,14 @@
 package org.talend.components.multiruntime;
 
+import java.util.Arrays;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ErrorCollector;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.service.internal.ComponentRegistry;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
-import org.talend.components.api.test.SimpleComponentRegistry;
 
 @SuppressWarnings("nls")
 public class MultiRuntimeComponentTest {
@@ -13,7 +16,7 @@ public class MultiRuntimeComponentTest {
     @Rule
     public ErrorCollector errorCollector = new ErrorCollector();
 
-    private ComponentServiceImpl componentService;
+    private ComponentService componentService;
 
     @Before
     public void initializeComponentRegistryAndService() {
@@ -24,9 +27,9 @@ public class MultiRuntimeComponentTest {
     // default implementation for pure java test.
     public ComponentService getComponentService() {
         if (componentService == null) {
-            SimpleComponentRegistry testComponentRegistry = new SimpleComponentRegistry();
-            testComponentRegistry.addComponent(MultiRuntimeComponentDefinition.COMPONENT_NAME,
-                    new MultiRuntimeComponentDefinition());
+            ComponentRegistry testComponentRegistry = new ComponentRegistry();
+            testComponentRegistry.registerComponentDefinition(Arrays.asList((ComponentDefinition)
+                    new MultiRuntimeComponentDefinition()));
             componentService = new ComponentServiceImpl(testComponentRegistry);
         }
         return componentService;

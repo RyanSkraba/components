@@ -20,6 +20,7 @@ import java.util.Hashtable;
 import javax.inject.Inject;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -34,6 +35,7 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.ComponentServiceTest;
 import org.talend.components.api.service.testcomponent.TestComponentDefinition;
+import org.talend.components.api.service.testcomponent.TestComponentInstaller;
 import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 
@@ -47,6 +49,15 @@ public class ComponentServiceTestIT extends ComponentServiceTest {
     @Inject
     private ComponentService osgiCompService;
 
+    // Ensure that the TestComponentInstaller is registered before the osgiCompService is created.
+    @BeforeClass
+    public static void installTestComponents() {
+        BundleContext bundleContext = FrameworkUtil.getBundle(ComponentServiceTestIT.class).getBundleContext();
+        final Dictionary<String, Object> props = new Hashtable<String, Object>();
+        props.put("component.name", "test");
+        bundleContext.registerService(ComponentInstaller.class, new TestComponentInstaller(), props);
+    }
+
     @Configuration
     public Option[] config() {
         try {
@@ -55,17 +66,6 @@ public class ComponentServiceTestIT extends ComponentServiceTest {
             e.printStackTrace();
             throw e;
         }
-
-    }
-
-    @Before
-    public void setupComponentService() {
-        BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
-        final Dictionary<String, Object> props = new Hashtable<String, Object>();
-        props.put("component.name", Constants.COMPONENT_BEAN_PREFIX + TestComponentDefinition.COMPONENT_NAME);
-        bundleContext.registerService(ComponentDefinition.class, new TestComponentDefinition(), props);
-        props.put("component.name", Constants.COMPONENT_WIZARD_BEAN_PREFIX + TestComponentWizardDefinition.COMPONENT_WIZARD_NAME);
-        bundleContext.registerService(ComponentWizardDefinition.class, new TestComponentWizardDefinition(), props);
     }
 
     @Test
@@ -78,7 +78,7 @@ public class ComponentServiceTestIT extends ComponentServiceTest {
             ComponentService compService = bundleContext.getService(compServiceRef);
             assertNotNull(compService);
         } else {
-            fail("Failed to retreive the Component service");
+            fail("Failed to retrieve the Component service");
         }
     }
 

@@ -14,24 +14,11 @@ package org.talend.components.api.service.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.avro.Schema;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.DefaultModelBuilderFactory;
-import org.apache.maven.model.building.DefaultModelBuildingRequest;
-import org.apache.maven.model.building.ModelBuilder;
-import org.apache.maven.model.building.ModelBuildingException;
-import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelBuildingResult;
-import org.apache.maven.model.building.ModelSource;
+import org.apache.maven.model.building.*;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectModelResolver;
@@ -55,11 +42,10 @@ import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
 import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
-import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.error.ComponentsApiErrorCode;
@@ -93,13 +79,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
 
     @Override
     public Set<String> getAllComponentNames() {
-        // remove the components# internal prefix to return the simple name
-        Collection<String> componentsInternalNames = componentRegistry.getComponents().keySet();
-        Set<String> compNames = new HashSet<>(componentsInternalNames.size());
-        for (String name : componentsInternalNames) {
-            compNames.add(name.substring(Constants.COMPONENT_BEAN_PREFIX.length()));
-        }
-        return compNames;
+        return Collections.unmodifiableSet(componentRegistry.getComponents().keySet());
     }
 
     @Override
@@ -127,8 +107,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
 
     @Override
     public ComponentDefinition getComponentDefinition(String name) {
-        final String beanName = Constants.COMPONENT_BEAN_PREFIX + name;
-        ComponentDefinition compDef = componentRegistry.getComponents().get(beanName);
+        ComponentDefinition compDef = componentRegistry.getComponents().get(name);
         if (compDef == null) {
             throw new ComponentException(ComponentsApiErrorCode.WRONG_COMPONENT_NAME, ExceptionContext.build().put("name", name)); //$NON-NLS-1$
         } // else got the def so use it
@@ -137,8 +116,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
 
     @Override
     public ComponentWizard getComponentWizard(String name, String location) {
-        final String beanName = Constants.COMPONENT_WIZARD_BEAN_PREFIX + name;
-        ComponentWizardDefinition wizardDefinition = componentRegistry.getComponentWizards().get(beanName);
+        ComponentWizardDefinition wizardDefinition = componentRegistry.getComponentWizards().get(name);
         if (wizardDefinition == null) {
             throw new ComponentException(ComponentsApiErrorCode.WRONG_WIZARD_NAME, ExceptionContext.build().put("name", name)); //$NON-NLS-1$
         }
@@ -176,8 +154,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
 
     @Override
     public InputStream getWizardPngImage(String wizardName, WizardImageType imageType) {
-        ComponentWizardDefinition wizardDefinition = componentRegistry.getComponentWizards()
-                .get(Constants.COMPONENT_WIZARD_BEAN_PREFIX + wizardName);
+        ComponentWizardDefinition wizardDefinition = componentRegistry.getComponentWizards().get(wizardName);
         if (wizardDefinition != null) {
             return getImageStream(wizardDefinition, wizardDefinition.getPngImagePath(imageType));
         } else {
@@ -189,8 +166,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
 
     @Override
     public InputStream getComponentPngImage(String componentName, ComponentImageType imageType) {
-        ComponentDefinition componentDefinition = componentRegistry.getComponents()
-                .get(Constants.COMPONENT_BEAN_PREFIX + componentName);
+        ComponentDefinition componentDefinition = componentRegistry.getComponents().get(componentName);
         if (componentDefinition != null) {
             return getImageStream(componentDefinition, componentDefinition.getPngImagePath(imageType));
         } else {

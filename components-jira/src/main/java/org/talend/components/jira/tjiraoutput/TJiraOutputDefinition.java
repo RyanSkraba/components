@@ -15,8 +15,6 @@ package org.talend.components.jira.tjiraoutput;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.talend.components.api.Constants;
-import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
@@ -26,12 +24,9 @@ import org.talend.components.jira.runtime.JiraSink;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
  * Jira output component definition
  */
-@Component(name = Constants.COMPONENT_BEAN_PREFIX + TJiraOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TJiraOutputDefinition extends JiraDefinition {
 
     /**

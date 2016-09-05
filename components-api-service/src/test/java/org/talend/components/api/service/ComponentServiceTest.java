@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -39,17 +40,14 @@ import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
+import org.talend.components.api.service.internal.ComponentRegistry;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
-import org.talend.components.api.service.testcomponent.ComponentPropertiesWithDefinedI18N;
-import org.talend.components.api.service.testcomponent.TestComponentDefinition;
-import org.talend.components.api.service.testcomponent.TestComponentProperties;
-import org.talend.components.api.service.testcomponent.TestComponentWizard;
-import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
+import org.talend.components.api.service.testcomponent.*;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.test.AbstractComponentTest;
 import org.talend.components.api.test.ComponentTestUtils;
-import org.talend.components.api.test.SimpleComponentRegistry;
 import org.talend.components.api.wizard.ComponentWizard;
+import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.i18n.I18nMessages;
 
@@ -97,10 +95,10 @@ public class ComponentServiceTest extends AbstractComponentTest {
     @Override
     public ComponentService getComponentService() {
         if (componentService == null) {
-            SimpleComponentRegistry testComponentRegistry = new SimpleComponentRegistry();
-            testComponentRegistry.addComponent(TestComponentDefinition.COMPONENT_NAME, new TestComponentDefinition());
-            testComponentRegistry.addWizard(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME,
-                    new TestComponentWizardDefinition());
+            ComponentRegistry testComponentRegistry = new ComponentRegistry();
+            testComponentRegistry.registerComponentDefinition(Arrays.asList((ComponentDefinition) new TestComponentDefinition()));
+            testComponentRegistry.registerComponentWizardDefinition(
+                    Arrays.asList((ComponentWizardDefinition) new TestComponentWizardDefinition()));
             componentService = new ComponentServiceImpl(testComponentRegistry);
         }
         return componentService;

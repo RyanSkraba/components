@@ -15,9 +15,7 @@ package org.talend.components.jdbc.tjdbcoutput;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
-import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
@@ -27,9 +25,6 @@ import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
-import aQute.bnd.annotation.component.Component;
-
-@Component(name = Constants.COMPONENT_BEAN_PREFIX + TJDBCOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TJDBCOutputDefinition extends AbstractComponentDefinition {
 
     public static final String COMPONENT_NAME = "tJDBCOutputNew";

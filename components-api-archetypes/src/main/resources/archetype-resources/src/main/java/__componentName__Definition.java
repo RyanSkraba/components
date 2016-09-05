@@ -27,7 +27,6 @@ import aQute.bnd.annotation.component.Component;
  * a component provides to integrate with the Studio (at design-time) and other 
  * components (at run-time).
  */
-@Component(name = Constants.COMPONENT_BEAN_PREFIX + ${componentName}Definition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class ${componentName}Definition extends AbstractComponentDefinition {
     public static final String COMPONENT_NAME = "${componentName}"; //$NON-NLS-1$
 

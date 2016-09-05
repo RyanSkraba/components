@@ -23,9 +23,9 @@ import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.exception.error.ComponentsErrorCode;
 import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.service.internal.ComponentRegistry;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.test.ComponentTestUtils;
-import org.talend.components.api.test.SimpleComponentRegistry;
 import org.talend.daikon.exception.TalendRuntimeException;
 
 @SuppressWarnings("nls")
@@ -34,7 +34,7 @@ public class ${componentName}Test {
     @Rule
     public ErrorCollector errorCollector = new ErrorCollector();
 
-    private ComponentServiceImpl componentService;
+    private ComponentService componentService;
 
     @Before
     public void initializeComponentRegistryAndService() {
@@ -45,8 +45,8 @@ public class ${componentName}Test {
     // default implementation for pure java test. 
     public ComponentService getComponentService() {
         if (componentService == null) {
-            SimpleComponentRegistry testComponentRegistry = new SimpleComponentRegistry();
-            testComponentRegistry.addComponent(${componentName}Definition.COMPONENT_NAME, new ${componentName}Definition());
+            ComponentRegistry testComponentRegistry = new ComponentRegistry();
+            testComponentRegistry.registerComponentFamilyDefinition(new ${componentName}FamilyDefinition());
             componentService = new ComponentServiceImpl(testComponentRegistry);
         }
         return componentService;

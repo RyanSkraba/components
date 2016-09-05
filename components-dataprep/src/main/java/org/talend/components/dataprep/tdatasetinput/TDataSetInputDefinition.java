@@ -15,8 +15,6 @@ package org.talend.components.dataprep.tdatasetinput;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.talend.components.api.Constants;
-import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
@@ -25,13 +23,10 @@ import org.talend.components.dataprep.DataPrepDefinition;
 import org.talend.components.dataprep.runtime.DataSetSource;
 import org.talend.daikon.properties.Properties;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
  * The TDataSetInputDefinition acts as an entry point for all of services that a component provides to integrate with
  * the Studio (at design-time) and other components (at run-time).
  */
-@Component(name = Constants.COMPONENT_BEAN_PREFIX + TDataSetInputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TDataSetInputDefinition extends DataPrepDefinition {
 
     public static final String COMPONENT_NAME = "tDatasetInput";

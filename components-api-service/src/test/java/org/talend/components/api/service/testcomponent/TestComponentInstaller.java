@@ -10,25 +10,16 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.salesforce;
-
-import org.talend.components.api.Constants;
-import org.talend.components.api.wizard.ComponentWizardDefinition;
+package org.talend.components.api.service.testcomponent;
 
 import aQute.bnd.annotation.component.Component;
+import org.talend.components.api.ComponentInstaller;
 
-public class SalesforceConnectionEditWizardDefinition extends SalesforceConnectionWizardDefinition {
-
-    public static final String COMPONENT_WIZARD_NAME = "salesforce.edit"; //$NON-NLS-1$
-
-    @Override
-    public String getName() {
-        return COMPONENT_WIZARD_NAME;
-    }
+@Component(name = "test", provide = ComponentInstaller.class)
+public class TestComponentInstaller implements ComponentInstaller {
 
     @Override
-    public boolean isTopLevel() {
-        return false;
+    public void install(ComponentFrameworkContext ctx) {
+        ctx.registerComponentFamilyDefinition(new TestComponentFamilyDefinition());
     }
-
 }
