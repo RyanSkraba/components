@@ -23,6 +23,8 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
 import org.talend.daikon.NamedThing;
+import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult;
 
 public class DataSetSink extends DataSetSourceOrSink implements Sink {
 
@@ -34,8 +36,9 @@ public class DataSetSink extends DataSetSourceOrSink implements Sink {
     }
 
     @Override
-    public void initialize(RuntimeContainer runtimeContainer, ComponentProperties componentProperties) {
+    public ValidationResult initialize(RuntimeContainer runtimeContainer, ComponentProperties componentProperties) {
         runtimeProperties = ((TDataSetOutputProperties) componentProperties).getRuntimeProperties();
+        return ValidationResult.OK;
     }
 
     @Override

@@ -21,6 +21,7 @@ import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.dataprep.tdatasetinput.TDataSetInputProperties;
+import org.talend.daikon.properties.ValidationResult;
 
 /**
  * The TDataSetInputSource provides the mechanism to supply data to other components at run-time.
@@ -43,9 +44,10 @@ public class DataSetSource extends DataSetSourceOrSink implements BoundedSource 
     private transient Schema schema;
 
     @Override
-    public void initialize(RuntimeContainer container, ComponentProperties properties) {
+    public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
         runtimeProperties = ((TDataSetInputProperties) properties).getRuntimeProperties();
         schema = new Schema.Parser().parse(runtimeProperties.getSchema());
+        return ValidationResult.OK;
     }
 
     public Schema getSchema() {

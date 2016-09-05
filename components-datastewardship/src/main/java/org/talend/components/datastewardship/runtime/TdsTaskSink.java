@@ -19,6 +19,8 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.datastewardship.common.CampaignType;
 import org.talend.components.datastewardship.common.TdsUtils;
 import org.talend.components.datastewardship.tdatastewardshiptaskoutput.TDataStewardshipTaskOutputProperties;
+import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
 
 /**
  * TDS Task {@link Sink}
@@ -61,17 +63,17 @@ public class TdsTaskSink extends TdsSink {
      * Task comment
      */
     private String taskComment;
-    
+
     /**
      * Batch size
      */
     private int batchSize = -1;
-    
+
     /**
      * Group ID
      */
     private String groupIdColumn;
-    
+
     /**
      * Source
      */
@@ -94,8 +96,11 @@ public class TdsTaskSink extends TdsSink {
      * @param properties user specified properties
      */
     @Override
-    public void initialize(RuntimeContainer container, ComponentProperties properties) {
-        super.initialize(container, properties);
+    public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
+        ValidationResult validate = super.initialize(container, properties);
+        if (validate.getStatus() == Result.ERROR) {
+            return validate;
+        }
         TDataStewardshipTaskOutputProperties outputProperties = (TDataStewardshipTaskOutputProperties) properties;
         campaignName = outputProperties.campaignName.getValue();
         campaignType = outputProperties.campaignType.getValue().toString();
@@ -105,17 +110,18 @@ public class TdsTaskSink extends TdsSink {
         taskState = outputProperties.tasksMetadata.taskState.getValue();
         taskAssignee = outputProperties.tasksMetadata.taskAssignee.getValue();
         taskComment = outputProperties.tasksMetadata.taskComment.getValue();
-        
+
         if (outputProperties.batchSize.getValue() != null) {
             batchSize = outputProperties.batchSize.getValue();
         }
-               
+
         if (campaignType.equals(CampaignType.MERGING.toString())) {
             groupIdColumn = outputProperties.advancedMappings.groupIdColumn.getValue();
             sourceColumn = outputProperties.advancedMappings.sourceColumn.getValue();
             masterColumn = outputProperties.advancedMappings.masterColumn.getValue();
             scoreColumn = outputProperties.advancedMappings.scoreColumn.getValue();
-        }               
+        }
+        return ValidationResult.OK;
     }
 
     /**
@@ -125,7 +131,7 @@ public class TdsTaskSink extends TdsSink {
     public WriteOperation<?> createWriteOperation() {
         return new TdsTaskWriteOperation(this);
     }
-    
+
     /**
      * Getter for campaignName.
      * 
@@ -188,7 +194,7 @@ public class TdsTaskSink extends TdsSink {
     public String getTaskComment() {
         return taskComment;
     }
-    
+
     /**
      * Getter for batchSize.
      * 
@@ -197,7 +203,7 @@ public class TdsTaskSink extends TdsSink {
     public Integer getBatchSize() {
         return batchSize;
     }
-    
+
     /**
      * Getter for groupId.
      * 
@@ -206,7 +212,7 @@ public class TdsTaskSink extends TdsSink {
     public String getGroupIdColumn() {
         return groupIdColumn;
     }
-    
+
     /**
      * Getter for source.
      * 
@@ -215,7 +221,7 @@ public class TdsTaskSink extends TdsSink {
     public String getSourceColumn() {
         return sourceColumn;
     }
-    
+
     /**
      * Getter for masterIndicator.
      * 
@@ -224,7 +230,7 @@ public class TdsTaskSink extends TdsSink {
     public String getMasterColumn() {
         return masterColumn;
     }
-    
+
     /**
      * Getter for score.
      * 

@@ -14,19 +14,16 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.test.MyClass1;
 
 /**
- * The MultiRuntimeComponentSource provides the mechanism to supply data to other
- * components at run-time.
+ * The MultiRuntimeComponentSource provides the mechanism to supply data to other components at run-time.
  *
- * Based on the Apache Beam project, the Source mechanism is appropriate to
- * describe distributed and non-distributed data sources and can be adapted
- * to scalable big data execution engines on a cluster, or run locally.
+ * Based on the Apache Beam project, the Source mechanism is appropriate to describe distributed and non-distributed
+ * data sources and can be adapted to scalable big data execution engines on a cluster, or run locally.
  *
- * This example component describes an input source that is guaranteed to be
- * run in a single JVM (whether on a cluster or locally), so:
+ * This example component describes an input source that is guaranteed to be run in a single JVM (whether on a cluster
+ * or locally), so:
  *
  * <ul>
- * <li>the simplified logic for reading is found in the {@link MultiRuntimeComponentReader},
- * and</li>
+ * <li>the simplified logic for reading is found in the {@link MultiRuntimeComponentReader}, and</li>
  * </ul>
  */
 public class MultiRuntimeComponentSource implements BoundedSource {
@@ -40,10 +37,11 @@ public class MultiRuntimeComponentSource implements BoundedSource {
     private transient Schema schema;
 
     @Override
-    public void initialize(RuntimeContainer container, ComponentProperties properties) {
+    public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
         this.properties = (MultiRuntimeComponentProperties) properties;
         // FIXME - this should be moved to the properties setup
         schema = new Schema.Parser().parse(this.properties.schema.schema.getStringValue());
+        return ValidationResult.OK;
     }
 
     @Override

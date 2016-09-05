@@ -79,12 +79,13 @@ public class TdsSourceOrSink implements SourceOrSink {
      * @param properties user specified properties
      */
     @Override
-    public void initialize(RuntimeContainer container, ComponentProperties properties) {
+    public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
         TdsProperties tdsProperties = (TdsProperties) properties;
         url = tdsProperties.connection.url.getValue();
         username = tdsProperties.connection.username.getValue();
         password = tdsProperties.connection.password.getValue();
         schema = tdsProperties.schema.schema.getValue();
+        return ValidationResult.OK;
     }
 
     /**

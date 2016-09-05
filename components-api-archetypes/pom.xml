@@ -51,6 +51,13 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-archetype-plugin</artifactId>
 				<version>2.4</version>
+				<dependencies>
+        			<dependency>
+            			<groupId>org.apache.maven.shared</groupId>
+            			<artifactId>maven-invoker</artifactId>
+            			<version>2.2</version>
+        			</dependency>
+    			</dependencies>
 				<executions>
 					<execution>
 						<id>archetype-test</id>

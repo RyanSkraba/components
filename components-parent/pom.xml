@@ -61,11 +61,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.talend.daikon</groupId>
-			<artifactId>daikon-spring</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.16</version>
@@ -219,6 +214,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
+				<version>3.0.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -231,6 +227,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.4</version>
 				<configuration>
 					<failOnError>false</failOnError>
 				</configuration>

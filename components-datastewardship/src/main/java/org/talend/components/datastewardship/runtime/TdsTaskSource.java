@@ -17,6 +17,8 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.datastewardship.common.CampaignType;
 import org.talend.components.datastewardship.runtime.reader.TdsTaskReader;
 import org.talend.components.datastewardship.tdatastewardshiptaskinput.TDataStewardshipTaskInputProperties;
+import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
 
 public class TdsTaskSource extends TdsSource {
 
@@ -63,8 +65,11 @@ public class TdsTaskSource extends TdsSource {
     private int batchSize = -1;
 
     @Override
-    public void initialize(RuntimeContainer container, ComponentProperties properties) {
-        super.initialize(container, properties);
+    public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
+        ValidationResult validate = super.initialize(container, properties);
+        if (validate.getStatus() == Result.ERROR) {
+            return validate;
+        }
         TDataStewardshipTaskInputProperties inputProperties = (TDataStewardshipTaskInputProperties) properties;
         this.campaignName = inputProperties.campaignName.getValue();
         this.campaignType = inputProperties.campaignType.getValue();
@@ -74,7 +79,7 @@ public class TdsTaskSource extends TdsSource {
         // this.taskPriority = inputProperties.searchCriteria.taskPriority.getValue().getValue();
         this.goldenOnly = inputProperties.goldenOnly.getValue();
         this.batchSize = inputProperties.batchSize.getValue();
-
+        return ValidationResult.OK;
     }
 
     @Override

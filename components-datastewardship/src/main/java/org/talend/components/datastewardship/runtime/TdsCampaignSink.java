@@ -22,11 +22,13 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.datastewardship.tdatastewardshipcampaigncreate.TDataStewardshipCampaignCreateProperties;
 import org.talend.daikon.NamedThing;
+import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
 
 public class TdsCampaignSink extends TdsSink {
 
     private static final long serialVersionUID = 3228265006313531905L;
-    
+
     /**
      * Data schema
      */
@@ -38,10 +40,14 @@ public class TdsCampaignSink extends TdsSink {
     }
 
     @Override
-    public void initialize(RuntimeContainer container, ComponentProperties properties) {
-        super.initialize(container, properties);
+    public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
+        ValidationResult validate = super.initialize(container, properties);
+        if (validate.getStatus() == Result.ERROR) {
+            return validate;
+        }
         TDataStewardshipCampaignCreateProperties outputProperties = (TDataStewardshipCampaignCreateProperties) properties;
         schema = outputProperties.schema.schema.getValue();
+        return ValidationResult.OK;
     }
 
     @Override
@@ -53,7 +59,6 @@ public class TdsCampaignSink extends TdsSink {
     public Schema getEndpointSchema(RuntimeContainer runtimeContainer, String s) throws IOException {
         return null;
     }
-    
 
     /**
      * Returns data schema
@@ -63,5 +68,5 @@ public class TdsCampaignSink extends TdsSink {
     public Schema getSchema() {
         return schema;
     }
-    
+
 }
