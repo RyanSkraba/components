@@ -15,6 +15,7 @@ package org.talend.components.api.component;
 import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.Source;
+import org.talend.components.api.component.runtime.WriterWithFeedback;
 
 /**
  * This will define the possible connections a component can handle. I'll be used to retrieve the right {@link RuntimeInfo}. One
@@ -30,7 +31,8 @@ public enum ConnectorTopology {
      */
     INCOMING,
     /**
-     * Transform component that have both incoming and outgoing connectors. The runtime class must implement ????
+     * Transform component that have both incoming and outgoing connectors. The runtime class can implement
+     * {@link WriterWithFeedback} or ????
      * Just a note to think about -- transformation components will probably implement any of java.function.Function (if java 8),
      * org.talend.daikon.java8.Function (if not), Beam DoFn (when we have beam libraries available) or a PTransform (when we're
      * committed to running in a Beam runner). Also, farther in the future, any of these can return a Beam PTransform!

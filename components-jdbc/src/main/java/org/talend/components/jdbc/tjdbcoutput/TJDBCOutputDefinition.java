@@ -74,7 +74,7 @@ public class TJDBCOutputDefinition extends AbstractComponentDefinition {
 
     @Override
     public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology) {
-        if (connectorTopology == ConnectorTopology.INCOMING) {
+        if (connectorTopology == ConnectorTopology.INCOMING || connectorTopology == ConnectorTopology.INCOMING_AND_OUTGOING) {
             return new SimpleRuntimeInfo(this.getClass().getClassLoader(), "org.talend.components", "components-jdbc",
                     JDBCSink.class.getCanonicalName());
         } else {
@@ -84,7 +84,7 @@ public class TJDBCOutputDefinition extends AbstractComponentDefinition {
 
     @Override
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
-        return EnumSet.of(ConnectorTopology.INCOMING);
+        return EnumSet.of(ConnectorTopology.INCOMING, ConnectorTopology.INCOMING_AND_OUTGOING);
     }
 
 }

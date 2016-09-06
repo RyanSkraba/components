@@ -71,7 +71,7 @@ public class TSalesforceOutputDefinition extends SalesforceDefinition {
 
     @Override
     public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology componentType) {
-        if (componentType == ConnectorTopology.INCOMING) {
+        if (componentType == ConnectorTopology.INCOMING || componentType == ConnectorTopology.INCOMING_AND_OUTGOING) {
             return new SimpleRuntimeInfo(this.getClass().getClassLoader(), getMavenGroupId(), getMavenArtifactId(),
                     SalesforceSink.class.getCanonicalName());
         } else {
@@ -81,7 +81,7 @@ public class TSalesforceOutputDefinition extends SalesforceDefinition {
 
     @Override
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
-        return EnumSet.of(ConnectorTopology.INCOMING);
+        return EnumSet.of(ConnectorTopology.INCOMING, ConnectorTopology.INCOMING_AND_OUTGOING);
     }
 
 }
