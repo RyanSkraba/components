@@ -109,7 +109,7 @@ public class DependenciesReader {
      * @return a list of maven url strings
      * @throws IOException if read fails.
      */
-    Set<String> parseDependencies(InputStream depStream) throws IOException {
+    public Set<String> parseDependencies(InputStream depStream) throws IOException {
         Set<String> mvnUris = new HashSet<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(depStream, "UTF-8"));
         // java 8 version
