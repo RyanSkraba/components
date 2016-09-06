@@ -10,6 +10,7 @@ import org.apache.avro.SchemaBuilder;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.wizard.ComponentWizard;
@@ -48,6 +49,18 @@ public class FileDelimitedTestIT extends FileDelimitedTestBasic {
 
     public FileDelimitedTestIT() {
         super();
+    }
+
+    @Test
+    public void testFamily() {
+        ComponentDefinition cdInput = getComponentService().getComponentDefinition(TFileInputDelimitedDefinition.COMPONENT_NAME);
+        assertEquals(1, cdInput.getFamilies().length);
+        assertEquals("File/Input", cdInput.getFamilies()[0]);
+
+        ComponentDefinition cdOutput = getComponentService()
+                .getComponentDefinition(TFileOutputDelimitedDefinition.COMPONENT_NAME);
+        assertEquals(1, cdOutput.getFamilies().length);
+        assertEquals("File/Output", cdOutput.getFamilies()[0]);
     }
 
     @Test
@@ -137,7 +150,7 @@ public class FileDelimitedTestIT extends FileDelimitedTestBasic {
         // Default properties
         assertFalse(input.csvOptions.getValue());
         assertFalse(inputMainForm.getWidget(input.rowSeparator.getName()).isHidden());
-        assertEquals("\\n", input.rowSeparator.getValue());
+        assertEquals("\n", input.rowSeparator.getValue());
         assertFalse(inputMainForm.getWidget(input.fieldSeparator.getName()).isHidden());
         assertEquals(";", input.fieldSeparator.getValue());
         assertTrue(inputMainForm.getWidget(input.escapeChar.getName()).isHidden());

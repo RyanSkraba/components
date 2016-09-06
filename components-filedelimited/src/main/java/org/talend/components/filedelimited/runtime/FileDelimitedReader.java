@@ -2,8 +2,11 @@ package org.talend.components.filedelimited.runtime;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +14,6 @@ import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.filedelimited.FileDelimitedDefinition;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 import org.talend.fileprocess.FileInputDelimited;
@@ -22,11 +24,13 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileDelimitedDefinition.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileDelimitedReader.class);
 
     private RuntimeContainer container;
 
     private transient IndexedRecord currentIndexRecord;
+
+    protected transient Schema schema;
 
     private IndexedRecordConverter factory;
 
@@ -38,6 +42,8 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
 
     TFileInputDelimitedProperties properties;
 
+    private List<String> values;
+
     public FileDelimitedReader(RuntimeContainer container, BoundedSource source, TFileInputDelimitedProperties properties) {
         super(source);
         this.container = container;
@@ -47,7 +53,8 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
         } else {
             factory = new DelimitedAdaptorFactory();
         }
-        factory.setSchema(properties.main.schema.getValue());
+        schema = properties.main.schema.getValue();
+        factory.setSchema(schema);
         fileDelimitedRuntime = new FileDelimitedRuntime(properties);
 
     }
@@ -64,12 +71,20 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
             fid = fileDelimitedRuntime.getFileDelimited();
             startAble = fid != null && fid.nextRecord();
         }
+        if (startAble) {
+            getCurrentRecord();
+        }
         return startAble;
     }
 
     @Override
     public boolean advance() throws IOException {
-        boolean isContinue = csvReader.readNext();
+        boolean isContinue = false;
+        if (properties.csvOptions.getValue()) {
+            isContinue = csvReader.readNext();
+        } else {
+            isContinue = fid.nextRecord();
+        }
         if (!isContinue) {
             if (properties.uncompress.getValue()) {
                 if (properties.csvOptions.getValue()) {
@@ -81,17 +96,14 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
                 }
             }
         }
-        return false;
+        if (isContinue) {
+            getCurrentRecord();
+        }
+        return isContinue;
     }
 
     @Override
     public IndexedRecord getCurrent() {
-        String values = null;
-        if (properties.csvOptions.getValue()) {
-            currentIndexRecord = ((CSVAdaptorFactory) factory).convertToAvro(csvReader);
-        } else {
-            currentIndexRecord = ((DelimitedAdaptorFactory) factory).convertToAvro(fid);
-        }
         return currentIndexRecord;
     }
 
@@ -116,4 +128,16 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
         return new Result().toMap();
     }
 
+    protected void getCurrentRecord() throws IOException {
+        if (properties.csvOptions.getValue()) {
+            currentIndexRecord = ((CSVAdaptorFactory) factory).convertToAvro(csvReader);
+        } else {
+            values = new ArrayList<>();
+            // TODO consider dynamic
+            for (int i = 0; i < schema.getFields().size(); i++) {
+                values.add(fid.get(i));
+            }
+            currentIndexRecord = ((DelimitedAdaptorFactory) factory).convertToAvro(values);
+        }
+    }
 }

@@ -60,7 +60,8 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
     @Override
     public void setupProperties() {
         super.setupProperties();
-        rowSeparator.setValue("\\n");
+        // TODO component defualt showed incorrect
+        rowSeparator.setValue("\n");
         fieldSeparator.setValue(";");
         escapeChar.setValue("\"\"");
         textEnclosure.setValue("\"\"");

@@ -8,6 +8,7 @@ import java.util.Date;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -87,10 +88,20 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
             return new StringToDecimalConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._double())) {
             return new StringToDoubleConverter(f);
+        } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._float())) {
+            return new StringToFloatConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._int())) {
             return new StringToIntegerConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._date())) {
             return new StringToDateConverter(f);
+        } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._long())) {
+            return new StringToLongConverter(f);
+        } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._bytes())) {
+            return new StringToBytesConverter(f);
+        } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._byte())) {
+            return new StringToByteConverter(f);
+        } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._character())) {
+            return new StringToCharacterConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._string())) {
             return super.getConverter(String.class);
         }
@@ -141,7 +152,7 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
         @Override
         public BigDecimal convertToAvro(String value) {
-            return value == null ? null : new BigDecimal(value);
+            return StringUtils.isEmpty(value) ? null : new BigDecimal(value);
         }
     }
 
@@ -153,7 +164,31 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
         @Override
         public Double convertToAvro(String value) {
-            return value == null ? null : Double.parseDouble(value);
+            return StringUtils.isEmpty(value) ? null : Double.parseDouble(value);
+        }
+    }
+
+    public static class StringToLongConverter extends AsStringConverter<Long> {
+
+        StringToLongConverter(Schema.Field field) {
+            super(field);
+        }
+
+        @Override
+        public Long convertToAvro(String value) {
+            return StringUtils.isEmpty(value) ? null : Long.parseLong(value);
+        }
+    }
+
+    public static class StringToFloatConverter extends AsStringConverter<Float> {
+
+        StringToFloatConverter(Schema.Field field) {
+            super(field);
+        }
+
+        @Override
+        public Float convertToAvro(String value) {
+            return StringUtils.isEmpty(value) ? null : Float.parseFloat(value);
         }
     }
 
@@ -171,7 +206,7 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
         @Override
         public Long convertToAvro(String value) {
             try {
-                return value == null ? null : format.parse(value).getTime();
+                return StringUtils.isEmpty(value) ? null : format.parse(value).getTime();
             } catch (ParseException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
@@ -193,7 +228,52 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
         @Override
         public Integer convertToAvro(String value) {
-            return value == null ? null : Integer.parseInt(value);
+            return StringUtils.isEmpty(value) ? null : Integer.parseInt(value);
+        }
+    }
+
+    public static class StringToByteConverter extends AsStringConverter<Byte> {
+
+        StringToByteConverter(Schema.Field field) {
+            super(field);
+        }
+
+        @Override
+        public Byte convertToAvro(String value) {
+            if (StringUtils.isEmpty(value)) {
+                return null;
+            }
+            // TODO is decode
+            boolean isDecode = false;
+            if (isDecode) {
+                return Byte.decode(value).byteValue();
+            } else {
+                return Byte.parseByte(value);
+            }
+        }
+    }
+
+    public static class StringToBytesConverter extends AsStringConverter<byte[]> {
+
+        StringToBytesConverter(Schema.Field field) {
+            super(field);
+        }
+
+        @Override
+        public byte[] convertToAvro(String value) {
+            return StringUtils.isEmpty(value) ? null : value.getBytes();
+        }
+    }
+
+    public static class StringToCharacterConverter extends AsStringConverter<Character> {
+
+        StringToCharacterConverter(Schema.Field field) {
+            super(field);
+        }
+
+        @Override
+        public Character convertToAvro(String value) {
+            return StringUtils.isEmpty(value) ? null : value.charAt(0);
         }
     }
 }

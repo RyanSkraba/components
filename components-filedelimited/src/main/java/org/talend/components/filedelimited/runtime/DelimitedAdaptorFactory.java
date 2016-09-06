@@ -1,30 +1,29 @@
 package org.talend.components.filedelimited.runtime;
 
-import java.io.IOException;
+import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
-import org.talend.fileprocess.FileInputDelimited;
 
-public class DelimitedAdaptorFactory implements IndexedRecordConverter<FileInputDelimited, IndexedRecord> {
+public class DelimitedAdaptorFactory implements IndexedRecordConverter<List, IndexedRecord> {
 
     Schema schema;
 
     @Override
-    public Class<FileInputDelimited> getDatumClass() {
-        return FileInputDelimited.class;
+    public Class<List> getDatumClass() {
+        return List.class;
     }
 
     @Override
-    public FileInputDelimited convertToDatum(IndexedRecord value) {
+    public List convertToDatum(IndexedRecord value) {
         return null;
     }
 
     @Override
-    public DelimitedIndexedRecord convertToAvro(FileInputDelimited fid) {
-        return new DelimitedIndexedRecord(fid);
+    public DelimitedIndexedRecord convertToAvro(List values) {
+        return new DelimitedIndexedRecord(values);
     }
 
     @Override
@@ -39,10 +38,10 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<FileInput
 
     private class DelimitedIndexedRecord implements IndexedRecord {
 
-        private FileInputDelimited fid;
+        List<String> values;
 
-        public DelimitedIndexedRecord(FileInputDelimited fid) {
-            this.fid = fid;
+        public DelimitedIndexedRecord(List<String> values) {
+            this.values = values;
         }
 
         @Override
@@ -66,12 +65,11 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<FileInput
                     fieldConverter[j] = new FileDelimitedAvroRegistry().getConverterFromString(f);
                 }
             }
-            try {
-                return fieldConverter[index].convertToAvro(fid.get(index));
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (index < values.size()) {
+                return fieldConverter[index].convertToAvro(values.get(index));
+            } else {
+                return null;
             }
-            return null;
         }
 
         @Override

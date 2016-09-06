@@ -26,7 +26,7 @@ public class FileDelimitedRuntime {
 
     private String encoding;
 
-    private int nbRandom;
+    private int nbRandom = -1;
 
     private int header;
 
@@ -79,8 +79,8 @@ public class FileDelimitedRuntime {
         if (props.uncompress.getValue()) {
             ZipEntry zipEntry = null;
             if (hashNextEntry()) {
-                fileInputDelimited = new FileInputDelimited(zipInputStream, encoding, Character.toString(fieldSeparator),
-                        Character.toString(rowSeparator), props.removeEmptyRow.getValue(), header, footer, limit, nbRandom,
+                fileInputDelimited = new FileInputDelimited(zipInputStream, encoding, props.fieldSeparator.getValue(),
+                        props.rowSeparator.getValue(), props.removeEmptyRow.getValue(), header, footer, limit, nbRandom,
                         props.splitRecord.getValue());
             }
         } else {
