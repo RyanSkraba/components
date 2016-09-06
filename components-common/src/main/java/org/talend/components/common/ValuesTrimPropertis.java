@@ -39,6 +39,10 @@ public class ValuesTrimPropertis extends ComponentPropertiesImpl {
         }
     }
 
+    public void afterTrimAll() {
+        refreshLayout(getForm(Form.MAIN));
+    }
+
     public void beforeTrimTable() {
         if (fieldNames != null && fieldNames.size() > 0) {
             trimTable.columnName.setValue(fieldNames);

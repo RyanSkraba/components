@@ -1,8 +1,7 @@
 package org.talend.components.filedelimited.runtime;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import org.apache.avro.generic.IndexedRecord;
@@ -15,30 +14,27 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.filedelimited.FileDelimitedDefinition;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
+import org.talend.fileprocess.FileInputDelimited;
 
-/**
- * Simple implementation of a reader.
- */
+import com.talend.csv.CSVReader;
+
 public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
 
-    /** Default serial version UID. */
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileDelimitedDefinition.class);
 
     private RuntimeContainer container;
 
-    private boolean started = false;
-
-    private BufferedReader reader = null;
-
     private transient IndexedRecord currentIndexRecord;
 
-    private transient String currentRow;
+    private IndexedRecordConverter factory;
 
-    private IndexedRecordConverter<String, FileDelimitedIndexedRecord> factory;
+    private FileDelimitedRuntime fileDelimitedRuntime;
 
-    private FileDelimitedRuntime fileDelimitedRuntime = new FileDelimitedRuntime();
+    private FileInputDelimited fid;
+
+    private CSVReader csvReader;
 
     TFileInputDelimitedProperties properties;
 
@@ -46,50 +42,73 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
         super(source);
         this.container = container;
         this.properties = properties;
-        factory = new FileDelimitedAdaptorFactory();
+        if (properties.csvOptions.getValue()) {
+            factory = new CSVAdaptorFactory();
+        } else {
+            factory = new DelimitedAdaptorFactory();
+        }
         factory.setSchema(properties.main.schema.getValue());
+        fileDelimitedRuntime = new FileDelimitedRuntime(properties);
 
     }
 
     @Override
     public boolean start() throws IOException {
-        started = true;
-        LOGGER.debug("open: " + properties.fileName.getStringValue()); //$NON-NLS-1$
-        reader = new BufferedReader(new FileReader(properties.fileName.getStringValue()));
-        currentRow = reader.readLine();
-        return currentRow != null;
+        fileDelimitedRuntime.init();
+        LOGGER.debug("open: " + properties.fileName.getStringValue());
+        boolean startAble = false;
+        if (properties.csvOptions.getValue()) {
+            csvReader = fileDelimitedRuntime.getCsvReader();
+            startAble = fileDelimitedRuntime.limit > 0 && csvReader != null && csvReader.readNext();
+        } else {
+            fid = fileDelimitedRuntime.getFileDelimited();
+            startAble = fid != null && fid.nextRecord();
+        }
+        return startAble;
     }
 
     @Override
     public boolean advance() throws IOException {
-        // currentRow = reader.readLine();
-        // return currentRow != null;
-        return fileDelimitedRuntime.fileRead(properties.uncompress.getValue()).nextRecord();
+        boolean isContinue = csvReader.readNext();
+        if (!isContinue) {
+            if (properties.uncompress.getValue()) {
+                if (properties.csvOptions.getValue()) {
+                    csvReader = fileDelimitedRuntime.getCsvReader();
+                    isContinue = csvReader != null && csvReader.readNext();
+                } else {
+                    fid = fileDelimitedRuntime.getFileDelimited();
+                    isContinue = fid != null && fid.nextRecord();
+                }
+            }
+        }
+        return false;
     }
 
     @Override
     public IndexedRecord getCurrent() {
-        // String fieldSeparator = properties.fieldSeparator.getStringValue();
-        // String[] values = currentRow.split(fieldSeparator);
         String values = null;
-        try {
-            int current = 0;
-            while (fileDelimitedRuntime.fileRead(properties.uncompress.getValue()).nextRecord()) {
-                values = fileDelimitedRuntime.fileRead(properties.uncompress.getValue()).get(current);
-                currentIndexRecord = factory.convertToAvro(values);
-                current++;
-            }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        if (properties.csvOptions.getValue()) {
+            currentIndexRecord = ((CSVAdaptorFactory) factory).convertToAvro(csvReader);
+        } else {
+            currentIndexRecord = ((DelimitedAdaptorFactory) factory).convertToAvro(fid);
         }
         return currentIndexRecord;
     }
 
     @Override
     public void close() throws IOException {
-        reader.close();
-        LOGGER.debug("close: " + properties.fileName.getStringValue()); //$NON-NLS-1$
+        if (!(fileDelimitedRuntime.fileNameOrStream instanceof InputStream)) {
+            if (properties.csvOptions.getValue()) {
+                if (csvReader != null) {
+                    csvReader.close();
+                }
+            } else {
+                if (fid != null) {
+                    fid.close();
+                }
+            }
+        }
+        LOGGER.debug("close: " + properties.fileName.getStringValue());
     }
 
     @Override

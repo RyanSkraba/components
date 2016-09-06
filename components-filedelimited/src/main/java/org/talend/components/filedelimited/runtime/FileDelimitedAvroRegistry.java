@@ -3,12 +3,11 @@ package org.talend.components.filedelimited.runtime;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.avro.Schema;
-import org.talend.components.filedelimited.connection.FileInputField;
+import org.apache.avro.SchemaBuilder;
+import org.apache.avro.generic.IndexedRecord;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -17,33 +16,30 @@ import org.talend.daikon.java8.SerializableFunction;
 
 public class FileDelimitedAvroRegistry extends AvroRegistry {
 
-    public static final String FAMILY_NAME = "FileInput";
-
     private static FileDelimitedAvroRegistry fileInputInstance;
 
     public FileDelimitedAvroRegistry() {
 
-        // Ensure that we know how to get Schemas for these DataPrep objects.
-        registerSchemaInferrer(FileInputField[].class, new SerializableFunction<FileInputField[], Schema>() {
+        // Ensure that we know how to get Schemas for these Salesforce objects.
+        registerSchemaInferrer(IndexedRecord.class, new SerializableFunction<IndexedRecord, Schema>() {
 
             /** Default serial version UID. */
             private static final long serialVersionUID = 1L;
 
             @Override
-            public Schema apply(FileInputField[] t) {
-                // TODO Auto-generated method stub
-                return null;
+            public Schema apply(IndexedRecord t) {
+                return inferSchemaRecord(t);
             }
 
         });
 
-        registerSchemaInferrer(FileInputField.class, new SerializableFunction<FileInputField, Schema>() {
+        registerSchemaInferrer(Schema.Field.class, new SerializableFunction<Schema.Field, Schema>() {
 
             /** Default serial version UID. */
             private static final long serialVersionUID = 1L;
 
             @Override
-            public Schema apply(FileInputField t) {
+            public Schema apply(Schema.Field t) {
                 return inferSchemaField(t);
             }
 
@@ -57,80 +53,34 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
         return fileInputInstance;
     }
 
-    /**
-     * @return The family that uses the specific objects that this converter
-     * knows how to translate.
-     */
-    public String getFamilyName() {
-        return FAMILY_NAME;
-    }
-
-    /**
-     *
-     * @param in
-     * the DescribeSObjectResult to analyse.
-     * @return the schema for data given from the object.
-     */
-    private Schema inferSchemaDataPrepResult(FileInputField[] in) {
-        List<Schema.Field> fields = new ArrayList<>();
-        for (FileInputField field : in) {
-
-            Schema.Field avroField = new Schema.Field(field.getColumnName(), AvroUtils._string(), null, field.getContent());
-
-            switch (field.getType()) {
-            case "date":
-                avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd");
-                break;
-            // TODO add right handling Date type
-            default:
-                break;
+    private Schema inferSchemaRecord(IndexedRecord in) {
+        SchemaBuilder.FieldAssembler<Schema> builder = SchemaBuilder.builder().record(in.getSchema().getName()).fields();
+        for (Schema.Field field : in.getSchema().getFields()) {
+            Schema fieldSchema = inferSchema(field);
+            Object fieldDefault = field.defaultVal();
+            if (null == fieldDefault) {
+                builder = builder.name(field.name()).type(fieldSchema).noDefault();
+            } else {
+                builder = builder.name(field.name()).type(fieldSchema).withDefault(fieldDefault);
             }
-            fields.add(avroField);
         }
-        return Schema.createRecord("Null", null, null, false, fields);
+        return builder.endRecord();
     }
 
     /**
+     * Infers an Avro schema for the given Salesforce Field. This can be an expensive operation so the schema should be
+     * cached where possible. The return type will be the Avro Schema that can contain the field data without loss of
+     * precision.
      *
-     * @param field
-     * the Field to analyse.
+     * @param field the Field to analyse.
      * @return the schema for data that the field describes.
      */
-    private Schema inferSchemaField(FileInputField field) {
-        Schema base;
-        switch (field.getType()) {
-        case "boolean":
-            base = AvroUtils._boolean();
-            break;
-        case "double":
-            base = AvroUtils._double();
-            break;
-        case "integer":
-            base = AvroUtils._int();
-            break;
-        case "float":
-            base = AvroUtils._float();
-            break;
-        default:
-            base = AvroUtils._string();
-            break;
-        }
-
-        // TODO add handling for numeric, any and date.
-
-        return base;
+    private Schema inferSchemaField(Schema.Field field) {
+        return field.schema();
     }
 
-    /**
-     * @param f
-     * is field in Avro Schema.
-     * @return converter for a given type.
-     */
     public AvroConverter<String, ?> getConverterFromString(org.apache.avro.Schema.Field f) {
         Schema fieldSchema = AvroUtils.unwrapIfNullable(f.schema());
-        // FIXME use avro type to decide the converter is not correct if the
-        // user change the avro type, Date to String
-        // for instance
         if (AvroUtils.isSameType(fieldSchema, AvroUtils._boolean())) {
             return new StringToBooleanConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._decimal())) {
@@ -146,8 +96,6 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
         }
         throw new UnsupportedOperationException("The type " + fieldSchema.getType() + " is not supported."); //$NON-NLS-1$ //$NON-NLS-2$
     }
-
-    // TODO(rskraba): These are probably useful utility items.
 
     public static abstract class AsStringConverter<T> implements AvroConverter<String, T> {
 

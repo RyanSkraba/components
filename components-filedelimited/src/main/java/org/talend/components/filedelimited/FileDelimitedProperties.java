@@ -15,7 +15,6 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
 import static org.talend.daikon.properties.presentation.Widget.widget;
-import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 
 public class FileDelimitedProperties extends FixedConnectorsComponentProperties {
 
@@ -35,14 +34,6 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
     };
 
     public Property<Boolean> csvOptions = PropertyFactory.newBoolean("csvOptions");
-
-    public enum CSVRowSeparator {
-        LF,
-        CR,
-        CRLF
-    }
-
-    public Property<CSVRowSeparator> csvRowSeparator = newEnum("csvRowSeparator", CSVRowSeparator.class);
 
     public Property<String> rowSeparator = PropertyFactory.newString("rowSeparator");
 
@@ -96,10 +87,6 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        if (form.getName().equals(Form.MAIN)) {
-            form.getWidget(rowSeparator.getName()).setHidden(csvOptions.getValue());
-            form.getWidget(csvRowSeparator.getName()).setHidden(!csvOptions.getValue());
-        }
         if (FORM_WIZARD.equals(form.getName())) {
             Form encodingForm = form.getChildForm(encoding.getName());
             if (encodingForm != null) {
@@ -128,7 +115,9 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
     public void afterCsvOptions() {
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(Form.ADVANCED));
-        refreshLayout(getForm(FORM_WIZARD));
+        if (getForm(FORM_WIZARD) != null) {
+            refreshLayout(getForm(FORM_WIZARD));
+        }
     }
 
     public void afterAdvancedSeparator() {

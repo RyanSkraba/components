@@ -56,13 +56,13 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
 
     protected transient PropertyPathConnector REJECT_CONNECTOR = new PropertyPathConnector(Connector.REJECT_NAME, "schemaReject");
 
-
     @Override
     public void setupProperties() {
         super.setupProperties();
         header.setValue(0);
         footer.setValue(0);
         nbRandom.setValue(10);
+        removeEmptyRow.setValue(true);
         setSchemaListener(new ISchemaListener() {
 
             @Override
@@ -81,7 +81,6 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(csvOptions);
         mainForm.addRow(rowSeparator);
-        mainForm.addColumn(csvRowSeparator);
         mainForm.addColumn(fieldSeparator);
         mainForm.addRow(escapeChar);
         mainForm.addColumn(textEnclosure);
