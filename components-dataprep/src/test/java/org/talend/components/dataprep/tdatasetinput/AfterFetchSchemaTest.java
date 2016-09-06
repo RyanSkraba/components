@@ -17,6 +17,7 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.SpringTestApp;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringTestApp.class)
@@ -41,7 +42,7 @@ public class AfterFetchSchemaTest {
         properties.pass.setValue("vincent");
         properties.dataSetName.setValue("mydataset");
         properties.dataSetId.setValue("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
-        Assert.assertEquals(ValidationResult.OK, properties.afterFetchSchema());
+        Assert.assertEquals(Result.OK, properties.afterFetchSchema().getStatus());
     }
 
     // TODO should remove the duplicated code for afterFetchSchema
@@ -54,7 +55,7 @@ public class AfterFetchSchemaTest {
         properties.pass.setValue("vincent");
         properties.dataSetName.setValue("mydataset");
         properties.dataSetId.setValue("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e");
-        Assert.assertEquals(ValidationResult.OK, properties.afterFetchSchema());
+        Assert.assertEquals(Result.OK, properties.afterFetchSchema().getStatus());
     }
 
     @Test
