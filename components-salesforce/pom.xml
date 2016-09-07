@@ -9,7 +9,7 @@
         <relativePath>../components-parent/pom.xml</relativePath>
     </parent>
     <properties>
-        <partner.version>34.0.0</partner.version>
+        <partner.version>37.0.3</partner.version>
     </properties>
 
     <name>Components - Salesforce</name>
@@ -21,13 +21,13 @@
         <dependency>
             <groupId>com.force.api</groupId>
             <artifactId>force-wsc</artifactId>
-            <version>35.0.0</version>
+            <version>38.0.1</version>
         </dependency>
 
         <!-- Generated Jar files from the WSDL -->
         <dependency>
-            <groupId>org.talend.components.salesforce</groupId>
-            <artifactId>partner</artifactId>
+            <groupId>com.force.api</groupId>
+            <artifactId>force-partner-api</artifactId>
             <version>${partner.version}</version>
         </dependency>
         <dependency>
