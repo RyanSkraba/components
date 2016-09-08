@@ -23,7 +23,6 @@
 		<module>components-jira</module>
 		<module>components-dataprep</module>
 		<module>components-api-full-example</module>
-		<module>components-datastewardship</module>
 		<module>components-jdbc</module>
 	</modules>
 	<profiles>
