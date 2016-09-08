@@ -100,16 +100,18 @@ public class TFileOutputDelimitedProperties extends FileDelimitedProperties {
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        if (form.getName().equals(Form.MAIN)) {
-            form.getWidget(useOsRowSeparator.getName()).setHidden(!csvOptions.getValue());
-            form.getWidget(compress.getName()).setHidden(append.getValue() || split.getValue());
-        }
-        if (form.getName().equals(Form.ADVANCED)) {
-            form.getWidget(creatDirIfNotExist.getName()).setHidden(targetIsStream.getValue());
-            form.getWidget(split.getName()).setHidden(targetIsStream.getValue());
-            form.getWidget(splitEvery.getName()).setHidden(targetIsStream.getValue() || !split.getValue());
-            form.getWidget(flushOnRowNum.getName()).setHidden(!flushOnRow.getValue());
-            form.getWidget(deleteEmptyFile.getName()).setHidden(targetIsStream.getValue());
+        if (form != null) {
+            if (form.getName().equals(Form.MAIN)) {
+                form.getWidget(useOsRowSeparator.getName()).setHidden(!csvOptions.getValue());
+                form.getWidget(compress.getName()).setHidden(append.getValue() || split.getValue());
+            }
+            if (form.getName().equals(Form.ADVANCED)) {
+                form.getWidget(creatDirIfNotExist.getName()).setHidden(targetIsStream.getValue());
+                form.getWidget(split.getName()).setHidden(targetIsStream.getValue());
+                form.getWidget(splitEvery.getName()).setHidden(targetIsStream.getValue() || !split.getValue());
+                form.getWidget(flushOnRowNum.getName()).setHidden(!flushOnRow.getValue());
+                form.getWidget(deleteEmptyFile.getName()).setHidden(targetIsStream.getValue());
+            }
         }
     }
 

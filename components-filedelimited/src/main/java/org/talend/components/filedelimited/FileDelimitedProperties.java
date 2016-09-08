@@ -63,8 +63,8 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
         // TODO component defualt showed incorrect
         rowSeparator.setValue("\n");
         fieldSeparator.setValue(";");
-        escapeChar.setValue("\"\"");
-        textEnclosure.setValue("\"\"");
+        escapeChar.setValue("\"");
+        textEnclosure.setValue("\"");
         thousandsSeparator.setValue(",");
         decimalSeparator.setValue(".");
         encoding.encodingType.setPossibleValues(encoding.getDefaultEncodings());
@@ -88,20 +88,15 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        if (FORM_WIZARD.equals(form.getName())) {
-            Form encodingForm = form.getChildForm(encoding.getName());
-            if (encodingForm != null) {
-                boolean custom = EncodingTypeProperties.ENCODING_TYPE_CUSTOM.equals(encoding.encodingType.getValue());
-                encodingForm.getWidget(encoding.customEncoding.getName()).setHidden(!custom);
+        if (form != null) {
+            if (Form.MAIN.equals(form.getName()) || FORM_WIZARD.equals(form.getName())) {
+                form.getWidget(escapeChar.getName()).setHidden(!csvOptions.getValue());
+                form.getWidget(textEnclosure.getName()).setHidden(!csvOptions.getValue());
             }
-        }
-        if (Form.MAIN.equals(form.getName()) || FORM_WIZARD.equals(form.getName())) {
-            form.getWidget(escapeChar.getName()).setHidden(!csvOptions.getValue());
-            form.getWidget(textEnclosure.getName()).setHidden(!csvOptions.getValue());
-        }
-        if (form.getName().equals(Form.ADVANCED)) {
-            form.getWidget(thousandsSeparator.getName()).setHidden(!advancedSeparator.getValue());
-            form.getWidget(decimalSeparator.getName()).setHidden(!advancedSeparator.getValue());
+            if (form.getName().equals(Form.ADVANCED)) {
+                form.getWidget(thousandsSeparator.getName()).setHidden(!advancedSeparator.getValue());
+                form.getWidget(decimalSeparator.getName()).setHidden(!advancedSeparator.getValue());
+            }
         }
     }
 

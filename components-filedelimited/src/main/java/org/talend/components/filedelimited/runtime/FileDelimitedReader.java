@@ -2,8 +2,6 @@ package org.talend.components.filedelimited.runtime;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.avro.Schema;
@@ -42,17 +40,17 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
 
     TFileInputDelimitedProperties properties;
 
-    private List<String> values;
+    private String[] values;
+
+    private int outputLine;
+
+    private int currentLine;
 
     public FileDelimitedReader(RuntimeContainer container, BoundedSource source, TFileInputDelimitedProperties properties) {
         super(source);
         this.container = container;
         this.properties = properties;
-        if (properties.csvOptions.getValue()) {
-            factory = new CSVAdaptorFactory();
-        } else {
-            factory = new DelimitedAdaptorFactory();
-        }
+        factory = new DelimitedAdaptorFactory();
         schema = properties.main.schema.getValue();
         factory.setSchema(schema);
         fileDelimitedRuntime = new FileDelimitedRuntime(properties);
@@ -66,13 +64,15 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
         boolean startAble = false;
         if (properties.csvOptions.getValue()) {
             csvReader = fileDelimitedRuntime.getCsvReader();
-            startAble = fileDelimitedRuntime.limit > 0 && csvReader != null && csvReader.readNext();
+            currentLine = fileDelimitedRuntime.currentLine;
+            startAble = fileDelimitedRuntime.limit != 0 && csvReader != null && csvReader.readNext();
         } else {
             fid = fileDelimitedRuntime.getFileDelimited();
             startAble = fid != null && fid.nextRecord();
         }
         if (startAble) {
             getCurrentRecord();
+            startAble = checkLimit();
         }
         return startAble;
     }
@@ -90,6 +90,7 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
                 if (properties.csvOptions.getValue()) {
                     csvReader = fileDelimitedRuntime.getCsvReader();
                     isContinue = csvReader != null && csvReader.readNext();
+                    currentLine = fileDelimitedRuntime.currentLine;
                 } else {
                     fid = fileDelimitedRuntime.getFileDelimited();
                     isContinue = fid != null && fid.nextRecord();
@@ -98,6 +99,9 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
         }
         if (isContinue) {
             getCurrentRecord();
+            if (properties.csvOptions.getValue()) {
+                isContinue = checkLimit();
+            }
         }
         return isContinue;
     }
@@ -130,14 +134,33 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
 
     protected void getCurrentRecord() throws IOException {
         if (properties.csvOptions.getValue()) {
-            currentIndexRecord = ((CSVAdaptorFactory) factory).convertToAvro(csvReader);
+            values = csvReader.getValues();
+            currentIndexRecord = ((DelimitedAdaptorFactory) factory).convertToAvro(values);
         } else {
-            values = new ArrayList<>();
+            values = new String[schema.getFields().size()];
             // TODO consider dynamic
             for (int i = 0; i < schema.getFields().size(); i++) {
-                values.add(fid.get(i));
+                values[i] = (fid.get(i));
             }
             currentIndexRecord = ((DelimitedAdaptorFactory) factory).convertToAvro(values);
         }
+    }
+
+    // For csv mode
+    private boolean checkLimit() throws IOException {
+        // empty line when row separator is '\n'
+        boolean isContinue = true;
+        if (properties.removeEmptyRow.getValue() && (values.length == 1 && ("\015").equals(values[0]))) {
+            isContinue = advance();
+        }
+        currentLine++;
+        if (fileDelimitedRuntime.lastLine > -1 && currentLine > fileDelimitedRuntime.lastLine) {
+            isContinue = false;
+        }
+        outputLine++;
+        if (fileDelimitedRuntime.limit > 0 && outputLine > fileDelimitedRuntime.limit) {
+            isContinue = false;
+        }
+        return isContinue;
     }
 }

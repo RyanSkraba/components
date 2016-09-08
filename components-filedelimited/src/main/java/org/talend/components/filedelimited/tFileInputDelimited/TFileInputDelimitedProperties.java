@@ -120,15 +120,18 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        if (form.getName().equals(Form.MAIN)) {
-            form.getWidget(footer.getName()).setHidden(uncompress.getValue());
-        }
-        if (form.getName().equals(Form.ADVANCED)) {
-            form.getWidget(random.getName()).setHidden(csvOptions.getValue() || uncompress.getValue());
-            form.getWidget(nbRandom.getName()).setHidden(csvOptions.getValue() || uncompress.getValue() || !random.getValue());
-            // TODO add table "TRIMSELECT"
-            form.getWidget(splitRecord.getName()).setHidden(csvOptions.getValue());
-            form.getWidget(decodeTable.getName()).setHidden(!enableDecode.getValue());
+        if (form != null) {
+            if (form.getName().equals(Form.MAIN)) {
+                form.getWidget(footer.getName()).setHidden(uncompress.getValue());
+            }
+            if (form.getName().equals(Form.ADVANCED)) {
+                form.getWidget(random.getName()).setHidden(csvOptions.getValue() || uncompress.getValue());
+                form.getWidget(nbRandom.getName())
+                        .setHidden(csvOptions.getValue() || uncompress.getValue() || !random.getValue());
+                // TODO add table "TRIMSELECT"
+                form.getWidget(splitRecord.getName()).setHidden(csvOptions.getValue());
+                form.getWidget(decodeTable.getName()).setHidden(!enableDecode.getValue());
+            }
         }
     }
 

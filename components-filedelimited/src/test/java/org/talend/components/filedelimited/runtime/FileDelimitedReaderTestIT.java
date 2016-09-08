@@ -1,5 +1,6 @@
 package org.talend.components.filedelimited.runtime;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -28,28 +29,75 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         TFileInputDelimitedProperties properties = (TFileInputDelimitedProperties) new TFileInputDelimitedDefinition()
                 .createProperties().init();
         properties.fileName.setValue(inputFile);
+        properties.rowSeparator.setValue("\n");
         properties.header.setValue(1);
         properties.main.schema.setValue(BASIC_SCHEMA);
         ComponentTestUtils.checkSerialize(properties, errorCollector);
 
+        testBasicInput(properties, 20);
+
+        properties.footer.setValue(5);
+        testBasicInput(properties, 15);
+
+        properties.limit.setValue(10);
+        testBasicInput(properties, 10);
+
+    }
+
+    @Test
+    public void testInputCSV() throws Throwable {
+        String resources = getClass().getResource("/runtime/input").getPath();
+        String inputFile = resources + "/test_input_csv.csv";
+        LOGGER.debug("Test file path: " + inputFile);
+        TFileInputDelimitedProperties properties = (TFileInputDelimitedProperties) new TFileInputDelimitedDefinition()
+                .createProperties().init();
+        properties.fileName.setValue(inputFile);
+        properties.rowSeparator.setValue("\n");
+        properties.csvOptions.setValue(true);
+        properties.header.setValue(1);
+
+        properties.main.schema.setValue(BASIC_SCHEMA);
+        ComponentTestUtils.checkSerialize(properties, errorCollector);
+
+        testBasicInput(properties, 20);
+
+        properties.footer.setValue(5);
+        testBasicInput(properties, 15);
+
+        properties.limit.setValue(10);
+        testBasicInput(properties, 10);
+    }
+
+    protected void testBasicInput(TFileInputDelimitedProperties properties, int count) throws IOException {
         List<IndexedRecord> records = readRows(properties);
 
         assertNotNull(records);
-        assertEquals(20, records.size());
+        assertEquals(count, records.size());
         StringBuffer sb = new StringBuffer();
         int fieldSize = BASIC_SCHEMA.getFields().size();
         assertTrue(records.get(0).get(0) instanceof Boolean);
+        assertEquals(false, records.get(0).get(0));
         assertTrue(records.get(0).get(1) instanceof Byte);
+        assertEquals(Byte.valueOf("1"), records.get(0).get(1));
         assertTrue(records.get(0).get(2) instanceof byte[]);
+        assertEquals("IIG2iTCNnLlicDqGVM", new String((byte[]) records.get(0).get(2)));
         assertTrue(records.get(0).get(3) instanceof Character);
+        assertEquals('n', records.get(0).get(3));
         assertTrue(records.get(0).get(4) instanceof Long);
+        assertEquals(1473147067000L, records.get(0).get(4));
         assertTrue(records.get(0).get(5) instanceof Double);
+        assertEquals(2.75, records.get(0).get(5));
         assertTrue(records.get(0).get(6) instanceof Float);
+        assertEquals(0.246f, records.get(0).get(6));
         assertTrue(records.get(0).get(7) instanceof BigDecimal);
+        assertEquals(BigDecimal.valueOf(4.797), records.get(0).get(7));
         assertTrue(records.get(0).get(8) instanceof Integer);
+        assertEquals(1820, records.get(0).get(8));
         assertTrue(records.get(0).get(9) instanceof Long);
-        assertTrue(records.get(0).get(10) instanceof Object);
-        for (int index = 0; index < records.size(); index++) {
+        assertEquals(1473147067519L, records.get(0).get(9));
+        assertTrue(records.get(0).get(10) instanceof byte[]);
+        assertEquals("Thomas Grant", new String((byte[]) records.get(0).get(10)));
+        for (int index = 0; index < count; index++) {
             IndexedRecord record = records.get(index);
             for (int i = 0; i < fieldSize; i++) {
                 sb.append(record.get(i));
@@ -61,11 +109,6 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
             LOGGER.debug("Row " + (index + 1) + " :" + sb.toString());
             sb.delete(0, sb.length());
         }
-    }
-
-    @Test
-    public void testInputCSV() {
-
     }
 
 }

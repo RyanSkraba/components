@@ -125,10 +125,18 @@ public class FileDelimitedTestIT extends FileDelimitedTestBasic {
         assertEquals("Name", wizardProps.getProperty("name").getDisplayName());
         wizardProps.name.setValue("connName");
         setupProps(wizardProps);
-        Form encoding = (Form) formWizard.getWidget("encoding").getContent();
-        assertEquals("Main", encoding.getDisplayName());
-        Property encodingType = (Property) encoding.getWidget("encodingType").getContent();
+        Form encodingForm = (Form) formWizard.getWidget("encoding").getContent();
+        assertEquals("Main", encodingForm.getDisplayName());
+        Property encodingType = (Property) encodingForm.getWidget("encodingType").getContent();
         assertEquals("Encoding", encodingType.getDisplayName());
+
+        assertFalse(formWizard.getWidget(wizardProps.encoding.getName()).isHidden());
+        assertFalse(encodingForm.getWidget(wizardProps.encoding.encodingType.getName()).isHidden());
+        assertTrue(encodingForm.getWidget(wizardProps.encoding.customEncoding.getName()).isHidden());
+        wizardProps.encoding.encodingType.setValue(EncodingTypeProperties.ENCODING_TYPE_CUSTOM);
+        assertTrue(encodingForm.getWidget(wizardProps.encoding.encodingType.getName()).isCallAfter());
+        getComponentService().afterProperty(wizardProps.encoding.encodingType.getName(), wizardProps.encoding);
+        assertFalse(encodingForm.getWidget(wizardProps.encoding.customEncoding.getName()).isHidden());
 
         wizardProps.main.schema.setValue(BASIC_SCHEMA);
         ValidationResult result = wizardProps.afterFormFinishWizard(repo);

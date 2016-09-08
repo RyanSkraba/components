@@ -38,11 +38,13 @@ public class FileDelimitedRuntime {
 
     private char fieldSeparator;
 
-    private char rowSeparator;
+    private char[] rowSeparator;
 
-    private int totalLine = 0;
+    protected int totalLine = 0;
 
-    private int lastLine = -1;
+    protected int lastLine = -1;
+
+    protected int currentLine;
 
     public FileDelimitedRuntime(TFileInputDelimitedProperties props) {
         this.props = props;
@@ -84,7 +86,7 @@ public class FileDelimitedRuntime {
                         props.splitRecord.getValue());
             }
         } else {
-            if (fileNameOrStream instanceof InputStream) {
+            if (sourceIsStream) {
                 checkFooterAndRandom();
                 fileInputDelimited = new FileInputDelimited((InputStream) fileNameOrStream, encoding,
                         props.fieldSeparator.getValue(), props.rowSeparator.getValue(), props.removeEmptyRow.getValue(), header,
@@ -103,7 +105,7 @@ public class FileDelimitedRuntime {
     public CSVReader getCsvReader() throws IOException {
 
         String[] row = null;
-        int currentLine = 0;
+        currentLine = 0;
         CSVReader csvReader = null;
 
         if (props.uncompress.getValue()) {
@@ -113,7 +115,7 @@ public class FileDelimitedRuntime {
                 return null;
             }
         } else {
-            if (fileNameOrStream instanceof InputStream) {
+            if (sourceIsStream) {
                 checkFooter();
                 csvReader = new CSVReader((java.io.InputStream) fileNameOrStream, fieldSeparator, encoding);
             } else {
@@ -124,9 +126,10 @@ public class FileDelimitedRuntime {
         }
 
         csvReader.setTrimWhitespace(false);
-        if ((rowSeparator != '\n') && (rowSeparator != '\r')) {
-            csvReader.setLineEnd("" + rowSeparator);
+        if ((rowSeparator[0] != '\n') && (rowSeparator[0] != '\r')) {
+            csvReader.setLineEnd("" + rowSeparator[0]);
         }
+        //TODO fixed quote char
         csvReader.setQuoteChar('"');
         csvReader.setEscapeChar(csvReader.getQuoteChar());
         if (footer > 0) {
@@ -134,7 +137,7 @@ public class FileDelimitedRuntime {
                 csvReader.readNext();
             }
             // TODO check csv option setting
-            csvReader.setSkipEmptyRecords(true);
+            csvReader.setSkipEmptyRecords(props.removeEmptyRow.getValue());
             while (csvReader.readNext()) {
 
                 row = csvReader.getValues();
@@ -155,13 +158,14 @@ public class FileDelimitedRuntime {
                 csvReader = new CSVReader((InputStream) fileNameOrStream, fieldSeparator, encoding);
             } else {
                 csvReader = new CSVReader(new java.io.BufferedReader(
-                        new java.io.InputStreamReader(new java.io.FileInputStream(String.valueOf(sourceIsStream)), encoding)),
+                        new java.io.InputStreamReader(new java.io.FileInputStream(String.valueOf(fileNameOrStream)), encoding)),
                         fieldSeparator);
             }
             csvReader.setTrimWhitespace(false);
-            if ((rowSeparator != '\n') && (rowSeparator != '\r')) {
-                csvReader.setLineEnd("" + rowSeparator);
+            if ((rowSeparator[0] != '\n') && (rowSeparator[0] != '\r')) {
+                csvReader.setLineEnd("" + rowSeparator[0]);
             }
+            //TODO fixed quote char
             csvReader.setQuoteChar('"');
             csvReader.setEscapeChar(csvReader.getQuoteChar());
         }
@@ -171,7 +175,7 @@ public class FileDelimitedRuntime {
                 csvReader.readNext();
             }
         }
-        csvReader.setSkipEmptyRecords(true);
+        csvReader.setSkipEmptyRecords(props.removeEmptyRow.getValue());
         return csvReader;
     }
 
@@ -187,15 +191,13 @@ public class FileDelimitedRuntime {
         return fSeparator;
     }
 
-    private char getRowSeparator() {
+    private char[] getRowSeparator() {
         String rowSeparator = props.rowSeparator.getValue();
-        char separatorChar;
         if (rowSeparator != null && rowSeparator.length() > 0) {
-            separatorChar = rowSeparator.toCharArray()[0];
+            return rowSeparator.toCharArray();
         } else {
             throw new IllegalArgumentException("Row Separator must be assigned a char.");
         }
-        return separatorChar;
     }
 
     private String getEncoding() {
@@ -233,5 +235,4 @@ public class FileDelimitedRuntime {
             throw new IOException("When the input source is a stream,footer shouldn't be bigger than 0.");
         }
     }
-
 }

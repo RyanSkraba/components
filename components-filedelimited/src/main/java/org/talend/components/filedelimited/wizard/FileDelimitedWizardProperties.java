@@ -3,6 +3,7 @@ package org.talend.components.filedelimited.wizard;
 import java.util.Arrays;
 
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
+import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
@@ -26,6 +27,8 @@ public class FileDelimitedWizardProperties extends TFileInputDelimitedProperties
 
     public Property<String> name = PropertyFactory.newString("name").setRequired();
 
+    public PresentationItem preview = new PresentationItem("preview", "Preview");
+
     // TODO check "Format"
 
     @Override
@@ -45,8 +48,8 @@ public class FileDelimitedWizardProperties extends TFileInputDelimitedProperties
         wizardForm.addRow(name);
         wizardForm.addRow(widget(fileName).setWidgetType(Widget.FILE_WIDGET_TYPE));
         wizardForm.addRow(encoding.getForm(Form.MAIN));
-        wizardForm.addRow(fieldSeparator);
-        wizardForm.addColumn(rowSeparator);
+        wizardForm.addRow(rowSeparator);
+        wizardForm.addColumn(fieldSeparator);
         wizardForm.addRow(csvOptions);
         wizardForm.addRow(escapeChar);
         wizardForm.addColumn(textEnclosure);
@@ -54,6 +57,7 @@ public class FileDelimitedWizardProperties extends TFileInputDelimitedProperties
         wizardForm.addColumn(footer);
         wizardForm.addRow(removeEmptyRow);
         wizardForm.addRow(limit);
+        wizardForm.addColumn(widget(preview).setLongRunning(true).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
 
     }
 

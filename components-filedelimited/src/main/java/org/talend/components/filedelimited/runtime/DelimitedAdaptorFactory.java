@@ -1,28 +1,26 @@
 package org.talend.components.filedelimited.runtime;
 
-import java.util.List;
-
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
-public class DelimitedAdaptorFactory implements IndexedRecordConverter<List, IndexedRecord> {
+public class DelimitedAdaptorFactory implements IndexedRecordConverter<String[], IndexedRecord> {
 
     Schema schema;
 
     @Override
-    public Class<List> getDatumClass() {
-        return List.class;
+    public Class<String[]> getDatumClass() {
+        return String[].class;
     }
 
     @Override
-    public List convertToDatum(IndexedRecord value) {
+    public String[] convertToDatum(IndexedRecord value) {
         return null;
     }
 
     @Override
-    public DelimitedIndexedRecord convertToAvro(List values) {
+    public DelimitedIndexedRecord convertToAvro(String[] values) {
         return new DelimitedIndexedRecord(values);
     }
 
@@ -38,9 +36,9 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<List, Ind
 
     private class DelimitedIndexedRecord implements IndexedRecord {
 
-        List<String> values;
+        String[] values;
 
-        public DelimitedIndexedRecord(List<String> values) {
+        public DelimitedIndexedRecord(String[] values) {
             this.values = values;
         }
 
@@ -65,8 +63,8 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<List, Ind
                     fieldConverter[j] = new FileDelimitedAvroRegistry().getConverterFromString(f);
                 }
             }
-            if (index < values.size()) {
-                return fieldConverter[index].convertToAvro(values.get(index));
+            if (index < values.length) {
+                return fieldConverter[index].convertToAvro(values[index]);
             } else {
                 return null;
             }
