@@ -57,7 +57,7 @@ public class FileDelimitedWizardProperties extends TFileInputDelimitedProperties
         wizardForm.addColumn(footer);
         wizardForm.addRow(removeEmptyRow);
         wizardForm.addRow(limit);
-        wizardForm.addColumn(widget(preview).setLongRunning(true).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
+        wizardForm.addRow(widget(preview).setLongRunning(true).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
 
     }
 

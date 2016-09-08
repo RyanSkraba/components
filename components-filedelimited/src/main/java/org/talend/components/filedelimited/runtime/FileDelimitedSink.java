@@ -15,7 +15,6 @@ public class FileDelimitedSink extends FileSourceOrSink implements Sink {
 
     @Override
     public WriteOperation<?> createWriteOperation() {
-        // TODO Auto-generated method stub
         return null;
     }
 

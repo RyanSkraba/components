@@ -23,8 +23,6 @@ public class EncodingTypeProperties extends PropertiesImpl {
 
     public Property<String> customEncoding = PropertyFactory.newString("customEncoding");
 
-    private boolean useDefaultSetting = true;
-
     public EncodingTypeProperties(String name) {
         super(name);
     }

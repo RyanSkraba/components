@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.avro.Schema;
-import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.talend.daikon.avro.AvroRegistry;
@@ -21,7 +20,6 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
     public FileDelimitedAvroRegistry() {
 
-        // Ensure that we know how to get Schemas for these Salesforce objects.
         registerSchemaInferrer(IndexedRecord.class, new SerializableFunction<IndexedRecord, Schema>() {
 
             /** Default serial version UID. */
@@ -55,17 +53,7 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
     }
 
     private Schema inferSchemaRecord(IndexedRecord in) {
-        SchemaBuilder.FieldAssembler<Schema> builder = SchemaBuilder.builder().record(in.getSchema().getName()).fields();
-        for (Schema.Field field : in.getSchema().getFields()) {
-            Schema fieldSchema = inferSchema(field);
-            Object fieldDefault = field.defaultVal();
-            if (null == fieldDefault) {
-                builder = builder.name(field.name()).type(fieldSchema).noDefault();
-            } else {
-                builder = builder.name(field.name()).type(fieldSchema).withDefault(fieldDefault);
-            }
-        }
-        return builder.endRecord();
+        return in.getSchema();
     }
 
     /**

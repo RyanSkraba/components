@@ -20,6 +20,8 @@ import org.talend.daikon.properties.ValidationResult;
 
 public class FileSourceOrSink implements SourceOrSink {
 
+    private static final long serialVersionUID = 1L;
+
     private transient static final Logger LOG = LoggerFactory.getLogger(FileDelimitedRuntime.class);
 
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(FileSourceOrSink.class);

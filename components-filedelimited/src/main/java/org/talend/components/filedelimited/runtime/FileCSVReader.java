@@ -14,13 +14,14 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
-import org.talend.fileprocess.FileInputDelimited;
 
-public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
+import com.talend.csv.CSVReader;
+
+public class FileCSVReader extends AbstractBoundedReader<IndexedRecord> {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileDelimitedReader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileCSVReader.class);
 
     private RuntimeContainer container;
 
@@ -32,13 +33,17 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
 
     private FileDelimitedRuntime fileDelimitedRuntime;
 
-    private FileInputDelimited fid;
+    private CSVReader csvReader;
 
     TFileInputDelimitedProperties properties;
 
     private String[] values;
 
-    public FileDelimitedReader(RuntimeContainer container, BoundedSource source, TFileInputDelimitedProperties properties) {
+    private int outputLine;
+
+    private int currentLine;
+
+    public FileCSVReader(RuntimeContainer container, BoundedSource source, TFileInputDelimitedProperties properties) {
         super(source);
         this.container = container;
         this.properties = properties;
@@ -54,10 +59,12 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
         fileDelimitedRuntime.init();
         LOGGER.debug("open: " + properties.fileName.getStringValue());
         boolean startAble = false;
-        fid = fileDelimitedRuntime.getFileDelimited();
-        startAble = fid != null && fid.nextRecord();
+        csvReader = fileDelimitedRuntime.getCsvReader();
+        currentLine = fileDelimitedRuntime.currentLine;
+        startAble = fileDelimitedRuntime.limit != 0 && csvReader != null && csvReader.readNext();
         if (startAble) {
             getCurrentRecord();
+            startAble = checkLimit();
         }
         return startAble;
     }
@@ -65,15 +72,17 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
     @Override
     public boolean advance() throws IOException {
         boolean isContinue = false;
-        isContinue = fid.nextRecord();
+        isContinue = csvReader.readNext();
         if (!isContinue) {
             if (properties.uncompress.getValue()) {
-                fid = fileDelimitedRuntime.getFileDelimited();
-                isContinue = fid != null && fid.nextRecord();
+                csvReader = fileDelimitedRuntime.getCsvReader();
+                isContinue = csvReader != null && csvReader.readNext();
+                currentLine = fileDelimitedRuntime.currentLine;
             }
         }
         if (isContinue) {
             getCurrentRecord();
+            isContinue = checkLimit();
         }
         return isContinue;
     }
@@ -86,8 +95,8 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
     @Override
     public void close() throws IOException {
         if (!(fileDelimitedRuntime.fileNameOrStream instanceof InputStream)) {
-            if (fid != null) {
-                fid.close();
+            if (csvReader != null) {
+                csvReader.close();
             }
         }
         LOGGER.debug("close: " + properties.fileName.getStringValue());
@@ -99,12 +108,24 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
     }
 
     protected void getCurrentRecord() throws IOException {
-        values = new String[schema.getFields().size()];
-        // TODO consider dynamic
-        for (int i = 0; i < schema.getFields().size(); i++) {
-            values[i] = (fid.get(i));
-        }
+        values = csvReader.getValues();
         currentIndexRecord = ((DelimitedAdaptorFactory) factory).convertToAvro(values);
     }
 
+    private boolean checkLimit() throws IOException {
+        // empty line when row separator is '\n'
+        boolean isContinue = true;
+        if (properties.removeEmptyRow.getValue() && (values.length == 1 && ("\015").equals(values[0]))) {
+            isContinue = advance();
+        }
+        currentLine++;
+        if (fileDelimitedRuntime.lastLine > -1 && currentLine > fileDelimitedRuntime.lastLine) {
+            isContinue = false;
+        }
+        outputLine++;
+        if (fileDelimitedRuntime.limit > 0 && outputLine > fileDelimitedRuntime.limit) {
+            isContinue = false;
+        }
+        return isContinue;
+    }
 }
