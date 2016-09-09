@@ -32,29 +32,25 @@ public class SimpleRuntimeInfo implements RuntimeInfo {
 
     private ClassLoader classloader;
 
-    private String mavenGroupId;
-
-    private String mavenArtifactId;
+    private String depTxtPath;
 
     /**
      * uses the <code>mavenGroupId</code> <code>mavenArtifactId</code> to locate the *dependency.txt* file using the rule defined
      * in {@link DependenciesReader#computeDesignDependenciesPath()}
      * 
      * @param classloader classloader used to locate the file thanks to {@link ClassLoader#getResourceAsStream(String)}
-     * @param mavenGroupId, used to locate the dependency.txt file
-     * @param mavenArtifactId used to locate the dependency.txt file
+     * @param depTxtPath, path used to locate the dependency.txt file
      * @param runtimeClassName class to be instanciated
      */
-    public SimpleRuntimeInfo(ClassLoader classloader, String mavenGroupId, String mavenArtifactId, String runtimeClassName) {
+    public SimpleRuntimeInfo(ClassLoader classloader, String depTxtPath, String runtimeClassName) {
         this.classloader = classloader;
-        this.mavenGroupId = mavenGroupId;
-        this.mavenArtifactId = mavenArtifactId;
+        this.depTxtPath = depTxtPath;
         this.runtimeClassName = runtimeClassName;
     }
 
     @Override
     public List<URL> getMavenUrlDependencies() {
-        DependenciesReader dependenciesReader = new DependenciesReader(mavenGroupId, mavenArtifactId);
+        DependenciesReader dependenciesReader = new DependenciesReader(depTxtPath);
         try {
             Set<String> dependencies = dependenciesReader.getDependencies(classloader);
             // convert the string to URL
@@ -65,7 +61,7 @@ public class SimpleRuntimeInfo implements RuntimeInfo {
             return result;
         } catch (IOException e) {
             throw new ComponentException(ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED, e,
-                    ExceptionContext.withBuilder().put("path", dependenciesReader.computeDesignDependenciesPath()).build());
+                    ExceptionContext.withBuilder().put("path", dependenciesReader.getDependencyFilePath()).build());
         }
 
     }

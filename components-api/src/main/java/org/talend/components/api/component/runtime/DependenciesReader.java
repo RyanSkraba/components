@@ -44,16 +44,20 @@ org.eclipse.aether:aether-impl:jar:1.0.0.v20140518:compile
  */
 public class DependenciesReader {
 
-    private String mavenArtifactId;
-
-    private String mavenGroupId;
+    private String depTxtPath;
 
     /**
-     * we use the <code>mavenGroupId<code> and <code>mavenArtifactId<code> to located the file that should be
+     * we use the <code>mavenGroupId<code> and <code>mavenArtifactId<code> to located the file that should be parsed
      */
     public DependenciesReader(String mavenGroupId, String mavenArtifactId) {
-        this.mavenGroupId = mavenGroupId;
-        this.mavenArtifactId = mavenArtifactId;
+        depTxtPath = computeDependenciesFilePath(mavenGroupId, mavenArtifactId);
+    }
+
+    /**
+     * we use the <code>depTxtPath<code> to located the file that should be parsed
+     */
+    public DependenciesReader(String depTxtPath) {
+        this.depTxtPath = depTxtPath;
     }
 
     /**
@@ -67,19 +71,16 @@ public class DependenciesReader {
      * @throws IOException if reading the file failed.
      */
     public Set<String> getDependencies(ClassLoader classLoader) throws IOException {
-        String depPath = computeDesignDependenciesPath();
-        if (classLoader == null) {
-            classLoader = this.getClass().getClassLoader();
+        ClassLoader zeClassLoader = classLoader;
+        if (zeClassLoader == null) {
+            zeClassLoader = this.getClass().getClassLoader();
         }
-        InputStream depStream = classLoader.getResourceAsStream(depPath);
-        if (depStream == null) {
-            throw new ComponentException(ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED,
-                    ExceptionContext.withBuilder().put("path", depPath).build());
-        } // else we found it so parse it now
-        try {
+        try (InputStream depStream = zeClassLoader.getResourceAsStream(depTxtPath)) {
+            if (depStream == null) {
+                throw new ComponentException(ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED,
+                        ExceptionContext.withBuilder().put("path", depTxtPath).build());
+            } // else we found it so parse it now
             return parseDependencies(depStream);
-        } finally {
-            depStream.close();
         }
     }
 
@@ -125,6 +126,10 @@ public class DependenciesReader {
         return mvnUris;
     }
 
+    String getDependencyFilePath() {
+        return depTxtPath;
+    }
+
     /**
      * return the location for resolving the depenencies.txt file inside a jar or folder.
      * 
@@ -132,7 +137,7 @@ public class DependenciesReader {
      * @param mavenArtifactId, artifactid used to create the location path.
      * @return "META-INF/maven/" + mavenGroupId + "/" + mavenArtifactId + "/dependencies.txt"
      */
-    public String computeDesignDependenciesPath() {
+    public static String computeDependenciesFilePath(String mavenGroupId, String mavenArtifactId) {
         return "META-INF/maven/" + mavenGroupId + "/" + mavenArtifactId + "/dependencies.txt";
     }
 

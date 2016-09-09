@@ -16,6 +16,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
@@ -44,7 +45,8 @@ public class TSalesforceGetUpdatedDefinition extends SalesforceDefinition {
     @Override
     public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology componentType) {
         if (componentType == ConnectorTopology.OUTGOING) {
-            return new SimpleRuntimeInfo(this.getClass().getClassLoader(), getMavenGroupId(), getMavenArtifactId(),
+            return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
+                    DependenciesReader.computeDependenciesFilePath(getMavenGroupId(), getMavenArtifactId()),
                     SalesforceSource.class.getCanonicalName());
         } else {
             return null;

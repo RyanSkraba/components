@@ -12,16 +12,14 @@
 // ============================================================================
 package org.talend.components.api.component.runtime;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.error.ComponentsApiErrorCode;
@@ -35,61 +33,55 @@ public class JarRuntimeInfo implements RuntimeInfo {
 
     private String runtimeClassName;
 
-    private String mavenGroupId;
-
-    private String mavenArtifactId;
-
     private URL jarUrl;
+
+    private String depTxtPath;
 
     /**
      * uses the <code>mavenGroupId</code> <code>mavenArtifactId</code> to locate the *dependency.txt* file using the rule defined
      * in {@link DependenciesReader#computeDesignDependenciesPath()}
      * 
-     * @param classloader classloader used to locate the file thanks to {@link ClassLoader#getResourceAsStream(String)}
-     * @param mavenGroupId, used to locate the dependency.txt file
-     * @param mavenArtifactId used to locate the dependency.txt file
+     * @param jarUrl url of the jar to read the depenency.txt from
+     * @param depTxtPath, path used to locate the dependency.txt file
      * @param runtimeClassName class to be instanciated
      */
-    public JarRuntimeInfo(URL jarUrl, String mavenGroupId, String mavenArtifactId, String runtimeClassName) {
+    public JarRuntimeInfo(URL jarUrl, String depTxtPath, String runtimeClassName) {
         this.jarUrl = jarUrl;
-        this.mavenGroupId = mavenGroupId;
-        this.mavenArtifactId = mavenArtifactId;
+        this.depTxtPath = depTxtPath;
         this.runtimeClassName = runtimeClassName;
     }
 
     @Override
     public List<URL> getMavenUrlDependencies() {
-        DependenciesReader dependenciesReader = new DependenciesReader(mavenGroupId, mavenArtifactId);
+        DependenciesReader dependenciesReader = new DependenciesReader(depTxtPath);
         try {
             // we assume that the url is a jar/zip file.
-            File file = new File(jarUrl.toURI());
-            if (file.exists()) {
-                try (ZipFile zip = new ZipFile(file)) {
-                    ZipEntry entry = zip.getEntry(dependenciesReader.computeDesignDependenciesPath());
-                    if (entry != null) {
-                        try (InputStream is = zip.getInputStream(entry)) {
-                            Set<String> dependencies = dependenciesReader.parseDependencies(is);
-                            // convert the string to URL
-                            List<URL> result = new ArrayList<>(dependencies.size());
-                            for (String urlString : dependencies) {
-                                result.add(new URL(urlString));
-                            }
-                            return result;
-                        }
-                    } else {// could not find dependency.txt
-                        throw new ComponentException(ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED, ExceptionContext
-                                .withBuilder().put("path", dependenciesReader.computeDesignDependenciesPath()).build());
-                    }
-                }
-            } else {// could not find file
-                throw new ComponentException(ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED,
-                        ExceptionContext.withBuilder().put("path", dependenciesReader.computeDesignDependenciesPath()).build());
+            try (JarInputStream jarInputStream = new JarInputStream(jarUrl.openStream())) {
+                return extracDependencyFromStream(dependenciesReader, depTxtPath, jarInputStream);
             }
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             throw new ComponentException(ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED, e,
-                    ExceptionContext.withBuilder().put("path", dependenciesReader.computeDesignDependenciesPath()).build());
+                    ExceptionContext.withBuilder().put("path", depTxtPath).build());
         }
+    }
 
+    static List<URL> extracDependencyFromStream(DependenciesReader dependenciesReader, String depTxtPath,
+            JarInputStream jarInputStream) throws IOException, MalformedURLException {
+        JarEntry nextJarEntry = jarInputStream.getNextJarEntry();
+        while (nextJarEntry != null) {
+            if (depTxtPath.equals(nextJarEntry.getName())) {// we got it so parse it.
+                Set<String> dependencies = dependenciesReader.parseDependencies(jarInputStream);
+                // convert the string to URL
+                List<URL> result = new ArrayList<>(dependencies.size());
+                for (String urlString : dependencies) {
+                    result.add(new URL(urlString));
+                }
+                return result;
+            }
+            nextJarEntry = jarInputStream.getNextJarEntry();
+        }
+        throw new ComponentException(ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED,
+                ExceptionContext.withBuilder().put("path", depTxtPath).build());
     }
 
     @Override

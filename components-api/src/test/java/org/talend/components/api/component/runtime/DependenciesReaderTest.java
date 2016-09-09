@@ -56,7 +56,7 @@ public class DependenciesReaderTest {
     @Test
     public void testComputeDesignDependenciesPath() {
         DependenciesReader dependenciesReader = new DependenciesReader("foo", "bar");
-        assertEquals("META-INF/maven/foo/bar/dependencies.txt", dependenciesReader.computeDesignDependenciesPath());
+        assertEquals("META-INF/maven/foo/bar/dependencies.txt", dependenciesReader.getDependencyFilePath());
 
     }
 

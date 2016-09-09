@@ -3,15 +3,13 @@ package org.talend.components.multiruntime;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Set;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.JarRuntimeInfo;
 import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
@@ -66,50 +64,23 @@ public class MultiRuntimeComponentDefinition extends AbstractComponentDefinition
             try {
                 result = new JarRuntimeInfo(
                         new URL("mvn:org.talend.components/test-multiple-runtime-comp-runtime-v01/0.1.0-SNAPSHOT"),
-                        "org.talend.components", "test-multiple-runtime-comp-runtime-v01",
+                        DependenciesReader.computeDependenciesFilePath("org.talend.components",
+                                "test-multiple-runtime-comp-runtime-v01"),
                         "org.talend.multiruntime.MultiRuntimeComponentSource");
             } catch (MalformedURLException e1) {
                 throw new TalendRuntimeException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e1);
             }
-            // result = new RuntimeInfo() {
-            //
-            // @Override
-            // public String getRuntimeClassName() {
-            // return "org.talend.multiruntime.MultiRuntimeComponentSource";
-            // }
-            //
-            // @Override
-            // public List<URL> getMavenUrlDependencies() {
-            // try {
-            // return new ArrayList<>(Arrays.asList(
-            // ,
-            // new URL("mvn:org.talend.test/zeLib/0.0.1-SNAPSHOT")));
-            // } catch (MalformedURLException e) {
-            // throw new TalendRuntimeException(CommonErrorCodes.UNEXPECTED_EXCEPTION);
-            // }
-            // }
-            // };
             break;
         case VERSION_0_2:
-            result = new RuntimeInfo() {
-
-                @Override
-                public String getRuntimeClassName() {
-                    return "org.talend.multiruntime.MultiRuntimeComponentSource";
-                }
-
-                @Override
-                public List<URL> getMavenUrlDependencies() {
-                    try {
-                        return new ArrayList<>(Arrays.asList(
-                                new URL("mvn:org.talend.components/test-multiple-runtime-comp-runtime-v02/0.1.0-SNAPSHOT"),
-                                new URL("mvn:org.talend.test/zeLibV2/0.0.2-SNAPSHOT")));
-                    } catch (MalformedURLException e) {
-                        throw new TalendRuntimeException(CommonErrorCodes.UNEXPECTED_EXCEPTION);
-                    }
-
-                }
-            };
+            try {
+                result = new JarRuntimeInfo(
+                        new URL("mvn:org.talend.components/test-multiple-runtime-comp-runtime-v02/0.1.0-SNAPSHOT"),
+                        DependenciesReader.computeDependenciesFilePath("org.talend.components",
+                                "test-multiple-runtime-comp-runtime-v02"),
+                        "org.talend.multiruntime.MultiRuntimeComponentSource");
+            } catch (MalformedURLException e1) {
+                throw new TalendRuntimeException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e1);
+            }
             break;
         default:
             break;

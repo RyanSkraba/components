@@ -32,22 +32,25 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 
-public class SingleVersionRuntimeInfoTest {
+public class SimpleRuntimeInfoTest {
 
     @BeforeClass
     public static void setupMavenUrlHandler() {
-        URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
+        try {
+            new URL("mvn:foo/bar");
+        } catch (MalformedURLException e) {
+            URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
 
-            @Override
-            public URLStreamHandler createURLStreamHandler(String protocol) {
-                if (ServiceConstants.PROTOCOL.equals(protocol)) {
-                    return new Handler();
-                } else {
-                    return null;
+                @Override
+                public URLStreamHandler createURLStreamHandler(String protocol) {
+                    if (ServiceConstants.PROTOCOL.equals(protocol)) {
+                        return new Handler();
+                    } else {
+                        return null;
+                    }
                 }
-            }
-        });
-
+            });
+        }
     }
 
     /**
@@ -79,8 +82,8 @@ public class SingleVersionRuntimeInfoTest {
                 return null;
             }
         };
-        SimpleRuntimeInfo runtimeInfo = new SimpleRuntimeInfo(cd.getClass().getClassLoader(), "org.talend.components.api.test",
-                "test-components", null);
+        SimpleRuntimeInfo runtimeInfo = new SimpleRuntimeInfo(cd.getClass().getClassLoader(),
+                DependenciesReader.computeDependenciesFilePath("org.talend.components.api.test", "test-components"), null);
         List<URL> mavenUriDependencies = runtimeInfo.getMavenUrlDependencies();
         assertEquals(5, mavenUriDependencies.size());
         assertThat(mavenUriDependencies,
@@ -97,7 +100,7 @@ public class SingleVersionRuntimeInfoTest {
      */
     @Test
     public void testGetRuntimeClassName() {
-        SimpleRuntimeInfo runtimeInfo = new SimpleRuntimeInfo(null, null, null, "org.talend.mr.Robot");
+        SimpleRuntimeInfo runtimeInfo = new SimpleRuntimeInfo(null, null, "org.talend.mr.Robot");
         assertEquals("org.talend.mr.Robot", runtimeInfo.getRuntimeClassName());
     }
 

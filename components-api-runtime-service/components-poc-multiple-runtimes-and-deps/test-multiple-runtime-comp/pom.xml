@@ -92,6 +92,13 @@
 		</dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
+            <artifactId>components-api-runtime-service</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
             <artifactId>multiple-runtime-comp</artifactId>
             <version>0.1.0-SNAPSHOT</version>
             <scope>test</scope>

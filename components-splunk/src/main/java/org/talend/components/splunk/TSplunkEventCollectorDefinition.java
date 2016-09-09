@@ -12,13 +12,14 @@
 // ============================================================================
 package org.talend.components.splunk;
 
-import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
+import static org.talend.daikon.properties.property.PropertyFactory.*;
 
 import java.util.EnumSet;
 import java.util.Set;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
@@ -71,7 +72,8 @@ public class TSplunkEventCollectorDefinition extends AbstractComponentDefinition
     @Override
     public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology componentType) {
         if (componentType == ConnectorTopology.INCOMING) {
-            return new SimpleRuntimeInfo(this.getClass().getClassLoader(), "org.talend.components", "components-splunk",
+            return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
+                    DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-splunk"),
                     TSplunkEventCollectorSink.class.getCanonicalName());
         } else {
             return null;
