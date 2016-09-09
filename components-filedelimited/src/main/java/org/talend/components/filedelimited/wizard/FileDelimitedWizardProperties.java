@@ -1,7 +1,9 @@
 package org.talend.components.filedelimited.wizard;
 
+import java.io.IOException;
 import java.util.Arrays;
 
+import org.talend.components.filedelimited.runtime.FileDelimitedSource;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.Properties;
@@ -81,6 +83,20 @@ public class FileDelimitedWizardProperties extends TFileInputDelimitedProperties
     public FileDelimitedWizardProperties setRepositoryLocation(String location) {
         repositoryLocation = location;
         return this;
+    }
+
+    public ValidationResult afterPreview() {
+        FileDelimitedSource source = new FileDelimitedSource();
+        try {
+            String jsonData = FileDelimitedSource.previewData(null, this, 200);
+            //TODO show in wizard
+        } catch (IOException e) {
+            ValidationResult vr = new ValidationResult();
+            vr.setMessage(e.getMessage());
+            vr.setStatus(ValidationResult.Result.ERROR);
+            return vr;
+        }
+        return ValidationResult.OK;
     }
 
 }

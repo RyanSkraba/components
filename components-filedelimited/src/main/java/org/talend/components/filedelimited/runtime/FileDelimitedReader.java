@@ -1,7 +1,5 @@
 package org.talend.components.filedelimited.runtime;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 
 import org.apache.avro.Schema;
@@ -14,29 +12,26 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
-import org.talend.fileprocess.FileInputDelimited;
 
-public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
+public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
 
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileDelimitedReader.class);
 
-    private RuntimeContainer container;
+    protected RuntimeContainer container;
 
-    private transient IndexedRecord currentIndexRecord;
+    protected transient IndexedRecord currentIndexRecord;
 
     protected transient Schema schema;
 
-    private IndexedRecordConverter factory;
+    protected IndexedRecordConverter factory;
 
-    private FileDelimitedRuntime fileDelimitedRuntime;
-
-    private FileInputDelimited fid;
+    protected FileDelimitedRuntime fileDelimitedRuntime;
 
     TFileInputDelimitedProperties properties;
 
-    private String[] values;
+    protected String[] values;
 
     public FileDelimitedReader(RuntimeContainer container, BoundedSource source, TFileInputDelimitedProperties properties) {
         super(source);
@@ -50,61 +45,13 @@ public class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
     }
 
     @Override
-    public boolean start() throws IOException {
-        fileDelimitedRuntime.init();
-        LOGGER.debug("open: " + properties.fileName.getStringValue());
-        boolean startAble = false;
-        fid = fileDelimitedRuntime.getFileDelimited();
-        startAble = fid != null && fid.nextRecord();
-        if (startAble) {
-            getCurrentRecord();
-        }
-        return startAble;
-    }
-
-    @Override
-    public boolean advance() throws IOException {
-        boolean isContinue = false;
-        isContinue = fid.nextRecord();
-        if (!isContinue) {
-            if (properties.uncompress.getValue()) {
-                fid = fileDelimitedRuntime.getFileDelimited();
-                isContinue = fid != null && fid.nextRecord();
-            }
-        }
-        if (isContinue) {
-            getCurrentRecord();
-        }
-        return isContinue;
-    }
-
-    @Override
     public IndexedRecord getCurrent() {
         return currentIndexRecord;
     }
 
     @Override
-    public void close() throws IOException {
-        if (!(fileDelimitedRuntime.fileNameOrStream instanceof InputStream)) {
-            if (fid != null) {
-                fid.close();
-            }
-        }
-        LOGGER.debug("close: " + properties.fileName.getStringValue());
-    }
-
-    @Override
     public Map<String, Object> getReturnValues() {
         return new Result().toMap();
-    }
-
-    protected void getCurrentRecord() throws IOException {
-        values = new String[schema.getFields().size()];
-        // TODO consider dynamic
-        for (int i = 0; i < schema.getFields().size(); i++) {
-            values[i] = (fid.get(i));
-        }
-        currentIndexRecord = ((DelimitedAdaptorFactory) factory).convertToAvro(values);
     }
 
 }

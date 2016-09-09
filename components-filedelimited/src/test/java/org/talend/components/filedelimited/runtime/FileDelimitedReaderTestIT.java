@@ -1,6 +1,5 @@
 package org.talend.components.filedelimited.runtime;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -34,6 +33,8 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         properties.main.schema.setValue(BASIC_SCHEMA);
         ComponentTestUtils.checkSerialize(properties, errorCollector);
 
+        LOGGER.debug(FileDelimitedSource.previewData(null, properties, 200));
+
         testBasicInput(properties, 20);
 
         properties.footer.setValue(5);
@@ -59,16 +60,20 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         properties.main.schema.setValue(BASIC_SCHEMA);
         ComponentTestUtils.checkSerialize(properties, errorCollector);
 
+        LOGGER.debug(FileDelimitedSource.previewData(null, properties, 200));
+
         testBasicInput(properties, 20);
 
         properties.footer.setValue(5);
         testBasicInput(properties, 15);
 
+        LOGGER.debug(FileDelimitedSource.previewData(null, properties, 200));
+
         properties.limit.setValue(10);
         testBasicInput(properties, 10);
     }
 
-    protected void testBasicInput(TFileInputDelimitedProperties properties, int count) throws IOException {
+    protected void testBasicInput(TFileInputDelimitedProperties properties, int count) throws Throwable {
         List<IndexedRecord> records = readRows(properties);
 
         assertNotNull(records);
@@ -84,7 +89,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         assertTrue(records.get(0).get(3) instanceof Character);
         assertEquals('n', records.get(0).get(3));
         assertTrue(records.get(0).get(4) instanceof Long);
-        assertEquals(1473147067000L, records.get(0).get(4));
+        assertEquals(parseToDate("yyyy-MM-dd'T'HH:mm:ss", "2016-09-06T15:31:07").getTime(), records.get(0).get(4));
         assertTrue(records.get(0).get(5) instanceof Double);
         assertEquals(2.75, records.get(0).get(5));
         assertTrue(records.get(0).get(6) instanceof Float);

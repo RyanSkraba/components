@@ -2,56 +2,29 @@ package org.talend.components.filedelimited.runtime;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
-import org.apache.avro.Schema;
-import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
-import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
-import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
 import com.talend.csv.CSVReader;
 
-public class FileCSVReader extends AbstractBoundedReader<IndexedRecord> {
+public class FileCSVReader extends FileDelimitedReader {
 
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileCSVReader.class);
 
-    private RuntimeContainer container;
-
-    private transient IndexedRecord currentIndexRecord;
-
-    protected transient Schema schema;
-
-    private IndexedRecordConverter factory;
-
-    private FileDelimitedRuntime fileDelimitedRuntime;
-
     private CSVReader csvReader;
-
-    TFileInputDelimitedProperties properties;
-
-    private String[] values;
 
     private int outputLine;
 
     private int currentLine;
 
     public FileCSVReader(RuntimeContainer container, BoundedSource source, TFileInputDelimitedProperties properties) {
-        super(source);
-        this.container = container;
-        this.properties = properties;
-        factory = new DelimitedAdaptorFactory();
-        schema = properties.main.schema.getValue();
-        factory.setSchema(schema);
-        fileDelimitedRuntime = new FileDelimitedRuntime(properties);
-
+        super(container, source, properties);
     }
 
     @Override
@@ -88,11 +61,6 @@ public class FileCSVReader extends AbstractBoundedReader<IndexedRecord> {
     }
 
     @Override
-    public IndexedRecord getCurrent() {
-        return currentIndexRecord;
-    }
-
-    @Override
     public void close() throws IOException {
         if (!(fileDelimitedRuntime.fileNameOrStream instanceof InputStream)) {
             if (csvReader != null) {
@@ -100,11 +68,6 @@ public class FileCSVReader extends AbstractBoundedReader<IndexedRecord> {
             }
         }
         LOGGER.debug("close: " + properties.fileName.getStringValue());
-    }
-
-    @Override
-    public Map<String, Object> getReturnValues() {
-        return new Result().toMap();
     }
 
     protected void getCurrentRecord() throws IOException {
@@ -128,4 +91,5 @@ public class FileCSVReader extends AbstractBoundedReader<IndexedRecord> {
         }
         return isContinue;
     }
+
 }

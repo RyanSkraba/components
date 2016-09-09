@@ -1,7 +1,10 @@
 package org.talend.components.filedelimited;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.avro.Schema;
@@ -108,6 +111,11 @@ public class FileDelimitedTestBasic extends AbstractComponentTest {
         }
         reader.close();
         return rows;
+    }
+
+    protected Date parseToDate(String pattern, String strDate) throws ParseException {
+        SimpleDateFormat format = new SimpleDateFormat(pattern);
+        return format.parse(strDate);
     }
 
 }

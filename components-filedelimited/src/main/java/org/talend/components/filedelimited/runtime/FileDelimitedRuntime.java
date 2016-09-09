@@ -2,6 +2,8 @@ package org.talend.components.filedelimited.runtime;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -12,6 +14,7 @@ import org.talend.components.common.runtime.FileRuntimeHelper;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
 import org.talend.fileprocess.FileInputDelimited;
 
+import com.google.gson.Gson;
 import com.talend.csv.CSVReader;
 
 public class FileDelimitedRuntime {
@@ -129,7 +132,7 @@ public class FileDelimitedRuntime {
         if ((rowSeparator[0] != '\n') && (rowSeparator[0] != '\r')) {
             csvReader.setLineEnd("" + rowSeparator[0]);
         }
-        //TODO fixed quote char
+        // TODO fixed quote char
         csvReader.setQuoteChar('"');
         csvReader.setEscapeChar(csvReader.getQuoteChar());
         if (footer > 0) {
@@ -165,7 +168,7 @@ public class FileDelimitedRuntime {
             if ((rowSeparator[0] != '\n') && (rowSeparator[0] != '\r')) {
                 csvReader.setLineEnd("" + rowSeparator[0]);
             }
-            //TODO fixed quote char
+            // TODO fixed quote char
             csvReader.setQuoteChar('"');
             csvReader.setEscapeChar(csvReader.getQuoteChar());
         }
@@ -234,5 +237,72 @@ public class FileDelimitedRuntime {
         if (footer > 0) {
             throw new IOException("When the input source is a stream,footer shouldn't be bigger than 0.");
         }
+    }
+
+    public String previewData(int maxRowsToPreview) throws IOException {
+        init();
+        PreviewResult result = new PreviewResult();
+        boolean retrieveHeader = false;
+        if (header > 0) {
+            header = header - 1;
+            retrieveHeader = true;
+        }
+        String[] rowData = null;
+        List<String[]> data = new ArrayList<>();
+
+        if (props.csvOptions.getValue()) {
+            CSVReader csvReader = getCsvReader();
+            try {
+                if (csvReader != null && csvReader.readNext()) {
+                    rowData = csvReader.getValues();
+                    if (retrieveHeader) {
+                        result.setColumnNames(rowData);
+                    } else {
+                        data.add(rowData);
+                    }
+
+                    while (csvReader.readNext()) {
+                        rowData = csvReader.getValues();
+                        if (props.removeEmptyRow.getValue() && (rowData.length == 1 && ("\015").equals(rowData[0]))) {
+                            continue;
+                        }
+                        currentLine++;
+                        if (lastLine > -1 && (currentLine > lastLine || currentLine > maxRowsToPreview)) {
+                            break;
+                        }
+                        data.add(rowData);
+                    }
+                }
+            } finally {
+                if (csvReader != null) {
+                    csvReader.close();
+                }
+            }
+        } else {
+            FileInputDelimited fid = getFileDelimited();
+            try {
+                while (fid != null && fid.nextRecord()) {
+                    rowData = new String[fid.getColumnsCountOfCurrentRow()];
+                    for (int i = 0; i < rowData.length; i++) {
+                        rowData[i] = fid.get(i);
+                    }
+                    if (retrieveHeader) {
+                        result.setColumnNames(rowData);
+                        retrieveHeader = false;
+                    } else {
+                        data.add(rowData);
+                    }
+                }
+            } finally {
+                if (fid != null) {
+                    fid.close();
+                }
+            }
+        }
+        if (data.size() > 0) {
+            result.setData(data);
+        }
+        Gson gson = new Gson();
+        return gson.toJson(result);
     }
 }
