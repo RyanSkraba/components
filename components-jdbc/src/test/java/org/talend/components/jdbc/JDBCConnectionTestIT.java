@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.jdbc;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 import java.sql.Connection;
@@ -21,15 +21,21 @@ import java.sql.SQLException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.jdbc.common.DBTestUtils;
-import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.runtime.JDBCSourceOrSink;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionDefinition;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionProperties;
+import org.talend.components.runtimeservice.RuntimeUtil;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.sandbox.SandboxedInstance;
 
 public class JDBCConnectionTestIT {
+
+    // private static String driverPath;
 
     private static String driverClass;
 
@@ -38,8 +44,6 @@ public class JDBCConnectionTestIT {
     private static String userId;
 
     private static String password;
-
-    private static JDBCConnectionModule connectionInfo;
 
     private JDBCSourceOrSink sourceOrSink = null;
 
@@ -51,6 +55,8 @@ public class JDBCConnectionTestIT {
             props.load(is);
         }
 
+        // driverPath = props.getProperty("driverPath");
+
         driverClass = props.getProperty("driverClass");
 
         jdbcUrl = props.getProperty("jdbcUrl");
@@ -58,13 +64,6 @@ public class JDBCConnectionTestIT {
         userId = props.getProperty("userId");
 
         password = props.getProperty("password");
-
-        connectionInfo = new JDBCConnectionModule("connection");
-
-        connectionInfo.driverClass.setValue(driverClass);
-        connectionInfo.jdbcUrl.setValue(jdbcUrl);
-        connectionInfo.userPassword.userId.setValue(userId);
-        connectionInfo.userPassword.password.setValue(password);
     }
 
     @After
@@ -83,7 +82,31 @@ public class JDBCConnectionTestIT {
         }
     }
 
+    // we want to test the dynamic library loading with the field driverPath, but fail, so seems that no way to test it
+    // now
+    @Ignore
     @Test
+    public void testDynamicLibLoad() {
+        TJDBCConnectionDefinition definition = new TJDBCConnectionDefinition();
+        TJDBCConnectionProperties properties = createCommonJDBCConnectionProperties(definition);
+
+        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(properties, ConnectorTopology.NONE);
+        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo,
+                definition.getClass().getClassLoader())) {
+            sourceOrSink = (JDBCSourceOrSink) sandboxedInstance.getInstance();
+            sourceOrSink.initialize(null, properties);
+            ValidationResult result = sourceOrSink.validate(null);
+            assertTrue(result.getStatus() == ValidationResult.Result.OK);
+            try {
+                Connection conn = sourceOrSink.getConnection(null);
+                assertTrue(conn == sourceOrSink.getConnection(null));
+                assertTrue(!conn.isClosed());
+            } catch (ClassNotFoundException | SQLException e) {
+                Assert.fail(e.getMessage());
+            }
+        }
+    }
+
     public void testConnection() {
         TJDBCConnectionDefinition definition = new TJDBCConnectionDefinition();
         TJDBCConnectionProperties properties = createCommonJDBCConnectionProperties(definition);
@@ -104,8 +127,7 @@ public class JDBCConnectionTestIT {
     private TJDBCConnectionProperties createCommonJDBCConnectionProperties(TJDBCConnectionDefinition definition) {
         TJDBCConnectionProperties properties = (TJDBCConnectionProperties) definition.createRuntimeProperties();
 
-        // TODO now framework doesn't support to load the JDBC jar by the setting
-        // properties.connection.driverJar.setValue("");
+        // properties.connection.driverTable.drivers.setValue(Arrays.asList(driverPath));
         properties.connection.driverClass.setValue(driverClass);
         properties.connection.jdbcUrl.setValue(jdbcUrl);
         properties.connection.userPassword.userId.setValue(userId);
@@ -118,6 +140,7 @@ public class JDBCConnectionTestIT {
         TJDBCConnectionDefinition definition = new TJDBCConnectionDefinition();
         TJDBCConnectionProperties properties = (TJDBCConnectionProperties) definition.createRuntimeProperties();
 
+        // properties.connection.driverTable.drivers.setValue(Arrays.asList(driverPath));
         properties.connection.driverClass.setValue("wrongDriver");
         properties.connection.jdbcUrl.setValue(jdbcUrl);
         properties.connection.userPassword.userId.setValue(userId);
@@ -135,6 +158,7 @@ public class JDBCConnectionTestIT {
         TJDBCConnectionDefinition definition = new TJDBCConnectionDefinition();
         TJDBCConnectionProperties properties = (TJDBCConnectionProperties) definition.createRuntimeProperties();
 
+        // properties.connection.driverTable.drivers.setValue(Arrays.asList(driverPath));
         properties.connection.driverClass.setValue(driverClass);
         properties.connection.jdbcUrl.setValue("wrongUrl");
         properties.connection.userPassword.userId.setValue(userId);

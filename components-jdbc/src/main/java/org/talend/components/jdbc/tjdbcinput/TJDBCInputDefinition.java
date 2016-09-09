@@ -17,11 +17,10 @@ import java.util.Set;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
-import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.RuntimeInfo;
-import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.runtime.JDBCSource;
+import org.talend.components.jdbc.runtime.JDBCTemplate;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
@@ -63,12 +62,10 @@ public class TJDBCInputDefinition extends AbstractComponentDefinition {
     @Override
     public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology) {
         if (connectorTopology == ConnectorTopology.OUTGOING) {
-            return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
-                    DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-jdbc"),
+            return JDBCTemplate.createCommonRuntime(this.getClass().getClassLoader(), properties,
                     JDBCSource.class.getCanonicalName());
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override

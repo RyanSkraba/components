@@ -630,9 +630,9 @@ public class JDBCOutputTestIT {
     }
 
     private String randomBatchAndCommit(TJDBCOutputProperties properties) {
-        properties.useBatch.setValue(true);
-        properties.batchSize.setValue(1);
-        properties.commitEvery.setValue(1);
+        properties.useBatch.setValue(DBTestUtils.randomBoolean());
+        properties.batchSize.setValue(DBTestUtils.randomInt());
+        properties.commitEvery.setValue(DBTestUtils.randomInt());
         return new StringBuilder().append("useBatch: ").append(properties.useBatch.getValue()).append(", batchSize: ")
                 .append(properties.batchSize.getValue()).append(", commitEvery:").append(properties.commitEvery.getValue())
                 .toString();

@@ -19,6 +19,10 @@ import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.jdbc.runtime.JDBCRowSink;
+import org.talend.components.jdbc.runtime.JDBCRowSource;
+import org.talend.components.jdbc.runtime.JDBCRowSourceOrSink;
+import org.talend.components.jdbc.runtime.JDBCTemplate;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 
@@ -41,6 +45,7 @@ public class TJDBCRowDefinition extends AbstractComponentDefinition {
     }
 
     // TODO add more return properties
+    @SuppressWarnings("rawtypes")
     @Override
     public Property[] getReturnProperties() {
         return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP };
@@ -48,12 +53,33 @@ public class TJDBCRowDefinition extends AbstractComponentDefinition {
 
     @Override
     public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology) {
-        return null;
+        switch (connectorTopology) {
+        case OUTGOING:
+            return JDBCTemplate.createCommonRuntime(this.getClass().getClassLoader(), properties,
+                    JDBCRowSource.class.getCanonicalName());
+        case INCOMING:
+            return JDBCTemplate.createCommonRuntime(this.getClass().getClassLoader(), properties,
+                    JDBCRowSink.class.getCanonicalName());
+        case INCOMING_AND_OUTGOING:
+            return JDBCTemplate.createCommonRuntime(this.getClass().getClassLoader(), properties,
+                    JDBCRowSink.class.getCanonicalName());
+        case NONE:
+            return JDBCTemplate.createCommonRuntime(this.getClass().getClassLoader(), properties,
+                    JDBCRowSourceOrSink.class.getCanonicalName());
+        default:
+            return null;
+        }
     }
 
     @Override
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
-        return EnumSet.of(ConnectorTopology.INCOMING);
+        return EnumSet.of(ConnectorTopology.OUTGOING, ConnectorTopology.INCOMING, ConnectorTopology.INCOMING_AND_OUTGOING,
+                ConnectorTopology.NONE);
+    }
+
+    @Override
+    public boolean isConditionalInputs() {
+        return true;
     }
 
 }

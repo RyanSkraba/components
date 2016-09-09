@@ -25,6 +25,7 @@ import org.talend.components.jdbc.runtime.writer.JDBCOutputInsertOrUpdateWriter;
 import org.talend.components.jdbc.runtime.writer.JDBCOutputInsertWriter;
 import org.talend.components.jdbc.runtime.writer.JDBCOutputUpdateOrInsertWriter;
 import org.talend.components.jdbc.runtime.writer.JDBCOutputUpdateWriter;
+import org.talend.components.jdbc.runtime.writer.JDBCRowWriter;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties.DataAction;
 import org.talend.components.jdbc.tjdbcrow.TJDBCRowProperties;
@@ -51,7 +52,14 @@ public class JDBCWriteOperation implements WriteOperation<Result> {
 
     @Override
     public Writer<Result> createWriter(RuntimeContainer runtimeContainer) {
-        JDBCConnectionInfoProperties properties = ((JDBCSink) sink).properties;
+        JDBCConnectionInfoProperties properties = null;
+
+        if (sink instanceof JDBCSink) {
+            properties = ((JDBCSink) sink).properties;
+        } else if (sink instanceof JDBCRowSink) {
+            properties = ((JDBCRowSink) sink).properties;
+        }
+
         if (properties instanceof TJDBCOutputProperties) {
             DataAction dataAction = ((TJDBCOutputProperties) properties).dataAction.getValue();
 
@@ -70,10 +78,10 @@ public class JDBCWriteOperation implements WriteOperation<Result> {
                 return null;
             }
         } else if (properties instanceof TJDBCRowProperties) {
-            return null;
-        } else {
-            return null;
+            return new JDBCRowWriter(this, runtimeContainer);
         }
+
+        return null;
     }
 
     @Override
