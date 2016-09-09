@@ -1,7 +1,7 @@
 ### Maven
  * In order to build components, you need libraries only found in various repositories that are covered in the root pom.xml. 
- You'll need to access the Talend main maven repository and you may have to setup your local .m2/settings.xml.  
- You'll find an example file in [maven/settings.xml](maven/settings.xml)
+ You may need to setup your local .m2/settings.xml if you need to launch integration test that require some credentials such as the salesforce component.  
+ 
 
 ### IntelliJ idea
  * Install [Eclipse Code Formatter](https://plugins.jetbrains.com/plugin/6546) plugin
