@@ -55,6 +55,9 @@ public class PaxExamOptions {
                 mavenBundle().groupId("org.codehaus.jackson").artifactId("jackson-mapper-asl"), //
                 mavenBundle().groupId("com.google.guava").artifactId("guava").version("15.0"), //
                 mavenBundle().groupId("org.apache.commons").artifactId("commons-compress"), //
+                mavenBundle().groupId("commons-beanutils").artifactId("commons-beanutils").version("1.8.0"), //
+                mavenBundle().groupId("org.apache.servicemix.bundles")
+                        .artifactId("org.apache.servicemix.bundles.commons-collections").version("3.2.1_3"), //
                 mavenBundle().groupId("org.apache.commons").artifactId("commons-lang3").version("3.4"), //
                 mavenBundle().groupId("org.apache.avro").artifactId("avro").version("1.8.0"), //
                 mavenBundle().groupId("org.eclipse.jetty.orbit").artifactId("javax.servlet").version("3.0.0.v201112011016"), //

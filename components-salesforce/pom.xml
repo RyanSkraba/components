@@ -23,7 +23,17 @@
             <artifactId>force-wsc</artifactId>
             <version>38.0.1</version>
         </dependency>
-
+        <!-- the following 2 deps are required for the com.force.api above -->
+		<dependency>
+		    <groupId>commons-beanutils</groupId>
+		    <artifactId>commons-beanutils</artifactId>
+		    <version>1.8.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>commons-collections</groupId>
+		    <artifactId>commons-collections</artifactId>
+		    <version>3.2</version>
+		</dependency>
         <!-- Generated Jar files from the WSDL -->
         <dependency>
             <groupId>com.force.api</groupId>
@@ -203,7 +213,7 @@
                                 <Bundle-SymbolicName>org.talend.components.salesforce</Bundle-SymbolicName>
                                 <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*,org.apache.avro.*,org.apache.oltu.oauth2*</Import-Package>
                                 <Service-Component>*</Service-Component>
-                                <Embed-Dependency>!components*,*;scope=compile|runtime</Embed-Dependency>
+                                <Embed-Dependency>!components*,*;scope=compile|runtime;artifactId=!commons-beanutils|commons-collections</Embed-Dependency>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                                 <Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt</Include-Resource>
                             </instructions>
