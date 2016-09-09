@@ -30,22 +30,6 @@ public abstract class JiraDefinition extends AbstractComponentDefinition {
         super(componentName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getMavenGroupId() {
-        return "org.talend.components";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getMavenArtifactId() {
-        return "components-jira";
-    }
-
     @Override
     public String[] getFamilies() {
         return new String[] { "Business/JIRA" };

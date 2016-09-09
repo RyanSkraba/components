@@ -12,9 +12,7 @@
 // ============================================================================
 package org.talend.components.api.test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import java.io.InputStream;
@@ -23,11 +21,8 @@ import java.util.Set;
 import org.junit.rules.ErrorCollector;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
-import org.talend.components.api.component.InputComponentDefinition;
-import org.talend.components.api.component.OutputComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.service.testcomponent.TestComponentDefinition;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.properties.Properties;
@@ -115,72 +110,5 @@ public class ComponentTestUtils {
             }
         }
     }
-
-    /**
-     * check that all Components have a runtime not null.
-     * 
-     * @param componentService service to get the components to be checked.
-     */
-    public static void testAllRuntimeAvaialble(ComponentService componentService) {
-        Set<ComponentDefinition> allComponents = componentService.getAllComponents();
-        for (ComponentDefinition cd : allComponents) {
-            if (cd instanceof TestComponentDefinition) {
-                continue;
-            }
-            Object runtime = null;
-            if (cd instanceof InputComponentDefinition) {
-                runtime = ((InputComponentDefinition) cd).getRuntime();
-            } else if (cd instanceof OutputComponentDefinition) {
-                runtime = ((OutputComponentDefinition) cd).getRuntime();
-            } else {
-                continue;
-                // FIXME - need to add support for transformation runtime
-            }
-            assertNotNull("the Runtime associated with component [" + cd.getName() + "] should never be null.", runtime);
-        }
-    }
-
-    /**
-     * check that the depenencies file is present during integration test.
-     * 
-     * @param componentService service to get the components to be checked.
-     */
-    public static void testAllDesignDependenciesPresent(ComponentService componentService, ErrorCollector errorCollector) {
-        Set<ComponentDefinition> allComponents = componentService.getAllComponents();
-        for (ComponentDefinition compDef : allComponents) {
-            errorCollector.checkThat(compDef.getMavenGroupId(), is(not(nullValue())));
-            errorCollector.checkThat(compDef.getMavenArtifactId(), is(not(nullValue())));
-            Set<String> mavenUriDependencies = componentService.getMavenUriDependencies(compDef.getName());
-            errorCollector.checkThat(mavenUriDependencies, is(not(nullValue())));
-            errorCollector.checkThat(mavenUriDependencies.isEmpty(), is(false));
-        }
-    }
-
-    // public static void checkFixedSchemaSetDefinitionSchemaPathAreOk(ComponentService componentService,
-    // ErrorCollector errorCollector) {
-    // Set<ComponentDefinition> allComponents = componentService.getAllComponents();
-    // for (ComponentDefinition cd : allComponents) {
-    // if (cd instanceof AbstractFixedSchemaSetComponentDefinition) {
-    // AbstractFixedSchemaSetComponentDefinition afsd = (AbstractFixedSchemaSetComponentDefinition) cd;
-    // ComponentProperties properties = afsd.createProperties();
-    // try {
-    // Set<String> outputConnections = afsd.getOutputConnections(properties);
-    // String[] outputSchemasPaths = afsd.getOutputSchemasPaths();
-    // if (outputSchemasPaths != null && outputConnections != null) {
-    // errorCollector.checkThat(
-    // cd.getName() + "should not have an SchemaProperties instance related to each schema path :"
-    // + ArrayUtils.toString(outputSchemasPaths),
-    // outputConnections.size(), equalTo(outputSchemasPaths.length));
-    // } else {
-    // errorCollector.checkThat(cd.getName() + "should not have an connector if not path is specified."
-    // + ArrayUtils.toString(outputSchemasPaths), outputConnections.size(), equalTo(0));
-    // }
-    // } catch (Exception e) {
-    // errorCollector.addError(new Exception(
-    // "Failed to compute output connections for class " + cd.getClass().getCanonicalName(), e));
-    // }
-    // }
-    // }
-    // }
 
 }

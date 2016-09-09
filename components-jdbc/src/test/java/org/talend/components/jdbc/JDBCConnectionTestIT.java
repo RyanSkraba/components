@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.jdbc;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.InputStream;
 import java.sql.Connection;
@@ -88,7 +88,7 @@ public class JDBCConnectionTestIT {
         TJDBCConnectionDefinition definition = new TJDBCConnectionDefinition();
         TJDBCConnectionProperties properties = createCommonJDBCConnectionProperties(definition);
 
-        sourceOrSink = (JDBCSourceOrSink) definition.getRuntime();
+        sourceOrSink = new JDBCSourceOrSink();
         sourceOrSink.initialize(null, properties);
         ValidationResult result = sourceOrSink.validate(null);
         assertTrue(result.getStatus() == ValidationResult.Result.OK);
@@ -123,7 +123,7 @@ public class JDBCConnectionTestIT {
         properties.connection.userPassword.userId.setValue(userId);
         properties.connection.userPassword.password.setValue(password);
 
-        sourceOrSink = (JDBCSourceOrSink) definition.getRuntime();
+        sourceOrSink = new JDBCSourceOrSink();
         sourceOrSink.initialize(null, properties);
         ValidationResult result = sourceOrSink.validate(null);
         assertTrue(result.getStatus() == ValidationResult.Result.ERROR);
@@ -140,7 +140,7 @@ public class JDBCConnectionTestIT {
         properties.connection.userPassword.userId.setValue(userId);
         properties.connection.userPassword.password.setValue(password);
 
-        sourceOrSink = (JDBCSourceOrSink) definition.getRuntime();
+        sourceOrSink = new JDBCSourceOrSink();
         sourceOrSink.initialize(null, properties);
         ValidationResult result = sourceOrSink.validate(null);
         assertTrue(result.getStatus() == ValidationResult.Result.ERROR);
@@ -155,7 +155,7 @@ public class JDBCConnectionTestIT {
         properties.useAutoCommit.setValue(true);
         properties.autocommit.setValue(false);
 
-        sourceOrSink = (JDBCSourceOrSink) definition.getRuntime();
+        sourceOrSink = new JDBCSourceOrSink();
         sourceOrSink.initialize(null, properties);
         ValidationResult result = sourceOrSink.validate(null);
         assertTrue(result.getStatus() == ValidationResult.Result.OK);
@@ -177,7 +177,7 @@ public class JDBCConnectionTestIT {
         properties.useAutoCommit.setValue(true);
         properties.autocommit.setValue(true);
 
-        sourceOrSink = (JDBCSourceOrSink) definition.getRuntime();
+        sourceOrSink = new JDBCSourceOrSink();
         sourceOrSink.initialize(null, properties);
         ValidationResult result = sourceOrSink.validate(null);
         assertTrue(result.getStatus() == ValidationResult.Result.OK);

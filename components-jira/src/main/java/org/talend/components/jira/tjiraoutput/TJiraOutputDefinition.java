@@ -12,22 +12,22 @@
 // ============================================================================
 package org.talend.components.jira.tjiraoutput;
 
-import org.talend.components.api.Constants;
-import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.OutputComponentDefinition;
-import org.talend.components.api.component.runtime.Sink;
+import java.util.EnumSet;
+import java.util.Set;
+
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.RuntimeInfo;
+import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jira.JiraDefinition;
 import org.talend.components.jira.runtime.JiraSink;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
-
-import aQute.bnd.annotation.component.Component;
 
 /**
  * Jira output component definition
  */
-@Component(name = Constants.COMPONENT_BEAN_PREFIX + TJiraOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TJiraOutputDefinition extends JiraDefinition implements OutputComponentDefinition {
+public class TJiraOutputDefinition extends JiraDefinition {
 
     /**
      * Jira output component name
@@ -45,14 +45,6 @@ public class TJiraOutputDefinition extends JiraDefinition implements OutputCompo
      * {@inheritDoc}
      */
     @Override
-    public Sink getRuntime() {
-        return new JiraSink();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return TJiraOutputProperties.class;
     }
@@ -61,6 +53,21 @@ public class TJiraOutputDefinition extends JiraDefinition implements OutputCompo
     public Property[] getReturnProperties() {
         return new Property[] { RETURN_TOTAL_RECORD_COUNT_PROP, RETURN_SUCCESS_RECORD_COUNT_PROP, RETURN_REJECT_RECORD_COUNT_PROP,
                 RETURN_ERROR_MESSAGE_PROP };
+    }
+
+    @Override
+    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology componentType) {
+        if (componentType == ConnectorTopology.INCOMING) {
+            return new SimpleRuntimeInfo(this.getClass().getClassLoader(), "org.talend.components", "components-jira",
+                    JiraSink.class.getCanonicalName());
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return EnumSet.of(ConnectorTopology.INCOMING);
     }
 
 }

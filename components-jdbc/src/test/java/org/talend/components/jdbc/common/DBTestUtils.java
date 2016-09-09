@@ -1,9 +1,7 @@
 package org.talend.components.jdbc.common;
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -462,7 +460,7 @@ public class DBTestUtils {
     @SuppressWarnings("rawtypes")
     public static JDBCOutputWriter createCommonJDBCOutputWriter(TJDBCOutputDefinition definition,
             TJDBCOutputProperties properties, RuntimeContainer container) {
-        JDBCSink sink = (JDBCSink) definition.getRuntime();
+        JDBCSink sink = new JDBCSink();
         sink.initialize(container, properties);
 
         WriteOperation writerOperation = sink.createWriteOperation();
@@ -485,7 +483,7 @@ public class DBTestUtils {
         properties.tableSelection.tablename.setValue(tablename);
         properties.sql.setValue("select * from " + tablename);
 
-        JDBCSource source = (JDBCSource) definition.getRuntime();
+        JDBCSource source = new JDBCSource();
         source.initialize(null, properties);
 
         Reader reader = null;
@@ -545,7 +543,7 @@ public class DBTestUtils {
 
     public static JDBCSource createCommonJDBCSource(TJDBCInputDefinition definition, TJDBCInputProperties properties,
             RuntimeContainer container) {
-        JDBCSource source = (JDBCSource) definition.getRuntime();
+        JDBCSource source = new JDBCSource();
         source.initialize(container, properties);
         return source;
     }

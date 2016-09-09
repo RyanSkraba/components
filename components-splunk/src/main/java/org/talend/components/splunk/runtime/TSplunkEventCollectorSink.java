@@ -50,12 +50,23 @@ public class TSplunkEventCollectorSink implements Sink {
     private I18nMessages messageFormatter;
 
     @Override
-    public void initialize(RuntimeContainer container, ComponentProperties properties) {
+    public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
         TSplunkEventCollectorProperties props = (TSplunkEventCollectorProperties) properties;
         this.serverUrl = props.fullUrl.getStringValue();
+        if (this.serverUrl.isEmpty()) {
+            return new ValidationResult().setStatus(Result.ERROR).setMessage("Server url should not be empty.");
+        }
         this.token = props.token.getStringValue();
+        if (this.token.isEmpty()) {
+            return new ValidationResult().setStatus(Result.ERROR).setMessage("Token should not be empty.");
+        }
         this.eventsBatchSize = props.getBatchSize();
+        if (this.eventsBatchSize <= 0) {
+            return new ValidationResult().setStatus(Result.ERROR)
+                    .setMessage("Events batch size cannot be less or equal to zero.");
+        }
         this.schema = props.getSchema();
+        return ValidationResult.OK;
     }
 
     @Override

@@ -12,9 +12,10 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,14 +25,15 @@ import org.apache.avro.SchemaBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.service.internal.ComponentRegistry;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.test.SimpleComponentDefinition;
-import org.talend.components.api.test.SimpleComponentRegistry;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
@@ -76,10 +78,10 @@ public class TestFixedConnectorComponentProperties {
 
     // default implementation for pure java test. Shall be overriden of Spring or OSGI tests
     public ComponentService getComponentService() {
-        SimpleComponentRegistry testComponentRegistry = new SimpleComponentRegistry();
+        ComponentRegistry testComponentRegistry = new ComponentRegistry();
         SimpleComponentDefinition componentDef = new SimpleComponentDefinition("foo");
         componentDef.setPropertyClass(TestProperties.class);
-        testComponentRegistry.addComponent("foo", componentDef);
+        testComponentRegistry.registerComponentDefinition(Arrays.asList((ComponentDefinition) componentDef));
         return new ComponentServiceImpl(testComponentRegistry);
     }
 

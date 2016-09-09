@@ -19,7 +19,9 @@ import java.util.Set;
 import org.apache.avro.Schema;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
+import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.wizard.ComponentWizard;
@@ -156,11 +158,11 @@ public interface ComponentService extends PropertiesService<Properties> {
      * list all the depencencies required for this component to be executed at runtime
      * 
      * @param componentName name of the component to get the dependencies of.
-     * @return a set of maven uri following the pax-maven uri scheme @see
-     *         <a href="https://ops4j1.jira.com/wiki/display/paxurl/Mvn+Protocol">https://ops4j1.jira.com/wiki/display/paxurl/
-     *         Mvn+Protocol</a>
+     * @param properties the properties to compute the dependencies from.
+     * @param componentType will determine the runtime class to be used.
+     * @return the runtime info for running the given component with the given properties
      */
-    Set<String> getMavenUriDependencies(String componentName);
+    RuntimeInfo getRuntimeInfo(String componentName, Properties properties, ConnectorTopology componentType);
 
     /**
      * get the schema associated with a given named connection for a componentProperties

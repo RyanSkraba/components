@@ -13,42 +13,22 @@
 package org.talend.components.jira.tjirainput;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContaining;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.jira.JiraDefinition;
 import org.talend.components.jira.runtime.JiraSource;
+import org.talend.components.runtimeservice.RuntimeUtil;
+import org.talend.daikon.sandbox.SandboxedInstance;
 
 /**
  * Unit-tests for {@link TJiraInputDefinition} class
  */
 public class TJiraInputDefinitionTest {
-
-    /**
-     * Check {@link TJiraInputDefinition#getMavenGroupId()} returns "org.talend.components"
-     */
-    @Test
-    public void testGetMavenGroupId() {
-        JiraDefinition definition = new TJiraInputDefinition();
-        String mavenGroupId = definition.getMavenGroupId();
-        assertThat(mavenGroupId, equalTo("org.talend.components"));
-    }
-
-    /**
-     * Check {@link TJiraInputDefinition#getMavenArtifactId()} returns "components-jira"
-     */
-    @Test
-    public void testGetMavenArtifactId() {
-        JiraDefinition definition = new TJiraInputDefinition();
-        String mavenArtifactId = definition.getMavenArtifactId();
-        assertThat(mavenArtifactId, equalTo("components-jira"));
-    }
 
     /**
      * Check {@link TJiraInputDefinition#getFamilies()} returns string array, which contains "Business/JIRA"
@@ -88,7 +68,9 @@ public class TJiraInputDefinitionTest {
     @Test
     public void testGetRuntime() {
         TJiraInputDefinition definition = new TJiraInputDefinition();
-        Source source = definition.getRuntime();
+        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(null, ConnectorTopology.OUTGOING);
+        SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, definition.getClass().getClassLoader());
+        Source source = (Source) sandboxedInstance.getInstance();
         assertThat(source, is(instanceOf(JiraSource.class)));
     }
 

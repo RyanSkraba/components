@@ -88,13 +88,14 @@ public class JiraSourceOrSink implements SourceOrSink {
      * @param properties user specified properties
      */
     @Override
-    public void initialize(RuntimeContainer container, ComponentProperties properties) {
+    public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
         JiraProperties jiraProperties = (JiraProperties) properties;
         hostPort = jiraProperties.connection.hostUrl.getValue();
         userId = jiraProperties.connection.basicAuthentication.userId.getValue();
         userPassword = jiraProperties.connection.basicAuthentication.password.getValue();
         resource = jiraProperties.resource.getValue();
         schema = jiraProperties.schema.schema.getValue();
+        return ValidationResult.OK;
     }
 
     /**

@@ -10,23 +10,19 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api.test;
+package org.talend.components.api;
 
-import org.talend.components.api.service.internal.ComponentRegistry;
-import org.talend.components.api.service.internal.ComponentServiceImpl;
+import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.wizard.ComponentWizardDefinition;
+import org.talend.daikon.NamedThing;
 
 /**
- * created by sgandon on 14 déc. 2015
+ * Placeholder for a Component family catalog item.
  */
-public class SimpleComponentService extends ComponentServiceImpl {
 
-    /**
-     * DOC sgandon SimpleComponentService constructor comment.
-     * 
-     * @param componentRegistry
-     */
-    public SimpleComponentService(ComponentRegistry componentRegistry) {
-        super(componentRegistry);
-    }
+public interface ComponentFamilyDefinition extends NamedThing {
 
+    Iterable<ComponentDefinition> getComponents();
+
+    Iterable<ComponentWizardDefinition> getComponentWizards();
 }

@@ -21,8 +21,6 @@ import org.talend.components.api.wizard.WizardImageType;
 
 import aQute.bnd.annotation.component.Component;
 
-@Component(name = Constants.COMPONENT_WIZARD_BEAN_PREFIX
-        + SalesforceConnectionWizardDefinition.COMPONENT_WIZARD_NAME, provide = ComponentWizardDefinition.class)
 public class SalesforceConnectionWizardDefinition extends AbstractComponentWizardDefintion {
 
     public static final String COMPONENT_WIZARD_NAME = "salesforce"; //$NON-NLS-1$

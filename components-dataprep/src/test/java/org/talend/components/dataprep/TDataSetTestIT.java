@@ -23,12 +23,6 @@ public class TDataSetTestIT {
     public ErrorCollector errorCollector = new ErrorCollector();
 
     @Test
-    // this is an integration test to check that the dependencies file is properly generated.
-    public void testDependencies() {
-        ComponentTestUtils.testAllDesignDependenciesPresent(componentService, errorCollector);
-    }
-
-    @Test
     public void testAlli18n() {
         ComponentTestUtils.testAlli18n(componentService, errorCollector);
     }
@@ -36,11 +30,6 @@ public class TDataSetTestIT {
     @Test
     public void testAllImagePath() {
         ComponentTestUtils.testAllImages(componentService);
-    }
-
-    @Test
-    public void testAllRuntimes() {
-        ComponentTestUtils.testAllRuntimeAvaialble(componentService);
     }
 
 }

@@ -12,19 +12,19 @@
 // ============================================================================
 package org.talend.components.jdbc.tjdbcconnection;
 
-import org.talend.components.api.Constants;
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.talend.components.api.component.AbstractComponentDefinition;
-import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.EndpointComponentDefinition;
-import org.talend.components.api.component.runtime.SourceOrSink;
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.RuntimeInfo;
+import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.runtime.JDBCSourceOrSink;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 
-import aQute.bnd.annotation.component.Component;
-
-@Component(name = Constants.COMPONENT_BEAN_PREFIX + TJDBCConnectionDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TJDBCConnectionDefinition extends AbstractComponentDefinition implements EndpointComponentDefinition {
+public class TJDBCConnectionDefinition extends AbstractComponentDefinition {
 
     public static final String COMPONENT_NAME = "tJDBCConnectionNew";
 
@@ -42,16 +42,6 @@ public class TJDBCConnectionDefinition extends AbstractComponentDefinition imple
         return new String[] { "Databases/DB_JDBC" };
     }
 
-    @Override
-    public String getMavenGroupId() {
-        return "org.talend.components";
-    }
-
-    @Override
-    public String getMavenArtifactId() {
-        return "components-jdbc";
-    }
-
     @SuppressWarnings("rawtypes")
     @Override
     public Property[] getReturnProperties() {
@@ -59,14 +49,24 @@ public class TJDBCConnectionDefinition extends AbstractComponentDefinition imple
     }
 
     @Override
-    public SourceOrSink getRuntime() {
-        return new JDBCSourceOrSink();
-    }
-
-    @Override
     public boolean isStartable() {
         return true;
 
+    }
+
+    @Override
+    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology) {
+        if (connectorTopology == ConnectorTopology.NONE) {
+            return new SimpleRuntimeInfo(this.getClass().getClassLoader(), "org.talend.components", "components-jdbc",
+                    JDBCSourceOrSink.class.getCanonicalName());
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return EnumSet.of(ConnectorTopology.NONE);
     }
 
 }

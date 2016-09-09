@@ -59,7 +59,7 @@ public class DataSetWriterTest {
         properties.login.setValue("vincent@dataprep.com");
         properties.pass.setValue("vincent");
         properties.limit.setValue(10);
-        sink = (DataSetSink) definition.getRuntime();
+        sink = new DataSetSink();
     }
 
     @Test
@@ -78,16 +78,14 @@ public class DataSetWriterTest {
         Schema schema = schemaRecord.endRecord();
 
         IndexedRecord record = new GenericData.Record(schema);
-        record.put(schema.getField("FieldString0").pos(), "String\nString");
+        record.put(schema.getField("FieldString0").pos(), String.format("String%nString"));
 
         writer.open("test");
         writer.write(record);
         writer.close();
 
         final String content = mock.getLastReceivedLiveDataSetContent();
-        Assert.assertEquals("FieldString0;FieldString1\n" +
-                "\"String\n" +
-                "String\";\n", content);
+        Assert.assertEquals(String.format("FieldString0;FieldString1%n" + "\"String%n" + "String\";%n"), content);
     }
 
     @Test

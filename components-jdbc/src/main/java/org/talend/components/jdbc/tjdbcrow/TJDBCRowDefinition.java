@@ -12,18 +12,17 @@
 // ============================================================================
 package org.talend.components.jdbc.tjdbcrow;
 
-import org.talend.components.api.Constants;
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.talend.components.api.component.AbstractComponentDefinition;
-import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.OutputComponentDefinition;
-import org.talend.components.api.component.runtime.Sink;
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 
-import aQute.bnd.annotation.component.Component;
-
-@Component(name = Constants.COMPONENT_BEAN_PREFIX + TJDBCRowDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TJDBCRowDefinition extends AbstractComponentDefinition implements OutputComponentDefinition {
+public class TJDBCRowDefinition extends AbstractComponentDefinition {
 
     public static final String COMPONENT_NAME = "tJDBCRowNew";
 
@@ -37,29 +36,24 @@ public class TJDBCRowDefinition extends AbstractComponentDefinition implements O
     }
 
     @Override
-    public Sink getRuntime() {
-        return null;
-    }
-
-    @Override
     public String[] getFamilies() {
         return new String[] { "Databases/DB_JDBC" };
-    }
-
-    @Override
-    public String getMavenGroupId() {
-        return "org.talend.components";
-    }
-
-    @Override
-    public String getMavenArtifactId() {
-        return "components-jdbc";
     }
 
     // TODO add more return properties
     @Override
     public Property[] getReturnProperties() {
         return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP };
+    }
+
+    @Override
+    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology) {
+        return null;
+    }
+
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return EnumSet.of(ConnectorTopology.INCOMING);
     }
 
 }

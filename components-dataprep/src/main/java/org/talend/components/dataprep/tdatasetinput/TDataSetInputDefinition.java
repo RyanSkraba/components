@@ -12,22 +12,22 @@
 // ============================================================================
 package org.talend.components.dataprep.tdatasetinput;
 
-import org.talend.components.api.Constants;
-import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.InputComponentDefinition;
-import org.talend.components.api.component.runtime.Source;
+import java.util.EnumSet;
+import java.util.Set;
+
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.RuntimeInfo;
+import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.dataprep.DataPrepDefinition;
 import org.talend.components.dataprep.runtime.DataSetSource;
-
-import aQute.bnd.annotation.component.Component;
+import org.talend.daikon.properties.Properties;
 
 /**
  * The TDataSetInputDefinition acts as an entry point for all of services that a component provides to integrate with
  * the Studio (at design-time) and other components (at run-time).
  */
-@Component(name = Constants.COMPONENT_BEAN_PREFIX + TDataSetInputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TDataSetInputDefinition extends DataPrepDefinition implements InputComponentDefinition {
+public class TDataSetInputDefinition extends DataPrepDefinition {
 
     public static final String COMPONENT_NAME = "tDatasetInput";
 
@@ -41,7 +41,18 @@ public class TDataSetInputDefinition extends DataPrepDefinition implements Input
     }
 
     @Override
-    public Source getRuntime() {
-        return new DataSetSource();
+    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology componentType) {
+        if (componentType == ConnectorTopology.OUTGOING) {
+            return new SimpleRuntimeInfo(this.getClass().getClassLoader(), "org.talend.components", "components-dataprep",
+                    DataSetSource.class.getCanonicalName());
+        } else {
+            return null;
+        }
     }
+
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return EnumSet.of(ConnectorTopology.OUTGOING);
+    }
+
 }

@@ -11,8 +11,15 @@ import java.util.Map;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.junit.Assert;
-import org.talend.components.api.component.runtime.*;
+import org.talend.components.api.component.runtime.Reader;
+import org.talend.components.api.component.runtime.Sink;
+import org.talend.components.api.component.runtime.Source;
+import org.talend.components.api.component.runtime.SourceOrSink;
+import org.talend.components.api.component.runtime.WriteOperation;
+import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.salesforce.SalesforceBulkProperties.Concurrency;
+import org.talend.components.salesforce.runtime.SalesforceBulkFileSink;
+import org.talend.components.salesforce.runtime.SalesforceSource;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
@@ -253,7 +260,7 @@ public class SalesforceRuntimeTestUtil {
                     .setValue(modelProperties.upsertRelationTable.polymorphic.getValue());
         }
 
-        SourceOrSink source_sink = definition.getRuntime();
+        SourceOrSink source_sink = new SalesforceBulkFileSink();
         source_sink.initialize(null, runtimeProperties);
         ValidationResult result = source_sink.validate(null);
         Assert.assertTrue(result.getStatus() == ValidationResult.Result.OK);
@@ -284,7 +291,7 @@ public class SalesforceRuntimeTestUtil {
         modelProperties.module.main.schema.setValue(schema);
         modelProperties.schemaFlow.schema.setValue(output);
 
-        Source source = definition.getRuntime();
+        Source source = new SalesforceSource();
         source.initialize(null, modelProperties);
         ValidationResult vr = source.validate(null);
         if (vr.getStatus() == ValidationResult.Result.ERROR) {

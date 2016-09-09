@@ -18,6 +18,8 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jira.Action;
 import org.talend.components.jira.tjiraoutput.TJiraOutputProperties;
+import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
 
 /**
  * Jira {@link Sink}
@@ -43,11 +45,15 @@ public class JiraSink extends JiraSourceOrSink implements Sink {
      * @param properties user specified properties
      */
     @Override
-    public void initialize(RuntimeContainer container, ComponentProperties properties) {
-        super.initialize(container, properties);
+    public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
+        ValidationResult validate = super.initialize(container, properties);
+        if (validate.getStatus() == Result.ERROR) {
+            return validate;
+        }
         TJiraOutputProperties outputProperties = (TJiraOutputProperties) properties;
         action = outputProperties.action.getValue();
         deleteSubtasks = outputProperties.deleteSubtasks.getValue();
+        return ValidationResult.OK;
     }
 
     /**

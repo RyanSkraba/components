@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
-		<version>0.14.0-SNAPSHOT</version>
+		<version>0.15.0-SNAPSHOT</version>
 		<relativePath>../components-parent/pom.xml</relativePath>
 	</parent>
 
@@ -15,7 +15,7 @@
 
 	<name>Component API OSGI tests</name>
 	<artifactId>components-osgitest</artifactId>
-	<version>0.14.0-SNAPSHOT</version>
+	<version>0.15.0-SNAPSHOT</version>
 
 	<dependencies>
         <dependency>
@@ -92,14 +92,14 @@
         <dependency>
             <groupId>org.talend.daikon</groupId>
             <artifactId>daikon</artifactId>
-			<version>${daikon.version}</version>
+			<version>0.13.0-SNAPSHOT</version>
 			<classifier>bundle</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.daikon</groupId>
             <artifactId>daikon</artifactId>
-			<version>${daikon.version}</version>
+			<version>0.13.0-SNAPSHOT</version>
 			<classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
@@ -120,7 +120,7 @@
 		<dependency>
 			<groupId>org.ops4j.pax.url</groupId>
 			<artifactId>pax-url-aether</artifactId>
-			<version>2.3.0</version>
+			<version>2.4.5-Talend</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -192,6 +192,38 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>15.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>multiple-runtime-comp</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>multiple-runtime-comp</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+			<classifier>bundle</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>test-multiple-runtime-comp</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+			<classifier>tests</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>test-multiple-runtime-comp-runtime-v01</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+            <scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>test-multiple-runtime-comp-runtime-v02</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+            <scope>provided</scope>
 		</dependency>
 	</dependencies>
 
