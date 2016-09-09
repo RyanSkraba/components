@@ -197,7 +197,8 @@ public class TDataSetOutputProperties extends DataPrepProperties {
                     login.getStringValue(), pass.getStringValue(), dataSetId.getStringValue(), dataSetName.getStringValue());
             List<Column> columnList = null;
             boolean wasProblem = false;
-            ValidationResult validationResult = ValidationResult.OK;
+            ValidationResult validationResult = new ValidationResult().setStatus(Result.OK)
+                    .setMessage(getI18nMessage("note.needCheckSchema"));
             try {
                 connectionHandler.connect();
                 columnList = connectionHandler.readSourceSchema();
