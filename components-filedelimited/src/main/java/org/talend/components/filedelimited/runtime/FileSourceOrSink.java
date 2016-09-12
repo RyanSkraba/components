@@ -3,6 +3,7 @@ package org.talend.components.filedelimited.runtime;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,6 +15,8 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.NamedThing;
+import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
@@ -63,6 +66,34 @@ public class FileSourceOrSink implements SourceOrSink {
     @Override
     public Schema getEndpointSchema(RuntimeContainer container, String schemaName) throws IOException {
         return null;
+    }
+
+    // "columnsName" is retrieved columns name, it maybe smaller than columnsLength size
+    // So we need add some default named columns "Column"+ columnIndex
+    public static Schema getSchema(String schemaName, List<String> columnsName, List<Integer> columnsLength) {
+        if (columnsLength != null) {
+            List<Schema.Field> fields = new ArrayList<>();
+            int fieldsSize = columnsLength.size();
+            String defaultValue = null;
+            for (int columnIndex = 0; columnIndex < fieldsSize; columnIndex++) {
+                int columnLength = columnsLength.get(columnIndex);
+                String columnName = null;
+                if (columnsName != null && columnIndex < columnsName.size()) {
+                    columnName = columnsName.get(columnIndex);
+                } else {
+                    columnName = "Column" + columnIndex;
+                }
+                // TODO guess data type
+                Schema.Field avroField = new Schema.Field(columnName, AvroUtils._string(), null, defaultValue);
+                if (columnLength != 0) {
+                    avroField.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, String.valueOf(columnLength));
+                }
+                fields.add(avroField);
+            }
+            return Schema.createRecord(schemaName, null, null, false, fields);
+        } else {
+            return Schema.createRecord(schemaName, null, null, false);
+        }
     }
 
 }

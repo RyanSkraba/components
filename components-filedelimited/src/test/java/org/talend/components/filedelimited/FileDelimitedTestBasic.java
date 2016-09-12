@@ -24,14 +24,17 @@ import org.talend.components.api.test.AbstractComponentTest;
 import org.talend.components.api.test.SimpleComponentRegistry;
 import org.talend.components.filedelimited.runtime.FileDelimitedSource;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedDefinition;
+import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
 import org.talend.components.filedelimited.tFileOutputDelimited.TFileOutputDelimitedDefinition;
 import org.talend.components.filedelimited.wizard.FileDelimitedWizardDefinition;
+import org.talend.components.filedelimited.wizard.FileDelimitedWizardProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings("nls")
@@ -118,4 +121,47 @@ public class FileDelimitedTestBasic extends AbstractComponentTest {
         return format.parse(strDate);
     }
 
+    protected TFileInputDelimitedProperties createInputProperties(Object file, boolean isCsvMode) {
+        TFileInputDelimitedProperties properties = (TFileInputDelimitedProperties) new TFileInputDelimitedDefinition()
+                .createProperties().init();
+        properties.fileName.setValue(file);
+        properties.rowSeparator.setValue("\n");
+        if (isCsvMode) {
+            properties.csvOptions.setValue(true);
+        }
+        properties.header.setValue(1);
+        properties.main.schema.setValue(BASIC_SCHEMA);
+        // ComponentTestUtils.checkSerialize(properties, errorCollector);
+        return properties;
+    }
+
+    protected FileDelimitedWizardProperties createWizaredProperties(TFileInputDelimitedProperties properties) {
+        FileDelimitedWizardProperties wizardProperties = new FileDelimitedWizardProperties("wizard");
+        wizardProperties.init();
+        wizardProperties.copyValuesFrom(properties);
+        return wizardProperties;
+    }
+
+    protected void printLogRecords(List<IndexedRecord> records) {
+        if (records != null) {
+            StringBuffer sb = new StringBuffer();
+            for (int index = 0; index < records.size(); index++) {
+                IndexedRecord record = records.get(index);
+                assertNotNull(record.getSchema());
+                int columnSize = record.getSchema().getFields().size();
+                for (int i = 0; i < columnSize; i++) {
+                    sb.append(record.get(i));
+                    if (i != columnSize - 1) {
+                        sb.append(" - ");
+                    }
+                }
+
+                LOGGER.debug("Row " + (index + 1) + " :" + sb.toString());
+                sb.delete(0, sb.length());
+            }
+        } else {
+            LOGGER.debug("Records list is empty!");
+        }
+
+    }
 }

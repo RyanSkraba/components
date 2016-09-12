@@ -3,7 +3,10 @@ package org.talend.components.filedelimited.runtime;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -48,6 +51,11 @@ public class FileDelimitedRuntime {
     protected int lastLine = -1;
 
     protected int currentLine;
+
+    // For preview data
+    protected List<String> columnNames;
+
+    protected List<Integer> columnsLength;
 
     public FileDelimitedRuntime(TFileInputDelimitedProperties props) {
         this.props = props;
@@ -239,9 +247,10 @@ public class FileDelimitedRuntime {
         }
     }
 
+    // Preview data and guess the columns
     public String previewData(int maxRowsToPreview) throws IOException {
         init();
-        PreviewResult result = new PreviewResult();
+        Map<String, Object> result = new HashMap<String, Object>();
         boolean retrieveHeader = false;
         if (header > 0) {
             header = header - 1;
@@ -249,18 +258,25 @@ public class FileDelimitedRuntime {
         }
         String[] rowData = null;
         List<String[]> data = new ArrayList<>();
-
         if (props.csvOptions.getValue()) {
+            if (limit < 1) {
+                limit = maxRowsToPreview;
+            }
             CSVReader csvReader = getCsvReader();
+            if (retrieveHeader) {
+                lastLine = lastLine - 1;
+            }
             try {
                 if (csvReader != null && csvReader.readNext()) {
                     rowData = csvReader.getValues();
                     if (retrieveHeader) {
-                        result.setColumnNames(rowData);
+                        result.put("columnNames", rowData);
+                        columnNames = Arrays.asList(rowData);
+                        LOG.debug("columnNames " + columnNames);
                     } else {
                         data.add(rowData);
+                        updateColumnsLength(rowData);
                     }
-
                     while (csvReader.readNext()) {
                         rowData = csvReader.getValues();
                         if (props.removeEmptyRow.getValue() && (rowData.length == 1 && ("\015").equals(rowData[0]))) {
@@ -271,6 +287,8 @@ public class FileDelimitedRuntime {
                             break;
                         }
                         data.add(rowData);
+                        updateColumnsLength(rowData);
+                        LOG.debug("Preview row " + currentLine + " : " + Arrays.asList(rowData));
                     }
                 }
             } finally {
@@ -279,18 +297,33 @@ public class FileDelimitedRuntime {
                 }
             }
         } else {
+            if (retrieveHeader) {
+                if (limit > 0) {
+                    limit = limit + 1;
+                } else {
+                    if (limit < 1) {
+                        limit = maxRowsToPreview + 1;
+                    }
+                }
+            }
             FileInputDelimited fid = getFileDelimited();
             try {
                 while (fid != null && fid.nextRecord()) {
-                    rowData = new String[fid.getColumnsCountOfCurrentRow()];
+                    int currentRowColsCount = fid.getColumnsCountOfCurrentRow();
+                    rowData = new String[currentRowColsCount];
                     for (int i = 0; i < rowData.length; i++) {
                         rowData[i] = fid.get(i);
                     }
                     if (retrieveHeader) {
-                        result.setColumnNames(rowData);
+                        result.put("columnNames", rowData);
+                        columnNames = Arrays.asList(rowData);
+                        LOG.debug("columnNames " + columnNames);
                         retrieveHeader = false;
                     } else {
+                        currentLine++;
                         data.add(rowData);
+                        updateColumnsLength(rowData);
+                        LOG.debug("Preview row " + currentLine + " : " + Arrays.asList(rowData));
                     }
                 }
             } finally {
@@ -300,9 +333,34 @@ public class FileDelimitedRuntime {
             }
         }
         if (data.size() > 0) {
-            result.setData(data);
+            result.put("data", data);
+            LOG.debug("Max columns count:" + columnsLength.size());
         }
         Gson gson = new Gson();
         return gson.toJson(result);
     }
+
+    // Get the column length from the preview data
+    private void updateColumnsLength(String[] rowData) {
+        if (columnsLength == null) {
+            columnsLength = new ArrayList<>();
+        }
+        int currentColumnsCount = columnsLength.size();
+        if (rowData != null) {
+            for (int i = 0; i < rowData.length; i++) {
+                if (i >= currentColumnsCount) {
+                    if (rowData[i] != null) {
+                        columnsLength.add(rowData[i].length());
+                    } else {
+                        columnsLength.add(0);
+                    }
+                } else {
+                    if (rowData[i] != null && rowData[i].length() > columnsLength.get(i)) {
+                        columnsLength.set(i, rowData[i].length());
+                    }
+                }
+            }
+        }
+    }
+
 }

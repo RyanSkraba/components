@@ -49,8 +49,9 @@ public class FileCSVReader extends FileDelimitedReader {
         if (!isContinue) {
             if (properties.uncompress.getValue()) {
                 csvReader = fileDelimitedRuntime.getCsvReader();
-                isContinue = csvReader != null && csvReader.readNext();
+                isContinue = fileDelimitedRuntime.limit != 0 && csvReader != null && csvReader.readNext();
                 currentLine = fileDelimitedRuntime.currentLine;
+                outputLine = 0;
             }
         }
         if (isContinue) {
@@ -87,7 +88,12 @@ public class FileCSVReader extends FileDelimitedReader {
         }
         outputLine++;
         if (fileDelimitedRuntime.limit > 0 && outputLine > fileDelimitedRuntime.limit) {
-            isContinue = false;
+            if (properties.uncompress.getValue()) {
+                isContinue = advance();
+            } else {
+                isContinue = false;
+            }
+
         }
         return isContinue;
     }

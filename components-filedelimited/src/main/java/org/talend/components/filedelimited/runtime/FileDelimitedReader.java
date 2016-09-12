@@ -4,8 +4,6 @@ import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.component.runtime.Result;
@@ -16,8 +14,6 @@ import org.talend.daikon.avro.converter.IndexedRecordConverter;
 public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
 
     private static final long serialVersionUID = 1L;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileDelimitedReader.class);
 
     protected RuntimeContainer container;
 

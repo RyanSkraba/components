@@ -2,7 +2,9 @@ package org.talend.components.filedelimited.wizard;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Map;
 
+import org.apache.avro.Schema;
 import org.talend.components.filedelimited.runtime.FileDelimitedSource;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.properties.PresentationItem;
@@ -86,10 +88,15 @@ public class FileDelimitedWizardProperties extends TFileInputDelimitedProperties
     }
 
     public ValidationResult afterPreview() {
-        FileDelimitedSource source = new FileDelimitedSource();
+
         try {
-            String jsonData = FileDelimitedSource.previewData(null, this, 200);
-            //TODO show in wizard
+            Map<String, Schema> dataAndSchema = FileDelimitedSource.previewData(null, this, 200);
+            for (String jsonData : dataAndSchema.keySet()) {
+                // TODO show in wizard
+                Schema schema = dataAndSchema.get(jsonData);
+                break;
+            }
+
         } catch (IOException e) {
             ValidationResult vr = new ValidationResult();
             vr.setMessage(e.getMessage());
