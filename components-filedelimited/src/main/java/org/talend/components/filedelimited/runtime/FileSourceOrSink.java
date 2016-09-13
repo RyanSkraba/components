@@ -96,4 +96,21 @@ public class FileSourceOrSink implements SourceOrSink {
         }
     }
 
+    public static Schema getDynamicSchema(String[] columnsName, String schemaName) {
+        if (columnsName != null) {
+            String defaultValue = null;
+            List<Schema.Field> fields = new ArrayList<>();
+            for (String columnName : columnsName) {
+                //TODO schema name can't be empty now. Specify a unique name ?
+                Schema.Field avroField = new Schema.Field(columnName, AvroUtils._string(), null, defaultValue);
+                avroField.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, String.valueOf(100));
+                avroField.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, String.valueOf(0));
+                fields.add(avroField);
+            }
+            return Schema.createRecord(schemaName, null, null, false, fields);
+        } else {
+            return Schema.createRecord(schemaName, null, null, false);
+        }
+    }
+
 }

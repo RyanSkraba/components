@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.common.EncodingTypeProperties;
 import org.talend.components.common.runtime.FileRuntimeHelper;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.fileprocess.FileInputDelimited;
 
 import com.google.gson.Gson;
@@ -52,6 +53,8 @@ public class FileDelimitedRuntime {
 
     protected int currentLine;
 
+    protected boolean schemaIsDynamic;
+
     // For preview data
     protected List<String> columnNames;
 
@@ -68,8 +71,13 @@ public class FileDelimitedRuntime {
 
         encoding = getEncoding();
 
+        schemaIsDynamic = AvroUtils.isIncludeAllFields(props.main.schema.getValue());
+
         header = (props.header.getValue() == null) ? -1 : props.header.getValue();
 
+        if (schemaIsDynamic) {
+            header = header - 1;
+        }
         footer = (props.footer.getValue() == null || props.uncompress.getValue()) ? -1 : props.footer.getValue();
 
         limit = (props.limit.getValue() == null) ? -1 : props.limit.getValue();
@@ -181,7 +189,6 @@ public class FileDelimitedRuntime {
             csvReader.setEscapeChar(csvReader.getQuoteChar());
         }
         if (limit != 0) {
-            // TODO <%= header %><%=hasDynamic?"-1":""%>
             for (currentLine = 0; currentLine < header; currentLine++) {
                 csvReader.readNext();
             }

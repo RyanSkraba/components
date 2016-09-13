@@ -187,7 +187,6 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
         StringToDateConverter(Schema.Field field) {
             super(field);
             String pattern = field.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
-            // TODO: null handling
             format = new SimpleDateFormat(pattern);
         }
 

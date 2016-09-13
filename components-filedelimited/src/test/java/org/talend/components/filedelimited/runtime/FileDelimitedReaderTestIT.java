@@ -85,6 +85,18 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         testInputCompressFile(false);
     }
 
+    // Test FileInputDelimited component read with CSV mode and source is compressed file
+    @Test
+    public void testInputDynamicCsvMode() throws Throwable {
+        testInputDynamic(true);
+    }
+
+    // Test FileInputDelimited component read with delimited mode and source is compressed file
+    @Test
+    public void testInputDynamicDelimitedMode() throws Throwable {
+        testInputDynamic(false);
+    }
+
     public void testInputDelimited(boolean previewData, boolean sourceIsStream) throws Throwable {
         String resources = getClass().getResource("/runtime/input").getPath();
         String inputFile = resources + "/test_input_delimited.csv";
@@ -156,6 +168,34 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         }
     }
 
+    protected void testInputDynamic(boolean isCsvMode) throws Throwable {
+        String resources = getClass().getResource("/runtime/input").getPath();
+        String inputFile = resources + "/input_delimited_dynamic.csv";
+        if (isCsvMode) {
+            inputFile = resources + "/input_csv_dynamic.csv";
+        }
+        LOGGER.debug("Test file path: " + inputFile);
+        TFileInputDelimitedProperties properties = createInputProperties(inputFile, isCsvMode);
+        properties.main.schema.setValue(BASIC_DYNAMIC_SCHEMA);
+
+        // row1 & row2 in the file is empty
+        // But "removeEmptyRow" default value is true. So would skip the empty row in the header part
+        testInputDynamic(properties, 20);
+
+        // Set header as not empty row
+        properties.header.setValue(3);
+        testInputDynamic(properties, 20);
+
+        properties.limit.setValue(10);
+        testInputDynamic(properties, 9);
+
+        // when specified header line include empty field value like ";;;;"
+        // Avro can be set field name empty. But we can do that before
+        properties.removeEmptyRow.setValue(false);
+        // properties.header.setValue(1);
+        // testInputDynamic(properties, 9);
+    }
+
     protected void testBasicInput(TFileInputDelimitedProperties properties, int count, boolean previewData) throws Throwable {
         if (previewData) {
             Map<String, Schema> result = FileDelimitedSource.previewData(null, properties, 200);
@@ -171,7 +211,6 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
                 // TODO need to check the field type after finish guess field type
                 break;
             }
-
         } else {
             List<IndexedRecord> records = readRows(properties);
 
@@ -247,6 +286,39 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
             assertEquals(3448, records.get(0).get(8));
             assertEquals(1473147067522L, records.get(0).get(9));
             assertEquals("Dwight Eisenhower", new String((byte[]) records.get(0).get(10)));
+        }
+        printLogRecords(records);
+
+    }
+
+    protected void testInputDynamic(TFileInputDelimitedProperties properties, int count) throws Throwable {
+        List<IndexedRecord> records = readRows(properties);
+
+        assertNotNull(records);
+        assertEquals(count, records.size());
+        Schema dynamicSchema = records.get(0).getSchema();
+        assertNotNull(dynamicSchema);
+        assertEquals(11, dynamicSchema.getFields().size());
+        assertEquals("TestBoolean", dynamicSchema.getFields().get(0).name());
+        assertEquals("TestBytes", dynamicSchema.getFields().get(2).name());
+        assertEquals("TestDate", dynamicSchema.getFields().get(4).name());
+        assertEquals("TestFloat", dynamicSchema.getFields().get(6).name());
+        assertEquals("TestInteger", dynamicSchema.getFields().get(8).name());
+        assertEquals("TestObject", dynamicSchema.getFields().get(10).name());
+        if (properties.header.getValue() == 1 || properties.header.getValue() == 3) {
+            assertEquals("1", records.get(0).get(1));
+            assertEquals("n", records.get(0).get(3));
+            assertEquals("2.75", records.get(0).get(5));
+            assertEquals("4.797", records.get(0).get(7));
+            assertEquals("1473147067519", records.get(0).get(9));
+        }
+        if (properties.limit.getValue() != null && properties.limit.getValue() == 10) {
+            assertEquals("false", records.get(8).get(0));
+            assertEquals("CqkDWKxfab9XJvd8l9", records.get(8).get(2));
+            assertEquals("2016-09-06T15:31:07", records.get(8).get(4));
+            assertEquals("10.578", records.get(8).get(6));
+            assertEquals("4671", records.get(8).get(8));
+            assertEquals("Herbert McKinley", records.get(8).get(10));
         }
         printLogRecords(records);
 

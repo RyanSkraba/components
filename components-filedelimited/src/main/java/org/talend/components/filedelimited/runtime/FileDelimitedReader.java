@@ -1,5 +1,6 @@
 package org.talend.components.filedelimited.runtime;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.apache.avro.Schema;
@@ -8,7 +9,9 @@ import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
 public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedRecord> {
@@ -21,7 +24,7 @@ public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedR
 
     protected transient Schema schema;
 
-    protected IndexedRecordConverter factory;
+    private IndexedRecordConverter factory;
 
     protected FileDelimitedRuntime fileDelimitedRuntime;
 
@@ -33,21 +36,50 @@ public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedR
         super(source);
         this.container = container;
         this.properties = properties;
-        factory = new DelimitedAdaptorFactory();
         schema = properties.main.schema.getValue();
-        factory.setSchema(schema);
         fileDelimitedRuntime = new FileDelimitedRuntime(properties);
 
     }
 
     @Override
     public IndexedRecord getCurrent() {
-        return currentIndexRecord;
+        try {
+            return ((DelimitedAdaptorFactory) getFactory()).convertToAvro(values);
+        } catch (IOException e) {
+            throw new ComponentException(e);
+        }
     }
+
+    abstract void retrieveValues() throws IOException;
 
     @Override
     public Map<String, Object> getReturnValues() {
         return new Result().toMap();
+    }
+
+    protected Schema getSchema() throws IOException {
+        if (schema == null) {
+            schema = properties.main.schema.getValue();
+        }
+        return schema;
+    }
+
+    protected void setupDynamicSchema() throws IOException {
+        if (getSchema() != null) {
+            if (AvroUtils.isIncludeAllFields(schema)) {
+                schema = FileSourceOrSink.getDynamicSchema(values, "dynamicSchema");
+            }
+        } else {
+            throw new IOException("Schema is not setup!");
+        }
+    }
+
+    protected IndexedRecordConverter getFactory() throws IOException {
+        if (factory == null) {
+            factory = new DelimitedAdaptorFactory();
+            factory.setSchema(getSchema());
+        }
+        return factory;
     }
 
 }

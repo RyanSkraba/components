@@ -21,6 +21,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.test.AbstractComponentTest;
+import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.test.SimpleComponentRegistry;
 import org.talend.components.filedelimited.runtime.FileDelimitedSource;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedDefinition;
@@ -55,6 +56,9 @@ public class FileDelimitedTestBasic extends AbstractComponentTest {
             .name("TestInteger").type().intType().noDefault() //
             .name("TestLong").type().longType().noDefault() //
             .name("TestObject").type(AvroUtils._bytes()).noDefault().endRecord();
+
+    public static Schema BASIC_DYNAMIC_SCHEMA = new org.apache.avro.Schema.Parser().parse(
+            "{\"type\":\"record\",\"name\":\"MAIN\",\"fields\":[],\"di.table.name\":\"MAIN\",\"di.table.label\":\"MAIN\",\"di.dynamic.column.comment\":\"\",\"di.dynamic.column.name\":\"test_dynamic\",\"di.column.talendType\":\"id_Dynamic\",\"talend.field.pattern\":\"yyyy-MM-dd'T'HH:mm:ss\",\"di.column.isNullable\":\"true\",\"talend.field.scale\":\"0\",\"talend.field.dbColumnName\":\"test_dynamic\",\"di.column.relatedEntity\":\"\",\"di.column.relationshipType\":\"\",\"di.dynamic.column.position\":\"0\",\"include-all-fields\":\"true\"}");
 
     @Rule
     public ErrorCollector errorCollector = new ErrorCollector();
@@ -131,7 +135,7 @@ public class FileDelimitedTestBasic extends AbstractComponentTest {
         }
         properties.header.setValue(1);
         properties.main.schema.setValue(BASIC_SCHEMA);
-        // ComponentTestUtils.checkSerialize(properties, errorCollector);
+        ComponentTestUtils.checkSerialize(properties, errorCollector);
         return properties;
     }
 

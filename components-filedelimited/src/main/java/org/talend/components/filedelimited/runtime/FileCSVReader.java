@@ -36,7 +36,12 @@ public class FileCSVReader extends FileDelimitedReader {
         currentLine = fileDelimitedRuntime.currentLine;
         startAble = fileDelimitedRuntime.limit != 0 && csvReader != null && csvReader.readNext();
         if (startAble) {
-            getCurrentRecord();
+            values = csvReader.getValues();
+            retrieveValues();
+            if (fileDelimitedRuntime.schemaIsDynamic) {
+                setupDynamicSchema();
+                startAble = advance();
+            }
             startAble = checkLimit();
         }
         return startAble;
@@ -55,7 +60,7 @@ public class FileCSVReader extends FileDelimitedReader {
             }
         }
         if (isContinue) {
-            getCurrentRecord();
+            retrieveValues();
             isContinue = checkLimit();
         }
         return isContinue;
@@ -71,9 +76,8 @@ public class FileCSVReader extends FileDelimitedReader {
         LOGGER.debug("close: " + properties.fileName.getStringValue());
     }
 
-    protected void getCurrentRecord() throws IOException {
+    protected void retrieveValues() throws IOException {
         values = csvReader.getValues();
-        currentIndexRecord = ((DelimitedAdaptorFactory) factory).convertToAvro(values);
     }
 
     private boolean checkLimit() throws IOException {

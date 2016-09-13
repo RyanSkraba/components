@@ -30,7 +30,11 @@ public class DelimitedReader extends FileDelimitedReader {
         fid = fileDelimitedRuntime.getFileDelimited();
         startAble = fid != null && fid.nextRecord();
         if (startAble) {
-            getCurrentRecord();
+            retrieveValues();
+            if (fileDelimitedRuntime.schemaIsDynamic) {
+                setupDynamicSchema();
+                startAble = advance();
+            }
         }
         return startAble;
     }
@@ -46,7 +50,7 @@ public class DelimitedReader extends FileDelimitedReader {
             }
         }
         if (isContinue) {
-            getCurrentRecord();
+            retrieveValues();
         }
         return isContinue;
     }
@@ -61,13 +65,17 @@ public class DelimitedReader extends FileDelimitedReader {
         LOGGER.debug("close: " + properties.fileName.getStringValue());
     }
 
-    protected void getCurrentRecord() throws IOException {
-        values = new String[schema.getFields().size()];
+    protected void retrieveValues() throws IOException {
+        if (fileDelimitedRuntime.schemaIsDynamic) {
+            values = new String[fid.getColumnsCountOfCurrentRow()];
+        } else {
+            values = new String[schema.getFields().size()];
+        }
+
         // TODO consider dynamic
-        for (int i = 0; i < schema.getFields().size(); i++) {
+        for (int i = 0; i < values.length; i++) {
             values[i] = (fid.get(i));
         }
-        currentIndexRecord = ((DelimitedAdaptorFactory) factory).convertToAvro(values);
     }
 
 }
