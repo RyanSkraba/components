@@ -39,12 +39,10 @@ public abstract class SalesforceDefinition extends AbstractComponentDefinition {
         return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP };
     }
 
-    @Override
     public String getMavenGroupId() {
         return "org.talend.components";
     }
 
-    @Override
     public String getMavenArtifactId() {
         return "components-salesforce";
     }

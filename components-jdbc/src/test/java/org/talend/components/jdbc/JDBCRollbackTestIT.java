@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.jdbc;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,14 +68,17 @@ public class JDBCRollbackTestIT {
 
         private Map<String, Object> map = new HashMap<>();
 
+        @Override
         public Object getComponentData(String componentId, String key) {
             return map.get(componentId + "_" + key);
         }
 
+        @Override
         public void setComponentData(String componentId, String key, Object data) {
             map.put(componentId + "_" + key, data);
         }
 
+        @Override
         public String getCurrentComponentId() {
             return refComponentId;
         }
@@ -130,7 +133,7 @@ public class JDBCRollbackTestIT {
         TJDBCConnectionDefinition connectionDefinition = new TJDBCConnectionDefinition();
         TJDBCConnectionProperties connectionProperties = createCommonJDBCConnectionProperties(connectionDefinition);
 
-        JDBCSourceOrSink sourceOrSink = (JDBCSourceOrSink) connectionDefinition.getRuntime();
+        JDBCSourceOrSink sourceOrSink = new JDBCSourceOrSink();
         sourceOrSink.initialize(null, connectionProperties);
 
         ValidationResult result = sourceOrSink.validate(container);
@@ -149,7 +152,7 @@ public class JDBCRollbackTestIT {
 
         outputProperties.referencedComponent.componentInstanceId.setValue(refComponentId);
 
-        JDBCSink sink = (JDBCSink) outputDefinition.getRuntime();
+        JDBCSink sink = new JDBCSink();
         sink.initialize(container, outputProperties);
 
         WriteOperation writerOperation = sink.createWriteOperation();
@@ -185,7 +188,7 @@ public class JDBCRollbackTestIT {
         rollbackProperties.referencedComponent.componentInstanceId.setValue(refComponentId);
         rollbackProperties.closeConnection.setValue(false);
 
-        JDBCRollbackSourceOrSink rollbackSourceOrSink = (JDBCRollbackSourceOrSink) rollbackDefinition.getRuntime();
+        JDBCRollbackSourceOrSink rollbackSourceOrSink = new JDBCRollbackSourceOrSink();
         rollbackSourceOrSink.initialize(container, rollbackProperties);
         rollbackSourceOrSink.validate(container);
 
@@ -216,7 +219,7 @@ public class JDBCRollbackTestIT {
         TJDBCConnectionDefinition connectionDefinition = new TJDBCConnectionDefinition();
         TJDBCConnectionProperties connectionProperties = createCommonJDBCConnectionProperties(connectionDefinition);
 
-        JDBCSourceOrSink sourceOrSink = (JDBCSourceOrSink) connectionDefinition.getRuntime();
+        JDBCSourceOrSink sourceOrSink = new JDBCSourceOrSink();
         sourceOrSink.initialize(null, connectionProperties);
 
         ValidationResult result = sourceOrSink.validate(container);
@@ -229,7 +232,7 @@ public class JDBCRollbackTestIT {
         rollbackProperties.referencedComponent.componentInstanceId.setValue(refComponentId);
         rollbackProperties.closeConnection.setValue(true);
 
-        JDBCRollbackSourceOrSink rollbackSourceOrSink = (JDBCRollbackSourceOrSink) rollbackDefinition.getRuntime();
+        JDBCRollbackSourceOrSink rollbackSourceOrSink = new JDBCRollbackSourceOrSink();
         rollbackSourceOrSink.initialize(container, rollbackProperties);
         rollbackSourceOrSink.validate(container);
 

@@ -15,12 +15,11 @@ package org.talend.components.fullexample;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.service.internal.ComponentRegistry;
+import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.test.AbstractComponentTest;
-import org.talend.components.api.test.SimpleComponentRegistry;
-import org.talend.components.api.test.SimpleComponentService;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult.Result;
@@ -30,7 +29,7 @@ public class FullExamplePropertiesTest extends AbstractComponentTest {
 
     FullExampleProperties cp;
 
-    private SimpleComponentService simpleComponentService;
+    private ComponentService simpleComponentService;
 
     @Before
     public void init() {
@@ -57,16 +56,16 @@ public class FullExamplePropertiesTest extends AbstractComponentTest {
     @Override
     public ComponentService getComponentService() {
         if (simpleComponentService == null) {
-            SimpleComponentRegistry componentRegistry = new SimpleComponentRegistry();
-            componentRegistry.addComponent(FullExampleDefinition.COMPONENT_NAME, new FullExampleDefinition());
-            simpleComponentService = new SimpleComponentService(componentRegistry);
+            ComponentRegistry componentRegistry = new ComponentRegistry();
+            componentRegistry.registerComponentFamilyDefinition(new FullExampleFamilyDefinition());
+            simpleComponentService = new ComponentServiceImpl(componentRegistry);
         }
         return simpleComponentService;
     }
 
     /**
-     * this method should be implemented by all clients to create interaction with all widget
-     * This default implmentaiton of this unit test is calling all service callbacks, but this must be overriden by clients.
+     * this method should be implemented by all clients to create interaction with all widget This default implmentaiton
+     * of this unit test is calling all service callbacks, but this must be overriden by clients.
      * 
      * @throws Throwable
      */
@@ -88,10 +87,4 @@ public class FullExamplePropertiesTest extends AbstractComponentTest {
         getComponentService().validateProperty(prop.getName(), cp);
     }
 
-    @Ignore
-    @Test
-    @Override
-    public void testAllRuntime() {
-        // do nothing cause there is not runtime for this sample example.
-    }
 }

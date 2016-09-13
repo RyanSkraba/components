@@ -17,7 +17,6 @@ import static org.junit.Assert.*;
 import javax.inject.Inject;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -90,10 +89,4 @@ public class SpringFullExamplePropertiesTestIT extends AbstractComponentTest {
         getComponentService().validateProperty(prop.getName(), cp);
     }
 
-    @Ignore
-    @Test
-    @Override
-    public void testAllRuntime() {
-        // do nothing cause there is not runtime for this sample example.
-    }
 }

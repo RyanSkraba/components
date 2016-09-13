@@ -17,8 +17,6 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 
 import aQute.bnd.annotation.component.Component;
 
-@Component(name = Constants.COMPONENT_WIZARD_BEAN_PREFIX
-        + SalesforceConnectionEditWizardDefinition.COMPONENT_WIZARD_NAME, provide = ComponentWizardDefinition.class)
 public class SalesforceConnectionEditWizardDefinition extends SalesforceConnectionWizardDefinition {
 
     public static final String COMPONENT_WIZARD_NAME = "salesforce.edit"; //$NON-NLS-1$

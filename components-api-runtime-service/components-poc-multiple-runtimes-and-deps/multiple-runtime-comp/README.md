@@ -1,0 +1,2 @@
+the test classes can be found in another sibling module called test module for test-multiple-runtime-comp that must be separate in order to avoir circular reference
+cause the test uses test-multiple-runtime-comp-runtime-v01 and test-multiple-runtime-comp-runtime-v02 and those 2 libs depends on the multiple-runtime-comp 

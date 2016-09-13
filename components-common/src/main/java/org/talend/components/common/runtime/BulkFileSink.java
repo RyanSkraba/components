@@ -1,5 +1,8 @@
 package org.talend.components.common.runtime;
 
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,9 +13,6 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.BulkFileProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
-
-import java.io.IOException;
-import java.util.List;
 
 public class BulkFileSink implements Sink {
 
@@ -27,8 +27,9 @@ public class BulkFileSink implements Sink {
     }
 
     @Override
-    public void initialize(RuntimeContainer container, ComponentProperties properties) {
-        this.properties = (BulkFileProperties)properties;
+    public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
+        this.properties = (BulkFileProperties) properties;
+        return ValidationResult.OK;
     }
 
     @Override

@@ -46,8 +46,9 @@ public class JDBCSourceOrSink implements SourceOrSink {
     private Connection conn;
 
     @Override
-    public void initialize(RuntimeContainer runtime, ComponentProperties properties) {
+    public ValidationResult initialize(RuntimeContainer runtime, ComponentProperties properties) {
         this.properties = (JDBCConnectionInfoProperties) properties;
+        return ValidationResult.OK;
     }
 
     private static ValidationResult fillValidationResult(ValidationResult vr, Exception ex) {
@@ -136,7 +137,8 @@ public class JDBCSourceOrSink implements SourceOrSink {
     }
 
     public Connection connect(RuntimeContainer runtime) throws ClassNotFoundException, SQLException {
-        // TODO now we use routines.system.TalendDataSource to get the data connection from the ESB runtime, but now we can't
+        // TODO now we use routines.system.TalendDataSource to get the data connection from the ESB runtime, but now we
+        // can't
         // refer it by the new framework, so will fix it later
 
         // TODO routines.system.SharedDBConnectionLog4j, the same with the TODO above

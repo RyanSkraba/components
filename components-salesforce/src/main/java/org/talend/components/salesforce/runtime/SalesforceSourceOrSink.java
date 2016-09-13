@@ -58,8 +58,9 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     protected static final String KEY_CONNECTION = "Connection";
 
     @Override
-    public void initialize(RuntimeContainer container, ComponentProperties properties) {
+    public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
         this.properties = (SalesforceProvideConnectionProperties) properties;
+        return ValidationResult.OK;
     }
 
     @Override

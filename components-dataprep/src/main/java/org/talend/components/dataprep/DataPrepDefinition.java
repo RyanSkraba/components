@@ -30,16 +30,6 @@ public abstract class DataPrepDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public String getMavenGroupId() {
-        return "org.talend.components";
-    }
-
-    @Override
-    public String getMavenArtifactId() {
-        return "components-dataprep";
-    }
-
-    @Override
     public boolean isSchemaAutoPropagate() {
         return true;
     }

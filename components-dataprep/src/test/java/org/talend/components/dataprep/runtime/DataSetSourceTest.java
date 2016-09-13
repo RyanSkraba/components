@@ -30,7 +30,7 @@ public class DataSetSourceTest {
     @Before
     public void setInputSource() {
         definition = (TDataSetInputDefinition) (componentService.getComponentDefinition("tDatasetInput"));
-        inputSource = (DataSetSource) definition.getRuntime();
+        inputSource = new DataSetSource();
     }
 
     @Test

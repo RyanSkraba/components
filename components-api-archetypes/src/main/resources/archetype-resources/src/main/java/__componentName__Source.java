@@ -44,10 +44,11 @@ public class ${componentName}Source implements BoundedSource {
     
     private transient Schema schema;
 
-    public void initialize(RuntimeContainer container, ComponentProperties properties) {
+    public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
         this.properties = (${componentName}Properties) properties;
         // FIXME - this should be moved to the properties setup
         schema = new Schema.Parser().parse(this.properties.schema.schema.getStringValue()); 
+        return ValidationResult.OK;
     }
 
     public BoundedReader createReader(RuntimeContainer container) {

@@ -32,8 +32,9 @@ public class JDBCRollbackSourceOrSink implements SourceOrSink {
     public TJDBCRollbackProperties properties;
 
     @Override
-    public void initialize(RuntimeContainer runtime, ComponentProperties properties) {
+    public ValidationResult initialize(RuntimeContainer runtime, ComponentProperties properties) {
         this.properties = (TJDBCRollbackProperties) properties;
+        return ValidationResult.OK;
     }
 
     private static ValidationResult fillValidationResult(ValidationResult vr, Exception ex) {

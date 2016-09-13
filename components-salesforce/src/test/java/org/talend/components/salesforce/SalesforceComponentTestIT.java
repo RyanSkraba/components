@@ -12,10 +12,14 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -492,7 +496,7 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
         assertEquals("Id", schema.getFields().get(0).name());
         LOGGER.debug("Endpoint:" + props.connection.endpoint.getValue());
         LOGGER.debug("Module \"Account\" column size:" + schema.getFields().size());
-         assertTrue(schema.getFields().size() > 40);
+        assertTrue(schema.getFields().size() > 40);
     }
 
     @Test
@@ -611,12 +615,6 @@ public class SalesforceComponentTestIT extends SalesforceTestBase {
     @Test
     public void testAllImages() {
         ComponentTestUtils.testAllImages(getComponentService());
-    }
-
-    @Override
-    @Test
-    public void testAllRuntime() {
-        ComponentTestUtils.testAllRuntimeAvaialble(getComponentService());
     }
 
     @Test

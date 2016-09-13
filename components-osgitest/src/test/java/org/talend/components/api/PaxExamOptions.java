@@ -14,6 +14,8 @@ package org.talend.components.api;
 
 import static org.ops4j.pax.exam.CoreOptions.*;
 
+import java.io.File;
+
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.options.DefaultCompositeOption;
 import org.ops4j.pax.exam.options.libraries.JUnitBundlesOption;
@@ -28,7 +30,7 @@ public class PaxExamOptions {
      */
     private static final String DAIKON_VERSION = "0.13.0-SNAPSHOT";
 
-    private static final String COMPONENTS_VERSION = "0.14.0-SNAPSHOT";
+    private static final String COMPONENTS_VERSION = "0.15.0-SNAPSHOT";
 
     private static final String APACHE_KARAF_AID = "apache-karaf";
 
@@ -37,6 +39,9 @@ public class PaxExamOptions {
     static String localRepo = System.getProperty("maven.repo.local", "");
 
     public static Option[] getOptions() {
+        if (localRepo != null && !"".equals(localRepo) && !new File(localRepo).isAbsolute()) {
+            throw new RuntimeException("maven.repo.local system properties must be absolute.");
+        }
         return options(mavenBundle("org.apache.felix", "org.apache.felix.scr"), //
 
         mavenBundle("org.slf4j", "slf4j-api"), //
@@ -50,6 +55,9 @@ public class PaxExamOptions {
                 mavenBundle().groupId("org.codehaus.jackson").artifactId("jackson-mapper-asl"), //
                 mavenBundle().groupId("com.google.guava").artifactId("guava").version("15.0"), //
                 mavenBundle().groupId("org.apache.commons").artifactId("commons-compress"), //
+                mavenBundle().groupId("commons-beanutils").artifactId("commons-beanutils").version("1.8.0"), //
+                mavenBundle().groupId("org.apache.servicemix.bundles")
+                        .artifactId("org.apache.servicemix.bundles.commons-collections").version("3.2.1_3"), //
                 mavenBundle().groupId("org.apache.commons").artifactId("commons-lang3").version("3.4"), //
                 mavenBundle().groupId("org.apache.avro").artifactId("avro").version("1.8.0"), //
                 mavenBundle().groupId("org.eclipse.jetty.orbit").artifactId("javax.servlet").version("3.0.0.v201112011016"), //
@@ -65,6 +73,8 @@ public class PaxExamOptions {
                         .version(COMPONENTS_VERSION), //
                 mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("tests")
                         .version(COMPONENTS_VERSION).noStart(),
+                mavenBundle().groupId("org.talend.components").artifactId("components-api-runtime-service").classifier("bundle")
+                        .version("0.1.0-SNAPSHOT"), //
                 mavenBundle().groupId("org.talend.components").artifactId("components-common").classifier("bundle")
                         .version(COMPONENTS_VERSION),
                 mavenBundle().groupId("org.talend.components").artifactId("components-common").classifier("tests")
@@ -76,15 +86,22 @@ public class PaxExamOptions {
                 mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("tests")
                         .version(COMPONENTS_VERSION).noStart(),
                 mavenBundle("org.apache.servicemix.bundles", "org.apache.servicemix.bundles.hamcrest", "1.3_1"), //
+                mavenBundle().groupId("org.talend.components").artifactId("multiple-runtime-comp").classifier("bundle")
+                        .version("0.1.0-SNAPSHOT"),
+                mavenBundle().groupId("org.talend.components").artifactId("test-multiple-runtime-comp").classifier("tests")
+                        .version("0.1.0-SNAPSHOT").noStart(),
+                mavenBundle().groupId("org.ops4j.pax.url").artifactId("pax-url-aether").version("2.4.5-Talend"),
                 // this is copied from junitBundles() to remove the default pax-exam hamcrest bundle that does
                 // not contains all the nice hamcrest Matchers
                 new DefaultCompositeOption(new JUnitBundlesOption(), systemProperty("pax.exam.invoker").value("junit"),
                         bundle("link:classpath:META-INF/links/org.ops4j.pax.exam.invoker.junit.link")),
                 cleanCaches() //
-                , frameworkProperty("org.osgi.framework.system.packages.extra").value("sun.misc"),
+                , frameworkProperty("org.osgi.framework.system.packages.extra").value("sun.misc"), //
                 when(localRepo.length() > 0).useOptions(systemProperty("org.ops4j.pax.url.mvn.localRepository").value(localRepo))
+
         // ,vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5010"), systemTimeout(0)//
         );
+
     }
 
     // public static Option[] getOptions() {

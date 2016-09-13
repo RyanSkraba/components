@@ -12,25 +12,24 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutput;
 
-import org.talend.components.api.Constants;
-import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.OutputComponentDefinition;
-import org.talend.components.api.component.runtime.Sink;
+import java.util.EnumSet;
+import java.util.Set;
+
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.RuntimeInfo;
+import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.runtime.SalesforceSink;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
-
-import aQute.bnd.annotation.component.Component;
 
 /**
  * Component that can connect to a salesforce system and put some data into it.
  */
-
-@Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TSalesforceOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TSalesforceOutputDefinition extends SalesforceDefinition implements OutputComponentDefinition {
+public class TSalesforceOutputDefinition extends SalesforceDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceOutput"; //$NON-NLS-1$
 
@@ -72,8 +71,19 @@ public class TSalesforceOutputDefinition extends SalesforceDefinition implements
     }
 
     @Override
-    public Sink getRuntime() {
-        return new SalesforceSink();
+    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology componentType) {
+        if (componentType == ConnectorTopology.INCOMING || componentType == ConnectorTopology.INCOMING_AND_OUTGOING) {
+            return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
+                    DependenciesReader.computeDependenciesFilePath(getMavenGroupId(), getMavenArtifactId()),
+                    SalesforceSink.class.getCanonicalName());
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return EnumSet.of(ConnectorTopology.INCOMING, ConnectorTopology.INCOMING_AND_OUTGOING);
     }
 
 }

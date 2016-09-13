@@ -13,11 +13,7 @@
 package org.talend.components.api.service.internal.osgi;
 
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.avro.Schema;
 import org.osgi.framework.BundleContext;
@@ -25,10 +21,12 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.AbstractTopLevelDefinition;
+import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentRegistry;
@@ -36,7 +34,6 @@ import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
-import org.talend.daikon.NamedThing;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.service.Repository;
@@ -61,20 +58,9 @@ public class ComponentServiceOsgi implements ComponentService {
         this.gctx = aGctx;
     }
 
-    private final class ComponentRegistryOsgi implements ComponentRegistry {
+    private ComponentService componentServiceDelegate;
 
-        private BundleContext bc;
-
-        public ComponentRegistryOsgi(BundleContext bc) {
-            this.bc = bc;
-
-        }
-
-        private Map<String, ComponentDefinition> components;
-
-        private Map<String, ComponentWizardDefinition> componentWizards;
-
-        protected <T extends NamedThing> Map<String, T> populateMap(Class<T> cls) {
+    protected static <T> Map<String, T> populateMap(BundleContext bc, Class<T> cls) {
             Map<String, T> map = new HashMap<>();
             try {
                 String typeCanonicalName = cls.getCanonicalName();
@@ -90,37 +76,23 @@ public class ComponentServiceOsgi implements ComponentService {
                                 + service.getClass().getCanonicalName());
                     }
                 }
-                if (map.isEmpty()) {// warn if not comonents where registered
+            if (map.isEmpty()) {// warn if no components were registered
                     LOGGER.warn("Could not find any registered components for type :" + typeCanonicalName); //$NON-NLS-1$
                 } // else everything is fine
             } catch (InvalidSyntaxException e) {
-                LOGGER.error("Failed to get ComponentDefinition services", e); //$NON-NLS-1$
+            LOGGER.error("Failed to get " + cls.getSimpleName() + " services", e); //$NON-NLS-1$
             }
             return map;
         }
 
-        @Override
-        public Map<String, ComponentDefinition> getComponents() {
-            if (components == null) {
-                components = populateMap(ComponentDefinition.class);
-            }
-            return components;
-        }
-
-        @Override
-        public Map<String, ComponentWizardDefinition> getComponentWizards() {
-            if (componentWizards == null) {
-                componentWizards = populateMap(ComponentWizardDefinition.class);
-            }
-            return componentWizards;
-        }
-    }
-
-    private ComponentService componentServiceDelegate;
-
     @Activate
     void activate(BundleContext bundleContext) throws InvalidSyntaxException {
-        this.componentServiceDelegate = new ComponentServiceImpl(new ComponentRegistryOsgi(bundleContext));
+        ComponentRegistry registry = new ComponentRegistry();
+        Map<String, ComponentInstaller> installers = populateMap(bundleContext, ComponentInstaller.class);
+        for (ComponentInstaller installer : installers.values())
+            installer.install(registry);
+        registry.lock();
+        this.componentServiceDelegate = new ComponentServiceImpl(registry);
     }
 
     @Override
@@ -239,11 +211,6 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
-    public Set<String> getMavenUriDependencies(String componentName) {
-        return componentServiceDelegate.getMavenUriDependencies(componentName);
-    }
-
-    @Override
     public Schema getSchema(ComponentProperties componentProperties, Connector connector, boolean isOuput) {
         return componentServiceDelegate.getSchema(componentProperties, connector, isOuput);
     }
@@ -262,6 +229,11 @@ public class ComponentServiceOsgi implements ComponentService {
     @Override
     public boolean setNestedPropertiesValues(ComponentProperties targetProperties, Properties nestedValues) {
         return componentServiceDelegate.setNestedPropertiesValues(targetProperties, nestedValues);
+    }
+
+    @Override
+    public RuntimeInfo getRuntimeInfo(String componentName, Properties properties, ConnectorTopology componentType) {
+        return componentServiceDelegate.getRuntimeInfo(componentName, properties, componentType);
     }
 
 }

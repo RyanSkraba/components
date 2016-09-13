@@ -14,24 +14,24 @@ package org.talend.components.splunk;
 
 import static org.talend.daikon.properties.property.PropertyFactory.*;
 
-import org.talend.components.api.Constants;
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.talend.components.api.component.AbstractComponentDefinition;
-import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.OutputComponentDefinition;
-import org.talend.components.api.component.runtime.Sink;
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.RuntimeInfo;
+import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.splunk.runtime.TSplunkEventCollectorSink;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
-
-import aQute.bnd.annotation.component.Component;
 
 /**
  * The tSplunkEventCollectorDefinition acts as an entry point for all of services that a component provides to integrate
  * with the Studio (at design-time) and other components (at run-time).
  */
-@Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TSplunkEventCollectorDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TSplunkEventCollectorDefinition extends AbstractComponentDefinition implements OutputComponentDefinition {
+public class TSplunkEventCollectorDefinition extends AbstractComponentDefinition {
 
     public static String RETURN_RESPONSE_CODE = "responseCode";
 
@@ -55,16 +55,6 @@ public class TSplunkEventCollectorDefinition extends AbstractComponentDefinition
     }
 
     @Override
-    public String getMavenGroupId() {
-        return "org.talend.components";
-    }
-
-    @Override
-    public String getMavenArtifactId() {
-        return "components-splunk";
-    }
-
-    @Override
     public String getName() {
         return COMPONENT_NAME;
     }
@@ -80,7 +70,18 @@ public class TSplunkEventCollectorDefinition extends AbstractComponentDefinition
     }
 
     @Override
-    public Sink getRuntime() {
-        return new TSplunkEventCollectorSink();
+    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology componentType) {
+        if (componentType == ConnectorTopology.INCOMING) {
+            return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
+                    DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-splunk"),
+                    TSplunkEventCollectorSink.class.getCanonicalName());
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return EnumSet.of(ConnectorTopology.INCOMING);
     }
 }

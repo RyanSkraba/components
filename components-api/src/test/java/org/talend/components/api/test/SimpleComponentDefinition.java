@@ -12,9 +12,14 @@
 // ============================================================================
 package org.talend.components.api.test;
 
+import java.util.Set;
+
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 
 public class SimpleComponentDefinition extends AbstractComponentDefinition {
@@ -33,8 +38,6 @@ public class SimpleComponentDefinition extends AbstractComponentDefinition {
 
     private String mavenArtifactId;
 
-    private String name;
-
     private Class<? extends ComponentProperties> propertyClass;
 
     @Override
@@ -45,21 +48,6 @@ public class SimpleComponentDefinition extends AbstractComponentDefinition {
     @Override
     public String getPngImagePath(ComponentImageType imageType) {
         return imagePath;
-    }
-
-    @Override
-    public String getMavenGroupId() {
-        return mavenGroupId;
-    }
-
-    @Override
-    public String getMavenArtifactId() {
-        return mavenArtifactId;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     @Override
@@ -95,21 +83,22 @@ public class SimpleComponentDefinition extends AbstractComponentDefinition {
     }
 
     /**
-     * Sets the name.
-     * 
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
      * Sets the propertyClass.
      * 
      * @param propertyClass the propertyClass to set
      */
     public void setPropertyClass(Class<? extends ComponentProperties> propertyClass) {
         this.propertyClass = propertyClass;
+    }
+
+    @Override
+    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology componentType) {
+        return null;
+    }
+
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return null;
     }
 
 }

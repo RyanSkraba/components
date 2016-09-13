@@ -12,20 +12,20 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutputbulk;
 
-import org.talend.components.api.Constants;
-import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.OutputComponentDefinition;
-import org.talend.components.api.component.runtime.Sink;
+import java.util.EnumSet;
+import java.util.Set;
+
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.RuntimeInfo;
+import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.runtime.SalesforceBulkFileSink;
+import org.talend.daikon.properties.Properties;
 
-import aQute.bnd.annotation.component.Component;
-
-@Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TSalesforceOutputBulkDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TSalesforceOutputBulkDefinition extends SalesforceDefinition implements OutputComponentDefinition {
+public class TSalesforceOutputBulkDefinition extends SalesforceDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceOutputBulk"; //$NON-NLS-1$
 
@@ -56,8 +56,18 @@ public class TSalesforceOutputBulkDefinition extends SalesforceDefinition implem
     }
 
     @Override
-    public Sink getRuntime() {
-        return new SalesforceBulkFileSink();
+    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology componentType) {
+        if (componentType == ConnectorTopology.INCOMING) {
+            return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
+                    DependenciesReader.computeDependenciesFilePath(getMavenGroupId(), getMavenArtifactId()),
+                    SalesforceBulkFileSink.class.getCanonicalName());
+        } else {
+            return null;
+        }
     }
 
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return EnumSet.of(ConnectorTopology.INCOMING);
+    }
 }

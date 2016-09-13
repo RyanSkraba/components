@@ -23,6 +23,8 @@ import org.talend.components.jira.runtime.reader.JiraProjectsReader;
 import org.talend.components.jira.runtime.reader.JiraReader;
 import org.talend.components.jira.runtime.reader.JiraSearchReader;
 import org.talend.components.jira.tjirainput.TJiraInputProperties;
+import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.ValidationResult.Result;
 
 /**
  * Jira {@link Source} implementation
@@ -32,8 +34,7 @@ public class JiraSource extends JiraSourceOrSink implements Source {
     private static final long serialVersionUID = 6087511765623929542L;
 
     /**
-     * Jira REST API resource type.
-     * Could be issue or project
+     * Jira REST API resource type. Could be issue or project
      */
     private Resource resourceType;
 
@@ -59,13 +60,17 @@ public class JiraSource extends JiraSourceOrSink implements Source {
      * @param properties component properties
      */
     @Override
-    public void initialize(RuntimeContainer container, ComponentProperties properties) {
-        super.initialize(container, properties);
+    public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
+        ValidationResult validate = super.initialize(container, properties);
+        if (validate.getStatus() == Result.ERROR) {
+            return validate;
+        }
         TJiraInputProperties inputProperties = (TJiraInputProperties) properties;
         this.jql = inputProperties.jql.getStringValue();
         this.batchSize = inputProperties.batchSize.getValue();
         this.projectId = inputProperties.projectId.getStringValue();
         this.resourceType = inputProperties.resource.getValue();
+        return ValidationResult.OK;
     }
 
     /**

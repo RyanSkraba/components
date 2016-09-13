@@ -16,6 +16,11 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLStreamHandler;
+import java.net.URLStreamHandlerFactory;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -23,25 +28,26 @@ import java.util.Set;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import org.ops4j.pax.url.mvn.Handler;
+import org.ops4j.pax.url.mvn.ServiceConstants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
+import org.talend.components.api.service.internal.ComponentRegistry;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
-import org.talend.components.api.service.testcomponent.ComponentPropertiesWithDefinedI18N;
-import org.talend.components.api.service.testcomponent.TestComponentDefinition;
-import org.talend.components.api.service.testcomponent.TestComponentProperties;
-import org.talend.components.api.service.testcomponent.TestComponentWizard;
-import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
+import org.talend.components.api.service.testcomponent.*;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.test.AbstractComponentTest;
 import org.talend.components.api.test.ComponentTestUtils;
-import org.talend.components.api.test.SimpleComponentRegistry;
 import org.talend.components.api.wizard.ComponentWizard;
+import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.i18n.I18nMessages;
 
@@ -59,6 +65,26 @@ public class ComponentServiceTest extends AbstractComponentTest {
 
     private ComponentServiceImpl componentService;
 
+    @BeforeClass
+    public static void setupMavenUrlHandler() {
+        try {
+            new URL("mvn:foo/bar");
+        } catch (MalformedURLException e) {// setup the mvn protocla handler if not already setup
+            URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
+
+                @Override
+                public URLStreamHandler createURLStreamHandler(String protocol) {
+                    if (ServiceConstants.PROTOCOL.equals(protocol)) {
+                        return new Handler();
+                    } else {
+                        return null;
+                    }
+                }
+            });
+        }
+
+    }
+
     @Before
     public void initializeComponentRegistryAnsService() {
         // reset the component service
@@ -69,10 +95,10 @@ public class ComponentServiceTest extends AbstractComponentTest {
     @Override
     public ComponentService getComponentService() {
         if (componentService == null) {
-            SimpleComponentRegistry testComponentRegistry = new SimpleComponentRegistry();
-            testComponentRegistry.addComponent(TestComponentDefinition.COMPONENT_NAME, new TestComponentDefinition());
-            testComponentRegistry.addWizard(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME,
-                    new TestComponentWizardDefinition());
+            ComponentRegistry testComponentRegistry = new ComponentRegistry();
+            testComponentRegistry.registerComponentDefinition(Arrays.asList((ComponentDefinition) new TestComponentDefinition()));
+            testComponentRegistry.registerComponentWizardDefinition(
+                    Arrays.asList((ComponentWizardDefinition) new TestComponentWizardDefinition()));
             componentService = new ComponentServiceImpl(testComponentRegistry);
         }
         return componentService;
@@ -134,38 +160,30 @@ public class ComponentServiceTest extends AbstractComponentTest {
         assertEquals(2, testComponentDefinition.getFamilies().length);
     }
 
+    @Override
     @Test
     public void testAlli18n() {
         ComponentTestUtils.testAlli18n(getComponentService(), errorCollector);
     }
 
+    @Override
     @Test
     public void testAllImages() {
         ComponentTestUtils.testAllImages(getComponentService());
     }
 
     @Test
-    public void testAllRuntime() {
-        ComponentTestUtils.testAllRuntimeAvaialble(getComponentService());
-    }
-
-    @Test
-    public void testGetDependencies() {
+    public void testGetRuntimeInfo() throws MalformedURLException {
         // check the comp def return the proper stream for the pom
-        Set<String> mavenUriDependencies = getComponentService().getMavenUriDependencies(TestComponentDefinition.COMPONENT_NAME);
-        assertEquals(5, mavenUriDependencies.size());
-        assertThat(mavenUriDependencies,
-                containsInAnyOrder("mvn:org.apache.maven/maven-core/3.3.3/jar", //
-                        "mvn:org.eclipse.sisu/org.eclipse.sisu.plexus/0.0.0.M2a/jar", //
-                        "mvn:org.apache.maven/maven-artifact/3.3.3/jar", //
-                        "mvn:org.eclipse.aether/aether-transport-file/1.0.0.v20140518/jar", //
-                        "mvn:org.talend.components/file-input/0.1.0.SNAPSHOT/jar"//
+        RuntimeInfo runtimeInfo = getComponentService().getRuntimeInfo(TestComponentDefinition.COMPONENT_NAME, null, null);
+        assertEquals(5, runtimeInfo.getMavenUrlDependencies().size());
+        assertThat(runtimeInfo.getMavenUrlDependencies(),
+                containsInAnyOrder(new URL("mvn:org.apache.maven/maven-core/3.3.3/jar"), //
+                        new URL("mvn:org.eclipse.sisu/org.eclipse.sisu.plexus/0.0.0.M2a/jar"), //
+                        new URL("mvn:org.apache.maven/maven-artifact/3.3.3/jar"), //
+                        new URL("mvn:org.eclipse.aether/aether-transport-file/1.0.0.v20140518/jar"), //
+                        new URL("mvn:org.talend.components/file-input/0.1.0.SNAPSHOT/jar")//
         ));
-    }
-
-    @Test
-    public void testGetAllDepenendencies() {
-        ComponentTestUtils.testAllDesignDependenciesPresent(getComponentService(), errorCollector);
     }
 
     @Test

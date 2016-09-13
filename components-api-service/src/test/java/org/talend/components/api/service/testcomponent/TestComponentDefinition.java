@@ -14,19 +14,22 @@ package org.talend.components.api.service.testcomponent;
 
 import static org.talend.daikon.properties.property.PropertyFactory.*;
 
-import org.talend.components.api.Constants;
+import java.util.Set;
+
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.RuntimeInfo;
+import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.StringProperty;
 
-import aQute.bnd.annotation.component.Component;
-
-@Component(name = Constants.COMPONENT_BEAN_PREFIX + TestComponentDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TestComponentDefinition extends AbstractComponentDefinition implements ComponentDefinition {
 
     public static final String COMPONENT_NAME = "TestComponent"; //$NON-NLS-1$
@@ -68,13 +71,15 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     }
 
     @Override
-    public String getMavenGroupId() {
-        return "org.talend.components.api.test";
+    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology compType) {
+        return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
+                DependenciesReader.computeDependenciesFilePath("org.talend.components.api.test", "test-components"),
+                COMPONENT_NAME);
     }
 
     @Override
-    public String getMavenArtifactId() {
-        return "test-components";
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return null;
     }
 
 }

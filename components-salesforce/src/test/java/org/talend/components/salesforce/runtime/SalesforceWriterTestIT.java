@@ -12,6 +12,9 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,19 +46,8 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputPropert
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.property.Property;
-import com.sforce.ws.util.Base64;
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import com.sforce.ws.util.Base64;
 
 public class SalesforceWriterTestIT extends SalesforceTestBase {
 
@@ -146,15 +138,16 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
             int nameIndex = -1;
             @SuppressWarnings("unchecked")
-            Reader<IndexedRecord> sfReader = (Reader<IndexedRecord>) sfSource.createReader(container);
+            Reader<IndexedRecord> sfReader = sfSource.createReader(container);
             if (sfReader.start()) {
                 do {
                     IndexedRecord r = sfReader.getCurrent();
                     if (nameIndex == -1) {
                         nameIndex = r.getSchema().getField("Name").pos();
                     }
-                    if (String.valueOf(r.get(nameIndex)).startsWith(prefixToDelete))
+                    if (String.valueOf(r.get(nameIndex)).startsWith(prefixToDelete)) {
                         recordsToClean.add(r);
+                    }
                 } while (sfReader.advance());
             }
         }
@@ -182,8 +175,9 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
             sfWriter.open("uid1");
 
             // Write one record.
-            for (IndexedRecord r : recordsToClean)
+            for (IndexedRecord r : recordsToClean) {
                 sfWriter.write(r);
+            }
 
             // Finish the Writer, WriteOperation and Sink.
             Result wr1 = sfWriter.close();
@@ -264,7 +258,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
     /**
      * @param isDynamic true if the actual rows should contain more columns than the schema specified in the component
-     * properties.
+     *            properties.
      */
     protected void runOutputInsert(boolean isDynamic) throws Exception {
         TSalesforceOutputProperties props = createSalesforceoutputProperties(EXISTING_MODULE_NAME);
@@ -605,7 +599,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
         DefaultComponentRuntimeContainerImpl container = new DefaultComponentRuntimeContainerImpl();
 
-        List records = new ArrayList<IndexedRecord>();
+        List<IndexedRecord> records = new ArrayList<>();
         String random = String.valueOf(createNewRandom());
         IndexedRecord r1 = new GenericData.Record(SCHEMA_INSERT_EVENT);
         r1.put(0, "2011-02-02T02:02:02");
@@ -655,16 +649,15 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
             IndexedRecord inputRecords_2 = inpuRecords.get(1);
             assertEquals(random, inputRecords_1.get(6));
             assertEquals(random, inputRecords_2.get(6));
-            assertEquals("2011-02-02T02:02:02.000Z", inputRecords_1.get(1));
-            assertEquals("2016-02-02T02:02:02.000Z", inputRecords_2.get(1));
-            assertEquals("2011-02-02T22:02:02.000Z", inputRecords_1.get(2));
-            assertEquals("2016-02-02T12:02:02.000Z", inputRecords_2.get(2));
-            assertEquals("2011-02-02", inputRecords_1.get(3));
-            assertEquals("2016-02-02", inputRecords_2.get(3));
-            assertEquals("1200", inputRecords_1.get(4));
-            assertEquals("600", inputRecords_2.get(4));
-            assertEquals("true", inputRecords_1.get(5));
-            assertEquals("false", inputRecords_2.get(5));
+            // we use containsInAnyOrder because we are not garanteed to have the same order every run.
+            assertThat(Arrays.asList("2011-02-02T02:02:02.000Z", "2016-02-02T02:02:02.000Z"),
+                    containsInAnyOrder(inputRecords_1.get(1), inputRecords_2.get(1)));
+            assertThat(Arrays.asList("2011-02-02T22:02:02.000Z", "2016-02-02T12:02:02.000Z"),
+                    containsInAnyOrder(inputRecords_1.get(2), inputRecords_2.get(2)));
+            assertThat(Arrays.asList("2011-02-02", "2016-02-02"),
+                    containsInAnyOrder(inputRecords_1.get(3), inputRecords_2.get(3)));
+            assertThat(Arrays.asList("1200", "600"), containsInAnyOrder(inputRecords_1.get(4), inputRecords_2.get(4)));
+            assertThat(Arrays.asList("true", "false"), containsInAnyOrder(inputRecords_1.get(5), inputRecords_2.get(5)));
 
         } finally {
             deleteRows(inpuRecords, sfInputProps);
@@ -688,13 +681,13 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         String parentId = getFirstCreatedAccountRecordId();
         LOGGER.debug("ParentId for attachments is:" + parentId);
         IndexedRecord r1 = new GenericData.Record(SCHEMA_ATTACHMENT);
-        r1.put(0, "attachment_1_"+random + ".txt");
+        r1.put(0, "attachment_1_" + random + ".txt");
         r1.put(1, "VGhpcyBpcyBhIHRlc3QgZmlsZSAxICE=");
         r1.put(2, "text/plain");
         r1.put(3, parentId);
 
         IndexedRecord r2 = new GenericData.Record(SCHEMA_ATTACHMENT);
-        r2.put(0, "attachment_2_"+random + ".txt");
+        r2.put(0, "attachment_2_" + random + ".txt");
         r2.put(1,
                 "QmFzZSA2NC1lbmNvZGVkIGJpbmFyeSBkYXRhLiBGaWVsZHMgb2YgdGhpcyB0eXBlIGFyZSB1c2VkIGZvciBzdG9yaW5"
                         + "nIGJpbmFyeSBmaWxlcyBpbiBBdHRhY2htZW50IHJlY29yZHMsIERvY3VtZW50IHJlY29yZHMsIGFuZCBTY2"
@@ -722,7 +715,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         ComponentDefinition sfInputDef = new TSalesforceInputDefinition();
         TSalesforceInputProperties sfInputProps = (TSalesforceInputProperties) sfInputDef.createRuntimeProperties();
         sfInputProps.copyValuesFrom(sfProps);
-        sfInputProps.condition.setValue("Name = 'attachment_1_"+ random + ".txt' or Name = 'attachment_2_"+ random + ".txt'");
+        sfInputProps.condition.setValue("Name = 'attachment_1_" + random + ".txt' or Name = 'attachment_2_" + random + ".txt'");
 
         sfInputProps.module.main.schema.setValue(SCHEMA_ATTACHMENT);
         List<IndexedRecord> inpuRecords = readRows(sfInputProps);
@@ -730,15 +723,15 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
             assertEquals(2, inpuRecords.size());
             IndexedRecord inputRecords_1 = null;
             IndexedRecord inputRecords_2 = null;
-            if(("attachment_1_"+random + ".txt").equals(String.valueOf(inpuRecords.get(0).get(0)))){
+            if (("attachment_1_" + random + ".txt").equals(String.valueOf(inpuRecords.get(0).get(0)))) {
                 inputRecords_1 = inpuRecords.get(0);
                 inputRecords_2 = inpuRecords.get(1);
-            }else {
+            } else {
                 inputRecords_1 = inpuRecords.get(1);
                 inputRecords_2 = inpuRecords.get(0);
             }
-            assertEquals("attachment_1_"+random + ".txt", inputRecords_1.get(0));
-            assertEquals("attachment_2_"+random + ".txt", inputRecords_2.get(0));
+            assertEquals("attachment_1_" + random + ".txt", inputRecords_1.get(0));
+            assertEquals("attachment_2_" + random + ".txt", inputRecords_2.get(0));
             assertEquals("VGhpcyBpcyBhIHRlc3QgZmlsZSAxICE=", inputRecords_1.get(1));
             assertEquals(
                     "Base 64-encoded binary data. Fields of this type are used for storing binary files in Attachment "

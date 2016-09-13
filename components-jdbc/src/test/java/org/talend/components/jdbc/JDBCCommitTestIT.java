@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.jdbc;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,14 +68,17 @@ public class JDBCCommitTestIT {
 
         private Map<String, Object> map = new HashMap<>();
 
+        @Override
         public Object getComponentData(String componentId, String key) {
             return map.get(componentId + "_" + key);
         }
 
+        @Override
         public void setComponentData(String componentId, String key, Object data) {
             map.put(componentId + "_" + key, data);
         }
 
+        @Override
         public String getCurrentComponentId() {
             return refComponentId;
         }
@@ -130,7 +133,7 @@ public class JDBCCommitTestIT {
         TJDBCConnectionDefinition connectionDefinition = new TJDBCConnectionDefinition();
         TJDBCConnectionProperties connectionProperties = createCommonJDBCConnectionProperties(connectionDefinition);
 
-        JDBCSourceOrSink sourceOrSink = (JDBCSourceOrSink) connectionDefinition.getRuntime();
+        JDBCSourceOrSink sourceOrSink = new JDBCSourceOrSink();
         sourceOrSink.initialize(null, connectionProperties);
 
         ValidationResult result = sourceOrSink.validate(container);
@@ -149,7 +152,7 @@ public class JDBCCommitTestIT {
 
         outputProperties.referencedComponent.componentInstanceId.setValue(refComponentId);
 
-        JDBCSink sink = (JDBCSink) outputDefinition.getRuntime();
+        JDBCSink sink = new JDBCSink();
         sink.initialize(container, outputProperties);
 
         WriteOperation writerOperation = sink.createWriteOperation();
@@ -185,7 +188,7 @@ public class JDBCCommitTestIT {
         commitProperties.referencedComponent.componentInstanceId.setValue(refComponentId);
         commitProperties.closeConnection.setValue(false);
 
-        JDBCCommitSourceOrSink commitSourceOrSink = (JDBCCommitSourceOrSink) commitDefinition.getRuntime();
+        JDBCCommitSourceOrSink commitSourceOrSink = new JDBCCommitSourceOrSink();
         commitSourceOrSink.initialize(container, commitProperties);
         commitSourceOrSink.validate(container);
 
@@ -217,7 +220,7 @@ public class JDBCCommitTestIT {
         TJDBCConnectionDefinition connectionDefinition = new TJDBCConnectionDefinition();
         TJDBCConnectionProperties connectionProperties = createCommonJDBCConnectionProperties(connectionDefinition);
 
-        JDBCSourceOrSink sourceOrSink = (JDBCSourceOrSink) connectionDefinition.getRuntime();
+        JDBCSourceOrSink sourceOrSink = new JDBCSourceOrSink();
         sourceOrSink.initialize(null, connectionProperties);
 
         ValidationResult result = sourceOrSink.validate(container);
@@ -230,7 +233,7 @@ public class JDBCCommitTestIT {
         commitProperties.referencedComponent.componentInstanceId.setValue(refComponentId);
         commitProperties.closeConnection.setValue(true);
 
-        JDBCCommitSourceOrSink commitSourceOrSink = (JDBCCommitSourceOrSink) commitDefinition.getRuntime();
+        JDBCCommitSourceOrSink commitSourceOrSink = new JDBCCommitSourceOrSink();
         commitSourceOrSink.initialize(container, commitProperties);
         commitSourceOrSink.validate(container);
 

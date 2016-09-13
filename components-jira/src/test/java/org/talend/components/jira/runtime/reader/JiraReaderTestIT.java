@@ -24,10 +24,7 @@ import static org.talend.components.jira.testutils.JiraTestConstants.PASS;
 import static org.talend.components.jira.testutils.JiraTestConstants.USER;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -40,8 +37,8 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.service.internal.ComponentRegistry;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
-import org.talend.components.api.test.SimpleComponentRegistry;
 import org.talend.components.jira.runtime.JiraSource;
 import org.talend.components.jira.tjirainput.TJiraInputDefinition;
 import org.talend.components.jira.tjirainput.TJiraInputProperties;
@@ -78,8 +75,8 @@ public class JiraReaderTestIT {
      */
     @BeforeClass
     public static void setupService() {
-        SimpleComponentRegistry registry = new SimpleComponentRegistry();
-        registry.addComponent(TJiraInputDefinition.COMPONENT_NAME, new TJiraInputDefinition());
+        ComponentRegistry registry = new ComponentRegistry();
+        registry.registerComponentDefinition(Arrays.asList((ComponentDefinition) new TJiraInputDefinition()));
         componentService = new ComponentServiceImpl(registry);
     }
 
@@ -287,7 +284,7 @@ public class JiraReaderTestIT {
         assertEquals(0, returnValues.get(ComponentDefinition.RETURN_REJECT_RECORD_COUNT));
         jiraReader.close();
     }
-    
+
     /**
      * Returns {@link Matcher} which iterates over {@link Iterable} and checks whether element contains
      * specified string
@@ -296,36 +293,36 @@ public class JiraReaderTestIT {
      * @return {@link Matcher}
      */
     public static <E> Matcher<Iterable<? extends E>> containtEntityWithName(String name) {
-    	return new IsIterableContainingEntityWithName<E>(name);
+        return new IsIterableContainingEntityWithName<E>(name);
     }
-    
+
     /**
      * Returns {@link Matcher} which iterates over {@link Iterable} and checks whether element contains
      * specified string
      */
     private static class IsIterableContainingEntityWithName<E> extends BaseMatcher<Iterable<? extends E>> {
-    	
-    	private String entityName;
-    	
-    	IsIterableContainingEntityWithName(String entityName) {
-    		this.entityName = entityName;
-    	}
 
-		@Override
-		public boolean matches(Object item) {
-			Iterable<? extends E> iterable = (Iterable<? extends E>) item;
-			for (E entity : iterable) {
-				if (entity.toString().contains(entityName)) {
-					return true;
-				}
-			}
-			return false;
-		}
+        private String entityName;
 
-		@Override
-		public void describeTo(Description description) {
-			description.appendText("JSON entity which contains " + entityName);
-		}
+        IsIterableContainingEntityWithName(String entityName) {
+            this.entityName = entityName;
+        }
+
+        @Override
+        public boolean matches(Object item) {
+            Iterable<? extends E> iterable = (Iterable<? extends E>) item;
+            for (E entity : iterable) {
+                if (entity.toString().contains(entityName)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public void describeTo(Description description) {
+            description.appendText("JSON entity which contains " + entityName);
+        }
     }
 
 }

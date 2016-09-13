@@ -12,20 +12,24 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceoutputbulkexec;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.VirtualComponentDefinition;
+import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 
 import aQute.bnd.annotation.component.Component;
 
-@Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TSalesforceOutputBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition implements VirtualComponentDefinition {
 
     public static final String COMPONENT_NAME = "tSalesforceOutputBulkExec"; //$NON-NLS-1$
@@ -74,6 +78,16 @@ public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition im
     @Override
     public ComponentDefinition getOutputComponentDefinition() {
         return new TSalesforceBulkExecDefinition();
+    }
+
+    @Override
+    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology) {
+        return null;// this is a very specific component that delegates the runtime to the output and input components
+    }
+
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return EnumSet.of(ConnectorTopology.INCOMING_AND_OUTGOING);
     }
 
 }

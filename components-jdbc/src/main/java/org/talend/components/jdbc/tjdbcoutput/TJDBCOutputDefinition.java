@@ -12,20 +12,21 @@
 // ============================================================================
 package org.talend.components.jdbc.tjdbcoutput;
 
-import org.talend.components.api.Constants;
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.talend.components.api.component.AbstractComponentDefinition;
-import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.OutputComponentDefinition;
-import org.talend.components.api.component.runtime.Sink;
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.RuntimeInfo;
+import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.runtime.JDBCSink;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
-import aQute.bnd.annotation.component.Component;
-
-@Component(name = Constants.COMPONENT_BEAN_PREFIX + TJDBCOutputDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TJDBCOutputDefinition extends AbstractComponentDefinition implements OutputComponentDefinition {
+public class TJDBCOutputDefinition extends AbstractComponentDefinition {
 
     public static final String COMPONENT_NAME = "tJDBCOutputNew";
 
@@ -39,23 +40,8 @@ public class TJDBCOutputDefinition extends AbstractComponentDefinition implement
     }
 
     @Override
-    public Sink getRuntime() {
-        return new JDBCSink();
-    }
-
-    @Override
     public String[] getFamilies() {
         return new String[] { "Databases/DB_JDBC" };
-    }
-
-    @Override
-    public String getMavenGroupId() {
-        return "org.talend.components";
-    }
-
-    @Override
-    public String getMavenArtifactId() {
-        return "components-jdbc";
     }
 
     // TODO can't i18n
@@ -85,6 +71,22 @@ public class TJDBCOutputDefinition extends AbstractComponentDefinition implement
     @Override
     public boolean isConditionalInputs() {
         return true;
+    }
+
+    @Override
+    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology) {
+        if (connectorTopology == ConnectorTopology.INCOMING || connectorTopology == ConnectorTopology.INCOMING_AND_OUTGOING) {
+            return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
+                    DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-jdbc"),
+                    JDBCSink.class.getCanonicalName());
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return EnumSet.of(ConnectorTopology.INCOMING, ConnectorTopology.INCOMING_AND_OUTGOING);
     }
 
 }

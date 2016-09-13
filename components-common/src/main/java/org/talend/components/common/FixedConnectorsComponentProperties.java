@@ -63,7 +63,7 @@ public abstract class FixedConnectorsComponentProperties extends ComponentProper
                 throw new ComponentException(ComponentsErrorCode.WRONG_CONNECTOR,
                         ExceptionContext.build().put("properties", this.getClass().getCanonicalName()));
             }
-        } // not a connector handled by this class
+        } // else not a connector handled by this class so return null
         return null;
     }
 

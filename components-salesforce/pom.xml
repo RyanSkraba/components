@@ -5,29 +5,39 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.14.0-SNAPSHOT</version>
+        <version>0.15.0-SNAPSHOT</version>
         <relativePath>../components-parent/pom.xml</relativePath>
     </parent>
     <properties>
-        <partner.version>34.0.0</partner.version>
+        <partner.version>37.0.3</partner.version>
     </properties>
 
     <name>Components - Salesforce</name>
     <artifactId>components-salesforce</artifactId>
-    <version>0.14.0-SNAPSHOT</version>
+    <version>0.15.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <dependencies>
 
         <dependency>
             <groupId>com.force.api</groupId>
             <artifactId>force-wsc</artifactId>
-            <version>35.0.0</version>
+            <version>38.0.1</version>
         </dependency>
-
+        <!-- the following 2 deps are required for the com.force.api above -->
+		<dependency>
+		    <groupId>commons-beanutils</groupId>
+		    <artifactId>commons-beanutils</artifactId>
+		    <version>1.8.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>commons-collections</groupId>
+		    <artifactId>commons-collections</artifactId>
+		    <version>3.2</version>
+		</dependency>
         <!-- Generated Jar files from the WSDL -->
         <dependency>
-            <groupId>org.talend.components.salesforce</groupId>
-            <artifactId>partner</artifactId>
+            <groupId>com.force.api</groupId>
+            <artifactId>force-partner-api</artifactId>
             <version>${partner.version}</version>
         </dependency>
         <dependency>
@@ -45,44 +55,44 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.14.0-SNAPSHOT</version>
+            <version>0.15.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.14.0-SNAPSHOT</version>
+            <version>0.15.0-SNAPSHOT</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service</artifactId>
-            <version>0.14.0-SNAPSHOT</version>
+            <version>0.15.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service</artifactId>
-            <version>0.14.0-SNAPSHOT</version>
+            <version>0.15.0-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
-            <version>0.14.0-SNAPSHOT</version>
+            <version>0.15.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
-            <version>0.14.0-SNAPSHOT</version>
+            <version>0.15.0-SNAPSHOT</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common-oauth</artifactId>
-            <version>0.14.0-SNAPSHOT</version>
+            <version>0.15.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>biz.aQute.bnd</groupId>
@@ -108,6 +118,12 @@
         	<version>1.3</version>
         	<scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api-runtime-service</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>        
         <dependency>
         	<groupId>org.littleshoot</groupId>
 	        <artifactId>littleproxy</artifactId>
@@ -159,7 +175,7 @@
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                                 <Service-Component>*</Service-Component>                                
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                                <Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
+                                <Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt</Include-Resource>
                             </instructions>
                         </configuration>
                     </execution>
@@ -197,9 +213,9 @@
                                 <Bundle-SymbolicName>org.talend.components.salesforce</Bundle-SymbolicName>
                                 <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*,org.apache.avro.*,org.apache.oltu.oauth2*</Import-Package>
                                 <Service-Component>*</Service-Component>
-                                <Embed-Dependency>!components*,*;scope=compile|runtime</Embed-Dependency>
+                                <Embed-Dependency>!components*,*;scope=compile|runtime;artifactId=!commons-beanutils|commons-collections</Embed-Dependency>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                                <Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/dependencies.txt</Include-Resource>
+                                <Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt</Include-Resource>
                             </instructions>
                         </configuration>
                     </execution>

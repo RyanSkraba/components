@@ -35,7 +35,7 @@ import static org.talend.daikon.properties.property.PropertyFactory.newString;
 public class SalesforceConnectionProperties extends ComponentPropertiesImpl
         implements SalesforceProvideConnectionProperties, ComponentReferencePropertiesEnclosing {
 
-    public static final String URL = "https://www.salesforce.com/services/Soap/u/34.0";
+    public static final String URL = "https://www.salesforce.com/services/Soap/u/37.0";
 
     public static final String OAUTH_URL = "https://login.salesforce.com/services/oauth2";
 

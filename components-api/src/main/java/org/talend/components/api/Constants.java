@@ -14,7 +14,9 @@ package org.talend.components.api;
 
 public class Constants {
 
-    public static final String COMPONENT_BEAN_PREFIX = "components#";
-
-    public static final String COMPONENT_WIZARD_BEAN_PREFIX = "components#wizards#";
+    /**
+     * Used in the name attribute of the aQute.bnd.annotation.component.Component annotation of a
+     * {@link ComponentInstaller}. This name attribute is only used during service discovery.
+     */
+    public static final String COMPONENT_INSTALLER_PREFIX = "installer::"; //$NON-NLS-1$
 }
