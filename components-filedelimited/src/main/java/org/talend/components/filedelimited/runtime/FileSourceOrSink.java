@@ -33,8 +33,9 @@ public class FileSourceOrSink implements SourceOrSink {
 
     private transient Schema schema;
 
-    public void initialize(RuntimeContainer container, ComponentProperties properties) {
+    public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
         this.properties = (TFileInputDelimitedProperties) properties;
+        return ValidationResult.OK;
     }
 
     @Override
@@ -101,7 +102,7 @@ public class FileSourceOrSink implements SourceOrSink {
             String defaultValue = null;
             List<Schema.Field> fields = new ArrayList<>();
             for (String columnName : columnsName) {
-                //TODO schema name can't be empty now. Specify a unique name ?
+                // TODO schema name can't be empty now. Specify a unique name ?
                 Schema.Field avroField = new Schema.Field(columnName, AvroUtils._string(), null, defaultValue);
                 avroField.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, String.valueOf(100));
                 avroField.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, String.valueOf(0));

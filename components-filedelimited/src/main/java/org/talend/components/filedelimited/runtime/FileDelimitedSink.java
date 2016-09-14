@@ -8,7 +8,6 @@ import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.NamedThing;
 
 public class FileDelimitedSink extends FileSourceOrSink implements Sink {
@@ -16,11 +15,6 @@ public class FileDelimitedSink extends FileSourceOrSink implements Sink {
     @Override
     public WriteOperation<?> createWriteOperation() {
         return null;
-    }
-
-    @Override
-    public void initialize(RuntimeContainer runtimeContainer, ComponentProperties componentProperties) {
-
     }
 
     @Override

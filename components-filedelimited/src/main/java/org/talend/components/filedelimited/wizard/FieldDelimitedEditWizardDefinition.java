@@ -12,13 +12,6 @@
 // ============================================================================
 package org.talend.components.filedelimited.wizard;
 
-import org.talend.components.api.Constants;
-import org.talend.components.api.wizard.ComponentWizardDefinition;
-
-import aQute.bnd.annotation.component.Component;
-
-@Component(name = Constants.COMPONENT_WIZARD_BEAN_PREFIX
-        + FieldDelimitedEditWizardDefinition.COMPONENT_WIZARD_NAME, provide = ComponentWizardDefinition.class)
 public class FieldDelimitedEditWizardDefinition extends FileDelimitedWizardDefinition {
 
     public static final String COMPONENT_WIZARD_NAME = "fileDelimitedNew.edit";

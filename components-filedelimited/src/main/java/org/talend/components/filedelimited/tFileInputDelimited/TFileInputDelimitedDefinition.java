@@ -1,18 +1,18 @@
 package org.talend.components.filedelimited.tFileInputDelimited;
 
-import org.talend.components.api.Constants;
-import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.InputComponentDefinition;
-import org.talend.components.api.component.runtime.Source;
+import java.util.EnumSet;
+import java.util.Set;
+
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.RuntimeInfo;
+import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.filedelimited.FileDelimitedDefinition;
 import org.talend.components.filedelimited.runtime.FileDelimitedSource;
+import org.talend.daikon.properties.Properties;
 
-import aQute.bnd.annotation.component.Component;
-
-@Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TFileInputDelimitedDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TFileInputDelimitedDefinition extends FileDelimitedDefinition implements InputComponentDefinition {
+public class TFileInputDelimitedDefinition extends FileDelimitedDefinition {
 
     public static final String COMPONENT_NAME = "tFileInputDelimited"; //$NON-NLS-1$
 
@@ -31,8 +31,19 @@ public class TFileInputDelimitedDefinition extends FileDelimitedDefinition imple
     }
 
     @Override
-    public Source getRuntime() {
-        return new FileDelimitedSource();
+    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology componentType) {
+        if (componentType == ConnectorTopology.OUTGOING) {
+            return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
+                    DependenciesReader.computeDependenciesFilePath(getMavenGroupId(), getMavenArtifactId()),
+                    FileDelimitedSource.class.getCanonicalName());
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return EnumSet.of(ConnectorTopology.OUTGOING);
     }
 
 }

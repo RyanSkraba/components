@@ -19,15 +19,13 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.service.internal.ComponentRegistry;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.test.AbstractComponentTest;
 import org.talend.components.api.test.ComponentTestUtils;
-import org.talend.components.api.test.SimpleComponentRegistry;
 import org.talend.components.filedelimited.runtime.FileDelimitedSource;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedDefinition;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
-import org.talend.components.filedelimited.tFileOutputDelimited.TFileOutputDelimitedDefinition;
-import org.talend.components.filedelimited.wizard.FileDelimitedWizardDefinition;
 import org.talend.components.filedelimited.wizard.FileDelimitedWizardProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -74,14 +72,9 @@ public class FileDelimitedTestBasic extends AbstractComponentTest {
     @Override
     public ComponentService getComponentService() {
         if (componentService == null) {
-            SimpleComponentRegistry testComponentRegistry = new SimpleComponentRegistry();
+            ComponentRegistry testComponentRegistry = new ComponentRegistry();
 
-            testComponentRegistry.addComponent(TFileInputDelimitedDefinition.COMPONENT_NAME, new TFileInputDelimitedDefinition());
-            testComponentRegistry.addComponent(TFileOutputDelimitedDefinition.COMPONENT_NAME,
-                    new TFileOutputDelimitedDefinition());
-
-            FileDelimitedWizardDefinition wizardDefinition = new FileDelimitedWizardDefinition();
-            testComponentRegistry.addWizard(FileDelimitedWizardDefinition.COMPONENT_WIZARD_NAME, wizardDefinition);
+            testComponentRegistry.registerComponentFamilyDefinition(new FileDelimitedFamilyDefinition());
             componentService = new ComponentServiceImpl(testComponentRegistry);
         }
         return componentService;

@@ -5,7 +5,7 @@ import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.property.Property;
 
-public class FileDelimitedDefinition extends AbstractComponentDefinition {
+public abstract class FileDelimitedDefinition extends AbstractComponentDefinition {
 
     public FileDelimitedDefinition(String componentName) {
         super(componentName);
@@ -20,7 +20,6 @@ public class FileDelimitedDefinition extends AbstractComponentDefinition {
         return "org.talend.components";
     }
 
-    @Override
     public String getMavenArtifactId() {
         return "components-filedelimited";
     }
