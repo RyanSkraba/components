@@ -1,17 +1,20 @@
 package org.talend.components.filedelimited.tFileInputDelimited;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.common.SchemaProperties;
 import org.talend.components.common.ValuesTrimPropertis;
 import org.talend.components.filedelimited.DecodeTable;
 import org.talend.components.filedelimited.FileDelimitedProperties;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
@@ -20,6 +23,10 @@ import org.talend.daikon.properties.property.PropertyFactory;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 
 public class TFileInputDelimitedProperties extends FileDelimitedProperties {
+
+    public static final String FIELD_ERROR_CODE = "errorCode";
+
+    public static final String FIELD_ERROR_MESSAGE = "errorMessage";
 
     public TFileInputDelimitedProperties(String name) {
         super(name);
@@ -54,7 +61,13 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
 
     public DecodeTable decodeTable = new DecodeTable("decodeTable");
 
+    protected transient PropertyPathConnector FLOW_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schemaFlow");
+
     protected transient PropertyPathConnector REJECT_CONNECTOR = new PropertyPathConnector(Connector.REJECT_NAME, "schemaReject");
+
+    public SchemaProperties schemaFlow = new SchemaProperties("schemaFlow"); //$NON-NLS-1$
+
+    public SchemaProperties schemaReject = new SchemaProperties("schemaReject"); //$NON-NLS-1$
 
     @Override
     public void setupProperties() {
@@ -67,6 +80,7 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
 
             @Override
             public void afterSchema() {
+                updateOutputSchemas();
                 List<String> fieldsName = getFieldNames(main.schema);
                 trimColumns.setFieldNames(fieldsName);
                 trimColumns.beforeTrimTable();
@@ -137,11 +151,12 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        HashSet<PropertyPathConnector> connectors = new HashSet<>();
         if (isOutputConnection) {
-            return Collections.singleton(MAIN_CONNECTOR);
-        } else {
-            return Collections.EMPTY_SET;
+            connectors.add(FLOW_CONNECTOR);
+            connectors.add(REJECT_CONNECTOR);
         }
+        return connectors;
     }
 
     protected List<String> getFieldNames(Property schema) {
@@ -163,5 +178,53 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
             }
             decodeTable.decode.setValue(decodeValueList);
         }
+    }
+
+    private void updateOutputSchemas() {
+        Schema schema = main.schema.getValue();
+        schemaFlow.schema.setValue(schema);
+
+        final List<Schema.Field> additionalRejectFields = new ArrayList<Schema.Field>();
+
+        Schema.Field field = null;
+        field = new Schema.Field(FIELD_ERROR_CODE, Schema.create(Schema.Type.STRING), null, (Object) null);
+        field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
+        field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
+        field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
+        additionalRejectFields.add(field);
+
+        field = new Schema.Field(FIELD_ERROR_MESSAGE, Schema.create(Schema.Type.STRING), null, (Object) null);
+        field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
+        field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
+        field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
+        additionalRejectFields.add(field);
+
+        Schema rejectSchema = newSchema(schema, "rejectOutput", additionalRejectFields);
+
+        schemaReject.schema.setValue(rejectSchema);
+    }
+
+    private Schema newSchema(Schema metadataSchema, String newSchemaName, List<Schema.Field> moreFields) {
+        Schema newSchema = Schema.createRecord(newSchemaName, metadataSchema.getDoc(), metadataSchema.getNamespace(),
+                metadataSchema.isError());
+        // TODO duplicate with salesforce, make it to a common one?
+        List<Schema.Field> copyFieldList = new ArrayList<>();
+        for (Schema.Field se : metadataSchema.getFields()) {
+            Schema.Field field = new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal(), se.order());
+            field.getObjectProps().putAll(se.getObjectProps());
+            for (Map.Entry<String, Object> entry : se.getObjectProps().entrySet()) {
+                field.addProp(entry.getKey(), entry.getValue());
+            }
+            copyFieldList.add(field);
+        }
+
+        copyFieldList.addAll(moreFields);
+
+        newSchema.setFields(copyFieldList);
+        for (Map.Entry<String, Object> entry : metadataSchema.getObjectProps().entrySet()) {
+            newSchema.addProp(entry.getKey(), entry.getValue());
+        }
+
+        return newSchema;
     }
 }

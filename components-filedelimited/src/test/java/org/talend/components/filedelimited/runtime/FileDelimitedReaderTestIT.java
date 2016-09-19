@@ -97,6 +97,18 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         testInputDynamic(false);
     }
 
+    @Test
+    @Ignore("Need to implement")
+    public void testInputRejectDelimitedMode() {
+        // TODO
+    }
+
+    @Test
+    @Ignore("Need to implement")
+    public void testInputRejectCsvMode() {
+        // TODO
+    }
+
     public void testInputDelimited(boolean previewData, boolean sourceIsStream) throws Throwable {
         String resources = getClass().getResource("/runtime/input").getPath();
         String inputFile = resources + "/test_input_delimited.csv";

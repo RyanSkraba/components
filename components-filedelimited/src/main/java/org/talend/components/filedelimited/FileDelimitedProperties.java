@@ -61,10 +61,10 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
     public void setupProperties() {
         super.setupProperties();
         // TODO component defualt showed incorrect
-        rowSeparator.setValue("\n");
+        rowSeparator.setValue("\\n");
         fieldSeparator.setValue(";");
-        escapeChar.setValue("\"");
-        textEnclosure.setValue("\"");
+        escapeChar.setValue("\\\"");
+        textEnclosure.setValue("\\\"");
         thousandsSeparator.setValue(",");
         decimalSeparator.setValue(".");
         encoding.encodingType.setPossibleValues(encoding.getDefaultEncodings());

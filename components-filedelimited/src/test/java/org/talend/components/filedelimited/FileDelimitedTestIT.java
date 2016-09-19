@@ -161,7 +161,7 @@ public class FileDelimitedTestIT extends FileDelimitedTestBasic {
         // Default properties
         assertFalse(input.csvOptions.getValue());
         assertFalse(inputMainForm.getWidget(input.rowSeparator.getName()).isHidden());
-        assertEquals("\n", input.rowSeparator.getValue());
+        assertEquals("\\n", input.rowSeparator.getValue());
         assertFalse(inputMainForm.getWidget(input.fieldSeparator.getName()).isHidden());
         assertEquals(";", input.fieldSeparator.getValue());
         assertTrue(inputMainForm.getWidget(input.escapeChar.getName()).isHidden());
@@ -285,7 +285,7 @@ public class FileDelimitedTestIT extends FileDelimitedTestBasic {
         assertTrue(encodingForm.getWidget(props.encoding.customEncoding.getName()).isHidden());
         assertEquals(EncodingTypeProperties.ENCODING_TYPE_UTF_8, props.encoding.encodingType.getValue());
         assertFalse(wizardForm.getWidget(props.rowSeparator.getName()).isHidden());
-        assertEquals("\n", props.rowSeparator.getValue());
+        assertEquals("\\n", props.rowSeparator.getValue());
         assertFalse(wizardForm.getWidget(props.fieldSeparator.getName()).isHidden());
         assertEquals(";", props.fieldSeparator.getValue());
         assertFalse(wizardForm.getWidget(props.csvOptions.getName()).isHidden());
@@ -306,9 +306,9 @@ public class FileDelimitedTestIT extends FileDelimitedTestBasic {
         assertTrue(wizardForm.getWidget(props.csvOptions.getName()).isCallAfter());
         getComponentService().afterProperty(props.csvOptions.getName(), props);
         assertFalse(wizardForm.getWidget(props.escapeChar.getName()).isHidden());
-        assertEquals("\"", props.escapeChar.getValue());
+        assertEquals("\\\"", props.escapeChar.getValue());
         assertFalse(wizardForm.getWidget(props.textEnclosure.getName()).isHidden());
-        assertEquals("\"", props.textEnclosure.getValue());
+        assertEquals("\\\"", props.textEnclosure.getValue());
 
         // Change name
         props.name.setValue("wizard");
