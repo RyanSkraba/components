@@ -13,10 +13,6 @@
     <groupId>org.talend.components</groupId>
     <artifactId>components-splunk</artifactId>
     <version>0.15.0-SNAPSHOT</version>
-    <properties>
-        <splunk.webui.port>8000</splunk.webui.port>
-        <splunk.ec.port>8088</splunk.ec.port>
-    </properties>
     <packaging>bundle</packaging>
     <dependencies>
 
@@ -205,6 +201,29 @@
 					</execution>
 				</executions>
 			</plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>port-allocator-maven-plugin</artifactId>
+                <version>1.2</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>allocate-ports</goal>
+                        </goals>
+                        <configuration>
+                            <ports>
+                                <port>
+                                    <name>splunk.webui.port</name>
+                                </port>
+                                <port>
+                                    <name>splunk.ec.port</name>
+                                </port>
+                            </ports>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>			
         </plugins>
     </build>
 </project>
