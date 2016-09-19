@@ -20,7 +20,7 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
 
     public static final String FORM_WIZARD = "Wizard";
 
-    public Property<Object> fileName = PropertyFactory.newProperty(Object.class, "fileName");
+    public Property<Object> fileName = PropertyFactory.newProperty(Object.class, "fileName").setRequired();
 
     public ISchemaListener schemaListener;
 
@@ -35,19 +35,19 @@ public class FileDelimitedProperties extends FixedConnectorsComponentProperties 
 
     public Property<Boolean> csvOptions = PropertyFactory.newBoolean("csvOptions");
 
-    public Property<String> rowSeparator = PropertyFactory.newString("rowSeparator");
+    public Property<String> rowSeparator = PropertyFactory.newString("rowSeparator").setRequired();
 
-    public Property<String> fieldSeparator = PropertyFactory.newString("fieldSeparator");
+    public Property<String> fieldSeparator = PropertyFactory.newString("fieldSeparator").setRequired();
 
-    public Property<String> escapeChar = PropertyFactory.newString("escapeChar");
+    public Property<String> escapeChar = PropertyFactory.newString("escapeChar").setRequired();
 
-    public Property<String> textEnclosure = PropertyFactory.newString("textEnclosure");
+    public Property<String> textEnclosure = PropertyFactory.newString("textEnclosure").setRequired();
 
     public Property<Boolean> advancedSeparator = PropertyFactory.newBoolean("advancedSeparator");
 
-    public Property<String> thousandsSeparator = PropertyFactory.newString("thousandsSeparator");
+    public Property<String> thousandsSeparator = PropertyFactory.newString("thousandsSeparator").setRequired();
 
-    public Property<String> decimalSeparator = PropertyFactory.newString("decimalSeparator");
+    public Property<String> decimalSeparator = PropertyFactory.newString("decimalSeparator").setRequired();
 
     public EncodingTypeProperties encoding = new EncodingTypeProperties("encoding");
 

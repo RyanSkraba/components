@@ -28,6 +28,7 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.service.Repository;
+import org.talend.daikon.properties.test.PropertiesTestUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -68,6 +69,9 @@ public class FileDelimitedTestIT extends FileDelimitedTestBasic {
         // Input properties
         testInputProperties();
 
+        // Wizard properties
+        testWizardProperties();
+
         // Output delimited
         ComponentProperties output = new TFileOutputDelimitedDefinition().createProperties();
         Form outputForm = output.getForm(Form.MAIN);
@@ -95,7 +99,7 @@ public class FileDelimitedTestIT extends FileDelimitedTestBasic {
             }
         }
         assertEquals(1, count);
-        assertEquals("file delimited", wizardDef.getMenuItemName());
+        assertEquals("file delimited (New)", wizardDef.getMenuItemName());
         ComponentWizard wiz = getComponentService().getComponentWizard(FileDelimitedWizardDefinition.COMPONENT_WIZARD_NAME,
                 "nodeFileDelimited");
         assertNotNull(wiz);
@@ -152,7 +156,6 @@ public class FileDelimitedTestIT extends FileDelimitedTestBasic {
         Form inputMainForm = input.getForm(Form.MAIN);
         ComponentTestUtils.checkSerialize(input, errorCollector);
         LOGGER.debug(inputMainForm.toString());
-        LOGGER.debug(input.toString());
         assertEquals(Form.MAIN, inputMainForm.getName());
 
         // Default properties
@@ -265,6 +268,115 @@ public class FileDelimitedTestIT extends FileDelimitedTestBasic {
         assertEquals(Arrays.asList("Id", "Name", "Age"), input.decodeTable.columnName.getValue());
         assertNotNull(input.decodeTable.decode.getValue());
         assertEquals(3, input.decodeTable.decode.getValue().size());
+    }
+
+    protected void testWizardProperties() throws Throwable {
+        FileDelimitedWizardProperties props = (FileDelimitedWizardProperties) new FileDelimitedWizardProperties("wizard").init();
+        Form wizardForm = props.getForm(FileDelimitedWizardProperties.FORM_WIZARD);
+        ComponentTestUtils.checkSerialize(props, errorCollector);
+        LOGGER.debug(wizardForm.toString());
+        assertEquals(FileDelimitedWizardProperties.FORM_WIZARD, wizardForm.getName());
+        assertFalse(wizardForm.isAllowFinish());
+
+        assertFalse(wizardForm.getWidget(props.name.getName()).isHidden());
+        assertFalse(wizardForm.getWidget(props.fileName.getName()).isHidden());
+        Form encodingForm = wizardForm.getChildForm(props.encoding.getName());
+        assertFalse(encodingForm.getWidget(props.encoding.encodingType.getName()).isHidden());
+        assertTrue(encodingForm.getWidget(props.encoding.customEncoding.getName()).isHidden());
+        assertEquals(EncodingTypeProperties.ENCODING_TYPE_UTF_8, props.encoding.encodingType.getValue());
+        assertFalse(wizardForm.getWidget(props.rowSeparator.getName()).isHidden());
+        assertEquals("\n", props.rowSeparator.getValue());
+        assertFalse(wizardForm.getWidget(props.fieldSeparator.getName()).isHidden());
+        assertEquals(";", props.fieldSeparator.getValue());
+        assertFalse(wizardForm.getWidget(props.csvOptions.getName()).isHidden());
+        assertFalse(props.csvOptions.getValue());
+        assertTrue(wizardForm.getWidget(props.textEnclosure.getName()).isHidden());
+        assertTrue(wizardForm.getWidget(props.escapeChar.getName()).isHidden());
+        assertFalse(wizardForm.getWidget(props.header.getName()).isHidden());
+        assertEquals(0, (int) props.header.getValue());
+        assertFalse(wizardForm.getWidget(props.footer.getName()).isHidden());
+        assertEquals(0, (int) props.footer.getValue());
+        assertFalse(wizardForm.getWidget(props.removeEmptyRow.getName()).isHidden());
+        assertTrue(props.removeEmptyRow.getValue());
+        assertFalse(wizardForm.getWidget(props.preview.getName()).isHidden());
+        assertFalse(wizardForm.getWidget(props.previewTable.getName()).isHidden());
+
+        // Change to CSV mode
+        props.csvOptions.setValue(true);
+        assertTrue(wizardForm.getWidget(props.csvOptions.getName()).isCallAfter());
+        getComponentService().afterProperty(props.csvOptions.getName(), props);
+        assertFalse(wizardForm.getWidget(props.escapeChar.getName()).isHidden());
+        assertEquals("\"", props.escapeChar.getValue());
+        assertFalse(wizardForm.getWidget(props.textEnclosure.getName()).isHidden());
+        assertEquals("\"", props.textEnclosure.getValue());
+
+        // Change name
+        props.name.setValue("wizard");
+        PropertiesTestUtils.checkAndValidate(getComponentService(), wizardForm, "name", props);
+        assertTrue(wizardForm.isAllowFinish());
+    }
+
+    @Test
+    public void testWizardPreviewData() throws Throwable {
+        String resources = getClass().getResource("/runtime/input").getPath();
+        FileDelimitedWizardProperties props = (FileDelimitedWizardProperties) new FileDelimitedWizardProperties("wizard").init();
+        props.rowSeparator.setValue("\n");
+        Form wizardForm = props.getForm(FileDelimitedWizardProperties.FORM_WIZARD);
+        // File name is empty means you can edit the schema manually
+        props.fileName.setValue("");
+
+        props = (FileDelimitedWizardProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), wizardForm, "preview",
+                props);
+        LOGGER.debug("File is not specified, you can edit the schema manual!");
+        assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
+        // File is not exist
+        props.fileName.setValue(resources + "/not_exist_file.csv");
+        props = (FileDelimitedWizardProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), wizardForm, "preview",
+                props);
+        LOGGER.debug(props.getValidationResult().getMessage());
+        assertEquals(ValidationResult.Result.ERROR, props.getValidationResult().getStatus());
+        // File is exist
+        props.name.setValue("test_wizard");
+        props.fileName.setValue(resources + "/test_input_delimited.csv");
+        props = (FileDelimitedWizardProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), wizardForm, "preview",
+                props);
+        assertNotNull(props.main.schema.getValue());
+        assertEquals(19, props.main.schema.getValue().getFields().size());
+        assertEquals(0, props.main.schema.getValue().getField("Column0").pos());
+        assertEquals(4, props.main.schema.getValue().getField("Column4").pos());
+        assertEquals(7, props.main.schema.getValue().getField("Column7").pos());
+        assertEquals(9, props.main.schema.getValue().getField("Column9").pos());
+        assertEquals(11, props.main.schema.getValue().getField("Column11").pos());
+        assertEquals(18, props.main.schema.getValue().getField("Column18").pos());
+        assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
+
+        resources = getClass().getResource("/runtime/wizard").getPath();
+
+        // File is empty
+        props.fileName.setValue(resources + "/wizard_file_empty.csv");
+        props = (FileDelimitedWizardProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), wizardForm, "preview",
+                props);
+        assertEquals("{\"data\":[]}", props.previewTable.getValue());
+        assertNotNull(props.main.schema.getValue());
+        assertEquals(0, props.main.schema.getValue().getFields().size());
+        assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
+
+        // Data is empty
+        props.fileName.setValue(resources + "/wizard_data_empty.csv");
+        props.header.setValue(1);
+        props = (FileDelimitedWizardProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), wizardForm, "preview",
+                props);
+        assertEquals(
+                "{\"columnNames\":[\"TestBoolean\",\"TestByte\",\"TestBytes\",\"TestChar\",\"TestDate\",\"TestDouble\",\"TestFloat\",\"TestBigDecimal\",\"TestInteger\",\"TestLong\",\"TestObject\"],\"data\":[]}",
+                props.previewTable.getValue());
+        assertNotNull(props.main.schema.getValue());
+        assertEquals(11, props.main.schema.getValue().getFields().size());
+        assertEquals(0, props.main.schema.getValue().getField("TestBoolean").pos());
+        assertEquals(4, props.main.schema.getValue().getField("TestDate").pos());
+        assertEquals(7, props.main.schema.getValue().getField("TestBigDecimal").pos());
+        assertEquals(9, props.main.schema.getValue().getField("TestLong").pos());
+        assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
+
     }
 
     static class RepoProps {

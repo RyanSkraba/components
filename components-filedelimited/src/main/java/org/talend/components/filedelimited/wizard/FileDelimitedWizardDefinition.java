@@ -34,7 +34,7 @@ public class FileDelimitedWizardDefinition extends AbstractComponentWizardDefint
 
     @Override
     public boolean supportsProperties(Class<? extends ComponentProperties> propertiesClass) {
-        return propertiesClass.isAssignableFrom(FileDelimitedProperties.class);
+        return propertiesClass.isAssignableFrom(FileDelimitedWizardProperties.class);
     }
 
     @Override

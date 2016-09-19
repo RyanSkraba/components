@@ -17,9 +17,6 @@ import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.filedelimited.FileDelimitedProperties;
 
-/**
- * Handles the creating a connection and creating the modules associated with the connection.
- */
 public class FileDelimitedWizard extends ComponentWizard {
 
     FileDelimitedWizardProperties cProps;

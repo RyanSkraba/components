@@ -21,7 +21,7 @@ public class EncodingTypeProperties extends PropertiesImpl {
 
     public Property<String> encodingType = PropertyFactory.newString("encodingType");
 
-    public Property<String> customEncoding = PropertyFactory.newString("customEncoding");
+    public Property<String> customEncoding = PropertyFactory.newString("customEncoding").setRequired();
 
     public EncodingTypeProperties(String name) {
         super(name);

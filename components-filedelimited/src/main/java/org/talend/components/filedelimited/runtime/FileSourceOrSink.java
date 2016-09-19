@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.common.SchemaProperties;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.avro.AvroUtils;
@@ -72,6 +73,12 @@ public class FileSourceOrSink implements SourceOrSink {
     // "columnsName" is retrieved columns name, it maybe smaller than columnsLength size
     // So we need add some default named columns "Column"+ columnIndex
     public static Schema getSchema(String schemaName, List<String> columnsName, List<Integer> columnsLength) {
+        if (columnsLength == null && columnsName != null && columnsName.size() > 0) {
+            columnsLength = new ArrayList<>();
+            for (String columnName : columnsName) {
+                columnsLength.add(255);
+            }
+        }
         if (columnsLength != null) {
             List<Schema.Field> fields = new ArrayList<>();
             int fieldsSize = columnsLength.size();
@@ -93,7 +100,7 @@ public class FileSourceOrSink implements SourceOrSink {
             }
             return Schema.createRecord(schemaName, null, null, false, fields);
         } else {
-            return Schema.createRecord(schemaName, null, null, false);
+            return SchemaProperties.EMPTY_SCHEMA;
         }
     }
 

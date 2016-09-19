@@ -1,10 +1,13 @@
 package org.talend.components.filedelimited.wizard;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.avro.Schema;
+import org.apache.commons.lang3.StringUtils;
+import org.talend.components.common.SchemaProperties;
 import org.talend.components.filedelimited.runtime.FileDelimitedSource;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.properties.PresentationItem;
@@ -32,6 +35,8 @@ public class FileDelimitedWizardProperties extends TFileInputDelimitedProperties
     public Property<String> name = PropertyFactory.newString("name").setRequired();
 
     public PresentationItem preview = new PresentationItem("preview", "Preview");
+
+    public Property<String> previewTable = PropertyFactory.newString("previewTable");
 
     // TODO check "Format"
 
@@ -62,6 +67,9 @@ public class FileDelimitedWizardProperties extends TFileInputDelimitedProperties
         wizardForm.addRow(removeEmptyRow);
         wizardForm.addRow(limit);
         wizardForm.addRow(widget(preview).setLongRunning(true).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
+        // TODO need add "Schema" to edit schema
+        // wizardForm.addColumn(main.getForm(Form.REFERENCE));
+        wizardForm.addRow(widget(previewTable).setWidgetType(Widget.JSON_TABLE_WIDGET_TYPE));
 
     }
 
@@ -75,10 +83,10 @@ public class FileDelimitedWizardProperties extends TFileInputDelimitedProperties
     }
 
     public ValidationResult afterFormFinishWizard(Repository<Properties> repo) throws Exception {
-        // String connRepLocation =
-        // TODO change the empty schema
-        repo.storeProperties(this, this.name.getValue(), repositoryLocation, "main.schema");
-        // repo.storeProperties(modProps, main.schema.getName(), connRepLocation, "main.schema");
+        // Clear the preview data when form is finished
+        previewTable.setValue("{\"data\":[]}");
+        String connRepLocation = repo.storeProperties(this, this.getName(), repositoryLocation, null);
+        repo.storeProperties(this, this.name.getValue(), connRepLocation, "main.schema");
         return ValidationResult.OK;
     }
 
@@ -87,23 +95,41 @@ public class FileDelimitedWizardProperties extends TFileInputDelimitedProperties
         return this;
     }
 
-    public ValidationResult afterPreview() {
-
+    public ValidationResult validatePreview() {
+        ValidationResult vr = new ValidationResult();
         try {
-            Map<String, Schema> dataAndSchema = FileDelimitedSource.previewData(null, this, 200);
-            for (String jsonData : dataAndSchema.keySet()) {
-                // TODO show in wizard
-                Schema schema = dataAndSchema.get(jsonData);
-                break;
+            if (!StringUtils.isEmpty(fileName.getStringValue())) {
+                File file = new File(fileName.getStringValue());
+                if (!file.exists() || !file.isFile()) {
+                    throw new IOException("File \"" + fileName.getStringValue() + "is not found.");
+                }
+                Map<String, Schema> dataAndSchema = FileDelimitedSource.previewData(null, this, 200);
+                for (String jsonData : dataAndSchema.keySet()) {
+                    Schema guessedSchema = dataAndSchema.get(jsonData);
+                    previewTable.setValue(jsonData);
+                    if (guessedSchema.getFields().size() > 0) {
+                        main.schema.setValue(guessedSchema);
+                    } else {
+                        main.schema.setValue(SchemaProperties.EMPTY_SCHEMA);
+                    }
+                }
+                if (main.schema.getValue() != null && main.schema.getValue().getFields().size() > 0) {
+                    getForm(FORM_WIZARD).setAllowFinish(true);
+                } else {
+                    getForm(FORM_WIZARD).setAllowFinish(false);
+                }
             }
-
-        } catch (IOException e) {
-            ValidationResult vr = new ValidationResult();
+        } catch (Exception e) {
+            // Reset preview table when get exception
+            previewTable.setValue("{\"data\":[]}");
             vr.setMessage(e.getMessage());
             vr.setStatus(ValidationResult.Result.ERROR);
-            return vr;
+            getForm(FORM_WIZARD).setAllowFinish(false);
         }
-        return ValidationResult.OK;
+        return vr;
     }
 
+    public void afterPreview() {
+        refreshLayout(getForm(FORM_WIZARD));
+    }
 }

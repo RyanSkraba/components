@@ -339,8 +339,8 @@ public class FileDelimitedRuntime {
                 }
             }
         }
+        result.put("data", data);
         if (data.size() > 0) {
-            result.put("data", data);
             LOG.debug("Max columns count:" + columnsLength.size());
         }
         Gson gson = new Gson();
