@@ -24,14 +24,14 @@ public class DelimitedReader extends FileDelimitedReader {
 
     @Override
     public boolean start() throws IOException {
-        fileDelimitedRuntime.init();
+        inputRuntime.init();
         LOGGER.debug("open: " + properties.fileName.getStringValue());
         boolean startAble = false;
-        fid = fileDelimitedRuntime.getFileDelimited();
+        fid = inputRuntime.getFileDelimited();
         startAble = fid != null && fid.nextRecord();
         if (startAble) {
             retrieveValues();
-            if (fileDelimitedRuntime.schemaIsDynamic) {
+            if (inputRuntime.schemaIsDynamic) {
                 setupDynamicSchema();
                 startAble = advance();
             }
@@ -45,7 +45,7 @@ public class DelimitedReader extends FileDelimitedReader {
         isContinue = fid.nextRecord();
         if (!isContinue) {
             if (properties.uncompress.getValue()) {
-                fid = fileDelimitedRuntime.getFileDelimited();
+                fid = inputRuntime.getFileDelimited();
                 isContinue = fid != null && fid.nextRecord();
             }
         }
@@ -57,7 +57,7 @@ public class DelimitedReader extends FileDelimitedReader {
 
     @Override
     public void close() throws IOException {
-        if (!(fileDelimitedRuntime.fileNameOrStream instanceof InputStream)) {
+        if (!(inputRuntime.fileNameOrStream instanceof InputStream)) {
             if (fid != null) {
                 fid.close();
             }
@@ -66,7 +66,7 @@ public class DelimitedReader extends FileDelimitedReader {
     }
 
     protected void retrieveValues() throws IOException {
-        if (fileDelimitedRuntime.schemaIsDynamic) {
+        if (inputRuntime.schemaIsDynamic) {
             values = new String[fid.getColumnsCountOfCurrentRow()];
         } else {
             values = new String[schema.getFields().size()];

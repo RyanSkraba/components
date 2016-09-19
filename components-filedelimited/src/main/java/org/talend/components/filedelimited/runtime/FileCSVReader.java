@@ -29,16 +29,16 @@ public class FileCSVReader extends FileDelimitedReader {
 
     @Override
     public boolean start() throws IOException {
-        fileDelimitedRuntime.init();
+        inputRuntime.init();
         LOGGER.debug("open: " + properties.fileName.getStringValue());
         boolean startAble = false;
-        csvReader = fileDelimitedRuntime.getCsvReader();
-        currentLine = fileDelimitedRuntime.currentLine;
-        startAble = fileDelimitedRuntime.limit != 0 && csvReader != null && csvReader.readNext();
+        csvReader = inputRuntime.getCsvReader();
+        currentLine = inputRuntime.currentLine;
+        startAble = inputRuntime.limit != 0 && csvReader != null && csvReader.readNext();
         if (startAble) {
             values = csvReader.getValues();
             retrieveValues();
-            if (fileDelimitedRuntime.schemaIsDynamic) {
+            if (inputRuntime.schemaIsDynamic) {
                 setupDynamicSchema();
                 startAble = advance();
             }
@@ -53,9 +53,9 @@ public class FileCSVReader extends FileDelimitedReader {
         isContinue = csvReader.readNext();
         if (!isContinue) {
             if (properties.uncompress.getValue()) {
-                csvReader = fileDelimitedRuntime.getCsvReader();
-                isContinue = fileDelimitedRuntime.limit != 0 && csvReader != null && csvReader.readNext();
-                currentLine = fileDelimitedRuntime.currentLine;
+                csvReader = inputRuntime.getCsvReader();
+                isContinue = inputRuntime.limit != 0 && csvReader != null && csvReader.readNext();
+                currentLine = inputRuntime.currentLine;
                 outputLine = 0;
             }
         }
@@ -68,7 +68,7 @@ public class FileCSVReader extends FileDelimitedReader {
 
     @Override
     public void close() throws IOException {
-        if (!(fileDelimitedRuntime.fileNameOrStream instanceof InputStream)) {
+        if (!(inputRuntime.fileNameOrStream instanceof InputStream)) {
             if (csvReader != null) {
                 csvReader.close();
             }
@@ -87,11 +87,11 @@ public class FileCSVReader extends FileDelimitedReader {
             isContinue = advance();
         }
         currentLine++;
-        if (fileDelimitedRuntime.lastLine > -1 && currentLine > fileDelimitedRuntime.lastLine) {
+        if (inputRuntime.lastLine > -1 && currentLine > inputRuntime.lastLine) {
             isContinue = false;
         }
         outputLine++;
-        if (fileDelimitedRuntime.limit > 0 && outputLine > fileDelimitedRuntime.limit) {
+        if (inputRuntime.limit > 0 && outputLine > inputRuntime.limit) {
             if (properties.uncompress.getValue()) {
                 isContinue = advance();
             } else {

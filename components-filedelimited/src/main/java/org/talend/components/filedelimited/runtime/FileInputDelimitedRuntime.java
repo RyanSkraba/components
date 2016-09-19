@@ -21,9 +21,9 @@ import org.talend.fileprocess.FileInputDelimited;
 import com.google.gson.Gson;
 import com.talend.csv.CSVReader;
 
-public class FileDelimitedRuntime {
+public class FileInputDelimitedRuntime {
 
-    private transient static final Logger LOG = LoggerFactory.getLogger(FileDelimitedRuntime.class);
+    private transient static final Logger LOG = LoggerFactory.getLogger(FileInputDelimitedRuntime.class);
 
     private TFileInputDelimitedProperties props;
 
@@ -60,7 +60,7 @@ public class FileDelimitedRuntime {
 
     protected List<Integer> columnsLength;
 
-    public FileDelimitedRuntime(TFileInputDelimitedProperties props) {
+    public FileInputDelimitedRuntime(TFileInputDelimitedProperties props) {
         this.props = props;
     }
 

@@ -26,7 +26,7 @@ public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedR
 
     private IndexedRecordConverter factory;
 
-    protected FileDelimitedRuntime fileDelimitedRuntime;
+    protected FileInputDelimitedRuntime inputRuntime;
 
     TFileInputDelimitedProperties properties;
 
@@ -37,7 +37,7 @@ public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedR
         this.container = container;
         this.properties = properties;
         schema = properties.main.schema.getValue();
-        fileDelimitedRuntime = new FileDelimitedRuntime(properties);
+        inputRuntime = new FileInputDelimitedRuntime(properties);
 
     }
 

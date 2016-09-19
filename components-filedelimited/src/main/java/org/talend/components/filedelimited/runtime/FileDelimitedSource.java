@@ -50,10 +50,10 @@ public class FileDelimitedSource extends FileSourceOrSink implements BoundedSour
         FileDelimitedSource ss = new FileDelimitedSource();
         ss.initialize(null, properties);
         FileDelimitedReader reader = ss.createReader(container);
-        String jsonData = reader.fileDelimitedRuntime.previewData(maxRowsToPreview);
+        String jsonData = reader.inputRuntime.previewData(maxRowsToPreview);
         LOGGER.debug("Return json data: " + jsonData);
         Schema schema = getSchema(((FileDelimitedWizardProperties) properties).name.getValue(),
-                reader.fileDelimitedRuntime.columnNames, reader.fileDelimitedRuntime.columnsLength);
+                reader.inputRuntime.columnNames, reader.inputRuntime.columnsLength);
         LOGGER.debug("Guessed schema: " + schema);
         result.put(jsonData, schema);
         return result;
