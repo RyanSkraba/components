@@ -175,8 +175,8 @@
 											<SPLUNK_START_ARGS>--accept-license</SPLUNK_START_ARGS>
 										</env>
 										<ports>
-											<port>${splunk.webui.port}:8000</port>
-											<port>${splunk.ec.port}:8088</port>
+											<port>splunk.webui.port:8000</port>
+											<port>splunk.ec.port:8088</port>
 										</ports>
 										<wait>
                                                                                    <http>
@@ -201,29 +201,6 @@
 					</execution>
 				</executions>
 			</plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>port-allocator-maven-plugin</artifactId>
-                <version>1.2</version>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>allocate-ports</goal>
-                        </goals>
-                        <configuration>
-                            <ports>
-                                <port>
-                                    <name>splunk.webui.port</name>
-                                </port>
-                                <port>
-                                    <name>splunk.ec.port</name>
-                                </port>
-                            </ports>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>			
         </plugins>
     </build>
 </project>

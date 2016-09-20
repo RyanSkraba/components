@@ -224,7 +224,7 @@
                                     <name>igonchar/atlassian-jira:7.1.7v2</name>
                                     <run>
                                         <ports>
-                                            <port>${jira.port}:8080</port>
+                                            <port>jira.port:8080</port>
                                         </ports>
                                         <wait>
                                             <http>
@@ -245,26 +245,6 @@
                         </goals>
                         <configuration>
                             <skip>${skipITs}</skip>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>port-allocator-maven-plugin</artifactId>
-                <version>1.2</version>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>allocate-ports</goal>
-                        </goals>
-                        <configuration>
-                            <ports>
-                                <port>
-                                    <name>jira.port</name>
-                                </port>
-                            </ports>
                         </configuration>
                     </execution>
                 </executions>
