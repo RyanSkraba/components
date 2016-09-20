@@ -17,10 +17,11 @@ import java.util.Set;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.RuntimeInfo;
+import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.runtime.JDBCCloseSourceOrSink;
-import org.talend.components.jdbc.runtime.JDBCTemplate;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 
@@ -57,7 +58,8 @@ public class TJDBCCloseDefinition extends AbstractComponentDefinition {
     @Override
     public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology) {
         if (connectorTopology == ConnectorTopology.NONE) {
-            return JDBCTemplate.createCommonRuntime(this.getClass().getClassLoader(), properties,
+            return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
+                    DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-jdbc"),
                     JDBCCloseSourceOrSink.class.getCanonicalName());
         }
         return null;
