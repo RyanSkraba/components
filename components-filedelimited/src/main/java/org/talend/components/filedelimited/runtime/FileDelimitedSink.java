@@ -14,7 +14,7 @@ public class FileDelimitedSink extends FileSourceOrSink implements Sink {
 
     @Override
     public WriteOperation<?> createWriteOperation() {
-        return null;
+        return new FileDelimitedWriteOperation(this);
     }
 
     @Override
