@@ -61,7 +61,7 @@ public class DataPrepServerMock {
     @RequestMapping(value = "/api/datasets/{id}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<InputStreamResource> readDataSet(@PathVariable String id,
-                                                           @RequestParam(value = "fullContent") boolean fullContent) {
+            @RequestParam(value = "fullContent") boolean fullContent) {
         if (id.equals("db119c7d-33fd-46f5-9bdc-1e8cf54d4d1e") && fullContent) {
             InputStreamResource inputStream = new InputStreamResource(
                     DataPrepServerMock.class.getResourceAsStream("dataset.json"));
@@ -79,6 +79,19 @@ public class DataPrepServerMock {
             return new ResponseEntity<InputStreamResource>(inputStream, HttpStatus.OK);
         }
         return new ResponseEntity<InputStreamResource>(HttpStatus.BAD_REQUEST);
+    }
+
+    @RequestMapping(value = "/api/datasets", method = RequestMethod.GET)
+    public ResponseEntity<InputStreamResource> getDataSetIdByName(@RequestParam(value = "name") String name) {
+        if ("mydataset".equals(name)) {
+            InputStreamResource inputStream = new InputStreamResource(
+                    DataPrepServerMock.class.getResourceAsStream("success_fetch_dataset_id_by_name_response.json"));
+            return new ResponseEntity<InputStreamResource>(inputStream, HttpStatus.OK);
+        } else {
+            InputStreamResource inputStream = new InputStreamResource(
+                    DataPrepServerMock.class.getResourceAsStream("fail_fetch_dataset_id_by_name_response.json"));
+            return new ResponseEntity<InputStreamResource>(inputStream, HttpStatus.OK);
+        }
     }
 
     @RequestMapping(value = "/api/datasets", method = RequestMethod.POST)

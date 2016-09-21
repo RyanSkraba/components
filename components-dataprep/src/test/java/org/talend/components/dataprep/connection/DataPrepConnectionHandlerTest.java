@@ -151,6 +151,21 @@ public class DataPrepConnectionHandlerTest {
     }
 
     @Test
+    public void test_create_or_update_create() throws IOException {
+        connectionHandler = new DataPrepConnectionHandler(URL + serverPort, LOGIN, PASS, ID, "??Hello world");
+        Assert.assertEquals(200, returnStatusCode(connectionHandler.connect()));
+        connectionHandler.write(DataPrepOutputModes.CreateOrUpdate).write("Hello".getBytes());
+        Assert.assertEquals(200, returnStatusCode(connectionHandler.logout()));
+    }
+
+    @Test
+    public void test_create_or_update_update() throws IOException {
+        Assert.assertEquals(200, returnStatusCode(connectionHandler.connect()));
+        connectionHandler.write(DataPrepOutputModes.CreateOrUpdate).write("Hello".getBytes());
+        Assert.assertEquals(200, returnStatusCode(connectionHandler.logout()));
+    }
+
+    @Test
     public void testReadDataSetIterator() throws IOException {
         Assert.assertEquals(200, returnStatusCode(connectionHandler.connect()));
         Assert.assertNotNull(connectionHandler.readDataSetIterator());

@@ -12,8 +12,16 @@
 // ============================================================================
 package org.talend.components.dataprep.connection;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -25,9 +33,13 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.dataprep.runtime.DataPrepOutputModes;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
+
+import com.cedarsoftware.util.io.JsonObject;
+import com.cedarsoftware.util.io.JsonReader;
 
 public class DataPrepConnectionHandler {
 
@@ -91,6 +103,46 @@ public class DataPrepConnectionHandler {
         return response;
     }
 
+    private String fetchDataSetId() throws IOException {
+        if (dataSetName == null || authorisationHeader == null) {
+            return null;
+        }
+
+        String result = null;
+
+        URI uri = null;
+        URL localUrl = new URL(url);
+        try {
+            uri = new URI(localUrl.getProtocol(), null, localUrl.getHost(), localUrl.getPort(), "/api/datasets",
+                    "name=" + dataSetName, null);
+        } catch (URISyntaxException e) {
+            throw new ComponentException(e);
+        }
+
+        Request request = Request.Get(uri);
+        request.addHeader(authorisationHeader);
+        HttpResponse response = request.execute().returnResponse();
+        String content = extractResponseInformationAndConsumeResponse(response);
+
+        if (returnStatusCode(response) != HttpServletResponse.SC_OK) {
+            throw new IOException(content);
+        }
+
+        if (content != null && !"".equals(content)) {
+            Object object = JsonReader.jsonToJava(content);
+            if (object != null && object instanceof Object[]) {
+                Object[] array = (Object[]) object;
+                if (array.length > 0) {
+                    @SuppressWarnings("rawtypes")
+                    JsonObject jo = (JsonObject) array[0];
+                    result = (String) jo.get("id");
+                }
+            }
+        }
+
+        return result;
+    }
+
     private void closeUrlConnection() throws IOException {
         LOGGER.debug("urlConnection = " + urlConnection);
         int responseCode = urlConnection.getResponseCode();
@@ -106,6 +158,9 @@ public class DataPrepConnectionHandler {
             case Update:
                 urlConnection.disconnect();
                 throw new IOException("Wrong DatasetID. Response information: " + errorMessage);
+            case CreateOrUpdate:
+                urlConnection.disconnect();
+                throw new IOException("Response information: " + errorMessage);
             case LiveDataset:
                 urlConnection.disconnect();
                 throw new IOException("Wrong url. Response information: " + errorMessage);
@@ -158,6 +213,13 @@ public class DataPrepConnectionHandler {
             return writeToServer("POST", requestEncoding());
         case Update:
             return writeToServer("PUT", url + API_DATASETS + dataSetId);
+        case CreateOrUpdate:
+            String dataSetId = fetchDataSetId();
+            if (dataSetId != null) {
+                return writeToServer("PUT", url + API_DATASETS + dataSetId);
+            } else {
+                return writeToServer("POST", requestEncoding());
+            }
         case LiveDataset:
             return writeToServer("POST", url);
         default:

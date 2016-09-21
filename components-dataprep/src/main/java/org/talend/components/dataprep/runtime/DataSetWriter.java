@@ -82,6 +82,10 @@ public class DataSetWriter implements Writer<Result> {
             connectionHandler.connect();
             outputStream = connectionHandler.write(DataPrepOutputModes.Update);
             break;
+        case CreateOrUpdate:
+            connectionHandler.connect();
+            outputStream = connectionHandler.write(DataPrepOutputModes.CreateOrUpdate);
+            break;
         case LiveDataset:
             outputStream = connectionHandler.write(DataPrepOutputModes.LiveDataset);
             break;
