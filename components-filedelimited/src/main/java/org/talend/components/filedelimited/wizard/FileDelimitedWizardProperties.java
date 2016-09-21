@@ -9,7 +9,7 @@ import org.apache.avro.Schema;
 import org.apache.commons.lang3.StringUtils;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.filedelimited.runtime.FileDelimitedSource;
-import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
+import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;

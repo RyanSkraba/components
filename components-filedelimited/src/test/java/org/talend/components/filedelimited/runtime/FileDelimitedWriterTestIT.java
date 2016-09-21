@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.common.runtime.FileRuntimeHelper;
 import org.talend.components.filedelimited.FileDelimitedTestBasic;
-import org.talend.components.filedelimited.tFileOutputDelimited.TFileOutputDelimitedProperties;
+import org.talend.components.filedelimited.tfileoutputdelimited.TFileOutputDelimitedProperties;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

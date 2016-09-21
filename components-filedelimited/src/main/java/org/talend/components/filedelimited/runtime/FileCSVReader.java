@@ -7,10 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
+import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
 
 import com.talend.csv.CSVReader;
 
+/*
+ * CSV mode reader
+ */
 public class FileCSVReader extends FileDelimitedReader {
 
     private static final long serialVersionUID = 1L;
@@ -29,39 +32,59 @@ public class FileCSVReader extends FileDelimitedReader {
 
     @Override
     public boolean start() throws IOException {
-        inputRuntime.init();
-        LOGGER.debug("open: " + properties.fileName.getStringValue());
         boolean startAble = false;
-        csvReader = inputRuntime.getCsvReader();
-        currentLine = inputRuntime.currentLine;
-        startAble = inputRuntime.limit != 0 && csvReader != null && csvReader.readNext();
-        if (startAble) {
-            values = csvReader.getValues();
-            retrieveValues();
-            if (inputRuntime.schemaIsDynamic) {
-                setupDynamicSchema();
+        try {
+            inputRuntime.init();
+            LOGGER.debug("open: " + properties.fileName.getStringValue());
+            csvReader = inputRuntime.getCsvReader();
+            currentLine = inputRuntime.currentLine;
+            startAble = inputRuntime.limit != 0 && csvReader != null && csvReader.readNext();
+            if (startAble) {
+                values = csvReader.getValues();
+                retrieveValues();
+                if (inputRuntime.schemaIsDynamic) {
+                    setupDynamicSchema();
+                    startAble = advance();
+                }
+                startAble = checkLimit();
+                currentIndexRecord = ((DelimitedAdaptorFactory) getFactory()).convertToAvro(values);
+            }
+        } catch (IOException e) {
+            if (properties.dieOnError.getValue()) {
+                throw e;
+            } else {
+                // TODO Meed junit test
                 startAble = advance();
             }
-            startAble = checkLimit();
         }
+
         return startAble;
     }
 
     @Override
     public boolean advance() throws IOException {
         boolean isContinue = false;
-        isContinue = csvReader.readNext();
-        if (!isContinue) {
-            if (properties.uncompress.getValue()) {
-                csvReader = inputRuntime.getCsvReader();
-                isContinue = inputRuntime.limit != 0 && csvReader != null && csvReader.readNext();
-                currentLine = inputRuntime.currentLine;
-                outputLine = 0;
+        try {
+            isContinue = csvReader.readNext();
+            if (!isContinue) {
+                if (properties.uncompress.getValue()) {
+                    csvReader = inputRuntime.getCsvReader();
+                    isContinue = inputRuntime.limit != 0 && csvReader != null && csvReader.readNext();
+                    currentLine = inputRuntime.currentLine;
+                    outputLine = 0;
+                }
             }
-        }
-        if (isContinue) {
-            retrieveValues();
-            isContinue = checkLimit();
+            if (isContinue) {
+                retrieveValues();
+                currentIndexRecord = ((DelimitedAdaptorFactory) getFactory()).convertToAvro(values);
+                isContinue = checkLimit();
+            }
+        } catch (IOException e) {
+            if (properties.dieOnError.getValue()) {
+                throw e;
+            } else {
+                isContinue = advance();
+            }
         }
         return isContinue;
     }

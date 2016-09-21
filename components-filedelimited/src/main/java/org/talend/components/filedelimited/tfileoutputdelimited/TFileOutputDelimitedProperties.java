@@ -1,4 +1,4 @@
-package org.talend.components.filedelimited.tFileOutputDelimited;
+package org.talend.components.filedelimited.tfileoutputdelimited;
 
 import java.util.Collections;
 import java.util.Set;

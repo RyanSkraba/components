@@ -17,7 +17,7 @@ import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.common.EncodingTypeProperties;
-import org.talend.components.filedelimited.tFileOutputDelimited.TFileOutputDelimitedProperties;
+import org.talend.components.filedelimited.tfileoutputdelimited.TFileOutputDelimitedProperties;
 import org.talend.daikon.avro.AvroUtils;
 
 import com.talend.csv.CSVWriter;

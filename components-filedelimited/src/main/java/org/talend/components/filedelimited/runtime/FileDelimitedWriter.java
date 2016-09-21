@@ -11,7 +11,7 @@ import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.ComponentConstants;
-import org.talend.components.filedelimited.tFileOutputDelimited.TFileOutputDelimitedProperties;
+import org.talend.components.filedelimited.tfileoutputdelimited.TFileOutputDelimitedProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
@@ -24,10 +24,6 @@ public class FileDelimitedWriter implements Writer<Result> {
     private final FileDelimitedSink sink;
 
     private IndexedRecordConverter<IndexedRecord, IndexedRecord> factory;
-
-    private int counter = 0;
-
-    private boolean firstRow = true;
 
     private WriteOperation<Result> writeOperation;
 
@@ -80,7 +76,6 @@ public class FileDelimitedWriter implements Writer<Result> {
 
     @Override
     public void write(Object datum) throws IOException {
-        counter++;
         if (datum == null) {
             return;
         }
@@ -222,7 +217,7 @@ public class FileDelimitedWriter implements Writer<Result> {
         StringBuilder sb = new StringBuilder();
         for (Schema.Field field : recordSchema.getFields()) {
             sb.append(record.get(field.pos()));
-            if (field.pos() != (recordSchema.getFields().size()-1)) {
+            if (field.pos() != (recordSchema.getFields().size() - 1)) {
                 sb.append(outputRuntime.fieldSeparator);
             }
         }

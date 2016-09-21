@@ -7,9 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
+import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
 import org.talend.fileprocess.FileInputDelimited;
 
+/*
+ * Delimited mode reader
+ */
 public class DelimitedReader extends FileDelimitedReader {
 
     private static final long serialVersionUID = 1L;
@@ -24,34 +27,57 @@ public class DelimitedReader extends FileDelimitedReader {
 
     @Override
     public boolean start() throws IOException {
-        inputRuntime.init();
-        LOGGER.debug("open: " + properties.fileName.getStringValue());
         boolean startAble = false;
-        fid = inputRuntime.getFileDelimited();
-        startAble = fid != null && fid.nextRecord();
-        if (startAble) {
-            retrieveValues();
-            if (inputRuntime.schemaIsDynamic) {
-                setupDynamicSchema();
+        try {
+            inputRuntime.init();
+            LOGGER.debug("open: " + properties.fileName.getStringValue());
+            fid = inputRuntime.getFileDelimited();
+            startAble = fid != null && fid.nextRecord();
+            if (startAble) {
+                retrieveValues();
+                if (inputRuntime.schemaIsDynamic) {
+                    setupDynamicSchema();
+                    startAble = advance();
+                }
+                currentIndexRecord = ((DelimitedAdaptorFactory) getFactory()).convertToAvro(values);
+            }
+        } catch (IOException e) {
+            if (properties.dieOnError.getValue()) {
+                throw e;
+            } else {
+                // TODO Meed junit test
                 startAble = advance();
             }
         }
+
         return startAble;
     }
 
     @Override
     public boolean advance() throws IOException {
         boolean isContinue = false;
-        isContinue = fid.nextRecord();
-        if (!isContinue) {
-            if (properties.uncompress.getValue()) {
-                fid = inputRuntime.getFileDelimited();
-                isContinue = fid != null && fid.nextRecord();
+        try {
+            isContinue = fid.nextRecord();
+            if (!isContinue) {
+                if (properties.uncompress.getValue()) {
+                    fid = inputRuntime.getFileDelimited();
+                    isContinue = fid != null && fid.nextRecord();
+                }
+            }
+            if (isContinue) {
+                retrieveValues();
+                currentIndexRecord = ((DelimitedAdaptorFactory) getFactory()).convertToAvro(values);
+                // successfulWrites.add(currentIndexRecord);
+            }
+        } catch (IOException e) {
+            if (properties.dieOnError.getValue()) {
+                throw e;
+            } else {
+                // TODO check reject ?
+                isContinue = advance();
             }
         }
-        if (isContinue) {
-            retrieveValues();
-        }
+
         return isContinue;
     }
 

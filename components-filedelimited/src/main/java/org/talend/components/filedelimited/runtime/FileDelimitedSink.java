@@ -7,7 +7,7 @@ import java.util.List;
 import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.filedelimited.tFileOutputDelimited.TFileOutputDelimitedProperties;
+import org.talend.components.filedelimited.tfileoutputdelimited.TFileOutputDelimitedProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 

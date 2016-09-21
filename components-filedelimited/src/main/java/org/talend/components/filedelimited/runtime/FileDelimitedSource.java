@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.filedelimited.FileDelimitedProperties;
-import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
+import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
 import org.talend.components.filedelimited.wizard.FileDelimitedWizardProperties;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;

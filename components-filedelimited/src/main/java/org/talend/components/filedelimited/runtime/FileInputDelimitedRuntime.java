@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.common.EncodingTypeProperties;
 import org.talend.components.common.runtime.FileRuntimeHelper;
-import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
+import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.fileprocess.FileInputDelimited;
 

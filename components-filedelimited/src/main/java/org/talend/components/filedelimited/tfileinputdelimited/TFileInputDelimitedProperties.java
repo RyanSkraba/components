@@ -1,4 +1,4 @@
-package org.talend.components.filedelimited.tFileInputDelimited;
+package org.talend.components.filedelimited.tfileinputdelimited;
 
 import java.util.ArrayList;
 import java.util.HashSet;

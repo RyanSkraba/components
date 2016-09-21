@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.filedelimited.FileDelimitedTestBasic;
-import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
+import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

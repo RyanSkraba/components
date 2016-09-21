@@ -3,8 +3,8 @@ package org.talend.components.filedelimited;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
-import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedDefinition;
-import org.talend.components.filedelimited.tFileOutputDelimited.TFileOutputDelimitedDefinition;
+import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedDefinition;
+import org.talend.components.filedelimited.tfileoutputdelimited.TFileOutputDelimitedDefinition;
 import org.talend.components.filedelimited.wizard.FieldDelimitedEditWizardDefinition;
 import org.talend.components.filedelimited.wizard.FileDelimitedWizardDefinition;
 
