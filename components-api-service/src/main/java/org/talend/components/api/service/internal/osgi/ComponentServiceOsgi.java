@@ -22,6 +22,7 @@ import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.ComponentInstaller;
+import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.Connector;
@@ -183,6 +184,11 @@ public class ComponentServiceOsgi implements ComponentService {
     @Override
     public Set<ComponentDefinition> getAllComponents() {
         return componentServiceDelegate.getAllComponents();
+    }
+
+    @Override
+    public <T extends RuntimableDefinition<?,? >> Iterable<T> getDefinitionsByType(Class<T> cls) {
+        return componentServiceDelegate.getDefinitionsByType(cls);
     }
 
     @Override

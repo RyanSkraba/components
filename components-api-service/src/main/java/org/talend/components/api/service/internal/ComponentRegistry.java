@@ -12,12 +12,11 @@
 // ============================================================================
 package org.talend.components.api.service.internal;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.talend.components.api.ComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
+import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 
@@ -30,7 +29,11 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
  */
 public class ComponentRegistry implements ComponentInstaller.ComponentFrameworkContext {
 
-    private Map<String, ComponentDefinition> components;
+    /**
+     * All of the {@link RuntimableDefinition}s that have been added to the framework, including
+     * {@link ComponentDefinition}s.
+     */
+    private List<RuntimableDefinition<?, ?>> definitions;
 
     private Map<String, ComponentWizardDefinition> componentWizards;
 
@@ -41,10 +44,35 @@ public class ComponentRegistry implements ComponentInstaller.ComponentFrameworkC
     }
 
     /**
-     * @return a map of components using their name as a key, never null.
+     * @return a list of all the extended {@link RuntimableDefinition} that have been added to the framework.
      */
-    public Map<String, ComponentDefinition> getComponents() {
-        return components;
+    public Iterable<RuntimableDefinition<?, ?>> getDefinitions() {
+        return definitions;
+    }
+
+    /**
+     * @return a subset of the known definitions
+     */
+    public <T extends RuntimableDefinition<?, ?>> Iterable<T> getDefinitionsByType(final Class<T> cls) {
+        // If we ever add a guava dependency: return Iterables.filter(definitions, cls);
+        List<T> byType = new ArrayList<>();
+        for (RuntimableDefinition<?, ?> def: definitions) {
+            if (cls.isAssignableFrom(def.getClass())) {
+                byType.add((T) def);
+            }
+        }
+        return byType;
+    }
+
+    /**
+     * @return a subset of the known definitions, keyed by name.
+     */
+    private <T extends RuntimableDefinition<?, ?>> Map<String, T> getDefinitionMapByType(final Class<T> cls) {
+        Map<String, T> definitionsAsMap = new HashMap<>();
+        for (T def : getDefinitionsByType(cls)) {
+            definitionsAsMap.put(def.getName(), def);
+        }
+        return definitionsAsMap;
     }
 
     /**
@@ -65,7 +93,7 @@ public class ComponentRegistry implements ComponentInstaller.ComponentFrameworkC
      * Remove all known definitions that are stored in the registry and returns it to a modifiable, empty state.
      */
     public void reset() {
-        components = new HashMap<>();
+        definitions = new ArrayList<>();
         componentWizards = new HashMap<>();
         componentFamilies = new HashMap<>();
     }
@@ -74,19 +102,20 @@ public class ComponentRegistry implements ComponentInstaller.ComponentFrameworkC
      * After all of the definitions have been stored in the registry, ensure that no further modifications can be made.
      */
     public void lock() {
-        components = Collections.unmodifiableMap(components);
+        definitions = Collections.unmodifiableList(definitions);
         componentWizards = Collections.unmodifiableMap(componentWizards);
         componentFamilies = Collections.unmodifiableMap(componentFamilies);
     }
 
     @Override
-    public void registerComponentDefinition(Iterable<ComponentDefinition> defs) {
-        for (ComponentDefinition component : defs)
-            getComponents().put(component.getName(), component);
+    public void registerDefinition(Iterable<? extends RuntimableDefinition<?, ?>> defs) {
+        for (RuntimableDefinition<?, ?> runtimable : defs) {
+            definitions.add(runtimable);
+        }
     }
 
     @Override
-    public void registerComponentWizardDefinition(Iterable<ComponentWizardDefinition> defs) {
+    public void registerComponentWizardDefinition(Iterable<? extends ComponentWizardDefinition> defs) {
         for (ComponentWizardDefinition componentWizard : defs)
             getComponentWizards().put(componentWizard.getName(), componentWizard);
     }
@@ -95,7 +124,7 @@ public class ComponentRegistry implements ComponentInstaller.ComponentFrameworkC
     public void registerComponentFamilyDefinition(ComponentFamilyDefinition componentFamily) {
         getComponentFamilies().put(componentFamily.getName(), componentFamily);
         // Always automatically register the nested definitions in the component family.
-        registerComponentDefinition(componentFamily.getComponents());
         registerComponentWizardDefinition(componentFamily.getComponentWizards());
+        registerDefinition(componentFamily.getDefinitions());
     }
 }

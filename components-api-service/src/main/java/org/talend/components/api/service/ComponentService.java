@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
@@ -39,16 +40,24 @@ public interface ComponentService extends PropertiesService<Properties> {
     /**
      * Get the list of all the component names that are registered
      *
-     * @return return the set of component names, never null
+     * @return the set of component names, never null
      */
     Set<String> getAllComponentNames();
 
     /**
      * Get the list of all the components {@link ComponentDefinition} that are registered
      *
-     * @return return the set of component definitions, never null.
+     * @return the set of component definitions, never null.
      */
     Set<ComponentDefinition> getAllComponents();
+
+    /**
+     * Get the list of all {@link RuntimableDefinition} that implement a specific interface.
+     *
+     * @param An interface or subclass of {@link RuntimableDefinition}.
+     * @return All {@link RuntimableDefinition} that were registered in the framework and that implement that interface.
+     */
+    <T extends RuntimableDefinition<?,? >> Iterable<T> getDefinitionsByType(Class<T> cls);
 
     /**
      * Return all top-level wizards that can be used to create component property sets.
@@ -111,7 +120,7 @@ public interface ComponentService extends PropertiesService<Properties> {
      * {@link ComponentProperties} object.
      * 
      * @param properties the {@link ComponentProperties} object to look for.
-     * @return the list of compatbible {@link ComponentDefinition} objects.
+     * @return the list of compatible {@link ComponentDefinition} objects.
      */
     List<ComponentDefinition> getPossibleComponents(ComponentProperties... properties) throws Throwable;
 

@@ -14,11 +14,11 @@ package org.talend.components.api.component;
 
 import java.util.Set;
 
+import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
@@ -30,7 +30,7 @@ import org.talend.daikon.properties.property.PropertyFactory;
  * {@link org.talend.components.api.service.ComponentService} to allow components to be discovered.
  */
 
-public interface ComponentDefinition extends NamedThing {
+public interface ComponentDefinition extends RuntimableDefinition<Properties, ConnectorTopology> {
 
     /**
      * Returns an array of paths that represent the categories of the component.

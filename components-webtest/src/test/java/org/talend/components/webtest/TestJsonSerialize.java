@@ -19,8 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
-import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
+import org.talend.components.fullexample.FullExampleProperties;
+//import org.talend.components.salesforce.SalesforceConnectionProperties;
+//import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.properties.Properties;
 
 import java.io.IOException;
@@ -37,16 +38,18 @@ public class TestJsonSerialize {
 
     @Test
     public void TestSerializationSizes() throws IOException {
-        TSalesforceInputProperties tsip = (TSalesforceInputProperties) new TSalesforceInputProperties(null).init();
-        tsip.connection.loginType.setValue(SalesforceConnectionProperties.LoginType.Basic);
-        tsip.connection.userPassword.userId.setValue("foooo");
-        // jsonio
-        String jsonioString = tsip.toSerialized();
+        FullExampleProperties fep = new FullExampleProperties(null);
+        fep.stringProp.setValue("stringProp");
+        fep.tableProp.colEnum.setValue(FullExampleProperties.TableProperties.ColEnum.FOO);
+        fep.tableProp.colString.setValue("foooo");
+        String jsonioString = fep.toSerialized();
         System.out.println("jsonio:" + FileUtils.byteCountToDisplaySize(jsonioString.getBytes().length));
-        TSalesforceInputProperties salesforceInputProperties = Properties.Helper.fromSerializedPersistent(jsonioString,
-                TSalesforceInputProperties.class).object;
-        assertNull(salesforceInputProperties.connection.proxy.host.getValue());
-        assertEquals("foooo", tsip.connection.userPassword.userId.getValue());
+
+        FullExampleProperties fepCopy = Properties.Helper.fromSerializedPersistent(jsonioString,
+                FullExampleProperties.class).object;
+        assertNull(fepCopy.hiddenTextProp.getValue());
+        assertEquals("foooo", fep.tableProp.colString.getValue());
+        assertEquals("foooo", fepCopy.tableProp.colString.getValue());
     }
 
 }

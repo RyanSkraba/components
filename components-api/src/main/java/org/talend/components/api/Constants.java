@@ -18,5 +18,5 @@ public class Constants {
      * Used in the name attribute of the aQute.bnd.annotation.component.Component annotation of a
      * {@link ComponentInstaller}. This name attribute is only used during service discovery.
      */
-    public static final String COMPONENT_INSTALLER_PREFIX = "installer::"; //$NON-NLS-1$
+    public static final String COMPONENT_INSTALLER_PREFIX = "installer$$"; //$NON-NLS-1$
 }

@@ -40,7 +40,7 @@ public class SpringFullExamplePropertiesTestIT extends AbstractComponentTest {
 
     @Before
     public void init() {
-        cp = (FullExampleProperties) getComponentService().getComponentProperties(FullExampleDefinition.COMPONENT_NAME);
+        cp = (FullExampleProperties) getComponentService().getComponentProperties(FullExampleInputDefinition.COMPONENT_NAME);
 
     }
 

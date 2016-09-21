@@ -57,7 +57,7 @@ public class JiraReaderTest {
     @BeforeClass
     public static void setupService() {
         ComponentRegistry registry = new ComponentRegistry();
-        registry.registerComponentDefinition(Arrays.asList((ComponentDefinition) new TJiraInputDefinition()));
+        registry.registerDefinition(Arrays.asList(new TJiraInputDefinition()));
         componentService = new ComponentServiceImpl(registry);
     }
 

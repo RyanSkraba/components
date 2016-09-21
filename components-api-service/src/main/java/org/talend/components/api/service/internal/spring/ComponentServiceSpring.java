@@ -20,6 +20,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.common.collect.Lists;
 import org.apache.avro.Schema;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -35,10 +36,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.talend.components.api.ComponentInstaller;
+import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
-import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
@@ -48,6 +50,7 @@ import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
+import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.service.Repository;
@@ -122,7 +125,7 @@ public class ComponentServiceSpring implements ComponentService {
             + "/possibleComponents", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ComponentDefinition> getPossibleComponents(
             @ApiParam(name = "properties", value = "Component properties") @RequestBody ComponentProperties... properties)
-                    throws Throwable {
+            throws Throwable {
         return componentServiceDelegate.getPossibleComponents(properties);
     }
 
@@ -150,7 +153,7 @@ public class ComponentServiceSpring implements ComponentService {
     public @ResponseBody Properties validateProperty(
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
             @ApiParam(name = "properties", value = "Properties holding the property to validate") @RequestBody Properties properties)
-                    throws Throwable {
+            throws Throwable {
         componentServiceDelegate.validateProperty(propName, properties);
         return properties;
     }
@@ -161,7 +164,7 @@ public class ComponentServiceSpring implements ComponentService {
     public @ResponseBody Properties beforePropertyActivate(
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
             @ApiParam(name = "properties", value = "Properties holding the property to activate") @RequestBody Properties properties)
-                    throws Throwable {
+            throws Throwable {
         componentServiceDelegate.beforePropertyActivate(propName, properties);
         return properties;
     }
@@ -172,7 +175,7 @@ public class ComponentServiceSpring implements ComponentService {
     public @ResponseBody Properties beforePropertyPresent(
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
             @ApiParam(name = "properties", value = "Properties holding the property that is going to be presented") @RequestBody Properties properties)
-                    throws Throwable {
+            throws Throwable {
         componentServiceDelegate.beforePropertyPresent(propName, properties);
         return properties;
     }
@@ -183,7 +186,7 @@ public class ComponentServiceSpring implements ComponentService {
     public @ResponseBody Properties afterProperty(
             @PathVariable(value = "propName") @ApiParam(name = "propName", value = "Name of property") String propName,
             @ApiParam(name = "properties", value = "Properties holding the value that just has been set") @RequestBody Properties properties)
-                    throws Throwable {
+            throws Throwable {
         componentServiceDelegate.afterProperty(propName, properties);
         return properties;
     }
@@ -194,7 +197,7 @@ public class ComponentServiceSpring implements ComponentService {
     public @ResponseBody Properties beforeFormPresent(
             @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
             @ApiParam(name = "properties", value = "Properties holding the form to be presented") @RequestBody Properties properties)
-                    throws Throwable {
+            throws Throwable {
         componentServiceDelegate.beforeFormPresent(formName, properties);
         return properties;
     }
@@ -205,7 +208,7 @@ public class ComponentServiceSpring implements ComponentService {
     public @ResponseBody Properties afterFormNext(
             @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
             @ApiParam(name = "properties", value = "Properties related to the current wizard form") @RequestBody Properties properties)
-                    throws Throwable {
+            throws Throwable {
         componentServiceDelegate.afterFormNext(formName, properties);
         return properties;
     }
@@ -216,7 +219,7 @@ public class ComponentServiceSpring implements ComponentService {
     public @ResponseBody Properties afterFormBack(
             @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
             @ApiParam(name = "properties", value = "Properties related to the current form") @RequestBody Properties properties)
-                    throws Throwable {
+            throws Throwable {
         componentServiceDelegate.afterFormBack(formName, properties);
         return properties;
     }
@@ -227,7 +230,7 @@ public class ComponentServiceSpring implements ComponentService {
     public @ResponseBody Properties afterFormFinish(
             @PathVariable(value = "formName") @ApiParam(name = "formName", value = "Name of form") String formName,
             @ApiParam(name = "properties", value = "Properties holding the current form to be closed.") @RequestBody Properties properties)
-                    throws Throwable {
+            throws Throwable {
         componentServiceDelegate.afterFormFinish(formName, properties);
         return properties;
     }
@@ -244,8 +247,26 @@ public class ComponentServiceSpring implements ComponentService {
         return componentServiceDelegate.getAllComponents();
     }
 
+    @Override
+    public <T extends RuntimableDefinition<?,? >> Iterable<T> getDefinitionsByType(Class<T> cls) {
+        // Needs to be copied into a new list to be serialized remotely.
+        return Lists.newArrayList(componentServiceDelegate.getDefinitionsByType(cls));
+    }
+
+    // The {cls:.+} notation ensures that no tokens in the classname are considered to be file extensions (like .json or .txt)
     @RequestMapping(value = BASE_PATH
-            + "/wizards/definitions", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+            + "/definitions/{cls:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get the definitions of a common type.", notes = "Given a class or interface, return all of the definitions that were implemented in the component framework that can be assigned to that type.")
+    public @ResponseBody Iterable<? extends RuntimableDefinition<?, ?>> getDefinitionsByType(
+            @PathVariable(value = "cls") @ApiParam(name = "cls", value = "Class name to fetch.") String cls) {
+        try {
+            Class<? extends RuntimableDefinition<?, ?>> defCls = (Class<? extends RuntimableDefinition<?, ?>>) Class.forName(cls);
+            return getDefinitionsByType(defCls);
+        } catch (ClassNotFoundException e) {
+            throw new TalendRuntimeException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
+        }
+    }
+
     @Override
     public Set<ComponentWizardDefinition> getTopLevelComponentWizards() {
         return componentServiceDelegate.getTopLevelComponentWizards();

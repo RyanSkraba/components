@@ -12,17 +12,15 @@
 // ============================================================================
 package org.talend.components.api;
 
-import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.daikon.NamedThing;
 
 /**
  * Placeholder for a Component family catalog item.
  */
-
 public interface ComponentFamilyDefinition extends NamedThing {
 
-    Iterable<ComponentDefinition> getComponents();
+    Iterable<? extends RuntimableDefinition<?, ?>> getDefinitions();
 
-    Iterable<ComponentWizardDefinition> getComponentWizards();
+    Iterable<? extends ComponentWizardDefinition> getComponentWizards();
 }

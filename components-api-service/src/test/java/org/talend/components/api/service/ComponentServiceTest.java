@@ -47,7 +47,6 @@ import org.talend.components.api.service.testcomponent.nestedprop.NestedComponen
 import org.talend.components.api.test.AbstractComponentTest;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.wizard.ComponentWizard;
-import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.i18n.I18nMessages;
 
@@ -96,9 +95,8 @@ public class ComponentServiceTest extends AbstractComponentTest {
     public ComponentService getComponentService() {
         if (componentService == null) {
             ComponentRegistry testComponentRegistry = new ComponentRegistry();
-            testComponentRegistry.registerComponentDefinition(Arrays.asList((ComponentDefinition) new TestComponentDefinition()));
-            testComponentRegistry.registerComponentWizardDefinition(
-                    Arrays.asList((ComponentWizardDefinition) new TestComponentWizardDefinition()));
+            testComponentRegistry.registerDefinition(Arrays.asList(new TestComponentDefinition()));
+            testComponentRegistry.registerComponentWizardDefinition(Arrays.asList(new TestComponentWizardDefinition()));
             componentService = new ComponentServiceImpl(testComponentRegistry);
         }
         return componentService;
@@ -183,7 +181,7 @@ public class ComponentServiceTest extends AbstractComponentTest {
                         new URL("mvn:org.apache.maven/maven-artifact/3.3.3/jar"), //
                         new URL("mvn:org.eclipse.aether/aether-transport-file/1.0.0.v20140518/jar"), //
                         new URL("mvn:org.talend.components/file-input/0.1.0.SNAPSHOT/jar")//
-        ));
+                ));
     }
 
     @Test

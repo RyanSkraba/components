@@ -81,7 +81,7 @@ public class TestFixedConnectorComponentProperties {
         ComponentRegistry testComponentRegistry = new ComponentRegistry();
         SimpleComponentDefinition componentDef = new SimpleComponentDefinition("foo");
         componentDef.setPropertyClass(TestProperties.class);
-        testComponentRegistry.registerComponentDefinition(Arrays.asList((ComponentDefinition) componentDef));
+        testComponentRegistry.registerDefinition(Arrays.asList(componentDef));
         return new ComponentServiceImpl(testComponentRegistry);
     }
 
