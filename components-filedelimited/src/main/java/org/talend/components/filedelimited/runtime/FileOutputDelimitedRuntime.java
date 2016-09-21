@@ -10,6 +10,7 @@ import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.List;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.avro.Schema;
@@ -41,9 +42,11 @@ public class FileOutputDelimitedRuntime {
 
     File file;
 
+    File zipFile;
+
     private ZipOutputStream zipOut;
 
-    private String encoding;
+    protected String encoding;
 
     protected String fieldSeparator;
 
@@ -117,14 +120,13 @@ public class FileOutputDelimitedRuntime {
                 if (props.compress.getValue() && !props.append.getValue()) {// compress the dest file
                     file = new File(fileName);
                     String zipName = fullName + ".zip";
-                    File file = new File(zipName);
-                    java.util.zip.ZipOutputStream zipOut = null;
+                    zipFile = new File(zipName);
 
-                    if (file.exists()) {
-                        file.delete();
+                    if (zipFile.exists()) {
+                        zipFile.delete();
                     }
-                    zipOut = new java.util.zip.ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipName)));
-                    zipOut.putNextEntry(new java.util.zip.ZipEntry(file.getName()));
+                    zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipName)));
+                    zipOut.putNextEntry(new ZipEntry(file.getName()));
                     this.streamWriter = new OutputStreamWriter(zipOut, encoding);
                 } else {
                     if (!props.append.getValue()) {
@@ -157,20 +159,19 @@ public class FileOutputDelimitedRuntime {
         } else {
             if (props.compress.getValue()) {
                 // compress the dest output stream
-                zipOut = new java.util.zip.ZipOutputStream(
-                        new java.io.BufferedOutputStream((OutputStream) props.fileName.getValue()));
-                zipOut.putNextEntry(new java.util.zip.ZipEntry("TalendOutputDelimited"));
-                streamWriter = new java.io.OutputStreamWriter(zipOut, encoding);
+                zipOut = new ZipOutputStream(new BufferedOutputStream((OutputStream) props.fileName.getValue()));
+                zipOut.putNextEntry(new ZipEntry("TalendOutputDelimited"));
+                streamWriter = new OutputStreamWriter(zipOut, encoding);
 
             } else {
-                streamWriter = new java.io.OutputStreamWriter((OutputStream) props.fileName.getValue(), encoding);
+                streamWriter = new OutputStreamWriter((OutputStream) props.fileName.getValue(), encoding);
             }
             if (props.rowMode.getValue()) {
                 this.writer = new BufferedOutput(streamWriter);
-                java.io.StringWriter strWriter = new java.io.StringWriter();
+                StringWriter strWriter = new StringWriter();
                 csvWriter = new com.talend.csv.CSVWriter(strWriter);
             } else {
-                java.io.BufferedWriter bufferWriter = new java.io.BufferedWriter(streamWriter);
+                BufferedWriter bufferWriter = new BufferedWriter(streamWriter);
                 csvWriter = new com.talend.csv.CSVWriter(bufferWriter);
             }
         }
@@ -184,7 +185,7 @@ public class FileOutputDelimitedRuntime {
             }
         }
         // when there is dynamic schema, it won't be enclosed with "\""
-        if (!(props.includeHeader.getValue() && AvroUtils.isIncludeAllFields(props.main.schema.getValue()))) {
+        if (!((props.includeHeader.getValue() || AvroUtils.isIncludeAllFields(props.main.schema.getValue())))) {
             csvWriter.setEscapeChar(escapeChar);
             csvWriter.setQuoteChar(textEnclosureChar);
             csvWriter.setQuoteStatus(com.talend.csv.CSVWriter.QuoteStatus.FORCE);
@@ -193,53 +194,53 @@ public class FileOutputDelimitedRuntime {
     }
 
     public Writer getWriter() throws IOException {
-        if (!props.split.getValue()) {
-            if (props.compress.getValue() && !props.append.getValue()) {// compress the dest file
-                file = new File(fileName);
-                String zipName = fullName + ".zip";
-                File file = new File(zipName);
-                // Row
-                java.util.zip.ZipOutputStream zipOut = null;
+        if (!props.targetIsStream.getValue()) {
+            if (!props.split.getValue()) {
+                if (props.compress.getValue() && !props.append.getValue()) {// compress the dest file
+                    file = new File(fileName);
+                    String zipName = fullName + ".zip";
+                    zipFile = new File(zipName);
 
-                if (file.exists()) {
-                    file.delete();
-                }
-                zipOut = new java.util.zip.ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipName)));
-                zipOut.putNextEntry(new java.util.zip.ZipEntry(file.getName()));
-                if (props.rowMode.getValue()) {
-                    writer = new BufferedOutput(new OutputStreamWriter(zipOut, encoding));
+                    if (zipFile.exists()) {
+                        zipFile.delete();
+                    }
+                    zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipName)));
+                    zipOut.putNextEntry(new ZipEntry(file.getName()));
+                    streamWriter = new OutputStreamWriter(zipOut, encoding);
                 } else {
-                    writer = new BufferedWriter(new OutputStreamWriter(zipOut, encoding));
+                    if (!props.append.getValue()) {
+                        File fileToDelete = new File(fileName);
+                        if (fileToDelete.exists()) {
+                            fileToDelete.delete();
+                        }
+                    }
+                    streamWriter = new OutputStreamWriter(new FileOutputStream(fileName, props.append.getValue()), encoding);
                 }
             } else {
+                file = new File(fullName + splitedFileNo + extension);
                 if (!props.append.getValue()) {
-                    File fileToDelete = new File(fileName);
-                    if (fileToDelete.exists()) {
-                        fileToDelete.delete();
+                    if (file.exists()) {
+                        file.delete();
                     }
                 }
-                streamWriter = new OutputStreamWriter(new FileOutputStream(fileName, props.append.getValue()), encoding);
-                if (props.rowMode.getValue()) {
-                    writer = new BufferedOutput(streamWriter);
-                } else {
-                    writer = new BufferedWriter(streamWriter);
-                }
+                streamWriter = new OutputStreamWriter(
+                        new FileOutputStream(fullName + splitedFileNo + extension, props.append.getValue()), encoding);
+                splitedFileNo++;
             }
         } else {
-            file = new File(fullName + splitedFileNo + extension);
-            if (!props.append.getValue()) {
-                if (file.exists()) {
-                    file.delete();
-                }
-            }
-            streamWriter = new OutputStreamWriter(
-                    new FileOutputStream(fullName + splitedFileNo + extension, props.append.getValue()), encoding);
-            if (props.rowMode.getValue()) {
-                writer = new BufferedOutput(streamWriter);
+            if (props.compress.getValue()) {
+                // compress the dest output stream
+                zipOut = new ZipOutputStream(new BufferedOutputStream((OutputStream) props.fileName.getValue()));
+                zipOut.putNextEntry(new ZipEntry("TalendOutputDelimited"));
+                streamWriter = new OutputStreamWriter(zipOut, encoding);
             } else {
-                writer = new BufferedWriter(streamWriter);
+                streamWriter = new OutputStreamWriter((OutputStream) props.fileName.getValue(), encoding);
             }
-            splitedFileNo++;
+        }
+        if (props.rowMode.getValue()) {
+            writer = new BufferedOutput(streamWriter);
+        } else {
+            writer = new BufferedWriter(streamWriter);
         }
         return writer;
     }
@@ -248,13 +249,14 @@ public class FileOutputDelimitedRuntime {
     public void writeHeader(Writer writer, Schema schema) throws IOException {
         if (props.includeHeader.getValue()) {
             // TODO support PARALLEL ? need recheck with code of javajet
-            if (file.length() == 0) {
+            if ((zipFile == null && file.length() == 0) || zipFile != null && zipFile.length() == 0) {
                 for (Schema.Field field : schema.getFields()) {
                     writer.write(field.name());
                     if (field.pos() != (schema.getFields().size() - 1)) {
                         writer.write(fieldSeparator);
                     }
                 }
+                writer.write(rowSeparator);
             }
         }
     }
@@ -266,6 +268,11 @@ public class FileOutputDelimitedRuntime {
                 writer.write(strWriter.getBuffer().toString());
                 strWriter.getBuffer().delete(0, strWriter.getBuffer().length());
             }
+            // Because of header should not be included "escapeChar" and "textEnclosureChar"
+            // So need set them after header is written
+            csvWriter.setEscapeChar(escapeChar);
+            csvWriter.setQuoteChar(textEnclosureChar);
+            csvWriter.setQuoteStatus(com.talend.csv.CSVWriter.QuoteStatus.FORCE);
         }
     }
 

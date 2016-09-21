@@ -1,6 +1,9 @@
 package org.talend.components.filedelimited.runtime;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -8,6 +11,8 @@ import java.util.Date;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.commons.lang3.StringUtils;
+import org.talend.components.common.ComponentConstants;
+import org.talend.components.common.runtime.FormatterUtils;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -16,7 +21,7 @@ import org.talend.daikon.java8.SerializableFunction;
 
 public class FileDelimitedAvroRegistry extends AvroRegistry {
 
-    private static FileDelimitedAvroRegistry fileInputInstance;
+    private static FileDelimitedAvroRegistry fileDelimitedInstance;
 
     public FileDelimitedAvroRegistry() {
 
@@ -45,11 +50,11 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
         });
     }
 
-    public static FileDelimitedAvroRegistry getFileInputInstance() {
-        if (fileInputInstance == null) {
-            fileInputInstance = new FileDelimitedAvroRegistry();
+    public static FileDelimitedAvroRegistry get() {
+        if (fileDelimitedInstance == null) {
+            fileDelimitedInstance = new FileDelimitedAvroRegistry();
         }
-        return fileInputInstance;
+        return fileDelimitedInstance;
     }
 
     private Schema inferSchemaRecord(IndexedRecord in) {
@@ -68,39 +73,39 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
         return field.schema();
     }
 
-    public AvroConverter<String, ?> getConverterFromString(org.apache.avro.Schema.Field f) {
+    public AvroConverter<String, ?> getConverter(org.apache.avro.Schema.Field f) {
         Schema fieldSchema = AvroUtils.unwrapIfNullable(f.schema());
         if (AvroUtils.isSameType(fieldSchema, AvroUtils._boolean())) {
-            return new StringToBooleanConverter(f);
+            return new BooleanConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._decimal())) {
-            return new StringToDecimalConverter(f);
+            return new DecimalConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._double())) {
-            return new StringToDoubleConverter(f);
+            return new DoubleConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._float())) {
-            return new StringToFloatConverter(f);
+            return new FloatConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._int())) {
-            return new StringToIntegerConverter(f);
+            return new IntegerConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._date())) {
-            return new StringToDateConverter(f);
+            return new DateConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._long())) {
-            return new StringToLongConverter(f);
+            return new LongConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._bytes())) {
-            return new StringToBytesConverter(f);
+            return new BytesConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._byte())) {
-            return new StringToByteConverter(f);
+            return new ByteConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._character())) {
-            return new StringToCharacterConverter(f);
+            return new CharacterConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._string())) {
             return super.getConverter(String.class);
         }
         throw new UnsupportedOperationException("The type " + fieldSchema.getType() + " is not supported."); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    public static abstract class AsStringConverter<T> implements AvroConverter<String, T> {
+    public static abstract class StringConverter<T> implements AvroConverter<String, T> {
 
-        private final Schema.Field field;
+        protected final Schema.Field field;
 
-        AsStringConverter(Schema.Field field) {
+        StringConverter(Schema.Field field) {
             this.field = field;
         }
 
@@ -120,9 +125,61 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
         }
     }
 
-    public static class StringToBooleanConverter extends AsStringConverter<Boolean> {
+    public static abstract class NumberConverter<T> implements AvroConverter<String, T> {
 
-        StringToBooleanConverter(Schema.Field field) {
+        private final Schema.Field field;
+
+        NumberConverter(Schema.Field field) {
+            this.field = field;
+        }
+
+        @Override
+        public Schema getSchema() {
+            return field.schema();
+        }
+
+        @Override
+        public Class<String> getDatumClass() {
+            return String.class;
+        }
+
+        @Override
+        public String convertToDatum(T value) {
+            // TODO check nullable?
+            if (value == null) {
+                return null;
+            }
+            Character thousandsSepChar = null;
+            Character decimalSepChar = null;
+            String thousandsSepString = field.getProp(ComponentConstants.THOUSANDS_SEPARATOR);
+            String decimalSepString = field.getProp(ComponentConstants.DECIMAL_SEPARATOR);
+            if (thousandsSepString != null) {
+                thousandsSepChar = thousandsSepString.charAt(0);
+            }
+            if (decimalSepString != null) {
+                decimalSepChar = decimalSepString.charAt(0);
+            }
+            if (thousandsSepChar != null || decimalSepChar != null) {
+                return FormatterUtils.formatNumber(new BigDecimal(String.valueOf(value)).toPlainString(), thousandsSepChar,
+                        decimalSepChar);
+            } else {
+                if (value instanceof BigDecimal) {
+                    String precision = field.getProp(SchemaConstants.TALEND_COLUMN_PRECISION);
+                    if (precision != null) {
+                        return ((BigDecimal) value).setScale(Integer.valueOf(precision), RoundingMode.HALF_UP).toPlainString();
+                    } else {
+                        return ((BigDecimal) value).toPlainString();
+                    }
+                }
+                return String.valueOf(value);
+            }
+        }
+
+    }
+
+    public static class BooleanConverter extends StringConverter<Boolean> {
+
+        BooleanConverter(Schema.Field field) {
             super(field);
         }
 
@@ -132,9 +189,9 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
         }
     }
 
-    public static class StringToDecimalConverter extends AsStringConverter<BigDecimal> {
+    public static class DecimalConverter extends NumberConverter<BigDecimal> {
 
-        StringToDecimalConverter(Schema.Field field) {
+        DecimalConverter(Schema.Field field) {
             super(field);
         }
 
@@ -144,9 +201,9 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
         }
     }
 
-    public static class StringToDoubleConverter extends AsStringConverter<Double> {
+    public static class DoubleConverter extends NumberConverter<Double> {
 
-        StringToDoubleConverter(Schema.Field field) {
+        DoubleConverter(Schema.Field field) {
             super(field);
         }
 
@@ -156,9 +213,9 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
         }
     }
 
-    public static class StringToLongConverter extends AsStringConverter<Long> {
+    public static class LongConverter extends NumberConverter<Long> {
 
-        StringToLongConverter(Schema.Field field) {
+        LongConverter(Schema.Field field) {
             super(field);
         }
 
@@ -168,9 +225,9 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
         }
     }
 
-    public static class StringToFloatConverter extends AsStringConverter<Float> {
+    public static class FloatConverter extends NumberConverter<Float> {
 
-        StringToFloatConverter(Schema.Field field) {
+        FloatConverter(Schema.Field field) {
             super(field);
         }
 
@@ -180,11 +237,11 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
         }
     }
 
-    public static class StringToDateConverter extends AsStringConverter<Long> {
+    public static class DateConverter extends StringConverter<Long> {
 
         private final SimpleDateFormat format;
 
-        StringToDateConverter(Schema.Field field) {
+        DateConverter(Schema.Field field) {
             super(field);
             String pattern = field.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
             format = new SimpleDateFormat(pattern);
@@ -207,9 +264,9 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
     }
 
-    public static class StringToIntegerConverter extends AsStringConverter<Integer> {
+    public static class IntegerConverter extends NumberConverter<Integer> {
 
-        StringToIntegerConverter(Schema.Field field) {
+        IntegerConverter(Schema.Field field) {
             super(field);
         }
 
@@ -219,9 +276,9 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
         }
     }
 
-    public static class StringToByteConverter extends AsStringConverter<Byte> {
+    public static class ByteConverter extends NumberConverter<Byte> {
 
-        StringToByteConverter(Schema.Field field) {
+        ByteConverter(Schema.Field field) {
             super(field);
         }
 
@@ -240,9 +297,9 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
         }
     }
 
-    public static class StringToBytesConverter extends AsStringConverter<byte[]> {
+    public static class BytesConverter extends StringConverter<byte[]> {
 
-        StringToBytesConverter(Schema.Field field) {
+        BytesConverter(Schema.Field field) {
             super(field);
         }
 
@@ -250,11 +307,18 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
         public byte[] convertToAvro(String value) {
             return StringUtils.isEmpty(value) ? null : value.getBytes();
         }
+
+        @Override
+        public String convertToDatum(byte[] value) {
+            return value == null ? null
+                    : Charset.forName(field.getProp(ComponentConstants.FILE_ENCODING)).decode(ByteBuffer.wrap(value)).toString();
+        }
+
     }
 
-    public static class StringToCharacterConverter extends AsStringConverter<Character> {
+    public static class CharacterConverter extends StringConverter<Character> {
 
-        StringToCharacterConverter(Schema.Field field) {
+        CharacterConverter(Schema.Field field) {
             super(field);
         }
 
