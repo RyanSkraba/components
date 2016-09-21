@@ -45,19 +45,19 @@ public class FileOutputDelimitedRuntime {
 
     private String encoding;
 
-    private int footer;
+    protected String fieldSeparator;
 
-    private String fieldSeparator;
+    protected String rowSeparator;
 
-    private String rowSeparator;
+    protected char escapeChar;
 
-    private char escapeChar;
-
-    private char textEnclosureChar;
+    protected char textEnclosureChar;
 
     Writer writer;
 
     StringWriter strWriter;
+
+    OutputStreamWriter streamWriter;
 
     private int splitedFileNo = 0;
 
@@ -125,15 +125,7 @@ public class FileOutputDelimitedRuntime {
                     }
                     zipOut = new java.util.zip.ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipName)));
                     zipOut.putNextEntry(new java.util.zip.ZipEntry(file.getName()));
-                    if (props.rowMode.getValue()) {
-                        // TODO
-                        // this.writer = new routines.system.BufferedOutput(new OutputStreamWriter(zipOut, encoding));
-                        this.strWriter = new StringWriter();
-                        csvWriter = new CSVWriter(strWriter);
-                    } else {
-                        csvWriter = new CSVWriter(new BufferedWriter(new OutputStreamWriter(zipOut, encoding)));
-
-                    }
+                    this.streamWriter = new OutputStreamWriter(zipOut, encoding);
                 } else {
                     if (!props.append.getValue()) {
                         File fileToDelete = new File(fileName);
@@ -141,16 +133,7 @@ public class FileOutputDelimitedRuntime {
                             fileToDelete.delete();
                         }
                     }
-                    if (props.rowMode.getValue()) {
-                        // TODO
-                        // this.writer = new routines.system.BufferedOutput(new OutputStreamWriter(
-                        // new FileOutputStream(fileName, props.append.getValue()), encoding));
-                        this.strWriter = new StringWriter();
-                        csvWriter = new CSVWriter(strWriter);
-                    } else {
-                        csvWriter = new CSVWriter(new BufferedWriter(
-                                new OutputStreamWriter(new FileOutputStream(fileName, props.append.getValue()), encoding)));
-                    }
+                    streamWriter = new OutputStreamWriter(new FileOutputStream(fileName, props.append.getValue()), encoding);
                 }
             } else {
                 file = new File(fullName + splitedFileNo + extension);
@@ -160,38 +143,34 @@ public class FileOutputDelimitedRuntime {
                         file.delete();
                     }
                 }
-                if (props.rowMode.getValue()) {
-                    // TODO
-                    // this.writer = new routines.system.BufferedOutput(new OutputStreamWriter(
-                    // new FileOutputStream(fullName + splitedFileNo + extension, props.append.getValue()), encoding));
-                    this.strWriter = new StringWriter();
-                    csvWriter = new CSVWriter(strWriter);
-                } else {
-                    csvWriter = new CSVWriter(new BufferedWriter(new OutputStreamWriter(
-                            new FileOutputStream(fullName + splitedFileNo + extension, props.append.getValue()), encoding)));
-                }
+                streamWriter = new OutputStreamWriter(
+                        new FileOutputStream(fullName + splitedFileNo + extension, props.append.getValue()), encoding);
                 splitedFileNo++;
-
+            }
+            if (props.rowMode.getValue()) {
+                this.writer = new BufferedOutput(streamWriter);
+                this.strWriter = new StringWriter();
+                csvWriter = new CSVWriter(strWriter);
+            } else {
+                csvWriter = new CSVWriter(new BufferedWriter(streamWriter));
             }
         } else {
-            java.io.OutputStreamWriter outWriter = null;
             if (props.compress.getValue()) {
                 // compress the dest output stream
                 zipOut = new java.util.zip.ZipOutputStream(
                         new java.io.BufferedOutputStream((OutputStream) props.fileName.getValue()));
                 zipOut.putNextEntry(new java.util.zip.ZipEntry("TalendOutputDelimited"));
-                outWriter = new java.io.OutputStreamWriter(zipOut, encoding);
+                streamWriter = new java.io.OutputStreamWriter(zipOut, encoding);
 
             } else {
-                outWriter = new java.io.OutputStreamWriter((OutputStream) props.fileName.getValue(), encoding);
+                streamWriter = new java.io.OutputStreamWriter((OutputStream) props.fileName.getValue(), encoding);
             }
             if (props.rowMode.getValue()) {
-                // TODO
-                // this.writer = new routines.system.BufferedOutput(outWriter);
+                this.writer = new BufferedOutput(streamWriter);
                 java.io.StringWriter strWriter = new java.io.StringWriter();
                 csvWriter = new com.talend.csv.CSVWriter(strWriter);
             } else {
-                java.io.BufferedWriter bufferWriter = new java.io.BufferedWriter(outWriter);
+                java.io.BufferedWriter bufferWriter = new java.io.BufferedWriter(streamWriter);
                 csvWriter = new com.talend.csv.CSVWriter(bufferWriter);
             }
         }
@@ -219,7 +198,7 @@ public class FileOutputDelimitedRuntime {
                 file = new File(fileName);
                 String zipName = fullName + ".zip";
                 File file = new File(zipName);
-                // routines.system.Row
+                // Row
                 java.util.zip.ZipOutputStream zipOut = null;
 
                 if (file.exists()) {
@@ -228,43 +207,37 @@ public class FileOutputDelimitedRuntime {
                 zipOut = new java.util.zip.ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipName)));
                 zipOut.putNextEntry(new java.util.zip.ZipEntry(file.getName()));
                 if (props.rowMode.getValue()) {
-                    // TODO create a class to replace routines class
-                    // writer = new routines.system.BufferedOutput (new OutputStreamWriter(zipOut, encoding));
+                    writer = new BufferedOutput(new OutputStreamWriter(zipOut, encoding));
                 } else {
                     writer = new BufferedWriter(new OutputStreamWriter(zipOut, encoding));
                 }
             } else {
-
                 if (!props.append.getValue()) {
                     File fileToDelete = new File(fileName);
                     if (fileToDelete.exists()) {
                         fileToDelete.delete();
                     }
                 }
+                streamWriter = new OutputStreamWriter(new FileOutputStream(fileName, props.append.getValue()), encoding);
                 if (props.rowMode.getValue()) {
-                    // TODO create a class to replace routines class
-                    // writer = new routines.system.BufferedOutput (new OutputStreamWriter(
-                    // new FileOutputStream(fileName, props.append.getValue()), encoding));
+                    writer = new BufferedOutput(streamWriter);
                 } else {
-                    writer = new BufferedWriter(
-                            new OutputStreamWriter(new FileOutputStream(fileName, props.append.getValue()), encoding));
+                    writer = new BufferedWriter(streamWriter);
                 }
             }
         } else {
             file = new File(fullName + splitedFileNo + extension);
-
             if (!props.append.getValue()) {
                 if (file.exists()) {
                     file.delete();
                 }
             }
+            streamWriter = new OutputStreamWriter(
+                    new FileOutputStream(fullName + splitedFileNo + extension, props.append.getValue()), encoding);
             if (props.rowMode.getValue()) {
-                // TODO create a class to replace routines class
-                // writer = new routines.system.BufferedOutput (new OutputStreamWriter(
-                // new FileOutputStream(fullName + splitedFileNo + extension, props.append.getValue()), encoding));
+                writer = new BufferedOutput(streamWriter);
             } else {
-                writer = new BufferedWriter(new OutputStreamWriter(
-                        new FileOutputStream(fullName + splitedFileNo + extension, props.append.getValue()), encoding));
+                writer = new BufferedWriter(streamWriter);
             }
             splitedFileNo++;
         }

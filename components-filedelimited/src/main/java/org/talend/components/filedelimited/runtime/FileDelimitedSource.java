@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.filedelimited.FileDelimitedProperties;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
 import org.talend.components.filedelimited.wizard.FileDelimitedWizardProperties;
 import org.talend.daikon.i18n.GlobalI18N;
@@ -30,7 +31,7 @@ public class FileDelimitedSource extends FileSourceOrSink implements BoundedSour
     private transient Schema schema;
 
     public FileDelimitedReader createReader(RuntimeContainer container) {
-        if (properties.csvOptions.getValue()) {
+        if (((FileDelimitedProperties) properties).csvOptions.getValue()) {
             return new FileCSVReader(container, this, (TFileInputDelimitedProperties) properties);
         } else {
             return new DelimitedReader(container, this, (TFileInputDelimitedProperties) properties);
@@ -38,9 +39,16 @@ public class FileDelimitedSource extends FileSourceOrSink implements BoundedSour
     }
 
     @Override
-    public ValidationResult validate(RuntimeContainer adaptor) {
-        ValidationResult vr = new ValidationResult();
-        Object fileOrStream = properties.fileName.getValue();
+    public ValidationResult validate(RuntimeContainer container) {
+        ValidationResult vr = super.validate(container);
+        // also check that the properties is the right type
+        if (vr.getStatus() != ValidationResult.Result.ERROR) {
+            if (!(properties instanceof TFileInputDelimitedProperties)) {
+                return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
+                        .setMessage("properties should be of type :" + TFileInputDelimitedProperties.class.getCanonicalName());
+            }
+        }
+        Object fileOrStream = ((FileDelimitedProperties) properties).fileName.getValue();
         if (fileOrStream == null) {
             vr.setMessage(messages.getMessage("error.fileNameIsNull"));
             vr.setStatus(ValidationResult.Result.ERROR);

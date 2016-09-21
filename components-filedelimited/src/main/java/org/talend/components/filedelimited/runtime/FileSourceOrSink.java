@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.avro.Schema;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
@@ -22,19 +20,21 @@ public class FileSourceOrSink implements SourceOrSink {
 
     private static final long serialVersionUID = 1L;
 
-    private transient static final Logger LOG = LoggerFactory.getLogger(FileInputDelimitedRuntime.class);
-
-    protected FileDelimitedProperties properties;
+    protected ComponentProperties properties;
 
     private transient Schema schema;
 
     public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
-        this.properties = (FileDelimitedProperties) properties;
+        this.properties = properties;
         return ValidationResult.OK;
     }
 
     @Override
     public ValidationResult validate(RuntimeContainer adaptor) {
+        if (!(properties instanceof FileDelimitedProperties)) {
+            return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
+                    .setMessage("properties should be of type :" + FileDelimitedProperties.class.getCanonicalName());
+        }
         return ValidationResult.OK;
     }
 

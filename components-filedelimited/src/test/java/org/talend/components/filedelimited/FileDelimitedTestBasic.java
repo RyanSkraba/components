@@ -17,15 +17,23 @@ import org.junit.rules.ErrorCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedReader;
+import org.talend.components.api.component.runtime.Result;
+import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentRegistry;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
 import org.talend.components.api.test.AbstractComponentTest;
 import org.talend.components.api.test.ComponentTestUtils;
+import org.talend.components.filedelimited.runtime.FileDelimitedSink;
 import org.talend.components.filedelimited.runtime.FileDelimitedSource;
+import org.talend.components.filedelimited.runtime.FileDelimitedWriteOperation;
+import org.talend.components.filedelimited.runtime.FileDelimitedWriter;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedDefinition;
 import org.talend.components.filedelimited.tFileInputDelimited.TFileInputDelimitedProperties;
+import org.talend.components.filedelimited.tFileOutputDelimited.TFileOutputDelimitedDefinition;
+import org.talend.components.filedelimited.tFileOutputDelimited.TFileOutputDelimitedProperties;
 import org.talend.components.filedelimited.wizard.FileDelimitedWizardProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -40,6 +48,8 @@ import static org.junit.Assert.assertTrue;
 public class FileDelimitedTestBasic extends AbstractComponentTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileDelimitedTestBasic.class);
+
+    protected RuntimeContainer adaptor;
 
     public static Schema BASIC_SCHEMA = SchemaBuilder.builder().record("Schema").fields() //
             .name("TestBoolean").type().booleanType().noDefault() //
@@ -62,6 +72,10 @@ public class FileDelimitedTestBasic extends AbstractComponentTest {
     public ErrorCollector errorCollector = new ErrorCollector();
 
     private ComponentServiceImpl componentService;
+
+    public FileDelimitedTestBasic() {
+        adaptor = new DefaultComponentRuntimeContainerImpl();
+    }
 
     @Before
     public void initializeComponentRegistryAndService() {
@@ -132,6 +146,19 @@ public class FileDelimitedTestBasic extends AbstractComponentTest {
         return properties;
     }
 
+    protected TFileOutputDelimitedProperties createOutputProperties(Object file, boolean isCsvMode) {
+        TFileOutputDelimitedProperties properties = (TFileOutputDelimitedProperties) new TFileOutputDelimitedDefinition()
+                .createProperties().init();
+        properties.fileName.setValue(file);
+        properties.rowSeparator.setValue("\n");
+        if (isCsvMode) {
+            properties.csvOptions.setValue(true);
+        }
+        properties.main.schema.setValue(BASIC_SCHEMA);
+        ComponentTestUtils.checkSerialize(properties, errorCollector);
+        return properties;
+    }
+
     protected FileDelimitedWizardProperties createWizaredProperties(TFileInputDelimitedProperties properties) {
         FileDelimitedWizardProperties wizardProperties = new FileDelimitedWizardProperties("wizard");
         wizardProperties.init();
@@ -159,6 +186,24 @@ public class FileDelimitedTestBasic extends AbstractComponentTest {
         } else {
             LOGGER.debug("Records list is empty!");
         }
+    }
 
+    // Returns the rows written (having been re-read so they have their Ids)
+    protected Result doWriteRows(TFileOutputDelimitedProperties props, List<IndexedRecord> outputRows) throws Exception {
+        FileDelimitedSink sink = new FileDelimitedSink();
+        sink.initialize(adaptor, props);
+        sink.validate(adaptor);
+        FileDelimitedWriteOperation writeOperation = sink.createWriteOperation();
+        FileDelimitedWriter saleforceWriter = writeOperation.createWriter(adaptor);
+        Result result;
+        saleforceWriter.open("foo");
+        try {
+            for (IndexedRecord row : outputRows) {
+                saleforceWriter.write(row);
+            }
+        } finally {
+            result = saleforceWriter.close();
+        }
+        return result;
     }
 }

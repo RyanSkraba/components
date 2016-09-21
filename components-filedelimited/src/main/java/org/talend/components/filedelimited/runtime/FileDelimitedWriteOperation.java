@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
-import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.RuntimeContainer;
 
 public class FileDelimitedWriteOperation implements WriteOperation<Result> {
@@ -26,8 +25,8 @@ public class FileDelimitedWriteOperation implements WriteOperation<Result> {
     }
 
     @Override
-    public Writer<Result> createWriter(RuntimeContainer adaptor) {
-        return new FileDelimitedWriter(this);
+    public FileDelimitedWriter createWriter(RuntimeContainer container) {
+        return new FileDelimitedWriter(this, container);
     }
 
     @Override
