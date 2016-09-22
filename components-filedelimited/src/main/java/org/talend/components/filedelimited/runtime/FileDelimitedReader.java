@@ -38,6 +38,8 @@ public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedR
 
     protected final List<IndexedRecord> rejectedWrites = new ArrayList<>();
 
+    protected int dataCount;
+
     public FileDelimitedReader(RuntimeContainer container, BoundedSource source, TFileInputDelimitedProperties properties) {
         super(source);
         this.container = container;
@@ -56,7 +58,9 @@ public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedR
 
     @Override
     public Map<String, Object> getReturnValues() {
-        return new Result().toMap();
+        Result result = new Result();
+        result.totalCount = dataCount;
+        return result.toMap();
     }
 
     protected Schema getSchema() throws IOException {

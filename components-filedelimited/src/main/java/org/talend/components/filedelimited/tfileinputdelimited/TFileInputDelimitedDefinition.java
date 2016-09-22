@@ -11,6 +11,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.filedelimited.FileDelimitedDefinition;
 import org.talend.components.filedelimited.runtime.FileDelimitedSource;
 import org.talend.daikon.properties.Properties;
+import org.talend.daikon.properties.property.Property;
 
 public class TFileInputDelimitedDefinition extends FileDelimitedDefinition {
 
@@ -26,8 +27,23 @@ public class TFileInputDelimitedDefinition extends FileDelimitedDefinition {
     }
 
     @Override
+    public boolean isSchemaAutoPropagate() {
+        return false;
+    }
+
+    @Override
+    public boolean isConditionalInputs() {
+        return true;
+    }
+
+    @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return TFileInputDelimitedProperties.class;
+    }
+
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP };
     }
 
     @Override

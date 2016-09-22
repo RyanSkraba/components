@@ -20,7 +20,7 @@ import org.talend.components.filedelimited.FileDelimitedProperties;
 
 public class FileDelimitedWizardDefinition extends AbstractComponentWizardDefintion {
 
-    public static final String COMPONENT_WIZARD_NAME = "fileDelimitedNew"; //$NON-NLS-1$
+    public static final String COMPONENT_WIZARD_NAME = "fileDelimited"; //$NON-NLS-1$
 
     @Override
     public String getName() {

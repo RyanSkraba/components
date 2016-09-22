@@ -7,10 +7,13 @@ import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.commons.lang3.StringUtils;
+import org.talend.components.api.exception.DataRejectException;
 import org.talend.components.common.ComponentConstants;
 import org.talend.components.common.runtime.FormatterUtils;
 import org.talend.daikon.avro.AvroRegistry;
@@ -237,7 +240,7 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
         }
     }
 
-    public static class DateConverter extends StringConverter<Long> {
+    public static class DateConverter extends StringConverter<Object> {
 
         private final SimpleDateFormat format;
 
@@ -252,14 +255,22 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
             try {
                 return StringUtils.isEmpty(value) ? null : format.parse(value).getTime();
             } catch (ParseException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
+                Map<String, Object> resultMessage = new HashMap<String, Object>();
+                resultMessage.put("errorMessage", e.getMessage());
+                throw new DataRejectException(resultMessage);
             }
         }
 
         @Override
-        public String convertToDatum(Long value) {
-            return value == null ? null : format.format(new Date(value));
+        public String convertToDatum(Object value) {
+            if (value == null) {
+                return null;
+            }
+            if (value instanceof Date) {
+                return format.format((Date) value);
+            } else {
+                return format.format(new Date((Long) value));
+            }
         }
 
     }

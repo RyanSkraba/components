@@ -14,7 +14,7 @@ package org.talend.components.filedelimited.wizard;
 
 public class FieldDelimitedEditWizardDefinition extends FileDelimitedWizardDefinition {
 
-    public static final String COMPONENT_WIZARD_NAME = "fileDelimitedNew.edit";
+    public static final String COMPONENT_WIZARD_NAME = "fileDelimited.edit";
 
     @Override
     public String getName() {

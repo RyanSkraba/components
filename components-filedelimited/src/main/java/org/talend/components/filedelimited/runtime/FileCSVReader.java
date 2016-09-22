@@ -57,7 +57,9 @@ public class FileCSVReader extends FileDelimitedReader {
                 startAble = advance();
             }
         }
-
+        if (startAble) {
+            dataCount++;
+        }
         return startAble;
     }
 
@@ -85,6 +87,9 @@ public class FileCSVReader extends FileDelimitedReader {
             } else {
                 isContinue = advance();
             }
+        }
+        if (isContinue) {
+            dataCount++;
         }
         return isContinue;
     }

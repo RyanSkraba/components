@@ -117,10 +117,7 @@ public class TFileOutputDelimitedProperties extends FileDelimitedProperties {
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
-        if (isOutputConnection) {
-            return Collections.singleton(MAIN_CONNECTOR);
-        } else {
-            return Collections.EMPTY_SET;
-        }
+        return Collections.singleton(MAIN_CONNECTOR);
     }
+
 }

@@ -99,7 +99,7 @@ public class FileDelimitedTestIT extends FileDelimitedTestBasic {
             }
         }
         assertEquals(1, count);
-        assertEquals("file delimited (New)", wizardDef.getMenuItemName());
+        assertEquals("file delimited", wizardDef.getMenuItemName());
         ComponentWizard wiz = getComponentService().getComponentWizard(FileDelimitedWizardDefinition.COMPONENT_WIZARD_NAME,
                 "nodeFileDelimited");
         assertNotNull(wiz);

@@ -67,10 +67,12 @@ public class FileDelimitedWriter implements Writer<Result> {
         } else {
             writer = outputRuntime.getWriter();
         }
-        if (csvWriter != null) {
-            outputRuntime.writeHeader(csvWriter, recordSchema);
-        } else {
-            outputRuntime.writeHeader(writer, recordSchema);
+        if (recordSchema != null) {
+            if (csvWriter != null) {
+                outputRuntime.writeHeader(csvWriter, recordSchema);
+            } else {
+                outputRuntime.writeHeader(writer, recordSchema);
+            }
         }
     }
 

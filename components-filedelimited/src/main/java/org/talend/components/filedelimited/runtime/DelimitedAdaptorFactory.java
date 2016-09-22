@@ -1,7 +1,11 @@
 package org.talend.components.filedelimited.runtime;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.talend.components.api.exception.DataRejectException;
 import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
@@ -54,6 +58,7 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<String[],
         @Override
         public Object get(int index) {
             // Lazy initialization of the cached converter objects.
+            Object value = null;
             if (names == null) {
                 names = new String[getSchema().getFields().size()];
                 fieldConverter = new AvroConverter[names.length];
@@ -64,10 +69,19 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<String[],
                 }
             }
             if (index < values.length) {
-                return fieldConverter[index].convertToAvro(values[index]);
-            } else {
-                return null;
+                try {
+                    value = fieldConverter[index].convertToAvro(values[index]);
+                } catch (DataRejectException re) {
+                    re.getRejectInfo().put("talend_record", this);
+                    throw re;
+                } catch (Exception e) {
+                    Map<String, Object> resultMessage = new HashMap<String, Object>();
+                    resultMessage.put("errorMessage", e.getMessage());
+                    resultMessage.put("talend_record", this);
+                    throw new DataRejectException(resultMessage);
+                }
             }
+            return value;
         }
 
         @Override
