@@ -16,9 +16,15 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLStreamHandler;
+import java.net.URLStreamHandlerFactory;
 import java.util.Set;
 
 import org.junit.rules.ErrorCollector;
+import org.ops4j.pax.url.mvn.Handler;
+import org.ops4j.pax.url.mvn.ServiceConstants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.properties.ComponentProperties;
@@ -109,6 +115,28 @@ public class ComponentTestUtils {
                         resourceAsStream);
             }
         }
+    }
+
+    /**
+     * this will setup the mvn URL handler if not already setup and use any maven local repo if it exists
+     */
+    public static void setupMavenUrlHandler() {
+        try {
+            new URL("mvn:foo/bar");
+        } catch (MalformedURLException e) {// setup the mvn protocla handler if not already setup
+            URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
+
+                @Override
+                public URLStreamHandler createURLStreamHandler(String protocol) {
+                    if (ServiceConstants.PROTOCOL.equals(protocol)) {
+                        return new Handler();
+                    } else {
+                        return null;
+                    }
+                }
+            });
+        }
+
     }
 
 }

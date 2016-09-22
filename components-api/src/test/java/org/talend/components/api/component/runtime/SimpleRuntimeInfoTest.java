@@ -39,6 +39,11 @@ public class SimpleRuntimeInfoTest {
         try {
             new URL("mvn:foo/bar");
         } catch (MalformedURLException e) {
+            // handles mvn local repository
+            String mvnLocalRepo = System.getProperty("maven.repo.local");
+            if (mvnLocalRepo != null) {
+                System.setProperty("org.ops4j.pax.url.mvn.localRepository", mvnLocalRepo);
+            }
             URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
 
                 @Override
