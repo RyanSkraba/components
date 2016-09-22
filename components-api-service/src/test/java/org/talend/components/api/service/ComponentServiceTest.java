@@ -18,8 +18,6 @@ import static org.junit.Assert.*;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLStreamHandler;
-import java.net.URLStreamHandlerFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -32,8 +30,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
-import org.ops4j.pax.url.mvn.Handler;
-import org.ops4j.pax.url.mvn.ServiceConstants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.runtime.RuntimeInfo;
@@ -42,7 +38,11 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.service.internal.ComponentRegistry;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
-import org.talend.components.api.service.testcomponent.*;
+import org.talend.components.api.service.testcomponent.ComponentPropertiesWithDefinedI18N;
+import org.talend.components.api.service.testcomponent.TestComponentDefinition;
+import org.talend.components.api.service.testcomponent.TestComponentProperties;
+import org.talend.components.api.service.testcomponent.TestComponentWizard;
+import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.test.AbstractComponentTest;
 import org.talend.components.api.test.ComponentTestUtils;
@@ -66,22 +66,7 @@ public class ComponentServiceTest extends AbstractComponentTest {
 
     @BeforeClass
     public static void setupMavenUrlHandler() {
-        try {
-            new URL("mvn:foo/bar");
-        } catch (MalformedURLException e) {// setup the mvn protocla handler if not already setup
-            URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
-
-                @Override
-                public URLStreamHandler createURLStreamHandler(String protocol) {
-                    if (ServiceConstants.PROTOCOL.equals(protocol)) {
-                        return new Handler();
-                    } else {
-                        return null;
-                    }
-                }
-            });
-        }
-
+        ComponentTestUtils.setupMavenUrlHandler();
     }
 
     @Before
@@ -181,7 +166,7 @@ public class ComponentServiceTest extends AbstractComponentTest {
                         new URL("mvn:org.apache.maven/maven-artifact/3.3.3/jar"), //
                         new URL("mvn:org.eclipse.aether/aether-transport-file/1.0.0.v20140518/jar"), //
                         new URL("mvn:org.talend.components/file-input/0.1.0.SNAPSHOT/jar")//
-                ));
+        ));
     }
 
     @Test

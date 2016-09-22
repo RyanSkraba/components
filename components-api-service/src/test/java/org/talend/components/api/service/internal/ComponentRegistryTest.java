@@ -13,7 +13,7 @@
 package org.talend.components.api.service.internal;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 
@@ -54,6 +54,7 @@ public class ComponentRegistryTest {
         assertThat(registry.getComponentWizards(), hasEntry(def.getName(), def));
     }
 
+    @SuppressWarnings("rawtypes")
     @Test
     public void testAddComponentFamilyDefinition() {
         ComponentRegistry registry = new ComponentRegistry();
@@ -64,7 +65,8 @@ public class ComponentRegistryTest {
 
         // All of the nested definitions were added.
         assertThat(registry.getDefinitions(), contains((RuntimableDefinition) def.getDefinitions().iterator().next()));
-        assertThat(registry.getComponentWizards().values(), contains(def.getComponentWizards().iterator().next()));
+        assertThat(registry.getComponentWizards().values(),
+                contains((ComponentWizardDefinition) def.getComponentWizards().iterator().next()));
     }
 
     @Test
