@@ -42,6 +42,7 @@ import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
 import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.Connector;
@@ -79,12 +80,24 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
 
     @Override
     public Set<String> getAllComponentNames() {
-        return Collections.unmodifiableSet(componentRegistry.getComponents().keySet());
+        Set<String> names = new HashSet<>();
+        for (ComponentDefinition def : getDefinitionsByType(ComponentDefinition.class))
+            names.add(def.getName());
+        return names;
     }
 
     @Override
     public Set<ComponentDefinition> getAllComponents() {
-        return new HashSet<>(componentRegistry.getComponents().values());
+        // If we ever add a guava dependency: return Sets.newHashSet(getDefinitionsByType...)
+        Set<ComponentDefinition> defs = new HashSet<>();
+        for (ComponentDefinition def: componentRegistry.getDefinitionsByType(ComponentDefinition.class))
+            defs.add(def);
+        return defs;
+    }
+
+    @Override
+    public <T extends RuntimableDefinition<?, ?>> Iterable<T> getDefinitionsByType(Class<T> cls) {
+        return componentRegistry.getDefinitionsByType(cls);
     }
 
     @Override
@@ -107,11 +120,12 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
 
     @Override
     public ComponentDefinition getComponentDefinition(String name) {
-        ComponentDefinition compDef = componentRegistry.getComponents().get(name);
-        if (compDef == null) {
-            throw new ComponentException(ComponentsApiErrorCode.WRONG_COMPONENT_NAME, ExceptionContext.build().put("name", name)); //$NON-NLS-1$
-        } // else got the def so use it
-        return compDef;
+        for (ComponentDefinition def : componentRegistry.getDefinitionsByType(ComponentDefinition.class)) {
+            if (name.equals(def.getName()))
+                return def;
+        }
+        // The component was not found.
+        throw new ComponentException(ComponentsApiErrorCode.WRONG_COMPONENT_NAME, ExceptionContext.build().put("name", name)); //$NON-NLS-1$
     }
 
     @Override
@@ -139,7 +153,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
     @Override
     public List<ComponentDefinition> getPossibleComponents(ComponentProperties... properties) {
         List<ComponentDefinition> returnList = new ArrayList<>();
-        for (ComponentDefinition cd : componentRegistry.getComponents().values()) {
+        for (ComponentDefinition cd : componentRegistry.getDefinitionsByType(ComponentDefinition.class)) {
             if (cd.supportsProperties(properties)) {
                 returnList.add(cd);
             }
@@ -166,13 +180,8 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
 
     @Override
     public InputStream getComponentPngImage(String componentName, ComponentImageType imageType) {
-        ComponentDefinition componentDefinition = componentRegistry.getComponents().get(componentName);
-        if (componentDefinition != null) {
-            return getImageStream(componentDefinition, componentDefinition.getPngImagePath(imageType));
-        } else {
-            throw new ComponentException(ComponentsApiErrorCode.WRONG_COMPONENT_NAME,
-                    ExceptionContext.build().put("name", componentName)); //$NON-NLS-1$
-        }
+        ComponentDefinition componentDefinition = getComponentDefinition(componentName);
+        return getImageStream(componentDefinition, componentDefinition.getPngImagePath(imageType));
     }
 
     /**

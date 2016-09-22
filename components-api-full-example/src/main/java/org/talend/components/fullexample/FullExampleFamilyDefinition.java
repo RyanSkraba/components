@@ -3,6 +3,7 @@ package org.talend.components.fullexample;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
+import org.talend.components.fullexample.datastore.FullExampleDatastoreDefinition;
 
 import aQute.bnd.annotation.component.Component;
 
@@ -15,7 +16,7 @@ public class FullExampleFamilyDefinition extends AbstractComponentFamilyDefiniti
     public static final String NAME = "FullExample";
 
     public FullExampleFamilyDefinition() {
-        super(NAME, new FullExampleDefinition());
+        super(NAME, new FullExampleInputDefinition(), new FullExampleDatastoreDefinition());
     }
 
     @Override

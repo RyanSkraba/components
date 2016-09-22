@@ -30,18 +30,26 @@ public interface ComponentInstaller {
      */
     public interface ComponentFrameworkContext {
 
-        void registerComponentDefinition(Iterable<ComponentDefinition> defs);
-
-        void registerComponentWizardDefinition(Iterable<ComponentWizardDefinition> defs);
-
         /**
          * Installs an entire component family.
          *
-         * This will cause any other definitions discovered through {@link ComponentFamilyDefinition#getComponents()} or
+         * This will cause any other definitions discovered through {@link ComponentFamilyDefinition#getExtensions()}, {@link ComponentFamilyDefinition#getComponents()} or
          * {@link ComponentFamilyDefinition#getComponentWizards()} to be installed.
          *
          * @param def An entire component family to install.
          */
         void registerComponentFamilyDefinition(ComponentFamilyDefinition def);
+
+        /**
+         * Install a {@link RuntimableDefinition}, including {@link ComponentDefinition} into the framework.
+         *
+         * @param defs The list of definitions to install.
+         */
+        void registerDefinition(Iterable<? extends RuntimableDefinition<?, ?>> defs);
+
+        /**
+         * @param defs The list of component wizard definitions to install.
+         */
+        void registerComponentWizardDefinition(Iterable<? extends ComponentWizardDefinition> defs);
     }
 }

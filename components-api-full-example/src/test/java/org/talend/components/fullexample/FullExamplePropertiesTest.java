@@ -33,7 +33,7 @@ public class FullExamplePropertiesTest extends AbstractComponentTest {
 
     @Before
     public void init() {
-        cp = (FullExampleProperties) getComponentService().getComponentProperties(FullExampleDefinition.COMPONENT_NAME);
+        cp = (FullExampleProperties) getComponentService().getComponentProperties(FullExampleInputDefinition.COMPONENT_NAME);
 
     }
 
@@ -64,8 +64,8 @@ public class FullExamplePropertiesTest extends AbstractComponentTest {
     }
 
     /**
-     * this method should be implemented by all clients to create interaction with all widget This default implmentaiton
-     * of this unit test is calling all service callbacks, but this must be overriden by clients.
+     * this method should be implemented by all clients to create interaction with all widget This default implementation
+     * of this unit test is calling all service callbacks, but this must be overridden by clients.
      * 
      * @throws Throwable
      */

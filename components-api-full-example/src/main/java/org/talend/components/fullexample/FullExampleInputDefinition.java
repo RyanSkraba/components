@@ -4,9 +4,7 @@ package org.talend.components.fullexample;
 import java.util.Collections;
 import java.util.Set;
 
-import org.talend.components.api.Constants;
 import org.talend.components.api.component.AbstractComponentDefinition;
-import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.RuntimeInfo;
@@ -14,18 +12,14 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
- * The FullExampleDefinition acts as an entry point for all of services that
- * a component provides to integrate with the Studio (at design-time) and other
- * components (at run-time).
+ * TODO
  */
-public class FullExampleDefinition extends AbstractComponentDefinition {
+public class FullExampleInputDefinition extends AbstractComponentDefinition {
 
-    public static final String COMPONENT_NAME = "FullExample"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "FullExampleInput"; //$NON-NLS-1$
 
-    public FullExampleDefinition() {
+    public FullExampleInputDefinition() {
         super(COMPONENT_NAME);
     }
 

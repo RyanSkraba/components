@@ -15,6 +15,7 @@ package org.talend.components.api.service.testcomponent;
 import java.util.Arrays;
 import java.util.List;
 
+import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.ComponentFamilyDefinition;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
@@ -28,7 +29,7 @@ public class TestComponentFamilyDefinition implements ComponentFamilyDefinition 
             .asList((ComponentWizardDefinition) new TestComponentWizardDefinition());
 
     @Override
-    public Iterable<ComponentDefinition> getComponents() {
+    public Iterable<? extends RuntimableDefinition<?, ?>> getDefinitions() {
         return components;
     }
 

@@ -5,7 +5,6 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ErrorCollector;
-import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentRegistry;
 import org.talend.components.api.service.internal.ComponentServiceImpl;
@@ -28,8 +27,7 @@ public class MultiRuntimeComponentTest {
     public ComponentService getComponentService() {
         if (componentService == null) {
             ComponentRegistry testComponentRegistry = new ComponentRegistry();
-            testComponentRegistry.registerComponentDefinition(Arrays.asList((ComponentDefinition)
-                    new MultiRuntimeComponentDefinition()));
+            testComponentRegistry.registerDefinition(Arrays.asList(new MultiRuntimeComponentDefinition()));
             componentService = new ComponentServiceImpl(testComponentRegistry);
         }
         return componentService;

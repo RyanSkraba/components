@@ -19,8 +19,11 @@ import java.util.Arrays;
 
 import org.junit.Test;
 import org.talend.components.api.ComponentFamilyDefinition;
+import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.service.testcomponent.*;
+import org.talend.components.api.service.testcomponent.TestComponentDefinition;
+import org.talend.components.api.service.testcomponent.TestComponentFamilyDefinition;
+import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 
 public class ComponentRegistryTest {
@@ -28,7 +31,7 @@ public class ComponentRegistryTest {
     @Test
     public void testEmpty() {
         ComponentRegistry registry = new ComponentRegistry();
-        assertThat(registry.getComponents().keySet(), empty());
+        assertThat(registry.getDefinitions(), emptyIterable());
         assertThat(registry.getComponentWizards().keySet(), empty());
         assertThat(registry.getComponentFamilies().keySet(), empty());
     }
@@ -37,9 +40,9 @@ public class ComponentRegistryTest {
     public void testAddComponentDefinition() {
         ComponentRegistry registry = new ComponentRegistry();
         ComponentDefinition def = new TestComponentDefinition();
-        registry.registerComponentDefinition(Arrays.asList(def));
-        assertThat(registry.getComponents().keySet(), hasSize(1));
-        assertThat(registry.getComponents(), hasEntry(def.getName(), def));
+        registry.registerDefinition(Arrays.asList(def));
+        assertThat(registry.getDefinitions(), contains((RuntimableDefinition) def));
+        assertThat(registry.getDefinitionsByType(ComponentDefinition.class), contains(def));
     }
 
     @Test
@@ -60,7 +63,7 @@ public class ComponentRegistryTest {
         assertThat(registry.getComponentFamilies(), hasEntry(def.getName(), def));
 
         // All of the nested definitions were added.
-        assertThat(registry.getComponents().values(), contains(def.getComponents().iterator().next()));
+        assertThat(registry.getDefinitions(), contains((RuntimableDefinition) def.getDefinitions().iterator().next()));
         assertThat(registry.getComponentWizards().values(), contains(def.getComponentWizards().iterator().next()));
     }
 

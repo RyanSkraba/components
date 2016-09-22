@@ -16,8 +16,6 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.NamedThing;
 
 /**
- */
-/**
  * created by sgandon on 8 févr. 2016
  */
 public interface ComponentWizardDefinition extends NamedThing {
