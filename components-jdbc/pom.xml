@@ -34,6 +34,13 @@
         </dependency>
         
         <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api-runtime-service</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1.1</version>

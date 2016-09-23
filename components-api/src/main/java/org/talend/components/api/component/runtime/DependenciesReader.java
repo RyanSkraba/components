@@ -126,7 +126,7 @@ public class DependenciesReader {
         return mvnUris;
     }
 
-    String getDependencyFilePath() {
+    public String getDependencyFilePath() {
         return depTxtPath;
     }
 

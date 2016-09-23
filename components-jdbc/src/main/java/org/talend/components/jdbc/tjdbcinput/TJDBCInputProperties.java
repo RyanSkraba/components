@@ -60,10 +60,6 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties
 
     // TODO query type
 
-    // TODO guess the query by the talend schema
-
-    // TODO guess the talend schema by the query
-
     public Property<String> sql = PropertyFactory.newString("sql").setRequired(true);
 
     public final PresentationItem fetchSchemaFromQuery = new PresentationItem("fetchSchemaFromQuery", "Fetch schema from query");
@@ -211,7 +207,7 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties
             return new ValidationResult().setStatus(ValidationResult.Result.ERROR).setMessage("Please set the schema before it");
         }
         String query = JDBCSQLBuilder.getInstance().generateSQL4SelectTable(tablename, schema);
-        sql.setValue(query);
+        sql.setValue("\"" + query + "\"");
 
         // TODO : it doesn't work
         refreshLayout(getForm(Form.MAIN));

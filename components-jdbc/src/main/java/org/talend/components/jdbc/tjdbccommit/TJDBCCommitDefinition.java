@@ -61,9 +61,8 @@ public class TJDBCCommitDefinition extends AbstractComponentDefinition {
             return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
                     DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-jdbc"),
                     JDBCCommitSourceOrSink.class.getCanonicalName());
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override

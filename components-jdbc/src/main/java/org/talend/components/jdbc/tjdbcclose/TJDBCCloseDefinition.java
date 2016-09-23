@@ -61,9 +61,8 @@ public class TJDBCCloseDefinition extends AbstractComponentDefinition {
             return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
                     DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-jdbc"),
                     JDBCCloseSourceOrSink.class.getCanonicalName());
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override

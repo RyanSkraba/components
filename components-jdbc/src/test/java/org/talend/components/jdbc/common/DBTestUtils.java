@@ -1,7 +1,9 @@
 package org.talend.components.jdbc.common;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -28,6 +30,7 @@ import org.talend.components.jdbc.runtime.JDBCSource;
 import org.talend.components.jdbc.runtime.JDBCTemplate;
 import org.talend.components.jdbc.runtime.type.JDBCAvroRegistry;
 import org.talend.components.jdbc.runtime.writer.JDBCOutputWriter;
+import org.talend.components.jdbc.runtime.writer.JDBCRowWriter;
 import org.talend.components.jdbc.tjdbcinput.TJDBCInputDefinition;
 import org.talend.components.jdbc.tjdbcinput.TJDBCInputProperties;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputDefinition;
@@ -566,6 +569,13 @@ public class DBTestUtils {
         assertThat(successfulWrites.get(0), is(r));
     }
 
+    public static void assertSuccessRecord(JDBCRowWriter writer, IndexedRecord r) {
+        assertThat(writer.getRejectedWrites(), empty());
+        List<IndexedRecord> successfulWrites = writer.getSuccessfulWrites();
+        assertThat(successfulWrites, hasSize(1));
+        assertThat(successfulWrites.get(0), is(r));
+    }
+
     public static void assertRejectRecord(JDBCOutputWriter writer) {
         assertThat(writer.getSuccessfulWrites(), empty());
 
@@ -620,6 +630,36 @@ public class DBTestUtils {
         default:
             return DataAction.INSERT;
         }
+    }
+
+    public static Schema createTestSchema4() {
+        FieldAssembler<Schema> builder = SchemaBuilder.builder().record("TEST").fields();
+
+        Schema schema = AvroUtils._string();// TODO : fix it as should be object type
+        schema = wrap(schema);
+        builder = builder.name("RESULTSET").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "RESULTSET").type(schema)
+                .noDefault();
+
+        return builder.endRecord();
+    }
+
+    public static Schema createTestSchema5() {
+        FieldAssembler<Schema> builder = SchemaBuilder.builder().record("TEST").fields();
+
+        Schema schema = AvroUtils._int();
+        schema = wrap(schema);
+        builder = builder.name("ID").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "ID").type(schema).noDefault();
+
+        schema = AvroUtils._string();
+        schema = wrap(schema);
+        builder = builder.name("NAME").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "NAME").type(schema).noDefault();
+
+        schema = AvroUtils._string();// TODO : fix it as should be object type
+        schema = wrap(schema);
+        builder = builder.name("RESULTSET").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "RESULTSET").type(schema)
+                .noDefault();
+
+        return builder.endRecord();
     }
 
 }
