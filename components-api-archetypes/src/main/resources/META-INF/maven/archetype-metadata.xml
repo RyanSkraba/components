@@ -15,7 +15,7 @@
             <defaultValue>0.1.0-SNAPSHOT</defaultValue>
         </requiredProperty>
         <requiredProperty key="package">
-            <defaultValue>org.talend.components.filedelimited</defaultValue>
+            <defaultValue>org.talend.components.fileinput</defaultValue>
         </requiredProperty>
         <requiredProperty key="componentName">
             <defaultValue>FileInput</defaultValue>
