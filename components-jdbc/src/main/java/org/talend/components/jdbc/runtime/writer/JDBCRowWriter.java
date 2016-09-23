@@ -74,7 +74,7 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
 
     private Statement statement;
 
-    protected ResultSet resultSet;
+    private ResultSet resultSet;
 
     private int insertCount;
 
@@ -250,19 +250,15 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
         for (Schema.Field outField : output.getSchema().getFields()) {
             Object outValue = null;
 
-            if (propagateQueryResultSet) {
-                String columnName = properties.useColumn.getValue();
-                if (outField.name().equals(columnName)) {
-                    output.put(outField.pos(), resultSet);
-                    continue;
+            if (propagateQueryResultSet && outField.name().equals(properties.useColumn.getValue())) {
+                output.put(outField.pos(), resultSet);
+            } else {
+                Schema.Field inField = input.getSchema().getField(outField.name());
+                if (inField != null) {
+                    outValue = input.get(inField.pos());
                 }
+                output.put(outField.pos(), outValue);
             }
-
-            Schema.Field inField = input.getSchema().getField(outField.name());
-            if (inField != null) {
-                outValue = input.get(inField.pos());
-            }
-            output.put(outField.pos(), outValue);
         }
 
         successfulWrites.add(output);

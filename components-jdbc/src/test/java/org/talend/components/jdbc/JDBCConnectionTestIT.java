@@ -35,8 +35,6 @@ import org.talend.daikon.sandbox.SandboxedInstance;
 
 public class JDBCConnectionTestIT {
 
-    // private static String driverPath;
-
     private static String driverClass;
 
     private static String jdbcUrl;
@@ -54,8 +52,6 @@ public class JDBCConnectionTestIT {
             props = new java.util.Properties();
             props.load(is);
         }
-
-        // driverPath = props.getProperty("driverPath");
 
         driverClass = props.getProperty("driverClass");
 
@@ -127,7 +123,6 @@ public class JDBCConnectionTestIT {
     private TJDBCConnectionProperties createCommonJDBCConnectionProperties(TJDBCConnectionDefinition definition) {
         TJDBCConnectionProperties properties = (TJDBCConnectionProperties) definition.createRuntimeProperties();
 
-        // properties.connection.driverTable.drivers.setValue(Arrays.asList(driverPath));
         properties.connection.driverClass.setValue(driverClass);
         properties.connection.jdbcUrl.setValue(jdbcUrl);
         properties.connection.userPassword.userId.setValue(userId);
@@ -140,7 +135,6 @@ public class JDBCConnectionTestIT {
         TJDBCConnectionDefinition definition = new TJDBCConnectionDefinition();
         TJDBCConnectionProperties properties = (TJDBCConnectionProperties) definition.createRuntimeProperties();
 
-        // properties.connection.driverTable.drivers.setValue(Arrays.asList(driverPath));
         properties.connection.driverClass.setValue("wrongDriver");
         properties.connection.jdbcUrl.setValue(jdbcUrl);
         properties.connection.userPassword.userId.setValue(userId);
@@ -158,7 +152,6 @@ public class JDBCConnectionTestIT {
         TJDBCConnectionDefinition definition = new TJDBCConnectionDefinition();
         TJDBCConnectionProperties properties = (TJDBCConnectionProperties) definition.createRuntimeProperties();
 
-        // properties.connection.driverTable.drivers.setValue(Arrays.asList(driverPath));
         properties.connection.driverClass.setValue(driverClass);
         properties.connection.jdbcUrl.setValue("wrongUrl");
         properties.connection.userPassword.userId.setValue(userId);

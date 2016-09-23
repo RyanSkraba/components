@@ -58,8 +58,6 @@ public class TJDBCRowDefinition extends AbstractComponentDefinition {
             return JDBCTemplate.createCommonRuntime(this.getClass().getClassLoader(), properties,
                     JDBCRowSource.class.getCanonicalName());
         case INCOMING:
-            return JDBCTemplate.createCommonRuntime(this.getClass().getClassLoader(), properties,
-                    JDBCRowSink.class.getCanonicalName());
         case INCOMING_AND_OUTGOING:
             return JDBCTemplate.createCommonRuntime(this.getClass().getClassLoader(), properties,
                     JDBCRowSink.class.getCanonicalName());
