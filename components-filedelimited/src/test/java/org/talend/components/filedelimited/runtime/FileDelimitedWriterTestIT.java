@@ -28,49 +28,37 @@ public class FileDelimitedWriterTestIT extends FileDelimitedTestBasic {
 
     // Test FileOutputDelimited component write with delimited mode
     @Test
-    @Ignore("Because of timezone problem")
     public void testOutputDelimited() throws Throwable {
-        // FIXME
         testOutputDelimited(false);
     }
 
     // Test FileOutputDelimited component write with CSV mode
     @Test
-    @Ignore("Because of timezone problem")
     public void testOutputCSV() throws Throwable {
-        // FIXME
         testOutputCSV(false);
     }
 
     // Test FileOutputDelimited component write with delimited mode
     @Test
-    @Ignore("Because of timezone problem")
     public void testIncludeHeaderDelimited() throws Throwable {
-        // FIXME
         testIncludeHeaderDelimited(false);
     }
 
     // Test FileOutputDelimited component write with CSV mode
     @Test
-    @Ignore("Because of timezone problem")
     public void testIncludeHeaderCSV() throws Throwable {
-        // FIXME
         testIncludeHeaderCSV(false);
     }
 
     // Test FileOutputDelimited component write with delimited mode and source is Stream
     @Test
-    @Ignore("Because of timezone problem")
     public void testOutputDelimitedStream() throws Throwable {
-        // FIXME
         testOutputDelimited(true);
     }
 
     // Test FileOutputDelimited component write with CSV mode and source is Stream
     @Test
-    @Ignore("Because of timezone problem")
     public void testOutputCsvStream() throws Throwable {
-        // FIXME
         testOutputCSV(true);
     }
 
@@ -216,7 +204,7 @@ public class FileDelimitedWriterTestIT extends FileDelimitedTestBasic {
             r.put(6, 951753.23f - i);
             r.put(7, new BigDecimal("16.07" + i));
             r.put(8, i);
-            r.put(9, parseToDate("yyyy-MM-dd'T'HH:mm:ss", "2016-09-06T15:31:07.123").getTime() - 3600753 * i);
+            r.put(9, 1473147067000L - 3600753 * i);
             r.put(10, ("Object_" + i).getBytes());
             records.add(r);
         }
