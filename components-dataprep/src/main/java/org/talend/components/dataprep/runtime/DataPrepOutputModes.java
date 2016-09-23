@@ -15,5 +15,6 @@ package org.talend.components.dataprep.runtime;
 public enum DataPrepOutputModes {
     Create,
     Update,
+    CreateOrUpdate,
     LiveDataset
 }

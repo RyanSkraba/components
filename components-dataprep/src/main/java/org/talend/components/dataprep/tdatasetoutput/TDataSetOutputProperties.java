@@ -143,6 +143,13 @@ public class TDataSetOutputProperties extends DataPrepProperties {
                 form.getWidget(dataSetName.getName()).setHidden(false);
                 form.getWidget(fetchSchema.getName()).setHidden(false);
                 break;
+            case CreateOrUpdate:
+                form.getWidget(login.getName()).setHidden(false);
+                form.getWidget(pass.getName()).setHidden(false);
+                form.getWidget(dataSetNameForCreateMode.getName()).setHidden(false);
+                form.getWidget(dataSetName.getName()).setHidden(true);
+                form.getWidget(fetchSchema.getName()).setHidden(true);
+                break;
             case LiveDataset:
                 form.getWidget(login.getName()).setHidden(true);
                 form.getWidget(pass.getName()).setHidden(true);
@@ -164,6 +171,9 @@ public class TDataSetOutputProperties extends DataPrepProperties {
             case Update:
                 form.getWidget(dataSetId.getName()).setHidden(false);
                 break;
+            case CreateOrUpdate:
+                form.getWidget(dataSetId.getName()).setHidden(true);
+                break;
             case LiveDataset:
                 form.getWidget(dataSetId.getName()).setHidden(true);
                 break;
@@ -179,11 +189,18 @@ public class TDataSetOutputProperties extends DataPrepProperties {
         runtimeProperties.setLogin(login.getStringValue());
         runtimeProperties.setPass(pass.getStringValue());
         runtimeProperties.setMode(mode.getValue());
-        if (mode.getValue().equals(DataPrepOutputModes.Create)) {
+        switch (mode.getValue()) {
+        case Create:
             runtimeProperties.setDataSetName(dataSetNameForCreateMode.getStringValue());
-        } else {
+            break;
+        case CreateOrUpdate:
+            runtimeProperties.setDataSetName(dataSetNameForCreateMode.getStringValue());
+            break;
+        default:
             runtimeProperties.setDataSetId(dataSetId.getStringValue());
+            break;
         }
+
         runtimeProperties.setLimit(limit.getStringValue());
         return runtimeProperties;
     }
