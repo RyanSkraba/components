@@ -6,6 +6,7 @@
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
         <version>0.15.0-SNAPSHOT</version>
+        <relativePath>../components-parent/pom.xml</relativePath>
     </parent>
 
     <name>Components - File Delimited</name>
@@ -13,16 +14,6 @@
     <artifactId>components-filedelimited</artifactId>
     <version>0.15.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
-    <repositories>
-        <repository>
-            <id>snapshots</id>
-            <url>http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
-        </repository>
-        <repository>
-            <id>releases</id>
-            <url>http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceRelease/</url>
-        </repository>
-    </repositories>
     <dependencies>
 
         <!-- APIs for all Components -->
