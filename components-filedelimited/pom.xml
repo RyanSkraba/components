@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -11,17 +9,14 @@
         <relativePath>../components-parent/pom.xml</relativePath>
     </parent>
 
-    <name>Components - Shared Component Parts</name>
-    <artifactId>components-common</artifactId>
+    <name>Components - File Delimited</name>
+    <groupId>org.talend.components</groupId>
+    <artifactId>components-filedelimited</artifactId>
     <version>0.15.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
-
     <dependencies>
-        <dependency>
-            <groupId>net.sourceforge.javacsv</groupId>
-            <artifactId>javacsv</artifactId>
-            <version>2.0</version>
-        </dependency>
+
+        <!-- APIs for all Components -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
@@ -30,8 +25,34 @@
         <dependency>
             <groupId>biz.aQute.bnd</groupId>
             <artifactId>annotation</artifactId>
-            <scope>test</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>org.talend.libraries</groupId>
+            <artifactId>talendcsv</artifactId>
+            <version>6.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.talend.libraries</groupId>
+            <artifactId>talend_file_enhanced_20070724</artifactId>
+            <version>6.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+
+        <!-- Shared component properties such as Use/Password or Schema -->
+        <dependency>
+          <groupId>org.talend.components</groupId>
+          <artifactId>components-common</artifactId>
+          <version>0.15.0-SNAPSHOT</version>
+        </dependency>
+        
+        <!-- Jar containing Test utils methods -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service</artifactId>
@@ -47,11 +68,11 @@
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
-            <artifactId>components-api</artifactId>
-            <version>0.15.0-SNAPSHOT</version>
-            <type>test-jar</type>
+            <artifactId>components-api-runtime-service</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
+        <!-- spring jar for integration tests -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
@@ -59,21 +80,16 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.talend.daikon</groupId>
-            <artifactId>daikon-spring</artifactId>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
                 <executions>
                     <execution>
                         <id>lib-jar</id>
@@ -83,8 +99,11 @@
                         </goals>
                         <configuration>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.common.lib</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>org.talend.components.filedelimited.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
+                                <Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt</Include-Resource>
+                                <Service-Component>*</Service-Component>                                
+                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                             </instructions>
                         </configuration>
                     </execution>
@@ -98,20 +117,20 @@
                             <classifier>tests</classifier>
                             <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
                             <instructions>
-                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*,org.hamcrest*</Import-Package>
-                                <Bundle-SymbolicName>org.talend.components.common.test</Bundle-SymbolicName>
+                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*</Import-Package>
+                                <Bundle-SymbolicName>org.talend.components.filedelimited.test</Bundle-SymbolicName>
                                 <Bundle-Name>Test Fragment for ${project.name}</Bundle-Name>
-                                <Fragment-Host>org.talend.components.common</Fragment-Host>
+                                <Fragment-Host>org.talend.components.filedelimited</Fragment-Host>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
+                                <DynamicImport-Package>*</DynamicImport-Package>
                                 <Embed-Dependency></Embed-Dependency>
                                 <Export-Package>*</Export-Package>
-                                <Include-Resource>=target/test-classes/
-                                </Include-Resource>
+                                <Include-Resource>=target/test-classes/</Include-Resource>
                             </instructions>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>bundle-jar</id>
+                        <id>osgi-bundle</id>
                         <phase>package</phase>
                         <goals>
                             <goal>bundle</goal>
@@ -119,14 +138,12 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.common</Bundle-SymbolicName>
-                                <Import-Package>org.talend*,org.slf4j*,org.apache.commons*,org.apache.avro*</Import-Package>
+                                <Bundle-SymbolicName>org.talend.components.filedelimited</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
-                                <Embed-Dependency>!components*,*;scope=compile|runtime;artifactId=avro;inline=false</Embed-Dependency>
-<!--                                 <Embed-Dependency> -->
-<!--                                     !org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api|javax.servlet-api|javax.inject|daikon -->
-<!--                                 </Embed-Dependency> -->
-                                
+                                <Import-Package>!sun.security.*,*,aQute.bnd.annotation.component</Import-Package>
+                                <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*</Embed-Dependency>
+                                <Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt</Include-Resource>
+                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                             </instructions>
                         </configuration>
                     </execution>
@@ -134,5 +151,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

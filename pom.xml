@@ -25,6 +25,7 @@
 		<module>components-dataprep</module>
 		<module>components-api-full-example</module>
 		<module>components-jdbc</module>
+		<module>components-filedelimited</module>
 	</modules>
 	<profiles>
 		<profile>
