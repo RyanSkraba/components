@@ -191,7 +191,7 @@
 		                    <goal>generate-test-resources</goal>
 		                </goals>
 		                <configuration>
-                            <name>%groupId%-%artifactId%-%dahsClassifier%.link</name>
+                            <name>%groupId%-%artifactId%%dashClassifier%.link</name>
 		                    <value>%url%</value>
 		                    <separator>${line.separator}</separator>
 		                    <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>

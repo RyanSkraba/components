@@ -49,12 +49,12 @@ public class OsgiSalesfoceComponentTestIT extends SalesforceComponentTestIT {
 
     static public Option[] getSalesforcePaxExamOption() {
         return options(composite(ComponentsPaxExamOptions.getOptions()), //
-                linkBundle("org.talend.components-components-common.bundle"), //
-                linkBundle("org.talend.components-components-common.tests").noStart(), //
-                linkBundle("org.talend.components-components-common-oauth.bundle"), //
-                linkBundle("org.talend.components-components-salesforce.bundle"), //
-                linkBundle("commons-beanutils-commons-beanutils.none"), //
-                linkBundle("org.apache.servicemix.bundles-org.apache.servicemix.bundles.commons-collections.none"), //
+                linkBundle("org.talend.components-components-common-bundle"), //
+                linkBundle("org.talend.components-components-common-tests").noStart(), //
+                linkBundle("org.talend.components-components-common-oauth-bundle"), //
+                linkBundle("org.talend.components-components-salesforce-bundle"), //
+                linkBundle("commons-beanutils-commons-beanutils"), //
+                linkBundle("org.apache.servicemix.bundles-org.apache.servicemix.bundles.commons-collections"), //
                 propagateSystemProperties("salesforce.user", "salesforce.password", "salesforce.key"));
     }
 
