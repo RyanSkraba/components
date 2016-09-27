@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.common.EncodingTypeProperties;
@@ -46,6 +47,10 @@ public class FileInputDelimitedRuntime {
     private char fieldSeparator;
 
     private char[] rowSeparator;
+
+    private char escapeChar;
+
+    private char textEnclosureChar;
 
     protected int totalLine = 0;
 
@@ -93,6 +98,8 @@ public class FileInputDelimitedRuntime {
 
         fieldSeparator = getFieldSeparator();
         rowSeparator = getRowSeparator();
+
+        setEscapeAndTextEnclosure(props.escapeChar.getValue(), props.textEnclosure.getValue());
     }
 
     public FileInputDelimited getFileDelimited() throws IOException {
@@ -148,9 +155,8 @@ public class FileInputDelimitedRuntime {
         if ((rowSeparator[0] != '\n') && (rowSeparator[0] != '\r')) {
             csvReader.setLineEnd("" + rowSeparator[0]);
         }
-        // TODO fixed quote char
-        csvReader.setQuoteChar('"');
-        csvReader.setEscapeChar(csvReader.getQuoteChar());
+        csvReader.setQuoteChar(textEnclosureChar);
+        csvReader.setEscapeChar(escapeChar);
         if (footer > 0) {
             for (totalLine = 0; totalLine < header; totalLine++) {
                 csvReader.readNext();
@@ -184,9 +190,8 @@ public class FileInputDelimitedRuntime {
             if ((rowSeparator[0] != '\n') && (rowSeparator[0] != '\r')) {
                 csvReader.setLineEnd("" + rowSeparator[0]);
             }
-            // TODO fixed quote char
-            csvReader.setQuoteChar('"');
-            csvReader.setEscapeChar(csvReader.getQuoteChar());
+            csvReader.setQuoteChar(textEnclosureChar);
+            csvReader.setEscapeChar(escapeChar);
         }
         if (limit != 0) {
             for (currentLine = 0; currentLine < header; currentLine++) {
@@ -216,6 +221,29 @@ public class FileInputDelimitedRuntime {
         } else {
             throw new IllegalArgumentException("Row Separator must be assigned a char.");
         }
+    }
+
+    // Setup the escape char and text Enclosure char, Because of need consider the migration so little complex
+    private void setEscapeAndTextEnclosure(String escape, String textEnclosure) {
+        // TODO add more junit for this and more detail comments
+        if (StringUtils.isEmpty(textEnclosure) || "\"".equals(textEnclosure)) {
+            textEnclosureChar = '\"';
+        } else {
+            textEnclosureChar = textEnclosure.charAt(0);
+        }
+
+        if (escape != null && "\\".equals(escape)) {
+            escapeChar = '\\';
+        } else if (escape.equals(textEnclosure)) {
+            escapeChar = textEnclosureChar;
+        } else {
+            if (!StringUtils.isEmpty(escape)) {
+                escapeChar = escape.charAt(0);
+            } else {
+                throw new IllegalArgumentException("Escape Char must be assigned a char.");
+            }
+        }
+
     }
 
     private String getEncoding() {

@@ -130,6 +130,8 @@ public class FileDelimitedTestBasic extends AbstractComponentTest {
         properties.rowSeparator.setValue("\n");
         if (isCsvMode) {
             properties.csvOptions.setValue(true);
+            properties.escapeChar.setValue("\"");
+            properties.textEnclosure.setValue("\"");
         }
         properties.header.setValue(1);
         properties.main.schema.setValue(BASIC_SCHEMA);

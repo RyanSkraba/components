@@ -81,16 +81,16 @@ public class FileDelimitedWriter implements Writer<Result> {
         if (datum == null) {
             return;
         }
-
-        IndexedRecord inputRecord = getFactory(datum).convertToAvro((IndexedRecord) datum);
+        // This for dynamic which would get schema from the first record
         if (recordSchema == null) {
-            recordSchema = inputRecord.getSchema();
+            recordSchema = ((IndexedRecord) datum).getSchema();
             if (csvWriter != null) {
                 outputRuntime.writeHeader(csvWriter, recordSchema);
             } else {
                 outputRuntime.writeHeader(writer, recordSchema);
             }
         }
+        IndexedRecord inputRecord = getFactory(datum).convertToAvro((IndexedRecord) datum);
 
         result.totalCount++;
         if (props.csvOptions.getValue()) {
@@ -210,7 +210,8 @@ public class FileDelimitedWriter implements Writer<Result> {
     private String[] getValues(IndexedRecord record) {
         String[] values = new String[recordSchema.getFields().size()];
         for (Schema.Field field : recordSchema.getFields()) {
-            values[field.pos()] = String.valueOf(record.get(field.pos()));
+            Object value = record.get(field.pos());
+            values[field.pos()] = value == null ? null : String.valueOf(value);
         }
         return values;
     }

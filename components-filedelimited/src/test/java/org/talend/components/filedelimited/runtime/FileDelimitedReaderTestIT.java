@@ -8,12 +8,14 @@ import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.filedelimited.FileDelimitedTestBasic;
 import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
+import org.talend.daikon.avro.AvroUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -22,6 +24,18 @@ import static org.junit.Assert.assertTrue;
 public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileDelimitedReaderTestIT.class);
+
+    public static String[] ALL_FIELDS_NAME = new String[] { "TestBoolean", "TestByte", "TestBytes", "TestChar", "TestDate",
+            "TestDouble", "TestFloat", "TestBigDecimal", "TestInteger", "TestLong", "TestObject" };
+
+    public static Schema DYNAMIC_IS_FIRST_SCHEMA = new org.apache.avro.Schema.Parser().parse(
+            "{\"type\":\"record\",\"name\":\"MAIN\",\"fields\":[{\"name\":\"test_end\",\"type\":[\"int\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"test_end\",\"di.column.talendType\":\"id_Integer\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"test_end\",\"di.column.relatedEntity\":\"\"}],\"di.table.name\":\"MAIN\",\"di.table.label\":\"MAIN\",\"di.dynamic.column.comment\":\"\",\"di.dynamic.column.name\":\"test_dynamic\",\"di.column.talendType\":\"id_Dynamic\",\"talend.field.pattern\":\"dd-MM-yyyy\",\"di.column.isNullable\":\"true\",\"talend.field.scale\":\"0\",\"talend.field.dbColumnName\":\"test_dynamic\",\"di.column.relatedEntity\":\"\",\"di.column.relationshipType\":\"\",\"di.dynamic.column.position\":\"0\",\"include-all-fields\":\"true\"}");
+
+    public static Schema DYNAMIC_IS_MID_SCHEMA = new org.apache.avro.Schema.Parser().parse(
+            "{\"type\":\"record\",\"name\":\"MAIN\",\"fields\":[{\"name\":\"test_begin\",\"type\":[\"int\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"test_begin\",\"di.column.talendType\":\"id_Integer\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"test_begin\",\"di.column.relatedEntity\":\"\"},{\"name\":\"test_end\",\"type\":[\"int\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"test_end\",\"di.column.talendType\":\"id_Integer\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"test_end\",\"di.column.relatedEntity\":\"\"}],\"di.table.name\":\"MAIN\",\"di.table.label\":\"MAIN\",\"di.dynamic.column.comment\":\"\",\"di.dynamic.column.name\":\"test_dynamic\",\"di.column.talendType\":\"id_Dynamic\",\"talend.field.pattern\":\"dd-MM-yyyy\",\"di.column.isNullable\":\"true\",\"talend.field.scale\":\"0\",\"talend.field.dbColumnName\":\"test_dynamic\",\"di.column.relatedEntity\":\"\",\"di.column.relationshipType\":\"\",\"di.dynamic.column.position\":\"1\",\"include-all-fields\":\"true\"}");
+
+    public static Schema DYNAMIC_IS_END_SCHEMA = new org.apache.avro.Schema.Parser().parse(
+            "{\"type\":\"record\",\"name\":\"MAIN\",\"fields\":[{\"name\":\"test_begin\",\"type\":[\"int\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"test_begin\",\"di.column.talendType\":\"id_Integer\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"test_begin\",\"di.column.relatedEntity\":\"\"}],\"di.table.name\":\"MAIN\",\"di.table.label\":\"MAIN\",\"di.dynamic.column.comment\":\"\",\"di.dynamic.column.name\":\"test_dynamic\",\"di.column.talendType\":\"id_Dynamic\",\"talend.field.pattern\":\"dd-MM-yyyy\",\"di.column.isNullable\":\"true\",\"talend.field.scale\":\"0\",\"talend.field.dbColumnName\":\"test_dynamic\",\"di.column.relatedEntity\":\"\",\"di.column.relationshipType\":\"\",\"di.dynamic.column.position\":\"1\",\"include-all-fields\":\"true\"}");
 
     // Test FileInputDelimited component read with delimited mode
     @Test
@@ -95,6 +109,52 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
     @Test
     public void testInputDynamicDelimitedMode() throws Throwable {
         testInputDynamic(false);
+    }
+
+    // Test FileInputDelimited component read with delimited mode and source is compressed file
+    @Test
+    public void testGetDynamicSchema() throws Throwable {
+
+        // Include all field in "ALL_FIELDS_NAME", and default type is String
+        Schema schemaOnlyDynamic = FileSourceOrSink.getDynamicSchema(ALL_FIELDS_NAME, "dynamic", BASIC_DYNAMIC_SCHEMA);
+        Assert.assertEquals(11, schemaOnlyDynamic.getFields().size());
+        Assert.assertEquals("TestBoolean", schemaOnlyDynamic.getFields().get(0).name());
+        Assert.assertTrue(AvroUtils.isSameType(AvroUtils._string(), schemaOnlyDynamic.getFields().get(0).schema()));
+        Assert.assertEquals("TestObject", schemaOnlyDynamic.getFields().get(10).name());
+        Assert.assertTrue(AvroUtils.isSameType(AvroUtils._string(), schemaOnlyDynamic.getFields().get(10).schema()));
+
+        // Column index 0~9 are included in dynamic field. The last field "test_end" is from "DYNAMIC_IS_FIRST_SCHEMA"
+        Schema schemaDynamicInFirst = FileSourceOrSink.getDynamicSchema(ALL_FIELDS_NAME, "dynamic", DYNAMIC_IS_FIRST_SCHEMA);
+        Assert.assertEquals(11, schemaDynamicInFirst.getFields().size());
+        Assert.assertEquals("TestBoolean", schemaDynamicInFirst.getFields().get(0).name());
+        Assert.assertTrue(AvroUtils.isSameType(AvroUtils._string(), schemaDynamicInFirst.getFields().get(0).schema()));
+        Assert.assertEquals("test_end", schemaDynamicInFirst.getFields().get(10).name());
+        Assert.assertTrue(AvroUtils.isSameType(AvroUtils.wrapAsNullable(AvroUtils._int()),
+                schemaDynamicInFirst.getFields().get(10).schema()));
+        // Column index 1~9 are included in dynamic field. The first field "test_begin" is from DYNAMIC_IS_MID_SCHEMA,The last
+        // field "test_end" is from "DYNAMIC_IS_MID_SCHEMA"
+        Schema schemaDynamicInMiddle = FileSourceOrSink.getDynamicSchema(ALL_FIELDS_NAME, "dynamic", DYNAMIC_IS_MID_SCHEMA);
+        Assert.assertEquals(11, schemaDynamicInMiddle.getFields().size());
+        Assert.assertEquals("test_begin", schemaDynamicInMiddle.getFields().get(0).name());
+        Assert.assertTrue(AvroUtils.isSameType(AvroUtils.wrapAsNullable(AvroUtils._int()),
+                schemaDynamicInMiddle.getFields().get(0).schema()));
+        Assert.assertEquals("TestByte", schemaDynamicInMiddle.getFields().get(1).name());
+        Assert.assertTrue(AvroUtils.isSameType(AvroUtils._string(), schemaDynamicInMiddle.getFields().get(1).schema()));
+        Assert.assertEquals("TestLong", schemaDynamicInMiddle.getFields().get(9).name());
+        Assert.assertTrue(AvroUtils.isSameType(AvroUtils._string(), schemaDynamicInMiddle.getFields().get(9).schema()));
+        Assert.assertEquals(10, schemaDynamicInFirst.getField("test_end").pos());
+        Assert.assertTrue(AvroUtils.isSameType(AvroUtils.wrapAsNullable(AvroUtils._int()),
+                schemaDynamicInMiddle.getFields().get(10).schema()));
+
+        // Column index 1~10 are included in dynamic field. The first field "test_begin" is from "DYNAMIC_IS_END_SCHEMA"
+        Schema schemaDynamicInEnd = FileSourceOrSink.getDynamicSchema(ALL_FIELDS_NAME, "dynamic", DYNAMIC_IS_END_SCHEMA);
+        Assert.assertEquals(11, schemaDynamicInEnd.getFields().size());
+        Assert.assertEquals("test_begin", schemaDynamicInEnd.getFields().get(0).name());
+        Assert.assertTrue(
+                AvroUtils.isSameType(AvroUtils.wrapAsNullable(AvroUtils._int()), schemaDynamicInEnd.getFields().get(0).schema()));
+        Assert.assertEquals("TestObject", schemaDynamicInEnd.getFields().get(10).name());
+        Assert.assertTrue(AvroUtils.isSameType(AvroUtils._string(), schemaDynamicInEnd.getFields().get(10).schema()));
+
     }
 
     @Test

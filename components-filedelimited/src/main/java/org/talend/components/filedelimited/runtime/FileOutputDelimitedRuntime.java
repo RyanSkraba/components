@@ -249,7 +249,9 @@ public class FileOutputDelimitedRuntime {
     public void writeHeader(Writer writer, Schema schema) throws IOException {
         if (props.includeHeader.getValue()) {
             // TODO support PARALLEL ? need recheck with code of javajet
-            if ((zipFile == null && file.length() == 0) || zipFile != null && zipFile.length() == 0) {
+            //If the target is stream, would write header directly
+            if (props.targetIsStream.getValue() || (file != null && file.length() == 0)
+                    || (zipFile != null && zipFile.length() == 0)) {
                 for (Schema.Field field : schema.getFields()) {
                     writer.write(field.name());
                     if (field.pos() != (schema.getFields().size() - 1)) {

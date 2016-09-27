@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.SourceOrSink;
@@ -14,6 +15,7 @@ import org.talend.components.filedelimited.FileDelimitedProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
+import org.talend.daikon.di.DiSchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 
 public class FileSourceOrSink implements SourceOrSink {
@@ -82,16 +84,56 @@ public class FileSourceOrSink implements SourceOrSink {
         }
     }
 
-    public static Schema getDynamicSchema(String[] columnsName, String schemaName) {
-        if (columnsName != null) {
-            String defaultValue = null;
+    /**
+     * Get dynamic schema base on the file and design schema
+     * 
+     * @param columnsName All columns name which read from file
+     * @param schemaName Specify the schema name
+     * @param designSchema The design schema of current component
+     * @return The build schema include all fields
+     */
+    public static Schema getDynamicSchema(String[] columnsName, String schemaName, Schema designSchema) {
+        if (columnsName != null && columnsName.length > 0) {
+            // FIXME can we use "DiSchemaConstants" here?
+            String dynamicPosProp = designSchema.getProp(DiSchemaConstants.TALEND6_DYNAMIC_COLUMN_POSITION);
             List<Schema.Field> fields = new ArrayList<>();
-            for (String columnName : columnsName) {
-                // TODO schema name can't be empty now. Specify a unique name ?
-                Schema.Field avroField = new Schema.Field(columnName, AvroUtils._string(), null, defaultValue);
-                avroField.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, String.valueOf(100));
-                avroField.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, String.valueOf(0));
-                fields.add(avroField);
+            if (dynamicPosProp != null) {
+                int dynPos = Integer.parseInt(dynamicPosProp);
+                int dynamicColumnSize = columnsName.length - designSchema.getFields().size();
+                String defaultValue = null;
+                if (designSchema.getFields().size() > 0) {
+                    for (Schema.Field field : designSchema.getFields()) {
+                        // Dynamic column is first or middle column in design schema
+                        if (dynPos == field.pos()) {
+                            for (int i = 0; i < dynamicColumnSize; i++) {
+                                // Add dynamic schema fields
+                                fields.add(getDefaultField(columnsName[i + dynPos], defaultValue));
+                            }
+                        }
+                        // Add fields of design schema
+                        Schema.Field avroField = new Schema.Field(field.name(), field.schema(), null, field.defaultVal());
+                        Map<String, Object> fieldProps = field.getObjectProps();
+                        for (String propName : fieldProps.keySet()) {
+                            Object propValue = fieldProps.get(propName);
+                            if (propValue != null) {
+                                avroField.addProp(propName, propValue);
+                            }
+                        }
+                        fields.add(avroField);
+                        // Dynamic column is last column in design schema
+                        if (field.pos() == (designSchema.getFields().size() - 1) && dynPos == (field.pos() + 1)) {
+                            for (int i = 0; i < dynamicColumnSize; i++) {
+                                // Add dynamic schema fields
+                                fields.add(getDefaultField(columnsName[i + dynPos], defaultValue));
+                            }
+                        }
+                    }
+                } else {
+                    // All fields are included in dynamic schema
+                    for (String columnName : columnsName) {
+                        fields.add(getDefaultField(columnName, defaultValue));
+                    }
+                }
             }
             return Schema.createRecord(schemaName, null, null, false, fields);
         } else {
@@ -99,4 +141,13 @@ public class FileSourceOrSink implements SourceOrSink {
         }
     }
 
+    /**
+     * Created default field for dynamic,default Length and Precision keep same with old behavior
+     */
+    protected static Schema.Field getDefaultField(String columnName, String defaultValue) {
+        Schema.Field avroField = new Schema.Field(columnName, AvroUtils._string(), null, defaultValue);
+        avroField.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, String.valueOf(100));
+        avroField.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, String.valueOf(0));
+        return avroField;
+    }
 }

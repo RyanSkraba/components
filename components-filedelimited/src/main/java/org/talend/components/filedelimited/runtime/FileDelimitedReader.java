@@ -73,7 +73,7 @@ public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedR
     protected void setupDynamicSchema() throws IOException {
         if (getSchema() != null) {
             if (AvroUtils.isIncludeAllFields(schema)) {
-                schema = FileSourceOrSink.getDynamicSchema(values, "dynamicSchema");
+                schema = FileSourceOrSink.getDynamicSchema(values, "dynamicSchema",schema);
             }
         } else {
             throw new IOException("Schema is not setup!");
