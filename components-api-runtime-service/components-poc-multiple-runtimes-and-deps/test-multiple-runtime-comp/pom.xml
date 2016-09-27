@@ -129,47 +129,10 @@
                             <dependencySet>
                                 <scope>test</scope>
                             </dependencySet>
-                            <artifacts>
-                              <artifact>
-                                  <groupId>${project.groupId}</groupId>
-                                  <artifactId>${project.artifactId}</artifactId>
-                                  <classifier>bundle</classifier>
-                                  <version>${project.version}</version>
-                              </artifact>
-                           </artifacts>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>          
-<!-- 			<plugin> -->
-<!-- 				<groupId>org.apache.felix</groupId> -->
-<!-- 				<artifactId>maven-bundle-plugin</artifactId> -->
-<!-- 				<extensions>true</extensions> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<id>test-bundle</id> -->
-<!-- 						<phase>package</phase> -->
-<!-- 						<goals> -->
-<!-- 							<goal>bundle</goal> -->
-<!-- 						</goals> -->
-<!-- 						<configuration> -->
-<!-- 							<classifier>tests</classifier> -->
-<!-- 							<outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory> -->
-<!-- 							<instructions> -->
-<!-- 								<Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*</Import-Package> -->
-<!-- 								<Bundle-SymbolicName>org.talend.poc.test-multiple-runtime-comp.test</Bundle-SymbolicName> -->
-<!-- 								<Bundle-Name>Test Fragment for ${project.name}</Bundle-Name> -->
-<!-- 								<Fragment-Host>org.talend.poc.multiple-runtime-comp</Fragment-Host> -->
-<!-- 								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy> -->
-<!-- 								<DynamicImport-Package>*</DynamicImport-Package> -->
-<!-- 								<Embed-Dependency></Embed-Dependency> -->
-<!-- 								<Export-Package>*</Export-Package> -->
-<!-- 								<Include-Resource>=target/test-classes/</Include-Resource> -->
-<!-- 							</instructions> -->
-<!-- 						</configuration> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
-<!-- 			</plugin> -->
 		</plugins>
 	</build>
 </project>

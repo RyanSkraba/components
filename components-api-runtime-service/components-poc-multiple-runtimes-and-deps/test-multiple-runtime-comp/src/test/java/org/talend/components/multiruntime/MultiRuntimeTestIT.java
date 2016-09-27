@@ -22,11 +22,6 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
 import org.talend.components.api.ComponentsPaxExamOptions;
 import org.talend.components.api.service.ComponentService;
 
@@ -45,23 +40,6 @@ public class MultiRuntimeTestIT extends AbstractMultiRuntimeComponentTests {
 
     @Override
     public ComponentService getComponentService() {
-        BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
-        try {
-            ServiceReference<?>[] compServiceRef = bundleContext.getAllServiceReferences(null, null);
-            for (ServiceReference<?> serviceRef : compServiceRef) {
-                System.out.println("SERVICE REF : " + serviceRef);
-                Object service = bundleContext.getService(serviceRef);
-                System.out.println("SERVICE : " + service);
-            }
-        } catch (InvalidSyntaxException e) {
-            throw new RuntimeException(e);
-        }
-        Bundle[] bundles = bundleContext.getBundles();
-        for (Bundle bun : bundles) {
-            System.out.println("BUNDLE : [" + bun.getSymbolicName() + "], state : " + bun.getState() + ", num services : "
-                    + (bun.getServicesInUse() != null ? bun.getServicesInUse().length : "0"));
-
-        }
         return osgiCompService;
     }
 

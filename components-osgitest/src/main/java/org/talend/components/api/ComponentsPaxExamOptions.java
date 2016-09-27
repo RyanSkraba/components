@@ -44,7 +44,7 @@ public class ComponentsPaxExamOptions {
         }
         return options(mavenBundle("org.apache.felix", "org.apache.felix.scr"), //
                 linkBundle("org.slf4j-slf4j-api"), //
-                // linkBundle("org.slf4j-log4j-over-slf4j").noStart(), //
+                linkBundle("org.slf4j-slf4j-simple").noStart(), //
                 linkBundle("com.fasterxml.jackson.core-jackson-annotations"), //
                 linkBundle("com.fasterxml.jackson.core-jackson-core"), //
                 linkBundle("com.cedarsoftware-json-io"), //
@@ -54,8 +54,6 @@ public class ComponentsPaxExamOptions {
                 linkBundle("org.codehaus.jackson-jackson-mapper-asl"), //
                 linkBundle("com.google.guava-guava"), //
                 linkBundle("org.apache.commons-commons-compress"), //
-                // linkBundle("commons-beanutils-commons-beanutils"), //
-                // linkBundle("org.apache.servicemix.bundles-org.apache.servicemix.bundles.commons-collections"), //
                 linkBundle("org.apache.commons-commons-lang3"), //
                 linkBundle("org.apache.avro-avro"), //
                 linkBundle("org.eclipse.jetty.orbit-javax.servlet"), //
@@ -66,12 +64,7 @@ public class ComponentsPaxExamOptions {
                 linkBundle("org.talend.components-components-api-runtime-service-bundle"), //
                 linkBundle("org.talend.components-components-api-bundle"), //
                 linkBundle("org.talend.components-components-api-tests").noStart(),
-                // linkBundle("org.talend.components-components-common-bundle"),
-                // linkBundle("org.talend.components-components-common-tests").noStart(),
-                // linkBundle("org.talend.components-components-common-oauth-bundle"),
                 linkBundle("org.apache.servicemix.bundles-org.apache.servicemix.bundles.hamcrest"), //
-                // linkBundle("org.talend.components-multiple-runtime-comp-bundle"),
-                // linkBundle("org.talend.components-test-multiple-runtime-comp-tests").noStart(),
                 linkBundle("org.ops4j.pax.url-pax-url-aether"),
                 // this is copied from junitBundles() to remove the default pax-exam hamcrest bundle that does
                 // not contains all the nice hamcrest Matchers
@@ -86,21 +79,6 @@ public class ComponentsPaxExamOptions {
 
     }
 
-    // public static Option[] getOptions() {
-    // return options(newKarafDistributionConfiguration(), KarafDistributionOption.keepRuntimeFolder(),
-    // provision(//
-    // mavenBundle("org.apache.felix", "org.apache.felix.scr"), //
-    // mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("bundle"), //
-    // mavenBundle().groupId("org.talend.components").artifactId("components-api").classifier("tests").noStart(),
-    // mavenBundle().groupId("org.talend.components").artifactId("components-common").classifier("bundle"),
-    // mavenBundle().groupId("org.talend.components").artifactId("components-common").classifier("tests")
-    // .noStart(),
-    // mavenBundle().groupId("org.talend.components").artifactId("components-common-oauth").classifier("bundle"),
-    // mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("bundle"),
-    // mavenBundle().groupId("org.talend.components").artifactId("components-salesforce").classifier("tests").noStart()),
-    // junitBundles(), cleanCaches());
-    // }
-    //
     // static KarafDistributionBaseConfigurationOption newKarafDistributionConfiguration() {
     // return karafDistributionConfiguration()
     // .frameworkUrl(
