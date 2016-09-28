@@ -18,6 +18,7 @@ import org.talend.components.filedelimited.FileDelimitedTestBasic;
 import org.talend.components.filedelimited.tfileoutputdelimited.TFileOutputDelimitedProperties;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class FileDelimitedWriterTestIT extends FileDelimitedTestBasic {
@@ -60,6 +61,28 @@ public class FileDelimitedWriterTestIT extends FileDelimitedTestBasic {
     @Test
     public void testOutputCsvStream() throws Throwable {
         testOutputCSV(true);
+    }
+
+    // Test FileOutputDelimited deleted generated empty file
+    @Test
+    public void testDeleteGeneratedEmptyFile() throws Throwable {
+        String resources = getResourceFolder();
+        String outputFile = resources + "/out/test_deleteGeneratedEmptyFile.csv";
+        LOGGER.debug("Test file path: " + outputFile);
+        TFileOutputDelimitedProperties properties = createOutputProperties(outputFile, false);
+        List<IndexedRecord> records = new ArrayList<>();
+        // Delete generated empty file function not be checked
+        doWriteRows(properties, records);
+        File outFile = new File(outputFile);
+        assertTrue(outFile.exists());
+        assertEquals(0, outFile.length());
+        assertTrue(outFile.delete());
+        // Active delete generated empty file function
+        assertFalse(outFile.exists());
+        properties.deleteEmptyFile.setValue(true);
+        doWriteRows(properties, records);
+        assertFalse(outFile.exists());
+
     }
 
     // Test FileOutputDelimited component write with CSV mode and source is compressed file

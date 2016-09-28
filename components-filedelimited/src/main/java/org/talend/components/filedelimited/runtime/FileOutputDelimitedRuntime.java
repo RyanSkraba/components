@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.common.EncodingTypeProperties;
 import org.talend.components.filedelimited.tfileoutputdelimited.TFileOutputDelimitedProperties;
+
 import com.talend.csv.CSVWriter;
 
 public class FileOutputDelimitedRuntime {
@@ -36,7 +37,7 @@ public class FileOutputDelimitedRuntime {
 
     String directory = null;
 
-    boolean isFileGenerated;
+    boolean isFileGenerated = true;
 
     File file;
 

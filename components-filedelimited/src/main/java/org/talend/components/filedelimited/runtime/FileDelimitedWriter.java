@@ -186,8 +186,16 @@ public class FileDelimitedWriter implements Writer<Result> {
                 }
             }
         }
+        if (!props.targetIsStream.getValue() && props.deleteEmptyFile.getValue() && outputRuntime.isFileGenerated
+                && result.totalCount == 0) {
+            // Delete empty file, if no record is written
+            if (props.compress.getValue() && !props.append.getValue() && !props.split.getValue()) {
+                outputRuntime.zipFile.delete();
+            } else {
+                outputRuntime.file.delete();
+            }
 
-        result.successCount = result.totalCount;
+        }
         return result;
     }
 
