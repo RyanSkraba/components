@@ -149,14 +149,16 @@ public class FileDelimitedWriter implements Writer<Result> {
                     if (csvWriter != null) {
                         csvWriter.close();
                     }
-                    if (outputRuntime.writer != null) {
-                        outputRuntime.writer.flush();
-                    }
-                    if (outputRuntime.writer != null) {
-                        outputRuntime.writer.flush();
-                    }
                 } else {
-
+                    if (csvWriter != null) {
+                        csvWriter.flush();
+                    }
+                }
+                if (outputRuntime.writer != null) {
+                    outputRuntime.writer.flush();
+                }
+                if (outputRuntime.streamWriter != null) {
+                    outputRuntime.streamWriter.flush();
                 }
             } else {
                 if (csvWriter != null) {
@@ -219,7 +221,10 @@ public class FileDelimitedWriter implements Writer<Result> {
     private String getRowString(IndexedRecord record) {
         StringBuilder sb = new StringBuilder();
         for (Schema.Field field : recordSchema.getFields()) {
-            sb.append(record.get(field.pos()));
+            Object value = record.get(field.pos());
+            if (value != null) {
+                sb.append(value);
+            }
             if (field.pos() != (recordSchema.getFields().size() - 1)) {
                 sb.append(outputRuntime.fieldSeparator);
             }
