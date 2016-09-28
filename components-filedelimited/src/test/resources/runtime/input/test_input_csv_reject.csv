@@ -1,0 +1,21 @@
+TestBoolean;TestByte;TestBytes;TestChar;TestDate;TestDouble;TestFloat;TestBigDecimal;TestInteger;TestLong;TestObject
+"false";"1";"IIG2iTCNnLlicDqGVM";"n";"2016-09-06T15:31:07";"2.75";"0.246";"4.797";"1820";"1473147067519";"Thomas Grant"
+"false";"42";"z2XStroflxLQrmp2w9";"l";"2016-09-06T15:31:07";"2.75";"7.749";"4.797";"3637";"1473147067522";"Harry Truman"
+"false";"29";"vEq3xp8fZsx92xwhz4";"G";"rejectDate";"5.75";"3.567";"3.567";"3448";"1473147067522";"Dwight Eisenhower";;;;;
+"true";"rejectByte";"SHD32M6xKXSwnZexFz";"I";"2016-09-06T15:31:07";"0.25";"10.947";"11.931";"7032";"1473147067523";"Jimmy Ford"
+"rejectBoolean";"4";"H0tGHdwxTSQ3sfJVqQ";"B";"2016-09-06T15:31:07";"7.625";"8.364";"9.102";"2599";"1473147067523";"Dwight Harding"
+"false";"66";"13T6u0pdjbvWnCKCHI";"u";"2016-09-06T15:31:07";"0.0";"11.562";"5.535";"6552";"1473147067523";"Chester Johnson"
+"true";"97";"jZRTtNMPQJqAI0uqkV";"v";"2016-09-06T15:31:07";"11.625";"7.38";"4.92";"3295";"1473147067523";"George Madison"
+"false";"54";"LrvVkh401GtY31gIgg";"o";"2016-09-06T15:31:07";"rejectDouble";"0.0";"4.797";"2945";"1473147067524";"Woodrow Reagan"
+"false";"99";"CqkDWKxfab9XJvd8l9";"E";"2016-09-06T15:31:07";"6.0";"10.578";"rejectDecimal";"4671";"1473147067524";"Herbert McKinley";;;
+"true";"12";"RIVmqNW5sIC3VA3X1O";"D";"2016-09-06T15:31:07";"4.875";"11.193";"12.177";"rejectInt";"1473147067524";"James Kennedy"
+"false";"58";"zajflyfxtZDBGLTral";"i";"2016-09-06T15:31:07";"4.5";"2.337";"2.706";"9557";"1473147067525";"Richard Johnson"
+"false";"8";"uKiBGux6dV6SdO4ZVX";"g";"2016-09-06T15:31:07";"9.375";"7.257";"10.455";"9735";"rejectLong";"Andrew Clinton"
+"false";"33";"uZenw77hMCCU4oqvkQ";"w";"2016-09-06T15:31:07";"4.5";"rejectFloat";"6.888";"8993";"1473147067525";"Theodore Lincoln"
+"true";"10";"RKmbLFyIHm1bGamR6w";"5";"2016-09-06T15:31:07";"9.75";"2.583";"12.3";"3756";"1473147067525";"Zachary Pierce"
+"false";"0";"0zeRpdPVAk90N9UvAe";"G";"2016-09-06T15:31:07";"9.75";"2.46";"9.471";"8411";"1473147067526";"Richard Kennedy"
+"true";"3";"cC2LZgbuxnk2vltssd";"o";"2016-09-06T15:31:07";"7.875";"1.599";"10.209";"6600";"1473147067527";"Theodore McKinley"
+"true";"84";"dZdoQIjySWgEayeLyW";"h";"2016-09-06T15:31:07";"8.875";"0.0";"1.23";"3451";"1473147067527";"Ronald Taylor"
+"true";"39";"b4YOTfTXK2AA2TxQoW";"C";"2016-09-06T15:31:07";"0.125";"4.428";"4.6739999999999995";"3752";"1473147067527";"John Johnson";;;;;;;;
+"false";"40";"Gqy0ze2UlJA7Y68p2y";"R";"2016-09-06T15:31:07";"4.25";"2.091";"1.23";"6213";"1473147067527";"Franklin Ford"
+"true";"74";"ScLBmNa5fRP3yWLppz";"G";"2016-09-06T15:31:07";"2.5";"11.07";"4.6739999999999995";"9750";"1473147067528";"George Madison"

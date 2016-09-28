@@ -7,13 +7,11 @@ import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.commons.lang3.StringUtils;
-import org.talend.components.api.exception.DataRejectException;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.ComponentConstants;
 import org.talend.components.common.runtime.FormatterUtils;
 import org.talend.daikon.avro.AvroRegistry;
@@ -188,7 +186,13 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
         @Override
         public Boolean convertToAvro(String value) {
-            return value == null ? null : Boolean.parseBoolean(value);
+            if (value == null) {
+                return null;
+            }
+            if (value.equals("1")) {
+                return Boolean.parseBoolean("true");
+            }
+            return Boolean.parseBoolean(value);
         }
     }
 
@@ -255,9 +259,8 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
             try {
                 return StringUtils.isEmpty(value) ? null : format.parse(value).getTime();
             } catch (ParseException e) {
-                Map<String, Object> resultMessage = new HashMap<String, Object>();
-                resultMessage.put("errorMessage", e.getMessage());
-                throw new DataRejectException(resultMessage);
+                // For die one error and reject, only need throw the exception
+                throw new ComponentException(e);
             }
         }
 

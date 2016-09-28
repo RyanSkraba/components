@@ -11,4 +11,6 @@ public class ComponentConstants {
 
     public final static String FILE_ENCODING = "file.encoding";
 
+    public final static String DIE_ON_ERROR = "component.dieonerror";
+
 }

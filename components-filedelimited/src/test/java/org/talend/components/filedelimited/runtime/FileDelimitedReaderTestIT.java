@@ -13,6 +13,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.filedelimited.FileDelimitedTestBasic;
 import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.avro.AvroUtils;
@@ -157,16 +158,56 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
 
     }
 
-    @Test
-    @Ignore("Need to implement")
-    public void testInputRejectDelimitedMode() {
-        // TODO
+    @Test(expected = NumberFormatException.class)
+    public void testInputDieOnErrorDelimitedMode() throws Throwable {
+        String resources = getClass().getResource("/runtime/input").getPath();
+        String inputFile = resources + "/test_input_delimited_reject.csv";
+        LOGGER.debug("Test file path: " + inputFile);
+
+        TFileInputDelimitedProperties properties = createWizaredProperties(createInputProperties(inputFile, false));
+        properties.dieOnError.setValue(true);
+        testInputReject(properties);
+
+    }
+
+    @Test(expected = ComponentException.class)
+    public void testInputDieOnErrorCsvMode() throws Throwable {
+        String resources = getClass().getResource("/runtime/input").getPath();
+        String inputFile = resources + "/test_input_csv_reject.csv";
+        LOGGER.debug("Test file path: " + inputFile);
+
+        TFileInputDelimitedProperties properties = createWizaredProperties(createInputProperties(inputFile, true));
+        properties.dieOnError.setValue(true);
+        testInputReject(properties);
+
     }
 
     @Test
-    @Ignore("Need to implement")
-    public void testInputRejectCsvMode() {
-        // TODO
+    public void testInputRejectDelimitedMode() throws Throwable {
+        String resources = getClass().getResource("/runtime/input").getPath();
+        String inputFile = resources + "/test_input_delimited_reject.csv";
+        LOGGER.debug("Test file path: " + inputFile);
+        testInputReject(createWizaredProperties(createInputProperties(inputFile, false)));
+    }
+
+    @Test
+    public void testInputRejectCsvMode() throws Throwable {
+        String resources = getClass().getResource("/runtime/input").getPath();
+        String inputFile = resources + "/test_input_csv_reject.csv";
+        LOGGER.debug("Test file path: " + inputFile);
+        testInputReject(createWizaredProperties(createInputProperties(inputFile, true)));
+    }
+
+    private void testInputReject(TFileInputDelimitedProperties properties) throws Throwable {
+        List<IndexedRecord> records = readRows(properties);
+
+        assertNotNull(records);
+        // Total records
+        assertEquals(20, records.size());
+
+        // Read without exception, and 7 row are rejected
+        List<IndexedRecord> successRecords = printLogRecords(records);
+        assertEquals(13, successRecords.size());
     }
 
     public void testInputDelimited(boolean previewData, boolean sourceIsStream) throws Throwable {
