@@ -18,8 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.common.EncodingTypeProperties;
 import org.talend.components.filedelimited.tfileoutputdelimited.TFileOutputDelimitedProperties;
-import org.talend.daikon.avro.AvroUtils;
-
 import com.talend.csv.CSVWriter;
 
 public class FileOutputDelimitedRuntime {
@@ -184,8 +182,9 @@ public class FileOutputDelimitedRuntime {
                 csvWriter.setLineEnd(rowSeparator);
             }
         }
-        // when there is dynamic schema, it won't be enclosed with "\""
-        if (!((props.includeHeader.getValue() || AvroUtils.isIncludeAllFields(props.main.schema.getValue())))) {
+        // Header can't be enclosed with text enclosed char
+        // This would set after write header
+        if (!props.includeHeader.getValue()) {
             csvWriter.setEscapeChar(escapeChar);
             csvWriter.setQuoteChar(textEnclosureChar);
             csvWriter.setQuoteStatus(com.talend.csv.CSVWriter.QuoteStatus.FORCE);
@@ -249,7 +248,7 @@ public class FileOutputDelimitedRuntime {
     public void writeHeader(Writer writer, Schema schema) throws IOException {
         if (props.includeHeader.getValue()) {
             // TODO support PARALLEL ? need recheck with code of javajet
-            //If the target is stream, would write header directly
+            // If the target is stream, would write header directly
             if (props.targetIsStream.getValue() || (file != null && file.length() == 0)
                     || (zipFile != null && zipFile.length() == 0)) {
                 for (Schema.Field field : schema.getFields()) {
