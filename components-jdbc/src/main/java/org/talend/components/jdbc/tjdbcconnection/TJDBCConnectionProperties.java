@@ -121,7 +121,7 @@ public class TJDBCConnectionProperties extends ComponentPropertiesImpl implement
         setting.setDriverClass(this.connection.driverClass.getValue());
         setting.setJdbcUrl(this.connection.jdbcUrl.getValue());
         setting.setUsername(this.connection.userPassword.userId.getValue());
-        setting.setPassword(this.connection.userPassword.userId.getValue());
+        setting.setPassword(this.connection.userPassword.password.getValue());
 
         setting.setUseAutoCommit(this.useAutoCommit.getValue());
         setting.setAutocommit(this.autocommit.getValue());
