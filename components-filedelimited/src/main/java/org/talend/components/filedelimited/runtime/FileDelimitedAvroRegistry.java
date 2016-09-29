@@ -171,6 +171,12 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
                     } else {
                         return ((BigDecimal) value).toPlainString();
                     }
+                } else if (AvroUtils.isSameType(AvroUtils._decimal(), AvroUtils.unwrapIfNullable(field.schema()))) {
+                    String precision = field.getProp(SchemaConstants.TALEND_COLUMN_PRECISION);
+                    if (precision != null) {
+                        return new BigDecimal(String.valueOf(value)).setScale(Integer.valueOf(precision), RoundingMode.HALF_UP)
+                                .toPlainString();
+                    }
                 }
                 return String.valueOf(value);
             }

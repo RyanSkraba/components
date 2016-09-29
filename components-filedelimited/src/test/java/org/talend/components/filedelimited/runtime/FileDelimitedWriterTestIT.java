@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Ignore;
@@ -16,6 +18,8 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.common.runtime.FileRuntimeHelper;
 import org.talend.components.filedelimited.FileDelimitedTestBasic;
 import org.talend.components.filedelimited.tfileoutputdelimited.TFileOutputDelimitedProperties;
+import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.SchemaConstants;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -61,6 +65,31 @@ public class FileDelimitedWriterTestIT extends FileDelimitedTestBasic {
     @Test
     public void testOutputCsvStream() throws Throwable {
         testOutputCSV(true);
+    }
+
+    @Test
+    public void testWriteDecimal() throws Throwable {
+        String resources = getResourceFolder();
+        String outputFile = resources + "/out/test_write_decimal.csv";
+        String refFilePath = resources + "/ref_test_write_decimal.csv";
+        LOGGER.debug("Test file path: " + outputFile);
+        TFileOutputDelimitedProperties properties = createOutputProperties(outputFile, false);
+        Schema outputSchema = SchemaBuilder.builder().record("Schema").fields().name("TestBigDecimal")
+                .prop(SchemaConstants.TALEND_COLUMN_PRECISION, "10").prop(SchemaConstants.TALEND_COLUMN_PRECISION, "2")
+                .type(AvroUtils._decimal()).noDefault().endRecord();
+        properties.main.schema.setValue(outputSchema);
+        List<IndexedRecord> records = new ArrayList<>();
+        IndexedRecord r1 = new GenericData.Record(outputSchema);
+        r1.put(0, "3.1415926");
+        IndexedRecord r2 = new GenericData.Record(outputSchema);
+        r2.put(0, "9.1798");
+        records.add(r1);
+        records.add(r2);
+        // Delete generated empty file function not be checked
+        doWriteRows(properties, records);
+
+        assertTrue(FileRuntimeHelper.compareInTextMode(outputFile, refFilePath, getEncoding(properties.encoding)));
+        assertTrue(deleteFile(outputFile));
     }
 
     // Test FileOutputDelimited deleted generated empty file
