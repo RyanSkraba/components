@@ -149,14 +149,16 @@ public class FileDelimitedWriter implements Writer<Result> {
                     if (csvWriter != null) {
                         csvWriter.close();
                     }
-                    if (outputRuntime.writer != null) {
-                        outputRuntime.writer.flush();
-                    }
-                    if (outputRuntime.writer != null) {
-                        outputRuntime.writer.flush();
-                    }
                 } else {
-
+                    if (csvWriter != null) {
+                        csvWriter.flush();
+                    }
+                }
+                if (outputRuntime.writer != null) {
+                    outputRuntime.writer.flush();
+                }
+                if (outputRuntime.streamWriter != null) {
+                    outputRuntime.streamWriter.flush();
                 }
             } else {
                 if (csvWriter != null) {
@@ -184,8 +186,16 @@ public class FileDelimitedWriter implements Writer<Result> {
                 }
             }
         }
+        if (!props.targetIsStream.getValue() && props.deleteEmptyFile.getValue() && outputRuntime.isFileGenerated
+                && result.totalCount == 0) {
+            // Delete empty file, if no record is written
+            if (props.compress.getValue() && !props.append.getValue() && !props.split.getValue()) {
+                outputRuntime.zipFile.delete();
+            } else {
+                outputRuntime.file.delete();
+            }
 
-        result.successCount = result.totalCount;
+        }
         return result;
     }
 
@@ -219,7 +229,10 @@ public class FileDelimitedWriter implements Writer<Result> {
     private String getRowString(IndexedRecord record) {
         StringBuilder sb = new StringBuilder();
         for (Schema.Field field : recordSchema.getFields()) {
-            sb.append(record.get(field.pos()));
+            Object value = record.get(field.pos());
+            if (value != null) {
+                sb.append(value);
+            }
             if (field.pos() != (recordSchema.getFields().size() - 1)) {
                 sb.append(outputRuntime.fieldSeparator);
             }

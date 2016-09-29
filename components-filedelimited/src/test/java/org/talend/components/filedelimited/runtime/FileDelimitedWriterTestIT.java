@@ -18,6 +18,7 @@ import org.talend.components.filedelimited.FileDelimitedTestBasic;
 import org.talend.components.filedelimited.tfileoutputdelimited.TFileOutputDelimitedProperties;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class FileDelimitedWriterTestIT extends FileDelimitedTestBasic {
@@ -60,6 +61,28 @@ public class FileDelimitedWriterTestIT extends FileDelimitedTestBasic {
     @Test
     public void testOutputCsvStream() throws Throwable {
         testOutputCSV(true);
+    }
+
+    // Test FileOutputDelimited deleted generated empty file
+    @Test
+    public void testDeleteGeneratedEmptyFile() throws Throwable {
+        String resources = getResourceFolder();
+        String outputFile = resources + "/out/test_deleteGeneratedEmptyFile.csv";
+        LOGGER.debug("Test file path: " + outputFile);
+        TFileOutputDelimitedProperties properties = createOutputProperties(outputFile, false);
+        List<IndexedRecord> records = new ArrayList<>();
+        // Delete generated empty file function not be checked
+        doWriteRows(properties, records);
+        File outFile = new File(outputFile);
+        assertTrue(outFile.exists());
+        assertEquals(0, outFile.length());
+        assertTrue(outFile.delete());
+        // Active delete generated empty file function
+        assertFalse(outFile.exists());
+        properties.deleteEmptyFile.setValue(true);
+        doWriteRows(properties, records);
+        assertFalse(outFile.exists());
+
     }
 
     // Test FileOutputDelimited component write with CSV mode and source is compressed file
@@ -111,7 +134,6 @@ public class FileDelimitedWriterTestIT extends FileDelimitedTestBasic {
         TFileOutputDelimitedProperties properties = createOutputProperties(outputFile, true);
         if (targetIsStream) {
             properties.targetIsStream.setValue(true);
-            properties.fileName.setValue(new FileOutputStream(new File(outputFile)));
         }
         basicOutputTest(properties, refFile);
     }
@@ -169,18 +191,25 @@ public class FileDelimitedWriterTestIT extends FileDelimitedTestBasic {
     }
 
     protected void basicOutputTest(TFileOutputDelimitedProperties properties, String refFilePath) throws Throwable {
+
+        String fileName = properties.fileName.getStringValue();
+        if (properties.targetIsStream.getValue()) {
+            properties.fileName.setValue(new FileOutputStream(new File(fileName)));
+        }
         List<IndexedRecord> records = generateRecords(25);
         Result result = doWriteRows(properties, records);
 
         assertEquals(25, result.getTotalCount());
-        if (!properties.targetIsStream.getValue()) {
-            String outputFile = properties.fileName.getStringValue();
-            if (properties.compress.getValue()) {
-                outputFile = outputFile.substring(0, outputFile.lastIndexOf(".")) + ".zip";
-            }
-            assertTrue(FileRuntimeHelper.compareInTextMode(outputFile, refFilePath, getEncoding(properties.encoding)));
-            assertTrue(deleteFile(properties.fileName.getStringValue()));
+        String outputFile = fileName;
+        if (properties.compress.getValue()) {
+            outputFile = outputFile.substring(0, outputFile.lastIndexOf(".")) + ".zip";
         }
+        assertTrue(FileRuntimeHelper.compareInTextMode(outputFile, refFilePath, getEncoding(properties.encoding)));
+        // Need to close the stream firstly. then
+        if (properties.targetIsStream.getValue()) {
+            ((FileOutputStream) properties.fileName.getValue()).close();
+        }
+        assertTrue(deleteFile(fileName));
 
     }
 

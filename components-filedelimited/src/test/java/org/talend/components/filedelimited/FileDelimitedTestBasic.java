@@ -20,6 +20,7 @@ import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.DataRejectException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.internal.ComponentRegistry;
@@ -161,26 +162,34 @@ public class FileDelimitedTestBasic extends AbstractComponentTest {
         return wizardProperties;
     }
 
-    protected void printLogRecords(List<IndexedRecord> records) {
+    // Return the records are not rejected
+    protected List<IndexedRecord> printLogRecords(List<IndexedRecord> records) {
+        List<IndexedRecord> successRecords = new ArrayList<>();
         if (records != null) {
             StringBuffer sb = new StringBuffer();
             for (int index = 0; index < records.size(); index++) {
-                IndexedRecord record = records.get(index);
-                assertNotNull(record.getSchema());
-                int columnSize = record.getSchema().getFields().size();
-                for (int i = 0; i < columnSize; i++) {
-                    sb.append(record.get(i));
-                    if (i != columnSize - 1) {
-                        sb.append(" - ");
+                try {
+                    IndexedRecord record = records.get(index);
+                    assertNotNull(record.getSchema());
+                    int columnSize = record.getSchema().getFields().size();
+                    for (int i = 0; i < columnSize; i++) {
+                        sb.append(record.get(i));
+                        if (i != columnSize - 1) {
+                            sb.append(" - ");
+                        }
                     }
-                }
 
-                LOGGER.debug("Row " + (index + 1) + " :" + sb.toString());
-                sb.delete(0, sb.length());
+                    LOGGER.debug("Row " + (index + 1) + " :" + sb.toString());
+                    sb.delete(0, sb.length());
+                    successRecords.add(record);
+                } catch (DataRejectException dre) {
+                    LOGGER.debug("Row " + (index + 1) + " :" + dre.getRejectInfo().get("errorMessage"));
+                }
             }
         } else {
             LOGGER.debug("Records list is empty!");
         }
+        return successRecords;
     }
 
     // Returns the rows written (having been re-read so they have their Ids)
