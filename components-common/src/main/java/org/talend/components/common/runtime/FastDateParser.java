@@ -15,7 +15,7 @@ package org.talend.components.common.runtime;
 import java.util.Locale;
 
 /*
- * This is a cpty of routines.system.FastDateParser
+ * This is a copy of routines.system.FastDateParser
  */
 public class FastDateParser {
 

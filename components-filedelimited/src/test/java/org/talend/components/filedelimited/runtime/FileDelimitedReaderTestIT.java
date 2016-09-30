@@ -13,7 +13,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.filedelimited.FileDelimitedTestBasic;
 import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.avro.AvroUtils;
@@ -158,30 +157,65 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
 
     }
 
+    // Test FileInputDelimited component read anc check date
+    @Test(expected = RuntimeException.class)
+    public void testInputCheckDate() throws Throwable {
+        String resources = getClass().getResource("/runtime/input").getPath();
+        String inputFile = resources + "/test_input_check_date.csv";
+        LOGGER.debug("Test file path: " + inputFile);
+
+        TFileInputDelimitedProperties properties = createInputProperties(inputFile, false);
+        properties.dieOnError.setValue(true);
+        // "Check date" not check. This means "2016-18-06T15:31:07" with wrong month number would be parsed lenient
+        List<IndexedRecord> successRecords = printLogRecords(readRows(properties));
+        assertEquals(20, successRecords.size());
+
+        // "Check date" check. This means "2016-18-06T15:31:07" with wrong month number would throw exception
+        properties.checkDate.setValue(true);
+        try {
+            printLogRecords(readRows(properties));
+        } catch (Exception e) {
+            LOGGER.debug("Expect exception: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    // Test FileInputDelimited component read with delimited mode and die on error
     @Test(expected = NumberFormatException.class)
     public void testInputDieOnErrorDelimitedMode() throws Throwable {
         String resources = getClass().getResource("/runtime/input").getPath();
         String inputFile = resources + "/test_input_delimited_reject.csv";
         LOGGER.debug("Test file path: " + inputFile);
 
-        TFileInputDelimitedProperties properties = createWizaredProperties(createInputProperties(inputFile, false));
+        TFileInputDelimitedProperties properties = createInputProperties(inputFile, false);
         properties.dieOnError.setValue(true);
-        testInputReject(properties);
+        try {
+            testInputReject(properties);
+        } catch (Exception e) {
+            LOGGER.debug("Expect exception: " + e.getMessage());
+            throw e;
+        }
 
     }
 
-    @Test(expected = ComponentException.class)
+    // Test FileInputDelimited component read with CSV mode and die on error
+    @Test(expected = RuntimeException.class)
     public void testInputDieOnErrorCsvMode() throws Throwable {
         String resources = getClass().getResource("/runtime/input").getPath();
         String inputFile = resources + "/test_input_csv_reject.csv";
         LOGGER.debug("Test file path: " + inputFile);
 
-        TFileInputDelimitedProperties properties = createWizaredProperties(createInputProperties(inputFile, true));
+        TFileInputDelimitedProperties properties = createInputProperties(inputFile, true);
         properties.dieOnError.setValue(true);
-        testInputReject(properties);
-
+        try {
+            testInputReject(properties);
+        } catch (Exception e) {
+            LOGGER.debug("Expect exception: " + e.getMessage());
+            throw e;
+        }
     }
 
+    // Test FileInputDelimited component read with delimited mode and with reject
     @Test
     public void testInputRejectDelimitedMode() throws Throwable {
         String resources = getClass().getResource("/runtime/input").getPath();
@@ -190,6 +224,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         testInputReject(createWizaredProperties(createInputProperties(inputFile, false)));
     }
 
+    // Test FileInputDelimited component read with CSV mode and with reject
     @Test
     public void testInputRejectCsvMode() throws Throwable {
         String resources = getClass().getResource("/runtime/input").getPath();

@@ -47,6 +47,7 @@ public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedR
         this.properties = properties;
         schema = properties.main.schema.getValue();
         schema.addProp(ComponentConstants.DIE_ON_ERROR, properties.dieOnError.getStringValue());
+        schema.addProp(ComponentConstants.CHECK_DATE, properties.checkDate.getStringValue());
         inputRuntime = new FileInputDelimitedRuntime(properties);
 
     }
@@ -69,7 +70,8 @@ public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedR
         if (schema != null) {
             if (AvroUtils.isIncludeAllFields(schema)) {
                 schema = FileSourceOrSink.getDynamicSchema(values, "dynamicSchema", schema);
-                schema.addProp(ComponentConstants.DIE_ON_ERROR, properties.dieOnError.getValue());
+                schema.addProp(ComponentConstants.DIE_ON_ERROR, properties.dieOnError.getStringValue());
+                schema.addProp(ComponentConstants.CHECK_DATE, properties.checkDate.getStringValue());
             }
         } else {
             throw new IOException("Schema is not setup!");

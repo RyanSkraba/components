@@ -4,16 +4,14 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.commons.lang3.StringUtils;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.ComponentConstants;
 import org.talend.components.common.runtime.FormatterUtils;
+import org.talend.components.common.runtime.ParserUtils;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -252,22 +250,19 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
     public static class DateConverter extends StringConverter<Object> {
 
-        private final SimpleDateFormat format;
+        String pattern;
+
+        boolean isLenient;
 
         DateConverter(Schema.Field field) {
             super(field);
-            String pattern = field.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
-            format = new SimpleDateFormat(pattern);
+            pattern = field.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
+            isLenient = Boolean.parseBoolean(field.getProp(ComponentConstants.CHECK_DATE));
         }
 
         @Override
         public Long convertToAvro(String value) {
-            try {
-                return StringUtils.isEmpty(value) ? null : format.parse(value).getTime();
-            } catch (ParseException e) {
-                // For die one error and reject, only need throw the exception
-                throw new ComponentException(e);
-            }
+            return StringUtils.isEmpty(value) ? null : ParserUtils.parseToDate(value, pattern, !isLenient).getTime();
         }
 
         @Override
@@ -276,9 +271,9 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
                 return null;
             }
             if (value instanceof Date) {
-                return format.format((Date) value);
+                return FormatterUtils.formatDate(((Date) value), pattern);
             } else {
-                return format.format(new Date((Long) value));
+                return FormatterUtils.formatDate(new Date((Long) value), pattern);
             }
         }
 
@@ -331,7 +326,7 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
         @Override
         public String convertToDatum(byte[] value) {
             return value == null ? null
-                    : Charset.forName(field.getProp(ComponentConstants.FILE_ENCODING)).decode(ByteBuffer.wrap(value)).toString();
+                    : Charset.forName(field.getProp(ComponentConstants.CHARSET_NAME)).decode(ByteBuffer.wrap(value)).toString();
         }
 
     }

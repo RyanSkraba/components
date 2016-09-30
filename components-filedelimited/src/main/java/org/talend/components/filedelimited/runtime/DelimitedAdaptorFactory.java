@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.DataRejectException;
 import org.talend.components.common.ComponentConstants;
 import org.talend.daikon.avro.converter.AvroConverter;
@@ -67,6 +66,7 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<String[],
                 for (int j = 0; j < names.length; j++) {
                     Schema.Field f = getSchema().getFields().get(j);
                     names[j] = f.name();
+                    f.addProp(ComponentConstants.CHECK_DATE, getSchema().getProp(ComponentConstants.CHECK_DATE));
                     fieldConverter[j] = new FileDelimitedAvroRegistry().getConverter(f);
                 }
             }
@@ -78,19 +78,10 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<String[],
                     if (propValue != null && Boolean.valueOf(propValue)) {
                         throw e;
                     } else {
-                        if (e instanceof DataRejectException) {
-                            ((DataRejectException) e).getRejectInfo().put("talend_record", this);
-                            throw e;
-                        } else {
-                            Map<String, Object> resultMessage = new HashMap<String, Object>();
-                            if (e instanceof ComponentException && e.getClass() != null) {
-                                resultMessage.put("errorMessage", e.getCause().getMessage());
-                            } else {
-                                resultMessage.put("errorMessage", e.getMessage());
-                            }
-                            resultMessage.put("talend_record", this);
-                            throw new DataRejectException(resultMessage);
-                        }
+                        Map<String, Object> resultMessage = new HashMap<String, Object>();
+                        resultMessage.put("errorMessage", e.getMessage());
+                        resultMessage.put("talend_record", this);
+                        throw new DataRejectException(resultMessage);
                     }
                 }
             }

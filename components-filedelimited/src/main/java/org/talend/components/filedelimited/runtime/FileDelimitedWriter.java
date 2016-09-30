@@ -207,7 +207,7 @@ public class FileDelimitedWriter implements Writer<Result> {
     private IndexedRecordConverter<IndexedRecord, IndexedRecord> getFactory(Object datum) {
         if (factory == null) {
             factory = new FileDelimitedIndexedRecordConverter();
-            recordSchema.addProp(ComponentConstants.FILE_ENCODING, outputRuntime.encoding);
+            recordSchema.addProp(ComponentConstants.CHARSET_NAME, outputRuntime.encoding);
             if (props.advancedSeparator.getValue()) {
                 recordSchema.addProp(ComponentConstants.THOUSANDS_SEPARATOR, props.thousandsSeparator.getValue());
                 recordSchema.addProp(ComponentConstants.DECIMAL_SEPARATOR, props.decimalSeparator.getValue());

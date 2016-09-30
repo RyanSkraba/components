@@ -42,7 +42,7 @@ public class FileDelimitedIndexedRecordConverter extends GenericIndexedRecordCon
                 fieldConverter = new AvroConverter[names.length];
                 String thousandsSeparator = getSchema().getProp(ComponentConstants.THOUSANDS_SEPARATOR);
                 String decimalSeparator = getSchema().getProp(ComponentConstants.DECIMAL_SEPARATOR);
-                String encoding = getSchema().getProp(ComponentConstants.FILE_ENCODING);
+                String encoding = getSchema().getProp(ComponentConstants.CHARSET_NAME);
                 for (int j = 0; j < names.length; j++) {
                     Schema.Field f = getSchema().getFields().get(j);
                     names[j] = f.name();
@@ -53,7 +53,7 @@ public class FileDelimitedIndexedRecordConverter extends GenericIndexedRecordCon
                         f.addProp(ComponentConstants.DECIMAL_SEPARATOR, decimalSeparator);
                     }
                     if (encoding != null) {
-                        f.addProp(ComponentConstants.FILE_ENCODING, encoding);
+                        f.addProp(ComponentConstants.CHARSET_NAME, encoding);
                     }
                     fieldConverter[j] = FileDelimitedAvroRegistry.get().getConverter(f);
                 }
