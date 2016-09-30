@@ -16,11 +16,5 @@ import org.talend.components.api.test.AbstractComponentTest;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringTestApp.class)
 public class Spring${componentName}TestIT extends ${componentName}TestBase {
-    @Inject
-    private ComponentService componentService;
-
-    public ComponentService getComponentService(){
-        return componentService;
-    }
-    
+    //all test are to be found the parent classes    
 }
