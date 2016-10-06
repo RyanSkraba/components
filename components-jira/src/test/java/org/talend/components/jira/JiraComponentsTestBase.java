@@ -36,7 +36,7 @@ public class JiraComponentsTestBase extends AbstractComponentTest {
 
     @Test
     public void componentHasBeenRegistered() {
-        checkComponentIsRegistered(TJiraInputDefinition.COMPONENT_NAME);
-        checkComponentIsRegistered(TJiraOutputDefinition.COMPONENT_NAME);
+        assertComponentIsRegistered(TJiraInputDefinition.COMPONENT_NAME);
+        assertComponentIsRegistered(TJiraOutputDefinition.COMPONENT_NAME);
     }
 }

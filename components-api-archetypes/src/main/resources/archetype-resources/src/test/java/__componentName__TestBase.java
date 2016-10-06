@@ -23,6 +23,6 @@ public class ${componentName}TestBase extends AbstractComponentTest {
     
     @Test
     public void componentHasBeenRegistered(){
-        checkComponentIsRegistered("${componentName}");
+        assertComponentIsRegistered("${componentName}");
     }
 }

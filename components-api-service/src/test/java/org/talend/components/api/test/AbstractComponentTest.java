@@ -46,7 +46,7 @@ public abstract class AbstractComponentTest {
         ComponentTestUtils.testAllImages(getComponentService());
     }
 
-    protected void checkComponentIsRegistered(String componentName) {
+    protected void assertComponentIsRegistered(String componentName) {
         try {
             ComponentDefinition componentDefinition = getComponentService().getComponentDefinition(componentName);
             assertNotNull(componentDefinition);
