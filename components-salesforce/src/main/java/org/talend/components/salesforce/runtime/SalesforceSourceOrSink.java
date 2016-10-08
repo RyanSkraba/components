@@ -142,6 +142,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     }
 
     protected ConnectionHolder connect(RuntimeContainer container) throws IOException {
+        enableTLSv11AndTLSv12ForJava7();
 
         final ConnectionHolder ch = new ConnectionHolder();
         SalesforceConnectionProperties connProps = properties.getConnectionProperties();
@@ -231,6 +232,13 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             return ch;
         } catch (ConnectionException e) {
             throw new IOException(e);
+        }
+    }
+
+    private void enableTLSv11AndTLSv12ForJava7() {
+        String version = System.getProperty("java.version");
+        if (version != null && version.startsWith("1.7")) {
+            System.setProperty("https.protocols", "TLSv1.1,TLSv1.2");
         }
     }
 
