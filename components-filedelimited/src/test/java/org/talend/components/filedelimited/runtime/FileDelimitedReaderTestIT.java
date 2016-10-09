@@ -20,6 +20,7 @@ import org.talend.daikon.avro.AvroUtils;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
 
@@ -28,14 +29,17 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
     public static String[] ALL_FIELDS_NAME = new String[] { "TestBoolean", "TestByte", "TestBytes", "TestChar", "TestDate",
             "TestDouble", "TestFloat", "TestBigDecimal", "TestInteger", "TestLong", "TestObject" };
 
-    public static Schema DYNAMIC_IS_FIRST_SCHEMA = new org.apache.avro.Schema.Parser().parse(
+    public static Schema DYNAMIC_IS_FIRST_SCHEMA = new Schema.Parser().parse(
             "{\"type\":\"record\",\"name\":\"MAIN\",\"fields\":[{\"name\":\"test_end\",\"type\":[\"int\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"test_end\",\"di.column.talendType\":\"id_Integer\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"test_end\",\"di.column.relatedEntity\":\"\"}],\"di.table.name\":\"MAIN\",\"di.table.label\":\"MAIN\",\"di.dynamic.column.comment\":\"\",\"di.dynamic.column.name\":\"test_dynamic\",\"di.column.talendType\":\"id_Dynamic\",\"talend.field.pattern\":\"dd-MM-yyyy\",\"di.column.isNullable\":\"true\",\"talend.field.scale\":\"0\",\"talend.field.dbColumnName\":\"test_dynamic\",\"di.column.relatedEntity\":\"\",\"di.column.relationshipType\":\"\",\"di.dynamic.column.position\":\"0\",\"include-all-fields\":\"true\"}");
 
-    public static Schema DYNAMIC_IS_MID_SCHEMA = new org.apache.avro.Schema.Parser().parse(
+    public static Schema DYNAMIC_IS_MID_SCHEMA = new Schema.Parser().parse(
             "{\"type\":\"record\",\"name\":\"MAIN\",\"fields\":[{\"name\":\"test_begin\",\"type\":[\"int\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"test_begin\",\"di.column.talendType\":\"id_Integer\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"test_begin\",\"di.column.relatedEntity\":\"\"},{\"name\":\"test_end\",\"type\":[\"int\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"test_end\",\"di.column.talendType\":\"id_Integer\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"test_end\",\"di.column.relatedEntity\":\"\"}],\"di.table.name\":\"MAIN\",\"di.table.label\":\"MAIN\",\"di.dynamic.column.comment\":\"\",\"di.dynamic.column.name\":\"test_dynamic\",\"di.column.talendType\":\"id_Dynamic\",\"talend.field.pattern\":\"dd-MM-yyyy\",\"di.column.isNullable\":\"true\",\"talend.field.scale\":\"0\",\"talend.field.dbColumnName\":\"test_dynamic\",\"di.column.relatedEntity\":\"\",\"di.column.relationshipType\":\"\",\"di.dynamic.column.position\":\"1\",\"include-all-fields\":\"true\"}");
 
-    public static Schema DYNAMIC_IS_END_SCHEMA = new org.apache.avro.Schema.Parser().parse(
+    public static Schema DYNAMIC_IS_END_SCHEMA = new Schema.Parser().parse(
             "{\"type\":\"record\",\"name\":\"MAIN\",\"fields\":[{\"name\":\"test_begin\",\"type\":[\"int\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"test_begin\",\"di.column.talendType\":\"id_Integer\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"test_begin\",\"di.column.relatedEntity\":\"\"}],\"di.table.name\":\"MAIN\",\"di.table.label\":\"MAIN\",\"di.dynamic.column.comment\":\"\",\"di.dynamic.column.name\":\"test_dynamic\",\"di.column.talendType\":\"id_Dynamic\",\"talend.field.pattern\":\"dd-MM-yyyy\",\"di.column.isNullable\":\"true\",\"talend.field.scale\":\"0\",\"talend.field.dbColumnName\":\"test_dynamic\",\"di.column.relatedEntity\":\"\",\"di.column.relationshipType\":\"\",\"di.dynamic.column.position\":\"1\",\"include-all-fields\":\"true\"}");
+
+    public static Schema NUMBER_DECODE_SCHEMA = new Schema.Parser().parse(
+            "{\"type\":\"record\",\"name\":\"tFileInputDelimited_1\",\"fields\":[{\"name\":\"TestBoolean\",\"type\":[\"boolean\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"TestBoolean\",\"di.column.talendType\":\"id_Boolean\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"TestBoolean\",\"di.column.relatedEntity\":\"\"},{\"name\":\"TestByte\",\"type\":[{\"type\":\"int\",\"java-class\":\"java.lang.Byte\"},\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"TestByte\",\"di.column.talendType\":\"id_Byte\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"TestByte\",\"di.column.relatedEntity\":\"\"},{\"name\":\"TestShort\",\"type\":[{\"type\":\"int\",\"java-class\":\"java.lang.Short\"},\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"TestShort\",\"di.column.talendType\":\"id_Short\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"dd-MM-yyyy\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"TestShort\",\"di.column.relatedEntity\":\"\"},{\"name\":\"TestInteger\",\"type\":[\"int\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"TestInteger\",\"di.column.talendType\":\"id_Integer\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"TestInteger\",\"di.column.relatedEntity\":\"\"},{\"name\":\"TestLong\",\"type\":[\"long\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"TestLong\",\"di.column.talendType\":\"id_Long\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"TestLong\",\"di.column.relatedEntity\":\"\"}],\"di.table.name\":\"tFileInputDelimited_1\",\"di.table.label\":\"tFileInputDelimited_1\"}");
 
     // Test FileInputDelimited component read with delimited mode
     @Test
@@ -154,6 +158,96 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
                 AvroUtils.isSameType(AvroUtils.wrapAsNullable(AvroUtils._int()), schemaDynamicInEnd.getFields().get(0).schema()));
         Assert.assertEquals("TestObject", schemaDynamicInEnd.getFields().get(10).name());
         Assert.assertTrue(AvroUtils.isSameType(AvroUtils._string(), schemaDynamicInEnd.getFields().get(10).schema()));
+
+    }
+
+    @Test
+    public void testInputDecodeDelimitedMode() throws Throwable {
+        String resources = getClass().getResource("/runtime/input").getPath();
+        String inputFile = resources + "/test_input_decode.csv";
+        LOGGER.debug("Test file path: " + inputFile);
+
+        TFileInputDelimitedProperties properties = createInputProperties(inputFile, false);
+        properties.main.schema.setValue(NUMBER_DECODE_SCHEMA);
+        properties.dieOnError.setValue(true);
+
+        // 1. Test enable decode
+        properties.enableDecode.setValue(true);
+
+        java.util.List<String> columnsName = new java.util.ArrayList<String>();
+        columnsName.add("TestBoolean");
+        columnsName.add("TestByte");
+        columnsName.add("TestShort");
+        columnsName.add("TestInteger");
+        columnsName.add("TestLong");
+        properties.decodeTable.setValue("columnName", columnsName);
+        java.util.List<Boolean> decodes = new java.util.ArrayList<Boolean>();
+        decodes.add(false);
+        decodes.add(true);
+        decodes.add(true);
+        decodes.add(true);
+        decodes.add(true);
+        properties.decodeTable.setValue("decode", decodes);
+
+        List<IndexedRecord> records = readRows(properties);
+        assertEquals(4, records.size());
+        List<IndexedRecord> successRecords = printLogRecords(records);
+        assertEquals(4, successRecords.size());
+
+        assertEquals(false, records.get(0).get(0));
+        // Decode OctalDigits "010"
+        assertEquals(Byte.valueOf("8"), records.get(0).get(1));
+        // Decode OctalDigits "0100"
+        assertEquals(Short.valueOf("64"), records.get(0).get(2));
+        // Decode OctalDigits "01000"
+        assertEquals(512, records.get(0).get(3));
+        // Decode OctalDigits "010000"
+        assertEquals(4096L, records.get(0).get(4));
+
+        assertEquals(true, records.get(3).get(0));
+        // Decode HexDigits "0X18"
+        assertEquals(Byte.valueOf("24"), records.get(3).get(1));
+        // Decode HexDigits "0X188"
+        assertEquals(Short.valueOf("392"), records.get(3).get(2));
+        // Decode HexDigits "0X1888"
+        assertEquals(6280, records.get(3).get(3));
+        // Decode HexDigits "0X18888"
+        assertEquals(100488L, records.get(3).get(4));
+
+        // 2. Test disable decode and disable "die on error"
+        properties.dieOnError.setValue(false);
+        properties.enableDecode.setValue(false);
+        records = readRows(properties);
+        assertEquals(4, records.size());
+        successRecords = printLogRecords(records);
+        assertEquals(1, successRecords.size());
+
+        try {
+            // 3. Test disable decode and enable "die on error"
+            properties.dieOnError.setValue(true);
+            records = readRows(properties);
+            assertEquals(4, records.size());
+            printLogRecords(records);
+            fail("Expect get NumberFormatException !");
+        } catch (Exception e) {
+            // "TestByte" parse value "0X10" fails
+            LOGGER.debug(e.getMessage());
+            assertEquals(NumberFormatException.class, e.getClass());
+        }
+
+        try {
+            // 3. Test enable decode, enable "die on error" and disable "TestInteger" decode
+            properties.enableDecode.setValue(true);
+            decodes.add(3, false);
+            records = readRows(properties);
+            assertEquals(4, records.size());
+            printLogRecords(records);
+            fail("Expect get NumberFormatException !");
+        } catch (Exception e) {
+            // "TestInteger" parse value "0X1000" fails
+            LOGGER.debug(e.getMessage());
+            assertEquals(NumberFormatException.class, e.getClass());
+        }
 
     }
 

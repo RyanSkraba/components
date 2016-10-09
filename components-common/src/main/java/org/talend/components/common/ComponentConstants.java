@@ -31,4 +31,9 @@ public class ComponentConstants {
      */
     public final static String CHECK_DATE = "check.date";
 
+    /**
+     * Specify whether or not decode the number string (decimal, hexadecimal, and octal numbers)
+     */
+    public final static String NUMBER_DECODE = "number.decode";
+
 }

@@ -48,6 +48,7 @@ public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedR
         schema = properties.main.schema.getValue();
         schema.addProp(ComponentConstants.DIE_ON_ERROR, properties.dieOnError.getStringValue());
         schema.addProp(ComponentConstants.CHECK_DATE, properties.checkDate.getStringValue());
+        setupDecodeProps(schema, properties);
         inputRuntime = new FileInputDelimitedRuntime(properties);
 
     }
@@ -70,8 +71,6 @@ public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedR
         if (schema != null) {
             if (AvroUtils.isIncludeAllFields(schema)) {
                 schema = FileSourceOrSink.getDynamicSchema(values, "dynamicSchema", schema);
-                schema.addProp(ComponentConstants.DIE_ON_ERROR, properties.dieOnError.getStringValue());
-                schema.addProp(ComponentConstants.CHECK_DATE, properties.checkDate.getStringValue());
             }
         } else {
             throw new IOException("Schema is not setup!");
@@ -84,6 +83,19 @@ public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedR
             factory.setSchema(schema);
         }
         return factory;
+    }
+
+    /**
+     * Add decode property for field base on the decode table
+     */
+    protected void setupDecodeProps(Schema schema, TFileInputDelimitedProperties properties) {
+        if (schema != null && properties != null && properties.enableDecode.getValue()) {
+            List<Boolean> decodeSelect = properties.decodeTable.decode.getValue();
+            for (Schema.Field field : schema.getFields()) {
+                field.addProp(ComponentConstants.NUMBER_DECODE,
+                        String.valueOf(decodeSelect != null && decodeSelect.get(field.pos())));
+            }
+        }
     }
 
 }

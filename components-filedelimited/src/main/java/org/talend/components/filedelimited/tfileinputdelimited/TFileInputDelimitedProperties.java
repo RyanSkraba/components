@@ -11,7 +11,7 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.SchemaProperties;
-import org.talend.components.common.ValuesTrimPropertis;
+import org.talend.components.common.ValuesTrimProperties;
 import org.talend.components.filedelimited.DecodeTable;
 import org.talend.components.filedelimited.FileDelimitedProperties;
 import org.talend.daikon.avro.SchemaConstants;
@@ -49,7 +49,7 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
 
     public Property<Integer> nbRandom = PropertyFactory.newInteger("nbRandom");
 
-    public ValuesTrimPropertis trimColumns = new ValuesTrimPropertis("trimColumns");
+    public ValuesTrimProperties trimColumns = new ValuesTrimProperties("trimColumns");
 
     public Property<Boolean> checkFieldsNum = PropertyFactory.newBoolean("checkFieldsNum");
 

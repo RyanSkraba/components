@@ -1,0 +1,5 @@
+TestBoolean;TestByte;TestShort;TestInteger;TestLong
+false;010;0100;01000;010000
+false;0X10;0X100;0X1000;0X10000
+false;0X16;0X166;0X1666;0X16666
+true;0X18;0X188;0X1888;0X18888

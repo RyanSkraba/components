@@ -92,6 +92,8 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
             return new BytesConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._byte())) {
             return new ByteConverter(f);
+        } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._short())) {
+            return new ShortConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._character())) {
             return new CharacterConverter(f);
         } else if (AvroUtils.isSameType(fieldSchema, AvroUtils._string())) {
@@ -128,8 +130,11 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
         private final Schema.Field field;
 
+        protected boolean isDecode;
+
         NumberConverter(Schema.Field field) {
             this.field = field;
+            this.isDecode = Boolean.valueOf(field.getProp(ComponentConstants.NUMBER_DECODE));
         }
 
         @Override
@@ -190,13 +195,7 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
         @Override
         public Boolean convertToAvro(String value) {
-            if (value == null) {
-                return null;
-            }
-            if (value.equals("1")) {
-                return Boolean.parseBoolean("true");
-            }
-            return Boolean.parseBoolean(value);
+            return ParserUtils.parseToBoolean(value);
         }
     }
 
@@ -232,7 +231,7 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
         @Override
         public Long convertToAvro(String value) {
-            return StringUtils.isEmpty(value) ? null : Long.parseLong(value);
+            return StringUtils.isEmpty(value) ? null : ParserUtils.parseToLong(value, isDecode);
         }
     }
 
@@ -287,7 +286,19 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
         @Override
         public Integer convertToAvro(String value) {
-            return StringUtils.isEmpty(value) ? null : Integer.parseInt(value);
+            return StringUtils.isEmpty(value) ? null : ParserUtils.parseToInteger(value, isDecode);
+        }
+    }
+
+    public static class ShortConverter extends NumberConverter<Short> {
+
+        ShortConverter(Schema.Field field) {
+            super(field);
+        }
+
+        @Override
+        public Short convertToAvro(String value) {
+            return StringUtils.isEmpty(value) ? null : ParserUtils.parseToShort(value, isDecode);
         }
     }
 
@@ -299,16 +310,7 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
         @Override
         public Byte convertToAvro(String value) {
-            if (StringUtils.isEmpty(value)) {
-                return null;
-            }
-            // TODO is decode
-            boolean isDecode = false;
-            if (isDecode) {
-                return Byte.decode(value).byteValue();
-            } else {
-                return Byte.parseByte(value);
-            }
+            return StringUtils.isEmpty(value) ? null : ParserUtils.parseToByte(value, isDecode);
         }
     }
 
