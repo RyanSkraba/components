@@ -129,12 +129,16 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
     public static abstract class NumberConverter<T> implements AvroConverter<String, T> {
 
         private final Schema.Field field;
+        private final Character thousandsSepChar;
+        private final Character decimalSepChar;
 
         protected boolean isDecode;
 
         NumberConverter(Schema.Field field) {
             this.field = field;
             this.isDecode = Boolean.valueOf(field.getProp(ComponentConstants.NUMBER_DECODE));
+            this.thousandsSepChar = ParserUtils.parseToCharacter(field.getProp(ComponentConstants.THOUSANDS_SEPARATOR));
+            this.decimalSepChar = ParserUtils.parseToCharacter(field.getProp(ComponentConstants.DECIMAL_SEPARATOR));
         }
 
         @Override
@@ -153,16 +157,7 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
             if (value == null) {
                 return null;
             }
-            Character thousandsSepChar = null;
-            Character decimalSepChar = null;
-            String thousandsSepString = field.getProp(ComponentConstants.THOUSANDS_SEPARATOR);
-            String decimalSepString = field.getProp(ComponentConstants.DECIMAL_SEPARATOR);
-            if (thousandsSepString != null) {
-                thousandsSepChar = thousandsSepString.charAt(0);
-            }
-            if (decimalSepString != null) {
-                decimalSepChar = decimalSepString.charAt(0);
-            }
+
             if (thousandsSepChar != null || decimalSepChar != null) {
                 return FormatterUtils.formatNumber(new BigDecimal(String.valueOf(value)).toPlainString(), thousandsSepChar,
                         decimalSepChar);
@@ -185,6 +180,15 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
             }
         }
 
+        /**
+         * Transform number string with thousandsSepChar and decimalSepChar
+         */
+        protected String transformNumberString(String value) {
+            if (thousandsSepChar != null && decimalSepChar != null) {
+                return ParserUtils.transformNumberString(value, thousandsSepChar, decimalSepChar);
+            }
+            return value;
+        }
     }
 
     public static class BooleanConverter extends StringConverter<Boolean> {
@@ -207,7 +211,7 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
         @Override
         public BigDecimal convertToAvro(String value) {
-            return StringUtils.isEmpty(value) ? null : new BigDecimal(value);
+            return StringUtils.isEmpty(value) ? null : new BigDecimal(transformNumberString(value));
         }
     }
 
@@ -219,7 +223,7 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
         @Override
         public Double convertToAvro(String value) {
-            return StringUtils.isEmpty(value) ? null : Double.parseDouble(value);
+            return StringUtils.isEmpty(value) ? null : Double.parseDouble(transformNumberString(value));
         }
     }
 
@@ -231,7 +235,7 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
         @Override
         public Long convertToAvro(String value) {
-            return StringUtils.isEmpty(value) ? null : ParserUtils.parseToLong(value, isDecode);
+            return StringUtils.isEmpty(value) ? null : ParserUtils.parseToLong(transformNumberString(value), isDecode);
         }
     }
 
@@ -243,7 +247,7 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
         @Override
         public Float convertToAvro(String value) {
-            return StringUtils.isEmpty(value) ? null : Float.parseFloat(value);
+            return StringUtils.isEmpty(value) ? null : Float.parseFloat(transformNumberString(value));
         }
     }
 
@@ -286,7 +290,7 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
         @Override
         public Integer convertToAvro(String value) {
-            return StringUtils.isEmpty(value) ? null : ParserUtils.parseToInteger(value, isDecode);
+            return StringUtils.isEmpty(value) ? null : ParserUtils.parseToInteger(transformNumberString(value), isDecode);
         }
     }
 
@@ -298,7 +302,7 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
         @Override
         public Short convertToAvro(String value) {
-            return StringUtils.isEmpty(value) ? null : ParserUtils.parseToShort(value, isDecode);
+            return StringUtils.isEmpty(value) ? null : ParserUtils.parseToShort(transformNumberString(value), isDecode);
         }
     }
 
@@ -306,11 +310,15 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
         ByteConverter(Schema.Field field) {
             super(field);
+            // This is for migration in TDI-29759
+            if (field.getProp(ComponentConstants.NUMBER_DECODE) == null) {
+                isDecode = true;
+            }
         }
 
         @Override
         public Byte convertToAvro(String value) {
-            return StringUtils.isEmpty(value) ? null : ParserUtils.parseToByte(value, isDecode);
+            return StringUtils.isEmpty(value) ? null : ParserUtils.parseToByte(transformNumberString(value), isDecode);
         }
     }
 

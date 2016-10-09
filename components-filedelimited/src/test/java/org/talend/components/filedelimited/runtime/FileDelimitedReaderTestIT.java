@@ -162,7 +162,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
     }
 
     @Test
-    public void testInputDecodeDelimitedMode() throws Throwable {
+    public void testInputDecodeNumber() throws Throwable {
         String resources = getClass().getResource("/runtime/input").getPath();
         String inputFile = resources + "/test_input_decode.csv";
         LOGGER.debug("Test file path: " + inputFile);
@@ -195,23 +195,23 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         assertEquals(4, successRecords.size());
 
         assertEquals(false, records.get(0).get(0));
-        // Decode OctalDigits "010"
+        // Decode OctalDigits "010" for Byte type
         assertEquals(Byte.valueOf("8"), records.get(0).get(1));
-        // Decode OctalDigits "0100"
+        // Decode OctalDigits "0100" for Short type
         assertEquals(Short.valueOf("64"), records.get(0).get(2));
-        // Decode OctalDigits "01000"
+        // Decode OctalDigits "01000" for Integer type
         assertEquals(512, records.get(0).get(3));
-        // Decode OctalDigits "010000"
+        // Decode OctalDigits "010000" for Long type
         assertEquals(4096L, records.get(0).get(4));
 
         assertEquals(true, records.get(3).get(0));
-        // Decode HexDigits "0X18"
+        // Decode HexDigits "0X18" for Byte type
         assertEquals(Byte.valueOf("24"), records.get(3).get(1));
-        // Decode HexDigits "0X188"
+        // Decode HexDigits "0X188" for Short type
         assertEquals(Short.valueOf("392"), records.get(3).get(2));
-        // Decode HexDigits "0X1888"
+        // Decode HexDigits "0X1888" for Integer type
         assertEquals(6280, records.get(3).get(3));
-        // Decode HexDigits "0X18888"
+        // Decode HexDigits "0X18888" for Long type
         assertEquals(100488L, records.get(3).get(4));
 
         // 2. Test disable decode and disable "die on error"
@@ -230,7 +230,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
             printLogRecords(records);
             fail("Expect get NumberFormatException !");
         } catch (Exception e) {
-            // "TestByte" parse value "0X10" fails
+            // "TestByte" parse value "0X100" fails
             LOGGER.debug(e.getMessage());
             assertEquals(NumberFormatException.class, e.getClass());
         }
@@ -248,6 +248,65 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
             LOGGER.debug(e.getMessage());
             assertEquals(NumberFormatException.class, e.getClass());
         }
+
+    }
+
+    @Test
+    public void testInputTransformNumberString() throws Throwable {
+        String resources = getClass().getResource("/runtime/input").getPath();
+        String inputFile = resources + "/test_input_transform_number.csv";
+        LOGGER.debug("Test file path: " + inputFile);
+
+        TFileInputDelimitedProperties properties = createInputProperties(inputFile, false);
+        properties.main.schema.setValue(NUMBER_DECODE_SCHEMA);
+        properties.dieOnError.setValue(true);
+        properties.enableDecode.setValue(true);
+
+        java.util.List<String> columnsName = new java.util.ArrayList<String>();
+        columnsName.add("TestBoolean");
+        columnsName.add("TestByte");
+        columnsName.add("TestShort");
+        columnsName.add("TestInteger");
+        columnsName.add("TestLong");
+        properties.decodeTable.setValue("columnName", columnsName);
+        java.util.List<Boolean> decodes = new java.util.ArrayList<Boolean>();
+        decodes.add(false);
+        decodes.add(true);
+        decodes.add(true);
+        decodes.add(true);
+        decodes.add(true);
+        properties.decodeTable.setValue("decode", decodes);
+
+        // Default thousandsSeparator and decimalSeparator setting is disabled
+        try {
+            List<IndexedRecord> records = readRows(properties);
+            assertEquals(4, records.size());
+            printLogRecords(records);
+            fail("Expect get NumberFormatException !");
+        } catch (Exception e) {
+            // "TestInteger" parse value "01,000" fails
+            LOGGER.debug(e.getMessage());
+            assertEquals(NumberFormatException.class, e.getClass());
+        }
+
+        // Enable thousandsSeparator and decimalSeparator setting
+        properties.advancedSeparator.setValue(true);
+        properties.thousandsSeparator.setValue(",");
+        properties.decimalSeparator.setValue(".");
+        List<IndexedRecord> records = readRows(properties);
+        assertEquals(4, records.size());
+        List<IndexedRecord> successRecords = printLogRecords(records);
+        assertEquals(4, successRecords.size());
+
+        assertEquals(true, records.get(3).get(0));
+        // Decode HexDigits "0X18"
+        assertEquals(Byte.valueOf("24"), records.get(3).get(1));
+        // Decode HexDigits and transform 0X1,888 for Short type
+        assertEquals(Short.valueOf("6280"), records.get(3).get(2));
+        // Decode HexDigits and transform "0X18,888" for Integer type
+        assertEquals(100488, records.get(3).get(3));
+        // Decode HexDigits and transform "0X188,888" for Long type
+        assertEquals(1607816L, records.get(3).get(4));
 
     }
 

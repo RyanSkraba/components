@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.component.runtime.Result;
@@ -46,9 +47,7 @@ public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedR
         this.container = container;
         this.properties = properties;
         schema = properties.main.schema.getValue();
-        schema.addProp(ComponentConstants.DIE_ON_ERROR, properties.dieOnError.getStringValue());
-        schema.addProp(ComponentConstants.CHECK_DATE, properties.checkDate.getStringValue());
-        setupDecodeProps(schema, properties);
+        setupSchemaProps(schema, properties);
         inputRuntime = new FileInputDelimitedRuntime(properties);
 
     }
@@ -80,21 +79,38 @@ public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedR
     protected IndexedRecordConverter getFactory() throws IOException {
         if (factory == null) {
             factory = new DelimitedAdaptorFactory();
+
             factory.setSchema(schema);
         }
         return factory;
     }
 
-    /**
-     * Add decode property for field base on the decode table
-     */
-    protected void setupDecodeProps(Schema schema, TFileInputDelimitedProperties properties) {
-        if (schema != null && properties != null && properties.enableDecode.getValue()) {
+    protected void setupSchemaProps(Schema schema, TFileInputDelimitedProperties properties) {
+        if (schema != null && properties != null) {
+            schema.addProp(ComponentConstants.DIE_ON_ERROR, properties.dieOnError.getStringValue());
+
             List<Boolean> decodeSelect = properties.decodeTable.decode.getValue();
-            for (Schema.Field field : schema.getFields()) {
-                field.addProp(ComponentConstants.NUMBER_DECODE,
-                        String.valueOf(decodeSelect != null && decodeSelect.get(field.pos())));
+            if (properties.advancedSeparator.getValue()) {
+                if (StringUtils.isEmpty(properties.thousandsSeparator.getValue())
+                        || StringUtils.isEmpty(properties.decimalSeparator.getValue())) {
+                    throw new IllegalArgumentException("Thousands separator and decimal separator must be specified!");
+                }
             }
+            for (Schema.Field field : schema.getFields()) {
+                // Whether check date
+                field.addProp(ComponentConstants.CHECK_DATE, properties.checkDate.getStringValue());
+                // Add decode property for field base on the decode table
+                if (properties.enableDecode.getValue()) {
+                    field.addProp(ComponentConstants.NUMBER_DECODE,
+                            String.valueOf(decodeSelect != null && decodeSelect.get(field.pos())));
+                }
+                // Whether need to transform number string
+                if (properties.advancedSeparator.getValue()) {
+                    field.addProp(ComponentConstants.THOUSANDS_SEPARATOR, properties.thousandsSeparator.getStringValue());
+                    field.addProp(ComponentConstants.DECIMAL_SEPARATOR, properties.decimalSeparator.getStringValue());
+                }
+            }
+
         }
     }
 

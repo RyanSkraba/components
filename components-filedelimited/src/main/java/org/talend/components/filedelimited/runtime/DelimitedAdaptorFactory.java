@@ -66,7 +66,6 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<String[],
                 for (int j = 0; j < names.length; j++) {
                     Schema.Field f = getSchema().getFields().get(j);
                     names[j] = f.name();
-                    f.addProp(ComponentConstants.CHECK_DATE, getSchema().getProp(ComponentConstants.CHECK_DATE));
                     fieldConverter[j] = new FileDelimitedAvroRegistry().getConverter(f);
                 }
             }
