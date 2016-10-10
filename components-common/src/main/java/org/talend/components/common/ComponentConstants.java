@@ -36,4 +36,9 @@ public class ComponentConstants {
      */
     public final static String NUMBER_DECODE = "number.decode";
 
+    /**
+     * Specify whether or not trim the field value
+     */
+    public final static String TRIM_FIELD_VALUE = "trim.field.value";
+
 }

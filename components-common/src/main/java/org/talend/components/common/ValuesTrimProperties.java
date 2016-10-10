@@ -46,11 +46,6 @@ public class ValuesTrimProperties extends ComponentPropertiesImpl {
     public void beforeTrimTable() {
         if (fieldNames != null && fieldNames.size() > 0) {
             trimTable.columnName.setValue(fieldNames);
-            List<Boolean> trimValues = new ArrayList<>();
-            for (int i = fieldNames.size(); i > 0; i--) {
-                trimValues.add(Boolean.FALSE);
-            }
-            trimTable.trim.setValue(trimValues);
         }
     }
 

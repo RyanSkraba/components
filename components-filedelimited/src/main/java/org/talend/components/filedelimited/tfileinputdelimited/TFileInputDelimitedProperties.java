@@ -172,11 +172,6 @@ public class TFileInputDelimitedProperties extends FileDelimitedProperties {
         List<String> fieldNames = trimColumns.getFieldNames();
         if (fieldNames != null && fieldNames.size() > 0) {
             decodeTable.columnName.setValue(fieldNames);
-            List<Boolean> decodeValueList = new ArrayList<>();
-            for (int i = fieldNames.size(); i > 0; i--) {
-                decodeValueList.add(Boolean.FALSE);
-            }
-            decodeTable.decode.setValue(decodeValueList);
         }
     }
 

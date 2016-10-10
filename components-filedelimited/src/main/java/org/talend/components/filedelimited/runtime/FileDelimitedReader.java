@@ -90,6 +90,7 @@ public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedR
             schema.addProp(ComponentConstants.DIE_ON_ERROR, properties.dieOnError.getStringValue());
 
             List<Boolean> decodeSelect = properties.decodeTable.decode.getValue();
+            List<Boolean> trimSelect = properties.trimColumns.trimTable.trim.getValue();
             if (properties.advancedSeparator.getValue()) {
                 if (StringUtils.isEmpty(properties.thousandsSeparator.getValue())
                         || StringUtils.isEmpty(properties.decimalSeparator.getValue())) {
@@ -109,6 +110,9 @@ public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedR
                     field.addProp(ComponentConstants.THOUSANDS_SEPARATOR, properties.thousandsSeparator.getStringValue());
                     field.addProp(ComponentConstants.DECIMAL_SEPARATOR, properties.decimalSeparator.getStringValue());
                 }
+                // Whether need to trim the field value
+                field.addProp(ComponentConstants.TRIM_FIELD_VALUE, String.valueOf(
+                        properties.trimColumns.trimAll.getValue() || (trimSelect != null && trimSelect.get(field.pos()))));
             }
 
         }

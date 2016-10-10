@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.talend.components.api.exception.DataRejectException;
 import org.talend.components.common.ComponentConstants;
 import org.talend.daikon.avro.converter.AvroConverter;
@@ -52,7 +53,7 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<String[],
             throw new UnsupportedOperationException();
         }
 
-        private String names[];
+        private boolean trimValues[];
 
         AvroConverter[] fieldConverter = null;
 
@@ -60,21 +61,23 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<String[],
         public Object get(int index) {
             // Lazy initialization of the cached converter objects.
             Object value = null;
-            if (names == null) {
-                names = new String[getSchema().getFields().size()];
-                fieldConverter = new AvroConverter[names.length];
-                for (int j = 0; j < names.length; j++) {
+            if (trimValues == null) {
+                trimValues = new boolean[getSchema().getFields().size()];
+                fieldConverter = new AvroConverter[trimValues.length];
+                for (int j = 0; j < trimValues.length; j++) {
                     Schema.Field f = getSchema().getFields().get(j);
-                    names[j] = f.name();
                     fieldConverter[j] = new FileDelimitedAvroRegistry().getConverter(f);
+                    trimValues[j] = Boolean.parseBoolean(f.getProp(ComponentConstants.TRIM_FIELD_VALUE));
                 }
             }
             if (index < values.length) {
                 try {
+                    if (trimValues[index] && !StringUtils.isEmpty(values[index])) {
+                        values[index] = values[index].trim();
+                    }
                     value = fieldConverter[index].convertToAvro(values[index]);
                 } catch (Exception e) {
-                    String propValue = getSchema().getProp(ComponentConstants.DIE_ON_ERROR);
-                    if (propValue != null && Boolean.valueOf(propValue)) {
+                    if (Boolean.parseBoolean(getSchema().getProp(ComponentConstants.DIE_ON_ERROR))) {
                         throw e;
                     } else {
                         Map<String, Object> resultMessage = new HashMap<String, Object>();

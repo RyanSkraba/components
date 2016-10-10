@@ -129,7 +129,9 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
     public static abstract class NumberConverter<T> implements AvroConverter<String, T> {
 
         private final Schema.Field field;
+
         private final Character thousandsSepChar;
+
         private final Character decimalSepChar;
 
         protected boolean isDecode;
@@ -265,7 +267,15 @@ public class FileDelimitedAvroRegistry extends AvroRegistry {
 
         @Override
         public Long convertToAvro(String value) {
-            return StringUtils.isEmpty(value) ? null : ParserUtils.parseToDate(value, pattern, !isLenient).getTime();
+            Date date = null;
+            if (!StringUtils.isEmpty(value)) {
+                date = ParserUtils.parseToDate(value, pattern, !isLenient);
+            }
+            if (date != null) {
+                return date.getTime();
+            } else {
+                return null;
+            }
         }
 
         @Override

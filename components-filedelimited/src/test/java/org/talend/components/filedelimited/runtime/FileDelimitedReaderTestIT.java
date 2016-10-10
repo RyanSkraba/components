@@ -19,6 +19,7 @@ import org.talend.daikon.avro.AvroUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -308,6 +309,76 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         // Decode HexDigits and transform "0X188,888" for Long type
         assertEquals(1607816L, records.get(3).get(4));
 
+    }
+
+    // Test FileInputDelimited component read with delimited mode and trim function
+    @Test
+    public void testInputTrimDelimitedMode() throws Throwable {
+        testInputTrim(false);
+    }
+
+    // Test FileInputDelimited component read with delimited mode and trim function
+    @Test
+    public void testInputTrimCSVdMode() throws Throwable {
+        testInputTrim(true);
+    }
+
+    protected void testInputTrim(boolean isCsvMode) throws Throwable {
+        String resources = getClass().getResource("/runtime/input").getPath();
+        String inputFile = resources + "/test_input_trim.csv";
+        LOGGER.debug("Test file path: " + inputFile);
+
+        TFileInputDelimitedProperties properties = createInputProperties(inputFile, isCsvMode);
+
+        List<IndexedRecord> records = readRows(properties);
+        assertEquals(20, records.size());
+        List<IndexedRecord> successRecords = printLogRecords(records);
+        assertEquals(14, successRecords.size());
+        // "true " for TestBoolean, would parse to false
+        assertEquals(false, records.get(0).get(0));
+        // " " for TestBytes
+        assertEquals("   ", new String((byte[]) records.get(2).get(2)));
+        // " I" for TestChar
+        assertEquals(" ".charAt(0), records.get(3).get(3));
+        // " " for TestDate, Date parser trim date string automatically
+        assertNull(records.get(4).get(4));
+        // " " for TestObject
+        assertEquals("   ", new String((byte[]) records.get(10).get(10)));
+        properties.dieOnError.setValue(true);
+        try {
+            printLogRecords(readRows(properties));
+            fail("Expect get NumberFormatException !");
+        } catch (Exception e) {
+            LOGGER.debug("Expect exception: " + e.getMessage());
+        }
+
+        properties.trimColumns.trimAll.setValue(true);
+        records = readRows(properties);
+        assertEquals(20, records.size());
+        successRecords = printLogRecords(records);
+        assertEquals(20, successRecords.size());
+        // "true " for TestBoolean. Would parse to true after trim
+        assertEquals(true, records.get(0).get(0));
+        // " " for TestByte
+        assertNull(records.get(1).get(1));
+        // " " for TestBytes
+        assertNull(records.get(2).get(2));
+        // " I" for TestChar
+        assertEquals('I', records.get(3).get(3));
+        // " " for TestDate, Date parser trim date string automatically
+        assertNull(records.get(4).get(4));
+        // " " for TestDouble
+        assertNull(records.get(5).get(5));
+        // " " for TestFloat
+        assertNull(records.get(6).get(6));
+        // " " for TestBigDecimal
+        assertNull(records.get(7).get(7));
+        // " " for TestInteger
+        assertNull(records.get(8).get(8));
+        // " " for TestLong
+        assertNull(records.get(9).get(9));
+        // " " for TestObject
+        assertNull(records.get(10).get(10));
     }
 
     // Test FileInputDelimited component read anc check date

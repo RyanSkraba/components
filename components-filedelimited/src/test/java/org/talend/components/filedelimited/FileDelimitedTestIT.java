@@ -256,8 +256,6 @@ public class FileDelimitedTestIT extends FileDelimitedTestBasic {
 
         assertNotNull(input.trimColumns.trimTable.columnName.getValue());
         assertEquals(Arrays.asList("Id", "Name", "Age"), input.trimColumns.trimTable.columnName.getValue());
-        assertNotNull(input.trimColumns.trimTable.trim.getValue());
-        assertEquals(3, input.trimColumns.trimTable.trim.getValue().size());
 
         // Decode table
         input.enableDecode.setValue(true);
@@ -266,8 +264,6 @@ public class FileDelimitedTestIT extends FileDelimitedTestBasic {
 
         assertNotNull(input.decodeTable.columnName.getValue());
         assertEquals(Arrays.asList("Id", "Name", "Age"), input.decodeTable.columnName.getValue());
-        assertNotNull(input.decodeTable.decode.getValue());
-        assertEquals(3, input.decodeTable.decode.getValue().size());
     }
 
     protected void testWizardProperties() throws Throwable {
