@@ -96,7 +96,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         }
     }
 
-    private static SandboxedInstance createSandboxedInstance(RuntimeInfo runtimeInfo, ClassLoader parentClassLoader) {
+    public static SandboxedInstance createSandboxedInstance(RuntimeInfo runtimeInfo, ClassLoader parentClassLoader) {
         return SandboxInstanceFactory.createSandboxedInstance(runtimeInfo.getRuntimeClassName(),
                 runtimeInfo.getMavenUrlDependencies(), parentClassLoader, true);
     }
