@@ -13,6 +13,10 @@
 package org.talend.components.salesforce;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
+import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.RuntimeInfo;
+import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
+import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.property.Property;
 
@@ -39,12 +43,10 @@ public abstract class SalesforceDefinition extends AbstractComponentDefinition {
         return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP };
     }
 
-    public String getMavenGroupId() {
-        return "org.talend.components";
-    }
-
-    public String getMavenArtifactId() {
-        return "components-salesforce";
+    public static RuntimeInfo getCommonRuntimeInfo(ClassLoader classLoader, Class<? extends SourceOrSink> clazz) {
+        return new SimpleRuntimeInfo(classLoader,
+                DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-salesforce"),
+                clazz.getCanonicalName());
     }
 
 }

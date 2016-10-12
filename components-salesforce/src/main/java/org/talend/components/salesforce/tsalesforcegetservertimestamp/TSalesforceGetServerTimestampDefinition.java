@@ -16,9 +16,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.talend.components.api.component.ConnectorTopology;
-import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.RuntimeInfo;
-import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.runtime.SalesforceSource;
@@ -45,9 +43,7 @@ public class TSalesforceGetServerTimestampDefinition extends SalesforceDefinitio
     @Override
     public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology componentType) {
         if (componentType == ConnectorTopology.OUTGOING) {
-            return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
-                    DependenciesReader.computeDependenciesFilePath(getMavenGroupId(), getMavenArtifactId()),
-                    SalesforceSource.class.getCanonicalName());
+            return getCommonRuntimeInfo(this.getClass().getClassLoader(), SalesforceSource.class);
         } else {
             return null;
         }
