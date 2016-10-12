@@ -57,4 +57,10 @@ public class RuntimeUtil {
                 runtimeInfo.getMavenUrlDependencies(), parentClassLoader, false);
     }
 
+    public static SandboxedInstance createRuntimeClassWithCurrentJVMProperties(RuntimeInfo runtimeInfo,
+            ClassLoader parentClassLoader) {
+        return SandboxInstanceFactory.createSandboxedInstance(runtimeInfo.getRuntimeClassName(),
+                runtimeInfo.getMavenUrlDependencies(), parentClassLoader, true);
+    }
+
 }

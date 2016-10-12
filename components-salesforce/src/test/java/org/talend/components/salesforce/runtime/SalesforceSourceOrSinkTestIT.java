@@ -29,6 +29,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.component.runtime.RuntimeInfo;
+import org.talend.components.runtimeservice.RuntimeUtil;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
@@ -64,7 +65,8 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
     public void testIsolatedClassLoader() {
         ClassLoader classLoader = SalesforceDefinition.class.getClassLoader();
         RuntimeInfo runtimeInfo = SalesforceDefinition.getCommonRuntimeInfo(classLoader, SalesforceSourceOrSink.class);
-        try (SandboxedInstance sandboxedInstance = SalesforceSourceOrSink.createSandboxedInstance(runtimeInfo, classLoader)) {
+        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(runtimeInfo,
+                classLoader)) {
             sandboxedInstance.getInstance();
             System.setProperty("key", "value");
         }

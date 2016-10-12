@@ -30,6 +30,7 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.runtime.ProxyPropertiesRuntimeHelper;
+import org.talend.components.runtimeservice.RuntimeUtil;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
@@ -37,7 +38,6 @@ import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnecti
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.ValidationResult;
-import org.talend.daikon.sandbox.SandboxInstanceFactory;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
 import com.sforce.async.AsyncApiException;
@@ -89,16 +89,12 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     public static ValidationResult validateConnection(SalesforceProvideConnectionProperties properties) {
         ClassLoader classLoader = SalesforceDefinition.class.getClassLoader();
         RuntimeInfo runtimeInfo = SalesforceDefinition.getCommonRuntimeInfo(classLoader, SalesforceSourceOrSink.class);
-        try (SandboxedInstance sandboxedInstance = createSandboxedInstance(runtimeInfo, classLoader)) {
+        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(runtimeInfo,
+                classLoader)) {
             SalesforceSourceOrSink ss = (SalesforceSourceOrSink) sandboxedInstance.getInstance();
             ss.initialize(null, (ComponentProperties) properties);
             return ss.validate(null);
         }
-    }
-
-    public static SandboxedInstance createSandboxedInstance(RuntimeInfo runtimeInfo, ClassLoader parentClassLoader) {
-        return SandboxInstanceFactory.createSandboxedInstance(runtimeInfo.getRuntimeClassName(),
-                runtimeInfo.getMavenUrlDependencies(), parentClassLoader, true);
     }
 
     public SalesforceConnectionProperties getConnectionProperties() {
@@ -259,7 +255,8 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             throws IOException {
         ClassLoader classLoader = SalesforceDefinition.class.getClassLoader();
         RuntimeInfo runtimeInfo = SalesforceDefinition.getCommonRuntimeInfo(classLoader, SalesforceSourceOrSink.class);
-        try (SandboxedInstance sandboxedInstance = createSandboxedInstance(runtimeInfo, classLoader)) {
+        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(runtimeInfo,
+                classLoader)) {
             SalesforceSourceOrSink ss = (SalesforceSourceOrSink) sandboxedInstance.getInstance();
             ss.initialize(null, (ComponentProperties) properties);
             try {
@@ -296,7 +293,8 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             throws IOException {
         ClassLoader classLoader = SalesforceDefinition.class.getClassLoader();
         RuntimeInfo runtimeInfo = SalesforceDefinition.getCommonRuntimeInfo(classLoader, SalesforceSourceOrSink.class);
-        try (SandboxedInstance sandboxedInstance = createSandboxedInstance(runtimeInfo, classLoader)) {
+        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(runtimeInfo,
+                classLoader)) {
             SalesforceSourceOrSink ss = (SalesforceSourceOrSink) sandboxedInstance.getInstance();
             ss.initialize(null, (ComponentProperties) properties);
             PartnerConnection connection = null;
