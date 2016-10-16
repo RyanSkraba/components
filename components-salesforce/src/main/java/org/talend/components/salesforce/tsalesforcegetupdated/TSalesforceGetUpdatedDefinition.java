@@ -16,11 +16,11 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.talend.components.api.component.ConnectorTopology;
-import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.runtime.SalesforceSource;
 import org.talend.daikon.properties.Properties;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 public class TSalesforceGetUpdatedDefinition extends SalesforceDefinition {
 

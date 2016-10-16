@@ -15,11 +15,9 @@ package org.talend.components.salesforce.tsalesforceoutputbulkexec;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.VirtualComponentDefinition;
-import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceModuleProperties;
@@ -27,8 +25,7 @@ import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecD
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
-
-import aQute.bnd.annotation.component.Component;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition implements VirtualComponentDefinition {
 

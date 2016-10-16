@@ -66,12 +66,6 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api-runtime-service</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
         <!-- spring jar for integration tests -->
         <dependency>
             <groupId>org.springframework</groupId>

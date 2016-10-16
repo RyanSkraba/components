@@ -1,14 +1,15 @@
 
 package org.talend.components.fullexample.datastore;
 
-import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
  * An example of a DatastoreDefinition.
  */
-public class FullExampleDatastoreDefinition extends SimpleNamedThing implements DatastoreDefinition<FullExampleDatastoreProperties> {
+public class FullExampleDatastoreDefinition extends SimpleNamedThing
+        implements DatastoreDefinition<FullExampleDatastoreProperties> {
 
     private static final String NAME = "FullExampleDatastore";
 

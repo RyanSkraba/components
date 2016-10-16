@@ -28,8 +28,6 @@ import org.apache.avro.Schema;
 import org.junit.Assert;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
-import org.talend.components.api.component.runtime.RuntimeInfo;
-import org.talend.components.runtimeservice.RuntimeUtil;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
@@ -37,6 +35,8 @@ import org.talend.components.salesforce.test.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult.Result;
+import org.talend.daikon.runtime.RuntimeInfo;
+import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
 public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {

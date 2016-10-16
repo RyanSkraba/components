@@ -1,12 +1,12 @@
 package org.talend.components.multiruntime;
 
-import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
-import org.talend.components.runtimeservice.RuntimeUtil;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
+import org.talend.daikon.runtime.RuntimeInfo;
+import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
 /**
