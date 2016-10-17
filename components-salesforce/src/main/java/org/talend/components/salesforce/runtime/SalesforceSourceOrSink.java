@@ -30,11 +30,15 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.runtime.ProxyPropertiesRuntimeHelper;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
+import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
 import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnection;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.runtime.RuntimeInfo;
+import org.talend.daikon.runtime.RuntimeUtil;
+import org.talend.daikon.sandbox.SandboxedInstance;
 
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.BulkConnection;
@@ -83,9 +87,14 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     }
 
     public static ValidationResult validateConnection(SalesforceProvideConnectionProperties properties) {
-        SalesforceSourceOrSink ss = new SalesforceSourceOrSink();
-        ss.initialize(null, (ComponentProperties) properties);
-        return ss.validate(null);
+        ClassLoader classLoader = SalesforceDefinition.class.getClassLoader();
+        RuntimeInfo runtimeInfo = SalesforceDefinition.getCommonRuntimeInfo(classLoader, SalesforceSourceOrSink.class);
+        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(runtimeInfo,
+                classLoader)) {
+            SalesforceSourceOrSink ss = (SalesforceSourceOrSink) sandboxedInstance.getInstance();
+            ss.initialize(null, (ComponentProperties) properties);
+            return ss.validate(null);
+        }
     }
 
     public SalesforceConnectionProperties getConnectionProperties() {
@@ -142,6 +151,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     }
 
     protected ConnectionHolder connect(RuntimeContainer container) throws IOException {
+        enableTLSv11AndTLSv12ForJava7();
 
         final ConnectionHolder ch = new ConnectionHolder();
         SalesforceConnectionProperties connProps = properties.getConnectionProperties();
@@ -234,15 +244,27 @@ public class SalesforceSourceOrSink implements SourceOrSink {
         }
     }
 
+    private void enableTLSv11AndTLSv12ForJava7() {
+        String version = System.getProperty("java.version");
+        if (version != null && version.startsWith("1.7")) {
+            System.setProperty("https.protocols", "TLSv1.1,TLSv1.2");
+        }
+    }
+
     public static List<NamedThing> getSchemaNames(RuntimeContainer container, SalesforceProvideConnectionProperties properties)
             throws IOException {
-        SalesforceSourceOrSink ss = new SalesforceSourceOrSink();
-        ss.initialize(null, (ComponentProperties) properties);
-        try {
-            PartnerConnection connection = ss.connect(container).connection;
-            return ss.getSchemaNames(container);
-        } catch (Exception ex) {
-            throw new ComponentException(exceptionToValidationResult(ex));
+        ClassLoader classLoader = SalesforceDefinition.class.getClassLoader();
+        RuntimeInfo runtimeInfo = SalesforceDefinition.getCommonRuntimeInfo(classLoader, SalesforceSourceOrSink.class);
+        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(runtimeInfo,
+                classLoader)) {
+            SalesforceSourceOrSink ss = (SalesforceSourceOrSink) sandboxedInstance.getInstance();
+            ss.initialize(null, (ComponentProperties) properties);
+            try {
+                ss.connect(container);
+                return ss.getSchemaNames(container);
+            } catch (Exception ex) {
+                throw new ComponentException(exceptionToValidationResult(ex));
+            }
         }
     }
 
@@ -269,15 +291,20 @@ public class SalesforceSourceOrSink implements SourceOrSink {
 
     public static Schema getSchema(RuntimeContainer container, SalesforceProvideConnectionProperties properties, String module)
             throws IOException {
-        SalesforceSourceOrSink ss = new SalesforceSourceOrSink();
-        ss.initialize(null, (ComponentProperties) properties);
-        PartnerConnection connection = null;
-        try {
-            connection = ss.connect(container).connection;
-        } catch (IOException ex) {
-            throw new ComponentException(exceptionToValidationResult(ex));
+        ClassLoader classLoader = SalesforceDefinition.class.getClassLoader();
+        RuntimeInfo runtimeInfo = SalesforceDefinition.getCommonRuntimeInfo(classLoader, SalesforceSourceOrSink.class);
+        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(runtimeInfo,
+                classLoader)) {
+            SalesforceSourceOrSink ss = (SalesforceSourceOrSink) sandboxedInstance.getInstance();
+            ss.initialize(null, (ComponentProperties) properties);
+            PartnerConnection connection = null;
+            try {
+                connection = ss.connect(container).connection;
+            } catch (IOException ex) {
+                throw new ComponentException(exceptionToValidationResult(ex));
+            }
+            return ss.getSchema(connection, module);
         }
-        return ss.getSchema(connection, module);
     }
 
     @Override

@@ -12,8 +12,9 @@
 // ============================================================================
 package org.talend.components.api.component.runtime;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -31,6 +32,7 @@ import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 public class SimpleRuntimeInfoTest {
 

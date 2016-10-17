@@ -61,7 +61,6 @@ public class ComponentsPaxExamOptions {
                 linkBundle("org.talend.daikon-daikon-tests").noStart(), //
                 linkBundle("org.talend.components-components-api-service-bundle").start(), //
                 linkBundle("org.talend.components-components-api-service-tests").noStart(), //
-                linkBundle("org.talend.components-components-api-runtime-service-bundle"), //
                 linkBundle("org.talend.components-components-api-bundle"), //
                 linkBundle("org.talend.components-components-api-tests").noStart(),
                 linkBundle("org.apache.servicemix.bundles-org.apache.servicemix.bundles.hamcrest"), //

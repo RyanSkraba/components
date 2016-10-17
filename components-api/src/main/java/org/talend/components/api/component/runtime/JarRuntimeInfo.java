@@ -24,6 +24,7 @@ import java.util.jar.JarInputStream;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.error.ComponentsApiErrorCode;
 import org.talend.daikon.exception.ExceptionContext;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
  * create a {@link RuntimeInfo} that will look for a given jar and will look for a dependency.txt file inside this jar given the

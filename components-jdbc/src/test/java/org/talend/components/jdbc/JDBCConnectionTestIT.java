@@ -24,13 +24,13 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.ConnectorTopology;
-import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.jdbc.common.DBTestUtils;
 import org.talend.components.jdbc.runtime.JDBCSourceOrSink;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionDefinition;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionProperties;
-import org.talend.components.runtimeservice.RuntimeUtil;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.runtime.RuntimeInfo;
+import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
 public class JDBCConnectionTestIT {

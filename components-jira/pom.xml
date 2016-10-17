@@ -113,12 +113,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api-runtime-service</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>        
 
         <!-- followings are transitive dependencies. They were added here to be 
             embed into bundle jar by bundle plugin -->

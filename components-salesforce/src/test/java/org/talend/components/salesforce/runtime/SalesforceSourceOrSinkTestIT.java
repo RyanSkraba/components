@@ -25,15 +25,19 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.junit.Assert;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
-import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
+import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.test.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult.Result;
+import org.talend.daikon.runtime.RuntimeInfo;
+import org.talend.daikon.runtime.RuntimeUtil;
+import org.talend.daikon.sandbox.SandboxedInstance;
 
 public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
 
@@ -55,6 +59,18 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
         // check validate is ERROR with wrong creadentials
         props.userPassword.userId.setValue("");
         assertEquals(Result.ERROR, salesforceSourceOrSink.validate(null).getStatus());
+    }
+
+    @Test
+    public void testIsolatedClassLoader() {
+        ClassLoader classLoader = SalesforceDefinition.class.getClassLoader();
+        RuntimeInfo runtimeInfo = SalesforceDefinition.getCommonRuntimeInfo(classLoader, SalesforceSourceOrSink.class);
+        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(runtimeInfo,
+                classLoader)) {
+            sandboxedInstance.getInstance();
+            System.setProperty("key", "value");
+        }
+        Assert.assertNull("The system property should not exist, but not", System.getProperty("key"));
     }
 
     @Test

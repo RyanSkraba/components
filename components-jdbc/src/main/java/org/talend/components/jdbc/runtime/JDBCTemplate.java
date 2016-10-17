@@ -18,7 +18,6 @@ import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.DependenciesReader;
-import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.error.ComponentsApiErrorCode;
 import org.talend.components.jdbc.JDBCConnectionInfoProperties;
@@ -28,6 +27,7 @@ import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.Properties;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 public class JDBCTemplate {
 

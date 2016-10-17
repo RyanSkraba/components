@@ -20,7 +20,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.common.collect.Lists;
 import org.apache.avro.Schema;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -41,7 +40,6 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.ConnectorTopology;
-import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
@@ -54,7 +52,9 @@ import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.service.Repository;
+import org.talend.daikon.runtime.RuntimeInfo;
 
+import com.google.common.collect.Lists;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -248,7 +248,7 @@ public class ComponentServiceSpring implements ComponentService {
     }
 
     @Override
-    public <T extends RuntimableDefinition<?,? >> Iterable<T> getDefinitionsByType(Class<T> cls) {
+    public <T extends RuntimableDefinition<?, ?>> Iterable<T> getDefinitionsByType(Class<T> cls) {
         // Needs to be copied into a new list to be serialized remotely.
         return Lists.newArrayList(componentServiceDelegate.getDefinitionsByType(cls));
     }

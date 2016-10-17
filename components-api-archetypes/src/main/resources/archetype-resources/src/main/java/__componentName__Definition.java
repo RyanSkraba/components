@@ -14,7 +14,7 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.DependenciesReader;
-import org.talend.components.api.component.runtime.RuntimeInfo;
+import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.properties.ComponentProperties;

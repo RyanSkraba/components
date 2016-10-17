@@ -1,8 +1,8 @@
 package org.talend.components.api;
 
-import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.Properties;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
  * A base class for definitions of business objects provided by the component framework.

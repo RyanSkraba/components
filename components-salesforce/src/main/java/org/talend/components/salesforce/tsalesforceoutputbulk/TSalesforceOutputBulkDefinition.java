@@ -16,14 +16,12 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.talend.components.api.component.ConnectorTopology;
-import org.talend.components.api.component.runtime.DependenciesReader;
-import org.talend.components.api.component.runtime.RuntimeInfo;
-import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.runtime.SalesforceBulkFileSink;
 import org.talend.daikon.properties.Properties;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 public class TSalesforceOutputBulkDefinition extends SalesforceDefinition {
 
@@ -58,9 +56,7 @@ public class TSalesforceOutputBulkDefinition extends SalesforceDefinition {
     @Override
     public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology componentType) {
         if (componentType == ConnectorTopology.INCOMING) {
-            return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
-                    DependenciesReader.computeDependenciesFilePath(getMavenGroupId(), getMavenArtifactId()),
-                    SalesforceBulkFileSink.class.getCanonicalName());
+            return getCommonRuntimeInfo(this.getClass().getClassLoader(), SalesforceBulkFileSink.class);
         } else {
             return null;
         }

@@ -14,11 +14,23 @@ package org.talend.components.api.service.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.*;
+import org.apache.maven.model.building.DefaultModelBuilderFactory;
+import org.apache.maven.model.building.DefaultModelBuildingRequest;
+import org.apache.maven.model.building.ModelBuilder;
+import org.apache.maven.model.building.ModelBuildingException;
+import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelBuildingResult;
+import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectModelResolver;
@@ -47,7 +59,6 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.ConnectorTopology;
-import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.error.ComponentsApiErrorCode;
 import org.talend.components.api.properties.ComponentProperties;
@@ -59,6 +70,7 @@ import org.talend.daikon.NamedThing;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.service.PropertiesServiceImpl;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
  * Main Component Service implementation that is not related to any framework (neither OSGI, nor Spring) it uses a
@@ -90,7 +102,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
     public Set<ComponentDefinition> getAllComponents() {
         // If we ever add a guava dependency: return Sets.newHashSet(getDefinitionsByType...)
         Set<ComponentDefinition> defs = new HashSet<>();
-        for (ComponentDefinition def: componentRegistry.getDefinitionsByType(ComponentDefinition.class))
+        for (ComponentDefinition def : componentRegistry.getDefinitionsByType(ComponentDefinition.class))
             defs.add(def);
         return defs;
     }
@@ -247,7 +259,8 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
             depsStrings.add("mvn:" + dep.getArtifact().getGroupId() + "/" + dep.getArtifact().getArtifactId() + "/" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
                     + dep.getArtifact().getVersion() + "/"
                     + (dep.getArtifact().getExtension().equals("") ? "" : dep.getArtifact().getExtension())
-                    + (dep.getArtifact().getClassifier().equals("") ? "" : ("/" + dep.getArtifact().getClassifier())));
+                    + (dep.getArtifact().getClassifier().equals("") ? ""
+                            : ("/" + dep.getArtifact().getClassifier())));
         }
         return depsStrings;
     }

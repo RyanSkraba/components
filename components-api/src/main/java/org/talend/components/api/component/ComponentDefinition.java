@@ -16,12 +16,12 @@ import java.util.Set;
 
 import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.runtime.Reader;
-import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
  * Defines a component.
@@ -123,7 +123,7 @@ public interface ComponentDefinition extends RuntimableDefinition<Properties, Co
      * @param connectorTopology the topology of connectors you want to get the Runtime from.
      * 
      * @return the runtime information related to this component and <code>connectorTopology</code>. Should return null if the
-     *         <code>componentType</code> is not par of the supported types returned by {@link #getSupportedConnectorTopologies()}
+     * <code>componentType</code> is not par of the supported types returned by {@link #getSupportedConnectorTopologies()}
      */
     RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology);
 

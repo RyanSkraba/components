@@ -87,11 +87,6 @@
 			<artifactId>spring-context</artifactId>
 			<version>4.2.0.RELEASE</version>
 		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-api-runtime-service</artifactId>
-			<version>0.1.0-SNAPSHOT</version>
-		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

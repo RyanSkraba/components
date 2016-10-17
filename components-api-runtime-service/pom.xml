@@ -9,7 +9,6 @@
 
 	<name>Component Runtime Service Aggregator</name>
 	<modules>
-        <module>components-api-runtime-service</module>
 		<module>components-poc-multiple-runtimes-and-deps</module>
   </modules>
 	<build>

@@ -11,13 +11,13 @@ import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.JarRuntimeInfo;
-import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.multiruntime.MultiRuntimeComponentProperties.Version;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
  * The MultiRuntimeComponentDefinition acts as an entry point for all of services that

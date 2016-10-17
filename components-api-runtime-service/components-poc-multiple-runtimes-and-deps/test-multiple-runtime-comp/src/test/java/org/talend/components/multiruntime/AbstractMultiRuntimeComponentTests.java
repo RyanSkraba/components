@@ -1,13 +1,13 @@
 package org.talend.components.multiruntime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.test.AbstractComponentTest;
 import org.talend.components.multiruntime.MultiRuntimeComponentProperties.Version;
-import org.talend.components.runtimeservice.RuntimeUtil;
+import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
 abstract public class AbstractMultiRuntimeComponentTests extends AbstractComponentTest {

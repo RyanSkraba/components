@@ -21,6 +21,7 @@ import java.util.Set;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.error.ComponentsApiErrorCode;
 import org.talend.daikon.exception.ExceptionContext;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
  * create a {@link RuntimeInfo} implementation for component that do not have to deal with multiple dependencies because of

@@ -12,10 +12,10 @@
 // ============================================================================
 package org.talend.components.api.component;
 
-import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
  * This will define the possible connections a component can handle. I'll be used to retrieve the right {@link RuntimeInfo}. One

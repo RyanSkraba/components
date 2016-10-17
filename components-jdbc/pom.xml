@@ -34,13 +34,6 @@
         </dependency>
         
         <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api-runtime-service</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        
-        <dependency>
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1.1</version>
@@ -49,6 +42,12 @@
         <dependency>
             <groupId>org.talend.daikon</groupId>
             <artifactId>daikon-spring</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.url</groupId>
+            <artifactId>pax-url-aether</artifactId>             
+            <version>2.4.7</version>
             <scope>test</scope>
         </dependency>
 

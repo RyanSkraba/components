@@ -12,8 +12,15 @@
 // ============================================================================
 package org.talend.components.api.service;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -32,7 +39,6 @@ import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
-import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
@@ -49,6 +55,7 @@ import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.i18n.I18nMessages;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 public class ComponentServiceTest extends AbstractComponentTest {
 
@@ -166,7 +173,7 @@ public class ComponentServiceTest extends AbstractComponentTest {
                         new URL("mvn:org.apache.maven/maven-artifact/3.3.3/jar"), //
                         new URL("mvn:org.eclipse.aether/aether-transport-file/1.0.0.v20140518/jar"), //
                         new URL("mvn:org.talend.components/file-input/0.1.0.SNAPSHOT/jar")//
-        ));
+                ));
     }
 
     @Test

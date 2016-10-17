@@ -20,13 +20,13 @@ import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
-import org.talend.components.api.component.runtime.RuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.service.testcomponent.nestedprop.inherited.InheritedComponentProperties;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.StringProperty;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 public class TestComponentDefinition extends AbstractComponentDefinition implements ComponentDefinition {
 
