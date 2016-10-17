@@ -14,8 +14,8 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.test.SpringTestApp;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
+import org.talend.components.service.spring.SpringTestApp;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 

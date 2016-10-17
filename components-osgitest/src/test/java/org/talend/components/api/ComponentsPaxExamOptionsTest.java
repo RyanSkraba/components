@@ -23,7 +23,6 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.test.ComponentTestUtils;
-import org.talend.daikon.runtime.RuntimeUtil;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
@@ -43,8 +42,6 @@ public class ComponentsPaxExamOptionsTest {
         new ComponentPropertiesImpl("foo");
         // api-service
         new ComponentTestUtils();
-        // runtime service
-        new RuntimeUtil();
     }
 
 }

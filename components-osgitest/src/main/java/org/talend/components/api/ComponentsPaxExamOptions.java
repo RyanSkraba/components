@@ -28,10 +28,6 @@ public class ComponentsPaxExamOptions {
     /**
      * 
      */
-    private static final String DAIKON_VERSION = "0.13.0-SNAPSHOT";
-
-    private static final String COMPONENTS_VERSION = "0.15.0-SNAPSHOT";
-
     private static final String APACHE_KARAF_AID = "apache-karaf";
 
     private static final String ORG_APACHE_KARAF_GID = "org.apache.karaf";
@@ -59,8 +55,8 @@ public class ComponentsPaxExamOptions {
                 linkBundle("org.eclipse.jetty.orbit-javax.servlet"), //
                 linkBundle("org.talend.daikon-daikon-bundle"), //
                 linkBundle("org.talend.daikon-daikon-tests").noStart(), //
-                linkBundle("org.talend.components-components-api-service-bundle").start(), //
-                linkBundle("org.talend.components-components-api-service-tests").noStart(), //
+                linkBundle("org.talend.components-components-api-service-osgi").start(), //
+                linkBundle("org.talend.components-components-api-service-osgi-tests").noStart(), //
                 linkBundle("org.talend.components-components-api-bundle"), //
                 linkBundle("org.talend.components-components-api-tests").noStart(),
                 linkBundle("org.apache.servicemix.bundles-org.apache.servicemix.bundles.hamcrest"), //

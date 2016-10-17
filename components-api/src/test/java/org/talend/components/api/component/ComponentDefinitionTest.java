@@ -15,8 +15,8 @@ package org.talend.components.api.component;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.talend.components.api.service.testcomponent.TestComponentDefinition;
-import org.talend.components.api.service.testcomponent.TestComponentProperties;
+import org.talend.components.api.testcomponent.TestComponentDefinition;
+import org.talend.components.api.testcomponent.TestComponentProperties;
 import org.talend.daikon.properties.property.Property;
 
 public class ComponentDefinitionTest {

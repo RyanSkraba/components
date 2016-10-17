@@ -15,8 +15,6 @@ package org.talend.components.api.wizard;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.talend.components.api.service.testcomponent.TestComponentWizard;
-import org.talend.components.api.service.testcomponent.TestComponentWizardDefinition;
 
 public class WizardTest {
 

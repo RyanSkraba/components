@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.talend.components</groupId>
+		<artifactId>components-parent</artifactId>
+		<version>0.15.0-SNAPSHOT</version>
+		<relativePath>../../components-parent/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>components-api-service-rest-all-components</artifactId>
+	<version>0.1.0-SNAPSHOT</version>
+
+	<name>Component Rest APIs packaged with all components</name>
+
+	<properties>
+		<java.version>1.7</java.version>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<maven.compiler.target>1.7</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<spring.boot.version>1.4.1.RELEASE</spring.boot.version>
+	</properties>
+
+	<dependencies>
+		<!-- list of embedded components -->
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-jira</artifactId>
+			<version>0.15.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-salesforce</artifactId>
+			<version>0.15.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api-full-example</artifactId>
+			<version>0.2.0-SNAPSHOT</version>
+		</dependency>
+		<!-- rest service -->
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api-service-rest</artifactId>
+			<version>0.15.0-SNAPSHOT</version>
+		</dependency>
+		<dependency><!-- this overides the parent definition that limited the artifact 
+				to tests -->
+			<groupId>org.talend.daikon</groupId>
+			<artifactId>daikon-spring</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api-service-rest</artifactId>
+			<version>0.15.0-SNAPSHOT</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api</artifactId>
+			<version>0.15.0-SNAPSHOT</version>
+			<classifier>tests</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.ops4j.pax.url</groupId>
+			<artifactId>pax-url-aether</artifactId>
+			<version>2.4.7</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>docker</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.spotify</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+						<configuration>
+							<imageName>registry.datapwn.com/${project.artifactId}:${project.version}</imageName>
+							<baseImage>mykro/java8-jre:latest</baseImage>
+							<cmd>java -Dfile.encoding=UTF-8 -jar /${project.build.finalName}.jar</cmd>
+							<resources>
+								<resource>
+									<targetPath>/</targetPath>
+									<directory>${project.build.directory}</directory>
+									<include>${project.build.finalName}.jar</include>
+								</resource>
+							</resources>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>install</phase>
+								<goals>
+									<goal>build</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+
+
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${spring.boot.version}</version>
+				<configuration>
+					<mainClass>org.talend.components.service.rest.Application</mainClass>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-standalone-jar</id>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+
+</project>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.talend.components</groupId>
+        <artifactId>components-parent</artifactId>
+        <version>0.15.0-SNAPSHOT</version>
+        <relativePath>../../components-parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>components-api-service-common</artifactId>
+    <version>0.15.0-SNAPSHOT</version>
+    <packaging>bundle</packaging>
+
+    <name>Commons classes for component service implem</name>
+
+    <properties>
+        <java.version>1.7</java.version>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api</artifactId>
+            <version>0.15.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api</artifactId>
+            <version>0.15.0-SNAPSHOT</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>biz.aQute.bnd</groupId>
+            <artifactId>annotation</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.url</groupId>
+            <artifactId>pax-url-aether</artifactId>
+            <version>2.4.7</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <!-- Test dependencies -->
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.spotify</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <configuration>
+                            <imageName>talend/${project.artifactId}:${project.version}</imageName>
+                            <baseImage>mykro/java8-jre:latest</baseImage>
+                            <cmd>java -Dfile.encoding=UTF-8 -Dspring.config.name=application_docker -jar /${project.build.finalName}.jar</cmd>
+                            <resources>
+                                <resource>
+                                    <targetPath>/</targetPath>
+                                    <directory>${project.build.directory}</directory>
+                                    <include>${project.build.finalName}.jar</include>
+                                </resource>
+                            </resources>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+
+    <repositories>
+        <repository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>lib-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                        <configuration>
+                            <instructions>
+                                <Bundle-SymbolicName>org.talend.components.api.service.common</Bundle-SymbolicName>
+                                <Bundle-Name>${project.name}</Bundle-Name>
+                            </instructions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>test-bundle</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>tests</classifier>
+                            <!-- removes the main classes we only want test classes -->
+                            <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
+                            <instructions>
+                                <Service-Component>*</Service-Component>
+                                <Import-Package>!*internal,org.talend*,javax.xml.namespace,org.junit*,org.hamcrest*</Import-Package>
+                                <Bundle-SymbolicName>org.talend.components.api.service.common.test</Bundle-SymbolicName>
+                                <Fragment-Host>org.talend.components.api.service.common</Fragment-Host>
+                                <Embed-Dependency>daikon-spring</Embed-Dependency>
+                                <Export-Package>org.talend.components*</Export-Package>
+                                <!-- include test classes -->
+                                <Include-Resource>=target/test-classes/</Include-Resource>
+                            </instructions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

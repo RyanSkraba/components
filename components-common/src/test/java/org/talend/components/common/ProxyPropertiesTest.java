@@ -14,22 +14,11 @@ package org.talend.components.common;
 
 import static org.junit.Assert.*;
 
-import javax.inject.Inject;
-
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.test.SpringTestApp;
+import org.talend.daikon.properties.PropertiesDynamicMethodHelper;
 import org.talend.daikon.properties.presentation.Form;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SpringTestApp.class)
 public class ProxyPropertiesTest {
-
-    @Inject
-    protected ComponentService componentService;
 
     public ProxyPropertiesTest() {
     }
@@ -43,7 +32,7 @@ public class ProxyPropertiesTest {
 
         props.useProxy.setValue(true);
         assertTrue(mainForm.getWidget("useProxy").isCallAfter());
-        componentService.afterProperty("useProxy", props);
+        PropertiesDynamicMethodHelper.afterProperty(props, "useProxy");
         assertFalse(mainForm.getWidget("host").isHidden());
         assertFalse(mainForm.getWidget("userPassword").isHidden());
     }

@@ -12,14 +12,13 @@
 // ============================================================================
 package org.talend.components.api.properties;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.talend.components.api.properties.ComponentReferenceProperties.ReferenceType;
-import org.talend.components.api.service.testcomponent.TestComponentProperties;
+import org.talend.components.api.testcomponent.TestComponentProperties;
 
 public class ComponentReferencePropertiesTest {
 

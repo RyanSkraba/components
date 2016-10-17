@@ -23,8 +23,8 @@ import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.exception.error.ComponentsErrorCode;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.service.internal.ComponentRegistry;
-import org.talend.components.api.service.internal.ComponentServiceImpl;
+import org.talend.components.api.service.common.ComponentRegistry;
+import org.talend.components.api.service.common.ComponentServiceImpl;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.daikon.exception.TalendRuntimeException;
 

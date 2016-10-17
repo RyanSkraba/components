@@ -1,6 +1,7 @@
 
 package org.talend.components.fullexample.datastore;
 
+import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -24,6 +25,12 @@ public class FullExampleDatastoreDefinition extends SimpleNamedThing
 
     @Override
     public RuntimeInfo getRuntimeInfo(FullExampleDatastoreProperties properties, Object ctx) {
+        return null;
+    }
+
+    @Override
+    public DatasetProperties getDatasetProperties() {
+        // TODO Auto-generated method stub
         return null;
     }
 }

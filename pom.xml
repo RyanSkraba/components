@@ -11,13 +11,10 @@
 	<modules>
 		<module>components-parent</module>
 		<module>components-api</module>
-		<module>components-api-service</module>
-		<module>components-api-runtime-service</module>
 		<module>components-common</module>
 		<module>components-common-oauth</module>
 		<module>components-api-archetypes</module>
 		<module>components-salesforce</module>
-		<module>components-webtest</module>
 		<module>components-osgitest</module>
 		<module>components-api-proptester</module>
 		<module>components-splunk</module>
@@ -26,6 +23,8 @@
 		<module>components-api-full-example</module>
 		<module>components-jdbc</module>
 		<module>components-filedelimited</module>
+		<module>services</module>
+		<module>examples</module>
 	</modules>
 	<profiles>
 		<profile>

@@ -14,12 +14,8 @@ package org.talend.components.api;
 
 import static org.junit.Assert.*;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
-
 import javax.inject.Inject;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -30,35 +26,27 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.service.ComponentServiceTest;
-import org.talend.components.api.service.testcomponent.TestComponentInstaller;
 
 /**
  * created by sgandon on 7 sept. 2015 Detailled comment
  */
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class OsgiComponentServiceTest extends ComponentServiceTest {
+public class OsgiComponentServiceTest {
+
+    static final Logger LOG = LoggerFactory.getLogger(OsgiComponentServiceTest.class);
 
     @Inject
-    private ComponentService osgiCompService;
-
-    // Ensure that the TestComponentInstaller is registered before the osgiCompService is created.
-    @BeforeClass
-    public static void installTestComponents() {
-        BundleContext bundleContext = FrameworkUtil.getBundle(ComponentServiceTest.class).getBundleContext();
-        final Dictionary<String, Object> props = new Hashtable<String, Object>();
-        props.put("component.name", "test");
-        bundleContext.registerService(ComponentInstaller.class, new TestComponentInstaller(), props);
-    }
+    BundleContext bc;
 
     @Configuration
     public Option[] config() {
         try {
             return ComponentsPaxExamOptions.getOptions();
         } catch (Exception e) {
-            e.printStackTrace();
             throw e;
         }
     }
@@ -75,11 +63,6 @@ public class OsgiComponentServiceTest extends ComponentServiceTest {
         } else {
             fail("Failed to retrieve the Component service");
         }
-    }
-
-    @Override
-    public ComponentService getComponentService() {
-        return osgiCompService;
     }
 
 }

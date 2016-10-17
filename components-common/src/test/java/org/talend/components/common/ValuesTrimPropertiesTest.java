@@ -12,25 +12,13 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import javax.inject.Inject;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.test.SpringTestApp;
+import org.talend.daikon.properties.PropertiesDynamicMethodHelper;
 import org.talend.daikon.properties.presentation.Form;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SpringTestApp.class)
 public class ValuesTrimPropertiesTest {
-
-    @Inject
-    protected ComponentService componentService;
 
     public ValuesTrimPropertiesTest() {
     }
@@ -44,7 +32,7 @@ public class ValuesTrimPropertiesTest {
 
         props.trimAll.setValue(true);
         assertTrue(mainForm.getWidget(props.trimAll.getName()).isCallAfter());
-        componentService.afterProperty(props.trimAll.getName(), props);
+        PropertiesDynamicMethodHelper.afterProperty(props, props.trimAll.getName());
         assertTrue(mainForm.getWidget(props.trimTable.getName()).isHidden());
     }
 }

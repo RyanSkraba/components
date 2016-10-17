@@ -1,28 +1,15 @@
 package org.talend.components.common;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.test.SpringTestApp;
+import org.talend.daikon.properties.PropertiesDynamicMethodHelper;
 import org.talend.daikon.properties.presentation.Form;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SpringTestApp.class)
 public class EncodingTypePropertiesTest {
-
-    @Inject
-    protected ComponentService componentService;
 
     public EncodingTypePropertiesTest() {
     }
@@ -40,7 +27,7 @@ public class EncodingTypePropertiesTest {
         defaultProperties.encodingType.setValue(EncodingTypeProperties.ENCODING_TYPE_CUSTOM);
         defaultProperties.customEncoding.setValue("UTF-16");
         assertTrue(defaultMainForm.getWidget("encodingType").isCallAfter());
-        componentService.afterProperty("encodingType", defaultProperties);
+        PropertiesDynamicMethodHelper.afterProperty(defaultProperties, "encodingType");
         assertFalse(defaultMainForm.getWidget("encodingType").isHidden());
         assertFalse(defaultMainForm.getWidget("customEncoding").isHidden());
         assertEquals("UTF-16", defaultProperties.customEncoding.getValue());
@@ -49,6 +36,7 @@ public class EncodingTypePropertiesTest {
         EncodingTypeProperties specifyProperties = (EncodingTypeProperties) new EncodingTypeProperties(
                 "defaultEncodingProperties") {
 
+            @Override
             public List<String> getDefaultEncodings() {
                 return Arrays.asList("UTF-16", "GBK", "ISO-8859-1", EncodingTypeProperties.ENCODING_TYPE_CUSTOM);
             };
@@ -61,7 +49,7 @@ public class EncodingTypePropertiesTest {
         specifyProperties.encodingType.setValue(EncodingTypeProperties.ENCODING_TYPE_CUSTOM);
         specifyProperties.customEncoding.setValue("GBK");
         assertTrue(specifyMainForm.getWidget("encodingType").isCallAfter());
-        componentService.afterProperty("encodingType", specifyProperties);
+        PropertiesDynamicMethodHelper.afterProperty(specifyProperties, "encodingType");
         assertFalse(specifyMainForm.getWidget("encodingType").isHidden());
         assertFalse(specifyMainForm.getWidget("customEncoding").isHidden());
         assertEquals("GBK", specifyProperties.customEncoding.getValue());

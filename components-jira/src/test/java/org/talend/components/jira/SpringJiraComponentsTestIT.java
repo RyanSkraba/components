@@ -15,7 +15,7 @@ package org.talend.components.jira;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.talend.components.api.test.SpringTestApp;
+import org.talend.components.service.spring.SpringTestApp;
 
 /**
  * Integration tests for Jira Input component, which check if nothing was missed

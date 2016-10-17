@@ -23,7 +23,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.AbstractComponentTest;
-import org.talend.components.api.test.SpringTestApp;
+import org.talend.components.service.spring.SpringTestApp;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult.Result;

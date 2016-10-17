@@ -59,26 +59,28 @@
         <!-- Jar containing Test utils methods -->
         <dependency>
             <groupId>org.talend.components</groupId>
-            <artifactId>components-api-service</artifactId>
+            <artifactId>components-api</artifactId>
+            <version>0.15.0-SNAPSHOT</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <!-- spring jar for integration tests -->
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api-service-rest</artifactId>
             <version>0.15.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
-            <artifactId>components-api-service</artifactId>
+            <artifactId>components-api-service-rest</artifactId>
             <version>0.15.0-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <!-- spring jar for integration tests -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

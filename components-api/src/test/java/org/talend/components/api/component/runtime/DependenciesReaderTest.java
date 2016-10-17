@@ -25,7 +25,7 @@ public class DependenciesReaderTest {
 
     /**
      * Test method for parseMvnUri
-     * {@link org.talend.components.api.service.internal.ComponentServiceImpl#parseMvnUri(java.lang.String)} .
+     * {@link org.talend.components.api.service.common.ComponentServiceImpl#parseMvnUri(java.lang.String)} .
      */
     @Test
     public void testparseMvnUri() {
