@@ -1,5 +1,11 @@
 package org.talend.components.filedelimited.runtime;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
@@ -16,12 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.filedelimited.FileDelimitedTestBasic;
 import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.avro.AvroUtils;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
 
@@ -197,9 +197,9 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
 
         assertEquals(false, records.get(0).get(0));
         // Decode OctalDigits "010" for Byte type
-        assertEquals(Byte.valueOf("8"), records.get(0).get(1));
+        assertEquals(8, records.get(0).get(1));
         // Decode OctalDigits "0100" for Short type
-        assertEquals(Short.valueOf("64"), records.get(0).get(2));
+        assertEquals(64, records.get(0).get(2));
         // Decode OctalDigits "01000" for Integer type
         assertEquals(512, records.get(0).get(3));
         // Decode OctalDigits "010000" for Long type
@@ -207,9 +207,9 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
 
         assertEquals(true, records.get(3).get(0));
         // Decode HexDigits "0X18" for Byte type
-        assertEquals(Byte.valueOf("24"), records.get(3).get(1));
+        assertEquals(24, records.get(3).get(1));
         // Decode HexDigits "0X188" for Short type
-        assertEquals(Short.valueOf("392"), records.get(3).get(2));
+        assertEquals(392, records.get(3).get(2));
         // Decode HexDigits "0X1888" for Integer type
         assertEquals(6280, records.get(3).get(3));
         // Decode HexDigits "0X18888" for Long type
@@ -286,6 +286,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
             fail("Expect get NumberFormatException !");
         } catch (Exception e) {
             // "TestInteger" parse value "01,000" fails
+            e.printStackTrace();
             LOGGER.debug(e.getMessage());
             assertEquals(NumberFormatException.class, e.getClass());
         }
@@ -301,9 +302,9 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
 
         assertEquals(true, records.get(3).get(0));
         // Decode HexDigits "0X18"
-        assertEquals(Byte.valueOf("24"), records.get(3).get(1));
+        assertEquals(24, records.get(3).get(1));
         // Decode HexDigits and transform 0X1,888 for Short type
-        assertEquals(Short.valueOf("6280"), records.get(3).get(2));
+        assertEquals(6280, records.get(3).get(2));
         // Decode HexDigits and transform "0X18,888" for Integer type
         assertEquals(100488, records.get(3).get(3));
         // Decode HexDigits and transform "0X188,888" for Long type
@@ -339,7 +340,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         // " " for TestBytes
         assertEquals("   ", new String((byte[]) records.get(2).get(2)));
         // " I" for TestChar
-        assertEquals(" ".charAt(0), records.get(3).get(3));
+        assertEquals(" ", records.get(3).get(3));
         // " " for TestDate, Date parser trim date string automatically
         assertNull(records.get(4).get(4));
         // " " for TestObject
@@ -364,7 +365,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         // " " for TestBytes
         assertNull(records.get(2).get(2));
         // " I" for TestChar
-        assertEquals('I', records.get(3).get(3));
+        assertEquals("I", records.get(3).get(3));
         // " " for TestDate, Date parser trim date string automatically
         assertNull(records.get(4).get(4));
         // " " for TestDouble
@@ -592,20 +593,20 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
             int fieldSize = BASIC_SCHEMA.getFields().size();
             assertTrue(records.get(0).get(0) instanceof Boolean);
             assertEquals(false, records.get(0).get(0));
-            assertTrue(records.get(0).get(1) instanceof Byte);
-            assertEquals(Byte.valueOf("1"), records.get(0).get(1));
+            assertTrue(records.get(0).get(1) instanceof Integer);
+            assertEquals(1, records.get(0).get(1));
             assertTrue(records.get(0).get(2) instanceof byte[]);
             assertEquals("IIG2iTCNnLlicDqGVM", new String((byte[]) records.get(0).get(2)));
-            assertTrue(records.get(0).get(3) instanceof Character);
-            assertEquals('n', records.get(0).get(3));
+            assertTrue(records.get(0).get(3) instanceof String);
+            assertEquals("n", records.get(0).get(3));
             assertTrue(records.get(0).get(4) instanceof Long);
             assertEquals(parseToDate("yyyy-MM-dd'T'HH:mm:ss", "2016-09-06T15:31:07").getTime(), records.get(0).get(4));
             assertTrue(records.get(0).get(5) instanceof Double);
             assertEquals(2.75, records.get(0).get(5));
             assertTrue(records.get(0).get(6) instanceof Float);
             assertEquals(0.246f, records.get(0).get(6));
-            assertTrue(records.get(0).get(7) instanceof BigDecimal);
-            assertEquals(BigDecimal.valueOf(4.797), records.get(0).get(7));
+            assertTrue(records.get(0).get(7) instanceof String);
+            assertEquals("4.797", records.get(0).get(7));
             assertTrue(records.get(0).get(8) instanceof Integer);
             assertEquals(1820, records.get(0).get(8));
             assertTrue(records.get(0).get(9) instanceof Long);
@@ -623,38 +624,38 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         assertEquals(count, records.size());
         int fieldSize = BASIC_SCHEMA.getFields().size();
         assertTrue(records.get(0).get(0) instanceof Boolean);
-        assertTrue(records.get(0).get(1) instanceof Byte);
+        assertTrue(records.get(0).get(1) instanceof Integer);
         assertTrue(records.get(0).get(2) instanceof byte[]);
-        assertTrue(records.get(0).get(3) instanceof Character);
+        assertTrue(records.get(0).get(3) instanceof String);
         assertTrue(records.get(0).get(4) instanceof Long);
         assertTrue(records.get(0).get(5) instanceof Double);
         assertTrue(records.get(0).get(6) instanceof Float);
-        assertTrue(records.get(0).get(7) instanceof BigDecimal);
+        assertTrue(records.get(0).get(7) instanceof String);
         assertTrue(records.get(0).get(8) instanceof Integer);
         assertTrue(records.get(0).get(9) instanceof Long);
         assertTrue(records.get(0).get(10) instanceof byte[]);
         if (properties.header.getValue() == 1) {
             assertEquals(false, records.get(0).get(0));
-            assertEquals(Byte.valueOf("1"), records.get(0).get(1));
+            assertEquals(1, records.get(0).get(1));
             assertEquals("IIG2iTCNnLlicDqGVM", new String((byte[]) records.get(0).get(2)));
-            assertEquals('n', records.get(0).get(3));
+            assertEquals("n", records.get(0).get(3));
             assertEquals(parseToDate("yyyy-MM-dd'T'HH:mm:ss", "2016-09-06T15:31:07").getTime(), records.get(0).get(4));
             assertEquals(2.75, records.get(0).get(5));
             assertEquals(0.246f, records.get(0).get(6));
-            assertEquals(BigDecimal.valueOf(4.797), records.get(0).get(7));
+            assertEquals("4.797", records.get(0).get(7));
             assertEquals(1820, records.get(0).get(8));
             assertEquals(1473147067519L, records.get(0).get(9));
             assertEquals("Thomas Grant", new String((byte[]) records.get(0).get(10)));
         }
         if (properties.header.getValue() == 3) {
             assertEquals(false, records.get(0).get(0));
-            assertEquals(Byte.valueOf("29"), records.get(0).get(1));
+            assertEquals(29, records.get(0).get(1));
             assertEquals("vEq3xp8fZsx92xwhz4", new String((byte[]) records.get(0).get(2)));
-            assertEquals('G', records.get(0).get(3));
+            assertEquals("G", records.get(0).get(3));
             assertEquals(parseToDate("yyyy-MM-dd'T'HH:mm:ss", "2016-09-06T15:31:07").getTime(), records.get(0).get(4));
             assertEquals(5.75, records.get(0).get(5));
             assertEquals(3.567f, records.get(0).get(6));
-            assertEquals(BigDecimal.valueOf(3.567), records.get(0).get(7));
+            assertEquals("3.567", records.get(0).get(7));
             assertEquals(3448, records.get(0).get(8));
             assertEquals(1473147067522L, records.get(0).get(9));
             assertEquals("Dwight Eisenhower", new String((byte[]) records.get(0).get(10)));

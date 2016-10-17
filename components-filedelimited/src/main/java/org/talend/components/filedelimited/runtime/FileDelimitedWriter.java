@@ -10,7 +10,6 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.common.ComponentConstants;
 import org.talend.components.filedelimited.tfileoutputdelimited.TFileOutputDelimitedProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
@@ -207,12 +206,8 @@ public class FileDelimitedWriter implements Writer<Result> {
     private IndexedRecordConverter<IndexedRecord, IndexedRecord> getFactory(Object datum) {
         if (factory == null) {
             factory = new FileDelimitedIndexedRecordConverter();
-            recordSchema.addProp(ComponentConstants.CHARSET_NAME, outputRuntime.encoding);
-            if (props.advancedSeparator.getValue()) {
-                recordSchema.addProp(ComponentConstants.THOUSANDS_SEPARATOR, props.thousandsSeparator.getValue());
-                recordSchema.addProp(ComponentConstants.DECIMAL_SEPARATOR, props.decimalSeparator.getValue());
-            }
             factory.setSchema(recordSchema);
+            ((FileDelimitedIndexedRecordConverter) factory).setProperties(props);
         }
         return factory;
     }

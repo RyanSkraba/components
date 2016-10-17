@@ -10,7 +10,6 @@ import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.common.ComponentConstants;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.filedelimited.FileDelimitedProperties;
 import org.talend.daikon.NamedThing;
@@ -137,12 +136,6 @@ public class FileSourceOrSink implements SourceOrSink {
                 }
             }
             Schema schema = Schema.createRecord(schemaName, null, null, false, fields);
-            if (designSchema.getProp(ComponentConstants.DIE_ON_ERROR) != null) {
-                schema.addProp(ComponentConstants.DIE_ON_ERROR, designSchema.getProp(ComponentConstants.DIE_ON_ERROR));
-            }
-            if (designSchema.getProp(ComponentConstants.CHECK_DATE) != null) {
-                schema.addProp(ComponentConstants.CHECK_DATE, designSchema.getProp(ComponentConstants.CHECK_DATE));
-            }
             return schema;
         } else {
             return Schema.createRecord(schemaName, null, null, false);

@@ -2,13 +2,23 @@ package org.talend.components.filedelimited.runtime;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
-import org.talend.components.common.ComponentConstants;
 import org.talend.components.common.runtime.GenericIndexedRecordConverter;
+import org.talend.components.filedelimited.FileDelimitedProperties;
 import org.talend.daikon.avro.converter.AvroConverter;
 
 public class FileDelimitedIndexedRecordConverter extends GenericIndexedRecordConverter {
 
     private String names[];
+
+    private FileDelimitedProperties properties;
+
+    public FileDelimitedProperties getProperties() {
+        return properties;
+    }
+
+    public void setProperties(FileDelimitedProperties properties) {
+        this.properties = properties;
+    }
 
     @Override
     public IndexedRecord convertToAvro(IndexedRecord value) {
@@ -38,24 +48,15 @@ public class FileDelimitedIndexedRecordConverter extends GenericIndexedRecordCon
         public Object get(int i) {
             // Lazy initialization of the cached converter objects.
             if (names == null) {
+                if (properties == null) {
+                    throw new IllegalArgumentException("Runtime properties for converter is not be set!");
+                }
                 names = new String[getSchema().getFields().size()];
                 fieldConverter = new AvroConverter[names.length];
-                String thousandsSeparator = getSchema().getProp(ComponentConstants.THOUSANDS_SEPARATOR);
-                String decimalSeparator = getSchema().getProp(ComponentConstants.DECIMAL_SEPARATOR);
-                String encoding = getSchema().getProp(ComponentConstants.CHARSET_NAME);
                 for (int j = 0; j < names.length; j++) {
                     Schema.Field f = getSchema().getFields().get(j);
                     names[j] = f.name();
-                    if (thousandsSeparator != null) {
-                        f.addProp(ComponentConstants.THOUSANDS_SEPARATOR, thousandsSeparator);
-                    }
-                    if (decimalSeparator != null) {
-                        f.addProp(ComponentConstants.DECIMAL_SEPARATOR, decimalSeparator);
-                    }
-                    if (encoding != null) {
-                        f.addProp(ComponentConstants.CHARSET_NAME, encoding);
-                    }
-                    fieldConverter[j] = FileDelimitedAvroRegistry.get().getConverter(f);
+                    fieldConverter[j] = FileDelimitedAvroRegistry.get().getConverter(f, properties);
                 }
             }
             return fieldConverter[i].convertToDatum(value.get(getSchema().getField(names[i]).pos()));
