@@ -60,45 +60,6 @@
 
         <!-- Test dependencies -->
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>docker</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.spotify</groupId>
-                        <artifactId>docker-maven-plugin</artifactId>
-                        <configuration>
-                            <imageName>talend/${project.artifactId}:${project.version}</imageName>
-                            <baseImage>mykro/java8-jre:latest</baseImage>
-                            <cmd>java -Dfile.encoding=UTF-8 -Dspring.config.name=application_docker -jar /${project.build.finalName}.jar</cmd>
-                            <resources>
-                                <resource>
-                                    <targetPath>/</targetPath>
-                                    <directory>${project.build.directory}</directory>
-                                    <include>${project.build.finalName}.jar</include>
-                                </resource>
-                            </resources>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <phase>install</phase>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
-
     <repositories>
         <repository>
             <id>spring-releases</id>

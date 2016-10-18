@@ -82,7 +82,6 @@
             <version>0.15.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
-        
         <!-- component specific dependencies -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

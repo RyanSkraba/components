@@ -15,6 +15,7 @@
 	<name>Component Rest APIs packaged with all components</name>
 
 	<properties>
+		<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
 		<java.version>1.7</java.version>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
@@ -90,7 +91,7 @@
 						<groupId>com.spotify</groupId>
 						<artifactId>docker-maven-plugin</artifactId>
 						<configuration>
-							<imageName>registry.datapwn.com/${project.artifactId}:${project.version}</imageName>
+							<imageName>registry.datapwn.com/talend/tcomp-${project.artifactId}:${docker.version}</imageName>
 							<baseImage>mykro/java8-jre:latest</baseImage>
 							<cmd>java -Dfile.encoding=UTF-8 -jar /${project.build.finalName}.jar</cmd>
 							<resources>

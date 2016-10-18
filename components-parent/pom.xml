@@ -18,16 +18,16 @@
 		<log4j.rootLogger>DEBUG, stdout</log4j.rootLogger>
 		<log4j.appender.stdout>org.apache.log4j.ConsoleAppender</log4j.appender.stdout>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <docker.removeVolumes>true</docker.removeVolumes>
-        <talend_snapshots>http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<docker.removeVolumes>true</docker.removeVolumes>
+		<talend_snapshots>http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots>
 	</properties>
 
-    <scm>
-        <connection>scm:git:https://github.com/Talend/components.git</connection>
-    </scm>
+	<scm>
+		<connection>scm:git:https://github.com/Talend/components.git</connection>
+	</scm>
 
-    <distributionManagement>
+	<distributionManagement>
 		<snapshotRepository>
 			<id>talend_nexus_deployment</id>
 			<url>${talend_snapshots}</url>
@@ -118,12 +118,12 @@
 				<version>${hamcrest.version}</version>
 				<scope>test</scope>
 			</dependency>
-	        <dependency>
-	            <groupId>biz.aQute.bnd</groupId>
-	            <artifactId>annotation</artifactId>
-	            <version>2.4.0</version>
-	            <scope>provided</scope>
-	        </dependency>
+			<dependency>
+				<groupId>biz.aQute.bnd</groupId>
+				<artifactId>annotation</artifactId>
+				<version>2.4.0</version>
+				<scope>provided</scope>
+			</dependency>
 			<dependency>
 				<groupId>javax.inject</groupId>
 				<artifactId>javax.inject</artifactId>
@@ -194,15 +194,15 @@
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-maven-plugin</artifactId>
 				</plugin>
-                <plugin>
-                    <artifactId>maven-scm-plugin</artifactId>
-                    <version>1.9.4</version>
-                    <configuration>
-                        <connectionUrl>scm:git:https://github.com/Talend/components.git</connectionUrl>
-                        <tag>${project.artifactId}-${project.version}</tag>
-                    </configuration>
-                </plugin>
-                <plugin>
+				<plugin>
+					<artifactId>maven-scm-plugin</artifactId>
+					<version>1.9.4</version>
+					<configuration>
+						<connectionUrl>scm:git:https://github.com/Talend/components.git</connectionUrl>
+						<tag>${project.artifactId}-${project.version}</tag>
+					</configuration>
+				</plugin>
+				<plugin>
 					<groupId>org.apache.felix</groupId>
 					<artifactId>maven-bundle-plugin</artifactId>
 					<version>3.0.1</version>
@@ -264,10 +264,12 @@
 				<version>1.4</version>
 				<executions>
 					<execution>
+						<id>append-self-artifact-to-deps</id>
 						<phase>process-resources</phase>
 						<configuration>
 							<tasks>
-								<echo file="target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt"
+								<echo
+									file="target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt"
 									message="${project.groupId}:${project.artifactId}:jar:${project.version}:runtime"
 									append="true" encoding="UTF-8" />
 							</tasks>
@@ -275,6 +277,26 @@
 						<goals>
 							<goal>run</goal>
 						</goals>
+					</execution>
+					<!-- Workaround maven not being able to set a property conditionally
+						based on the current version being SNAPSHOT or not -->
+					<execution>
+						<id>compute-docker-version</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<exportAntProperties>true</exportAntProperties>
+							<target>
+								<echo message="computing docker version" />
+								<condition property="docker.version"
+									value="${project.version}-${maven.build.timestamp}" else="${project.version}">
+									<contains string="${project.version}" substring="SNAPSHOT" />
+								</condition>
+								<echo message="${docker.version}" />
+							</target>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -299,7 +321,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.4.201502262128</version>
+				<version>0.7.7.201606060606</version>
 				<executions>
 					<execution>
 						<id>default-prepare-agent</id>

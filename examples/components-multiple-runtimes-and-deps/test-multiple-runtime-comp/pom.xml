@@ -7,7 +7,7 @@
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
 		<version>0.15.0-SNAPSHOT</version>
-        <relativePath>../../../components-parent/pom.xml</relativePath>		
+		<relativePath>../../../components-parent/pom.xml</relativePath>
 	</parent>
 
 	<name>Test MultiRuntimeComponent component</name>
@@ -53,83 +53,83 @@
 			<artifactId>components-common</artifactId>
 			<version>0.15.0-SNAPSHOT</version>
 		</dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api-runtime-service</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
-        </dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api-runtime-service</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+		</dependency>
 
-        <!-- Jar containing Test utils methods -->
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api</artifactId>
-            <version>0.15.0-SNAPSHOT</version>
-            <classifier>tests</classifier>
-            <scope>test</scope>
-        </dependency>
-        <!-- spring jar for integration tests -->
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api-service-rest</artifactId>
-            <version>0.15.0-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api-service-rest</artifactId>
-            <version>0.15.0-SNAPSHOT</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api-runtime-service</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
-            <classifier>tests</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>multiple-runtime-comp</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-osgitest</artifactId>
-            <version>0.15.0-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
+		<!-- Jar containing Test utils methods -->
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api</artifactId>
+			<version>0.15.0-SNAPSHOT</version>
+			<classifier>tests</classifier>
+			<scope>test</scope>
+		</dependency>
+		<!-- spring jar for integration tests -->
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api-service-rest</artifactId>
+			<version>0.15.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api-service-rest</artifactId>
+			<version>0.15.0-SNAPSHOT</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api-runtime-service</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+			<classifier>tests</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>multiple-runtime-comp</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-osgitest</artifactId>
+			<version>0.15.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
-            <plugin>
-                <groupId>com.github.veithen.alta</groupId>
-                <artifactId>alta-maven-plugin</artifactId>
-                <version>0.4.1</version>
-                <executions>
-                    <execution>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>generate-test-resources</goal>
-                        </goals>
-                        <configuration>
-                            <name>%groupId%-%artifactId%.link</name>
-                            <value>%url%</value>
-                            <separator>${line.separator}</separator>
-                            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
-                            <dependencySet>
-                                <scope>test</scope>
-                            </dependencySet>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>          
+			<plugin>
+				<groupId>com.github.veithen.alta</groupId>
+				<artifactId>alta-maven-plugin</artifactId>
+				<version>0.4.1</version>
+				<executions>
+					<execution>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>generate-test-resources</goal>
+						</goals>
+						<configuration>
+							<name>%groupId%-%artifactId%.link</name>
+							<value>%url%</value>
+							<separator>${line.separator}</separator>
+							<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+							<dependencySet>
+								<scope>test</scope>
+							</dependencySet>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 </project>
