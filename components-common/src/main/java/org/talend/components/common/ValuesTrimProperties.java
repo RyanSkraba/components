@@ -11,7 +11,7 @@ import org.talend.daikon.properties.property.Property;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 
-public class ValuesTrimPropertis extends ComponentPropertiesImpl {
+public class ValuesTrimProperties extends ComponentPropertiesImpl {
 
     public Property<Boolean> trimAll = newBoolean("trimAll");
 
@@ -19,7 +19,7 @@ public class ValuesTrimPropertis extends ComponentPropertiesImpl {
 
     private List<String> fieldNames = new ArrayList<>();
 
-    public ValuesTrimPropertis(String name) {
+    public ValuesTrimProperties(String name) {
         super(name);
     }
 
@@ -46,11 +46,6 @@ public class ValuesTrimPropertis extends ComponentPropertiesImpl {
     public void beforeTrimTable() {
         if (fieldNames != null && fieldNames.size() > 0) {
             trimTable.columnName.setValue(fieldNames);
-            List<Boolean> trimValues = new ArrayList<>();
-            for (int i = fieldNames.size(); i > 0; i--) {
-                trimValues.add(Boolean.FALSE);
-            }
-            trimTable.trim.setValue(trimValues);
         }
     }
 

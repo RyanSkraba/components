@@ -16,7 +16,6 @@ import java.util.zip.ZipOutputStream;
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.common.EncodingTypeProperties;
 import org.talend.components.filedelimited.tfileoutputdelimited.TFileOutputDelimitedProperties;
 
 import com.talend.csv.CSVWriter;
@@ -66,7 +65,7 @@ public class FileOutputDelimitedRuntime {
     public FileOutputDelimitedRuntime(TFileOutputDelimitedProperties props) {
         this.props = props;
         this.useStream = props.targetIsStream.getValue();
-        this.encoding = getEncoding();
+        this.encoding = props.encoding.getEncoding();
         setFieldSeparator(props.fieldSeparator.getValue());
         setRowSeparator(props.rowSeparator.getValue());
         if (props.csvOptions.getValue()) {
@@ -341,13 +340,6 @@ public class FileOutputDelimitedRuntime {
         } else {
             this.rowSeparator = rowSeparator;
         }
-    }
-
-    private String getEncoding() {
-        if (EncodingTypeProperties.ENCODING_TYPE_CUSTOM.equals(props.encoding.encodingType.getValue())) {
-            return props.encoding.customEncoding.getValue();
-        }
-        return props.encoding.encodingType.getValue();
     }
 
 }

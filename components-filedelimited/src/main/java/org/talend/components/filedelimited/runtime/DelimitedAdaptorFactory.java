@@ -1,19 +1,23 @@
 package org.talend.components.filedelimited.runtime;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
-import org.talend.components.api.exception.ComponentException;
+import org.apache.commons.lang3.StringUtils;
 import org.talend.components.api.exception.DataRejectException;
-import org.talend.components.common.ComponentConstants;
+import org.talend.components.filedelimited.FileDelimitedProperties;
+import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
 public class DelimitedAdaptorFactory implements IndexedRecordConverter<String[], IndexedRecord> {
 
     Schema schema;
+
+    FileDelimitedProperties properties;
 
     @Override
     public Class<String[]> getDatumClass() {
@@ -40,6 +44,14 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<String[],
         this.schema = schema;
     }
 
+    public FileDelimitedProperties getProperties() {
+        return properties;
+    }
+
+    public void setProperties(FileDelimitedProperties properties) {
+        this.properties = properties;
+    }
+
     private class DelimitedIndexedRecord implements IndexedRecord {
 
         String[] values;
@@ -53,7 +65,7 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<String[],
             throw new UnsupportedOperationException();
         }
 
-        private String names[];
+        private boolean trimValues[];
 
         AvroConverter[] fieldConverter = null;
 
@@ -61,36 +73,40 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<String[],
         public Object get(int index) {
             // Lazy initialization of the cached converter objects.
             Object value = null;
-            if (names == null) {
-                names = new String[getSchema().getFields().size()];
-                fieldConverter = new AvroConverter[names.length];
-                for (int j = 0; j < names.length; j++) {
-                    Schema.Field f = getSchema().getFields().get(j);
-                    names[j] = f.name();
-                    fieldConverter[j] = new FileDelimitedAvroRegistry().getConverter(f);
+            if (trimValues == null) {
+                if (properties == null) {
+                    throw new IllegalArgumentException("Runtime properties for converter is not be set!");
                 }
+                trimValues = new boolean[getSchema().getFields().size()];
+                fieldConverter = new AvroConverter[trimValues.length];
+                Object trimSelect = ((TFileInputDelimitedProperties) properties).trimColumns.trimTable.trim.getValue();
+                boolean trimAll = ((TFileInputDelimitedProperties) properties).trimColumns.trimAll.getValue();
+                for (int j = 0; j < trimValues.length; j++) {
+                    Schema.Field f = getSchema().getFields().get(j);
+                    fieldConverter[j] = new FileDelimitedAvroRegistry().getConverter(f, properties);
+                    if (trimAll) {
+                        trimValues[j] = true;
+                    } else if (trimSelect != null && (trimSelect instanceof List) && (j < ((List<Boolean>) trimSelect).size())) {
+                        trimValues[j] = ((List<Boolean>) trimSelect).get(j);
+                    }
+
+                }
+
             }
             if (index < values.length) {
                 try {
+                    if (trimValues[index] && !StringUtils.isEmpty(values[index])) {
+                        values[index] = values[index].trim();
+                    }
                     value = fieldConverter[index].convertToAvro(values[index]);
                 } catch (Exception e) {
-                    String propValue = getSchema().getProp(ComponentConstants.DIE_ON_ERROR);
-                    if (propValue != null && Boolean.valueOf(propValue)) {
+                    if (((TFileInputDelimitedProperties) properties).dieOnError.getValue()) {
                         throw e;
                     } else {
-                        if (e instanceof DataRejectException) {
-                            ((DataRejectException) e).getRejectInfo().put("talend_record", this);
-                            throw e;
-                        } else {
-                            Map<String, Object> resultMessage = new HashMap<String, Object>();
-                            if (e instanceof ComponentException && e.getClass() != null) {
-                                resultMessage.put("errorMessage", e.getCause().getMessage());
-                            } else {
-                                resultMessage.put("errorMessage", e.getMessage());
-                            }
-                            resultMessage.put("talend_record", this);
-                            throw new DataRejectException(resultMessage);
-                        }
+                        Map<String, Object> resultMessage = new HashMap<String, Object>();
+                        resultMessage.put("errorMessage", e.getMessage());
+                        resultMessage.put("talend_record", this);
+                        throw new DataRejectException(resultMessage);
                     }
                 }
             }

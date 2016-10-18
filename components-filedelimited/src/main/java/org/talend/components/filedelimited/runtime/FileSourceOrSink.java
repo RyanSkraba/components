@@ -135,7 +135,8 @@ public class FileSourceOrSink implements SourceOrSink {
                     }
                 }
             }
-            return Schema.createRecord(schemaName, null, null, false, fields);
+            Schema schema = Schema.createRecord(schemaName, null, null, false, fields);
+            return schema;
         } else {
             return Schema.createRecord(schemaName, null, null, false);
         }

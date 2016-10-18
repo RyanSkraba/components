@@ -25,7 +25,7 @@ public class ValuesTrimPropertiesTest {
 
     @Test
     public void testValuesTrimProperties() throws Throwable {
-        ValuesTrimPropertis props = (ValuesTrimPropertis) new ValuesTrimPropertis("trim").init();
+        ValuesTrimProperties props = (ValuesTrimProperties) new ValuesTrimProperties("trim").init();
         Form mainForm = props.getForm(Form.MAIN);
         assertFalse(mainForm.getWidget(props.trimAll.getName()).isHidden());
         assertFalse(mainForm.getWidget(props.trimTable.getName()).isHidden());

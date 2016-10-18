@@ -180,11 +180,11 @@ public class FileDelimitedTestBasic extends AbstractComponentTest {
                     }
 
                     LOGGER.debug("Row " + (index + 1) + " :" + sb.toString());
-                    sb.delete(0, sb.length());
                     successRecords.add(record);
                 } catch (DataRejectException dre) {
                     LOGGER.debug("Row " + (index + 1) + " :" + dre.getRejectInfo().get("errorMessage"));
                 }
+                sb.delete(0, sb.length());
             }
         } else {
             LOGGER.debug("Records list is empty!");

@@ -1,5 +1,11 @@
 package org.talend.components.filedelimited.runtime;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
@@ -13,14 +19,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.filedelimited.FileDelimitedTestBasic;
 import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.avro.AvroUtils;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
 
@@ -29,14 +30,17 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
     public static String[] ALL_FIELDS_NAME = new String[] { "TestBoolean", "TestByte", "TestBytes", "TestChar", "TestDate",
             "TestDouble", "TestFloat", "TestBigDecimal", "TestInteger", "TestLong", "TestObject" };
 
-    public static Schema DYNAMIC_IS_FIRST_SCHEMA = new org.apache.avro.Schema.Parser().parse(
+    public static Schema DYNAMIC_IS_FIRST_SCHEMA = new Schema.Parser().parse(
             "{\"type\":\"record\",\"name\":\"MAIN\",\"fields\":[{\"name\":\"test_end\",\"type\":[\"int\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"test_end\",\"di.column.talendType\":\"id_Integer\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"test_end\",\"di.column.relatedEntity\":\"\"}],\"di.table.name\":\"MAIN\",\"di.table.label\":\"MAIN\",\"di.dynamic.column.comment\":\"\",\"di.dynamic.column.name\":\"test_dynamic\",\"di.column.talendType\":\"id_Dynamic\",\"talend.field.pattern\":\"dd-MM-yyyy\",\"di.column.isNullable\":\"true\",\"talend.field.scale\":\"0\",\"talend.field.dbColumnName\":\"test_dynamic\",\"di.column.relatedEntity\":\"\",\"di.column.relationshipType\":\"\",\"di.dynamic.column.position\":\"0\",\"include-all-fields\":\"true\"}");
 
-    public static Schema DYNAMIC_IS_MID_SCHEMA = new org.apache.avro.Schema.Parser().parse(
+    public static Schema DYNAMIC_IS_MID_SCHEMA = new Schema.Parser().parse(
             "{\"type\":\"record\",\"name\":\"MAIN\",\"fields\":[{\"name\":\"test_begin\",\"type\":[\"int\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"test_begin\",\"di.column.talendType\":\"id_Integer\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"test_begin\",\"di.column.relatedEntity\":\"\"},{\"name\":\"test_end\",\"type\":[\"int\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"test_end\",\"di.column.talendType\":\"id_Integer\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"test_end\",\"di.column.relatedEntity\":\"\"}],\"di.table.name\":\"MAIN\",\"di.table.label\":\"MAIN\",\"di.dynamic.column.comment\":\"\",\"di.dynamic.column.name\":\"test_dynamic\",\"di.column.talendType\":\"id_Dynamic\",\"talend.field.pattern\":\"dd-MM-yyyy\",\"di.column.isNullable\":\"true\",\"talend.field.scale\":\"0\",\"talend.field.dbColumnName\":\"test_dynamic\",\"di.column.relatedEntity\":\"\",\"di.column.relationshipType\":\"\",\"di.dynamic.column.position\":\"1\",\"include-all-fields\":\"true\"}");
 
-    public static Schema DYNAMIC_IS_END_SCHEMA = new org.apache.avro.Schema.Parser().parse(
+    public static Schema DYNAMIC_IS_END_SCHEMA = new Schema.Parser().parse(
             "{\"type\":\"record\",\"name\":\"MAIN\",\"fields\":[{\"name\":\"test_begin\",\"type\":[\"int\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"test_begin\",\"di.column.talendType\":\"id_Integer\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"test_begin\",\"di.column.relatedEntity\":\"\"}],\"di.table.name\":\"MAIN\",\"di.table.label\":\"MAIN\",\"di.dynamic.column.comment\":\"\",\"di.dynamic.column.name\":\"test_dynamic\",\"di.column.talendType\":\"id_Dynamic\",\"talend.field.pattern\":\"dd-MM-yyyy\",\"di.column.isNullable\":\"true\",\"talend.field.scale\":\"0\",\"talend.field.dbColumnName\":\"test_dynamic\",\"di.column.relatedEntity\":\"\",\"di.column.relationshipType\":\"\",\"di.dynamic.column.position\":\"1\",\"include-all-fields\":\"true\"}");
+
+    public static Schema NUMBER_DECODE_SCHEMA = new Schema.Parser().parse(
+            "{\"type\":\"record\",\"name\":\"tFileInputDelimited_1\",\"fields\":[{\"name\":\"TestBoolean\",\"type\":[\"boolean\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"TestBoolean\",\"di.column.talendType\":\"id_Boolean\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"TestBoolean\",\"di.column.relatedEntity\":\"\"},{\"name\":\"TestByte\",\"type\":[{\"type\":\"int\",\"java-class\":\"java.lang.Byte\"},\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"TestByte\",\"di.column.talendType\":\"id_Byte\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"TestByte\",\"di.column.relatedEntity\":\"\"},{\"name\":\"TestShort\",\"type\":[{\"type\":\"int\",\"java-class\":\"java.lang.Short\"},\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"TestShort\",\"di.column.talendType\":\"id_Short\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"dd-MM-yyyy\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"TestShort\",\"di.column.relatedEntity\":\"\"},{\"name\":\"TestInteger\",\"type\":[\"int\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"TestInteger\",\"di.column.talendType\":\"id_Integer\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"TestInteger\",\"di.column.relatedEntity\":\"\"},{\"name\":\"TestLong\",\"type\":[\"long\",\"null\"],\"di.table.comment\":\"\",\"talend.field.dbColumnName\":\"TestLong\",\"di.column.talendType\":\"id_Long\",\"di.column.isNullable\":\"true\",\"talend.field.pattern\":\"\",\"di.column.relationshipType\":\"\",\"di.table.label\":\"TestLong\",\"di.column.relatedEntity\":\"\"}],\"di.table.name\":\"tFileInputDelimited_1\",\"di.table.label\":\"tFileInputDelimited_1\"}");
 
     // Test FileInputDelimited component read with delimited mode
     @Test
@@ -158,30 +162,285 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
 
     }
 
+    @Test
+    public void testInputDecodeNumber() throws Throwable {
+        String resources = getClass().getResource("/runtime/input").getPath();
+        String inputFile = resources + "/test_input_decode.csv";
+        LOGGER.debug("Test file path: " + inputFile);
+
+        TFileInputDelimitedProperties properties = createInputProperties(inputFile, false);
+        properties.main.schema.setValue(NUMBER_DECODE_SCHEMA);
+        properties.dieOnError.setValue(true);
+
+        // 1. Test enable decode
+        properties.enableDecode.setValue(true);
+
+        java.util.List<String> columnsName = new java.util.ArrayList<String>();
+        columnsName.add("TestBoolean");
+        columnsName.add("TestByte");
+        columnsName.add("TestShort");
+        columnsName.add("TestInteger");
+        columnsName.add("TestLong");
+        properties.decodeTable.setValue("columnName", columnsName);
+        java.util.List<Boolean> decodes = new java.util.ArrayList<Boolean>();
+        decodes.add(false);
+        decodes.add(true);
+        decodes.add(true);
+        decodes.add(true);
+        decodes.add(true);
+        properties.decodeTable.setValue("decode", decodes);
+
+        List<IndexedRecord> records = readRows(properties);
+        assertEquals(4, records.size());
+        List<IndexedRecord> successRecords = printLogRecords(records);
+        assertEquals(4, successRecords.size());
+
+        assertEquals(false, records.get(0).get(0));
+        // Decode OctalDigits "010" for Byte type
+        assertEquals(8, records.get(0).get(1));
+        // Decode OctalDigits "0100" for Short type
+        assertEquals(64, records.get(0).get(2));
+        // Decode OctalDigits "01000" for Integer type
+        assertEquals(512, records.get(0).get(3));
+        // Decode OctalDigits "010000" for Long type
+        assertEquals(4096L, records.get(0).get(4));
+
+        assertEquals(true, records.get(3).get(0));
+        // Decode HexDigits "0X18" for Byte type
+        assertEquals(24, records.get(3).get(1));
+        // Decode HexDigits "0X188" for Short type
+        assertEquals(392, records.get(3).get(2));
+        // Decode HexDigits "0X1888" for Integer type
+        assertEquals(6280, records.get(3).get(3));
+        // Decode HexDigits "0X18888" for Long type
+        assertEquals(100488L, records.get(3).get(4));
+
+        // 2. Test disable decode and disable "die on error"
+        properties.dieOnError.setValue(false);
+        properties.enableDecode.setValue(false);
+        records = readRows(properties);
+        assertEquals(4, records.size());
+        successRecords = printLogRecords(records);
+        assertEquals(1, successRecords.size());
+
+        try {
+            // 3. Test disable decode and enable "die on error"
+            properties.dieOnError.setValue(true);
+            records = readRows(properties);
+            assertEquals(4, records.size());
+            printLogRecords(records);
+            fail("Expect get NumberFormatException !");
+        } catch (Exception e) {
+            // "TestByte" parse value "0X100" fails
+            LOGGER.debug(e.getMessage());
+            assertEquals(NumberFormatException.class, e.getClass());
+        }
+
+        try {
+            // 3. Test enable decode, enable "die on error" and disable "TestInteger" decode
+            properties.enableDecode.setValue(true);
+            decodes.add(3, false);
+            records = readRows(properties);
+            assertEquals(4, records.size());
+            printLogRecords(records);
+            fail("Expect get NumberFormatException !");
+        } catch (Exception e) {
+            // "TestInteger" parse value "0X1000" fails
+            LOGGER.debug(e.getMessage());
+            assertEquals(NumberFormatException.class, e.getClass());
+        }
+
+    }
+
+    @Test
+    public void testInputTransformNumberString() throws Throwable {
+        String resources = getClass().getResource("/runtime/input").getPath();
+        String inputFile = resources + "/test_input_transform_number.csv";
+        LOGGER.debug("Test file path: " + inputFile);
+
+        TFileInputDelimitedProperties properties = createInputProperties(inputFile, false);
+        properties.main.schema.setValue(NUMBER_DECODE_SCHEMA);
+        properties.dieOnError.setValue(true);
+        properties.enableDecode.setValue(true);
+
+        java.util.List<String> columnsName = new java.util.ArrayList<String>();
+        columnsName.add("TestBoolean");
+        columnsName.add("TestByte");
+        columnsName.add("TestShort");
+        columnsName.add("TestInteger");
+        columnsName.add("TestLong");
+        properties.decodeTable.setValue("columnName", columnsName);
+        java.util.List<Boolean> decodes = new java.util.ArrayList<Boolean>();
+        decodes.add(false);
+        decodes.add(true);
+        decodes.add(true);
+        decodes.add(true);
+        decodes.add(true);
+        properties.decodeTable.setValue("decode", decodes);
+
+        // Default thousandsSeparator and decimalSeparator setting is disabled
+        try {
+            List<IndexedRecord> records = readRows(properties);
+            assertEquals(4, records.size());
+            printLogRecords(records);
+            fail("Expect get NumberFormatException !");
+        } catch (Exception e) {
+            // "TestInteger" parse value "01,000" fails
+            e.printStackTrace();
+            LOGGER.debug(e.getMessage());
+            assertEquals(NumberFormatException.class, e.getClass());
+        }
+
+        // Enable thousandsSeparator and decimalSeparator setting
+        properties.advancedSeparator.setValue(true);
+        properties.thousandsSeparator.setValue(",");
+        properties.decimalSeparator.setValue(".");
+        List<IndexedRecord> records = readRows(properties);
+        assertEquals(4, records.size());
+        List<IndexedRecord> successRecords = printLogRecords(records);
+        assertEquals(4, successRecords.size());
+
+        assertEquals(true, records.get(3).get(0));
+        // Decode HexDigits "0X18"
+        assertEquals(24, records.get(3).get(1));
+        // Decode HexDigits and transform 0X1,888 for Short type
+        assertEquals(6280, records.get(3).get(2));
+        // Decode HexDigits and transform "0X18,888" for Integer type
+        assertEquals(100488, records.get(3).get(3));
+        // Decode HexDigits and transform "0X188,888" for Long type
+        assertEquals(1607816L, records.get(3).get(4));
+
+    }
+
+    // Test FileInputDelimited component read with delimited mode and trim function
+    @Test
+    public void testInputTrimDelimitedMode() throws Throwable {
+        testInputTrim(false);
+    }
+
+    // Test FileInputDelimited component read with delimited mode and trim function
+    @Test
+    public void testInputTrimCSVdMode() throws Throwable {
+        testInputTrim(true);
+    }
+
+    protected void testInputTrim(boolean isCsvMode) throws Throwable {
+        String resources = getClass().getResource("/runtime/input").getPath();
+        String inputFile = resources + "/test_input_trim.csv";
+        LOGGER.debug("Test file path: " + inputFile);
+
+        TFileInputDelimitedProperties properties = createInputProperties(inputFile, isCsvMode);
+
+        List<IndexedRecord> records = readRows(properties);
+        assertEquals(20, records.size());
+        List<IndexedRecord> successRecords = printLogRecords(records);
+        assertEquals(14, successRecords.size());
+        // "true " for TestBoolean, would parse to false
+        assertEquals(false, records.get(0).get(0));
+        // " " for TestBytes
+        assertEquals("   ", new String((byte[]) records.get(2).get(2)));
+        // " I" for TestChar
+        assertEquals(" ", records.get(3).get(3));
+        // " " for TestDate, Date parser trim date string automatically
+        assertNull(records.get(4).get(4));
+        // " " for TestObject
+        assertEquals("   ", new String((byte[]) records.get(10).get(10)));
+        properties.dieOnError.setValue(true);
+        try {
+            printLogRecords(readRows(properties));
+            fail("Expect get NumberFormatException !");
+        } catch (Exception e) {
+            LOGGER.debug("Expect exception: " + e.getMessage());
+        }
+
+        properties.trimColumns.trimAll.setValue(true);
+        records = readRows(properties);
+        assertEquals(20, records.size());
+        successRecords = printLogRecords(records);
+        assertEquals(20, successRecords.size());
+        // "true " for TestBoolean. Would parse to true after trim
+        assertEquals(true, records.get(0).get(0));
+        // " " for TestByte
+        assertNull(records.get(1).get(1));
+        // " " for TestBytes
+        assertNull(records.get(2).get(2));
+        // " I" for TestChar
+        assertEquals("I", records.get(3).get(3));
+        // " " for TestDate, Date parser trim date string automatically
+        assertNull(records.get(4).get(4));
+        // " " for TestDouble
+        assertNull(records.get(5).get(5));
+        // " " for TestFloat
+        assertNull(records.get(6).get(6));
+        // " " for TestBigDecimal
+        assertNull(records.get(7).get(7));
+        // " " for TestInteger
+        assertNull(records.get(8).get(8));
+        // " " for TestLong
+        assertNull(records.get(9).get(9));
+        // " " for TestObject
+        assertNull(records.get(10).get(10));
+    }
+
+    // Test FileInputDelimited component read anc check date
+    @Test(expected = RuntimeException.class)
+    public void testInputCheckDate() throws Throwable {
+        String resources = getClass().getResource("/runtime/input").getPath();
+        String inputFile = resources + "/test_input_check_date.csv";
+        LOGGER.debug("Test file path: " + inputFile);
+
+        TFileInputDelimitedProperties properties = createInputProperties(inputFile, false);
+        properties.dieOnError.setValue(true);
+        // "Check date" not check. This means "2016-18-06T15:31:07" with wrong month number would be parsed lenient
+        List<IndexedRecord> successRecords = printLogRecords(readRows(properties));
+        assertEquals(20, successRecords.size());
+
+        // "Check date" check. This means "2016-18-06T15:31:07" with wrong month number would throw exception
+        properties.checkDate.setValue(true);
+        try {
+            printLogRecords(readRows(properties));
+        } catch (Exception e) {
+            LOGGER.debug("Expect exception: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    // Test FileInputDelimited component read with delimited mode and die on error
     @Test(expected = NumberFormatException.class)
     public void testInputDieOnErrorDelimitedMode() throws Throwable {
         String resources = getClass().getResource("/runtime/input").getPath();
         String inputFile = resources + "/test_input_delimited_reject.csv";
         LOGGER.debug("Test file path: " + inputFile);
 
-        TFileInputDelimitedProperties properties = createWizaredProperties(createInputProperties(inputFile, false));
+        TFileInputDelimitedProperties properties = createInputProperties(inputFile, false);
         properties.dieOnError.setValue(true);
-        testInputReject(properties);
+        try {
+            testInputReject(properties);
+        } catch (Exception e) {
+            LOGGER.debug("Expect exception: " + e.getMessage());
+            throw e;
+        }
 
     }
 
-    @Test(expected = ComponentException.class)
+    // Test FileInputDelimited component read with CSV mode and die on error
+    @Test(expected = RuntimeException.class)
     public void testInputDieOnErrorCsvMode() throws Throwable {
         String resources = getClass().getResource("/runtime/input").getPath();
         String inputFile = resources + "/test_input_csv_reject.csv";
         LOGGER.debug("Test file path: " + inputFile);
 
-        TFileInputDelimitedProperties properties = createWizaredProperties(createInputProperties(inputFile, true));
+        TFileInputDelimitedProperties properties = createInputProperties(inputFile, true);
         properties.dieOnError.setValue(true);
-        testInputReject(properties);
-
+        try {
+            testInputReject(properties);
+        } catch (Exception e) {
+            LOGGER.debug("Expect exception: " + e.getMessage());
+            throw e;
+        }
     }
 
+    // Test FileInputDelimited component read with delimited mode and with reject
     @Test
     public void testInputRejectDelimitedMode() throws Throwable {
         String resources = getClass().getResource("/runtime/input").getPath();
@@ -190,6 +449,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         testInputReject(createWizaredProperties(createInputProperties(inputFile, false)));
     }
 
+    // Test FileInputDelimited component read with CSV mode and with reject
     @Test
     public void testInputRejectCsvMode() throws Throwable {
         String resources = getClass().getResource("/runtime/input").getPath();
@@ -333,20 +593,20 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
             int fieldSize = BASIC_SCHEMA.getFields().size();
             assertTrue(records.get(0).get(0) instanceof Boolean);
             assertEquals(false, records.get(0).get(0));
-            assertTrue(records.get(0).get(1) instanceof Byte);
-            assertEquals(Byte.valueOf("1"), records.get(0).get(1));
+            assertTrue(records.get(0).get(1) instanceof Integer);
+            assertEquals(1, records.get(0).get(1));
             assertTrue(records.get(0).get(2) instanceof byte[]);
             assertEquals("IIG2iTCNnLlicDqGVM", new String((byte[]) records.get(0).get(2)));
-            assertTrue(records.get(0).get(3) instanceof Character);
-            assertEquals('n', records.get(0).get(3));
+            assertTrue(records.get(0).get(3) instanceof String);
+            assertEquals("n", records.get(0).get(3));
             assertTrue(records.get(0).get(4) instanceof Long);
             assertEquals(parseToDate("yyyy-MM-dd'T'HH:mm:ss", "2016-09-06T15:31:07").getTime(), records.get(0).get(4));
             assertTrue(records.get(0).get(5) instanceof Double);
             assertEquals(2.75, records.get(0).get(5));
             assertTrue(records.get(0).get(6) instanceof Float);
             assertEquals(0.246f, records.get(0).get(6));
-            assertTrue(records.get(0).get(7) instanceof BigDecimal);
-            assertEquals(BigDecimal.valueOf(4.797), records.get(0).get(7));
+            assertTrue(records.get(0).get(7) instanceof String);
+            assertEquals("4.797", records.get(0).get(7));
             assertTrue(records.get(0).get(8) instanceof Integer);
             assertEquals(1820, records.get(0).get(8));
             assertTrue(records.get(0).get(9) instanceof Long);
@@ -364,38 +624,38 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         assertEquals(count, records.size());
         int fieldSize = BASIC_SCHEMA.getFields().size();
         assertTrue(records.get(0).get(0) instanceof Boolean);
-        assertTrue(records.get(0).get(1) instanceof Byte);
+        assertTrue(records.get(0).get(1) instanceof Integer);
         assertTrue(records.get(0).get(2) instanceof byte[]);
-        assertTrue(records.get(0).get(3) instanceof Character);
+        assertTrue(records.get(0).get(3) instanceof String);
         assertTrue(records.get(0).get(4) instanceof Long);
         assertTrue(records.get(0).get(5) instanceof Double);
         assertTrue(records.get(0).get(6) instanceof Float);
-        assertTrue(records.get(0).get(7) instanceof BigDecimal);
+        assertTrue(records.get(0).get(7) instanceof String);
         assertTrue(records.get(0).get(8) instanceof Integer);
         assertTrue(records.get(0).get(9) instanceof Long);
         assertTrue(records.get(0).get(10) instanceof byte[]);
         if (properties.header.getValue() == 1) {
             assertEquals(false, records.get(0).get(0));
-            assertEquals(Byte.valueOf("1"), records.get(0).get(1));
+            assertEquals(1, records.get(0).get(1));
             assertEquals("IIG2iTCNnLlicDqGVM", new String((byte[]) records.get(0).get(2)));
-            assertEquals('n', records.get(0).get(3));
+            assertEquals("n", records.get(0).get(3));
             assertEquals(parseToDate("yyyy-MM-dd'T'HH:mm:ss", "2016-09-06T15:31:07").getTime(), records.get(0).get(4));
             assertEquals(2.75, records.get(0).get(5));
             assertEquals(0.246f, records.get(0).get(6));
-            assertEquals(BigDecimal.valueOf(4.797), records.get(0).get(7));
+            assertEquals("4.797", records.get(0).get(7));
             assertEquals(1820, records.get(0).get(8));
             assertEquals(1473147067519L, records.get(0).get(9));
             assertEquals("Thomas Grant", new String((byte[]) records.get(0).get(10)));
         }
         if (properties.header.getValue() == 3) {
             assertEquals(false, records.get(0).get(0));
-            assertEquals(Byte.valueOf("29"), records.get(0).get(1));
+            assertEquals(29, records.get(0).get(1));
             assertEquals("vEq3xp8fZsx92xwhz4", new String((byte[]) records.get(0).get(2)));
-            assertEquals('G', records.get(0).get(3));
+            assertEquals("G", records.get(0).get(3));
             assertEquals(parseToDate("yyyy-MM-dd'T'HH:mm:ss", "2016-09-06T15:31:07").getTime(), records.get(0).get(4));
             assertEquals(5.75, records.get(0).get(5));
             assertEquals(3.567f, records.get(0).get(6));
-            assertEquals(BigDecimal.valueOf(3.567), records.get(0).get(7));
+            assertEquals("3.567", records.get(0).get(7));
             assertEquals(3448, records.get(0).get(8));
             assertEquals(1473147067522L, records.get(0).get(9));
             assertEquals("Dwight Eisenhower", new String((byte[]) records.get(0).get(10)));
