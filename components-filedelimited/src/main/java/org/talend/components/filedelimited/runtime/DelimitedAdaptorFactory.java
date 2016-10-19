@@ -19,6 +19,10 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<String[],
 
     FileDelimitedProperties properties;
 
+    private boolean trimValues[];
+
+    private AvroConverter[] fieldConverter = null;
+
     @Override
     public Class<String[]> getDatumClass() {
         return String[].class;
@@ -52,6 +56,27 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<String[],
         this.properties = properties;
     }
 
+    private void initializeConverters() {
+        if (properties == null) {
+            throw new IllegalArgumentException("Runtime properties for converter is not be set!");
+        }
+        trimValues = new boolean[getSchema().getFields().size()];
+        fieldConverter = new AvroConverter[trimValues.length];
+        Object trimSelect = ((TFileInputDelimitedProperties) properties).trimColumns.trimTable.trim.getValue();
+        boolean trimAll = ((TFileInputDelimitedProperties) properties).trimColumns.trimAll.getValue();
+        for (int j = 0; j < trimValues.length; j++) {
+            Schema.Field f = getSchema().getFields().get(j);
+            fieldConverter[j] = new FileDelimitedAvroRegistry().getConverter(f, properties);
+            if (trimAll) {
+                trimValues[j] = true;
+            } else if (trimSelect != null && (trimSelect instanceof List) && (j < ((List<Boolean>) trimSelect).size())) {
+                trimValues[j] = ((List<Boolean>) trimSelect).get(j);
+            }
+
+        }
+    }
+
+
     private class DelimitedIndexedRecord implements IndexedRecord {
 
         String[] values;
@@ -65,34 +90,14 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<String[],
             throw new UnsupportedOperationException();
         }
 
-        private boolean trimValues[];
-
-        AvroConverter[] fieldConverter = null;
-
         @Override
         public Object get(int index) {
             // Lazy initialization of the cached converter objects.
-            Object value = null;
             if (trimValues == null) {
-                if (properties == null) {
-                    throw new IllegalArgumentException("Runtime properties for converter is not be set!");
-                }
-                trimValues = new boolean[getSchema().getFields().size()];
-                fieldConverter = new AvroConverter[trimValues.length];
-                Object trimSelect = ((TFileInputDelimitedProperties) properties).trimColumns.trimTable.trim.getValue();
-                boolean trimAll = ((TFileInputDelimitedProperties) properties).trimColumns.trimAll.getValue();
-                for (int j = 0; j < trimValues.length; j++) {
-                    Schema.Field f = getSchema().getFields().get(j);
-                    fieldConverter[j] = new FileDelimitedAvroRegistry().getConverter(f, properties);
-                    if (trimAll) {
-                        trimValues[j] = true;
-                    } else if (trimSelect != null && (trimSelect instanceof List) && (j < ((List<Boolean>) trimSelect).size())) {
-                        trimValues[j] = ((List<Boolean>) trimSelect).get(j);
-                    }
-
-                }
-
+                initializeConverters();
             }
+
+            Object value = null;
             if (index < values.length) {
                 try {
                     if (trimValues[index] && !StringUtils.isEmpty(values[index])) {
