@@ -11,7 +11,7 @@ import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
+import org.talend.components.filedelimited.FileDelimitedProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
@@ -29,7 +29,7 @@ public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedR
 
     protected FileInputDelimitedRuntime inputRuntime;
 
-    TFileInputDelimitedProperties properties;
+    FileDelimitedProperties properties;
 
     protected String[] values;
 
@@ -40,7 +40,7 @@ public abstract class FileDelimitedReader extends AbstractBoundedReader<IndexedR
 
     protected int dataCount;
 
-    public FileDelimitedReader(RuntimeContainer container, BoundedSource source, TFileInputDelimitedProperties properties) {
+    public FileDelimitedReader(RuntimeContainer container, BoundedSource source, FileDelimitedProperties properties) {
         super(source);
         this.container = container;
         this.properties = properties;

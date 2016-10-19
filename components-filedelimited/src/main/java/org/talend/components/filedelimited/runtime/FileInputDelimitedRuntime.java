@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.common.EncodingTypeProperties;
 import org.talend.components.common.runtime.FileRuntimeHelper;
+import org.talend.components.filedelimited.FileDelimitedProperties;
 import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.fileprocess.FileInputDelimited;
@@ -26,7 +27,7 @@ public class FileInputDelimitedRuntime {
 
     private transient static final Logger LOG = LoggerFactory.getLogger(FileInputDelimitedRuntime.class);
 
-    private TFileInputDelimitedProperties props;
+    private FileDelimitedProperties props;
 
     protected Object fileNameOrStream;
 
@@ -60,12 +61,18 @@ public class FileInputDelimitedRuntime {
 
     protected boolean schemaIsDynamic;
 
+    private boolean uncompress;
+
+    private boolean splitRecord;
+
+    private boolean random;
+
     // For preview data
     protected List<String> columnNames;
 
     protected List<Integer> columnsLength;
 
-    public FileInputDelimitedRuntime(TFileInputDelimitedProperties props) {
+    public FileInputDelimitedRuntime(FileDelimitedProperties props) {
         this.props = props;
     }
 
@@ -83,13 +90,17 @@ public class FileInputDelimitedRuntime {
         if (schemaIsDynamic) {
             header = header - 1;
         }
-        footer = (props.footer.getValue() == null || props.uncompress.getValue()) ? -1 : props.footer.getValue();
-
+        if (props instanceof TFileInputDelimitedProperties) {
+            uncompress = ((TFileInputDelimitedProperties) props).uncompress.getValue();
+            splitRecord = ((TFileInputDelimitedProperties) props).splitRecord.getValue();
+            if (((TFileInputDelimitedProperties) props).random.getValue()) {
+                nbRandom = (((TFileInputDelimitedProperties) props).nbRandom.getValue() == null || uncompress) ? -1
+                        : ((TFileInputDelimitedProperties) props).nbRandom.getValue();
+            }
+        }
+        footer = (props.footer.getValue() == null || uncompress) ? -1 : props.footer.getValue();
         limit = (props.limit.getValue() == null) ? -1 : props.limit.getValue();
 
-        if (props.random.getValue()) {
-            nbRandom = (props.nbRandom.getValue() == null || props.uncompress.getValue()) ? -1 : props.nbRandom.getValue();
-        }
         if (sourceIsStream) {
             zipInputStream = FileRuntimeHelper.getZipInputStream((InputStream) fileNameOrStream);
         } else {
@@ -104,23 +115,23 @@ public class FileInputDelimitedRuntime {
 
     public FileInputDelimited getFileDelimited() throws IOException {
         FileInputDelimited fileInputDelimited = null;
-        if (props.uncompress.getValue()) {
+        if (uncompress) {
             ZipEntry zipEntry = null;
             if (hashNextEntry()) {
                 fileInputDelimited = new FileInputDelimited(zipInputStream, encoding, props.fieldSeparator.getValue(),
                         props.rowSeparator.getValue(), props.removeEmptyRow.getValue(), header, footer, limit, nbRandom,
-                        props.splitRecord.getValue());
+                        splitRecord);
             }
         } else {
             if (sourceIsStream) {
                 checkFooterAndRandom();
                 fileInputDelimited = new FileInputDelimited((InputStream) fileNameOrStream, encoding,
                         props.fieldSeparator.getValue(), props.rowSeparator.getValue(), props.removeEmptyRow.getValue(), header,
-                        footer, limit, nbRandom, props.splitRecord.getValue());
+                        footer, limit, nbRandom, splitRecord);
             } else {
                 fileInputDelimited = new FileInputDelimited(String.valueOf(fileNameOrStream), encoding,
                         props.fieldSeparator.getValue(), props.rowSeparator.getValue(), props.removeEmptyRow.getValue(), header,
-                        footer, limit, nbRandom, props.splitRecord.getValue());
+                        footer, limit, nbRandom, splitRecord);
             }
 
         }
@@ -134,7 +145,7 @@ public class FileInputDelimitedRuntime {
         currentLine = 0;
         CSVReader csvReader = null;
 
-        if (props.uncompress.getValue()) {
+        if (uncompress) {
             if (hashNextEntry()) {
                 csvReader = new CSVReader(zipInputStream, getFieldSeparator(), encoding);
             } else {

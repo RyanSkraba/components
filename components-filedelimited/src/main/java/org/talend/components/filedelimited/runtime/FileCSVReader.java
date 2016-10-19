@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.filedelimited.FileDelimitedProperties;
 import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
 
 import com.talend.csv.CSVReader;
@@ -26,7 +27,7 @@ public class FileCSVReader extends FileDelimitedReader {
 
     private int currentLine;
 
-    public FileCSVReader(RuntimeContainer container, BoundedSource source, TFileInputDelimitedProperties properties) {
+    public FileCSVReader(RuntimeContainer container, BoundedSource source, FileDelimitedProperties properties) {
         super(container, source, properties);
     }
 
@@ -50,7 +51,7 @@ public class FileCSVReader extends FileDelimitedReader {
                 currentIndexRecord = ((DelimitedAdaptorFactory) getFactory()).convertToAvro(values);
             }
         } catch (IOException e) {
-            if (properties.dieOnError.getValue()) {
+            if (((TFileInputDelimitedProperties) properties).dieOnError.getValue()) {
                 throw e;
             } else {
                 // TODO Meed junit test
@@ -69,7 +70,7 @@ public class FileCSVReader extends FileDelimitedReader {
         try {
             isContinue = csvReader.readNext();
             if (!isContinue) {
-                if (properties.uncompress.getValue()) {
+                if (((TFileInputDelimitedProperties) properties).uncompress.getValue()) {
                     csvReader = inputRuntime.getCsvReader();
                     isContinue = inputRuntime.limit != 0 && csvReader != null && csvReader.readNext();
                     currentLine = inputRuntime.currentLine;
@@ -82,7 +83,7 @@ public class FileCSVReader extends FileDelimitedReader {
                 isContinue = checkLimit();
             }
         } catch (IOException e) {
-            if (properties.dieOnError.getValue()) {
+            if (((TFileInputDelimitedProperties) properties).dieOnError.getValue()) {
                 throw e;
             } else {
                 isContinue = advance();
@@ -120,7 +121,7 @@ public class FileCSVReader extends FileDelimitedReader {
         }
         outputLine++;
         if (inputRuntime.limit > 0 && outputLine > inputRuntime.limit) {
-            if (properties.uncompress.getValue()) {
+            if (((TFileInputDelimitedProperties) properties).uncompress.getValue()) {
                 isContinue = advance();
             } else {
                 isContinue = false;

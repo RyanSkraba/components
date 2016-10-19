@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.common.EncodingTypeProperties;
 import org.talend.components.filedelimited.FileDelimitedProperties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
@@ -48,7 +49,8 @@ public class TFileOutputDelimitedProperties extends FileDelimitedProperties {
         creatDirIfNotExist.setValue(true);
         splitEvery.setValue(1000);
         flushOnRowNum.setValue(1);
-
+        encoding.encodingType.setPossibleValues(encoding.getDefaultEncodings());
+        encoding.encodingType.setValue(EncodingTypeProperties.ENCODING_TYPE_ISO_8859_15);
     }
 
     @Override

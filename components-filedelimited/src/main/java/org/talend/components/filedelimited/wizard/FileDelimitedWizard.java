@@ -19,12 +19,12 @@ import org.talend.components.filedelimited.FileDelimitedProperties;
 
 public class FileDelimitedWizard extends ComponentWizard {
 
-    FileDelimitedWizardProperties cProps;
+    FileDelimitedProperties cProps;
 
     FileDelimitedWizard(ComponentWizardDefinition def, String repositoryLocation) {
         super(def, repositoryLocation);
 
-        cProps = new FileDelimitedWizardProperties("file").setRepositoryLocation(getRepositoryLocation());
+        cProps = new FileDelimitedProperties("file").setRepositoryLocation(getRepositoryLocation());
         cProps.init();
         addForm(cProps.getForm(FileDelimitedProperties.FORM_WIZARD));
 

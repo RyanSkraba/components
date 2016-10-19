@@ -17,6 +17,8 @@ import org.talend.components.api.wizard.AbstractComponentWizardDefintion;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.filedelimited.FileDelimitedProperties;
+import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
+import org.talend.components.filedelimited.tfileoutputdelimited.TFileOutputDelimitedProperties;
 
 public class FileDelimitedWizardDefinition extends AbstractComponentWizardDefintion {
 
@@ -34,7 +36,8 @@ public class FileDelimitedWizardDefinition extends AbstractComponentWizardDefint
 
     @Override
     public boolean supportsProperties(Class<? extends ComponentProperties> propertiesClass) {
-        return propertiesClass.isAssignableFrom(FileDelimitedWizardProperties.class);
+        return propertiesClass.isAssignableFrom(TFileInputDelimitedProperties.class)
+                || propertiesClass.isAssignableFrom(TFileOutputDelimitedProperties.class);
     }
 
     @Override

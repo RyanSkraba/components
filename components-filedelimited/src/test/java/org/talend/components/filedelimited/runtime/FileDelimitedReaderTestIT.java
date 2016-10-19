@@ -8,7 +8,6 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +18,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.filedelimited.FileDelimitedProperties;
 import org.talend.components.filedelimited.FileDelimitedTestBasic;
 import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
 import org.talend.daikon.avro.AvroUtils;
@@ -446,7 +446,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         String resources = getClass().getResource("/runtime/input").getPath();
         String inputFile = resources + "/test_input_delimited_reject.csv";
         LOGGER.debug("Test file path: " + inputFile);
-        testInputReject(createWizaredProperties(createInputProperties(inputFile, false)));
+        testInputReject(createInputProperties(inputFile, false));
     }
 
     // Test FileInputDelimited component read with CSV mode and with reject
@@ -455,10 +455,10 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         String resources = getClass().getResource("/runtime/input").getPath();
         String inputFile = resources + "/test_input_csv_reject.csv";
         LOGGER.debug("Test file path: " + inputFile);
-        testInputReject(createWizaredProperties(createInputProperties(inputFile, true)));
+        testInputReject(createInputProperties(inputFile, true));
     }
 
-    private void testInputReject(TFileInputDelimitedProperties properties) throws Throwable {
+    private void testInputReject(FileDelimitedProperties properties) throws Throwable {
         List<IndexedRecord> records = readRows(properties);
 
         assertNotNull(records);
@@ -510,7 +510,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
     }
 
     protected void basicInputTest(Object file, boolean previewData, boolean isCsvMode, boolean sourceIsStream) throws Throwable {
-        TFileInputDelimitedProperties properties = null;
+        FileDelimitedProperties properties = null;
 
         if (previewData) {
             properties = createWizaredProperties(createInputProperties(file, isCsvMode));
@@ -569,7 +569,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         // testInputDynamic(properties, 9);
     }
 
-    protected void testBasicInput(TFileInputDelimitedProperties properties, int count, boolean previewData) throws Throwable {
+    protected void testBasicInput(FileDelimitedProperties properties, int count, boolean previewData) throws Throwable {
         if (previewData) {
             Map<String, Schema> result = FileDelimitedSource.previewData(null, properties, 200);
             for (String jsonData : result.keySet()) {

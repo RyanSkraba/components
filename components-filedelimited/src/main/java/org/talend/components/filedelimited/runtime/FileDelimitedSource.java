@@ -15,7 +15,6 @@ import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.filedelimited.FileDelimitedProperties;
 import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
-import org.talend.components.filedelimited.wizard.FileDelimitedWizardProperties;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
@@ -32,9 +31,9 @@ public class FileDelimitedSource extends FileSourceOrSink implements BoundedSour
 
     public FileDelimitedReader createReader(RuntimeContainer container) {
         if (((FileDelimitedProperties) properties).csvOptions.getValue()) {
-            return new FileCSVReader(container, this, (TFileInputDelimitedProperties) properties);
+            return new FileCSVReader(container, this, (FileDelimitedProperties) properties);
         } else {
-            return new DelimitedReader(container, this, (TFileInputDelimitedProperties) properties);
+            return new DelimitedReader(container, this, (FileDelimitedProperties) properties);
         }
     }
 
@@ -43,9 +42,9 @@ public class FileDelimitedSource extends FileSourceOrSink implements BoundedSour
         ValidationResult vr = super.validate(container);
         // also check that the properties is the right type
         if (vr.getStatus() != ValidationResult.Result.ERROR) {
-            if (!(properties instanceof TFileInputDelimitedProperties)) {
+            if (!(properties instanceof FileDelimitedProperties)) {
                 return new ValidationResult().setStatus(ValidationResult.Result.ERROR)
-                        .setMessage("properties should be of type :" + TFileInputDelimitedProperties.class.getCanonicalName());
+                        .setMessage("properties should be of type :" + FileDelimitedProperties.class.getCanonicalName());
             }
         }
         Object fileOrStream = ((FileDelimitedProperties) properties).fileName.getValue();
@@ -79,7 +78,7 @@ public class FileDelimitedSource extends FileSourceOrSink implements BoundedSour
         return false;
     }
 
-    public static Map<String, Schema> previewData(RuntimeContainer container, TFileInputDelimitedProperties properties,
+    public static Map<String, Schema> previewData(RuntimeContainer container, FileDelimitedProperties properties,
             int maxRowsToPreview) throws IOException {
         Map<String, Schema> result = new HashMap<>();
         FileDelimitedSource ss = new FileDelimitedSource();
@@ -87,8 +86,7 @@ public class FileDelimitedSource extends FileSourceOrSink implements BoundedSour
         FileDelimitedReader reader = ss.createReader(container);
         String jsonData = reader.inputRuntime.previewData(maxRowsToPreview);
         LOGGER.debug("Return json data: " + jsonData);
-        Schema schema = getSchema(((FileDelimitedWizardProperties) properties).name.getValue(), reader.inputRuntime.columnNames,
-                reader.inputRuntime.columnsLength);
+        Schema schema = getSchema(properties.name.getValue(), reader.inputRuntime.columnNames, reader.inputRuntime.columnsLength);
         LOGGER.debug("Guessed schema: " + schema);
         result.put(jsonData, schema);
         return result;

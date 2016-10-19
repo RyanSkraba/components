@@ -34,4 +34,9 @@ public abstract class FileDelimitedDefinition extends AbstractComponentDefinitio
         return true;
     }
 
+    @Override
+    public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
+        return new Class[] { FileDelimitedProperties.class };
+    }
+
 }

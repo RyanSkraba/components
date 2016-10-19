@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.filedelimited.FileDelimitedProperties;
 import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
 import org.talend.fileprocess.FileInputDelimited;
 
@@ -21,7 +22,7 @@ public class DelimitedReader extends FileDelimitedReader {
 
     private FileInputDelimited fid;
 
-    public DelimitedReader(RuntimeContainer container, BoundedSource source, TFileInputDelimitedProperties properties) {
+    public DelimitedReader(RuntimeContainer container, BoundedSource source, FileDelimitedProperties properties) {
         super(container, source, properties);
     }
 
@@ -42,7 +43,7 @@ public class DelimitedReader extends FileDelimitedReader {
                 currentIndexRecord = ((DelimitedAdaptorFactory) getFactory()).convertToAvro(values);
             }
         } catch (IOException e) {
-            if (properties.dieOnError.getValue()) {
+            if (((TFileInputDelimitedProperties) properties).dieOnError.getValue()) {
                 throw e;
             } else {
                 // TODO Meed junit test
@@ -59,7 +60,7 @@ public class DelimitedReader extends FileDelimitedReader {
         try {
             isContinue = fid.nextRecord();
             if (!isContinue) {
-                if (properties.uncompress.getValue()) {
+                if (((TFileInputDelimitedProperties) properties).uncompress.getValue()) {
                     fid = inputRuntime.getFileDelimited();
                     isContinue = fid != null && fid.nextRecord();
                 }
@@ -70,7 +71,7 @@ public class DelimitedReader extends FileDelimitedReader {
                 // successfulWrites.add(currentIndexRecord);
             }
         } catch (IOException e) {
-            if (properties.dieOnError.getValue()) {
+            if (((TFileInputDelimitedProperties) properties).dieOnError.getValue()) {
                 throw e;
             } else {
                 // TODO check reject ?

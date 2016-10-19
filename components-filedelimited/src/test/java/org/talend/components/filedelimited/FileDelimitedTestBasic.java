@@ -1,5 +1,9 @@
 package org.talend.components.filedelimited;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -36,15 +40,10 @@ import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimit
 import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
 import org.talend.components.filedelimited.tfileoutputdelimited.TFileOutputDelimitedDefinition;
 import org.talend.components.filedelimited.tfileoutputdelimited.TFileOutputDelimitedProperties;
-import org.talend.components.filedelimited.wizard.FileDelimitedWizardProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings("nls")
 public class FileDelimitedTestBasic extends AbstractComponentTest {
@@ -155,8 +154,8 @@ public class FileDelimitedTestBasic extends AbstractComponentTest {
         return properties;
     }
 
-    protected FileDelimitedWizardProperties createWizaredProperties(TFileInputDelimitedProperties properties) {
-        FileDelimitedWizardProperties wizardProperties = new FileDelimitedWizardProperties("wizard");
+    protected FileDelimitedProperties createWizaredProperties(TFileInputDelimitedProperties properties) {
+        FileDelimitedProperties wizardProperties = new FileDelimitedProperties("wizard");
         wizardProperties.init();
         wizardProperties.copyValuesFrom(properties);
         return wizardProperties;
