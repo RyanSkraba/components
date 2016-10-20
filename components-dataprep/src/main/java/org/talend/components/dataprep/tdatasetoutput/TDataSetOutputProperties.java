@@ -39,6 +39,8 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
+import org.talend.daikon.serialize.PostDeserializeSetup;
+import org.talend.daikon.serialize.SerializeSetVersion;
 
 /**
  * The ComponentProperties subclass provided by a component stores the configuration of a component and is used for:
@@ -58,7 +60,7 @@ import org.talend.daikon.properties.property.PropertyFactory;
  * <li>{code schema}, an embedded property referring to a Schema.</li>
  * </ol>
  */
-public class TDataSetOutputProperties extends DataPrepProperties {
+public class TDataSetOutputProperties extends DataPrepProperties implements SerializeSetVersion {
 
     private static final Logger LOG = LoggerFactory.getLogger(TDataSetOutputProperties.class);
 
@@ -256,4 +258,22 @@ public class TDataSetOutputProperties extends DataPrepProperties {
         return !isEmpty(url.getStringValue()) && !isEmpty(login.getStringValue()) && !isEmpty(pass.getStringValue())
                 && !isEmpty(dataSetName.getStringValue()) && !isEmpty(dataSetId.getStringValue());
     }
+
+    @Override
+    public int getVersionNumber() {
+        return 1;
+    }
+
+    @Override
+    public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
+        boolean migrated = super.postDeserialize(version, setup, persistent);
+
+        if (version < this.getVersionNumber()) {
+            mode.setPossibleValues(DataPrepOutputModes.class.getEnumConstants());
+            migrated = true;
+        }
+
+        return migrated;
+    }
+
 }
