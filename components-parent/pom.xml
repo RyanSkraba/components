@@ -261,7 +261,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.4</version>
+				<version>1.8</version>
 				<executions>
 					<execution>
 						<id>append-self-artifact-to-deps</id>
@@ -288,14 +288,14 @@
 						</goals>
 						<configuration>
 							<exportAntProperties>true</exportAntProperties>
-							<target>
+							<tasks>
 								<echo message="computing docker version" />
 								<condition property="docker.version"
 									value="${project.version}-${maven.build.timestamp}" else="${project.version}">
 									<contains string="${project.version}" substring="SNAPSHOT" />
 								</condition>
-								<echo message="${docker.version}" />
-							</target>
+								<echo message="the docker version is ${docker.version}" />
+                            </tasks>
 						</configuration>
 					</execution>
 				</executions>
