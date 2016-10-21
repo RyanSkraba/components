@@ -9,5 +9,5 @@ import org.talend.components.common.dataset.DatasetProperties;
 public interface DatastoreDefinition<DatastorePropT extends DatastoreProperties>
         extends RuntimableDefinition<DatastorePropT, Object> {
 
-    public DatasetProperties getDatasetProperties();
+    public DatasetProperties createDatasetProperties(DatastoreProperties storeProp);
 }

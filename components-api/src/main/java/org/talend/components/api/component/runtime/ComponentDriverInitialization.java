@@ -16,7 +16,7 @@ package org.talend.components.api.component.runtime;
  * Basic interface for defining properties and common methods required for Runtimes of components without connectors, or
  * components which need some pre-processing before performing the actual job.
  */
-public interface ComponentDriverInitialization extends ComponentRuntime {
+public interface ComponentDriverInitialization extends RuntimableRuntime {
 
     /**
      * Execute some code before the job or flow is started. This code will be called on driver node only, before actual

@@ -22,7 +22,7 @@ import org.talend.daikon.properties.ValidationResult;
  * and debugging messages.
  *
  */
-public interface SourceOrSink extends ComponentRuntime {
+public interface SourceOrSink extends RuntimableRuntime<ComponentProperties> {
 
     /**
      * Get the list of schema names available for this {@code SourceOrSink} or an empty List if none.

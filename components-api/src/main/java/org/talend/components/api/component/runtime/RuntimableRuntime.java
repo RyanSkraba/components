@@ -15,7 +15,7 @@ package org.talend.components.api.component.runtime;
 import java.io.Serializable;
 
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
 
 /**
@@ -30,7 +30,7 @@ import org.talend.daikon.properties.ValidationResult;
  * serialized in the main program and then deserialized on remote worker machines.
  *
  */
-public interface ComponentRuntime extends Serializable {
+public interface RuntimableRuntime<P extends Properties> extends Serializable {
 
     /**
      * Gets the ComponentProperties associated with this runtime class in order to configure it. This class also checks
@@ -46,6 +46,6 @@ public interface ComponentRuntime extends Serializable {
      * @param properties used to configure this runtime class.
      * @return ValidationResult status of the validation, if the status is ERROR then the flow or job shall be stopped.
      */
-    ValidationResult initialize(RuntimeContainer container, ComponentProperties properties);
+    ValidationResult initialize(RuntimeContainer container, P properties);
 
 }
