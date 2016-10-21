@@ -197,15 +197,15 @@ public class FileDelimitedTestBasic extends AbstractComponentTest {
         sink.initialize(adaptor, props);
         sink.validate(adaptor);
         FileDelimitedWriteOperation writeOperation = sink.createWriteOperation();
-        FileDelimitedWriter saleforceWriter = writeOperation.createWriter(adaptor);
+        FileDelimitedWriter delimitedWriter = writeOperation.createWriter(adaptor);
         Result result;
-        saleforceWriter.open("foo");
+        delimitedWriter.open("foo");
         try {
             for (IndexedRecord row : outputRows) {
-                saleforceWriter.write(row);
+                delimitedWriter.write(row);
             }
         } finally {
-            result = saleforceWriter.close();
+            result = delimitedWriter.close();
         }
         return result;
     }

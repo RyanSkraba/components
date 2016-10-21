@@ -17,6 +17,7 @@ import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.filedelimited.tfileoutputdelimited.TFileOutputDelimitedProperties;
+import org.talend.daikon.runtime.BufferedLineWriter;
 
 import com.talend.csv.CSVWriter;
 
@@ -148,7 +149,7 @@ public class FileOutputDelimitedRuntime {
                 splitedFileNo++;
             }
             if (props.rowMode.getValue()) {
-                this.writer = new BufferedOutput(streamWriter);
+                this.writer = new BufferedLineWriter(streamWriter);
                 this.strWriter = new StringWriter();
                 csvWriter = new CSVWriter(strWriter);
             } else {
@@ -165,8 +166,8 @@ public class FileOutputDelimitedRuntime {
                 streamWriter = new OutputStreamWriter((OutputStream) props.fileName.getValue(), encoding);
             }
             if (props.rowMode.getValue()) {
-                this.writer = new BufferedOutput(streamWriter);
-                StringWriter strWriter = new StringWriter();
+                this.writer = new BufferedLineWriter(streamWriter);
+                this.strWriter = new StringWriter();
                 csvWriter = new com.talend.csv.CSVWriter(strWriter);
             } else {
                 BufferedWriter bufferWriter = new BufferedWriter(streamWriter);
@@ -237,7 +238,7 @@ public class FileOutputDelimitedRuntime {
             }
         }
         if (props.rowMode.getValue()) {
-            writer = new BufferedOutput(streamWriter);
+            writer = new BufferedLineWriter(streamWriter);
         } else {
             writer = new BufferedWriter(streamWriter);
         }
