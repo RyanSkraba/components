@@ -27,11 +27,6 @@ public class TFileInputDelimitedDefinition extends FileDelimitedDefinition {
     }
 
     @Override
-    public boolean isSchemaAutoPropagate() {
-        return false;
-    }
-
-    @Override
     public boolean isConditionalInputs() {
         return true;
     }

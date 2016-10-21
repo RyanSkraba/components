@@ -28,17 +28,12 @@ public class TFileOutputDelimitedDefinition extends FileDelimitedDefinition {
 
     @Override
     public boolean isSchemaAutoPropagate() {
-        return false;
-    }
-
-    @Override
-    public boolean isConditionalInputs() {
         return true;
     }
 
     @Override
     public String getPartitioning() {
-        return AUTO;
+        return NONE;
     }
 
     @Override

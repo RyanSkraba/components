@@ -30,11 +30,6 @@ public abstract class FileDelimitedDefinition extends AbstractComponentDefinitio
     }
 
     @Override
-    public boolean isSchemaAutoPropagate() {
-        return true;
-    }
-
-    @Override
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return new Class[] { FileDelimitedProperties.class };
     }

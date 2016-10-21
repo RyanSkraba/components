@@ -7,13 +7,16 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.common.EncodingTypeProperties;
@@ -39,15 +42,28 @@ public class FileDelimitedTestIT extends FileDelimitedTestBasic {
     }
 
     @Test
-    public void testFamily() {
+    public void testComponentDefinition() {
         ComponentDefinition cdInput = getComponentService().getComponentDefinition(TFileInputDelimitedDefinition.COMPONENT_NAME);
         assertEquals(1, cdInput.getFamilies().length);
         assertEquals("File/Input", cdInput.getFamilies()[0]);
+        assertFalse(cdInput.isDataAutoPropagate());
+        assertFalse(cdInput.isSchemaAutoPropagate());
+        assertTrue(cdInput.isConditionalInputs());
+        assertTrue(cdInput.isStartable());
+        assertNull(cdInput.getPartitioning());
+        assertEquals(EnumSet.of(ConnectorTopology.OUTGOING), cdInput.getSupportedConnectorTopologies());
 
         ComponentDefinition cdOutput = getComponentService()
                 .getComponentDefinition(TFileOutputDelimitedDefinition.COMPONENT_NAME);
         assertEquals(1, cdOutput.getFamilies().length);
         assertEquals("File/Output", cdOutput.getFamilies()[0]);
+        assertTrue(cdOutput.isSchemaAutoPropagate());
+        assertFalse(cdOutput.isConditionalInputs());
+        assertFalse(cdInput.isDataAutoPropagate());
+        assertFalse(cdOutput.isStartable());
+        assertEquals(AbstractComponentDefinition.NONE, cdOutput.getPartitioning());
+        assertEquals(EnumSet.of(ConnectorTopology.INCOMING, ConnectorTopology.INCOMING_AND_OUTGOING),
+                cdOutput.getSupportedConnectorTopologies());
     }
 
     @Test
