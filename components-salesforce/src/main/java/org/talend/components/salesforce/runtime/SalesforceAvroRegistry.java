@@ -166,6 +166,9 @@ public class SalesforceAvroRegistry extends AvroRegistry {
         case _double:
             base = AvroUtils._double();
             break;
+        case percent:
+            base = AvroUtils._double();
+            break;
         case _int:
             base = AvroUtils._int();
             break;
