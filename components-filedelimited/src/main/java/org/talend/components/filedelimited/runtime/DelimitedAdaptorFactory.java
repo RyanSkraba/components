@@ -1,5 +1,7 @@
 package org.talend.components.filedelimited.runtime;
 
+import static org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties.FIELD_ERROR_MESSAGE;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +78,6 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<String[],
         }
     }
 
-
     private class DelimitedIndexedRecord implements IndexedRecord {
 
         String[] values;
@@ -109,7 +110,7 @@ public class DelimitedAdaptorFactory implements IndexedRecordConverter<String[],
                         throw e;
                     } else {
                         Map<String, Object> resultMessage = new HashMap<String, Object>();
-                        resultMessage.put("errorMessage", e.getMessage());
+                        resultMessage.put(FIELD_ERROR_MESSAGE, e.getMessage());
                         resultMessage.put("talend_record", this);
                         throw new DataRejectException(resultMessage);
                     }

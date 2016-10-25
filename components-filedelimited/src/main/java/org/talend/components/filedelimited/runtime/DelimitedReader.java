@@ -50,7 +50,9 @@ public class DelimitedReader extends FileDelimitedReader {
                 startAble = advance();
             }
         }
-
+        if (startAble) {
+            dataCount++;
+        }
         return startAble;
     }
 
@@ -78,7 +80,9 @@ public class DelimitedReader extends FileDelimitedReader {
                 isContinue = advance();
             }
         }
-
+        if (isContinue) {
+            dataCount++;
+        }
         return isContinue;
     }
 

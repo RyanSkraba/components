@@ -18,6 +18,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.runtime.BoundedReader;
+import org.talend.components.api.exception.DataRejectException;
 import org.talend.components.filedelimited.FileDelimitedProperties;
 import org.talend.components.filedelimited.FileDelimitedTestBasic;
 import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
@@ -470,6 +473,23 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         assertEquals(13, successRecords.size());
     }
 
+    // Test FileInputDelimited component nb line count
+    @Test
+    public void testInputNBLine() throws Throwable {
+        String resources = getClass().getResource("/runtime/input").getPath();
+        // CSV mode
+        String inputFile = resources + "/test_input_csv_reject.csv";
+        TFileInputDelimitedProperties properties = createInputProperties(inputFile, true);
+        // For tFileInputDelimited, number of line is total line (means included reject lines)
+        readAndCheck(properties, 20, false);
+
+        // Delimited mode
+        inputFile = resources + "/test_input_delimited_reject.csv";
+        properties = createInputProperties(inputFile, false);
+        readAndCheck(properties, 20, false);
+
+    }
+
     public void testInputDelimited(boolean previewData, boolean sourceIsStream) throws Throwable {
         String resources = getClass().getResource("/runtime/input").getPath();
         String inputFile = resources + "/test_input_delimited.csv";
@@ -695,6 +715,46 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
         }
         printLogRecords(records);
 
+    }
+
+    // Read the records from the file and check the records
+    private void readAndCheck(TFileInputDelimitedProperties inputProps, int count, boolean dieOnError) throws Throwable {
+        FileDelimitedSource source = new FileDelimitedSource();
+        source.initialize(null, inputProps);
+        source.validate(null);
+        BoundedReader<IndexedRecord> reader = source.createReader(null);
+        boolean hasRecord = reader.start();
+        while (hasRecord) {
+            try {
+                IndexedRecord currentRecord = reader.getCurrent();
+                assertNotNull(currentRecord.getSchema());
+                StringBuffer sb = new StringBuffer();
+                int columnSize = currentRecord.getSchema().getFields().size();
+                for (int i = 0; i < columnSize; i++) {
+                    // This convert exception maybe throw exception
+                    // DataRejectException or the real exception which based on "Die on error" check or not.
+                    sb.append(currentRecord.get(i));
+                    if (i != columnSize - 1) {
+                        sb.append(" - ");
+                    }
+                }
+                LOGGER.debug("Valid row " + " :" + sb.toString());
+                sb.delete(0, sb.length());
+            } catch (DataRejectException e) {
+                if (dieOnError) {
+                    throw e;
+                } else {
+                    LOGGER.debug(
+                            "Invalid row " + " :" + e.getRejectInfo().get(TFileInputDelimitedProperties.FIELD_ERROR_MESSAGE));
+                }
+            }
+            hasRecord = reader.advance();
+        }
+        reader.close();
+        Map<String, Object> returnMap = reader.getReturnValues();
+        assertNotNull(returnMap);
+        // Check the nb line with except value
+        assertEquals(count, returnMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
     }
 
 }
