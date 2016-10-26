@@ -8,12 +8,9 @@ import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
-import org.talend.daikon.properties.Properties;
-import org.talend.daikon.serialize.jsonschema.JsonUtil;
+import org.talend.daikon.serialize.SerializerDeserializer;
 
-import com.cedarsoftware.util.io.JsonReader;
 import com.cedarsoftware.util.io.JsonWriter;
 
 public class JsonSchema2HttpMessageConverter extends AbstractHttpMessageConverter<Object> {
@@ -35,17 +32,11 @@ public class JsonSchema2HttpMessageConverter extends AbstractHttpMessageConverte
      */
     @Override
     protected void writeInternal(Object t, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
-        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputMessage.getBody());
-        String objectToJson = null;
-        if (Properties.class.isAssignableFrom(t.getClass())) {
-            objectToJson = JsonUtil.toJson((Properties) t, true);
-        } else {
-            objectToJson = JsonWriter.objectToJson(t);
+        try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputMessage.getBody())) {
+            String objectToJson = JsonWriter.objectToJson(t);
+            outputStreamWriter.write(objectToJson);
+            outputStreamWriter.flush();
         }
-
-        outputStreamWriter.write(objectToJson);
-        outputStreamWriter.flush();
-        outputStreamWriter.close();
     }
 
     /**
@@ -68,16 +59,7 @@ public class JsonSchema2HttpMessageConverter extends AbstractHttpMessageConverte
      * @return deserialized object
      */
     @Override
-    protected Object readInternal(Class<? extends Object> clazz, HttpInputMessage inputMessage)
-            throws IOException, HttpMessageNotReadableException {
-        if (Properties.class.isAssignableFrom(clazz)) {
-            try {
-                return JsonUtil.fromJson(inputMessage.getBody());
-            } catch (Exception e) {
-                throw new IOException(e.getMessage());
-            }
-        } else {
-            return JsonReader.jsonToJava(inputMessage.getBody(), null);
-        }
+    protected Object readInternal(Class<? extends Object> clazz, HttpInputMessage inputMessage) throws IOException {
+        return SerializerDeserializer.fromSerialized(inputMessage.getBody(), clazz, null, false);
     }
 }
