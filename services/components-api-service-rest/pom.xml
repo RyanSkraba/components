@@ -6,13 +6,13 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.15.0-SNAPSHOT</version>
+        <version>0.16.0-SNAPSHOT</version>
         <relativePath>../../components-parent/pom.xml</relativePath>
     </parent>
 
 
 	<artifactId>components-api-service-rest</artifactId>
-	<version>0.15.0-SNAPSHOT</version>
+	<version>0.16.0-SNAPSHOT</version>
 
 	<name>Components REST API</name>
 
@@ -46,7 +46,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.15.0-SNAPSHOT</version>
+            <version>0.16.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -65,7 +65,7 @@
        <dependency>
            <groupId>org.talend.components</groupId>
            <artifactId>components-api-service-common</artifactId>
-           <version>0.15.0-SNAPSHOT</version>
+           <version>0.16.0-SNAPSHOT</version>
        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -75,7 +75,7 @@
        <dependency>
            <groupId>org.talend.components</groupId>
            <artifactId>components-api-service-common</artifactId>
-           <version>0.15.0-SNAPSHOT</version>
+           <version>0.16.0-SNAPSHOT</version>
            <classifier>tests</classifier>
            <scope>test</scope>
        </dependency>
