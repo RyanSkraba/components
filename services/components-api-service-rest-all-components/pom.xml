@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
-		<version>0.16.0-SNAPSHOT</version>
+		<version>0.15.0-SNAPSHOT</version>
 		<relativePath>../../components-parent/pom.xml</relativePath>
 	</parent>
 
@@ -21,6 +21,9 @@
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.boot.version>1.4.1.RELEASE</spring.boot.version>
+
+		<!-- Used for Docker images name -->
+		<git_branch>local</git_branch>
 	</properties>
 
 	<dependencies>
@@ -28,12 +31,12 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-jira</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.15.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-salesforce</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.15.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
@@ -44,7 +47,7 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-rest</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.15.0-SNAPSHOT</version>
 		</dependency>
 		<dependency><!-- this overides the parent definition that limited the artifact 
 				to tests -->
@@ -55,14 +58,14 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-rest</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.15.0-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.15.0-SNAPSHOT</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
@@ -102,9 +105,9 @@
 									<registry>${talend_docker_registry}</registry>
 									<images>
 										<image>
-											<name>registry.datapwn.com/talend/tcomp-${project.artifactId}</name>
+											<name>${talend_docker_registry}/talend/tcomp-${project.artifactId}-${git_branch}</name>
 											<build>
-												<from>registry.datapwn.com/talend/java:1.8u72-alpine</from>
+												<from>${talend_docker_registry}/talend/java:1.8u72-alpine</from>
 												<tags>
 													<tag>${docker.version}</tag>
 												</tags>
