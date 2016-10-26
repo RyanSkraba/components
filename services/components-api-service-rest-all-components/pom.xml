@@ -21,6 +21,9 @@
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.boot.version>1.4.1.RELEASE</spring.boot.version>
+
+		<!-- Used for Docker images name -->
+		<git_branch>local</git_branch>
 	</properties>
 
 	<dependencies>
@@ -102,9 +105,9 @@
 									<registry>${talend_docker_registry}</registry>
 									<images>
 										<image>
-											<name>registry.datapwn.com/talend/tcomp-${project.artifactId}</name>
+											<name>${talend_docker_registry}/talend/tcomp-${project.artifactId}-${git_branch}</name>
 											<build>
-												<from>registry.datapwn.com/talend/java:1.8u72-alpine</from>
+												<from>${talend_docker_registry}/talend/java:1.8u72-alpine</from>
 												<tags>
 													<tag>${docker.version}</tag>
 												</tags>
