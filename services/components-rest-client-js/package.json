@@ -1,0 +1,14 @@
+{
+  "name": "talend-components",
+  "version": "0.0.1",
+  "licence": "Apache-2.0",
+  "author": "Geoffroy Lorieux glorieux@talend.com",
+  "main": "src/tcomp.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Talend/components"
+  },
+  "peerDependencies": {
+    "whatwg-fetch": "^1.0.0"
+  }
+}
