@@ -25,6 +25,7 @@ import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
+import org.talend.components.common.avro.JDBCAvroRegistryInfluencer;
 import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.JDBCConnectionInfoProperties;
 import org.talend.components.jdbc.ReferAnotherComponent;
@@ -41,7 +42,7 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
 public class TJDBCInputProperties extends FixedConnectorsComponentProperties
-        implements ComponentReferencePropertiesEnclosing, JDBCConnectionInfoProperties, ReferAnotherComponent {
+        implements ComponentReferencePropertiesEnclosing, JDBCConnectionInfoProperties, ReferAnotherComponent, JDBCAvroRegistryInfluencer {
 
     public TJDBCInputProperties(String name) {
         super(name);
@@ -215,4 +216,8 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties
         return ValidationResult.OK;
     }
 
+    @Override
+    public boolean trim() {
+        return trimStringOrCharColumns.getValue();
+    }
 }

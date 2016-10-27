@@ -44,6 +44,7 @@ import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
+import org.talend.components.api.wizard.WizardNameComparator;
 import org.talend.components.common.CommonTestUtils;
 import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;

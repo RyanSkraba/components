@@ -10,13 +10,11 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.salesforce.test;
+package org.talend.components.api.wizard;
 
 import java.util.Comparator;
 
-import org.talend.components.api.wizard.ComponentWizard;
-
-class WizardNameComparator implements Comparator<ComponentWizard> {
+public class WizardNameComparator implements Comparator<ComponentWizard> {
 
     @Override
     public int compare(ComponentWizard o1, ComponentWizard o2) {

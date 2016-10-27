@@ -26,9 +26,9 @@ import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.components.common.avro.JDBCAvroRegistry;
+import org.talend.components.common.avro.JDBCResultSetIndexedRecordConverter;
 import org.talend.components.jdbc.runtime.JDBCSource;
-import org.talend.components.jdbc.runtime.type.JDBCAvroRegistry;
-import org.talend.components.jdbc.runtime.type.JDBCResultSetIndexedRecordConverter;
 import org.talend.components.jdbc.tjdbcinput.TJDBCInputProperties;
 import org.talend.daikon.avro.AvroUtils;
 
@@ -76,7 +76,7 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
         if (null == factory) {
             factory = new JDBCResultSetIndexedRecordConverter();
             factory.setSchema(getSchema());
-            factory.setProperties(properties);
+            factory.setInfluencer(properties);
         }
         return factory;
     }
