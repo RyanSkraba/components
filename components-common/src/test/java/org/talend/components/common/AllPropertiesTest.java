@@ -39,7 +39,7 @@ public class AllPropertiesTest {
         ComponentTestUtils.checkAllI18N(new ProxyProperties(null).init(), errorCollector);
         ComponentTestUtils.checkAllI18N(new SchemaProperties(null).init(), errorCollector);
         ComponentTestUtils.checkAllI18N(new UserPasswordProperties(null).init(), errorCollector);
-        ComponentTestUtils.checkAllI18N(new HttpsProperties(null).init(), errorCollector);
+        ComponentTestUtils.checkAllI18N(new SslProperties(null).init(), errorCollector);
     }
 
 }

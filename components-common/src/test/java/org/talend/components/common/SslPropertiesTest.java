@@ -10,20 +10,20 @@ import org.junit.Test;
 import org.talend.daikon.properties.PropertiesDynamicMethodHelper;
 import org.talend.daikon.properties.presentation.Form;
 
-public class HttpsPropertiesTest {
+public class SslPropertiesTest {
 
     @Test
-    public void testHttpsProperteis() throws Throwable {
-        HttpsProperties props = new HttpsProperties("https");
+    public void testSslProperteis() throws Throwable {
+        SslProperties props = new SslProperties("ssl");
         props.init();
         Form mainForm = props.getForm(Form.MAIN);
 
         // Check default value
-        assertFalse(props.useHttps.getValue());
+        assertFalse(props.useSsl.getValue());
         assertFalse(props.needClientAuth.getValue());
         assertTrue(props.verifyHost.getValue());
 
-        assertTrue(mainForm.getWidget("useHttps").isVisible());
+        assertTrue(mainForm.getWidget("useSsl").isVisible());
 
         List<String> group1 = Arrays.asList("trustStoreType", "trustStorePath", "trustStorePassword", "needClientAuth",
                 "verifyHost");
@@ -35,9 +35,9 @@ public class HttpsPropertiesTest {
             assertTrue(pName, mainForm.getWidget(pName).isHidden());
         }
 
-        props.useHttps.setValue(true);
-        assertTrue(mainForm.getWidget("useHttps").isCallAfter());
-        PropertiesDynamicMethodHelper.afterProperty(props, "useHttps");
+        props.useSsl.setValue(true);
+        assertTrue(mainForm.getWidget("useSsl").isCallAfter());
+        PropertiesDynamicMethodHelper.afterProperty(props, "useSsl");
         for (String pName : group1) {
             assertTrue(pName, mainForm.getWidget(pName).isVisible());
         }

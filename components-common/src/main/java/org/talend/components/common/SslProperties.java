@@ -7,9 +7,9 @@ import org.talend.daikon.properties.property.EnumProperty;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
-public class HttpsProperties extends PropertiesImpl {
+public class SslProperties extends PropertiesImpl {
 
-    public Property<Boolean> useHttps = PropertyFactory.newBoolean("useHttps", false);
+    public Property<Boolean> useSsl = PropertyFactory.newBoolean("useSsl", false);
 
     public EnumProperty<StoreType> trustStoreType = PropertyFactory.newEnum("trustStoreType", StoreType.class);
 
@@ -28,7 +28,7 @@ public class HttpsProperties extends PropertiesImpl {
     // If verify client hostname with the hostname in the cert. for debugging, usually set false
     public Property<Boolean> verifyHost = PropertyFactory.newBoolean("verifyHost", true);
 
-    public HttpsProperties(String name) {
+    public SslProperties(String name) {
         super(name);
     }
 
@@ -36,7 +36,7 @@ public class HttpsProperties extends PropertiesImpl {
     public void setupLayout() {
         super.setupLayout();
         Form main = new Form(this, Form.MAIN);
-        main.addRow(useHttps);
+        main.addRow(useSsl);
         main.addRow(trustStoreType);
         main.addRow(trustStorePath);
         main.addRow(Widget.widget(trustStorePassword).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
@@ -47,7 +47,7 @@ public class HttpsProperties extends PropertiesImpl {
         main.addRow(verifyHost);
     }
 
-    public void afterUseHttps() {
+    public void afterUseSsl() {
         refreshLayout(getForm(Form.MAIN));
     }
 
@@ -60,13 +60,13 @@ public class HttpsProperties extends PropertiesImpl {
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN)) {
 
-            form.getWidget(trustStoreType).setVisible(useHttps);
-            form.getWidget(trustStorePath).setVisible(useHttps);
-            form.getWidget(trustStorePassword).setVisible(useHttps);
-            form.getWidget(needClientAuth).setVisible(useHttps);
-            form.getWidget(verifyHost).setVisible(useHttps);
+            form.getWidget(trustStoreType).setVisible(useSsl);
+            form.getWidget(trustStorePath).setVisible(useSsl);
+            form.getWidget(trustStorePassword).setVisible(useSsl);
+            form.getWidget(needClientAuth).setVisible(useSsl);
+            form.getWidget(verifyHost).setVisible(useSsl);
 
-            boolean needClient = useHttps.getValue() && needClientAuth.getValue();
+            boolean needClient = useSsl.getValue() && needClientAuth.getValue();
             form.getWidget(keyStoreType).setVisible(needClient);
             form.getWidget(keyStorePath).setVisible(needClient);
             form.getWidget(keyStorePassword).setVisible(needClient);
