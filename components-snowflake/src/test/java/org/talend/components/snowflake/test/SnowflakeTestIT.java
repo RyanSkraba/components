@@ -59,6 +59,7 @@ import static org.junit.Assert.*;
 import static org.talend.daikon.properties.presentation.Form.MAIN;
 
 @SuppressWarnings("nls")
+@Ignore
 public class SnowflakeTestIT extends AbstractComponentTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SnowflakeTestIT.class);

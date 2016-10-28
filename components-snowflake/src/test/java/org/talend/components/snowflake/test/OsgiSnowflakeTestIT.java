@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.snowflake.test;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -36,6 +37,7 @@ import static org.ops4j.pax.exam.CoreOptions.*;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
+@Ignore
 public class OsgiSnowflakeTestIT extends SnowflakeTestIT {
 
     @Inject
