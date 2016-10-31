@@ -24,7 +24,6 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 public class AuthorizationCodeCallBackHandler extends AbstractHandler {
-
     String code;
 
     @Override

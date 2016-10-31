@@ -321,7 +321,6 @@ public class PropertiesTester {
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(PropertiesTester.class);
         app.setWebEnvironment(false);
-        app.setShowBanner(false);
         app.setHeadless(true);
         app.setLogStartupInfo(false);
         app.run(args);

@@ -13,16 +13,16 @@
 package org.talend.components.jira;
 
 import org.junit.runner.RunWith;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.talend.components.service.spring.SpringTestApp;
 
 /**
  * Integration tests for Jira Input component, which check if nothing was missed
  * during component implementation
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SpringTestApp.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = SpringTestApp.class)
 public class SpringJiraComponentsTestIT extends JiraComponentsTestBase {
     // all test case are in the parent class.
 }

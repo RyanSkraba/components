@@ -7,6 +7,7 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.test.AbstractComponentTest;
 
 public class ${componentName}TestBase extends AbstractComponentTest {
+
     @Inject
     private ComponentService componentService;
 

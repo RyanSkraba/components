@@ -24,11 +24,12 @@ import org.talend.daikon.i18n.LocaleProvider;
 @Component
 public class I18nMessageProviderSpring extends I18nMessageProvider {
 
+    @Inject
+    LocaleProvider localeProvider;
+
     @Override
     protected LocaleProvider getLocaleProvider() {
         return localeProvider;
     }
 
-    @Inject
-    LocaleProvider localeProvider;
 }

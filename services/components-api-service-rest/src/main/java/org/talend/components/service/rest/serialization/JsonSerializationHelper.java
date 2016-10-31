@@ -10,11 +10,13 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.service.rest;
+package org.talend.components.service.rest.serialization;
 
 import java.io.InputStream;
 import java.util.HashMap;
 
+import org.springframework.stereotype.Component;
+import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.serialize.SerializerDeserializer;
 import org.talend.daikon.serialize.jsonschema.JsonSchemaUtil;
@@ -22,11 +24,9 @@ import org.talend.daikon.serialize.jsonschema.JsonSchemaUtil;
 import com.cedarsoftware.util.io.JsonWriter;
 
 /**
- * this provide helper methods from serilizing and deserializing TComp object for REST apis
+ * this provide helper methods from serializing and deserializing TComp object for REST apis
  */
-/**
- *
- */
+@Component
 public class JsonSerializationHelper {
 
     private HashMap<String, Object> jsonIoOptions;
@@ -39,12 +39,12 @@ public class JsonSerializationHelper {
     /**
      * Setup {@link Properties} from the data contained in the json-data stream (UTF-8) into a
      * 
-     * @param jsonDataInputStream json-data formated input stream in UTF-8
-     * @param initalisedProperties instance of the properties to iniitalize with the json data.
+     * @param jsonDataStream json-data formated input stream in UTF-8
+     * @param initializedProperties instance of the properties to iniitalize with the json data.
      * @return the same instance as initalisedProperties setup with the json-data values.
      */
-    public <P extends Properties> P toProperties(InputStream jsonDataStream, P initalisedProperties) {
-        return JsonSchemaUtil.fromJson(jsonDataStream, initalisedProperties);
+    public <P extends Properties> P toProperties(InputStream jsonDataStream, P initializedProperties) {
+        return JsonSchemaUtil.fromJson(jsonDataStream, initializedProperties);
     }
 
     /**
@@ -55,6 +55,11 @@ public class JsonSerializationHelper {
      */
     public String toJson(Properties properties) {
         return JsonSchemaUtil.toJson(properties);
+    }
+
+
+    public String toJson(DatastoreDefinition definition) {
+        return toJson((Object)definition);
     }
 
     /**

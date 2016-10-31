@@ -35,4 +35,13 @@ public class FullExampleDatastoreDefinition extends SimpleNamedThing
         return null;
     }
 
+    @Override
+    public String getDisplayName() {
+        return "Full example datastore";
+    }
+
+    @Override
+    public String getTitle() {
+        return "Full example datastore";
+    }
 }
