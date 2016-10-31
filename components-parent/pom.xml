@@ -66,7 +66,11 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-test</artifactId>
+				<version>${spring.boot.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>com.wordnik</groupId>
 				<artifactId>swagger-annotations</artifactId>
@@ -232,7 +236,7 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
-					<!-- Workaround maven not being able to set a property conditionally
+					<!-- Workaround maven not being able to set a property conditionally 
 						based on the current version being SNAPSHOT or not -->
 					<execution>
 						<id>compute-docker-version</id>
@@ -249,7 +253,7 @@
 									<contains string="${project.version}" substring="SNAPSHOT" />
 								</condition>
 								<echo message="the docker version is ${docker.version}" />
-                            </tasks>
+							</tasks>
 						</configuration>
 					</execution>
 				</executions>
@@ -264,9 +268,9 @@
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>2.18</version>
 				<configuration>
-				    <systemProperties>
-				    <org.ops4j.pax.url.mvn.repositories>+${talend_snapshots}@snapshots@noreleases@id=talsnap,http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceRelease@id=talrelease</org.ops4j.pax.url.mvn.repositories>
-				    </systemProperties>
+					<systemProperties>
+						<org.ops4j.pax.url.mvn.repositories>+${talend_snapshots}@snapshots@noreleases@id=talsnap,http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceRelease@id=talrelease</org.ops4j.pax.url.mvn.repositories>
+					</systemProperties>
 				</configuration>
 				<executions>
 					<execution>
