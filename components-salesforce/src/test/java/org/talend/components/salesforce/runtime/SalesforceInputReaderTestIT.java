@@ -12,6 +12,11 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -30,11 +35,6 @@ import org.talend.components.salesforce.test.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.avro.AvroUtils;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
@@ -161,7 +161,6 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
     }
 
     @Test
-    @Ignore("need to be reworked cause data may be writen in salesforce between the 2 queries.")
     public void testManualQuery() throws Throwable {
         TSalesforceInputProperties props = createTSalesforceInputProperties(false, false);
         props.manualQuery.setValue(true);
@@ -169,13 +168,16 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         props.module.main.schema.setValue(SchemaBuilder.builder().record("MakeRowRecord").fields().name("Id").type().nullable()
                 .stringType().noDefault().name("Name").type().nullable().stringType().noDefault().name("Owner_Name").type()
                 .nullable().stringType().noDefault().name("Owner_Id").type().nullable().stringType().noDefault().endRecord());
-        props.query.setValue("SELECT Id, Name, Owner.Name ,Owner.Id FROM Account");
+        // "LastViewedDate" field :The timestamp for when the current user last viewed this record.
+        // For default records of Account, their "LastViewedDate" field value must not be null
+        // But for new created records which created by our test, this field must be null
+        props.query.setValue("SELECT Id, Name, Owner.Name ,Owner.Id FROM Account WHERE LastViewedDate != null");
         List<IndexedRecord> rowsWithForeignKey = readRows(props);
         // Manual query with foreign key
         props.module.main.schema.setValue(SchemaBuilder.builder().record("MakeRowRecord").fields().name("Id").type().nullable()
                 .stringType().noDefault().name("Name").type().nullable().stringType().noDefault().name("OwnerId").type()
                 .nullable().stringType().noDefault().endRecord());
-        props.query.setValue("SELECT Id, Name, OwnerId FROM Account");
+        props.query.setValue("SELECT Id, Name, OwnerId FROM Account WHERE LastViewedDate != null");
         List<IndexedRecord> rowsCommon = readRows(props);
 
         assertEquals(rowsWithForeignKey.size(), rowsCommon.size());

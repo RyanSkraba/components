@@ -416,32 +416,6 @@ public class SalesforceBulkRuntime {
         closeJob();
     }
 
-    public InputStream getQueryResultStream(String resultId) throws AsyncApiException, IOException, ConnectionException {
-        return getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId);
-    }
-
-    public List<Map<String, String>> getQueryResult(String resultId) throws AsyncApiException, IOException, ConnectionException {
-        // batchInfoList was populated when batches were created and submitted
-        List<Map<String, String>> resultInfoList = new ArrayList<Map<String, String>>();
-        Map<String, String> resultInfo;
-        baseFileReader = new com.csvreader.CsvReader(new java.io.BufferedReader(new java.io.InputStreamReader(
-                getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId), FILE_ENCODING)), ',');
-
-        if (baseFileReader.readRecord()) {
-            baseFileHeader = Arrays.asList(baseFileReader.getValues());
-        }
-        baseFileHeaderSize = baseFileHeader.size();
-        List<String> row = null;
-        while (baseFileReader.readRecord()) {
-            resultInfo = new HashMap<String, String>();
-            for (int i = 0; i < baseFileHeaderSize; i++) {
-                resultInfo.put(baseFileHeader.get(i), row.get(i));
-            }
-            resultInfoList.add(resultInfo);
-        }
-        return resultInfoList;
-    }
-
     public BulkResultSet getQueryResultSet(String resultId) throws AsyncApiException, IOException, ConnectionException {
         baseFileReader = new com.csvreader.CsvReader(new java.io.BufferedReader(new java.io.InputStreamReader(
                 getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId), FILE_ENCODING)), ',');
