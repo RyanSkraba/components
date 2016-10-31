@@ -7,7 +7,6 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
-import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.snowflake.SnowflakeConnectionProperties;
@@ -24,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction.UPSERT;
 
-public final class SnowflakeWriter  implements Writer<Result> {
+public final class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
     private StreamLoader loader;
 
@@ -57,8 +56,18 @@ public final class SnowflakeWriter  implements Writer<Result> {
 
     private transient Schema mainSchema;
 
+    @Override
+    public Iterable<IndexedRecord> getSuccessfulWrites() {
+        return new ArrayList<IndexedRecord>();
+    }
+
+    @Override
+    public Iterable<IndexedRecord> getRejectedWrites() {
+        return listener.getErrors();
+    }
+
     class ResultListener implements LoadResultListener {
-        final private List<LoadingError> errors = new ArrayList<>();
+        final private List<IndexedRecord> errors = new ArrayList<>();
 
         final private AtomicInteger errorCount = new AtomicInteger(0);
         final private AtomicInteger errorRecordCount = new AtomicInteger(0);
@@ -85,8 +94,28 @@ public final class SnowflakeWriter  implements Writer<Result> {
 
         @Override
         public void addError(LoadingError error) {
-            // TODO - need to have a way to dispatch the errors
-            errors.add(error);
+            Schema rejectSchema = sprops.schemaReject.schema.getValue();
+
+            IndexedRecord reject = new GenericData.Record(rejectSchema);
+            reject.put(rejectSchema.getField(TSnowflakeOutputProperties.FIELD_COLUMN_NAME).pos(),
+                    error.getProperty(LoadingError.ErrorProperty.COLUMN_NAME));
+            reject.put(rejectSchema.getField(TSnowflakeOutputProperties.FIELD_ROW_NUMBER).pos(),
+                    error.getProperty(LoadingError.ErrorProperty.ROW_NUMBER));
+            reject.put(rejectSchema.getField(TSnowflakeOutputProperties.FIELD_CATEGORY).pos(),
+                    error.getProperty(LoadingError.ErrorProperty.CATEGORY));
+            reject.put(rejectSchema.getField(TSnowflakeOutputProperties.FIELD_CHARACTER).pos(),
+                    error.getProperty(LoadingError.ErrorProperty.CHARACTER));
+            reject.put(rejectSchema.getField(TSnowflakeOutputProperties.FIELD_ERROR_MESSAGE).pos(),
+                    error.getProperty(LoadingError.ErrorProperty.ERROR));
+            reject.put(rejectSchema.getField(TSnowflakeOutputProperties.FIELD_BYTE_OFFSET).pos(),
+                    error.getProperty(LoadingError.ErrorProperty.BYTE_OFFSET));
+            reject.put(rejectSchema.getField(TSnowflakeOutputProperties.FIELD_LINE).pos(),
+                    error.getProperty(LoadingError.ErrorProperty.LINE));
+            reject.put(rejectSchema.getField(TSnowflakeOutputProperties.FIELD_SQL_STATE).pos(),
+                    error.getProperty(LoadingError.ErrorProperty.SQL_STATE));
+            reject.put(rejectSchema.getField(TSnowflakeOutputProperties.FIELD_CODE).pos(),
+                    error.getProperty(LoadingError.ErrorProperty.CODE));
+            errors.add(reject);
         }
 
         @Override
@@ -94,7 +123,7 @@ public final class SnowflakeWriter  implements Writer<Result> {
             return throwOnError;
         }
 
-        public List<LoadingError> getErrors() {
+        public List<IndexedRecord> getErrors() {
             return errors;
         }
 
@@ -286,7 +315,7 @@ public final class SnowflakeWriter  implements Writer<Result> {
             throw new IOException(e);
         }
 
-        return new Result(uId, listener.getSubmittedRowCount(), listener.processed.get(), listener.getErrorRecordCount());
+        return new Result(uId, listener.getSubmittedRowCount(), listener.counter.get(), listener.getErrorRecordCount());
     }
 
 
