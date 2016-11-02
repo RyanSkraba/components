@@ -18,10 +18,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -34,6 +36,7 @@ import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.test.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
+import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.avro.AvroUtils;
 
 public class SalesforceInputReaderTestIT extends SalesforceTestBase {
@@ -162,28 +165,47 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
     @Test
     public void testManualQuery() throws Throwable {
+        String random = createNewRandom();
         TSalesforceInputProperties props = createTSalesforceInputProperties(false, false);
+        // 1. Write test data
+        List<IndexedRecord> outputRows = new ArrayList<IndexedRecord>();
+        Schema schema = getMakeRowSchema(false);
+        IndexedRecord record1 = new GenericData.Record(schema);
+        record1.put(1, "TestName_" + random);
+        IndexedRecord record2 = new GenericData.Record(schema);
+        record2.put(1, "TestName_" + random);
+        outputRows.add(record1);
+        outputRows.add(record2);
+        TSalesforceOutputProperties outputProps = new TSalesforceOutputProperties("output"); //$NON-NLS-1$
+        outputProps.copyValuesFrom(props);
+        outputProps.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
+        doWriteRows(outputProps, outputRows);
+        // 2. Make sure 2 rows write successfully
         props.manualQuery.setValue(true);
-        // Manual query with foreign key
-        props.module.main.schema.setValue(SchemaBuilder.builder().record("MakeRowRecord").fields().name("Id").type().nullable()
-                .stringType().noDefault().name("Name").type().nullable().stringType().noDefault().name("Owner_Name").type()
-                .nullable().stringType().noDefault().name("Owner_Id").type().nullable().stringType().noDefault().endRecord());
-        // "LastViewedDate" field :The timestamp for when the current user last viewed this record.
-        // For default records of Account, their "LastViewedDate" field value must not be null
-        // But for new created records which created by our test, this field must be null
-        props.query.setValue("SELECT Id, Name, Owner.Name ,Owner.Id FROM Account WHERE LastViewedDate != null");
-        List<IndexedRecord> rowsWithForeignKey = readRows(props);
-        // Manual query with foreign key
-        props.module.main.schema.setValue(SchemaBuilder.builder().record("MakeRowRecord").fields().name("Id").type().nullable()
-                .stringType().noDefault().name("Name").type().nullable().stringType().noDefault().name("OwnerId").type()
-                .nullable().stringType().noDefault().endRecord());
-        props.query.setValue("SELECT Id, Name, OwnerId FROM Account WHERE LastViewedDate != null");
-        List<IndexedRecord> rowsCommon = readRows(props);
+        props.query.setValue("select Id from Account WHERE Name = 'TestName_" + random + "'");
+        outputRows = readRows(props);
+        assertEquals(2, outputRows.size());
+        try {
+            // 3. Test 2 ways of manual query with foreign key
+            props.module.main.schema.setValue(SchemaBuilder.builder().record("MakeRowRecord").fields()//
+                    .name("Id").type().nullable().stringType().noDefault() //
+                    .name("Name").type().nullable().stringType().noDefault() //
+                    .name("Owner_Name").type().nullable().stringType().noDefault() //
+                    .name("Owner_Id").type().nullable().stringType().noDefault().endRecord());
+            props.query.setValue("SELECT Id, Name, Owner.Name ,Owner.Id FROM Account WHERE Name = 'TestName_" + random + "'");
+            List<IndexedRecord> rowsWithForeignKey = readRows(props);
 
-        assertEquals(rowsWithForeignKey.size(), rowsCommon.size());
-        if (rowsWithForeignKey.size() > 0) {
+            props.module.main.schema.setValue(SchemaBuilder.builder().record("MakeRowRecord").fields()//
+                    .name("Id").type().nullable().stringType().noDefault() //
+                    .name("Name").type().nullable().stringType().noDefault() //
+                    .name("OwnerId").type().nullable().stringType().noDefault().endRecord());
+            props.query.setValue("SELECT Id, Name, OwnerId FROM Account WHERE Name = 'TestName_" + random + "'");
+            outputRows = readRows(props);
+
+            assertEquals(rowsWithForeignKey.size(), outputRows.size());
+            assertEquals(2, rowsWithForeignKey.size());
             IndexedRecord fkRecord = rowsWithForeignKey.get(0);
-            IndexedRecord commonRecord = rowsCommon.get(0);
+            IndexedRecord commonRecord = outputRows.get(0);
             assertNotNull(fkRecord);
             assertNotNull(commonRecord);
             Schema schemaFK = fkRecord.getSchema();
@@ -194,6 +216,9 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
             assertEquals(commonRecord.get(schemaCommon.getField("OwnerId").pos()),
                     fkRecord.get(schemaFK.getField("Owner_Id").pos()));
             System.out.println("Account records Owner id: " + fkRecord.get(schemaFK.getField("Owner_Id").pos()));
+        } finally {
+            // 4. Delete test data
+            deleteRows(outputRows, props);
         }
     }
 
