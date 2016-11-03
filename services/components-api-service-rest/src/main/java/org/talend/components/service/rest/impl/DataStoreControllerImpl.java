@@ -1,5 +1,8 @@
 package org.talend.components.service.rest.impl;
 
+import static java.util.stream.StreamSupport.*;
+import static org.slf4j.LoggerFactory.*;
+
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -14,9 +17,7 @@ import org.talend.components.service.rest.DataStoreController;
 import org.talend.components.service.rest.DataStoreDefinitionDTO;
 import org.talend.components.service.rest.serialization.JsonSerializationHelper;
 import org.talend.daikon.annotation.ServiceImplementation;
-
-import static java.util.stream.StreamSupport.stream;
-import static org.slf4j.LoggerFactory.getLogger;
+import org.talend.daikon.definition.service.DefinitionRegistryService;
 
 /**
  * Rest controller in charge of data stores.
@@ -31,13 +32,16 @@ public class DataStoreControllerImpl implements DataStoreController {
     private ComponentService componentServiceDelegate;
 
     @Autowired
+    private DefinitionRegistryService definitionServiceDelegate;
+
+    @Autowired
     private JsonSerializationHelper jsonSerializationHelper;
 
     @Override
     public Iterable<DataStoreDefinitionDTO> listDataStoreDefinitions() {
         log.debug("listing datastore definitions");
         Iterable<DatastoreDefinition> definitionsByType = //
-                componentServiceDelegate.getDefinitionsByType(DatastoreDefinition.class);
+        definitionServiceDelegate.getDefinitionsMapByType(DatastoreDefinition.class).values();
 
         return stream(definitionsByType.spliterator(), false).map(DataStoreDefinitionDTO::from).collect(Collectors.toList());
     }
@@ -45,7 +49,8 @@ public class DataStoreControllerImpl implements DataStoreController {
     @Override
     public String getDatastoreDefinition(@PathVariable String dataStoreName) {
         Validate.notNull(dataStoreName, "Data store name cannot be null.");
-        final Iterable<DatastoreDefinition> iterable = componentServiceDelegate.getDefinitionsByType(DatastoreDefinition.class);
+        final Iterable<DatastoreDefinition> iterable = definitionServiceDelegate
+                .getDefinitionsMapByType(DatastoreDefinition.class).values();
 
         final Optional<DatastoreDefinition> first = stream(iterable.spliterator(), true) //
                 .filter(def -> dataStoreName.equals(def.getName())) //

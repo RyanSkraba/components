@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
@@ -25,14 +25,13 @@ import org.apache.avro.SchemaBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
-import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.service.common.ComponentRegistry;
 import org.talend.components.api.service.common.ComponentServiceImpl;
+import org.talend.components.api.service.common.DefinitionRegistry;
 import org.talend.components.api.test.SimpleComponentDefinition;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
@@ -78,7 +77,7 @@ public class TestFixedConnectorComponentProperties {
 
     // default implementation for pure java test. Shall be overriden of Spring or OSGI tests
     public ComponentService getComponentService() {
-        ComponentRegistry testComponentRegistry = new ComponentRegistry();
+        DefinitionRegistry testComponentRegistry = new DefinitionRegistry();
         SimpleComponentDefinition componentDef = new SimpleComponentDefinition("foo");
         componentDef.setPropertyClass(TestProperties.class);
         testComponentRegistry.registerDefinition(Arrays.asList(componentDef));

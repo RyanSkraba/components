@@ -2,6 +2,7 @@ package org.talend.components.api;
 
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
+import org.talend.daikon.definition.Definition;
 
 /**
  * Install all of the functionality of a component family into the framework.
@@ -33,7 +34,8 @@ public interface ComponentInstaller {
         /**
          * Installs an entire component family.
          *
-         * This will cause any other definitions discovered through {@link ComponentFamilyDefinition#getExtensions()}, {@link ComponentFamilyDefinition#getComponents()} or
+         * This will cause any other definitions discovered through {@link ComponentFamilyDefinition#getExtensions()},
+         * {@link ComponentFamilyDefinition#getComponents()} or
          * {@link ComponentFamilyDefinition#getComponentWizards()} to be installed.
          *
          * @param def An entire component family to install.
@@ -45,11 +47,13 @@ public interface ComponentInstaller {
          *
          * @param defs The list of definitions to install.
          */
-        void registerDefinition(Iterable<? extends RuntimableDefinition<?, ?>> defs);
+        void registerDefinition(Iterable<? extends Definition> defs);
 
         /**
          * @param defs The list of component wizard definitions to install.
+         * @deprecated please use the {@link #registerDefinition(Iterable)}
          */
+        @Deprecated
         void registerComponentWizardDefinition(Iterable<? extends ComponentWizardDefinition> defs);
     }
 }

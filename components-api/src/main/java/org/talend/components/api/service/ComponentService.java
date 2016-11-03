@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.avro.Schema;
-import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.Connector;
@@ -41,23 +40,19 @@ public interface ComponentService extends PropertiesService<Properties> {
      * Get the list of all the component names that are registered
      *
      * @return the set of component names, never null
+     * @deprecated use {@link DefinitionRegistryService#getDefinitionsMapByType(ComponentDefinition.class).keySet()}
      */
+    @Deprecated
     Set<String> getAllComponentNames();
 
     /**
      * Get the list of all the components {@link ComponentDefinition} that are registered
      *
      * @return the set of component definitions, never null.
+     * @deprecated use {@link DefinitionRegistryService#getDefinitionsByType(ComponentDefinition.class)}
      */
+    @Deprecated
     Set<ComponentDefinition> getAllComponents();
-
-    /**
-     * Get the list of all {@link RuntimableDefinition} that implement a specific interface.
-     *
-     * @param An interface or subclass of {@link RuntimableDefinition}.
-     * @return All {@link RuntimableDefinition} that were registered in the framework and that implement that interface.
-     */
-    <T extends RuntimableDefinition<?, ?>> Iterable<T> getDefinitionsByType(Class<T> cls);
 
     /**
      * Return all top-level wizards that can be used to create component property sets.
@@ -85,7 +80,9 @@ public interface ComponentService extends PropertiesService<Properties> {
      * @param name the name of the component
      * @return the {@code ComponentDefinition} object.
      * @exception ComponentException thrown if the component is not registered in the service
+     * @deprecated use {@link DefinitionRegistryService#getDefinitionsMapByType(ComponentDefinition.class).get(name)}
      */
+    @Deprecated
     ComponentDefinition getComponentDefinition(String name);
 
     /**
@@ -97,7 +94,7 @@ public interface ComponentService extends PropertiesService<Properties> {
      *
      * @param name the name of the wizard
      * @param location an arbitrary repositoryLocation string to optionally be used in the wizard processing. This is
-     * given to an implementation of the {@link Repository} object when the {@link ComponentProperties} are stored.
+     *            given to an implementation of the {@link Repository} object when the {@link ComponentProperties} are stored.
      * @return a {@code ComponentWizard} object.
      * @exception ComponentException thrown if the wizard is not registered in the service
      */
@@ -192,8 +189,8 @@ public interface ComponentService extends PropertiesService<Properties> {
      * @param schema schema to be set for the given connector
      * @param isOuput true is the connection is an output connection, false if it is an input connection
      * @return the schema associated with a given connector token of input or ouput connectors, may be null if schema is
-     * associated with the connector. This should never be the case for output connections but may be null for input
-     * connections because the component does not need to have any input schema and can handle any data type.
+     *         associated with the connector. This should never be the case for output connections but may be null for input
+     *         connections because the component does not need to have any input schema and can handle any data type.
      */
     void setSchema(ComponentProperties componentProperties, Connector connector, Schema schema, boolean isOuput);
 
@@ -203,7 +200,7 @@ public interface ComponentService extends PropertiesService<Properties> {
      * @param componentProperties the Properties to get the connectors from
      * @param connectedConnetor list of connectors already setup. This shall be managed by the client.
      * @param isOuput true is the requested connections are output connections, false if the request is on input
-     * connections
+     *            connections
      * @return the set of availalble connectors, may be empty.
      */
     Set<? extends Connector> getAvailableConnectors(ComponentProperties componentProperties,

@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ErrorCollector;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.service.common.ComponentRegistry;
+import org.talend.components.api.service.common.DefinitionRegistry;
 import org.talend.components.api.service.common.ComponentServiceImpl;
 
 @SuppressWarnings("nls")
@@ -26,7 +26,7 @@ public class MultiRuntimeComponentTest {
     // default implementation for pure java test.
     public ComponentService getComponentService() {
         if (componentService == null) {
-            ComponentRegistry testComponentRegistry = new ComponentRegistry();
+            DefinitionRegistry testComponentRegistry = new DefinitionRegistry();
             testComponentRegistry.registerDefinition(Arrays.asList(new MultiRuntimeComponentDefinition()));
             componentService = new ComponentServiceImpl(testComponentRegistry);
         }

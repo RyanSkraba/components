@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.service.common.ComponentRegistry;
+import org.talend.components.api.service.common.DefinitionRegistry;
 import org.talend.components.api.service.common.ComponentServiceImpl;
 import org.talend.components.api.test.AbstractComponentTest;
 import org.talend.daikon.NamedThing;
@@ -56,7 +56,7 @@ public class FullExamplePropertiesTest extends AbstractComponentTest {
     @Override
     public ComponentService getComponentService() {
         if (simpleComponentService == null) {
-            ComponentRegistry componentRegistry = new ComponentRegistry();
+            DefinitionRegistry componentRegistry = new DefinitionRegistry();
             componentRegistry.registerComponentFamilyDefinition(new FullExampleFamilyDefinition());
             simpleComponentService = new ComponentServiceImpl(componentRegistry);
         }

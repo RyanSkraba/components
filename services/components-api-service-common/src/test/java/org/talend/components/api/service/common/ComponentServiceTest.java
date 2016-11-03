@@ -85,7 +85,7 @@ public class ComponentServiceTest extends AbstractComponentTest {
     @Override
     public ComponentService getComponentService() {
         if (componentService == null) {
-            ComponentRegistry testComponentRegistry = new ComponentRegistry();
+            DefinitionRegistry testComponentRegistry = new DefinitionRegistry();
             testComponentRegistry.registerDefinition(Arrays.asList(new TestComponentDefinition()));
             testComponentRegistry.registerComponentWizardDefinition(Arrays.asList(new TestComponentWizardDefinition()));
             componentService = new ComponentServiceImpl(testComponentRegistry);

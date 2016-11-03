@@ -22,10 +22,12 @@ import java.util.List;
 import org.talend.components.api.AbstractTopLevelDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.NamedThing;
+import org.talend.daikon.definition.Definition;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.property.Property;
 
-public abstract class AbstractComponentDefinition extends AbstractTopLevelDefinition implements ComponentDefinition {
+public abstract class AbstractComponentDefinition extends AbstractTopLevelDefinition
+        implements ComponentDefinition, Definition {
 
     /**
      * Component name.
@@ -191,6 +193,11 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
             nt.setI18nMessageFormatter(getI18nMessageFormatter());
         }
         return namedThings;
+    }
+
+    @Override
+    public String getImagePath() {
+        return getPngImagePath(ComponentImageType.PALLETE_ICON_32X32);
     }
 
 }

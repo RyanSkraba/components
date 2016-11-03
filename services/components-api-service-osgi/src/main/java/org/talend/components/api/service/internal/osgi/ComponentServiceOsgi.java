@@ -26,15 +26,14 @@ import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.ComponentInstaller;
-import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.service.common.ComponentRegistry;
 import org.talend.components.api.service.common.ComponentServiceImpl;
+import org.talend.components.api.service.common.DefinitionRegistry;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
@@ -63,7 +62,7 @@ public class ComponentServiceOsgi implements ComponentService {
         this.gctx = aGctx;
     }
 
-    private ComponentService componentServiceDelegate;
+    private ComponentServiceImpl componentServiceDelegate;
 
     protected static <T> Map<String, T> populateMap(BundleContext bc, Class<T> cls) {
         Map<String, T> map = new HashMap<>();
@@ -92,10 +91,11 @@ public class ComponentServiceOsgi implements ComponentService {
 
     @Activate
     void activate(BundleContext bundleContext) throws InvalidSyntaxException {
-        ComponentRegistry registry = new ComponentRegistry();
+        DefinitionRegistry registry = new DefinitionRegistry();
         Map<String, ComponentInstaller> installers = populateMap(bundleContext, ComponentInstaller.class);
-        for (ComponentInstaller installer : installers.values())
+        for (ComponentInstaller installer : installers.values()) {
             installer.install(registry);
+        }
         registry.lock();
         this.componentServiceDelegate = new ComponentServiceImpl(registry);
     }
@@ -188,11 +188,6 @@ public class ComponentServiceOsgi implements ComponentService {
     @Override
     public Set<ComponentDefinition> getAllComponents() {
         return componentServiceDelegate.getAllComponents();
-    }
-
-    @Override
-    public <T extends RuntimableDefinition<?, ?>> Iterable<T> getDefinitionsByType(Class<T> cls) {
-        return componentServiceDelegate.getDefinitionsByType(cls);
     }
 
     @Override

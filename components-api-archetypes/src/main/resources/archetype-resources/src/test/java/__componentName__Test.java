@@ -23,7 +23,7 @@ import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.exception.error.ComponentsErrorCode;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.service.common.ComponentRegistry;
+import org.talend.components.api.service.common.DefinitionRegistry;
 import org.talend.components.api.service.common.ComponentServiceImpl;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.daikon.exception.TalendRuntimeException;
@@ -45,7 +45,7 @@ public class ${componentName}Test {
     // default implementation for pure java test. 
     public ComponentService getComponentService() {
         if (componentService == null) {
-            ComponentRegistry testComponentRegistry = new ComponentRegistry();
+            DefinitionRegistry testComponentRegistry = new DefinitionRegistry();
             testComponentRegistry.registerComponentFamilyDefinition(new ${componentName}FamilyDefinition());
             componentService = new ComponentServiceImpl(testComponentRegistry);
         }

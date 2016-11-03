@@ -1,6 +1,6 @@
 package org.talend.components.api;
 
-import org.talend.daikon.NamedThing;
+import org.talend.daikon.definition.Definition;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.runtime.RuntimeInfo;
 
@@ -32,9 +32,9 @@ import org.talend.daikon.runtime.RuntimeInfo;
  *
  * @param <PropT> The type of properties that the specific definition works with.
  * @param <RuntimeInfoContextT> Creating a runtime object for this class may require additional information than just
- * the properties.
+ *            the properties.
  */
-public interface RuntimableDefinition<PropT extends Properties, RuntimeInfoContextT> extends NamedThing {
+public interface RuntimableDefinition<PropT extends Properties, RuntimeInfoContextT> extends Definition {
 
     /**
      * @return An empty instance of the properties for an instance of this definition.
@@ -45,7 +45,7 @@ public interface RuntimableDefinition<PropT extends Properties, RuntimeInfoConte
      * @param properties an instance of the definition.
      * @param ctx a helper context containing additional information outside of the instance, if any.
      * @return an object that can be used to create a runtime instance of this definition, configured by the properties
-     * of the instance and the context. This can be null if no runtime applies.
+     *         of the instance and the context. This can be null if no runtime applies.
      */
     RuntimeInfo getRuntimeInfo(PropT properties, RuntimeInfoContextT ctx);
 }

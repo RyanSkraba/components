@@ -26,7 +26,7 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.service.common.ComponentRegistry;
+import org.talend.components.api.service.common.DefinitionRegistry;
 import org.talend.components.api.service.common.ComponentServiceImpl;
 import org.talend.components.jira.runtime.JiraSource;
 import org.talend.components.jira.tjirainput.TJiraInputDefinition;
@@ -56,7 +56,7 @@ public class JiraReaderTest {
      */
     @BeforeClass
     public static void setupService() {
-        ComponentRegistry registry = new ComponentRegistry();
+        DefinitionRegistry registry = new DefinitionRegistry();
         registry.registerDefinition(Arrays.asList(new TJiraInputDefinition()));
         componentService = new ComponentServiceImpl(registry);
     }

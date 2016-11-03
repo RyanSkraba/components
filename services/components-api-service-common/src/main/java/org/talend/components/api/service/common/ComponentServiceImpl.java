@@ -22,7 +22,6 @@ import java.util.Set;
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.Connector;
@@ -36,6 +35,7 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.exception.ExceptionContext;
+import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.service.PropertiesServiceImpl;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -48,40 +48,31 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ComponentServiceImpl.class);
 
-    private ComponentRegistry componentRegistry;
+    private DefinitionRegistry definitionRegistry;
 
-    public ComponentServiceImpl(ComponentRegistry componentRegistry) {
-        this.componentRegistry = componentRegistry;
+    public ComponentServiceImpl(DefinitionRegistry componentRegistry) {
+        this.definitionRegistry = componentRegistry;
     }
 
     @Override
     public Set<String> getAllComponentNames() {
-        Set<String> names = new HashSet<>();
-        for (ComponentDefinition def : getDefinitionsByType(ComponentDefinition.class)) {
-            names.add(def.getName());
-        }
-        return names;
+        return definitionRegistry.getDefinitionsMapByType(ComponentDefinition.class).keySet();
     }
 
     @Override
     public Set<ComponentDefinition> getAllComponents() {
         // If we ever add a guava dependency: return Sets.newHashSet(getDefinitionsByType...)
         Set<ComponentDefinition> defs = new HashSet<>();
-        for (ComponentDefinition def : componentRegistry.getDefinitionsByType(ComponentDefinition.class)) {
+        for (ComponentDefinition def : definitionRegistry.getDefinitionsByType(ComponentDefinition.class)) {
             defs.add(def);
         }
         return defs;
     }
 
     @Override
-    public <T extends RuntimableDefinition<?, ?>> Iterable<T> getDefinitionsByType(Class<T> cls) {
-        return componentRegistry.getDefinitionsByType(cls);
-    }
-
-    @Override
     public Set<ComponentWizardDefinition> getTopLevelComponentWizards() {
         Set<ComponentWizardDefinition> defs = new HashSet<>();
-        for (ComponentWizardDefinition def : componentRegistry.getComponentWizards().values()) {
+        for (ComponentWizardDefinition def : definitionRegistry.getDefinitionsByType(ComponentWizardDefinition.class)) {
             if (def.isTopLevel()) {
                 defs.add(def);
             }
@@ -98,7 +89,11 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
 
     @Override
     public ComponentDefinition getComponentDefinition(String name) {
-        for (ComponentDefinition def : componentRegistry.getDefinitionsByType(ComponentDefinition.class)) {
+        Map<String, ComponentDefinition> compDefMap = definitionRegistry.getDefinitionsMapByType(ComponentDefinition.class);
+        if (compDefMap.isEmpty()) {
+            throw TalendRuntimeException.createUnexpectedException("fails to retrieve any Component definitions.");
+        }
+        for (ComponentDefinition def : definitionRegistry.getDefinitionsByType(ComponentDefinition.class)) {
             if (name.equals(def.getName())) {
                 return def;
             }
@@ -109,7 +104,12 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
 
     @Override
     public ComponentWizard getComponentWizard(String name, String location) {
-        ComponentWizardDefinition wizardDefinition = componentRegistry.getComponentWizards().get(name);
+        Map<String, ComponentWizardDefinition> definitionMapByType = definitionRegistry
+                .getDefinitionsMapByType(ComponentWizardDefinition.class);
+        if (definitionMapByType.isEmpty()) {
+            throw TalendRuntimeException.createUnexpectedException("fails to retrieve any Wizard definitions.");
+        }
+        ComponentWizardDefinition wizardDefinition = definitionMapByType.get(name);
         if (wizardDefinition == null) {
             throw new ComponentException(ComponentsApiErrorCode.WRONG_WIZARD_NAME, ExceptionContext.build().put("name", name)); //$NON-NLS-1$
         }
@@ -120,7 +120,8 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
     @Override
     public List<ComponentWizard> getComponentWizardsForProperties(ComponentProperties properties, String location) {
         List<ComponentWizard> wizards = new ArrayList<>();
-        for (ComponentWizardDefinition wizardDefinition : componentRegistry.getComponentWizards().values()) {
+        for (ComponentWizardDefinition wizardDefinition : definitionRegistry
+                .getDefinitionsByType(ComponentWizardDefinition.class)) {
             if (wizardDefinition.supportsProperties(properties.getClass())) {
                 ComponentWizard wizard = wizardDefinition.createWizard(properties, location);
                 wizards.add(wizard);
@@ -132,7 +133,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
     @Override
     public List<ComponentDefinition> getPossibleComponents(ComponentProperties... properties) {
         List<ComponentDefinition> returnList = new ArrayList<>();
-        for (ComponentDefinition cd : componentRegistry.getDefinitionsByType(ComponentDefinition.class)) {
+        for (ComponentDefinition cd : definitionRegistry.getDefinitionsByType(ComponentDefinition.class)) {
             if (cd.supportsProperties(properties)) {
                 returnList.add(cd);
             }
@@ -147,7 +148,12 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
 
     @Override
     public InputStream getWizardPngImage(String wizardName, WizardImageType imageType) {
-        ComponentWizardDefinition wizardDefinition = componentRegistry.getComponentWizards().get(wizardName);
+        Map<String, ComponentWizardDefinition> wizardsDefs = definitionRegistry
+                .getDefinitionsMapByType(ComponentWizardDefinition.class);
+        if (wizardsDefs.isEmpty()) {
+            throw TalendRuntimeException.createUnexpectedException("fails to retrieve any Wizard defintions.");
+        }
+        ComponentWizardDefinition wizardDefinition = wizardsDefs.get(wizardName);
         if (wizardDefinition != null) {
             return getImageStream(wizardDefinition, wizardDefinition.getPngImagePath(imageType));
         } else {
@@ -169,18 +175,18 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
      * @param definition, must not be null
      * @return the stream or null if no image was defined for th component or the path is wrong
      */
-    private InputStream getImageStream(NamedThing definition, String pngIconPath) {
+    static InputStream getImageStream(NamedThing definition, String imagePathPath) {
         InputStream result = null;
-        if (pngIconPath != null && !"".equals(pngIconPath)) { //$NON-NLS-1$
-            InputStream resourceAsStream = definition.getClass().getResourceAsStream(pngIconPath);
+        if (imagePathPath != null && !"".equals(imagePathPath)) { //$NON-NLS-1$
+            InputStream resourceAsStream = definition.getClass().getResourceAsStream(imagePathPath);
             if (resourceAsStream == null) {// no resource found so this is an component error, so log it and return
                                            // null
-                LOGGER.error("Failed to load the Wizard icon [" + definition.getName() + "," + pngIconPath + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                LOGGER.error("Failed to load the image [" + definition.getName() + "," + imagePathPath + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             } else {
                 result = resourceAsStream;
             }
         } else {// no path provided so will return null but log it.
-            LOGGER.warn("The defintion of [" + definition.getName() + "] did not specify any icon"); //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.warn("The definition of [" + definition.getName() + "] did not specify any icon"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return result;
     }

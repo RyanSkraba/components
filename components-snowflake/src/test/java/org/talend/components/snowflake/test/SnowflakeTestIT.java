@@ -19,7 +19,7 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.service.common.ComponentRegistry;
+import org.talend.components.api.service.common.DefinitionRegistry;
 import org.talend.components.api.service.common.ComponentServiceImpl;
 import org.talend.components.api.test.AbstractComponentTest;
 import org.talend.components.api.test.ComponentTestUtils;
@@ -121,7 +121,7 @@ public class SnowflakeTestIT extends AbstractComponentTest {
     @Override
     public ComponentService getComponentService() {
         if (componentService == null) {
-            ComponentRegistry testComponentRegistry = new ComponentRegistry();
+            DefinitionRegistry testComponentRegistry = new DefinitionRegistry();
             // register component
             testComponentRegistry.registerComponentFamilyDefinition(new SnowflakeFamilyDefinition());
             componentService = new ComponentServiceImpl(testComponentRegistry);

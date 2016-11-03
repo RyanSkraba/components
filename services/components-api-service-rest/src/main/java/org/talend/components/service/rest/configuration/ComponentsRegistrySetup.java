@@ -1,6 +1,6 @@
 package org.talend.components.service.rest.configuration;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import static org.slf4j.LoggerFactory.*;
 
 import java.util.Map;
 
@@ -11,8 +11,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.service.common.ComponentRegistry;
 import org.talend.components.api.service.common.ComponentServiceImpl;
+import org.talend.components.api.service.common.DefinitionRegistry;
+import org.talend.daikon.definition.service.DefinitionRegistryService;
 
 /**
  * Configuration that deals with ComponentRegistry setup.
@@ -26,20 +27,29 @@ public class ComponentsRegistrySetup {
     @Autowired
     private ApplicationContext context;
 
+    private DefinitionRegistry registry;
+
     @Bean
     public ComponentService getComponentService() {
         return new ComponentServiceImpl(getComponentRegistry());
     }
 
-    private ComponentRegistry getComponentRegistry() {
-        ComponentRegistry registry = new ComponentRegistry();
-        Map<String, ComponentInstaller> installers = context.getBeansOfType(ComponentInstaller.class);
-        for (ComponentInstaller installer : installers.values()) {
-            installer.install(registry);
-            LOGGER.debug("{} installed in the registry", installer);
-        }
+    @Bean
+    public DefinitionRegistryService getDefintionRegistryService() {
+        return getComponentRegistry();
+    }
 
-        registry.lock();
+    private DefinitionRegistry getComponentRegistry() {
+        if (registry == null) {
+            registry = new DefinitionRegistry();
+            Map<String, ComponentInstaller> installers = context.getBeansOfType(ComponentInstaller.class);
+            for (ComponentInstaller installer : installers.values()) {
+                installer.install(registry);
+                LOGGER.debug("{} installed in the registry", installer);
+            }
+
+            registry.lock();
+        } // else registry already initialised
         return registry;
     }
 }

@@ -13,12 +13,12 @@
 package org.talend.components.api.wizard;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.daikon.NamedThing;
+import org.talend.daikon.definition.Definition;
 
 /**
  * created by sgandon on 8 févr. 2016
  */
-public interface ComponentWizardDefinition extends NamedThing {
+public interface ComponentWizardDefinition extends Definition {
 
     String getMenuItemName();
 
@@ -29,7 +29,7 @@ public interface ComponentWizardDefinition extends NamedThing {
      * {@link ComponentDesigner} when {@link ComponentProperties} objects are created.
      *
      * @param location the repository location where the {@link ComponentProperties} associated with this wizard are to
-     * be stored. See {@link Repository}.
+     *            be stored. See {@link Repository}.
      * @return
      */
     ComponentWizard createWizard(String location);
@@ -42,7 +42,7 @@ public interface ComponentWizardDefinition extends NamedThing {
      * {@link ComponentDesigner} when {@link ComponentProperties} objects are created.
      *
      * @param location the repository location where the {@link ComponentProperties} associated with this wizard are to
-     * be stored. See {@link Repository}.
+     *            be stored. See {@link Repository}.
      * @return
      */
     ComponentWizard createWizard(ComponentProperties properties, String location);

@@ -35,8 +35,14 @@ public abstract class AbstractComponentWizardDefintion extends AbstractTopLevelD
         return getI18nMessage(getI18nPrefix() + getName() + I18N_MENU_NAME_SUFFIX);
     }
 
+    @Override
     public boolean isTopLevel() {
         return false;
+    }
+
+    @Override
+    public String getImagePath() {
+        return getPngImagePath(WizardImageType.TREE_ICON_16X16);
     }
 
 }
