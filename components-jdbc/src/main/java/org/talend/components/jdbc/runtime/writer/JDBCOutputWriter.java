@@ -120,21 +120,13 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
         }
 
         String sql = JDBCSQLBuilder.getInstance().generateSQL4DeleteTable(setting.getTablename());
-        Statement statement = null;
         try {
             conn = sink.getConnection(runtime);
-            statement = conn.createStatement();
-            deleteCount += statement.executeUpdate(sql);
+            try (Statement statement = conn.createStatement()) {
+                deleteCount += statement.executeUpdate(sql);
+            }
         } catch (ClassNotFoundException | SQLException e) {
             throw new ComponentException(e);
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    // close quietly
-                }
-            }
         }
 
     }

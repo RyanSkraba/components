@@ -82,18 +82,14 @@ public class JDBCRowSourceOrSink implements SourceOrSink {
 
         try {
             if (usePreparedStatement) {
-                PreparedStatement pstmt = conn.prepareStatement(sql);
-
-                JDBCTemplate.setPreparedStatement(pstmt, setting.getIndexs(), setting.getTypes(), setting.getValues());
-
-                pstmt.execute();
-                pstmt.close();
-                pstmt = null;
+                try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                    JDBCTemplate.setPreparedStatement(pstmt, setting.getIndexs(), setting.getTypes(), setting.getValues());
+                    pstmt.execute();
+                }
             } else {
-                Statement stmt = conn.createStatement();
-                stmt.execute(sql);
-                stmt.close();
-                stmt = null;
+                try (Statement stmt = conn.createStatement()) {
+                    stmt.execute(sql);
+                }
             }
 
             if (!useExistedConnection) {

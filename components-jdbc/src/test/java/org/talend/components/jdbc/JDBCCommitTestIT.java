@@ -191,16 +191,16 @@ public class JDBCCommitTestIT {
         commitSourceOrSink.initialize(container, commitProperties);
         commitSourceOrSink.validate(container);
 
-        // create another session and check if the data is inserted
-        Connection conn = JDBCTemplate.createConnection(allSetting);
-        Statement statement = conn.createStatement();
-        ResultSet resultset = statement.executeQuery("select count(*) from TEST");
         int count = -1;
-        if (resultset.next()) {
-            count = resultset.getInt(1);
+
+        // create another session and check if the data is inserted
+        try (Connection conn = JDBCTemplate.createConnection(allSetting);
+                Statement statement = conn.createStatement();
+                ResultSet resultset = statement.executeQuery("select count(*) from TEST")) {
+            if (resultset.next()) {
+                count = resultset.getInt(1);
+            }
         }
-        statement.close();
-        conn.close();
 
         Assert.assertEquals(5, count);
 

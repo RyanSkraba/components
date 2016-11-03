@@ -192,15 +192,14 @@ public class JDBCRollbackTestIT {
         rollbackSourceOrSink.validate(container);
 
         // create another session and check if the data is inserted
-        Connection conn = JDBCTemplate.createConnection(allSetting);
-        Statement statement = conn.createStatement();
-        ResultSet resultset = statement.executeQuery("select count(*) from TEST");
         int count = -1;
-        if (resultset.next()) {
-            count = resultset.getInt(1);
+        try (Connection conn = JDBCTemplate.createConnection(allSetting);
+                Statement statement = conn.createStatement();
+                ResultSet resultset = statement.executeQuery("select count(*) from TEST")) {
+            if (resultset.next()) {
+                count = resultset.getInt(1);
+            }
         }
-        statement.close();
-        conn.close();
 
         Assert.assertEquals(3, count);
 

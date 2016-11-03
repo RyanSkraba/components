@@ -90,50 +90,36 @@ public class JDBCSourceOrSink implements SourceOrSink {
     @Override
     public List<NamedThing> getSchemaNames(RuntimeContainer runtime) throws IOException {
         List<NamedThing> result = new ArrayList<>();
-        Connection conn = null;
-        try {
-            conn = connect(runtime);
-            DatabaseMetaData metadata = conn.getMetaData();
-            ResultSet resultset = metadata.getTables(null, null, null, new String[] { "TABLE" });
+        try (Connection conn = connect(runtime);
+                ResultSet resultset = conn.getMetaData().getTables(null, null, null, new String[] { "TABLE" })) {
             while (resultset.next()) {
                 String tablename = resultset.getString("TABLE_NAME");
                 result.add(new SimpleNamedThing(tablename, tablename));
             }
         } catch (Exception e) {
             throw new ComponentException(fillValidationResult(new ValidationResult(), e));
-        } finally {
-            closeQuietly(conn);
         }
         return result;
     }
 
     @Override
     public Schema getEndpointSchema(RuntimeContainer runtime, String tableName) throws IOException {
-        Connection conn = null;
-        try {
-            conn = connect(runtime);
-            DatabaseMetaData metadata = conn.getMetaData();
-            ResultSet resultset = metadata.getColumns(null, null, tableName, null);
+        try (Connection conn = connect(runtime);
+                ResultSet resultset = conn.getMetaData().getColumns(null, null, tableName, null)) {
             return JDBCAvroRegistry.get().inferSchema(resultset);
         } catch (Exception e) {
             throw new ComponentException(e);
-        } finally {
-            closeQuietly(conn);
         }
     }
 
     public Schema getSchemaFromQuery(RuntimeContainer runtime, String query) {
-        Connection conn = null;
-        try {
-            conn = connect(runtime);
-            Statement statement = conn.createStatement();
-            ResultSet resultset = statement.executeQuery(query);
+        try (Connection conn = connect(runtime);
+                Statement statement = conn.createStatement();
+                ResultSet resultset = statement.executeQuery(query)) {
             ResultSetMetaData metadata = resultset.getMetaData();
             return JDBCAvroRegistry.get().inferSchema(metadata);
         } catch (Exception e) {
             throw new ComponentException(e);
-        } finally {
-            closeQuietly(conn);
         }
     }
 
