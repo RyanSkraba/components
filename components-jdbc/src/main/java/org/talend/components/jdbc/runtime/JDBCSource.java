@@ -1,13 +1,15 @@
 package org.talend.components.jdbc.runtime;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.runtime.reader.JDBCInputReader;
-import org.talend.components.jdbc.tjdbcinput.TJDBCInputProperties;
 
 public class JDBCSource extends JDBCSourceOrSink implements BoundedSource {
 
@@ -16,11 +18,7 @@ public class JDBCSource extends JDBCSourceOrSink implements BoundedSource {
     @SuppressWarnings("rawtypes")
     @Override
     public BoundedReader createReader(RuntimeContainer container) {
-        if (properties instanceof TJDBCInputProperties) {
-            JDBCInputReader reader = new JDBCInputReader(container, this, (TJDBCInputProperties) properties);
-            return reader;
-        }
-        return null;
+        return new JDBCInputReader(container, this, properties);
     }
 
     @Override
@@ -39,6 +37,21 @@ public class JDBCSource extends JDBCSourceOrSink implements BoundedSource {
     @Override
     public boolean producesSortedKeys(RuntimeContainer adaptor) {
         return false;
+    }
+
+    @Override
+    public Connection connect(RuntimeContainer runtime) throws ClassNotFoundException, SQLException {
+        String refComponentId = setting.getReferencedComponentId();
+        // using another component's connection
+        if (refComponentId != null && runtime != null) {
+            Object existedConn = runtime.getComponentData(refComponentId, ComponentConstants.CONNECTION_KEY);
+            if (existedConn == null) {
+                throw new RuntimeException("Referenced component: " + refComponentId + " is not connected");
+            }
+            return (Connection) existedConn;
+        }
+
+        return JDBCTemplate.createConnection(setting);
     }
 
 }

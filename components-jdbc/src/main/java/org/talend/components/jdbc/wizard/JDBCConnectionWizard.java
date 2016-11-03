@@ -30,14 +30,14 @@ public class JDBCConnectionWizard extends ComponentWizard {
         addForm(connectionProperties.getForm(Form.MAIN));
 
         moduleProperties = new JDBCModuleListWizardProperties("moduleList").setName(connectionProperties.name.getValue())
-                .setConnection(connectionProperties.getJDBCConnectionModule()).setRepositoryLocation(getRepositoryLocation());
+                .setConnection(connectionProperties.connection).setRepositoryLocation(getRepositoryLocation());
         moduleProperties.init();
         addForm(moduleProperties.getForm(Form.MAIN));
     }
 
     public void setupProperties(JDBCConnectionWizardProperties connectionProperties) {
         this.connectionProperties.copyValuesFrom(connectionProperties);
-        this.moduleProperties.setConnection(connectionProperties.getJDBCConnectionModule());
+        this.moduleProperties.setConnection(connectionProperties.connection);
     }
 
 }

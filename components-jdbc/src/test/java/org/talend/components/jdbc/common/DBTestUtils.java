@@ -24,11 +24,12 @@ import org.junit.Assert;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCAvroRegistry;
-import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.runtime.JDBCSink;
 import org.talend.components.jdbc.runtime.JDBCSource;
 import org.talend.components.jdbc.runtime.JDBCTemplate;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.runtime.writer.JDBCOutputWriter;
 import org.talend.components.jdbc.runtime.writer.JDBCRowWriter;
 import org.talend.components.jdbc.tjdbcinput.TJDBCInputDefinition;
@@ -64,9 +65,9 @@ public class DBTestUtils {
          */
     }
 
-    public static void releaseResource(JDBCConnectionModule connectionInfo) throws ClassNotFoundException, SQLException {
+    public static void releaseResource(AllSetting allSetting) throws ClassNotFoundException, SQLException {
         try {
-            Connection conn = JDBCTemplate.createConnection(connectionInfo);
+            Connection conn = JDBCTemplate.createConnection(allSetting);
 
             try {
                 dropTestTable(conn);
@@ -131,9 +132,8 @@ public class DBTestUtils {
         return builder.endRecord();
     }
 
-    public static void prepareTableAndData(JDBCConnectionModule connectionInfo)
-            throws ClassNotFoundException, SQLException, Exception {
-        Connection conn = JDBCTemplate.createConnection(connectionInfo);
+    public static void prepareTableAndData(AllSetting allSetting) throws ClassNotFoundException, SQLException, Exception {
+        Connection conn = JDBCTemplate.createConnection(allSetting);
 
         try {
             dropTestTable(conn);
@@ -161,9 +161,9 @@ public class DBTestUtils {
         return builder.endRecord();
     }
 
-    public static void prepareTableAndDataForEveryType(JDBCConnectionModule connectionInfo)
+    public static void prepareTableAndDataForEveryType(AllSetting allSetting)
             throws ClassNotFoundException, SQLException, Exception {
-        Connection conn = JDBCTemplate.createConnection(connectionInfo);
+        Connection conn = JDBCTemplate.createConnection(allSetting);
 
         try {
             dropTestTable(conn);
@@ -529,23 +529,21 @@ public class DBTestUtils {
     }
 
     @SuppressWarnings("rawtypes")
-    public static Reader createCommonJDBCInputReader(TJDBCInputDefinition definition, TJDBCInputProperties properties) {
-        return createCommonJDBCInputReader(definition, properties, null);
+    public static Reader createCommonJDBCInputReader(ComponentProperties properties) {
+        return createCommonJDBCInputReader(properties, null);
     }
 
     @SuppressWarnings("rawtypes")
-    public static Reader createCommonJDBCInputReader(TJDBCInputDefinition definition, TJDBCInputProperties properties,
-            RuntimeContainer container) {
-        JDBCSource source = createCommonJDBCSource(definition, properties, container);
+    public static Reader createCommonJDBCInputReader(ComponentProperties properties, RuntimeContainer container) {
+        JDBCSource source = createCommonJDBCSource(properties, container);
         return source.createReader(container);
     }
 
-    public static JDBCSource createCommonJDBCSource(TJDBCInputDefinition definition, TJDBCInputProperties properties) {
-        return createCommonJDBCSource(definition, properties, null);
+    public static JDBCSource createCommonJDBCSource(ComponentProperties properties) {
+        return createCommonJDBCSource(properties, null);
     }
 
-    public static JDBCSource createCommonJDBCSource(TJDBCInputDefinition definition, TJDBCInputProperties properties,
-            RuntimeContainer container) {
+    public static JDBCSource createCommonJDBCSource(ComponentProperties properties, RuntimeContainer container) {
         JDBCSource source = new JDBCSource();
         source.initialize(container, properties);
         return source;

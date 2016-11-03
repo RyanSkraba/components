@@ -32,10 +32,13 @@ import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCAvroRegistry;
+import org.talend.components.jdbc.CommonUtils;
+import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.JDBCSink;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.runtime.sqlbuilder.JDBCSQLBuilder;
-import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties.DataAction;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
@@ -49,7 +52,9 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
 
     protected JDBCSink sink;
 
-    protected TJDBCOutputProperties properties;
+    protected RuntimeSettingProvider properties;
+
+    protected AllSetting setting;
 
     protected RuntimeContainer runtime;
 
@@ -89,31 +94,32 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
         this.writeOperation = writeOperation;
         this.runtime = runtime;
         sink = (JDBCSink) writeOperation.getSink();
-        properties = (TJDBCOutputProperties) sink.properties;
+        properties = sink.properties;
+        setting = properties.getRuntimeSetting();
 
-        useBatch = properties.useBatch.getValue();
-        DataAction dataAction = properties.dataAction.getValue();
+        useBatch = setting.getUseBatch();
+        DataAction dataAction = setting.getDataAction();
         if ((dataAction == DataAction.INSERTORUPDATE) || (dataAction == DataAction.UPDATEORINSERT)) {
             useBatch = false;
         }
-        batchSize = properties.batchSize.getValue();
+        batchSize = setting.getBatchSize();
 
-        useExistedConnection = properties.getReferencedComponentId() != null;
+        useExistedConnection = setting.getReferencedComponentId() != null;
         if (!useExistedConnection) {
-            commitEvery = properties.commitEvery.getValue();
+            commitEvery = setting.getCommitEvery();
         }
 
-        dieOnError = properties.dieOnError.getValue();
+        dieOnError = setting.getDieOnError();
 
         result = new Result();
     }
 
     public void open(String uId) throws IOException {
-        if (!properties.clearDataInTable.getValue()) {
+        if (!setting.getClearDataInTable()) {
             return;
         }
 
-        String sql = JDBCSQLBuilder.getInstance().generateSQL4DeleteTable(properties.tableSelection.tablename.getValue());
+        String sql = JDBCSQLBuilder.getInstance().generateSQL4DeleteTable(setting.getTablename());
         Statement statement = null;
         try {
             conn = sink.getConnection(runtime);
@@ -203,7 +209,7 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
         }
 
         rejectCount++;
-        Schema outSchema = properties.schemaReject.schema.getValue();
+        Schema outSchema = CommonUtils.getRejectSchema((ComponentProperties) properties);
         IndexedRecord reject = new GenericData.Record(outSchema);
         for (Schema.Field outField : reject.getSchema().getFields()) {
             Object outValue = null;

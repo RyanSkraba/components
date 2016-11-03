@@ -20,18 +20,16 @@ import java.util.Set;
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
-import org.talend.components.common.avro.JDBCAvroRegistryInfluencer;
 import org.talend.components.jdbc.CommonUtils;
-import org.talend.components.jdbc.JDBCConnectionInfoProperties;
-import org.talend.components.jdbc.ReferAnotherComponent;
+import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.module.JDBCTableSelectionModule;
 import org.talend.components.jdbc.runtime.JDBCSourceOrSink;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.runtime.sqlbuilder.JDBCSQLBuilder;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionDefinition;
 import org.talend.daikon.properties.PresentationItem;
@@ -42,7 +40,7 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
 public class TJDBCInputProperties extends FixedConnectorsComponentProperties
-        implements ComponentReferencePropertiesEnclosing, JDBCConnectionInfoProperties, ReferAnotherComponent, JDBCAvroRegistryInfluencer {
+        implements ComponentReferencePropertiesEnclosing, RuntimeSettingProvider {
 
     public TJDBCInputProperties(String name) {
         super(name);
@@ -162,26 +160,11 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties
     }
 
     @Override
-    public JDBCConnectionModule getJDBCConnectionModule() {
-        return connection;
-    }
-
-    @Override
-    public String getReferencedComponentId() {
-        return referencedComponent.componentInstanceId.getValue();
-    }
-
-    @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
         if (isOutputConnection) {
             return Collections.singleton(mainConnector);
         }
         return Collections.emptySet();
-    }
-
-    @Override
-    public ComponentProperties getReferencedComponentProperties() {
-        return referencedComponent.componentProperties;
     }
 
     public ValidationResult afterFetchSchemaFromQuery() {
@@ -216,8 +199,26 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties
         return ValidationResult.OK;
     }
 
-    @Override
-    public boolean trim() {
-        return trimStringOrCharColumns.getValue();
+    public AllSetting getRuntimeSetting() {
+        AllSetting setting = new AllSetting();
+
+        setting.setReferencedComponentId(referencedComponent.componentInstanceId.getValue());
+        setting.setReferencedComponentProperties(referencedComponent.componentProperties);
+
+        setting.setDriverPaths(this.connection.driverTable.drivers.getValue());
+        setting.setDriverClass(this.connection.driverClass.getValue());
+        setting.setJdbcUrl(this.connection.jdbcUrl.getValue());
+        setting.setUsername(this.connection.userPassword.userId.getValue());
+        setting.setPassword(this.connection.userPassword.userId.getValue());
+
+        setting.setTablename(this.tableSelection.tablename.getValue());
+        setting.setSql(this.sql.getValue());
+
+        setting.setUseCursor(this.useCursor.getValue());
+        setting.setCursor(this.cursor.getValue());
+        setting.setTrimStringOrCharColumns(this.trimStringOrCharColumns.getValue());
+
+        return setting;
     }
+
 }

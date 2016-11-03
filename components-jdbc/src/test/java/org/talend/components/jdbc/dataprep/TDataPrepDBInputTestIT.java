@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.jdbc;
+package org.talend.components.jdbc.dataprep;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -31,17 +31,16 @@ import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.jdbc.common.DBTestUtils;
+import org.talend.components.jdbc.dataprep.TDataPrepDBInputProperties.DBType;
 import org.talend.components.jdbc.runtime.JDBCSource;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
-import org.talend.components.jdbc.tjdbcinput.TJDBCInputDefinition;
-import org.talend.components.jdbc.tjdbcinput.TJDBCInputProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 import org.talend.daikon.di.DiOutgoingSchemaEnforcer;
 
-public class JDBCInputTestIT {
+public class TDataPrepDBInputTestIT {
 
     private static String driverClass;
 
@@ -51,8 +50,6 @@ public class JDBCInputTestIT {
 
     private static String password;
 
-    private static String tablename;
-
     private static String sql;
 
     public static AllSetting allSetting;
@@ -60,7 +57,7 @@ public class JDBCInputTestIT {
     @BeforeClass
     public static void init() throws Exception {
         java.util.Properties props = new java.util.Properties();
-        try (InputStream is = JDBCInputTestIT.class.getClassLoader().getResourceAsStream("connection.properties")) {
+        try (InputStream is = TDataPrepDBInputTestIT.class.getClassLoader().getResourceAsStream("connection.properties")) {
             props = new java.util.Properties();
             props.load(is);
         }
@@ -72,8 +69,6 @@ public class JDBCInputTestIT {
         userId = props.getProperty("userId");
 
         password = props.getProperty("password");
-
-        tablename = props.getProperty("tablename");
 
         sql = props.getProperty("sql");
 
@@ -93,11 +88,10 @@ public class JDBCInputTestIT {
 
     @Test
     public void testGetSchemaNames() throws Exception {
-        TJDBCInputDefinition definition = new TJDBCInputDefinition();
-        TJDBCInputProperties properties = createCommonJDBCInputProperties(definition);
+        TDataPrepDBInputDefinition definition = new TDataPrepDBInputDefinition();
+        TDataPrepDBInputProperties properties = createCommonJDBCInputProperties(definition);
 
         properties.main.schema.setValue(DBTestUtils.createTestSchema());
-        properties.tableSelection.tablename.setValue(tablename);
         properties.sql.setValue(sql);
 
         JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
@@ -119,11 +113,10 @@ public class JDBCInputTestIT {
 
     @Test
     public void testGetSchema() throws Exception {
-        TJDBCInputDefinition definition = new TJDBCInputDefinition();
-        TJDBCInputProperties properties = createCommonJDBCInputProperties(definition);
+        TDataPrepDBInputDefinition definition = new TDataPrepDBInputDefinition();
+        TDataPrepDBInputProperties properties = createCommonJDBCInputProperties(definition);
 
         properties.main.schema.setValue(DBTestUtils.createTestSchema());
-        properties.tableSelection.tablename.setValue(tablename);
         properties.sql.setValue(sql);
 
         JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
@@ -163,11 +156,10 @@ public class JDBCInputTestIT {
     public void testReader() {
         Reader reader = null;
         try {
-            TJDBCInputDefinition definition = new TJDBCInputDefinition();
-            TJDBCInputProperties properties = createCommonJDBCInputProperties(definition);
+            TDataPrepDBInputDefinition definition = new TDataPrepDBInputDefinition();
+            TDataPrepDBInputProperties properties = createCommonJDBCInputProperties(definition);
 
             properties.main.schema.setValue(DBTestUtils.createTestSchema());
-            properties.tableSelection.tablename.setValue(tablename);
             properties.sql.setValue(sql);
 
             reader = DBTestUtils.createCommonJDBCInputReader(properties);
@@ -220,11 +212,10 @@ public class JDBCInputTestIT {
     @SuppressWarnings({ "rawtypes" })
     @Test
     public void testType() throws Exception {
-        TJDBCInputDefinition definition = new TJDBCInputDefinition();
-        TJDBCInputProperties properties = createCommonJDBCInputProperties(definition);
+        TDataPrepDBInputDefinition definition = new TDataPrepDBInputDefinition();
+        TDataPrepDBInputProperties properties = createCommonJDBCInputProperties(definition);
 
         properties.main.schema.setValue(DBTestUtils.createTestSchema());
-        properties.tableSelection.tablename.setValue(tablename);
         properties.sql.setValue(sql);
 
         Reader reader = DBTestUtils.createCommonJDBCInputReader(properties);
@@ -250,15 +241,13 @@ public class JDBCInputTestIT {
         }
     }
 
-    private TJDBCInputProperties createCommonJDBCInputProperties(TJDBCInputDefinition definition) {
-        TJDBCInputProperties properties = (TJDBCInputProperties) definition.createRuntimeProperties();
+    private TDataPrepDBInputProperties createCommonJDBCInputProperties(TDataPrepDBInputDefinition definition) {
+        TDataPrepDBInputProperties properties = (TDataPrepDBInputProperties) definition.createRuntimeProperties();
 
-        // TODO now framework doesn't support to load the JDBC jar by the setting
-        // properties.connection.driverJar.setValue("port", props.getProperty("port"));
-        properties.connection.driverClass.setValue(driverClass);
-        properties.connection.jdbcUrl.setValue(jdbcUrl);
-        properties.connection.userPassword.userId.setValue(userId);
-        properties.connection.userPassword.password.setValue(password);
+        properties.dbTypes.setValue(DBType.DERBY);
+        properties.jdbcUrl.setValue(jdbcUrl);
+        properties.userPassword.userId.setValue(userId);
+        properties.userPassword.password.setValue(password);
         return properties;
     }
 

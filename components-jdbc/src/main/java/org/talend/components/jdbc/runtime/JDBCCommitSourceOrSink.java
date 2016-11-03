@@ -21,7 +21,8 @@ import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.ComponentConstants;
-import org.talend.components.jdbc.tjdbccommit.TJDBCCommitProperties;
+import org.talend.components.jdbc.RuntimeSettingProvider;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 
@@ -29,11 +30,11 @@ public class JDBCCommitSourceOrSink implements SourceOrSink {
 
     private static final long serialVersionUID = -7226558840084293603L;
 
-    public TJDBCCommitProperties properties;
+    public ComponentProperties properties;
 
     @Override
     public ValidationResult initialize(RuntimeContainer runtime, ComponentProperties properties) {
-        this.properties = (TJDBCCommitProperties) properties;
+        this.properties = properties;
         return ValidationResult.OK;
     }
 
@@ -68,14 +69,15 @@ public class JDBCCommitSourceOrSink implements SourceOrSink {
     }
 
     public void doCommitAction(RuntimeContainer runtime) throws SQLException {
-        String refComponentId = properties.getReferencedComponentId();
+        String refComponentId = ((RuntimeSettingProvider) properties).getRuntimeSetting().getReferencedComponentId();
         if (refComponentId != null && runtime != null) {
             java.sql.Connection conn = (java.sql.Connection) runtime.getComponentData(refComponentId,
                     ComponentConstants.CONNECTION_KEY);
             if (conn != null && !conn.isClosed()) {
                 conn.commit();
 
-                if (properties.closeConnection.getValue()) {
+                AllSetting setting = ((RuntimeSettingProvider) properties).getRuntimeSetting();
+                if (setting.getCloseConnection()) {
                     conn.close();
                 }
             }

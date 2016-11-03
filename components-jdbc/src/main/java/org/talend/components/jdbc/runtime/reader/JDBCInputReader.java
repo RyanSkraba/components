@@ -26,15 +26,20 @@ import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCAvroRegistry;
 import org.talend.components.common.avro.JDBCResultSetIndexedRecordConverter;
+import org.talend.components.jdbc.CommonUtils;
+import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.JDBCSource;
-import org.talend.components.jdbc.tjdbcinput.TJDBCInputProperties;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.avro.AvroUtils;
 
 public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
 
-    protected TJDBCInputProperties properties;
+    protected RuntimeSettingProvider properties;
+
+    private AllSetting setting;
 
     protected RuntimeContainer container;
 
@@ -54,17 +59,18 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
 
     private boolean useExistedConnection;
 
-    public JDBCInputReader(RuntimeContainer container, JDBCSource source, TJDBCInputProperties props) {
+    public JDBCInputReader(RuntimeContainer container, JDBCSource source, RuntimeSettingProvider props) {
         super(source);
         this.container = container;
         this.properties = props;
+        setting = props.getRuntimeSetting();
         this.source = (JDBCSource) getCurrentSource();
-        this.useExistedConnection = props.getReferencedComponentId() != null;
+        this.useExistedConnection = setting.getReferencedComponentId() != null;
     }
 
     private Schema getSchema() throws IOException, SQLException {
         if (querySchema == null) {
-            querySchema = properties.main.schema.getValue();
+            querySchema = CommonUtils.getMainSchemaFromOutputConnector((ComponentProperties) properties);
             if (AvroUtils.isIncludeAllFields(querySchema)) {
                 querySchema = JDBCAvroRegistry.get().inferSchema(resultSet.getMetaData());
             }
@@ -76,7 +82,7 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
         if (null == factory) {
             factory = new JDBCResultSetIndexedRecordConverter();
             factory.setSchema(getSchema());
-            factory.setInfluencer(properties);
+            factory.setInfluencer(setting);
         }
         return factory;
     }
@@ -85,7 +91,7 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
     public boolean start() throws IOException {
         // TODO need to adjust the key
         if (container != null) {
-            container.setComponentData(container.getCurrentComponentId(), "QUERY", properties.sql.getValue());
+            container.setComponentData(container.getCurrentComponentId(), "QUERY", setting.getSql());
         }
 
         result = new Result();
@@ -98,11 +104,11 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
             // statement = conn.createStatement(java.sql.ResultSet.TYPE_FORWARD_ONLY, java.sql.ResultSet.CONCUR_READ_ONLY);
             // ((com.mysql.jdbc.Statement) statement).enableStreamingResults();
             // and mysql driver don't support setFetchSize method
-            if (properties.useCursor.getValue()) {
-                statement.setFetchSize(properties.cursor.getValue());
+            if (setting.getUseCursor() != null && setting.getUseCursor()) {
+                statement.setFetchSize(setting.getCursor());
             }
 
-            resultSet = statement.executeQuery(properties.sql.getValue());
+            resultSet = statement.executeQuery(setting.getSql());
 
             return haveNext();
         } catch (Exception e) {

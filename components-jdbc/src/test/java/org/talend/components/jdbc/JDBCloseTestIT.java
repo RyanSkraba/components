@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.jdbc;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -25,7 +25,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jdbc.common.DBTestUtils;
-import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.runtime.JDBCCloseSourceOrSink;
 import org.talend.components.jdbc.runtime.JDBCSourceOrSink;
 import org.talend.components.jdbc.tjdbcclose.TJDBCCloseDefinition;
@@ -43,8 +42,6 @@ public class JDBCloseTestIT {
     private static String userId;
 
     private static String password;
-
-    private static JDBCConnectionModule connectionInfo;
 
     private final String refComponentId = "tJDBCConnection1";
 
@@ -89,13 +86,6 @@ public class JDBCloseTestIT {
         userId = props.getProperty("userId");
 
         password = props.getProperty("password");
-
-        connectionInfo = new JDBCConnectionModule("connection");
-
-        connectionInfo.driverClass.setValue(driverClass);
-        connectionInfo.jdbcUrl.setValue(jdbcUrl);
-        connectionInfo.userPassword.userId.setValue(userId);
-        connectionInfo.userPassword.password.setValue(password);
     }
 
     @AfterClass

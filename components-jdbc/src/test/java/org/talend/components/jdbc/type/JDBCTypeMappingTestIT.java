@@ -21,8 +21,8 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.jdbc.JDBCConnectionTestIT;
 import org.talend.components.jdbc.common.DBTestUtils;
-import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.runtime.JDBCSource;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.runtime.writer.JDBCOutputWriter;
 import org.talend.components.jdbc.tjdbcinput.TJDBCInputDefinition;
 import org.talend.components.jdbc.tjdbcinput.TJDBCInputProperties;
@@ -44,7 +44,7 @@ public class JDBCTypeMappingTestIT {
 
     private static String password;
 
-    private static JDBCConnectionModule connectionInfo;
+    public static AllSetting allSetting;
 
     private static String tablename;
 
@@ -70,22 +70,21 @@ public class JDBCTypeMappingTestIT {
 
         sql = props.getProperty("sql");
 
-        connectionInfo = new JDBCConnectionModule("connection");
-
-        connectionInfo.driverClass.setValue(driverClass);
-        connectionInfo.jdbcUrl.setValue(jdbcUrl);
-        connectionInfo.userPassword.userId.setValue(userId);
-        connectionInfo.userPassword.password.setValue(password);
+        allSetting = new AllSetting();
+        allSetting.setDriverClass(driverClass);
+        allSetting.setJdbcUrl(jdbcUrl);
+        allSetting.setUsername(userId);
+        allSetting.setPassword(password);
     }
 
     @AfterClass
     public static void clean() throws ClassNotFoundException, SQLException {
-        DBTestUtils.releaseResource(connectionInfo);
+        DBTestUtils.releaseResource(allSetting);
     }
 
     @Before
     public void before() throws ClassNotFoundException, SQLException, Exception {
-        DBTestUtils.prepareTableAndDataForEveryType(connectionInfo);
+        DBTestUtils.prepareTableAndDataForEveryType(allSetting);
     }
 
     private TJDBCInputProperties createCommonJDBCInputProperties(TJDBCInputDefinition definition) {
@@ -109,7 +108,7 @@ public class JDBCTypeMappingTestIT {
         properties.tableSelection.tablename.setValue(tablename);
         properties.sql.setValue(sql);
 
-        JDBCSource source = DBTestUtils.createCommonJDBCSource(definition, properties);
+        JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
 
         Schema schema = source.getEndpointSchema(null, "TEST");
         assertEquals("TEST", schema.getName().toUpperCase());
@@ -304,7 +303,7 @@ public class JDBCTypeMappingTestIT {
         properties.tableSelection.tablename.setValue(tablename);
         properties.sql.setValue(sql);
 
-        Reader reader = DBTestUtils.createCommonJDBCInputReader(definition, properties);
+        Reader reader = DBTestUtils.createCommonJDBCInputReader(properties);
 
         try {
             IndexedRecordConverter<Object, ? extends IndexedRecord> converter = null;
@@ -361,7 +360,7 @@ public class JDBCTypeMappingTestIT {
             properties.tableSelection.tablename.setValue(tablename);
             properties.sql.setValue(sql);
 
-            reader = DBTestUtils.createCommonJDBCInputReader(definition, properties);
+            reader = DBTestUtils.createCommonJDBCInputReader(properties);
 
             reader.start();
 
@@ -607,7 +606,7 @@ public class JDBCTypeMappingTestIT {
             properties1.tableSelection.tablename.setValue(tablename);
             properties1.sql.setValue(sql);
 
-            reader = DBTestUtils.createCommonJDBCInputReader(definition1, properties1);
+            reader = DBTestUtils.createCommonJDBCInputReader(properties1);
 
             reader.start();
             int i = 0;

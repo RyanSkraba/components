@@ -12,6 +12,8 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.runtime.JDBCTemplate;
 import org.talend.components.jdbc.runtime.sqlbuilder.JDBCSQLBuilder;
 import org.talend.components.jdbc.runtime.type.JDBCMapping;
@@ -31,8 +33,8 @@ public class JDBCOutputDeleteWriter extends JDBCOutputWriter {
         super.open(uId);
         try {
             conn = sink.getConnection(runtime);
-            sql = JDBCSQLBuilder.getInstance().generateSQL4Delete(properties.tableSelection.tablename.getValue(),
-                    properties.main.schema.getValue());
+            sql = JDBCSQLBuilder.getInstance().generateSQL4Delete(setting.getTablename(),
+                    CommonUtils.getMainSchemaFromInputConnector((ComponentProperties) properties));
             statement = conn.prepareStatement(sql);
         } catch (ClassNotFoundException | SQLException e) {
             throw new ComponentException(e);

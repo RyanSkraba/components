@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.jdbc;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,11 +33,11 @@ import org.junit.Test;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jdbc.common.DBTestUtils;
-import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.runtime.JDBCCommitSourceOrSink;
 import org.talend.components.jdbc.runtime.JDBCSink;
 import org.talend.components.jdbc.runtime.JDBCSourceOrSink;
 import org.talend.components.jdbc.runtime.JDBCTemplate;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.runtime.writer.JDBCOutputInsertWriter;
 import org.talend.components.jdbc.tjdbccommit.TJDBCCommitDefinition;
 import org.talend.components.jdbc.tjdbccommit.TJDBCCommitProperties;
@@ -60,7 +60,7 @@ public class JDBCCommitTestIT {
 
     private static String tablename;
 
-    public static JDBCConnectionModule connectionInfo;
+    public static AllSetting allSetting;
 
     private final String refComponentId = "tJDBCConnection1";
 
@@ -108,22 +108,21 @@ public class JDBCCommitTestIT {
 
         tablename = props.getProperty("tablename");
 
-        connectionInfo = new JDBCConnectionModule("connection");
-
-        connectionInfo.driverClass.setValue(driverClass);
-        connectionInfo.jdbcUrl.setValue(jdbcUrl);
-        connectionInfo.userPassword.userId.setValue(userId);
-        connectionInfo.userPassword.password.setValue(password);
+        allSetting = new AllSetting();
+        allSetting.setDriverClass(driverClass);
+        allSetting.setJdbcUrl(jdbcUrl);
+        allSetting.setUsername(userId);
+        allSetting.setPassword(password);
     }
 
     @AfterClass
     public static void clean() throws ClassNotFoundException, SQLException {
-        DBTestUtils.releaseResource(connectionInfo);
+        DBTestUtils.releaseResource(allSetting);
     }
 
     @Before
     public void before() throws ClassNotFoundException, SQLException, Exception {
-        DBTestUtils.prepareTableAndData(connectionInfo);
+        DBTestUtils.prepareTableAndData(allSetting);
     }
 
     @SuppressWarnings("rawtypes")
@@ -193,7 +192,7 @@ public class JDBCCommitTestIT {
         commitSourceOrSink.validate(container);
 
         // create another session and check if the data is inserted
-        Connection conn = JDBCTemplate.createConnection(connectionInfo);
+        Connection conn = JDBCTemplate.createConnection(allSetting);
         Statement statement = conn.createStatement();
         ResultSet resultset = statement.executeQuery("select count(*) from TEST");
         int count = -1;

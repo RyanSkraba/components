@@ -29,10 +29,8 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCAvroRegistry;
 import org.talend.components.jdbc.ComponentConstants;
-import org.talend.components.jdbc.JDBCConnectionInfoProperties;
-import org.talend.components.jdbc.ReferAnotherComponent;
-import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionProperties;
-import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties;
+import org.talend.components.jdbc.RuntimeSettingProvider;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.ValidationResult;
@@ -41,13 +39,16 @@ public class JDBCSourceOrSink implements SourceOrSink {
 
     private static final long serialVersionUID = -1730391293657968628L;
 
-    public JDBCConnectionInfoProperties properties;
+    public RuntimeSettingProvider properties;
+
+    protected AllSetting setting;
 
     private Connection conn;
 
     @Override
     public ValidationResult initialize(RuntimeContainer runtime, ComponentProperties properties) {
-        this.properties = (JDBCConnectionInfoProperties) properties;
+        this.properties = (RuntimeSettingProvider) properties;
+        setting = this.properties.getRuntimeSetting();
         return ValidationResult.OK;
     }
 
@@ -143,53 +144,20 @@ public class JDBCSourceOrSink implements SourceOrSink {
 
         // TODO routines.system.SharedDBConnectionLog4j, the same with the TODO above
 
-        if (properties instanceof ReferAnotherComponent) {
-            ReferAnotherComponent rac = (ReferAnotherComponent) properties;
-            String refComponentId = rac.getReferencedComponentId();
-            // using another component's connection
-            if (refComponentId != null) {
-                if (runtime != null) {
-                    Object existedConn = runtime.getComponentData(refComponentId, ComponentConstants.CONNECTION_KEY);
-                    if (existedConn == null) {
-                        throw new RuntimeException("Referenced component: " + refComponentId + " is not connected");
-                    }
-                    return (Connection) existedConn;
-                }
+        AllSetting setting = properties.getRuntimeSetting();
 
-                return JDBCTemplate.createConnection(
-                        ((JDBCConnectionInfoProperties) rac.getReferencedComponentProperties()).getJDBCConnectionModule());
-            } else {
-                Connection conn = JDBCTemplate.createConnection(properties.getJDBCConnectionModule());
+        // connection component
+        Connection conn = JDBCTemplate.createConnection(setting);
 
-                if (properties instanceof TJDBCOutputProperties) {
-                    TJDBCOutputProperties props = (TJDBCOutputProperties) properties;
-                    Integer commitEvery = props.commitEvery.getValue();
-                    if (commitEvery != null && commitEvery > 0) {
-                        conn.setAutoCommit(false);
-                    }
-                }
-
-                return conn;
-            }
-        } else {// connection component
-            Connection conn = JDBCTemplate.createConnection(properties.getJDBCConnectionModule());
-
-            if (properties instanceof TJDBCConnectionProperties) {
-                TJDBCConnectionProperties jdbcConnectionProperties = (TJDBCConnectionProperties) properties;
-
-                boolean useAutoCommit = jdbcConnectionProperties.useAutoCommit.getValue();
-                if (useAutoCommit) {
-                    boolean autoCommit = jdbcConnectionProperties.autocommit.getValue();
-                    conn.setAutoCommit(autoCommit);
-                }
-
-                if (runtime != null) {
-                    runtime.setComponentData(runtime.getCurrentComponentId(), ComponentConstants.CONNECTION_KEY, conn);
-                }
-            }
-
-            return conn;
+        if (setting.getUseAutoCommit()) {
+            conn.setAutoCommit(setting.getAutocommit());
         }
+
+        if (runtime != null) {
+            runtime.setComponentData(runtime.getCurrentComponentId(), ComponentConstants.CONNECTION_KEY, conn);
+        }
+
+        return conn;
     }
 
     public Connection getConnection(RuntimeContainer runtime) throws ClassNotFoundException, SQLException {

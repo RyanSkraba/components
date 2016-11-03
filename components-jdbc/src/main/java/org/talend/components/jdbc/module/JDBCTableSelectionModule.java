@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.jdbc.JDBCConnectionInfoProperties;
+import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.JDBCSourceOrSink;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.PropertiesImpl;
@@ -32,7 +32,7 @@ public class JDBCTableSelectionModule extends PropertiesImpl {
 
     public StringProperty tablename = newString("tablename");
 
-    private JDBCConnectionInfoProperties connection = null;
+    private RuntimeSettingProvider connection = null;
 
     public JDBCTableSelectionModule(String name) {
         super(name);
@@ -64,7 +64,7 @@ public class JDBCTableSelectionModule extends PropertiesImpl {
         return ValidationResult.OK;
     }
 
-    public void setConnection(JDBCConnectionInfoProperties connection) {
+    public void setConnection(RuntimeSettingProvider connection) {
         this.connection = connection;
     }
 

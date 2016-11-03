@@ -37,11 +37,11 @@ import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.DataRejectException;
 import org.talend.components.jdbc.common.DBTestUtils;
-import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.module.PreparedStatementTable;
 import org.talend.components.jdbc.runtime.JDBCRowSink;
 import org.talend.components.jdbc.runtime.JDBCRowSource;
 import org.talend.components.jdbc.runtime.JDBCRowSourceOrSink;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.runtime.writer.JDBCRowWriter;
 import org.talend.components.jdbc.tjdbcinput.TJDBCInputDefinition;
 import org.talend.components.jdbc.tjdbcinput.TJDBCInputProperties;
@@ -63,7 +63,7 @@ public class JDBCRowTestIT {
 
     private static String tablename;
 
-    private static JDBCConnectionModule connectionInfo;
+    public static AllSetting allSetting;
 
     @BeforeClass
     public static void init() throws Exception {
@@ -83,22 +83,21 @@ public class JDBCRowTestIT {
 
         tablename = props.getProperty("tablename");
 
-        connectionInfo = new JDBCConnectionModule("connection");
-
-        connectionInfo.driverClass.setValue(driverClass);
-        connectionInfo.jdbcUrl.setValue(jdbcUrl);
-        connectionInfo.userPassword.userId.setValue(userId);
-        connectionInfo.userPassword.password.setValue(password);
+        allSetting = new AllSetting();
+        allSetting.setDriverClass(driverClass);
+        allSetting.setJdbcUrl(jdbcUrl);
+        allSetting.setUsername(userId);
+        allSetting.setPassword(password);
     }
 
     @AfterClass
     public static void clean() throws ClassNotFoundException, SQLException {
-        DBTestUtils.releaseResource(connectionInfo);
+        DBTestUtils.releaseResource(allSetting);
     }
 
     @Before
     public void before() throws ClassNotFoundException, SQLException, Exception {
-        DBTestUtils.prepareTableAndData(connectionInfo);
+        DBTestUtils.prepareTableAndData(allSetting);
     }
 
     @Test
