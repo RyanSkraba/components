@@ -30,21 +30,22 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.DataRejectException;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.jdbc.CommonUtils;
+import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.JDBCRowSource;
 import org.talend.components.jdbc.runtime.JDBCTemplate;
-import org.talend.components.jdbc.tjdbcrow.TJDBCRowProperties;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 
 public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
 
-    protected TJDBCRowProperties properties;
+    protected RuntimeSettingProvider properties;
 
     protected RuntimeContainer container;
 
     protected Connection conn;
 
     protected ResultSet resultSet;
-
-    private transient Schema querySchema;
 
     private JDBCRowSource source;
 
@@ -56,31 +57,23 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
 
     private boolean useExistedConnection;
 
-    private boolean dieOnError;
+    private AllSetting setting;
 
-    public JDBCRowReader(RuntimeContainer container, JDBCRowSource source, TJDBCRowProperties props) {
+    public JDBCRowReader(RuntimeContainer container, JDBCRowSource source, RuntimeSettingProvider props) {
         super(source);
         this.container = container;
         this.properties = props;
         this.source = (JDBCRowSource) getCurrentSource();
 
-        this.dieOnError = props.dieOnError.getValue();
+        this.setting = props.getRuntimeSetting();
 
-    }
-
-    @SuppressWarnings("unused")
-    private Schema getSchema() {
-        if (querySchema == null) {
-            querySchema = properties.main.schema.getValue();
-        }
-        return querySchema;
     }
 
     @Override
     public boolean start() throws IOException {
         // TODO need to adjust the key
         if (container != null) {
-            container.setComponentData(container.getCurrentComponentId(), "QUERY", properties.sql.getValue());
+            container.setComponentData(container.getCurrentComponentId(), "QUERY", setting.getSql());
         }
 
         result = new Result();
@@ -102,14 +95,15 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
     @Override
     public IndexedRecord getCurrent() throws NoSuchElementException {
         try {
-            boolean usePreparedStatement = properties.usePreparedStatement.getValue();
-            String sql = properties.sql.getValue();
-            boolean propagateQueryResultSet = properties.propagateQueryResultSet.getValue();
+            boolean usePreparedStatement = setting.getUsePreparedStatement();
+            String sql = setting.getSql();
+            boolean propagateQueryResultSet = setting.getPropagateQueryResultSet();
 
             if (usePreparedStatement) {
                 prepared_statement = conn.prepareStatement(sql);
 
-                JDBCTemplate.setPreparedStatement(prepared_statement, properties.preparedStatementTable);
+                JDBCTemplate.setPreparedStatement(prepared_statement, setting.getIndexs(), setting.getTypes(),
+                        setting.getValues());
 
                 if (propagateQueryResultSet) {
                     resultSet = prepared_statement.executeQuery();
@@ -130,7 +124,7 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
 
             return output;
         } catch (SQLException e) {
-            if (dieOnError) {
+            if (setting.getDieOnError()) {
                 throw new ComponentException(e);
             } else {
                 // TODO : log it
@@ -142,11 +136,11 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
     }
 
     private IndexedRecord handleSuccess(boolean propagateQueryResultSet) {
-        Schema outSchema = properties.schemaFlow.schema.getValue();
+        Schema outSchema = CommonUtils.getOutputSchema((ComponentProperties) properties);
         IndexedRecord output = new GenericData.Record(outSchema);
 
         if (propagateQueryResultSet) {
-            String columnName = properties.useColumn.getValue();
+            String columnName = setting.getUseColumn();
             for (Schema.Field outField : output.getSchema().getFields()) {
                 if (outField.name().equals(columnName)) {
                     output.put(outField.pos(), resultSet);
@@ -158,7 +152,7 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
     }
 
     private void handleReject(SQLException e) {
-        Schema outSchema = properties.schemaReject.schema.getValue();
+        Schema outSchema = CommonUtils.getRejectSchema((ComponentProperties) properties);
         IndexedRecord reject = new GenericData.Record(outSchema);
 
         for (Schema.Field outField : reject.getSchema().getFields()) {

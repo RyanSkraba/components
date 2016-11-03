@@ -85,7 +85,7 @@ public abstract class FixedConnectorsComponentProperties extends ComponentProper
      * {@link #getAllSchemaPropertiesConnectors(boolean)} and the existingConnectors.
      * 
      * @param existingConnectors list of connectors already connected that may be of use to compute what remains to be
-     *            connected.
+     * connected.
      * @param isOutputConnection wether we query the possible output or input connections.
      * @return set of connector left to be connected.
      */

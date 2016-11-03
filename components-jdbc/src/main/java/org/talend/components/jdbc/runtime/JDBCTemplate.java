@@ -20,9 +20,9 @@ import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.error.ComponentsApiErrorCode;
-import org.talend.components.jdbc.JDBCConnectionInfoProperties;
-import org.talend.components.jdbc.module.JDBCConnectionModule;
+import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.module.PreparedStatementTable;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.error.CommonErrorCodes;
@@ -31,10 +31,10 @@ import org.talend.daikon.runtime.RuntimeInfo;
 
 public class JDBCTemplate {
 
-    public static Connection createConnection(JDBCConnectionModule properties) throws ClassNotFoundException, SQLException {
-        java.lang.Class.forName(properties.driverClass.getValue());
-        Connection conn = java.sql.DriverManager.getConnection(properties.jdbcUrl.getValue(),
-                properties.userPassword.userId.getValue(), properties.userPassword.password.getValue());
+    public static Connection createConnection(AllSetting setting) throws ClassNotFoundException, SQLException {
+        java.lang.Class.forName(setting.getDriverClass());
+        Connection conn = java.sql.DriverManager.getConnection(setting.getJdbcUrl(), setting.getUsername(),
+                setting.getPassword());
         return conn;
     }
 
@@ -95,8 +95,8 @@ public class JDBCTemplate {
                     }
 
                     if (properties != null) {
-                        final JDBCConnectionInfoProperties props = (JDBCConnectionInfoProperties) properties;
-                        List<String> drivers = props.getJDBCConnectionModule().driverTable.drivers.getValue();
+                        final RuntimeSettingProvider props = (RuntimeSettingProvider) properties;
+                        List<String> drivers = props.getRuntimeSetting().getDriverPaths();
                         if (drivers != null) {
                             for (String driver : drivers) {
                                 result.add(new URL(removeQuote(driver)));
@@ -121,11 +121,8 @@ public class JDBCTemplate {
         return content;
     }
 
-    public static void setPreparedStatement(PreparedStatement pstmt, PreparedStatementTable table) throws SQLException {
-        List<Integer> indexs = table.indexs.getValue();
-        List<String> types = table.types.getValue();
-        List<Object> values = table.values.getValue();
-
+    public static void setPreparedStatement(final PreparedStatement pstmt, final List<Integer> indexs, final List<String> types,
+            final List<Object> values) throws SQLException {
         // TODO : adjust it
         for (int i = 0; i < indexs.size(); i++) {
             Integer index = indexs.get(i);

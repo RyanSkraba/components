@@ -14,13 +14,14 @@ package org.talend.components.jdbc.tjdbcconnection;
 
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.jdbc.CommonUtils;
-import org.talend.components.jdbc.JDBCConnectionInfoProperties;
+import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.module.JDBCConnectionModule;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
-public class TJDBCConnectionProperties extends ComponentPropertiesImpl implements JDBCConnectionInfoProperties {
+public class TJDBCConnectionProperties extends ComponentPropertiesImpl implements RuntimeSettingProvider {
 
     public TJDBCConnectionProperties(String name) {
         super(name);
@@ -113,8 +114,19 @@ public class TJDBCConnectionProperties extends ComponentPropertiesImpl implement
     }
 
     @Override
-    public JDBCConnectionModule getJDBCConnectionModule() {
-        return connection;
+    public AllSetting getRuntimeSetting() {
+        AllSetting setting = new AllSetting();
+
+        setting.setDriverPaths(this.connection.driverTable.drivers.getValue());
+        setting.setDriverClass(this.connection.driverClass.getValue());
+        setting.setJdbcUrl(this.connection.jdbcUrl.getValue());
+        setting.setUsername(this.connection.userPassword.userId.getValue());
+        setting.setPassword(this.connection.userPassword.password.getValue());
+
+        setting.setUseAutoCommit(this.useAutoCommit.getValue());
+        setting.setAutocommit(this.autocommit.getValue());
+
+        return setting;
     }
 
 }

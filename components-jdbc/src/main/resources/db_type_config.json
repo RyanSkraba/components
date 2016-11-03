@@ -1,0 +1,23 @@
+[
+
+	{
+		"id" : "MYSQL",
+		"class" : "org.gjt.mm.mysql.Driver",
+		"paths" : 
+	 	[
+	 		{"path" : "mvn:org.talend.libraries/mysql-connector-java-5.1.30-bin/6.3.0"}
+	 	]
+	
+	},
+	
+	{
+		"id" : "DERBY",
+		"class" : "org.apache.derby.jdbc.EmbeddedDriver",
+		"paths" : 
+	 	[
+	 		{"path" : "mvn:org.apache.derby/derby/10.12.1.1"}
+	 	]
+	
+	}
+
+]

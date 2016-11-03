@@ -16,9 +16,10 @@ import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.jdbc.CommonUtils;
-import org.talend.components.jdbc.JDBCConnectionInfoProperties;
+import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.runtime.JDBCSourceOrSink;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
@@ -26,7 +27,7 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
-public class JDBCConnectionWizardProperties extends ComponentPropertiesImpl implements JDBCConnectionInfoProperties {
+public class JDBCConnectionWizardProperties extends ComponentPropertiesImpl implements RuntimeSettingProvider {
 
     public Property<String> name = PropertyFactory.newString("name").setRequired();
 
@@ -73,8 +74,9 @@ public class JDBCConnectionWizardProperties extends ComponentPropertiesImpl impl
     }
 
     @Override
-    public JDBCConnectionModule getJDBCConnectionModule() {
-        return connection;
+    public AllSetting getRuntimeSetting() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

@@ -32,10 +32,13 @@ import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCAvroRegistry;
+import org.talend.components.jdbc.CommonUtils;
+import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.JDBCRowSink;
 import org.talend.components.jdbc.runtime.JDBCTemplate;
-import org.talend.components.jdbc.tjdbcrow.TJDBCRowProperties;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
 public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
@@ -48,7 +51,9 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
 
     private JDBCRowSink sink;
 
-    private TJDBCRowProperties properties;
+    private AllSetting setting;
+
+    private RuntimeSettingProvider properties;
 
     private RuntimeContainer runtime;
 
@@ -92,16 +97,17 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
         this.writeOperation = writeOperation;
         this.runtime = runtime;
         sink = (JDBCRowSink) writeOperation.getSink();
-        properties = (TJDBCRowProperties) sink.properties;
+        setting = ((RuntimeSettingProvider) sink.properties).getRuntimeSetting();
+        properties = (RuntimeSettingProvider) sink.properties;
 
-        useExistedConnection = properties.getReferencedComponentId() != null;
+        useExistedConnection = setting.getReferencedComponentId() != null;
         if (!useExistedConnection) {
-            commitEvery = properties.commitEvery.getValue();
+            commitEvery = setting.getCommitEvery();
         }
 
-        dieOnError = properties.dieOnError.getValue();
+        dieOnError = setting.getDieOnError();
 
-        propagateQueryResultSet = properties.propagateQueryResultSet.getValue();
+        propagateQueryResultSet = setting.getPropagateQueryResultSet();
 
         result = new Result();
     }
@@ -110,8 +116,8 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
         try {
             conn = sink.getConnection(runtime);
 
-            usePreparedStatement = properties.usePreparedStatement.getValue();
-            sql = properties.sql.getValue();
+            usePreparedStatement = setting.getUsePreparedStatement();
+            sql = setting.getSql();
 
             if (usePreparedStatement) {
                 prepared_statement = conn.prepareStatement(sql);
@@ -133,7 +139,8 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
 
         try {
             if (usePreparedStatement) {
-                JDBCTemplate.setPreparedStatement(prepared_statement, properties.preparedStatementTable);
+                JDBCTemplate.setPreparedStatement(prepared_statement, setting.getIndexs(), setting.getTypes(),
+                        setting.getValues());
 
                 if (propagateQueryResultSet) {
                     resultSet = prepared_statement.executeQuery();
@@ -241,7 +248,7 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
     private void handleSuccess(IndexedRecord input) {
         successCount++;
 
-        Schema outSchema = properties.schemaFlow.schema.getValue();
+        Schema outSchema = CommonUtils.getOutputSchema((ComponentProperties) properties);
         if (outSchema == null || outSchema.getFields().size() == 0) {
             return;
         }
@@ -250,7 +257,7 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
         for (Schema.Field outField : output.getSchema().getFields()) {
             Object outValue = null;
 
-            if (propagateQueryResultSet && outField.name().equals(properties.useColumn.getValue())) {
+            if (propagateQueryResultSet && outField.name().equals(setting.getUseColumn())) {
                 output.put(outField.pos(), resultSet);
             } else {
                 Schema.Field inField = input.getSchema().getField(outField.name());
@@ -267,7 +274,7 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
     private void handleReject(IndexedRecord input, SQLException e) throws IOException {
         rejectCount++;
 
-        Schema outSchema = properties.schemaReject.schema.getValue();
+        Schema outSchema = CommonUtils.getRejectSchema((ComponentProperties) properties);
         IndexedRecord reject = new GenericData.Record(outSchema);
 
         for (Schema.Field outField : reject.getSchema().getFields()) {

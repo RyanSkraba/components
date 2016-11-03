@@ -29,7 +29,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.jdbc.common.DBTestUtils;
-import org.talend.components.jdbc.module.JDBCConnectionModule;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.runtime.writer.JDBCOutputWriter;
 import org.talend.components.jdbc.tjdbcinput.TJDBCInputDefinition;
 import org.talend.components.jdbc.tjdbcinput.TJDBCInputProperties;
@@ -49,7 +49,7 @@ public class JDBCOutputTestIT {
 
     private static String tablename;
 
-    private static JDBCConnectionModule connectionInfo;
+    private static AllSetting allSetting;
 
     @BeforeClass
     public static void init() throws Exception {
@@ -69,22 +69,21 @@ public class JDBCOutputTestIT {
 
         tablename = props.getProperty("tablename");
 
-        connectionInfo = new JDBCConnectionModule("connection");
-
-        connectionInfo.driverClass.setValue(driverClass);
-        connectionInfo.jdbcUrl.setValue(jdbcUrl);
-        connectionInfo.userPassword.userId.setValue(userId);
-        connectionInfo.userPassword.password.setValue(password);
+        allSetting = new AllSetting();
+        allSetting.setDriverClass(driverClass);
+        allSetting.setJdbcUrl(jdbcUrl);
+        allSetting.setUsername(userId);
+        allSetting.setPassword(password);
     }
 
     @AfterClass
     public static void clean() throws ClassNotFoundException, SQLException {
-        DBTestUtils.releaseResource(connectionInfo);
+        DBTestUtils.releaseResource(allSetting);
     }
 
     @Before
     public void before() throws ClassNotFoundException, SQLException, Exception {
-        DBTestUtils.prepareTableAndData(connectionInfo);
+        DBTestUtils.prepareTableAndData(allSetting);
     }
 
     @Test

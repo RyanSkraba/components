@@ -23,7 +23,7 @@ public class JDBCRowSink extends JDBCRowSourceOrSink implements Sink {
 
     @Override
     public WriteOperation<?> createWriteOperation() {
-        return new JDBCWriteOperation(this);
+        return new JDBCRowWriteOperation(this);
     }
 
     @Override

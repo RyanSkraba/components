@@ -14,12 +14,12 @@ package org.talend.components.jdbc.tjdbcrollback;
 
 import static org.talend.daikon.properties.presentation.Widget.widget;
 
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
 import org.talend.components.jdbc.CommonUtils;
-import org.talend.components.jdbc.ReferAnotherComponent;
+import org.talend.components.jdbc.RuntimeSettingProvider;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionDefinition;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
@@ -27,7 +27,7 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
 public class TJDBCRollbackProperties extends ComponentPropertiesImpl
-        implements ComponentReferencePropertiesEnclosing, ReferAnotherComponent {
+        implements ComponentReferencePropertiesEnclosing, RuntimeSettingProvider {
 
     public TJDBCRollbackProperties(String name) {
         super(name);
@@ -56,13 +56,14 @@ public class TJDBCRollbackProperties extends ComponentPropertiesImpl
     }
 
     @Override
-    public String getReferencedComponentId() {
-        return referencedComponent.componentInstanceId.getValue();
-    }
+    public AllSetting getRuntimeSetting() {
+        AllSetting setting = new AllSetting();
 
-    @Override
-    public ComponentProperties getReferencedComponentProperties() {
-        return referencedComponent.componentProperties;
+        setting.setReferencedComponentId(referencedComponent.componentInstanceId.getValue());
+        setting.setReferencedComponentProperties(referencedComponent.componentProperties);
+        setting.setCloseConnection(this.closeConnection.getValue());
+
+        return setting;
     }
 
 }

@@ -14,6 +14,8 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.runtime.JDBCTemplate;
 import org.talend.components.jdbc.runtime.sqlbuilder.JDBCSQLBuilder;
 import org.talend.components.jdbc.runtime.type.JDBCMapping;
@@ -44,16 +46,16 @@ public class JDBCOutputInsertOrUpdateWriter extends JDBCOutputWriter {
         try {
             conn = sink.getConnection(runtime);
 
-            sqlQuery = JDBCSQLBuilder.getInstance().generateQuerySQL4InsertOrUpdate(
-                    properties.tableSelection.tablename.getValue(), properties.main.schema.getValue());
+            sqlQuery = JDBCSQLBuilder.getInstance().generateQuerySQL4InsertOrUpdate(setting.getTablename(),
+                    CommonUtils.getMainSchemaFromInputConnector((ComponentProperties) properties));
             statementQuery = conn.prepareStatement(sqlQuery);
 
-            sqlInsert = JDBCSQLBuilder.getInstance().generateSQL4Insert(properties.tableSelection.tablename.getValue(),
-                    properties.main.schema.getValue());
+            sqlInsert = JDBCSQLBuilder.getInstance().generateSQL4Insert(setting.getTablename(),
+                    CommonUtils.getMainSchemaFromInputConnector((ComponentProperties) properties));
             statementInsert = conn.prepareStatement(sqlInsert);
 
-            sqlUpdate = JDBCSQLBuilder.getInstance().generateSQL4Update(properties.tableSelection.tablename.getValue(),
-                    properties.main.schema.getValue());
+            sqlUpdate = JDBCSQLBuilder.getInstance().generateSQL4Update(setting.getTablename(),
+                    CommonUtils.getMainSchemaFromInputConnector((ComponentProperties) properties));
             statementUpdate = conn.prepareStatement(sqlUpdate);
 
         } catch (ClassNotFoundException | SQLException e) {

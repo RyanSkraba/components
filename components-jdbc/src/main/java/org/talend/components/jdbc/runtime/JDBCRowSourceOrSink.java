@@ -25,8 +25,8 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.ComponentConstants;
-import org.talend.components.jdbc.JDBCConnectionInfoProperties;
-import org.talend.components.jdbc.tjdbcrow.TJDBCRowProperties;
+import org.talend.components.jdbc.RuntimeSettingProvider;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 
@@ -34,7 +34,9 @@ public class JDBCRowSourceOrSink implements SourceOrSink {
 
     private static final long serialVersionUID = -1730391293657968628L;
 
-    public TJDBCRowProperties properties;
+    public RuntimeSettingProvider properties;
+
+    protected AllSetting setting;
 
     private Connection conn;
 
@@ -42,8 +44,9 @@ public class JDBCRowSourceOrSink implements SourceOrSink {
 
     @Override
     public ValidationResult initialize(RuntimeContainer runtime, ComponentProperties properties) {
-        this.properties = (TJDBCRowProperties) properties;
-        useExistedConnection = this.properties.getReferencedComponentId() != null;
+        this.properties = (RuntimeSettingProvider) properties;
+        setting = this.properties.getRuntimeSetting();
+        useExistedConnection = setting.getReferencedComponentId() != null;
         return ValidationResult.OK;
     }
 
@@ -65,9 +68,10 @@ public class JDBCRowSourceOrSink implements SourceOrSink {
     public ValidationResult validate(RuntimeContainer runtime) {
         ValidationResult vr = new ValidationResult();
 
-        String sql = this.properties.sql.getValue();
-        boolean usePreparedStatement = this.properties.usePreparedStatement.getValue();
-        boolean dieOnError = this.properties.dieOnError.getValue();
+        AllSetting setting = properties.getRuntimeSetting();
+        String sql = setting.getSql();
+        boolean usePreparedStatement = setting.getUsePreparedStatement();
+        boolean dieOnError = setting.getDieOnError();
 
         Connection conn = null;
         try {
@@ -78,18 +82,14 @@ public class JDBCRowSourceOrSink implements SourceOrSink {
 
         try {
             if (usePreparedStatement) {
-                PreparedStatement pstmt = conn.prepareStatement(sql);
-
-                JDBCTemplate.setPreparedStatement(pstmt, properties.preparedStatementTable);
-
-                pstmt.execute();
-                pstmt.close();
-                pstmt = null;
+                try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                    JDBCTemplate.setPreparedStatement(pstmt, setting.getIndexs(), setting.getTypes(), setting.getValues());
+                    pstmt.execute();
+                }
             } else {
-                Statement stmt = conn.createStatement();
-                stmt.execute(sql);
-                stmt.close();
-                stmt = null;
+                try (Statement stmt = conn.createStatement()) {
+                    stmt.execute(sql);
+                }
             }
 
             if (!useExistedConnection) {
@@ -126,7 +126,7 @@ public class JDBCRowSourceOrSink implements SourceOrSink {
         // using another component's connection
         if (useExistedConnection) {
             if (runtime != null) {
-                String refComponentId = properties.getReferencedComponentId();
+                String refComponentId = setting.getReferencedComponentId();
                 Object existedConn = runtime.getComponentData(refComponentId, ComponentConstants.CONNECTION_KEY);
                 if (existedConn == null) {
                     throw new RuntimeException("Referenced component: " + refComponentId + " is not connected");
@@ -134,10 +134,9 @@ public class JDBCRowSourceOrSink implements SourceOrSink {
                 return (Connection) existedConn;
             }
 
-            return JDBCTemplate.createConnection(
-                    ((JDBCConnectionInfoProperties) properties.getReferencedComponentProperties()).getJDBCConnectionModule());
+            return JDBCTemplate.createConnection(setting);
         } else {
-            Connection conn = JDBCTemplate.createConnection(properties.getJDBCConnectionModule());
+            Connection conn = JDBCTemplate.createConnection(properties.getRuntimeSetting());
 
             if (conn.getAutoCommit()) {
                 conn.setAutoCommit(false);

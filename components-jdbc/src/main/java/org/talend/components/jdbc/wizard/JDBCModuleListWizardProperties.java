@@ -20,9 +20,10 @@ import java.util.List;
 import org.apache.avro.Schema;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
-import org.talend.components.jdbc.JDBCConnectionInfoProperties;
+import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.runtime.JDBCSourceOrSink;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.tjdbcinput.TJDBCInputProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.Properties;
@@ -32,7 +33,7 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.service.Repository;
 
-public class JDBCModuleListWizardProperties extends ComponentPropertiesImpl implements JDBCConnectionInfoProperties {
+public class JDBCModuleListWizardProperties extends ComponentPropertiesImpl implements RuntimeSettingProvider {
 
     private String name;
 
@@ -110,7 +111,8 @@ public class JDBCModuleListWizardProperties extends ComponentPropertiesImpl impl
     }
 
     @Override
-    public JDBCConnectionModule getJDBCConnectionModule() {
-        return connection;
+    public AllSetting getRuntimeSetting() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
