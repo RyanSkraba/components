@@ -1,16 +1,22 @@
 Components API Service REST
 ===
 
-run local:
+Run locally:
 
 ```
 mvn spring-boot:run
 ```
 
-run docker: 
-
+Build docker image:
 ```
 mvn -Pdocker install
-docker  run -p 8080:8080 registry.datapwn.com/talend/tcomp-components-api-service-rest-all-components:<version>
 ```
 
+Run docker: 
+```
+docker run -p 8080:8080 registry.datapwn.com/talend/tcomp-components-api-service-rest-all-components-master:0.1.0-SNAPSHOT-20161103-1746
+```
+*Note:* you must logon **docker registry** first:
+```
+docker login -u <your jira username> -p <your jira password> registry.datapwn.com
+```
