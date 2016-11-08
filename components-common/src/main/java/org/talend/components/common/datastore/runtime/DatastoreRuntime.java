@@ -17,11 +17,11 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.daikon.properties.ValidationResult;
 
-public interface DatastoreRuntime extends RuntimableRuntime<DatastoreProperties> {
+public interface DatastoreRuntime<DatastorePropT extends DatastoreProperties> extends RuntimableRuntime<DatastorePropT> {
 
     /**
-     * perform a series of health checks like cheking the connection is possible or the status of each clusters.
-     * This method will be called in the same process where the runtime will actually be executed.
+     * perform a series of health checks like cheking the connection is possible or the status of each clusters. This
+     * method will be called in the same process where the runtime will actually be executed.
      */
     Iterable<ValidationResult> doHealthChecks(RuntimeContainer container);
 }

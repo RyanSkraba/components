@@ -1,6 +1,5 @@
 package org.talend.components.common.datastore;
 
-import org.talend.components.api.RuntimableDefinition;
 import org.talend.daikon.properties.Properties;
 
 /**

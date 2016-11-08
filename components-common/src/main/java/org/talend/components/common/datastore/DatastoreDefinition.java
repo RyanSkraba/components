@@ -6,7 +6,12 @@ import org.talend.components.common.dataset.DatasetProperties;
 /**
  * Placeholder for DatastoreDefinition
  */
-public interface DatastoreDefinition<P extends DatastoreProperties> extends RuntimableDefinition<P, Object> {
+public interface DatastoreDefinition<DatastorePropT extends DatastoreProperties>
+        extends RuntimableDefinition<DatastorePropT, Object> {
 
-    public DatasetProperties createDatasetProperties(DatastoreProperties storeProp);
+    public DatasetProperties createDatasetProperties(DatastorePropT storeProp);
+
+    public String getInputCompDefinitionName();
+
+    public String getOutputCompDefinitionName();
 }
