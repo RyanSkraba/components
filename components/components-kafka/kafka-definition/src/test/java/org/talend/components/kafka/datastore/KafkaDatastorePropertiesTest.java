@@ -38,7 +38,7 @@ public class KafkaDatastorePropertiesTest {
 
     @Test
     public void testDefaultValue() {
-        assertEquals(KafkaDatastoreProperties.KafkaVersion.V_0_9_0_1, datastore.version.getValue());
+        assertEquals(KafkaDatastoreProperties.KafkaVersion.V_0_10_0_1, datastore.version.getValue());
         assertNull(datastore.brokers.getValue());
     }
 
