@@ -2,11 +2,10 @@ package org.talend.components.kafka.runtime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.talend.components.kafka.runtime.KafkaTestConstants.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeoutException;
+import java.util.*;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -20,6 +19,12 @@ import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.kafka.dataset.KafkaDatasetProperties;
@@ -27,9 +32,7 @@ import org.talend.components.kafka.datastore.KafkaDatastoreProperties;
 import org.talend.components.kafka.input.KafkaInputProperties;
 import org.talend.components.kafka.output.KafkaOutputProperties;
 
-import kafka.producer.KeyedMessage;
-
-public class KafkaBeamRuntimeTest extends KafkaTestBase {
+public class KafkaBeamRuntimeTestIT {
 
     KafkaDatastoreProperties datastoreProperties;
 
@@ -37,37 +40,40 @@ public class KafkaBeamRuntimeTest extends KafkaTestBase {
 
     KafkaDatasetProperties outputDatasetProperties;
 
-    String topic_in = "test_in";
+    Integer maxRecords = 10;
 
-    String topic_out = "test_out";
-
-    Integer maxRecords = 100;
-
-    List<KeyedMessage<String, String>> assertMessages = new ArrayList<>();
+    List<Map<String, String>> assertMessages = new ArrayList<>();
 
     @Before
     public void init() {
 
-        kafkaUnitRule.getKafkaUnit().createTopic(topic_in);
-        kafkaUnitRule.getKafkaUnit().createTopic(topic_out);
+        Properties props = new Properties();
+        props.put("bootstrap.servers", BOOTSTRAP_HOST);
+        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
-        for (int i = 1; i <= maxRecords; i++) {
-            KeyedMessage<String, String> message = new KeyedMessage<>(topic_in, "k" + i, "v" + i);
-            kafkaUnitRule.getKafkaUnit().sendMessages(message);
-            assertMessages.add(new KeyedMessage<String, String>(topic_out, message.key(), message.message()));
+        Producer<String, String> producer = new KafkaProducer<>(props);
+        for (int i = 0; i < maxRecords; i++) {
+            ProducerRecord<String, String> message = new ProducerRecord<>(TOPIC_IN, Integer.toString(i), Integer.toString(i));
+            producer.send(message);
+            HashMap<String, String> assertMessage = new HashMap<>();
+            assertMessage.put(message.key(), message.value());
+            assertMessages.add(assertMessage);
         }
+
+        producer.close();
 
         datastoreProperties = new KafkaDatastoreProperties("datastore");
         datastoreProperties.init();
-        datastoreProperties.brokers.setValue(BROKER_URL);
+        datastoreProperties.brokers.setValue(BOOTSTRAP_HOST);
         inputDatasetProperties = new KafkaDatasetProperties("inputDataset");
         inputDatasetProperties.init();
         inputDatasetProperties.setDatastoreProperties(datastoreProperties);
-        inputDatasetProperties.topic.setValue(topic_in);
+        inputDatasetProperties.topic.setValue(TOPIC_IN);
         outputDatasetProperties = new KafkaDatasetProperties("outputDataset");
         outputDatasetProperties.init();
         outputDatasetProperties.setDatastoreProperties(datastoreProperties);
-        outputDatasetProperties.topic.setValue(topic_out);
+        outputDatasetProperties.topic.setValue(TOPIC_OUT);
     }
 
     @Test
@@ -107,13 +113,27 @@ public class KafkaBeamRuntimeTest extends KafkaTestBase {
             e.printStackTrace();
         }
 
-        try {
-            List<KeyedMessage<String, String>> keyedMessages = kafkaUnitRule.getKafkaUnit().readKeyedMessages(topic_out,
-                    maxRecords);
-            assertEquals(assertMessages, keyedMessages);
-        } catch (TimeoutException e) {
-            e.printStackTrace();
+        Properties props = new Properties();
+        props.put("bootstrap.servers", BOOTSTRAP_HOST);
+        props.put("group.id", "getResult");
+        props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("auto.offset.reset", "earliest");
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+        consumer.subscribe(Arrays.asList(TOPIC_OUT));
+        List<Map<String, String>> results = new ArrayList<>();
+        while (true) {
+            ConsumerRecords<String, String> records = consumer.poll(100);
+            for (ConsumerRecord<String, String> record : records) {
+                Map<String, String> resultMessage = new HashMap<>();
+                resultMessage.put(record.key(), record.value());
+                results.add(resultMessage);
+            }
+            if (results.size() >= maxRecords) {
+                break;
+            }
         }
+        assertEquals(assertMessages, results);
     }
 
     private static class StartWith implements SerializableFunction<Iterable<KV<String, String>>, Void> {

@@ -1,9 +1,10 @@
 package org.talend.components.kafka.runtime;
 
 import static org.junit.Assert.assertEquals;
+import static org.talend.components.kafka.runtime.KafkaTestConstants.TOPIC_IN;
+import static org.talend.components.kafka.runtime.KafkaTestConstants.TOPIC_OUT;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
@@ -13,7 +14,7 @@ import org.junit.Test;
 import org.talend.components.kafka.dataset.KafkaDatasetProperties;
 import org.talend.daikon.NamedThing;
 
-public class KafkaDatasetTest extends KafkaTestBase {
+public class KafkaDatasetTestIT {
 
     KafkaDatasetProperties datasetProperties;
 
@@ -21,17 +22,13 @@ public class KafkaDatasetTest extends KafkaTestBase {
 
     @Before
     public void init() throws TimeoutException {
-        topics.add("topic1");
-        topics.add("topic2");
-        topics.add("topic3");
-        Iterator topicsIter = topics.iterator();
-        while (topicsIter.hasNext()) {
-            kafkaUnitRule.getKafkaUnit().createTopic(topicsIter.next().toString());
-        }
+        topics.add(TOPIC_IN);
+        topics.add(TOPIC_OUT);
+        topics.add("__consumer_offsets");
 
         datasetProperties = new KafkaDatasetProperties("inputDatasetProperties");
         datasetProperties.init();
-        datasetProperties.getDatastoreProperties().brokers.setValue(BROKER_URL);
+        datasetProperties.getDatastoreProperties().brokers.setValue(KafkaTestConstants.BOOTSTRAP_HOST);
     }
 
     @Test

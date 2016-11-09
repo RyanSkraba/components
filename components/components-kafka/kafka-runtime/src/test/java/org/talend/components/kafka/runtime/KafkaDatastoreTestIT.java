@@ -1,6 +1,7 @@
 package org.talend.components.kafka.runtime;
 
 import static org.junit.Assert.assertEquals;
+import static org.talend.components.kafka.runtime.KafkaTestConstants.BOOTSTRAP_HOST;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,10 +9,14 @@ import java.util.concurrent.TimeoutException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.kafka.datastore.KafkaDatastoreProperties;
 import org.talend.daikon.properties.ValidationResult;
 
-public class KafkaDatastoreTest extends KafkaTestBase {
+public class KafkaDatastoreTestIT {
+
+    Logger LOG = LoggerFactory.getLogger(KafkaDatastoreTestIT.class);
 
     KafkaDatastoreProperties datastoreProperties;
 
@@ -46,7 +51,7 @@ public class KafkaDatastoreTest extends KafkaTestBase {
         assertEquals(1, wrongValidationResults.size());
         assertEquals(ValidationResult.Result.ERROR, wrongValidationResults.get(0).getStatus());
 
-        datastoreProperties.brokers.setValue("localhost:5001");
+        datastoreProperties.brokers.setValue(BOOTSTRAP_HOST);
         Iterable<ValidationResult> correctValidationResultIter = runtime.doHealthChecks(null);
         List<ValidationResult> correctValidationResults = new ArrayList<>();
         for (ValidationResult validationResult : correctValidationResultIter) {
@@ -67,7 +72,7 @@ public class KafkaDatastoreTest extends KafkaTestBase {
         ValidationResult wrongValidationResult = datastoreProperties.validateTestConnection();
         assertEquals(ValidationResult.Result.ERROR, wrongValidationResult.getStatus());
 
-        datastoreProperties.brokers.setValue("localhost:5001");
+        datastoreProperties.brokers.setValue(BOOTSTRAP_HOST);
         ValidationResult correctValidationResult = datastoreProperties.validateTestConnection();
         assertEquals(ValidationResult.Result.OK, correctValidationResult.getStatus());
     }
