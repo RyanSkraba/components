@@ -32,7 +32,7 @@ public class KafkaDatastoreProperties extends PropertiesImpl implements Datastor
     @Override
     public void setupProperties() {
         super.setupProperties();
-        version.setValue(KafkaVersion.V_0_9_0_1);
+        version.setValue(KafkaVersion.V_0_10_0_1);
     }
 
     @Override
