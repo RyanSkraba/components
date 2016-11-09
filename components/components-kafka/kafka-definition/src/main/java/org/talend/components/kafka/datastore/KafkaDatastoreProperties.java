@@ -14,6 +14,8 @@ import org.talend.daikon.properties.property.EnumProperty;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.runtime.RuntimeInfo;
+import org.talend.daikon.runtime.RuntimeUtil;
+import org.talend.daikon.sandbox.SandboxedInstance;
 
 public class KafkaDatastoreProperties extends PropertiesImpl implements DatastoreProperties {
 
@@ -47,19 +49,21 @@ public class KafkaDatastoreProperties extends PropertiesImpl implements Datastor
 
     }
 
-    // FIXME 1. is it the way to call runtime?
-    // FIXME 2. doHealthChecks return list of ValidationResult, but validate method only return one
+    // FIXME doHealthChecks return list of ValidationResult, but validate method only return one
     public ValidationResult validateTestConnection() throws Exception {
         KafkaDatastoreDefinition definition = new KafkaDatastoreDefinition();
         RuntimeInfo runtimeInfo = definition.getRuntimeInfo(this, null);
-        DatastoreRuntime runtime = (DatastoreRuntime) Class.forName(runtimeInfo.getRuntimeClassName()).newInstance();
-        runtime.initialize(null, this);
-        Iterable<ValidationResult> iterables = runtime.doHealthChecks(null);
-        for (ValidationResult validationResult : iterables) {
-            if (validationResult.getStatus() == ValidationResult.Result.ERROR) {
-                return validationResult;
+        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, getClass().getClassLoader())) {
+            DatastoreRuntime runtime = (DatastoreRuntime) sandboxedInstance.getInstance();
+            runtime.initialize(null, this);
+            Iterable<ValidationResult> iterables = runtime.doHealthChecks(null);
+            for (ValidationResult validationResult : iterables) {
+                if (validationResult.getStatus() == ValidationResult.Result.ERROR) {
+                    return validationResult;
+                }
             }
         }
+
         return ValidationResult.OK;
     }
 

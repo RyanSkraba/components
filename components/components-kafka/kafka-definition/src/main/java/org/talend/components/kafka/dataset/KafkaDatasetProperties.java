@@ -21,6 +21,8 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.runtime.RuntimeInfo;
+import org.talend.daikon.runtime.RuntimeUtil;
+import org.talend.daikon.sandbox.SandboxedInstance;
 
 public class KafkaDatasetProperties extends PropertiesImpl implements DatasetProperties<KafkaDatastoreProperties> {
 
@@ -70,9 +72,11 @@ public class KafkaDatasetProperties extends PropertiesImpl implements DatasetPro
     private IKafkaDatasetRuntime getRuntime() throws Exception {
         KafkaDatasetDefinition definition = new KafkaDatasetDefinition();
         RuntimeInfo runtimeInfo = definition.getRuntimeInfo(this, null);
-        IKafkaDatasetRuntime runtime = (IKafkaDatasetRuntime) Class.forName(runtimeInfo.getRuntimeClassName()).newInstance();
-        runtime.initialize(null, this);
-        return runtime;
+        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, getClass().getClassLoader())) {
+            IKafkaDatasetRuntime runtime = (IKafkaDatasetRuntime) sandboxedInstance.getInstance();
+            runtime.initialize(null, this);
+            return runtime;
+        }
     }
 
     @Override
