@@ -27,7 +27,8 @@
 		<module>components-filedelimited</module>
 		<module>services</module>
 		<module>examples</module>
-	</modules>
+		<module>components</module>
+  	</modules>
 	<profiles>
 		<profile>
 			<id>eclipse</id>
