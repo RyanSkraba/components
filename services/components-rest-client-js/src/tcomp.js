@@ -46,8 +46,7 @@ function TComp(prefix) {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify(body),
-		})
-			.then(response => response.json());
+		});
 	}
 
 	// TODO: Remove once implementation is done
@@ -71,7 +70,12 @@ function TComp(prefix) {
 		//get(`/definitions/components?type=${type}`)
 		return get('/components/names')
 			.then(function (json) {
+				if (json['@items'] === undefined) {
+					return Promise.reject(new Error('JSON response error'));
+				}
 				return json['@items'];
+			}).catch(function (err) {
+				return Promise.reject(err);
 			});
 	}
 
@@ -84,6 +88,9 @@ function TComp(prefix) {
 	 * @returns {Object}
 	 */
 	function getProperties(type, componentName) {
+		if (componentName === undefined) {
+			return Promise.reject(new Error('component name argument is required'));
+		}
 		//get(`/definitions/${type}/${componentName}`)
 		return get(`/components/properties/${componentName}`);
 	}
@@ -98,9 +105,20 @@ function TComp(prefix) {
 	 * @returns {Promise}
 	 */
 	function validateComponentProperties(type, name, data) {
+		if (name === undefined) {
+			return Promise.reject(new Error('component name argument is required'));
+		}
+		if (data === undefined) {
+			return Promise.reject(new Error('component data argument is required'));
+		}
 		//post(`/definitions/${type}/${name}`, data)
-		post(`/components/properties/${name}/validate`, data)
-			.then(debugHandler);
+		return post(`/components/properties/${name}/validate`, data)
+			.then(function (response) {
+				if (response.status === 204) {
+					return Promise.resolve();
+				}
+				return response.json();
+			});
 	}
 
 	/**
@@ -113,8 +131,19 @@ function TComp(prefix) {
 	 * @returns {Promise}
 	 */
 	function checkComponentConnection(type, name, data) {
-		post(`/runtimes/${type}/${name}`, data)
-			.then(debugHandler);
+		if (name === undefined) {
+			return Promise.reject(new Error('component name argument is required'));
+		}
+		if (data === undefined) {
+			return Promise.reject(new Error('component data argument is required'));
+		}
+		return post(`/runtimes/${type}/${name}`, data)
+			.then(function (response) {
+				if (response.status === 204) {
+					return Promise.resolve();
+				}
+				return response.json();
+			});
 	}
 
 	/**
@@ -183,8 +212,25 @@ function TComp(prefix) {
 	 * @returns {Promise}
 	 */
 	function DatasetProperties(name, datastoreName, datastoreProperties) {
-		post(`/definitions/${types.datastore}/${name}/${types.dataset}`, datastoreProperties)
-			.then(debugHandler);
+		if (name === undefined) {
+			return Promise.reject(new Error('component name argument is required'));
+		}
+		if (datastoreName === undefined) {
+			return Promise.reject(
+				new Error('datastoreName argument is required')
+			);
+		}
+		if (datastoreProperties === undefined) {
+			return Promise.reject(
+				new Error('datastoreProperties argument is required')
+			);
+		}
+		return post(
+			`/definitions/${types.datastore}/${name}/${types.dataset}`,
+			datastoreProperties
+		).then(function (resp) {
+			return resp.json();
+		});
 	}
 
 	/**
@@ -196,7 +242,7 @@ function TComp(prefix) {
 	 * @returns {undefined}
 	 */
 	function ValidateDatasetProperties(name, datastoreProperties, datasetProperties) {
-		return validateComponentProperties(types.dataset, newDatasetPayload(
+		return validateComponentProperties(types.dataset, name, newDatasetPayload(
 			datastoreProperties,
 			datasetProperties
 		));
@@ -226,10 +272,27 @@ function TComp(prefix) {
 	 * @returns {undefined}
 	 */
 	function DatasetSchema(name, datastoreProperties, datasetProperties) {
-		post(`/definitions/${types.dataset}/${name}/schema`, newDatasetPayload(
+		if (name === undefined) {
+			return Promise.reject(
+				new Error('dataset name argument is required')
+			);
+		}
+		if (datastoreProperties === undefined) {
+			return Promise.reject(
+				new Error('datastoreProperties argument is required')
+			);
+		}
+		if (datasetProperties === undefined) {
+			return Promise.reject(
+				new Error('datasetProperties argument is required')
+			);
+		}
+		return post(`/definitions/${types.dataset}/${name}/schema`, newDatasetPayload(
 			datastoreProperties,
 			datasetProperties
-		)).then(debugHandler);
+		)).then(function (response) {
+			return response.json();
+		});
 	}
 
 	/**
@@ -241,10 +304,27 @@ function TComp(prefix) {
 	 * @returns {undefined}
 	 */
 	function DatasetContent(name, datastoreProperties, datasetProperties) {
-		post(`/runtimes/${types.dataset}/${name}/data`, newDatasetPayload(
+		if (name === undefined) {
+			return Promise.reject(
+				new Error('dataset name argument is required')
+			);
+		}
+		if (datastoreProperties === undefined) {
+			return Promise.reject(
+				new Error('datastoreProperties argument is required')
+			);
+		}
+		if (datasetProperties === undefined) {
+			return Promise.reject(
+				new Error('datasetProperties argument is required')
+			);
+		}
+		return post(`/runtimes/${types.dataset}/${name}/data`, newDatasetPayload(
 			datastoreProperties,
 			datasetProperties
-		)).then(debugHandler);
+		)).then(function (response) {
+			return response.json();
+		});
 	}
 
 	/**
@@ -264,8 +344,20 @@ function TComp(prefix) {
 	 * @returns {undefined}
 	 */
 	function ValidateProperties(name, data) {
-		post(`/properties/${name}/validate`, data)
-			.then(debugHandler);
+		if (name === undefined) {
+			return Promise.reject(
+				new Error('name argument is required')
+			);
+		}
+		if (data === undefined) {
+			return Promise.reject(
+				new Error('data argument is required')
+			);
+		}
+		return post(`/properties/${name}/validate`, data)
+			.then(function (response) {
+				return response.json();
+			});
 	}
 
 	return {
@@ -283,4 +375,4 @@ function TComp(prefix) {
 	};
 }
 
-exports.default = TComp;
+exports = module.exports = TComp;
