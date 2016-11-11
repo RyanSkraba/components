@@ -56,8 +56,11 @@ public class KafkaDatasetProperties extends PropertiesImpl implements DatasetPro
     }
 
     public ValidationResult beforeTopic() {
-        try {
-            IKafkaDatasetRuntime runtime = getRuntime();
+        KafkaDatasetDefinition definition = new KafkaDatasetDefinition();
+        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(this, null);
+        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, getClass().getClassLoader())) {
+            IKafkaDatasetRuntime runtime = (IKafkaDatasetRuntime) sandboxedInstance.getInstance();
+            runtime.initialize(null, this);
             List<NamedThing> topics = new ArrayList<>();
             for (String topic : runtime.listTopic()) {
                 topics.add(new SimpleNamedThing(topic, topic));
@@ -66,16 +69,6 @@ public class KafkaDatasetProperties extends PropertiesImpl implements DatasetPro
             return ValidationResult.OK;
         } catch (Exception e) {
             return new ValidationResult(new ComponentException(e));
-        }
-    }
-
-    private IKafkaDatasetRuntime getRuntime() throws Exception {
-        KafkaDatasetDefinition definition = new KafkaDatasetDefinition();
-        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(this, null);
-        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, getClass().getClassLoader())) {
-            IKafkaDatasetRuntime runtime = (IKafkaDatasetRuntime) sandboxedInstance.getInstance();
-            runtime.initialize(null, this);
-            return runtime;
         }
     }
 
