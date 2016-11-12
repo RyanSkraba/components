@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 import org.junit.Test;
 import org.talend.components.api.ComponentFamilyDefinition;
@@ -64,10 +65,10 @@ public class DefintitionRegistryTest {
         assertThat(registry.getComponentFamilies(), hasEntry(def.getName(), def));
 
         // All of the nested definitions were added.
-        assertThat(registry.getDefinitionsMapByType(ComponentDefinition.class).values(),
-                contains((Definition) def.getDefinitions().iterator().next()));
+        Iterator<? extends Definition> iterator = def.getDefinitions().iterator();
+        assertThat(registry.getDefinitionsMapByType(ComponentDefinition.class).values(), contains((Definition) iterator.next()));
         assertThat(registry.getDefinitionsMapByType(ComponentWizardDefinition.class).values(),
-                contains((ComponentWizardDefinition) def.getComponentWizards().iterator().next()));
+                contains((ComponentWizardDefinition) iterator.next()));
     }
 
     @Test

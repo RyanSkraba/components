@@ -29,12 +29,14 @@ public class JmsDatasetDefinition extends SimpleNamedThing implements DatasetDef
         super(NAME);
     }
 
+    @Override
     public JmsDatasetProperties createProperties() {
         JmsDatasetProperties properties = new JmsDatasetProperties(NAME);
         properties.init();
         return properties;
     }
 
+    @Override
     public RuntimeInfo getRuntimeInfo(JmsDatasetProperties properties, Object ctx) {
         return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
                 DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-jms/jms-runtime_1_1"),
@@ -45,4 +47,10 @@ public class JmsDatasetDefinition extends SimpleNamedThing implements DatasetDef
     public String getImagePath() {
         return null;
     }
+
+    @Override
+    public String getDisplayName() {
+        return getI18nMessage("dataset." + getName() + I18N_DISPLAY_NAME_SUFFIX);
+    }
+
 }
