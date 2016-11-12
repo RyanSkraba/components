@@ -61,7 +61,9 @@ public class ComponentTestUtils {
                 System.out.println("No properties to check fo I18n for :" + cd.getName());
             }
             // check component definition title
-            errorCollector.checkThat("missing I18n property :" + cd.getTitle(), cd.getTitle().contains("component."), is(false));
+            errorCollector.checkThat(
+                    "missing I18n property [" + cd.getTitle() + "] for definition [" + cd.getClass().getName() + "]",
+                    cd.getTitle().contains("component."), is(false));
             // check return properties i18n
             checkAllPropertyI18n(cd.getReturnProperties(), cd, errorCollector);
         }
