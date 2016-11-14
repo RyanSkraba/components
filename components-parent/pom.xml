@@ -270,7 +270,9 @@
 				<version>2.18</version>
 				<configuration>
 					<systemProperties>
-						<org.ops4j.pax.url.mvn.repositories>+${talend_snapshots}@snapshots@noreleases@id=talsnap,http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceRelease@id=talrelease</org.ops4j.pax.url.mvn.repositories>
+					<!-- settings.xml and repo are used for pax tests on branch build that mirror the talend_nexus repo -->
+						<org.ops4j.pax.url.mvn.repositories>+http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceSnapshot@snapshots@noreleases@id=talend_nexus,http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceRelease@id=talrelease</org.ops4j.pax.url.mvn.repositories>
+						<org.ops4j.pax.url.mvn.settings>${project.basedir}/settings.xml</org.ops4j.pax.url.mvn.settings>
 					</systemProperties>
 				</configuration>
 				<executions>
