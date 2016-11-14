@@ -28,7 +28,7 @@
 		<module>services</module>
 		<module>examples</module>
 		<module>components</module>
-  	</modules>
+	</modules>
 	<profiles>
 		<profile>
 			<id>eclipse</id>

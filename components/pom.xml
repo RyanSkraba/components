@@ -16,5 +16,6 @@
 
     <modules>
         <module>components-jms</module>
+        <module>components-kafka</module>
     </modules>
 </project>
