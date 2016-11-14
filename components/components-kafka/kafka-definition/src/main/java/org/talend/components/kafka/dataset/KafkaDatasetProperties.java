@@ -26,7 +26,7 @@ import org.talend.daikon.sandbox.SandboxedInstance;
 
 public class KafkaDatasetProperties extends PropertiesImpl implements DatasetProperties<KafkaDatastoreProperties> {
 
-    public KafkaDatastoreProperties datastore = new KafkaDatastoreProperties("datastore");
+    public transient KafkaDatastoreProperties datastore = new KafkaDatastoreProperties("datastore");
 
     public Property<String> topic = PropertyFactory.newString("topic");
 

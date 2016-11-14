@@ -9,7 +9,7 @@ import org.talend.components.kafka.dataset.KafkaDatasetProperties;
 public abstract class KafkaIOBasedProperties extends FixedConnectorsComponentProperties
         implements IOProperties<KafkaDatasetProperties> {
 
-    public KafkaDatasetProperties dataset = new KafkaDatasetProperties("dataset");
+    public transient KafkaDatasetProperties dataset = new KafkaDatasetProperties("dataset");
 
     protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "module.main");
 
