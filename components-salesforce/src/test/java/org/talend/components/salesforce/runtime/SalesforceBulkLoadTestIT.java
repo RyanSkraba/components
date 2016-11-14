@@ -32,7 +32,6 @@ import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputB
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkProperties;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
-import org.talend.daikon.di.DiOutgoingSchemaEnforcer;
 
 /**
  * Created by wwang on 2016-05-16.
@@ -66,8 +65,6 @@ public class SalesforceBulkLoadTestIT extends SalesforceTestBase {
 		List<String> ids = new ArrayList<String>();
 		List<String> sids = new ArrayList<String>();
 		try {
-			DiOutgoingSchemaEnforcer current = new DiOutgoingSchemaEnforcer(util.getTestSchema2(), false);
-
 			IndexedRecordConverter<Object, ? extends IndexedRecord> factory = null;
 
 			final List<Map<String, String>> result = new ArrayList<Map<String, String>>();
@@ -76,16 +73,17 @@ public class SalesforceBulkLoadTestIT extends SalesforceTestBase {
 				try {
 					Object data = reader.getCurrent();
 
-					factory = initCurrentData(current, factory, data);
+					factory = initCurrentData(factory, data);
+					IndexedRecord record = factory.convertToAvro(data);
 
-					String id = (String) current.get(0);
+					String id = (String) record.get(0);
 					ids.add(id);
 
-					String firstname = (String) current.get(1);
-					String lasttname = (String) current.get(2);
-					String phone = (String) current.get(3);
+					String firstname = (String) record.get(1);
+					String lasttname = (String) record.get(2);
+					String phone = (String) record.get(3);
 
-					String salesforce_id = (String) current.get(4);
+					String salesforce_id = (String) record.get(4);
 					sids.add(salesforce_id);
 
 					Map<String, String> row = new HashMap<String, String>();
@@ -139,20 +137,17 @@ public class SalesforceBulkLoadTestIT extends SalesforceTestBase {
 		modelProps.outputAction.setValue(TSalesforceBulkExecProperties.OutputAction.DELETE);
 
 		try {
-			DiOutgoingSchemaEnforcer current = new DiOutgoingSchemaEnforcer(util.getTestSchema3(), false);
-
 			IndexedRecordConverter<Object, ? extends IndexedRecord> factory = null;
-
-			final List<Map<String, String>> result = new ArrayList<Map<String, String>>();
 
 			List<String> resultIds = new ArrayList<String>();
 			for (boolean available = reader.start(); available; available = reader.advance()) {
 				try {
 					Object data = reader.getCurrent();
 
-					factory = initCurrentData(current, factory, data);
+					factory = initCurrentData(factory, data);
+					IndexedRecord record = factory.convertToAvro(data);
 
-					String id = (String) current.get(0);
+					String id = (String) record.get(0);
 					resultIds.add(id);
 				} catch (Exception e) {
 					Assert.fail(e.getMessage());
@@ -208,20 +203,17 @@ public class SalesforceBulkLoadTestIT extends SalesforceTestBase {
 		modelProps.outputAction.setValue(TSalesforceBulkExecProperties.OutputAction.UPDATE);
 
 		try {
-			DiOutgoingSchemaEnforcer current = new DiOutgoingSchemaEnforcer(util.getTestSchema2(), false);
-
 			IndexedRecordConverter<Object, ? extends IndexedRecord> factory = null;
-
-			final List<Map<String, String>> result = new ArrayList<Map<String, String>>();
 
 			for (boolean available = reader.start(); available; available = reader.advance()) {
 				try {
 					Object data = reader.getCurrent();
 
-					factory = initCurrentData(current, factory, data);
+					factory = initCurrentData(factory, data);
+					IndexedRecord record = factory.convertToAvro(data);
 
-					String resultid = (String) current.get(0);
-					String phone = (String) current.get(3);
+					String resultid = (String) record.get(0);
+					String phone = (String) record.get(3);
 
 					Assert.assertEquals(id, resultid);
 					Assert.assertEquals("010-89492686", phone);
@@ -230,12 +222,13 @@ public class SalesforceBulkLoadTestIT extends SalesforceTestBase {
 					Object data = info.get("talend_record");
 					String err = (String) info.get("error");
 
-					factory = initCurrentData(current, factory, data);
+					factory = initCurrentData(factory, data);
+					IndexedRecord record = factory.convertToAvro(data);
 
-					String resultid = (String) current.get(0);
-					String firstname = (String) current.get(1);
-					String lastname = (String) current.get(2);
-					String phone = (String) current.get(3);
+					String resultid = (String) record.get(0);
+					String firstname = (String) record.get(1);
+					String lastname = (String) record.get(2);
+					String phone = (String) record.get(3);
 
 					Assert.assertNull(resultid);
 					Assert.assertEquals("Who", firstname);
@@ -293,21 +286,18 @@ public class SalesforceBulkLoadTestIT extends SalesforceTestBase {
 		modelProps.upsertKeyColumn.setValue("Id");
 
 		try {
-			DiOutgoingSchemaEnforcer current = new DiOutgoingSchemaEnforcer(util.getTestSchema2(), false);
-
 			IndexedRecordConverter<Object, ? extends IndexedRecord> factory = null;
-
-			final List<Map<String, String>> result = new ArrayList<Map<String, String>>();
 
 			int index = -1;
 			for (boolean available = reader.start(); available; available = reader.advance()) {
 				try {
 					Object data = reader.getCurrent();
 
-					factory = initCurrentData(current, factory, data);
+					factory = initCurrentData(factory, data);
+					IndexedRecord record = factory.convertToAvro(data);
 
-					String resultid = (String) current.get(0);
-					String phone = (String) current.get(3);
+					String resultid = (String) record.get(0);
+					String phone = (String) record.get(3);
 
 					index++;
 					if (index == 0) {
@@ -330,17 +320,16 @@ public class SalesforceBulkLoadTestIT extends SalesforceTestBase {
 		}
 	}
 
-	private IndexedRecordConverter<Object, ? extends IndexedRecord> initCurrentData(
-			DiOutgoingSchemaEnforcer current, IndexedRecordConverter<Object, ? extends IndexedRecord> factory,
-			Object data) {
-		if (factory == null) {
-			factory = (IndexedRecordConverter<Object, ? extends IndexedRecord>) new AvroRegistry()
-					.createIndexedRecordConverter(data.getClass());
-		}
+    private IndexedRecordConverter<Object, ? extends IndexedRecord> initCurrentData(
+            IndexedRecordConverter<Object, ? extends IndexedRecord> factory, Object data) {
+        if (factory == null) {
+            factory = (IndexedRecordConverter<Object, ? extends IndexedRecord>) new AvroRegistry()
+                    .createIndexedRecordConverter(data.getClass());
+        }
 
-		IndexedRecord unenforced = factory.convertToAvro(data);
-		current.setWrapped(unenforced);
-		return factory;
-	}
+        // IndexedRecord unenforced = factory.convertToAvro(data);
+        // current.setWrapped(unenforced);
+        return factory;
+    }
 
 }

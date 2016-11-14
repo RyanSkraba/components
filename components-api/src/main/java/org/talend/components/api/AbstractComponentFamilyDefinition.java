@@ -12,11 +12,11 @@
 // ============================================================================
 package org.talend.components.api;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.talend.components.api.wizard.ComponentWizardDefinition;
+import org.talend.daikon.definition.Definition;
 
 /**
  * The AbstractComponentFamilyDefinition provides an implementation without any nested definitions.
@@ -26,41 +26,25 @@ public abstract class AbstractComponentFamilyDefinition extends AbstractTopLevel
     /** Family name, must be unique in the framework. */
     private String familyName;
 
-    private final Iterable<RuntimableDefinition<?, ?>> definitions;
-
-    private final Iterable<ComponentWizardDefinition> componentWizards;
-
+    private final List<Definition> definitions;
 
     /**
      * Construct the subclass with a given, predefined, unmodifiable set of definitions.
      *
      * @param familyName Unique identifier for the family in the component framework.
      * @param definitionsAndWizards A list of definitions that are related to this component family. If the type of the definition
-     * is not correct or unknown, it will ignored. Otherwise, it will appear in one of the getXxxxDefinitions() methods.
+     *            is not correct or unknown, it will ignored. Otherwise, it will appear in one of the getXxxxDefinitions()
+     *            methods.
      */
-    public AbstractComponentFamilyDefinition(String familyName, Object... definitionsAndWizards) {
+    public AbstractComponentFamilyDefinition(String familyName, Definition... definitions) {
         this.familyName = familyName;
 
-        if (definitionsAndWizards == null || definitionsAndWizards.length == 0) {
+        if (definitions == null || definitions.length == 0) {
             // Shortcut if there are no definitions. The subclass can overwrite the implementations instead.
-            definitions = Collections.emptyList();
-            componentWizards = Collections.emptyList();
+            this.definitions = Collections.emptyList();
         } else {
             // Otherwise sort the definitions into their respective categories.
-            List<ComponentWizardDefinition> compw = new ArrayList<>();
-            List<RuntimableDefinition<?, ?>> allDefs = new ArrayList<>();
-            for (Object def : definitionsAndWizards) {
-                if (def instanceof RuntimableDefinition) {
-                    allDefs.add((RuntimableDefinition) def);
-                }
-                if (def instanceof ComponentWizardDefinition) {
-                    compw.add((ComponentWizardDefinition) def);
-                }
-            }
-            definitions = allDefs.size() != 0 ? Collections.unmodifiableList(allDefs)
-                    : Collections.<RuntimableDefinition<?, ?>> emptyList();
-            componentWizards = compw.size() != 0 ? Collections.unmodifiableList(compw)
-                    : Collections.<ComponentWizardDefinition> emptyList();
+            this.definitions = Collections.unmodifiableList(Arrays.asList(definitions));
         }
     }
 
@@ -78,12 +62,7 @@ public abstract class AbstractComponentFamilyDefinition extends AbstractTopLevel
     }
 
     @Override
-    public Iterable<? extends ComponentWizardDefinition> getComponentWizards() {
-        return componentWizards;
-    }
-
-    @Override
-    public Iterable<? extends RuntimableDefinition<?, ?>> getDefinitions() {
+    public Iterable<? extends Definition> getDefinitions() {
         return definitions;
     }
 }

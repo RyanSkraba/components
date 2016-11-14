@@ -10,6 +10,8 @@ import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericRecord;
 import org.junit.Assert;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Sink;
@@ -17,15 +19,14 @@ import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
-import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceBulkProperties.Concurrency;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.runtime.SalesforceBulkFileSink;
 import org.talend.components.salesforce.runtime.SalesforceSource;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecDefinition;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkProperties;
-import org.talend.daikon.di.DiIncomingSchemaEnforcer;
 import org.talend.daikon.properties.ValidationResult;
 
 import com.sforce.soap.partner.DeleteResult;
@@ -222,15 +223,13 @@ public class SalesforceRuntimeTestUtil {
             Schema schema, List<Map<String, String>> rows) throws IOException {
         Writer writer = initWriter(definition, modelProperties);
 
-        DiIncomingSchemaEnforcer enforcer = new DiIncomingSchemaEnforcer(schema);
-
         try {
             for (Map<String, String> row : rows) {
+                GenericRecord record = new GenericData.Record(schema);
                 for (Map.Entry<String, String> entry : row.entrySet()) {
-                    enforcer.put(entry.getKey(), entry.getValue());
+                    record.put(entry.getKey(), entry.getValue());
                 }
-                Object data = enforcer.createIndexedRecord();
-                writer.write(data);
+                writer.write(record);
             }
         } finally {
             writer.close();

@@ -39,7 +39,6 @@ import org.talend.daikon.NamedThing;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
-import org.talend.daikon.di.DiOutgoingSchemaEnforcer;
 
 public class JDBCInputTestIT {
 
@@ -232,16 +231,13 @@ public class JDBCInputTestIT {
         try {
             IndexedRecordConverter<Object, ? extends IndexedRecord> converter = null;
 
-            DiOutgoingSchemaEnforcer current = new DiOutgoingSchemaEnforcer(properties.main.schema.getValue(), false);
-
             for (boolean available = reader.start(); available; available = reader.advance()) {
                 converter = DBTestUtils.getIndexRecordConverter(reader, converter);
 
-                IndexedRecord unenforced = converter.convertToAvro(reader.getCurrent());
-                current.setWrapped(unenforced);
+                IndexedRecord record = converter.convertToAvro(reader.getCurrent());
 
-                assertEquals(Integer.class, current.get(0).getClass());
-                assertEquals(String.class, current.get(1).getClass());
+                assertEquals(Integer.class, record.get(0).getClass());
+                assertEquals(String.class, record.get(1).getClass());
             }
 
             reader.close();

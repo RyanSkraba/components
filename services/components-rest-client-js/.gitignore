@@ -20,6 +20,7 @@ out/
 npm-debug.log
 node_modules/
 .node-gyp
+.yarn-error.log
 coverage/
 
 # Compilation output #

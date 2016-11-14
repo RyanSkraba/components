@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.api.service.common;
 
+import static org.slf4j.LoggerFactory.*;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
 import org.talend.components.api.ComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.RuntimableDefinition;
@@ -36,6 +39,9 @@ import org.talend.daikon.exception.TalendRuntimeException;
  * {@link org.talend.components.api.service.ComponentService} implementations.
  */
 public class DefinitionRegistry implements ComponentInstaller.ComponentFrameworkContext, DefinitionRegistryService {
+
+    /** This class' logger. */
+    private static final Logger LOGGER = getLogger(DefinitionRegistry.class);
 
     /**
      * All of the {@link RuntimableDefinition}s that have been added to the framework, including
@@ -113,11 +119,17 @@ public class DefinitionRegistry implements ComponentInstaller.ComponentFramework
     @Override
     public void registerDefinition(Iterable<? extends Definition> defs) {
         for (Definition def : defs) {
-            Definition previousValue = definitions.put(def.getName(), def);
+            String name = def.getName();
+            if (name == null) {
+                throw TalendRuntimeException
+                        .createUnexpectedException("The definition [" + def.getClass().getName() + "] name cannot be null.");
+            } // else we are fine keep going
+            Definition previousValue = definitions.put(name, def);
             if (previousValue != null) {// we cannot have 2 definiions with the same name
                 throw TalendRuntimeException.createUnexpectedException(
                         "2 definitions have the same name [" + previousValue.getName() + "] but their name must be unique.");
             }
+            LOGGER.info("Talend Definition registered :" + name);
         }
     }
 
@@ -130,7 +142,6 @@ public class DefinitionRegistry implements ComponentInstaller.ComponentFramework
     public void registerComponentFamilyDefinition(ComponentFamilyDefinition componentFamily) {
         getComponentFamilies().put(componentFamily.getName(), componentFamily);
         // Always automatically register the nested definitions in the component family.
-        registerDefinition(componentFamily.getComponentWizards());
         registerDefinition(componentFamily.getDefinitions());
     }
 

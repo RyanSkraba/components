@@ -32,7 +32,6 @@ import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties.DataAction;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
-import org.talend.daikon.di.DiOutgoingSchemaEnforcer;
 
 public class JDBCTypeMappingTestIT {
 
@@ -308,30 +307,27 @@ public class JDBCTypeMappingTestIT {
         try {
             IndexedRecordConverter<Object, ? extends IndexedRecord> converter = null;
 
-            DiOutgoingSchemaEnforcer current = new DiOutgoingSchemaEnforcer(properties.main.schema.getValue(), false);
-
             reader.start();
 
             converter = DBTestUtils.getIndexRecordConverter(reader, converter);
 
-            IndexedRecord unenforced = converter.convertToAvro(reader.getCurrent());
-            current.setWrapped(unenforced);
+            IndexedRecord record = converter.convertToAvro(reader.getCurrent());
 
-            assertEquals(Integer.class, current.get(0).getClass());
-            assertEquals(Short.class, current.get(1).getClass());
-            assertEquals(Long.class, current.get(2).getClass());
-            assertEquals(Float.class, current.get(3).getClass());
-            assertEquals(Double.class, current.get(4).getClass());
-            assertEquals(Float.class, current.get(5).getClass());
-            assertEquals(BigDecimal.class, current.get(6).getClass());
-            assertEquals(BigDecimal.class, current.get(7).getClass());
-            assertEquals(Boolean.class, current.get(8).getClass());
-            assertEquals(String.class, current.get(9).getClass());
-            assertEquals(java.util.Date.class, current.get(10).getClass());
-            assertEquals(java.util.Date.class, current.get(11).getClass());
-            assertEquals(java.util.Date.class, current.get(12).getClass());
-            assertEquals(String.class, current.get(13).getClass());
-            assertEquals(String.class, current.get(14).getClass());
+            assertEquals(Integer.class, record.get(0).getClass());
+            assertEquals(Short.class, record.get(1).getClass());
+            assertEquals(Long.class, record.get(2).getClass());
+            assertEquals(Float.class, record.get(3).getClass());
+            assertEquals(Double.class, record.get(4).getClass());
+            assertEquals(Float.class, record.get(5).getClass());
+            assertEquals(BigDecimal.class, record.get(6).getClass());
+            assertEquals(BigDecimal.class, record.get(7).getClass());
+            assertEquals(Boolean.class, record.get(8).getClass());
+            assertEquals(String.class, record.get(9).getClass());
+            assertEquals(Long.class, record.get(10).getClass());
+            assertEquals(Long.class, record.get(11).getClass());
+            assertEquals(Long.class, record.get(12).getClass());
+            assertEquals(String.class, record.get(13).getClass());
+            assertEquals(String.class, record.get(14).getClass());
 
             reader.close();
         } finally {

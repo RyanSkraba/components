@@ -42,10 +42,17 @@ public class DataPrepServerMock {
             headers.add("Authorization", TOKEN);
             return new ResponseEntity(headers, HttpStatus.OK);
         }
+
         if (username.equals("testLogout") && password.equals("testLogout")) {
             headers.add("Authorization", "testLogout");
             return new ResponseEntity(headers, HttpStatus.OK);
         }
+
+        if (username.equals("username+") && (password.equals("+password"))) {
+            headers.add("Authorization", TOKEN);
+            return new ResponseEntity(headers, HttpStatus.OK);
+        }
+
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
