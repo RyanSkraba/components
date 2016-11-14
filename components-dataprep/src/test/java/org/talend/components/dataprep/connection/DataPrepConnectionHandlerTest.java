@@ -63,6 +63,14 @@ public class DataPrepConnectionHandlerTest {
         Assert.assertNotNull(response.getFirstHeader("Authorization"));
     }
 
+    @Test
+    public void testLoginWithSpecialChar() throws IOException {
+        connectionHandler = new DataPrepConnectionHandler(URL + serverPort, "username+", "+password", ID, NAME);
+        HttpResponse response = connectionHandler.connect();
+        Assert.assertEquals(response.getStatusLine().getStatusCode(), 200);
+        Assert.assertNotNull(response.getFirstHeader("Authorization"));
+    }
+
     @Test(expected = IOException.class)
     public void testFailedLogin() throws IOException {
         connectionHandler = new DataPrepConnectionHandler(URL + serverPort, LOGIN, "wrong", "anyId", "anyName");

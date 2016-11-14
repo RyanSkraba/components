@@ -22,6 +22,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -76,7 +77,14 @@ public class DataPrepConnectionHandler {
     }
 
     public HttpResponse connect() throws IOException {
-        Request request = Request.Post(url + "/login?username=" + login + "&password=" + pass + "&client-app=studio");
+        String encoding = "UTF-8";
+
+        if ((url == null) || (login == null) || (pass == null)) {
+            throw new IOException(messages.getMessage("error.loginFailed", "please set the url, email and password"));
+        }
+
+        Request request = Request.Post(url + "/login?username=" + URLEncoder.encode(login, encoding) + "&password="
+                + URLEncoder.encode(pass, encoding) + "&client-app=studio");
         HttpResponse response = request.execute().returnResponse();
         authorisationHeader = response.getFirstHeader("Authorization");
         if (returnStatusCode(response) != HttpServletResponse.SC_OK && authorisationHeader == null) {
