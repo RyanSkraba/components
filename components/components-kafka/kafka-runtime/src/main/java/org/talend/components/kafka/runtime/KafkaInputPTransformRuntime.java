@@ -21,6 +21,8 @@ import org.apache.beam.sdk.values.PCollection;
 import org.joda.time.Duration;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.kafka.dataset.KafkaDatasetProperties;
+import org.talend.components.kafka.datastore.KafkaDatastoreProperties;
 import org.talend.components.kafka.input.KafkaInputProperties;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
@@ -71,11 +73,19 @@ public class KafkaInputPTransformRuntime extends PTransform<PBegin, PCollection<
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeUTF((properties).toSerialized());
+        out.writeUTF(properties.toSerialized());
+        out.writeUTF(properties.getDatasetProperties().toSerialized());
+        out.writeUTF(properties.getDatasetProperties().getDatastoreProperties().toSerialized());
     }
 
     private void readObject(ObjectInputStream in) throws IOException {
         properties = Properties.Helper.fromSerializedPersistent(in.readUTF(), KafkaInputProperties.class).object;
+        KafkaDatasetProperties dataset = Properties.Helper.fromSerializedPersistent(in.readUTF(),
+                KafkaDatasetProperties.class).object;
+        KafkaDatastoreProperties datastore = Properties.Helper.fromSerializedPersistent(in.readUTF(),
+                KafkaDatastoreProperties.class).object;
+        properties.setDatasetProperties(dataset);
+        properties.getDatasetProperties().setDatastoreProperties(datastore);
     }
 
     class KafkaIndexedRecord implements IndexedRecord, Comparable<IndexedRecord> {

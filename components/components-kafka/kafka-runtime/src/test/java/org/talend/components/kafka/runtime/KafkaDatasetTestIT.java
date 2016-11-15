@@ -1,6 +1,6 @@
 package org.talend.components.kafka.runtime;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.talend.components.kafka.runtime.KafkaTestConstants.TOPIC_IN;
 import static org.talend.components.kafka.runtime.KafkaTestConstants.TOPIC_OUT;
 
@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.kafka.dataset.KafkaDatasetProperties;
 import org.talend.daikon.NamedThing;
@@ -19,31 +18,30 @@ public class KafkaDatasetTestIT {
 
     KafkaDatasetProperties datasetProperties;
 
-    Set topics = new HashSet();
+    Set expectedTopics = new HashSet();
 
     @Before
     public void init() throws TimeoutException {
-        topics.add(TOPIC_IN);
-        topics.add(TOPIC_OUT);
-        topics.add("__consumer_offsets");
+        expectedTopics.add(TOPIC_IN);
+        expectedTopics.add(TOPIC_OUT);
+        // there may exists other topics than these build in(configured in pom.xml) topics, but ignore them
 
         datasetProperties = new KafkaDatasetProperties("inputDatasetProperties");
         datasetProperties.init();
         datasetProperties.getDatastoreProperties().brokers.setValue(KafkaTestConstants.BOOTSTRAP_HOST);
     }
 
-    // TODO: This test should be run, but is currently failing.
-    @Ignore
     @Test
     public void listTopicForRuntime() throws Exception {
         KafkaDatasetRuntime runtime = new KafkaDatasetRuntime();
         runtime.initialize(null, datasetProperties);
         Set<String> topics = runtime.listTopic();
-        assertEquals(this.topics, topics);
+        for (Object expectedTopic : expectedTopics) {
+            assertTrue(topics.contains(expectedTopic));
+        }
+
     }
 
-    // TODO: This test should be run, but is currently failing.
-    @Ignore
     @Test
     public void listTopicForProperties() throws Exception {
         datasetProperties.beforeTopic();
@@ -52,8 +50,9 @@ public class KafkaDatasetTestIT {
         for (NamedThing possibleTopic : possibleTopics) {
             topics.add(possibleTopic.getName());
         }
-
-        assertEquals(this.topics, topics);
+        for (Object expectedTopic : expectedTopics) {
+            assertTrue(topics.contains(expectedTopic));
+        }
     }
 
 }

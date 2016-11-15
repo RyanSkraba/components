@@ -14,14 +14,20 @@ import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PDone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.kafka.dataset.KafkaDatasetProperties;
+import org.talend.components.kafka.datastore.KafkaDatastoreProperties;
 import org.talend.components.kafka.output.KafkaOutputProperties;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
 
 public class KafkaOutputPTransformRuntime extends PTransform<PCollection<IndexedRecord>, PDone>
         implements RuntimableRuntime<KafkaOutputProperties> {
+
+    private static Logger LOG = LoggerFactory.getLogger(KafkaOutputPTransformRuntime.class);
 
     private transient KafkaOutputProperties properties;
 
@@ -57,6 +63,7 @@ public class KafkaOutputPTransformRuntime extends PTransform<PCollection<Indexed
                         // FIXME auto convert type before here, or use converter with some built-in auto convert
                         // function for basic type
                         Schema schema = c.element().getSchema();
+                        LOG.debug("schema is \n" + schema.toString(true));
                         c.output(KV.of((byte[]) c.element().get(schema.getField("key").pos()),
                                 (byte[]) c.element().get(schema.getField("value").pos())));
                     }
@@ -76,11 +83,19 @@ public class KafkaOutputPTransformRuntime extends PTransform<PCollection<Indexed
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeUTF((properties).toSerialized());
+        out.writeUTF(properties.toSerialized());
+        out.writeUTF(properties.getDatasetProperties().toSerialized());
+        out.writeUTF(properties.getDatasetProperties().getDatastoreProperties().toSerialized());
     }
 
     private void readObject(ObjectInputStream in) throws IOException {
         properties = Properties.Helper.fromSerializedPersistent(in.readUTF(), KafkaOutputProperties.class).object;
+        KafkaDatasetProperties dataset = Properties.Helper.fromSerializedPersistent(in.readUTF(),
+                KafkaDatasetProperties.class).object;
+        KafkaDatastoreProperties datastore = Properties.Helper.fromSerializedPersistent(in.readUTF(),
+                KafkaDatastoreProperties.class).object;
+        properties.setDatasetProperties(dataset);
+        properties.getDatasetProperties().setDatastoreProperties(datastore);
     }
 
 }
