@@ -49,7 +49,7 @@ public class FullExampleInputDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology compType) {
+    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology compType) {
         return null;
     }
 

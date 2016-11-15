@@ -13,28 +13,19 @@
 
 package org.talend.components.jms.output;
 
+import static org.talend.daikon.properties.property.PropertyFactory.*;
+
 import org.talend.components.api.properties.ComponentPropertiesImpl;
-import org.talend.components.common.SchemaProperties;
 import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.io.IOProperties;
+import org.talend.components.jms.JmsDatasetDefinition;
 import org.talend.components.jms.JmsDatasetProperties;
+import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
-
-import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
-import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
-
 public class JmsOutputProperties extends ComponentPropertiesImpl implements IOProperties {
-
-    @Override public DatasetProperties getDatasetProperties() {
-        return dataset;
-    }
-
-    @Override public void setDatasetProperties(DatasetProperties datasetProperties) {
-        this.dataset = (JmsDatasetProperties) datasetProperties;
-    }
 
     public enum JmsAdvancedDeliveryMode {
         Non_persistent,
@@ -45,27 +36,39 @@ public class JmsOutputProperties extends ComponentPropertiesImpl implements IOPr
         super(name);
     }
 
-    public Property<String> to = PropertyFactory.newString("to","");
+    public Property<String> to = PropertyFactory.newString("to", "");
 
-    public Property<JmsAdvancedDeliveryMode> delivery_mode = newEnum("delivery_mode", JmsAdvancedDeliveryMode.class).setRequired();
+    public Property<JmsAdvancedDeliveryMode> delivery_mode = newEnum("delivery_mode", JmsAdvancedDeliveryMode.class)
+            .setRequired();
 
-    public Property<String> pool_max_total = PropertyFactory.newString("pool_max_total","8");
+    public Property<String> pool_max_total = PropertyFactory.newString("pool_max_total", "8");
 
-    public Property<String> pool_max_wait = PropertyFactory.newString("pool_max_wait","-1");
+    public Property<String> pool_max_wait = PropertyFactory.newString("pool_max_wait", "-1");
 
-    public Property<String> pool_min_Idle = PropertyFactory.newString("pool_min_Idle","0");
+    public Property<String> pool_min_Idle = PropertyFactory.newString("pool_min_Idle", "0");
 
-    public Property<String> pool_max_Idle = PropertyFactory.newString("pool_max_Idle","8");
+    public Property<String> pool_max_Idle = PropertyFactory.newString("pool_max_Idle", "8");
 
-    public Property<Boolean> pool_use_eviction = newBoolean("pool_use_eviction",false);
+    public Property<Boolean> pool_use_eviction = newBoolean("pool_use_eviction", false);
 
-    public Property<String> pool_time_between_eviction = PropertyFactory.newString("pool_time_between_eviction","-1");
+    public Property<String> pool_time_between_eviction = PropertyFactory.newString("pool_time_between_eviction", "-1");
 
-    public Property<String> pool_eviction_min_idle_time = PropertyFactory.newString("pool_eviction_min_idle_time","1800000");
+    public Property<String> pool_eviction_min_idle_time = PropertyFactory.newString("pool_eviction_min_idle_time", "1800000");
 
-    public Property<String> pool_eviction_soft_min_idle_time = PropertyFactory.newString("pool_eviction_soft_min_idle_time","0");
+    public Property<String> pool_eviction_soft_min_idle_time = PropertyFactory.newString("pool_eviction_soft_min_idle_time", "0");
 
-    public JmsDatasetProperties dataset = new JmsDatasetProperties("dataset");
+    transient public ReferenceProperties<JmsDatasetProperties> datasetRef = new ReferenceProperties<>("datasetRef",
+            JmsDatasetDefinition.NAME);
+
+    @Override
+    public DatasetProperties getDatasetProperties() {
+        return datasetRef.getReference();
+    }
+
+    @Override
+    public void setDatasetProperties(DatasetProperties datasetProperties) {
+        datasetRef.setReference(datasetProperties);
+    }
 
     @Override
     public void setupLayout() {

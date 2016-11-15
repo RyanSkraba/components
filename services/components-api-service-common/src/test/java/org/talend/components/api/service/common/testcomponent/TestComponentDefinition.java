@@ -71,7 +71,7 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology compType) {
+    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology compType) {
         return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
                 DependenciesReader.computeDependenciesFilePath("org.talend.components.api.test", "test-components"),
                 COMPONENT_NAME);

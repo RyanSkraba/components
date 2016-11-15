@@ -45,4 +45,10 @@ public abstract class AbstractComponentWizardDefintion extends AbstractTopLevelD
         return getPngImagePath(WizardImageType.TREE_ICON_16X16);
     }
 
+    @Override
+    public Class getPropertiesClass() {
+        // this should eventually be used to create the Properties class associated with the wizard.
+        return null;
+    }
+
 }

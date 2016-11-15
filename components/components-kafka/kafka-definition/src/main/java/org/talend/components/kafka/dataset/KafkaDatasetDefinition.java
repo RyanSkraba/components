@@ -15,10 +15,8 @@ public class KafkaDatasetDefinition extends SimpleNamedThing implements DatasetD
     }
 
     @Override
-    public KafkaDatasetProperties createProperties() {
-        KafkaDatasetProperties properties = new KafkaDatasetProperties("kafkaDataset");
-        properties.init();
-        return properties;
+    public Class<KafkaDatasetProperties> getPropertiesClass() {
+        return KafkaDatasetProperties.class;
     }
 
     @Override
@@ -33,4 +31,5 @@ public class KafkaDatasetDefinition extends SimpleNamedThing implements DatasetD
         // FIXME add image
         return null;
     }
+
 }

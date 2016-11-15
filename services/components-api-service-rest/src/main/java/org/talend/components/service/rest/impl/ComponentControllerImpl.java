@@ -28,6 +28,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
@@ -57,10 +58,10 @@ public class ComponentControllerImpl implements ComponentController {
     private JsonSerializationHelper jsonSerializer = new JsonSerializationHelper();
 
     @Override
-    public StreamingResponseBody getComponentProperties(String name) {
+    public StreamingResponseBody getComponentProperties(@PathVariable String name) {
         return outputStream -> {
             try (Writer w = new OutputStreamWriter(outputStream)) {
-                w.write(jsonSerializer.toJson(componentServiceDelegate.getComponentProperties(name)));
+                w.write(jsonSerializer.toJson(componentServiceDelegate.getComponentProperties(name), name));
             }
         };
     }

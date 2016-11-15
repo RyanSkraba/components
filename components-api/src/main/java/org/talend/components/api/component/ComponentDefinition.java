@@ -18,7 +18,7 @@ import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.daikon.properties.Properties;
+import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -29,8 +29,8 @@ import org.talend.daikon.runtime.RuntimeInfo;
  * A class implementing this interface is the definition of a component. Instances are registered with the
  * {@link org.talend.components.api.service.ComponentService} to allow components to be discovered.
  */
-
-public interface ComponentDefinition extends RuntimableDefinition<Properties, ConnectorTopology> {
+// TODO make this a RuntimableDefinition<ComponentProperties...
+public interface ComponentDefinition extends RuntimableDefinition<ComponentProperties, ConnectorTopology> {
 
     /**
      * Returns an array of paths that represent the categories of the component.
@@ -40,6 +40,15 @@ public interface ComponentDefinition extends RuntimableDefinition<Properties, Co
     /**
      * Create and initialize a suitable {@link ComponentProperties} which configures an instance of this component.
      */
+    @Override
+    Class<ComponentProperties> getPropertiesClass();
+
+    /**
+     * create an instance of the associated ComponentProperties
+     * 
+     * @deprecated please use {@link PropertiesImpl#createNewInstance(Class, String)} along with the {@link #getPropertiesClass()}
+     */
+    @Deprecated
     ComponentProperties createProperties();
 
     /**
@@ -123,9 +132,10 @@ public interface ComponentDefinition extends RuntimableDefinition<Properties, Co
      * @param connectorTopology the topology of connectors you want to get the Runtime from.
      * 
      * @return the runtime information related to this component and <code>connectorTopology</code>. Should return null if the
-     * <code>componentType</code> is not par of the supported types returned by {@link #getSupportedConnectorTopologies()}
+     *         <code>componentType</code> is not par of the supported types returned by {@link #getSupportedConnectorTopologies()}
      */
-    RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology);
+    @Override
+    RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology connectorTopology);
 
     /**
      * This will returns a set connectors topologies that this component supports.

@@ -13,7 +13,7 @@
 
 package org.talend.components.jms;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -30,7 +30,6 @@ public class JmsDatastoreDefinitionTest {
 
     @Test
     public void testCreateProperties() {
-        JmsDatastoreProperties props = datastoreDefinition.createProperties();
-        assertEquals("JmsDatastore", props.getName());
+        assertEquals(JmsDatastoreProperties.class, datastoreDefinition.getPropertiesClass());
     }
 }

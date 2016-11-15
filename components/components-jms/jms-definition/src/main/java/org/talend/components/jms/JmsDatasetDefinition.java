@@ -30,10 +30,8 @@ public class JmsDatasetDefinition extends SimpleNamedThing implements DatasetDef
     }
 
     @Override
-    public JmsDatasetProperties createProperties() {
-        JmsDatasetProperties properties = new JmsDatasetProperties(NAME);
-        properties.init();
-        return properties;
+    public Class getPropertiesClass() {
+        return JmsDatasetProperties.class;
     }
 
     @Override

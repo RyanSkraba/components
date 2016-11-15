@@ -22,6 +22,7 @@ import java.util.Set;
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.Connector;
@@ -93,13 +94,12 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
         if (compDefMap.isEmpty()) {
             throw TalendRuntimeException.createUnexpectedException("fails to retrieve any Component definitions.");
         }
-        for (ComponentDefinition def : definitionRegistry.getDefinitionsByType(ComponentDefinition.class)) {
-            if (name.equals(def.getName())) {
-                return def;
-            }
+        ComponentDefinition componentDefinition = definitionRegistry.getDefinitionsMapByType(ComponentDefinition.class).get(name);
+        if (componentDefinition == null) {
+            // The component was not found.
+            throw ComponentException.build(ComponentsApiErrorCode.WRONG_COMPONENT_NAME).set(name);
         }
-        // The component was not found.
-        throw new ComponentException(ComponentsApiErrorCode.WRONG_COMPONENT_NAME, ExceptionContext.build().put("name", name)); //$NON-NLS-1$
+        return componentDefinition;
     }
 
     @Override
@@ -193,7 +193,7 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
 
     @Override
     public RuntimeInfo getRuntimeInfo(String componentName, Properties properties, ConnectorTopology componentType) {
-        ComponentDefinition componentDef = getComponentDefinition(componentName);
+        RuntimableDefinition componentDef = getComponentDefinition(componentName);
         return componentDef.getRuntimeInfo(properties, componentType);
 
     }

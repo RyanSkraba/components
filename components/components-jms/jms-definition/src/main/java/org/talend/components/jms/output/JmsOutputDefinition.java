@@ -40,7 +40,7 @@ public class JmsOutputDefinition extends AbstractComponentDefinition {
         return JmsOutputProperties.class;
     }
 
-    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology) {
+    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology connectorTopology) {
         return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
                 DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-jms/jms-runtime_1_1"),
                 RUNTIME_1_1);

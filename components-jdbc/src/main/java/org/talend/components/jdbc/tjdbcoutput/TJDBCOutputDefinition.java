@@ -73,7 +73,7 @@ public class TJDBCOutputDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology) {
+    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology connectorTopology) {
         if (connectorTopology == ConnectorTopology.INCOMING || connectorTopology == ConnectorTopology.INCOMING_AND_OUTGOING) {
             return JDBCTemplate.createCommonRuntime(this.getClass().getClassLoader(), properties,
                     JDBCSink.class.getCanonicalName());

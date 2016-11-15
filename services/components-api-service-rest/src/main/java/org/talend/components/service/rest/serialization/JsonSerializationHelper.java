@@ -15,8 +15,11 @@ package org.talend.components.service.rest.serialization;
 import java.io.InputStream;
 import java.util.HashMap;
 
+import javax.inject.Inject;
+
 import org.springframework.stereotype.Component;
 import org.talend.components.common.datastore.DatastoreDefinition;
+import org.talend.daikon.definition.service.DefinitionRegistryService;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.serialize.SerializerDeserializer;
 import org.talend.daikon.serialize.jsonschema.JsonSchemaUtil;
@@ -28,6 +31,9 @@ import com.cedarsoftware.util.io.JsonWriter;
  */
 @Component
 public class JsonSerializationHelper {
+
+    @Inject
+    DefinitionRegistryService definitionRegistry;
 
     private HashMap<String, Object> jsonIoOptions;
 
@@ -48,18 +54,27 @@ public class JsonSerializationHelper {
     }
 
     /**
+     * Setup {@link Properties} from the data contained in the json-data stream (UTF-8) into a
+     * 
+     * @param jsonDataStream json-data formated input stream in UTF-8
+     * @return a properties instance, never null.
+     */
+    public Properties toProperties(InputStream jsonDataStream) {
+        return JsonSchemaUtil.fromJson(jsonDataStream, definitionRegistry);
+    }
+
+    /**
      * Creates a ui-spec representation of the properties including json-schema, json-ui and json-data
      * 
      * @param properties instance of the properties to serialize.
      * @return json string in ui-specs representation of the data.
      */
-    public String toJson(Properties properties) {
-        return JsonSchemaUtil.toJson(properties);
+    public String toJson(Properties properties, String definitionName) {
+        return JsonSchemaUtil.toJson(properties, definitionName);
     }
 
-
     public String toJson(DatastoreDefinition definition) {
-        return toJson((Object)definition);
+        return toJson((Object) definition);
     }
 
     /**

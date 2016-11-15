@@ -24,6 +24,9 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.service.common.testcomponent.TestComponentDefinition;
 import org.talend.components.api.service.common.testcomponent.TestComponentFamilyDefinition;
 import org.talend.components.api.service.common.testcomponent.TestComponentWizardDefinition;
+import org.talend.components.api.service.common.testcomponent.nestedprop.NestedComponentProperties;
+import org.talend.components.api.service.common.testcomponent.nestedprop.inherited.InheritedComponentProperties;
+import org.talend.components.api.test.SimpleComponentDefinition;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.daikon.definition.Definition;
 
@@ -83,6 +86,23 @@ public class DefintitionRegistryTest {
         } catch (UnsupportedOperationException e) {
             // all is good if we are here
         }
+    }
+
+    @Test
+    public void testGetDefinitionForPropertiesType() {
+        // we'll check that 2 derived Properties have thier definition returned.
+        SimpleComponentDefinition compDef = new SimpleComponentDefinition("def");
+        compDef.setPropertyClass(NestedComponentProperties.class);
+        SimpleComponentDefinition inheritedDef = new SimpleComponentDefinition("DefOfinherited");
+        inheritedDef.setPropertyClass(InheritedComponentProperties.class);
+
+        DefinitionRegistry definitionRegistry = new DefinitionRegistry();
+        definitionRegistry.registerDefinition(Arrays.asList(compDef, inheritedDef, new TestComponentDefinition()));
+
+        Iterable<Definition> definitionForPropertiesType = definitionRegistry
+                .getDefinitionForPropertiesType(NestedComponentProperties.class);
+        assertThat(definitionForPropertiesType, contains((Definition) compDef, inheritedDef));
+
     }
 
 }

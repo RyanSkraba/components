@@ -30,6 +30,8 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.daikon.definition.Definition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
 import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.properties.Properties;
+import org.talend.daikon.properties.PropertiesImpl;
 
 /**
  * Utility for getting and setting the definitions registered in the component framework.
@@ -153,5 +155,22 @@ public class DefinitionRegistry implements ComponentInstaller.ComponentFramework
                     .createUnexpectedException("fails to retrieve any definition for the name [" + definitionName + "].");
         }
         return ComponentServiceImpl.getImageStream(def, def.getImagePath());
+    }
+
+    @Override
+    public Iterable<Definition> getDefinitionForPropertiesType(Class<? extends Properties> propertiesClass) {
+        List<Definition> matchingDefs = new ArrayList<>();
+        for (Definition def : definitions.values()) {
+            Class<? extends Properties> defPropClass = def.getPropertiesClass();
+            if (defPropClass != null && propertiesClass.isAssignableFrom(def.getPropertiesClass())) {
+                matchingDefs.add(def);
+            }
+        }
+        return matchingDefs;
+    }
+
+    @Override
+    public <P extends Properties> P createProperties(Definition<P> definition, String name) {
+        return PropertiesImpl.createNewInstance(definition.getPropertiesClass(), name);
     }
 }

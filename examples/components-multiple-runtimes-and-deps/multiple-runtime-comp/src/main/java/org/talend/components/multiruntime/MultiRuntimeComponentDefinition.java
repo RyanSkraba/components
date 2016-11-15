@@ -15,7 +15,6 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.multiruntime.MultiRuntimeComponentProperties.Version;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
-import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
@@ -89,7 +88,7 @@ public class MultiRuntimeComponentDefinition extends AbstractComponentDefinition
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(Properties prop, ConnectorTopology connectorTopology) {
+    public RuntimeInfo getRuntimeInfo(ComponentProperties prop, ConnectorTopology connectorTopology) {
         if (connectorTopology == ConnectorTopology.OUTGOING) {
             if (prop != null && prop instanceof MultiRuntimeComponentProperties) {
                 MultiRuntimeComponentProperties mrcpProp = (MultiRuntimeComponentProperties) prop;

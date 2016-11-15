@@ -26,7 +26,7 @@ public abstract class AbstractComponentFamilyDefinition extends AbstractTopLevel
     /** Family name, must be unique in the framework. */
     private String familyName;
 
-    private final List<Definition> definitions;
+    private final List<Definition<?>> definitions;
 
     /**
      * Construct the subclass with a given, predefined, unmodifiable set of definitions.
@@ -36,7 +36,7 @@ public abstract class AbstractComponentFamilyDefinition extends AbstractTopLevel
      *            is not correct or unknown, it will ignored. Otherwise, it will appear in one of the getXxxxDefinitions()
      *            methods.
      */
-    public AbstractComponentFamilyDefinition(String familyName, Definition... definitions) {
+    public AbstractComponentFamilyDefinition(String familyName, Definition<?>... definitions) {
         this.familyName = familyName;
 
         if (definitions == null || definitions.length == 0) {

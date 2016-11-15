@@ -13,7 +13,6 @@
 package org.talend.components.api.component;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,12 +21,10 @@ import java.util.List;
 import org.talend.components.api.AbstractTopLevelDefinition;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.NamedThing;
-import org.talend.daikon.definition.Definition;
-import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.property.Property;
 
-public abstract class AbstractComponentDefinition extends AbstractTopLevelDefinition
-        implements ComponentDefinition, Definition {
+public abstract class AbstractComponentDefinition extends AbstractTopLevelDefinition implements ComponentDefinition {
 
     /**
      * Component name.
@@ -80,31 +77,17 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
         return "component."; //$NON-NLS-1$
     }
 
+    @Deprecated
     @Override
     public ComponentProperties createProperties() {
-        ComponentProperties compProp = instantiateComponentProperties();
+        ComponentProperties compProp = PropertiesImpl.createNewInstance(getPropertiesClass(), "root");
         compProp.init();
-        return compProp;
-    }
-
-    public ComponentProperties instantiateComponentProperties() {
-        ComponentProperties compProp = null;
-        try {
-            Class<?> propertyClass = getPropertyClass();
-            if (propertyClass == null) {
-                return null;// TODO throw an exception
-            } // else keep going
-            Constructor<?> c = propertyClass.getConstructor(String.class);
-            compProp = (ComponentProperties) c.newInstance("root");
-        } catch (Exception e) {
-            TalendRuntimeException.unexpectedException(e);
-        }
         return compProp;
     }
 
     @Override
     public ComponentProperties createRuntimeProperties() {
-        ComponentProperties compProp = instantiateComponentProperties();
+        ComponentProperties compProp = PropertiesImpl.createNewInstance(getPropertiesClass(), "root");
         compProp.initForRuntime();
         return compProp;
     }
@@ -159,11 +142,16 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
                 + "\n props: " + getPropertyClass();
     }
 
+    @Override
+    public Class<ComponentProperties> getPropertiesClass() {
+        return (Class<ComponentProperties>) getPropertyClass();
+    }
+
     /**
      * @return the associated ComponentProperties class associated with the Component. This shall be used to initialised
      *         the runtime classes.
      */
-    // TODO we should rename this
+    // TODO remove this and use the getPropertiesClass()
     abstract public Class<? extends ComponentProperties> getPropertyClass();
 
     /**

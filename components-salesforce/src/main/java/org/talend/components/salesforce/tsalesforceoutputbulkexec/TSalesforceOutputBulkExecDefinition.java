@@ -78,7 +78,7 @@ public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition im
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology) {
+    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology connectorTopology) {
         return null;// this is a very specific component that delegates the runtime to the output and input components
     }
 

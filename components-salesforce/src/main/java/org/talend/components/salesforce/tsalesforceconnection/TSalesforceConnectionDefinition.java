@@ -48,7 +48,7 @@ public class TSalesforceConnectionDefinition extends SalesforceDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology componentType) {
+    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology componentType) {
         if (componentType == ConnectorTopology.NONE) {
             return getCommonRuntimeInfo(this.getClass().getClassLoader(), SalesforceSourceOrSink.class);
         } else {

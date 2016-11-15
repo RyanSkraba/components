@@ -32,6 +32,7 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.properties.Properties;
+import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
 
@@ -53,7 +54,8 @@ public class ComponentTestUtils {
     static public void testAlli18n(ComponentService componentService, ErrorCollector errorCollector) {
         Set<ComponentDefinition> allComponents = componentService.getAllComponents();
         for (ComponentDefinition cd : allComponents) {
-            ComponentProperties props = cd.createProperties();
+            ComponentProperties props = (ComponentProperties) PropertiesImpl.createNewInstance(cd.getPropertiesClass(), "root")
+                    .init();
             // check all properties
             if (props != null) {
                 checkAllI18N(props, errorCollector);

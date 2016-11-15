@@ -54,7 +54,7 @@ public class TDataPrepDBInputDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology) {
+    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology connectorTopology) {
         if (connectorTopology == ConnectorTopology.OUTGOING) {
             return JDBCTemplate.createCommonRuntime(this.getClass().getClassLoader(), properties,
                     JDBCSource.class.getCanonicalName());

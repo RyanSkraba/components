@@ -40,16 +40,19 @@ public class JmsInputDefinition extends AbstractComponentDefinition {
         return JmsInputProperties.class;
     }
 
-    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology) {
+    @Override
+    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology connectorTopology) {
         return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
                 DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-jms/jms-runtime_1_1"),
                 RUNTIME_1_1);
     }
 
+    @Override
     public Property[] getReturnProperties() {
         return new Property[] {};
     }
 
+    @Override
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
         return EnumSet.of(ConnectorTopology.OUTGOING);
     }

@@ -33,10 +33,8 @@ public class JmsDatastoreDefinition extends SimpleNamedThing implements Datastor
     }
 
     @Override
-    public JmsDatastoreProperties createProperties() {
-        JmsDatastoreProperties properties = new JmsDatastoreProperties(NAME);
-        properties.init();
-        return properties;
+    public Class getPropertiesClass() {
+        return JmsDatastoreProperties.class;
     }
 
     @Override

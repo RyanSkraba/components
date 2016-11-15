@@ -20,10 +20,8 @@ public class KafkaDatastoreDefinition extends SimpleNamedThing implements Datast
     }
 
     @Override
-    public KafkaDatastoreProperties createProperties() {
-        KafkaDatastoreProperties datastoreProperties = new KafkaDatastoreProperties(NAME);
-        datastoreProperties.init();
-        return datastoreProperties;
+    public Class<KafkaDatastoreProperties> getPropertiesClass() {
+        return KafkaDatastoreProperties.class;
     }
 
     @Override

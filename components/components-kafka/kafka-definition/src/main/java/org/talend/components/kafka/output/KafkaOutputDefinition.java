@@ -8,7 +8,6 @@ import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.kafka.KafkaIOBasedDefinition;
-import org.talend.daikon.properties.Properties;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 public class KafkaOutputDefinition extends KafkaIOBasedDefinition {
@@ -30,7 +29,7 @@ public class KafkaOutputDefinition extends KafkaIOBasedDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology) {
+    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology connectorTopology) {
         return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
                 DependenciesReader.computeDependenciesFilePath("org.talend.components", "kafka-runtime"),
                 "org.talend.components.kafka.runtime.KafkaOutputPTransformRuntime");

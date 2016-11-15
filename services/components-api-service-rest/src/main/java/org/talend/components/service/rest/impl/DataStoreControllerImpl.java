@@ -3,7 +3,6 @@ package org.talend.components.service.rest.impl;
 import static java.util.stream.StreamSupport.*;
 import static org.slf4j.LoggerFactory.*;
 
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
@@ -18,6 +17,8 @@ import org.talend.components.service.rest.DataStoreDefinitionDTO;
 import org.talend.components.service.rest.serialization.JsonSerializationHelper;
 import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
+import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.exception.error.CommonErrorCodes;
 
 /**
  * Rest controller in charge of data stores.
@@ -47,24 +48,15 @@ public class DataStoreControllerImpl implements DataStoreController {
     }
 
     @Override
-    public String getDatastoreDefinition(@PathVariable String dataStoreName) {
+    public String getDatastoreProperties(@PathVariable String dataStoreName) {
         Validate.notNull(dataStoreName, "Data store name cannot be null.");
-        final Iterable<DatastoreDefinition> iterable = definitionServiceDelegate
-                .getDefinitionsMapByType(DatastoreDefinition.class).values();
+        DatastoreDefinition def = definitionServiceDelegate.getDefinitionsMapByType(DatastoreDefinition.class).get(dataStoreName);
 
-        final Optional<DatastoreDefinition> first = stream(iterable.spliterator(), true) //
-                .filter(def -> dataStoreName.equals(def.getName())) //
-                .findFirst();
-
-        String result;
-        if (first.isPresent()) {
-            log.debug("Found data store definition {} for {}", first.get(), dataStoreName);
-            result = jsonSerializationHelper.toJson(first.get().createProperties());
+        if (def != null) {
+            return jsonSerializationHelper.toJson(definitionServiceDelegate.createProperties(def, ""), dataStoreName);
         } else {
-            log.debug("Did not found data store definition for {}", dataStoreName);
-            result = null;
+            throw TalendRuntimeException.build(CommonErrorCodes.UNREGISTERED_DEFINITION).set(dataStoreName);
         }
-        return result;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package org.talend.components.kafka.dataset;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,9 +16,8 @@ public class KafkaDatasetDefinitionTest {
     }
 
     @Test
-    public void createProperties() throws Exception {
-        KafkaDatasetProperties properties = definition.createProperties();
-        assertNotNull(properties);
+    public void getPropertiesTest() throws Exception {
+        assertEquals(KafkaDatasetProperties.class, definition.getPropertiesClass());
     }
 
     @Test

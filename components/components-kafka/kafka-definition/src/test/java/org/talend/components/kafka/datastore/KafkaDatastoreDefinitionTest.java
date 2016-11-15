@@ -1,7 +1,6 @@
 package org.talend.components.kafka.datastore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,9 +22,8 @@ public class KafkaDatastoreDefinitionTest {
     }
 
     @Test
-    public void createProperties() throws Exception {
-        KafkaDatastoreProperties properties = definition.createProperties();
-        assertNotNull(properties);
+    public void getPropertiesTest() throws Exception {
+        assertEquals(KafkaDatastoreProperties.class, definition.getPropertiesClass());
     }
 
     @Test
@@ -36,7 +34,7 @@ public class KafkaDatastoreDefinitionTest {
 
     @Test
     public void createDatasetProperties() throws Exception {
-        KafkaDatastoreProperties properties = definition.createProperties();
+        KafkaDatastoreProperties properties = new KafkaDatastoreProperties("");
         DatasetProperties datasetProperties = definition.createDatasetProperties(properties);
         assertNotNull(datasetProperties);
         assertEquals(properties, datasetProperties.getDatastoreProperties());

@@ -29,7 +29,7 @@ public class JmsInputDefinitionTest {
     private final JmsInputDefinition inputDefinition = new JmsInputDefinition();
 
     /**
-     * Check {@link JmsInputDefinition#getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology)} returns RuntimeInfo,
+     * Check {@link JmsInputDefinition#getRuntimeInfo(ComponentProperties properties, ConnectorTopology connectorTopology)} returns RuntimeInfo,
      * which runtime class name is "org.talend.components.jms.runtime_1_1.JmsSink"
      */
     @Test

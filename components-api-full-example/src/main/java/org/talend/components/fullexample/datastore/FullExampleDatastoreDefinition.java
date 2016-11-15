@@ -20,8 +20,8 @@ public class FullExampleDatastoreDefinition extends SimpleNamedThing
     }
 
     @Override
-    public FullExampleDatastoreProperties createProperties() {
-        return (FullExampleDatastoreProperties) new FullExampleDatastoreProperties(null).init();
+    public Class<FullExampleDatastoreProperties> getPropertiesClass() {
+        return FullExampleDatastoreProperties.class;
     }
 
     @Override

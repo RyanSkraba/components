@@ -52,7 +52,7 @@ public class TJDBCRowDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(Properties properties, ConnectorTopology connectorTopology) {
+    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology connectorTopology) {
         switch (connectorTopology) {
         case OUTGOING:
             return JDBCTemplate.createCommonRuntime(this.getClass().getClassLoader(), properties,
