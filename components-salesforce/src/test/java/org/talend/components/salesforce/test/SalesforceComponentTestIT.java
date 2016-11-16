@@ -71,7 +71,7 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
 
-public class SalesforceComponentTestIT extends SalesforceTestBase {
+public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceComponentTestIT.class);
 
