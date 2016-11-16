@@ -37,7 +37,6 @@ import static org.ops4j.pax.exam.CoreOptions.*;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-@Ignore
 public class OsgiSnowflakeTestIT extends SnowflakeTestIT {
 
     @Inject

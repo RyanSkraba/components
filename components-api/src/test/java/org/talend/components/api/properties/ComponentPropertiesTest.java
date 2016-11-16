@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
+import org.talend.daikon.serialize.SerializerDeserializer;
 
 public class ComponentPropertiesTest {
 
@@ -75,6 +76,7 @@ public class ComponentPropertiesTest {
     @Test
     public void testUpdateNestedProperties() throws IllegalAccessException {
         NestedNestedProperties nestedProperties = new NestedNestedProperties("bar");
+        System.out.println(SerializerDeserializer.toSerializedPersistent(nestedProperties));
         nestedProperties.value.setValue("XYZ");
         assertNull(foo.two.four.value.getValue());
         ComponentProperties oldProp = foo.two.four;

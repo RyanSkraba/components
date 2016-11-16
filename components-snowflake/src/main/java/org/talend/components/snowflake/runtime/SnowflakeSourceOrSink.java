@@ -226,21 +226,22 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
 
             ResultSet resultSet = metaData.getColumns(getCatalog(connProps), getDbSchema(connProps), tableName, null);
             tableSchema = SnowflakeAvroRegistry.get().inferSchema(resultSet);
+            // FIXME - I18N for this message
+            if (tableSchema == null)
+                throw new IOException("Table: " + tableName + " not found");
 
             // Update the schema with Primary Key details
             // FIXME - move this into the inferSchema stuff
-            if (null != tableSchema) {
-                ResultSet keysIter = metaData.getPrimaryKeys(getCatalog(connProps), getDbSchema(connProps), tableName);
+            ResultSet keysIter = metaData.getPrimaryKeys(getCatalog(connProps), getDbSchema(connProps), tableName);
 
-                List<String> pkColumns = new ArrayList<>(); // List of Primary Key columns for this table
-                while (keysIter.next()) {
-                    pkColumns.add(keysIter.getString("COLUMN_NAME"));
-                }
+            List<String> pkColumns = new ArrayList<>(); // List of Primary Key columns for this table
+            while (keysIter.next()) {
+                pkColumns.add(keysIter.getString("COLUMN_NAME"));
+            }
 
-                for (Field f : tableSchema.getFields()) {
-                    if (pkColumns.contains(f.name())) {
-                        f.schema().addProp(SchemaConstants.TALEND_COLUMN_IS_KEY, "true");
-                    }
+            for (Field f : tableSchema.getFields()) {
+                if (pkColumns.contains(f.name())) {
+                    f.schema().addProp(SchemaConstants.TALEND_COLUMN_IS_KEY, "true");
                 }
             }
 

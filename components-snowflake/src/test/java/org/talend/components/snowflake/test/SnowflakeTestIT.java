@@ -25,7 +25,6 @@ import org.talend.components.api.test.AbstractComponentTest;
 import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
-import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.api.wizard.WizardNameComparator;
 import org.talend.components.common.CommonTestUtils;
 import org.talend.components.snowflake.*;
@@ -59,8 +58,7 @@ import static org.junit.Assert.*;
 import static org.talend.daikon.properties.presentation.Form.MAIN;
 
 @SuppressWarnings("nls")
-@Ignore
-public class SnowflakeTestIT extends AbstractComponentTest {
+public abstract class SnowflakeTestIT extends AbstractComponentTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SnowflakeTestIT.class);
 
@@ -83,7 +81,9 @@ public class SnowflakeTestIT extends AbstractComponentTest {
     private static String TEST_TABLE = "LOADER_TEST_TABLE";
 
     // So that multiple tests can run at the same time
-    private static String testTable = TEST_TABLE + "_" + Integer.toString(ThreadLocalRandom.current().nextInt(1, 100000));
+    private static String testNumber = Integer.toString(ThreadLocalRandom.current().nextInt(1, 100000));
+    private static String testTable = TEST_TABLE + "_" + testNumber;
+    private static String testSchema = schema + "_" + testNumber;
 
 
     private static Date testTimestamp = new Date();
@@ -154,7 +154,7 @@ public class SnowflakeTestIT extends AbstractComponentTest {
         props.account.setStoredValue(accountStr);
         props.warehouse.setStoredValue(warehouse);
         props.db.setStoredValue(db);
-        props.schemaName.setStoredValue(schema);
+        props.schemaName.setStoredValue(testSchema);
         return props;
     }
 
@@ -174,22 +174,22 @@ public class SnowflakeTestIT extends AbstractComponentTest {
             connectionUrl +=
                     "/?user=" +
                             user + "&password=" +
-                            password + "&schema=" + schema +
+                            password + "&testSchema=" + testSchema +
                             "&db=" + db + "&warehouse=" + warehouse;
 
             Properties properties = new Properties();
 
             testConnection = DriverManager.getConnection(connectionUrl, properties);
             testConnection.createStatement().execute(
-                    "CREATE OR REPLACE SCHEMA " + schema);
+                    "CREATE OR REPLACE SCHEMA " + testSchema);
             testConnection.createStatement().execute(
-                    "USE SCHEMA " + schema);
+                    "USE SCHEMA " + testSchema);
             testConnection.createStatement().execute(
-                    "DROP TABLE IF EXISTS " + schema +
+                    "DROP TABLE IF EXISTS " + testSchema +
                             "." + testTable +
                             " CASCADE");
             testConnection.createStatement().execute(
-                    "CREATE TABLE " + schema +
+                    "CREATE TABLE " + testSchema +
                             "." + testTable +
                             " ("
                             + "ID int PRIMARY KEY, "
@@ -209,10 +209,10 @@ public class SnowflakeTestIT extends AbstractComponentTest {
     public static void teardownDatabase() throws SQLException {
         if (!false) {
             testConnection.createStatement().execute(
-                    "DROP TABLE IF EXISTS " + schema +
+                    "DROP TABLE IF EXISTS " + testSchema +
                             "." + testTable);
             testConnection.createStatement().execute(
-                    "DROP SCHEMA IF EXISTS " + schema);
+                    "DROP SCHEMA IF EXISTS " + testSchema);
             testConnection.close();
         }
     }
@@ -235,7 +235,7 @@ public class SnowflakeTestIT extends AbstractComponentTest {
     public void tearDown() throws SQLException {
         if (!false) {
             testConnection.createStatement().execute(
-                    "DELETE FROM " + schema +
+                    "DELETE FROM " + testSchema +
                             "." + testTable);
         }
     }
@@ -471,7 +471,7 @@ public class SnowflakeTestIT extends AbstractComponentTest {
         LOGGER.debug(prop.getPossibleValues().toString());
         LOGGER.debug(tableProps.getValidationResult().toString());
         assertEquals(ValidationResult.Result.OK, tableProps.getValidationResult().getStatus());
-        assertTrue(prop.getPossibleValues().size() == 1);
+        assertEquals(1, prop.getPossibleValues().size());
 
         tableProps.tableName.setValue(testTable);
         tableProps = (SnowflakeTableProperties) PropertiesTestUtils.checkAndAfter(getComponentService(), f, tableProps.tableName.getName(), tableProps);
