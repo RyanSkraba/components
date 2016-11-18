@@ -18,8 +18,10 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.common.ComponentConstants;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -61,7 +63,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         queryMode.setValue(QueryMode.Query);
         normalizeDelimiter.setValue(";");
         columnNameDelimiter.setValue("_");
-
+        query.setTaggedValue(ComponentConstants.LINE_SEPARATOR_REPLACED_TO, " ");
     }
 
     @Override
@@ -71,7 +73,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         mainForm.addRow(queryMode);
         mainForm.addRow(condition);
         mainForm.addRow(manualQuery);
-        mainForm.addRow(query);
+        mainForm.addRow(Widget.widget(query).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
         mainForm.addRow(includeDeleted);
 
         Form advancedForm = getForm(Form.ADVANCED);
