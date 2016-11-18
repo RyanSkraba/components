@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.dataprep.connection;
 
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.*;
 
 import java.io.IOException;
 
@@ -24,12 +24,14 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.talend.components.dataprep.runtime.DataPrepOutputModes;
 import org.talend.components.service.spring.SpringTestApp;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringTestApp.class, webEnvironment = RANDOM_PORT)
+@TestPropertySource(properties = { "server.contextPath=" })
 public class DataPrepConnectionHandlerTest {
 
     @Autowired

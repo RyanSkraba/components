@@ -1,7 +1,7 @@
 package org.talend.components.dataprep.tdatasetinput;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.*;
 
 import javax.inject.Inject;
 
@@ -12,6 +12,7 @@ import org.junit.rules.ErrorCollector;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
@@ -21,6 +22,7 @@ import org.talend.daikon.properties.ValidationResult.Result;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringTestApp.class, webEnvironment = RANDOM_PORT)
+@TestPropertySource(properties = { "server.contextPath=" })
 public class AfterFetchSchemaTest {
 
     @Inject

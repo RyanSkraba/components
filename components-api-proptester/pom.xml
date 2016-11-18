@@ -21,12 +21,12 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>1.4.1.RELEASE</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>org.talend.daikon</groupId>
+            <artifactId>daikon-spring</artifactId>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
@@ -49,10 +49,7 @@
             <artifactId>jline</artifactId>
             <version>2.12</version>
         </dependency>
-        <dependency>
-        	<groupId>org.talend.daikon</groupId>
-        	<artifactId>daikon-spring</artifactId>
-        </dependency>
+
     </dependencies>
 
 

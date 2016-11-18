@@ -53,12 +53,6 @@
 			<artifactId>components-common</artifactId>
 			<version>0.16.0-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-api-runtime-service</artifactId>
-			<version>0.1.0-SNAPSHOT</version>
-		</dependency>
-
 		<!-- Jar containing Test utils methods -->
 		<dependency>
 			<groupId>org.talend.components</groupId>
@@ -85,13 +79,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-api-runtime-service</artifactId>
-			<version>0.1.0-SNAPSHOT</version>
-			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

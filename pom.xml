@@ -14,7 +14,6 @@
 		<module>core/components-adapter-beam</module>
 		<module>components-common</module>
 		<module>components-common-oauth</module>
-		<module>components-api-archetypes</module>
 		<module>components-salesforce</module>
 		<module>components-osgitest</module>
 		<module>components-api-proptester</module>
@@ -28,6 +27,7 @@
 		<module>services</module>
 		<module>examples</module>
 		<module>components</module>
+		<module>components-api-archetypes</module>
 	</modules>
 	<profiles>
 		<profile>

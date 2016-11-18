@@ -1,6 +1,6 @@
 package org.talend.components.dataprep.runtime;
 
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.*;
 
 import javax.inject.Inject;
 
@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.dataprep.tdatasetinput.TDataSetInputDefinition;
@@ -18,6 +19,7 @@ import org.talend.components.service.spring.SpringTestApp;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringTestApp.class, webEnvironment = RANDOM_PORT)
+@TestPropertySource(properties = { "server.contextPath=" })
 public class DataSetReaderTest {
 
     @Inject
