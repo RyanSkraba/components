@@ -44,8 +44,6 @@ public class JmsDatastorePropertiesTest {
         assertEquals("", properties.userPassword.password.getValue());
         assertEquals(false, properties.useHttps.getValue());
         assertNull(properties.httpsSettings.getValue());
-        assertEquals("", properties.property.getValue());
-        assertEquals("", properties.value.getValue());
     }
 
     /**
@@ -61,7 +59,7 @@ public class JmsDatastorePropertiesTest {
         Form main = properties.getForm(Form.MAIN);
         assertThat(main, notNullValue());
         Collection<Widget> mainWidgets = main.getWidgets();
-        assertThat(mainWidgets, hasSize(9));
+        assertThat(mainWidgets, hasSize(7));
         Widget msgType = main.getWidget("version");
         assertThat(msgType, notNullValue());
         Widget contextProvider = main.getWidget("contextProvider");
@@ -76,10 +74,6 @@ public class JmsDatastorePropertiesTest {
         assertThat(useHttps, notNullValue());
         Widget httpsSettings = main.getWidget("httpsSettings");
         assertThat(httpsSettings, notNullValue());
-        Widget property = main.getWidget("property");
-        assertThat(property, notNullValue());
-        Widget value = main.getWidget("value");
-        assertThat(value, notNullValue());
     }
 
     /**

@@ -13,19 +13,15 @@
 
 package org.talend.components.jms.input;
 
+import static junit.framework.TestCase.assertFalse;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import java.util.Collection;
+
 import org.junit.Test;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
-
-import java.util.Collection;
-
-import static junit.framework.TestCase.assertFalse;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 
 public class JmsInputPropertiesTest {
 
@@ -36,10 +32,9 @@ public class JmsInputPropertiesTest {
     @Test
     public void testDefaultProperties() {
         JmsInputProperties properties = new JmsInputProperties("test");
-        assertEquals("",properties.from.getValue());
-        assertEquals(-1,(long)properties.timeout.getValue());
-        assertEquals(-1,(long)properties.max_msg.getValue());
-        assertEquals("",properties.msg_selector.getValue());
+        assertEquals(-1, (long) properties.timeout.getValue());
+        assertEquals(-1, (long) properties.max_msg.getValue());
+        assertEquals("", properties.msg_selector.getValue());
     }
 
     /**
@@ -56,9 +51,7 @@ public class JmsInputPropertiesTest {
         assertThat(main, notNullValue());
 
         Collection<Widget> mainWidgets = main.getWidgets();
-        assertThat(mainWidgets, hasSize(4));
-        Widget from = main.getWidget("from");
-        assertThat(from, notNullValue());
+        assertThat(mainWidgets, hasSize(3));
         Widget timeout = main.getWidget("timeout");
         assertThat(timeout, notNullValue());
         Widget max_msg = main.getWidget("max_msg");
@@ -77,7 +70,6 @@ public class JmsInputPropertiesTest {
         properties.init();
         properties.refreshLayout(properties.getForm(Form.MAIN));
 
-        assertFalse(properties.getForm(Form.MAIN).getWidget("from").isHidden());
         assertFalse(properties.getForm(Form.MAIN).getWidget("timeout").isHidden());
         assertFalse(properties.getForm(Form.MAIN).getWidget("max_msg").isHidden());
         assertFalse(properties.getForm(Form.MAIN).getWidget("msg_selector").isHidden());

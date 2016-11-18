@@ -33,10 +33,18 @@ public class JmsDatasetDefinitionTest {
     }
 
     /**
-     * Check {@link JmsDatasetDefinition#createProperties()} returns JmsDatasetProperties, which canonical name is "jms"
+     * Check {@link JmsDatasetDefinition#getImagePath()} ()} returns JmsDatasetProperties, which canonical name is "jms"
      */
     @Test
-    public void testCreateProperties() {
-        assertEquals(JmsDatasetProperties.class, datasetDefinition.getPropertiesClass());
+    public void testGetImagePath() {
+        assertEquals(null, datasetDefinition.getImagePath());
+    }
+
+    /**
+     * Check {@link JmsDatasetDefinition#getImagePath()} ()} returns JmsDatasetProperties, which canonical name is "jms"
+     */
+    @Test
+    public void testGetDisplayName() {
+        assertEquals("Java Message Service", datasetDefinition.getDisplayName());
     }
 }

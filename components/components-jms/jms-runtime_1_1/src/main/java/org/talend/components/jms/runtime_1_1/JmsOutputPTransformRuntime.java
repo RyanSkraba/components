@@ -1,3 +1,16 @@
+// ============================================================================
+//
+// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+//
+// This source code is available under agreement available at
+// %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
+//
+// You should have received a copy of the agreement
+// along with this program; if not, write to Talend SA
+// 9 rue Pages 92150 Suresnes, France
+//
+// ============================================================================
+
 package org.talend.components.jms.runtime_1_1;
 
 import org.apache.avro.generic.IndexedRecord;
@@ -7,6 +20,7 @@ import org.apache.beam.sdk.transforms.PTransform;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PDone;
+import org.talend.components.adapter.beam.LazyAvroCoder;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jms.JmsMessageType;
@@ -18,21 +32,24 @@ import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
 
-public class JmsOutputPTransformRuntime extends PTransform<PCollection<Object>, PDone>implements RuntimableRuntime {
+import java.util.UUID;
 
-    private JmsOutputProperties properties;
+public class JmsOutputPTransformRuntime extends PTransform<PCollection<Object>, PDone> implements RuntimableRuntime {
+
+    transient private JmsOutputProperties properties;
+
+    private JmsDatastoreRuntime datastoreRuntime;
 
     private JmsMessageType messageType;
 
+    private String id = UUID.randomUUID().toString();
+
     @Override
     public PDone apply(PCollection<Object> objectPCollection) {
-        System.out.println("deb apply");
-        PCollection<IndexedRecord> test = objectPCollection.apply("ExtractIndexedRecord",
+        PCollection<IndexedRecord> indexedCollection = objectPCollection.apply("ExtractIndexedRecord",
                 ParDo.of(new DoFn<Object, IndexedRecord>() {
 
                     IndexedRecordConverter converter;
-
-                    transient AvroRegistry avroRegistry = new AvroRegistry();
 
                     @DoFn.ProcessElement
                     public void processElement(ProcessContext c) throws Exception {
@@ -40,31 +57,33 @@ public class JmsOutputPTransformRuntime extends PTransform<PCollection<Object>, 
                             return;
                         }
                         if (converter == null) {
-                            converter = avroRegistry.createIndexedRecordConverter(c.element().getClass());
-                            c.output((IndexedRecord) converter.convertToAvro(c.element()));
+                            converter = new AvroRegistry().createIndexedRecordConverter(c.element().getClass());
                         }
+                        c.output((IndexedRecord) converter.convertToAvro(c.element()));
                     }
                 }));
-        // test.setCoder(AvroCoder.of(IndexedRecord.class));
+        indexedCollection.setCoder(LazyAvroCoder.<IndexedRecord> of(id));
 
-        PCollection<String> jmsCollection = test.apply("ExtractString", ParDo.of(new DoFn<IndexedRecord, String>() {
+        PCollection<String> jmsCollection = indexedCollection.apply("ExtractString", ParDo.of(new DoFn<IndexedRecord, String>() {
 
             @DoFn.ProcessElement
             public void processElement(ProcessContext c) throws Exception {
-                c.output(c.element().toString());
+                c.output(c.element().get(0).toString());
+
             }
         }));
 
+        datastoreRuntime = new JmsDatastoreRuntime();
+        datastoreRuntime.initialize(null, properties.datasetRef.getReference().getDatastoreProperties());
         if (messageType.equals(JmsMessageType.QUEUE)) {
-            return jmsCollection.apply(JmsIO.write()
-                    // .withConnectionFactory(properties.dataset.datastore.getConnectionFactory())
-                    .withQueue(properties.to.toString()));
+            // TODO label comes from user
+            return jmsCollection.apply("writeToJms", JmsIO.write().withConnectionFactory(datastoreRuntime.getConnectionFactory())
+                    .withQueue(properties.datasetRef.getReference().queueTopicName.getValue()));
         } else if (messageType.equals(JmsMessageType.TOPIC)) {
             // TODO label comes from user
-            return jmsCollection.apply("writeToJms",
-                    JmsIO.write()
-                            // .withConnectionFactory(properties.dataset.datastore.getConnectionFactory())
-                            .withTopic(properties.to.toString()));
+            return jmsCollection.apply("writeToJms", JmsIO.write().withConnectionFactory(datastoreRuntime.getConnectionFactory())
+                    .withTopic(properties.datasetRef.getReference().queueTopicName.getValue()));
+
         } else {
             throw new TalendRuntimeException(CommonErrorCodes.UNEXPECTED_ARGUMENT);
         }
@@ -77,6 +96,7 @@ public class JmsOutputPTransformRuntime extends PTransform<PCollection<Object>, 
     }
 
     public void setMessageType() {
+        messageType = properties.datasetRef.getReference().msgType.getValue();
         messageType = properties.datasetRef.getReference().msgType.getValue();
     }
 }

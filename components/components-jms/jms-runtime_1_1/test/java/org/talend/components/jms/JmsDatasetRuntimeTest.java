@@ -1,3 +1,16 @@
+// ============================================================================
+//
+// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+//
+// This source code is available under agreement available at
+// %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
+//
+// You should have received a copy of the agreement
+// along with this program; if not, write to Talend SA
+// 9 rue Pages 92150 Suresnes, France
+//
+// ============================================================================
+
 package org.talend.components.jms;
 
 import org.apache.avro.Schema;
@@ -15,30 +28,5 @@ import static org.junit.Assert.assertEquals;
 public class JmsDatasetRuntimeTest {
 
     private final JmsDatasetRuntime datasetRuntime = new JmsDatasetRuntime();
-    /*
 
-     * Check {@link JmsDatasetRuntime#getEndpointSchema(RuntimeContainer)}}
-     * returns null in the jms case
-
-
-    @Test
-    public void testGetEndpointSchema() {
-        try {
-            Schema schema = datasetRuntime.getEndpointSchema(null);
-            assertEquals(null, schema);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-     * Check {@link JmsDatasetRuntime#initialize(RuntimeContainer, ComponentProperties)}
-     * Returns OK
-
-
-    @Test
-    public void initialize() {
-        ValidationResult result = datasetRuntime.initialize(null, null);
-        assertEquals(ValidationResult.OK, result);
-    }
-    */
 }

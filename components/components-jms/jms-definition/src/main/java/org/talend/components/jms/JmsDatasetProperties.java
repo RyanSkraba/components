@@ -20,24 +20,15 @@ import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
-
-/*
- * import javax.jms.ConnectionFactory;
- * import javax.jms.JMSException;
- * import javax.jms.QueueConnection;
- * import javax.jms.QueueConnectionFactory;
- * import javax.jms.TopicConnection;
- * import javax.jms.TopicConnectionFactory;
- * import javax.naming.Context;
- * import javax.naming.InitialContext;
- * import javax.naming.NamingException;
- */
+import org.talend.daikon.properties.property.PropertyFactory;
 
 public class JmsDatasetProperties extends PropertiesImpl implements DatasetProperties<JmsDatastoreProperties> {
 
     public final Property<JmsMessageType> msgType = newEnum("msgType", JmsMessageType.class).setRequired();
 
     public final Property<JmsProcessingMode> processingMode = newEnum("processingMode", JmsProcessingMode.class);
+
+    public final Property<String> queueTopicName = PropertyFactory.newString("queueTopicName", "");
 
     public final transient ReferenceProperties<JmsDatastoreProperties> datastoreRef = new ReferenceProperties<>("datastoreRef",
             JmsDatastoreDefinition.NAME);
@@ -66,31 +57,7 @@ public class JmsDatasetProperties extends PropertiesImpl implements DatasetPrope
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(msgType);
+        mainForm.addRow(queueTopicName);
         mainForm.addRow(processingMode);
     }
-
-    /*
-     * public QueueConnection getQueueConnectionFactory() {
-     * 
-     * InitialContext context;
-     * Hashtable env = new Hashtable();
-     * env.put(Context.INITIAL_CONTEXT_FACTORY,datastore.contextProvider);
-     * env.put(Context.PROVIDER_URL, datastore.serverUrl);
-     * QueueConnection connection = null;
-     * try {
-     * context = new InitialContext(env);
-     * QueueConnectionFactory qcf = (javax.jms.QueueConnectionFactory)context.lookup(datastore.connectionFactoryName.getValue());
-     * if (datastore.needUserIdentity.getValue()) {
-     * connection = qcf.createQueueConnection(datastore.userName.getValue(),datastore.userPassword.getValue());
-     * } else {
-     * connection = qcf.createQueueConnection();
-     * }
-     * } catch (NamingException e) {
-     * e.printStackTrace();
-     * } catch (JMSException e) {
-     * e.printStackTrace();
-     * }
-     * return connection;
-     * }
-     */
 }

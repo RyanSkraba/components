@@ -27,7 +27,7 @@ import org.talend.daikon.runtime.RuntimeInfo;
 
 public class JmsInputDefinition extends AbstractComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tJmsInput"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "JmsInput"; //$NON-NLS-1$
 
     public static final String RUNTIME_1_1 = "org.talend.components.jms.runtime_1_1.JmsSink";
 

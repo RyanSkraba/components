@@ -10,15 +10,17 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
+
 package org.talend.components.jms;
 
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.talend.components.service.spring.SpringTestApp;
+import org.junit.Test;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = SpringTestApp.class)
-public class SpringJmsComponentTestIT extends JmsComponentTestITBase {
-    // all test case are in the parent class.
+public class JmsDatastorePropertiesTestIT {
+
+    private JmsDatastoreProperties properties;
+
+    @Test
+    public void testConnection() {
+
+    }
 }

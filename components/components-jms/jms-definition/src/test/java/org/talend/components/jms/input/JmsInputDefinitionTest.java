@@ -15,6 +15,7 @@ package org.talend.components.jms.input;
 
 import org.junit.Test;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.properties.Properties;
 
@@ -26,14 +27,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class JmsInputDefinitionTest {
+
     private final JmsInputDefinition inputDefinition = new JmsInputDefinition();
 
     /**
-     * Check {@link JmsInputDefinition#getRuntimeInfo(ComponentProperties properties, ConnectorTopology connectorTopology)} returns RuntimeInfo,
+     * Check {@link JmsInputDefinition#getRuntimeInfo(ComponentProperties, ConnectorTopology)} returns RuntimeInfo,
      * which runtime class name is "org.talend.components.jms.runtime_1_1.JmsSink"
      */
     @Test
-    public void testGetRuntimeInfo(){
+    public void testGetRuntimeInfo() {
         RuntimeInfo runtimeInfo = inputDefinition.getRuntimeInfo(null, null);
         assertEquals("org.talend.components.jms.runtime_1_1.JmsSink", runtimeInfo.getRuntimeClassName());
     }
@@ -48,20 +50,21 @@ public class JmsInputDefinitionTest {
         String canonicalName = propertyClass.getCanonicalName();
         assertThat(canonicalName, equalTo("org.talend.components.jms.input.JmsInputProperties"));
     }
+
     /**
-     * Check {@link JmsInputDefinition#getName()} returns "tJIRAInput"
+     * Check {@link JmsInputDefinition#getName()} returns "JmsInput"
      */
     @Test
     public void testGetName() {
         String componentName = inputDefinition.getName();
-        assertEquals(componentName, "tJmsInput");
+        assertEquals(componentName, "JmsInput");
     }
 
     /**
      * Check {@link JmsInputDefinition#getSupportedConnectorTopologies()} returns ConnectorTopology.OUTGOING
      */
     @Test
-    public void testGetSupportedConnectorTopologies(){
+    public void testGetSupportedConnectorTopologies() {
         Set<ConnectorTopology> test = inputDefinition.getSupportedConnectorTopologies();
         assertTrue(test.contains(ConnectorTopology.OUTGOING));
     }

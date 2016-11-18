@@ -25,18 +25,19 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
+import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
+
 public class JmsOutputProperties extends ComponentPropertiesImpl implements IOProperties {
 
     public enum JmsAdvancedDeliveryMode {
-        Non_persistent,
-        persistent
+        NON_PERSISTENT,
+        PERSISTENT
     }
 
     public JmsOutputProperties(String name) {
         super(name);
     }
-
-    public Property<String> to = PropertyFactory.newString("to", "");
 
     public Property<JmsAdvancedDeliveryMode> delivery_mode = newEnum("delivery_mode", JmsAdvancedDeliveryMode.class)
             .setRequired();
@@ -74,7 +75,6 @@ public class JmsOutputProperties extends ComponentPropertiesImpl implements IOPr
     public void setupLayout() {
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
-        mainForm.addRow(to);
 
         Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(delivery_mode);

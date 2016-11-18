@@ -18,6 +18,7 @@ import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.io.IOProperties;
 import org.talend.components.jms.JmsDatasetDefinition;
 import org.talend.components.jms.JmsDatasetProperties;
+
 import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
@@ -28,8 +29,6 @@ public class JmsInputProperties extends ComponentPropertiesImpl implements IOPro
     public JmsInputProperties(String name) {
         super(name);
     }
-
-    public Property<String> from = PropertyFactory.newString("from", "");
 
     public Property<Integer> timeout = PropertyFactory.newInteger("timeout", -1);
 
@@ -44,7 +43,6 @@ public class JmsInputProperties extends ComponentPropertiesImpl implements IOPro
     public void setupLayout() {
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
-        mainForm.addRow(from);
         mainForm.addRow(timeout);
         mainForm.addRow(max_msg);
         mainForm.addRow(msg_selector);
