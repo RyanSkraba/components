@@ -102,7 +102,7 @@ public class DependenciesReader {
      * and return a list of mvn url strings following the <a href="https://ops4j1.jira.com/wiki/display/paxurl/Mvn+Protocol"
      * >pax-urm mvn</a> protocol
      * .<br>
-     * this will ignore test dependencies.
+     * this will ignore test and system dependencies.
      * 
      * 
      * 
@@ -119,11 +119,26 @@ public class DependenciesReader {
         // forEach(line -> mvnUris.add(parseMvnUri(line)));
         while (reader.ready()) {
             String line = reader.readLine();
-            if ((org.apache.commons.lang3.StringUtils.countMatches(line, ":") > 3) && !line.endsWith("test")) {
+            if (isRequiredDependency(line)) {
                 mvnUris.add(parseMvnUri(line));
             } // else not an expected dependencies so ignor it.
         }
         return mvnUris;
+    }
+    
+    /**
+     * Checks whether dependency is correct and required.
+     * Required dependencies are: compile, runtime, provided
+     * Also dependency should be fully described. It should contain gav, classifier and scope
+     * (totally 5 fields, thus 4 ":" separators between fields)
+     * 
+     * @param dependencyLine line from dependencies.txt file describing component dependencies
+     * @return true, if dependency is required; false - otherwise
+     */
+    private boolean isRequiredDependency(String dependencyLine) {
+        boolean result = (StringUtils.countMatches(dependencyLine, ":") > 3) && !dependencyLine.endsWith("test")
+                && !dependencyLine.endsWith("system");
+        return result;
     }
 
     public String getDependencyFilePath() {
