@@ -13,15 +13,11 @@
 package org.talend.components.jdbc.dataprep;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
-import org.apache.avro.Schema;
-import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -31,14 +27,13 @@ import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.jdbc.common.DBTestUtils;
-import org.talend.components.jdbc.dataprep.di.TDataPrepDBInputDefinition;
-import org.talend.components.jdbc.dataprep.di.TDataPrepDBInputProperties;
-import org.talend.components.jdbc.runtime.JDBCSource;
+import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
+import org.talend.components.jdbc.datastore.JDBCDatastoreDefinition;
+import org.talend.components.jdbc.datastore.JDBCDatastoreProperties;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
-import org.talend.daikon.NamedThing;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
-public class TDataPrepDBInputTestIT {
+public class JDBCInputTestIT {
 
     public static AllSetting allSetting;
 
@@ -59,57 +54,13 @@ public class TDataPrepDBInputTestIT {
         DBTestUtils.truncateTableAndLoadData(allSetting);
     }
 
-    @Test
-    public void testGetSchemaNames() throws Exception {
-        TDataPrepDBInputDefinition definition = new TDataPrepDBInputDefinition();
-        TDataPrepDBInputProperties properties = createCommonJDBCInputProperties(definition);
-
-        properties.main.schema.setValue(DBTestUtils.createTestSchema());
-        properties.sql.setValue(DBTestUtils.getSQL());
-
-        JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
-
-        List<NamedThing> schemaNames = source.getSchemaNames(null);
-        assertTrue(schemaNames != null);
-        assertTrue(!schemaNames.isEmpty());
-
-        boolean exists = false;
-        for (NamedThing name : schemaNames) {
-            if ("TEST".equals(name.getName().toUpperCase())) {
-                exists = true;
-                break;
-            }
-        }
-
-        assertTrue(exists);
-    }
-
-    @Test
-    public void testGetSchema() throws Exception {
-        TDataPrepDBInputDefinition definition = new TDataPrepDBInputDefinition();
-        TDataPrepDBInputProperties properties = createCommonJDBCInputProperties(definition);
-
-        properties.main.schema.setValue(DBTestUtils.createTestSchema());
-        properties.sql.setValue(DBTestUtils.getSQL());
-
-        JDBCSource source = DBTestUtils.createCommonJDBCSource(properties);
-
-        Schema schema = source.getEndpointSchema(null, "TEST");
-        assertEquals("TEST", schema.getName().toUpperCase());
-        List<Field> columns = schema.getFields();
-        DBTestUtils.testMetadata(columns);
-    }
-
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
     public void testReader() {
         Reader reader = null;
         try {
-            TDataPrepDBInputDefinition definition = new TDataPrepDBInputDefinition();
-            TDataPrepDBInputProperties properties = createCommonJDBCInputProperties(definition);
-
-            properties.main.schema.setValue(DBTestUtils.createTestSchema());
-            properties.sql.setValue(DBTestUtils.getSQL());
+            JDBCInputDefinition definition = new JDBCInputDefinition();
+            JDBCInputProperties properties = createCommonJDBCInputProperties(definition);
 
             reader = DBTestUtils.createCommonJDBCInputReader(properties);
 
@@ -161,11 +112,8 @@ public class TDataPrepDBInputTestIT {
     @SuppressWarnings({ "rawtypes" })
     @Test
     public void testType() throws Exception {
-        TDataPrepDBInputDefinition definition = new TDataPrepDBInputDefinition();
-        TDataPrepDBInputProperties properties = createCommonJDBCInputProperties(definition);
-
-        properties.main.schema.setValue(DBTestUtils.createTestSchema());
-        properties.sql.setValue(DBTestUtils.getSQL());
+        JDBCInputDefinition definition = new JDBCInputDefinition();
+        JDBCInputProperties properties = createCommonJDBCInputProperties(definition);
 
         Reader reader = DBTestUtils.createCommonJDBCInputReader(properties);
 
@@ -187,15 +135,26 @@ public class TDataPrepDBInputTestIT {
         }
     }
 
-    private TDataPrepDBInputProperties createCommonJDBCInputProperties(TDataPrepDBInputDefinition definition) {
-        TDataPrepDBInputProperties properties = (TDataPrepDBInputProperties) definition.createRuntimeProperties();
+    private JDBCInputProperties createCommonJDBCInputProperties(JDBCInputDefinition definition) {
+        JDBCDatastoreDefinition datastore_def = new JDBCDatastoreDefinition();
+        JDBCDatastoreProperties datastore_props = new JDBCDatastoreProperties("datastore");
 
-        properties.dbTypes.setValue("DERBY");
-        properties.jdbcUrl.setValue(allSetting.getJdbcUrl());
-        properties.driverClass.setValue(allSetting.getDriverClass());
+        datastore_props.dbTypes.setValue("DERBY");
+        datastore_props.afterDbTypes();
 
-        properties.userPassword.userId.setValue(allSetting.getUsername());
-        properties.userPassword.password.setValue(allSetting.getPassword());
+        datastore_props.driverClass.setValue(allSetting.getDriverClass());
+        datastore_props.jdbcUrl.setValue(allSetting.getJdbcUrl());
+        datastore_props.userPassword.userId.setValue(allSetting.getUsername());
+        datastore_props.userPassword.password.setValue(allSetting.getPassword());
+
+        JDBCDatasetProperties dataset = (JDBCDatasetProperties) datastore_def.createDatasetProperties(datastore_props);
+        dataset.sql.setValue(DBTestUtils.getSQL());
+
+        dataset.updateSchema();
+
+        JDBCInputProperties properties = (JDBCInputProperties) definition.createRuntimeProperties();
+        properties.setDatasetProperties(dataset);
+
         return properties;
     }
 

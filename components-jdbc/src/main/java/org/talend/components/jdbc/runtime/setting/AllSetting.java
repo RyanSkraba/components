@@ -3,6 +3,7 @@ package org.talend.components.jdbc.runtime.setting;
 import java.io.Serializable;
 import java.util.List;
 
+import org.apache.avro.Schema;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCAvroRegistryInfluencer;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties.DataAction;
@@ -291,6 +292,18 @@ public class AllSetting implements Serializable, JDBCAvroRegistryInfluencer {
     @Override
     public boolean trim() {
         return trimStringOrCharColumns;
+    }
+
+    // TODO this is a temp fix, need to remove it after the CommonUtils.getMainSchemaFromOutputConnector can work for datastore
+    // and dataset. Better to find the schema by the connector, not this.
+    private Schema schema;
+
+    public Schema getSchema() {
+        return schema;
+    }
+
+    public void setSchema(Schema schema) {
+        this.schema = schema;
     }
 
 }

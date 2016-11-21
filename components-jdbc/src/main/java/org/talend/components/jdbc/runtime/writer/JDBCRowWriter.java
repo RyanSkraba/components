@@ -97,8 +97,8 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
         this.writeOperation = writeOperation;
         this.runtime = runtime;
         sink = (JDBCRowSink) writeOperation.getSink();
-        setting = ((RuntimeSettingProvider) sink.properties).getRuntimeSetting();
-        properties = (RuntimeSettingProvider) sink.properties;
+        setting = sink.properties.getRuntimeSetting();
+        properties = sink.properties;
 
         useExistedConnection = setting.getReferencedComponentId() != null;
         if (!useExistedConnection) {

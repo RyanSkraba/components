@@ -1,18 +1,23 @@
 package org.talend.components.jdbc;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.SchemaProperties;
+import org.talend.components.jdbc.module.JDBCConnectionModule;
+import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.presentation.Form;
 
 public class CommonUtils {
 
     public static Schema getSchema(SchemaProperties schema) {
-        return (Schema) schema.schema.getValue();
+        return schema.schema.getValue();
     }
 
     public static Form addForm(Properties props, String formName) {
@@ -83,5 +88,37 @@ public class CommonUtils {
         }
 
         return null;
+    }
+
+    public static Schema newSchema(Schema metadataSchema, String newSchemaName, List<Schema.Field> moreFields) {
+        Schema newSchema = Schema.createRecord(newSchemaName, metadataSchema.getDoc(), metadataSchema.getNamespace(),
+                metadataSchema.isError());
+
+        List<Schema.Field> copyFieldList = new ArrayList<>();
+        for (Schema.Field se : metadataSchema.getFields()) {
+            Schema.Field field = new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal(), se.order());
+            field.getObjectProps().putAll(se.getObjectProps());
+            for (Map.Entry<String, Object> entry : se.getObjectProps().entrySet()) {
+                field.addProp(entry.getKey(), entry.getValue());
+            }
+            copyFieldList.add(field);
+        }
+
+        copyFieldList.addAll(moreFields);
+
+        newSchema.setFields(copyFieldList);
+        for (Map.Entry<String, Object> entry : metadataSchema.getObjectProps().entrySet()) {
+            newSchema.addProp(entry.getKey(), entry.getValue());
+        }
+
+        return newSchema;
+    }
+
+    public static void setCommonConnectionInfo(AllSetting setting, JDBCConnectionModule connection) {
+        setting.setDriverPaths(connection.driverTable.drivers.getValue());
+        setting.setDriverClass(connection.driverClass.getValue());
+        setting.setJdbcUrl(connection.jdbcUrl.getValue());
+        setting.setUsername(connection.userPassword.userId.getValue());
+        setting.setPassword(connection.userPassword.password.getValue());
     }
 }

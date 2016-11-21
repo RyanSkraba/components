@@ -22,7 +22,6 @@ import org.talend.components.jdbc.runtime.JDBCRowSink;
 import org.talend.components.jdbc.runtime.JDBCRowSource;
 import org.talend.components.jdbc.runtime.JDBCRowSourceOrSink;
 import org.talend.components.jdbc.runtime.JDBCTemplate;
-import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 

@@ -17,7 +17,6 @@ import static org.talend.daikon.properties.presentation.Widget.widget;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.avro.Schema;
@@ -127,33 +126,9 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties
         field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
         additionalRejectFields.add(field);
 
-        Schema rejectSchema = newSchema(inputSchema, "rejectOutput", additionalRejectFields);
+        Schema rejectSchema = CommonUtils.newSchema(inputSchema, "rejectOutput", additionalRejectFields);
 
         schemaReject.schema.setValue(rejectSchema);
-    }
-
-    private Schema newSchema(Schema metadataSchema, String newSchemaName, List<Schema.Field> moreFields) {
-        Schema newSchema = Schema.createRecord(newSchemaName, metadataSchema.getDoc(), metadataSchema.getNamespace(),
-                metadataSchema.isError());
-
-        List<Schema.Field> copyFieldList = new ArrayList<>();
-        for (Schema.Field se : metadataSchema.getFields()) {
-            Schema.Field field = new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal(), se.order());
-            field.getObjectProps().putAll(se.getObjectProps());
-            for (Map.Entry<String, Object> entry : se.getObjectProps().entrySet()) {
-                field.addProp(entry.getKey(), entry.getValue());
-            }
-            copyFieldList.add(field);
-        }
-
-        copyFieldList.addAll(moreFields);
-
-        newSchema.setFields(copyFieldList);
-        for (Map.Entry<String, Object> entry : metadataSchema.getObjectProps().entrySet()) {
-            newSchema.addProp(entry.getKey(), entry.getValue());
-        }
-
-        return newSchema;
     }
 
     @Override
@@ -274,11 +249,7 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties
         setting.setReferencedComponentId(referencedComponent.componentInstanceId.getValue());
         setting.setReferencedComponentProperties(referencedComponent.componentProperties);
 
-        setting.setDriverPaths(this.connection.driverTable.drivers.getValue());
-        setting.setDriverClass(this.connection.driverClass.getValue());
-        setting.setJdbcUrl(this.connection.jdbcUrl.getValue());
-        setting.setUsername(this.connection.userPassword.userId.getValue());
-        setting.setPassword(this.connection.userPassword.password.getValue());
+        CommonUtils.setCommonConnectionInfo(setting, connection);
 
         setting.setTablename(this.tableSelection.tablename.getValue());
         setting.setDataAction(this.dataAction.getValue());

@@ -117,11 +117,7 @@ public class TJDBCConnectionProperties extends ComponentPropertiesImpl implement
     public AllSetting getRuntimeSetting() {
         AllSetting setting = new AllSetting();
 
-        setting.setDriverPaths(this.connection.driverTable.drivers.getValue());
-        setting.setDriverClass(this.connection.driverClass.getValue());
-        setting.setJdbcUrl(this.connection.jdbcUrl.getValue());
-        setting.setUsername(this.connection.userPassword.userId.getValue());
-        setting.setPassword(this.connection.userPassword.password.getValue());
+        CommonUtils.setCommonConnectionInfo(setting, connection);
 
         setting.setUseAutoCommit(this.useAutoCommit.getValue());
         setting.setAutocommit(this.autocommit.getValue());

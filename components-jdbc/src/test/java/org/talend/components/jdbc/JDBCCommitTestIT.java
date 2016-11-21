@@ -15,7 +15,6 @@ package org.talend.components.jdbc;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -50,16 +49,6 @@ import org.talend.daikon.properties.ValidationResult;
 
 public class JDBCCommitTestIT {
 
-    public static String driverClass;
-
-    private static String jdbcUrl;
-
-    private static String userId;
-
-    private static String password;
-
-    private static String tablename;
-
     public static AllSetting allSetting;
 
     private final String refComponentId = "tJDBCConnection1";
@@ -91,38 +80,20 @@ public class JDBCCommitTestIT {
     };
 
     @BeforeClass
-    public static void init() throws Exception {
-        java.util.Properties props = new java.util.Properties();
-        try (InputStream is = JDBCCommitTestIT.class.getClassLoader().getResourceAsStream("connection.properties")) {
-            props = new java.util.Properties();
-            props.load(is);
-        }
+    public static void beforeClass() throws Exception {
+        allSetting = DBTestUtils.createAllSetting();
 
-        driverClass = props.getProperty("driverClass");
-
-        jdbcUrl = props.getProperty("jdbcUrl");
-
-        userId = props.getProperty("userId");
-
-        password = props.getProperty("password");
-
-        tablename = props.getProperty("tablename");
-
-        allSetting = new AllSetting();
-        allSetting.setDriverClass(driverClass);
-        allSetting.setJdbcUrl(jdbcUrl);
-        allSetting.setUsername(userId);
-        allSetting.setPassword(password);
+        DBTestUtils.createTable(allSetting);
     }
 
     @AfterClass
-    public static void clean() throws ClassNotFoundException, SQLException {
+    public static void afterClass() throws ClassNotFoundException, SQLException {
         DBTestUtils.releaseResource(allSetting);
     }
 
     @Before
-    public void before() throws ClassNotFoundException, SQLException, Exception {
-        DBTestUtils.prepareTableAndData(allSetting);
+    public void before() throws SQLException, ClassNotFoundException {
+        DBTestUtils.truncateTableAndLoadData(allSetting);
     }
 
     @SuppressWarnings("rawtypes")
@@ -130,7 +101,8 @@ public class JDBCCommitTestIT {
     public void testCommit() throws IOException, ClassNotFoundException, SQLException {
         // connection part
         TJDBCConnectionDefinition connectionDefinition = new TJDBCConnectionDefinition();
-        TJDBCConnectionProperties connectionProperties = createCommonJDBCConnectionProperties(connectionDefinition);
+        TJDBCConnectionProperties connectionProperties = DBTestUtils.createCommonJDBCConnectionProperties(allSetting,
+                connectionDefinition);
 
         JDBCSourceOrSink sourceOrSink = new JDBCSourceOrSink();
         sourceOrSink.initialize(null, connectionProperties);
@@ -145,7 +117,7 @@ public class JDBCCommitTestIT {
         outputProperties.main.schema.setValue(DBTestUtils.createTestSchema());
         outputProperties.updateOutputSchemas();
 
-        outputProperties.tableSelection.tablename.setValue(tablename);
+        outputProperties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
 
         outputProperties.dataAction.setValue(DataAction.INSERT);
 
@@ -204,20 +176,19 @@ public class JDBCCommitTestIT {
 
         Assert.assertEquals(5, count);
 
-        java.sql.Connection refConnection = (java.sql.Connection) container.getComponentData(refComponentId,
-                ComponentConstants.CONNECTION_KEY);
-
-        assertTrue(refConnection != null);
-        Assert.assertTrue(!refConnection.isClosed());
-        refConnection.close();
-
+        try (java.sql.Connection refConnection = (java.sql.Connection) container.getComponentData(refComponentId,
+                ComponentConstants.CONNECTION_KEY)) {
+            assertTrue(refConnection != null);
+            Assert.assertTrue(!refConnection.isClosed());
+        }
     }
 
     @Test
     public void testClose() throws IOException, ClassNotFoundException, SQLException {
         // connection part
         TJDBCConnectionDefinition connectionDefinition = new TJDBCConnectionDefinition();
-        TJDBCConnectionProperties connectionProperties = createCommonJDBCConnectionProperties(connectionDefinition);
+        TJDBCConnectionProperties connectionProperties = DBTestUtils.createCommonJDBCConnectionProperties(allSetting,
+                connectionDefinition);
 
         JDBCSourceOrSink sourceOrSink = new JDBCSourceOrSink();
         sourceOrSink.initialize(null, connectionProperties);
@@ -236,24 +207,11 @@ public class JDBCCommitTestIT {
         commitSourceOrSink.initialize(container, commitProperties);
         commitSourceOrSink.validate(container);
 
-        java.sql.Connection refConnection = (java.sql.Connection) container.getComponentData(refComponentId,
-                ComponentConstants.CONNECTION_KEY);
-
-        assertTrue(refConnection != null);
-        Assert.assertTrue(refConnection.isClosed());
-    }
-
-    private TJDBCConnectionProperties createCommonJDBCConnectionProperties(TJDBCConnectionDefinition connectionDefinition) {
-        TJDBCConnectionProperties connectionProperties = (TJDBCConnectionProperties) connectionDefinition
-                .createRuntimeProperties();
-
-        // TODO now framework doesn't support to load the JDBC jar by the setting
-        // properties.connection.driverJar.setValue("port", props.getProperty("port"));
-        connectionProperties.connection.driverClass.setValue(driverClass);
-        connectionProperties.connection.jdbcUrl.setValue(jdbcUrl);
-        connectionProperties.connection.userPassword.userId.setValue(userId);
-        connectionProperties.connection.userPassword.password.setValue(password);
-        return connectionProperties;
+        try (java.sql.Connection refConnection = (java.sql.Connection) container.getComponentData(refComponentId,
+                ComponentConstants.CONNECTION_KEY)) {
+            assertTrue(refConnection != null);
+            Assert.assertTrue(refConnection.isClosed());
+        }
     }
 
 }

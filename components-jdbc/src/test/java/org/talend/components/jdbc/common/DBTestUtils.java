@@ -3,9 +3,11 @@ package org.talend.components.jdbc.common;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
 import org.apache.avro.generic.GenericData;
@@ -32,11 +35,15 @@ import org.talend.components.jdbc.runtime.JDBCTemplate;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.runtime.writer.JDBCOutputWriter;
 import org.talend.components.jdbc.runtime.writer.JDBCRowWriter;
+import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionDefinition;
+import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionProperties;
 import org.talend.components.jdbc.tjdbcinput.TJDBCInputDefinition;
 import org.talend.components.jdbc.tjdbcinput.TJDBCInputProperties;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputDefinition;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties.DataAction;
+import org.talend.components.jdbc.tjdbcrow.TJDBCRowDefinition;
+import org.talend.components.jdbc.tjdbcrow.TJDBCRowProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
@@ -68,26 +75,30 @@ public class DBTestUtils {
     public static void releaseResource(AllSetting allSetting) throws ClassNotFoundException, SQLException {
         try (Connection conn = JDBCTemplate.createConnection(allSetting)) {
             dropTestTable(conn);
-        } catch (Exception e) {
-            // do nothing
         } finally {
             shutdownDBIfNecessary();
         }
     }
 
-    public static void createTestTable(Connection conn) throws Exception {
+    public static void createTestTable(Connection conn) throws SQLException {
         try (Statement statement = conn.createStatement()) {
             statement.execute("create table TEST (ID int, NAME varchar(8))");
         }
     }
 
-    public static void dropTestTable(Connection conn) throws Exception {
+    public static void dropTestTable(Connection conn) throws SQLException {
         try (Statement statement = conn.createStatement()) {
             statement.execute("drop table TEST");
         }
     }
 
-    public static void loadTestData(Connection conn) throws Exception {
+    public static void truncateTable(Connection conn) throws SQLException {
+        try (Statement statement = conn.createStatement()) {
+            statement.execute("delete from TEST");
+        }
+    }
+
+    public static void loadTestData(Connection conn) throws SQLException {
         try (PreparedStatement statement = conn.prepareStatement("insert into TEST values(?,?)")) {
             statement.setInt(1, 1);
             statement.setString(2, "wangwei");
@@ -124,14 +135,15 @@ public class DBTestUtils {
         return builder.endRecord();
     }
 
-    public static void prepareTableAndData(AllSetting allSetting) throws ClassNotFoundException, SQLException, Exception {
+    public static void createTable(AllSetting allSetting) throws Exception {
         try (Connection conn = JDBCTemplate.createConnection(allSetting)) {
-            try {
-                dropTestTable(conn);
-            } catch (Exception e) {
-                // do nothing
-            }
             createTestTable(conn);
+        }
+    }
+
+    public static void truncateTableAndLoadData(AllSetting allSetting) throws ClassNotFoundException, SQLException {
+        try (Connection conn = JDBCTemplate.createConnection(allSetting)) {
+            truncateTable(conn);
             loadTestData(conn);
         }
     }
@@ -151,15 +163,15 @@ public class DBTestUtils {
         return builder.endRecord();
     }
 
-    public static void prepareTableAndDataForEveryType(AllSetting allSetting)
-            throws ClassNotFoundException, SQLException, Exception {
+    public static void createTableForEveryType(AllSetting allSetting) throws SQLException, ClassNotFoundException {
         try (Connection conn = JDBCTemplate.createConnection(allSetting)) {
-            try {
-                dropTestTable(conn);
-            } catch (Exception e) {
-                // do nothing
-            }
             createTestTableForEveryType(conn);
+        }
+    }
+
+    public static void truncateTableAndLoadDataForEveryType(AllSetting allSetting) throws SQLException, ClassNotFoundException {
+        try (Connection conn = JDBCTemplate.createConnection(allSetting)) {
+            truncateTable(conn);
             loadTestDataForEveryType(conn);
         }
     }
@@ -646,4 +658,113 @@ public class DBTestUtils {
         return builder.endRecord();
     }
 
+    public static TJDBCConnectionProperties createCommonJDBCConnectionProperties(AllSetting allSetting,
+            TJDBCConnectionDefinition connectionDefinition) {
+        TJDBCConnectionProperties connectionProperties = (TJDBCConnectionProperties) connectionDefinition
+                .createRuntimeProperties();
+
+        // TODO now framework doesn't support to load the JDBC jar by the setting
+        // properties.connection.driverJar.setValue(null);
+        connectionProperties.connection.driverClass.setValue(allSetting.getDriverClass());
+        connectionProperties.connection.jdbcUrl.setValue(allSetting.getJdbcUrl());
+        connectionProperties.connection.userPassword.userId.setValue(allSetting.getUsername());
+        connectionProperties.connection.userPassword.password.setValue(allSetting.getPassword());
+        return connectionProperties;
+    }
+
+    public static TJDBCOutputProperties createCommonJDBCOutputProperties(AllSetting allSetting,
+            TJDBCOutputDefinition definition) {
+        TJDBCOutputProperties properties = (TJDBCOutputProperties) definition.createRuntimeProperties();
+
+        // TODO now framework doesn't support to load the JDBC jar by the setting
+        // properties.connection.driverJar.setValue(null);
+        properties.connection.driverClass.setValue(allSetting.getDriverClass());
+        properties.connection.jdbcUrl.setValue(allSetting.getJdbcUrl());
+        properties.connection.userPassword.userId.setValue(allSetting.getUsername());
+        properties.connection.userPassword.password.setValue(allSetting.getPassword());
+        return properties;
+    }
+
+    public static TJDBCInputProperties createCommonJDBCInputProperties(AllSetting allSetting, TJDBCInputDefinition definition) {
+        TJDBCInputProperties properties = (TJDBCInputProperties) definition.createRuntimeProperties();
+
+        // TODO now framework doesn't support to load the JDBC jar by the setting
+        // properties.connection.driverJar.setValue(null);
+        properties.connection.driverClass.setValue(allSetting.getDriverClass());
+        properties.connection.jdbcUrl.setValue(allSetting.getJdbcUrl());
+        properties.connection.userPassword.userId.setValue(allSetting.getUsername());
+        properties.connection.userPassword.password.setValue(allSetting.getPassword());
+        return properties;
+    }
+
+    public static TJDBCRowProperties createCommonJDBCRowProperties(AllSetting allSetting, TJDBCRowDefinition definition) {
+        TJDBCRowProperties properties = (TJDBCRowProperties) definition.createRuntimeProperties();
+
+        // properties.connection.driverTable.drivers.setValue(Arrays.asList(driverPath));
+        properties.connection.driverClass.setValue(allSetting.getDriverClass());
+        properties.connection.jdbcUrl.setValue(allSetting.getJdbcUrl());
+        properties.connection.userPassword.userId.setValue(allSetting.getUsername());
+        properties.connection.userPassword.password.setValue(allSetting.getPassword());
+        return properties;
+    }
+
+    private static java.util.Properties props = null;
+
+    public static AllSetting createAllSetting() throws IOException {
+        if (props == null) {
+            try (InputStream is = DBTestUtils.class.getClassLoader().getResourceAsStream("connection.properties")) {
+                props = new java.util.Properties();
+                props.load(is);
+            }
+        }
+
+        String driverClass = props.getProperty("driverClass");
+
+        String jdbcUrl = props.getProperty("jdbcUrl");
+
+        String userId = props.getProperty("userId");
+
+        String password = props.getProperty("password");
+
+        AllSetting allSetting = new AllSetting();
+
+        allSetting.setDriverClass(driverClass);
+        allSetting.setJdbcUrl(jdbcUrl);
+        allSetting.setUsername(userId);
+        allSetting.setPassword(password);
+
+        return allSetting;
+    }
+
+    public static String getTablename() {
+        return "TEST";
+    }
+
+    public static String getSQL() {
+        return "select * from TEST";
+    }
+
+    public static void testMetadata(List<Field> columns) {
+        Schema.Field field = columns.get(0);
+
+        assertEquals("ID", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
+        assertEquals(Schema.Type.INT, AvroUtils.unwrapIfNullable(field.schema()).getType());
+        assertEquals(java.sql.Types.INTEGER, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+        assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
+        assertEquals(10, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
+        assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
+        assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DEFAULT));
+
+        field = columns.get(1);
+
+        assertEquals("NAME", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
+        assertEquals(Schema.Type.STRING, AvroUtils.unwrapIfNullable(field.schema()).getType());
+        assertEquals(java.sql.Types.VARCHAR, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+        assertEquals(8, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
+        assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));
+        assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_SCALE));
+        assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DEFAULT));
+    }
 }

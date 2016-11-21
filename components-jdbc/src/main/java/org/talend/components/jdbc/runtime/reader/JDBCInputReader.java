@@ -26,10 +26,8 @@ import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
-import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCAvroRegistry;
 import org.talend.components.common.avro.JDBCResultSetIndexedRecordConverter;
-import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.JDBCSource;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
@@ -70,7 +68,9 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
 
     private Schema getSchema() throws IOException, SQLException {
         if (querySchema == null) {
-            querySchema = CommonUtils.getMainSchemaFromOutputConnector((ComponentProperties) properties);
+            // querySchema = CommonUtils.getMainSchemaFromOutputConnector((ComponentProperties) properties);
+            querySchema = setting.getSchema();
+
             if (AvroUtils.isIncludeAllFields(querySchema)) {
                 querySchema = JDBCAvroRegistry.get().inferSchema(resultSet.getMetaData());
             }

@@ -14,7 +14,6 @@ package org.talend.components.jdbc.runtime;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -28,6 +27,8 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCAvroRegistry;
+import org.talend.components.common.dataset.DatasetProperties;
+import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
@@ -47,6 +48,21 @@ public class JDBCSourceOrSink implements SourceOrSink {
 
     @Override
     public ValidationResult initialize(RuntimeContainer runtime, ComponentProperties properties) {
+        this.properties = (RuntimeSettingProvider) properties;
+        setting = this.properties.getRuntimeSetting();
+        return ValidationResult.OK;
+    }
+
+    // TODO adjust it, now only as a temp workaround for reuse current class in the datastore runtime
+    public ValidationResult initialize(RuntimeContainer runtime, DatastoreProperties properties) {
+        this.properties = (RuntimeSettingProvider) properties;
+        setting = this.properties.getRuntimeSetting();
+        return ValidationResult.OK;
+    }
+
+    // TODO adjust it, now only as a temp workaround for reuse current class in the dataset runtime
+    @SuppressWarnings("rawtypes")
+    public ValidationResult initialize(RuntimeContainer runtime, DatasetProperties properties) {
         this.properties = (RuntimeSettingProvider) properties;
         setting = this.properties.getRuntimeSetting();
         return ValidationResult.OK;
@@ -75,16 +91,6 @@ public class JDBCSourceOrSink implements SourceOrSink {
             fillValidationResult(vr, ex);
         }
         return vr;
-    }
-
-    private void closeQuietly(Connection conn) {
-        try {
-            if (conn != null) {
-                conn.close();
-            }
-        } catch (SQLException e) {
-            // close quietly
-        }
     }
 
     @Override
@@ -135,7 +141,8 @@ public class JDBCSourceOrSink implements SourceOrSink {
         // connection component
         Connection conn = JDBCTemplate.createConnection(setting);
 
-        if (setting.getUseAutoCommit()) {
+        Boolean autoCommit = setting.getUseAutoCommit();
+        if (autoCommit != null && autoCommit) {
             conn.setAutoCommit(setting.getAutocommit());
         }
 

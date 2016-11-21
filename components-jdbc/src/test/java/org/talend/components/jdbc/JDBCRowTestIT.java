@@ -16,7 +16,6 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 
-import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -53,59 +52,31 @@ import org.talend.daikon.sandbox.SandboxedInstance;
 
 public class JDBCRowTestIT {
 
-    private static String driverClass;
-
-    private static String jdbcUrl;
-
-    private static String userId;
-
-    private static String password;
-
-    private static String tablename;
-
     public static AllSetting allSetting;
 
     @BeforeClass
-    public static void init() throws Exception {
-        java.util.Properties props = new java.util.Properties();
-        try (InputStream is = JDBCRowTestIT.class.getClassLoader().getResourceAsStream("connection.properties")) {
-            props = new java.util.Properties();
-            props.load(is);
-        }
+    public static void beforeClass() throws Exception {
+        allSetting = DBTestUtils.createAllSetting();
 
-        driverClass = props.getProperty("driverClass");
-
-        jdbcUrl = props.getProperty("jdbcUrl");
-
-        userId = props.getProperty("userId");
-
-        password = props.getProperty("password");
-
-        tablename = props.getProperty("tablename");
-
-        allSetting = new AllSetting();
-        allSetting.setDriverClass(driverClass);
-        allSetting.setJdbcUrl(jdbcUrl);
-        allSetting.setUsername(userId);
-        allSetting.setPassword(password);
+        DBTestUtils.createTable(allSetting);
     }
 
     @AfterClass
-    public static void clean() throws ClassNotFoundException, SQLException {
+    public static void afterClass() throws ClassNotFoundException, SQLException {
         DBTestUtils.releaseResource(allSetting);
     }
 
     @Before
-    public void before() throws ClassNotFoundException, SQLException, Exception {
-        DBTestUtils.prepareTableAndData(allSetting);
+    public void before() throws Exception {
+        DBTestUtils.truncateTableAndLoadData(allSetting);
     }
 
     @Test
     public void test_basic_no_connector() throws Exception {
         TJDBCRowDefinition definition = new TJDBCRowDefinition();
-        TJDBCRowProperties properties = createCommonJDBCRowProperties(definition);
+        TJDBCRowProperties properties = DBTestUtils.createCommonJDBCRowProperties(allSetting, definition);
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         properties.sql.setValue("insert into test values(4, 'momo')");
         properties.dieOnError.setValue(true);
         randomCommit(properties);
@@ -119,9 +90,9 @@ public class JDBCRowTestIT {
         }
 
         TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
-        TJDBCInputProperties properties1 = createCommonJDBCInputProperties(definition1);
-        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(tablename, DBTestUtils.createTestSchema(),
-                definition1, properties1);
+        TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
+        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(DBTestUtils.getTablename(),
+                DBTestUtils.createTestSchema(), definition1, properties1);
 
         assertThat(records, hasSize(4));
         Assert.assertEquals(4, records.get(3).get(0));
@@ -131,17 +102,17 @@ public class JDBCRowTestIT {
     @Test
     public void test_use_preparedstatement_no_connector() throws Exception {
         TJDBCRowDefinition definition = new TJDBCRowDefinition();
-        TJDBCRowProperties properties = createCommonJDBCRowProperties(definition);
+        TJDBCRowProperties properties = DBTestUtils.createCommonJDBCRowProperties(allSetting, definition);
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         properties.sql.setValue("insert into test values(?, ?)");
         properties.dieOnError.setValue(true);
         randomCommit(properties);
 
         properties.usePreparedStatement.setValue(true);
-        properties.preparedStatementTable.indexs.setValue(Arrays.<Integer> asList(1, 2));
-        properties.preparedStatementTable.types.setValue(
-                Arrays.<String> asList(PreparedStatementTable.Type.Int.name(), PreparedStatementTable.Type.String.name()));
+        properties.preparedStatementTable.indexs.setValue(Arrays.asList(1, 2));
+        properties.preparedStatementTable.types
+                .setValue(Arrays.asList(PreparedStatementTable.Type.Int.name(), PreparedStatementTable.Type.String.name()));
         properties.preparedStatementTable.values.setValue(Arrays.<Object> asList(4, "momo"));
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(
@@ -153,9 +124,9 @@ public class JDBCRowTestIT {
         }
 
         TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
-        TJDBCInputProperties properties1 = createCommonJDBCInputProperties(definition1);
-        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(tablename, DBTestUtils.createTestSchema(),
-                definition1, properties1);
+        TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
+        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(DBTestUtils.getTablename(),
+                DBTestUtils.createTestSchema(), definition1, properties1);
 
         assertThat(records, hasSize(4));
         Assert.assertEquals(4, records.get(3).get(0));
@@ -165,9 +136,9 @@ public class JDBCRowTestIT {
     @Test
     public void test_die_on_error_no_connector() throws Exception {
         TJDBCRowDefinition definition = new TJDBCRowDefinition();
-        TJDBCRowProperties properties = createCommonJDBCRowProperties(definition);
+        TJDBCRowProperties properties = DBTestUtils.createCommonJDBCRowProperties(allSetting, definition);
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         properties.sql.setValue("insert into test values(4, 'a too long value')");
         properties.dieOnError.setValue(true);
         randomCommit(properties);
@@ -186,13 +157,13 @@ public class JDBCRowTestIT {
     @Test
     public void test_basic_as_input() throws Exception {
         TJDBCRowDefinition definition = new TJDBCRowDefinition();
-        TJDBCRowProperties properties = createCommonJDBCRowProperties(definition);
+        TJDBCRowProperties properties = DBTestUtils.createCommonJDBCRowProperties(allSetting, definition);
 
         Schema schema = DBTestUtils.createTestSchema4();
         properties.main.schema.setValue(schema);
         properties.updateOutputSchemas();
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         properties.sql.setValue("select id, name from test");
         properties.dieOnError.setValue(true);
         randomCommit(properties);
@@ -242,13 +213,13 @@ public class JDBCRowTestIT {
     @Test
     public void test_use_preparedstatement_as_input() throws Exception {
         TJDBCRowDefinition definition = new TJDBCRowDefinition();
-        TJDBCRowProperties properties = createCommonJDBCRowProperties(definition);
+        TJDBCRowProperties properties = DBTestUtils.createCommonJDBCRowProperties(allSetting, definition);
 
         Schema schema = DBTestUtils.createTestSchema4();
         properties.main.schema.setValue(schema);
         properties.updateOutputSchemas();
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         properties.sql.setValue("select id, name from test where id = ?");
         properties.dieOnError.setValue(true);
         randomCommit(properties);
@@ -259,8 +230,8 @@ public class JDBCRowTestIT {
         properties.useColumn.setValue(properties.useColumn.getPossibleValues().get(0).toString());
 
         properties.usePreparedStatement.setValue(true);
-        properties.preparedStatementTable.indexs.setValue(Arrays.<Integer> asList(1));
-        properties.preparedStatementTable.types.setValue(Arrays.<String> asList(PreparedStatementTable.Type.Int.name()));
+        properties.preparedStatementTable.indexs.setValue(Arrays.asList(1));
+        properties.preparedStatementTable.types.setValue(Arrays.asList(PreparedStatementTable.Type.Int.name()));
         properties.preparedStatementTable.values.setValue(Arrays.<Object> asList(1));
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(
@@ -295,13 +266,13 @@ public class JDBCRowTestIT {
     @Test
     public void test_reject_as_input() throws Exception {
         TJDBCRowDefinition definition = new TJDBCRowDefinition();
-        TJDBCRowProperties properties = createCommonJDBCRowProperties(definition);
+        TJDBCRowProperties properties = DBTestUtils.createCommonJDBCRowProperties(allSetting, definition);
 
         Schema schema = DBTestUtils.createTestSchema4();
         properties.main.schema.setValue(schema);
         properties.updateOutputSchemas();
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         properties.sql.setValue("select id, name from notexists");
         properties.dieOnError.setValue(false);
         randomCommit(properties);
@@ -345,21 +316,21 @@ public class JDBCRowTestIT {
     @Test
     public void test_basic_as_output() throws Exception {
         TJDBCRowDefinition definition = new TJDBCRowDefinition();
-        TJDBCRowProperties properties = createCommonJDBCRowProperties(definition);
+        TJDBCRowProperties properties = DBTestUtils.createCommonJDBCRowProperties(allSetting, definition);
 
         Schema schema = DBTestUtils.createTestSchema();
         properties.main.schema.setValue(schema);
         properties.updateOutputSchemas();
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         properties.sql.setValue("insert into test values(?,?)");
         properties.dieOnError.setValue(true);
         randomCommit(properties);
 
         properties.usePreparedStatement.setValue(true);
-        properties.preparedStatementTable.indexs.setValue(Arrays.<Integer> asList(1, 2));
-        properties.preparedStatementTable.types.setValue(
-                Arrays.<String> asList(PreparedStatementTable.Type.Int.name(), PreparedStatementTable.Type.String.name()));
+        properties.preparedStatementTable.indexs.setValue(Arrays.asList(1, 2));
+        properties.preparedStatementTable.types
+                .setValue(Arrays.asList(PreparedStatementTable.Type.Int.name(), PreparedStatementTable.Type.String.name()));
         properties.preparedStatementTable.values.setValue(Arrays.<Object> asList(4, "momo"));
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(
@@ -397,8 +368,9 @@ public class JDBCRowTestIT {
         }
 
         TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
-        TJDBCInputProperties properties1 = createCommonJDBCInputProperties(definition1);
-        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(tablename, schema, definition1, properties1);
+        TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
+        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(DBTestUtils.getTablename(), schema, definition1,
+                properties1);
 
         assertThat(records, hasSize(5));
         Assert.assertEquals(4, records.get(3).get(0));
@@ -411,21 +383,21 @@ public class JDBCRowTestIT {
     @Test
     public void test_reject_as_output() throws Exception {
         TJDBCRowDefinition definition = new TJDBCRowDefinition();
-        TJDBCRowProperties properties = createCommonJDBCRowProperties(definition);
+        TJDBCRowProperties properties = DBTestUtils.createCommonJDBCRowProperties(allSetting, definition);
 
         Schema schema = DBTestUtils.createTestSchema();
         properties.main.schema.setValue(schema);
         properties.updateOutputSchemas();
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         properties.sql.setValue("insert into test values(?,?)");
         properties.dieOnError.setValue(false);
         randomCommit(properties);
 
         properties.usePreparedStatement.setValue(true);
-        properties.preparedStatementTable.indexs.setValue(Arrays.<Integer> asList(1, 2));
-        properties.preparedStatementTable.types.setValue(
-                Arrays.<String> asList(PreparedStatementTable.Type.Int.name(), PreparedStatementTable.Type.String.name()));
+        properties.preparedStatementTable.indexs.setValue(Arrays.asList(1, 2));
+        properties.preparedStatementTable.types
+                .setValue(Arrays.asList(PreparedStatementTable.Type.Int.name(), PreparedStatementTable.Type.String.name()));
         properties.preparedStatementTable.values.setValue(Arrays.<Object> asList(4, "a too long value"));
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(
@@ -481,21 +453,21 @@ public class JDBCRowTestIT {
     @Test
     public void test_die_on_error_as_output() throws Exception {
         TJDBCRowDefinition definition = new TJDBCRowDefinition();
-        TJDBCRowProperties properties = createCommonJDBCRowProperties(definition);
+        TJDBCRowProperties properties = DBTestUtils.createCommonJDBCRowProperties(allSetting, definition);
 
         Schema schema = DBTestUtils.createTestSchema();
         properties.main.schema.setValue(schema);
         properties.updateOutputSchemas();
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         properties.sql.setValue("insert into test values(?,?)");
         properties.dieOnError.setValue(true);
         randomCommit(properties);
 
         properties.usePreparedStatement.setValue(true);
-        properties.preparedStatementTable.indexs.setValue(Arrays.<Integer> asList(1, 2));
-        properties.preparedStatementTable.types.setValue(
-                Arrays.<String> asList(PreparedStatementTable.Type.Int.name(), PreparedStatementTable.Type.String.name()));
+        properties.preparedStatementTable.indexs.setValue(Arrays.asList(1, 2));
+        properties.preparedStatementTable.types
+                .setValue(Arrays.asList(PreparedStatementTable.Type.Int.name(), PreparedStatementTable.Type.String.name()));
         properties.preparedStatementTable.values.setValue(Arrays.<Object> asList(4, "a too long value"));
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(
@@ -530,20 +502,20 @@ public class JDBCRowTestIT {
     @Test
     public void test_propagate_query_result_set_as_output() throws Exception {
         TJDBCRowDefinition definition = new TJDBCRowDefinition();
-        TJDBCRowProperties properties = createCommonJDBCRowProperties(definition);
+        TJDBCRowProperties properties = DBTestUtils.createCommonJDBCRowProperties(allSetting, definition);
 
         Schema schema = DBTestUtils.createTestSchema5();
         properties.main.schema.setValue(schema);
         properties.updateOutputSchemas();
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         properties.sql.setValue("select id, name from test where id = ?");
         properties.dieOnError.setValue(true);
         randomCommit(properties);
 
         properties.usePreparedStatement.setValue(true);
-        properties.preparedStatementTable.indexs.setValue(Arrays.<Integer> asList(1));
-        properties.preparedStatementTable.types.setValue(Arrays.<String> asList(PreparedStatementTable.Type.Int.name()));
+        properties.preparedStatementTable.indexs.setValue(Arrays.asList(1));
+        properties.preparedStatementTable.types.setValue(Arrays.asList(PreparedStatementTable.Type.Int.name()));
         properties.preparedStatementTable.values.setValue(Arrays.<Object> asList(3));
 
         properties.propagateQueryResultSet.setValue(true);
@@ -610,28 +582,6 @@ public class JDBCRowTestIT {
     private String randomCommit(TJDBCRowProperties properties) {
         properties.commitEvery.setValue(DBTestUtils.randomInt());
         return new StringBuilder().append("commitEvery:").append(properties.commitEvery.getValue()).toString();
-    }
-
-    private TJDBCRowProperties createCommonJDBCRowProperties(TJDBCRowDefinition definition) {
-        TJDBCRowProperties properties = (TJDBCRowProperties) definition.createRuntimeProperties();
-
-        // properties.connection.driverTable.drivers.setValue(Arrays.asList(driverPath));
-        properties.connection.driverClass.setValue(driverClass);
-        properties.connection.jdbcUrl.setValue(jdbcUrl);
-        properties.connection.userPassword.userId.setValue(userId);
-        properties.connection.userPassword.password.setValue(password);
-        return properties;
-    }
-
-    private TJDBCInputProperties createCommonJDBCInputProperties(TJDBCInputDefinition definition) {
-        TJDBCInputProperties properties = (TJDBCInputProperties) definition.createRuntimeProperties();
-
-        // properties.connection.driverTable.drivers.setValue(Arrays.asList(driverPath));
-        properties.connection.driverClass.setValue(driverClass);
-        properties.connection.jdbcUrl.setValue(jdbcUrl);
-        properties.connection.userPassword.userId.setValue(userId);
-        properties.connection.userPassword.password.setValue(password);
-        return properties;
     }
 
 }

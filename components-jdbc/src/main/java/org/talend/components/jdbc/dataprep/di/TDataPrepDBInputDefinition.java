@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.jdbc.dataprep;
+package org.talend.components.jdbc.dataprep.di;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -20,13 +20,12 @@ import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.runtime.JDBCSource;
 import org.talend.components.jdbc.runtime.JDBCTemplate;
-import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 public class TDataPrepDBInputDefinition extends AbstractComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tDataPrepDBInputDefinition";
+    public static final String COMPONENT_NAME = "tDataPrepDBInput";
 
     public TDataPrepDBInputDefinition() {
         super(COMPONENT_NAME);

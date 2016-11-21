@@ -15,7 +15,6 @@ package org.talend.components.jdbc;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -39,63 +38,35 @@ import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties.DataAction;
 
 public class JDBCOutputTestIT {
 
-    private static String driverClass;
-
-    private static String jdbcUrl;
-
-    private static String userId;
-
-    private static String password;
-
-    private static String tablename;
-
     private static AllSetting allSetting;
 
     @BeforeClass
-    public static void init() throws Exception {
-        java.util.Properties props = new java.util.Properties();
-        try (InputStream is = JDBCOutputTestIT.class.getClassLoader().getResourceAsStream("connection.properties")) {
-            props = new java.util.Properties();
-            props.load(is);
-        }
+    public static void beforeClass() throws Exception {
+        allSetting = DBTestUtils.createAllSetting();
 
-        driverClass = props.getProperty("driverClass");
-
-        jdbcUrl = props.getProperty("jdbcUrl");
-
-        userId = props.getProperty("userId");
-
-        password = props.getProperty("password");
-
-        tablename = props.getProperty("tablename");
-
-        allSetting = new AllSetting();
-        allSetting.setDriverClass(driverClass);
-        allSetting.setJdbcUrl(jdbcUrl);
-        allSetting.setUsername(userId);
-        allSetting.setPassword(password);
+        DBTestUtils.createTable(allSetting);
     }
 
     @AfterClass
-    public static void clean() throws ClassNotFoundException, SQLException {
+    public static void afterClass() throws ClassNotFoundException, SQLException {
         DBTestUtils.releaseResource(allSetting);
     }
 
     @Before
-    public void before() throws ClassNotFoundException, SQLException, Exception {
-        DBTestUtils.prepareTableAndData(allSetting);
+    public void before() throws Exception {
+        DBTestUtils.truncateTableAndLoadData(allSetting);
     }
 
     @Test
     public void testInsert() throws Exception {
         TJDBCOutputDefinition definition = new TJDBCOutputDefinition();
-        TJDBCOutputProperties properties = createCommonJDBCOutputProperties(definition);
+        TJDBCOutputProperties properties = DBTestUtils.createCommonJDBCOutputProperties(allSetting, definition);
 
         Schema schema = DBTestUtils.createTestSchema();
         properties.main.schema.setValue(schema);
         properties.updateOutputSchemas();
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         properties.dataAction.setValue(DataAction.INSERT);
         properties.dieOnError.setValue(true);
 
@@ -126,8 +97,9 @@ public class JDBCOutputTestIT {
         }
 
         TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
-        TJDBCInputProperties properties1 = createCommonJDBCInputProperties(definition1);
-        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(tablename, schema, definition1, properties1);
+        TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
+        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(DBTestUtils.getTablename(), schema, definition1,
+                properties1);
 
         assertThat(records, hasSize(5));
         Assert.assertEquals(4, records.get(3).get(0));
@@ -139,13 +111,13 @@ public class JDBCOutputTestIT {
     @Test
     public void testInsertReject() throws Exception {
         TJDBCOutputDefinition definition = new TJDBCOutputDefinition();
-        TJDBCOutputProperties properties = createCommonJDBCOutputProperties(definition);
+        TJDBCOutputProperties properties = DBTestUtils.createCommonJDBCOutputProperties(allSetting, definition);
 
         Schema schema = DBTestUtils.createTestSchema();
         properties.main.schema.setValue(schema);
         properties.updateOutputSchemas();
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         properties.dataAction.setValue(DataAction.INSERT);
         properties.useBatch.setValue(false);// reject function can't work with batch function
 
@@ -197,8 +169,9 @@ public class JDBCOutputTestIT {
         }
 
         TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
-        TJDBCInputProperties properties1 = createCommonJDBCInputProperties(definition1);
-        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(tablename, schema, definition1, properties1);
+        TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
+        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(DBTestUtils.getTablename(), schema, definition1,
+                properties1);
 
         assertThat(records, hasSize(6));
         Assert.assertEquals(4, records.get(3).get(0));
@@ -212,13 +185,13 @@ public class JDBCOutputTestIT {
     @Test
     public void testUpdate() throws Exception {
         TJDBCOutputDefinition definition = new TJDBCOutputDefinition();
-        TJDBCOutputProperties properties = createCommonJDBCOutputProperties(definition);
+        TJDBCOutputProperties properties = DBTestUtils.createCommonJDBCOutputProperties(allSetting, definition);
 
         Schema schema = DBTestUtils.createTestSchema2();
         properties.main.schema.setValue(schema);
         properties.updateOutputSchemas();
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         properties.dataAction.setValue(DataAction.UPDATE);
         properties.dieOnError.setValue(true);
 
@@ -249,8 +222,9 @@ public class JDBCOutputTestIT {
         }
 
         TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
-        TJDBCInputProperties properties1 = createCommonJDBCInputProperties(definition1);
-        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(tablename, schema, definition1, properties1);
+        TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
+        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(DBTestUtils.getTablename(), schema, definition1,
+                properties1);
 
         assertThat(records, hasSize(3));
         Assert.assertEquals(1, records.get(0).get(0));
@@ -264,13 +238,13 @@ public class JDBCOutputTestIT {
     @Test
     public void testUpdateReject() throws Exception {
         TJDBCOutputDefinition definition = new TJDBCOutputDefinition();
-        TJDBCOutputProperties properties = createCommonJDBCOutputProperties(definition);
+        TJDBCOutputProperties properties = DBTestUtils.createCommonJDBCOutputProperties(allSetting, definition);
 
         Schema schema = DBTestUtils.createTestSchema2();
         properties.main.schema.setValue(schema);
         properties.updateOutputSchemas();
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         properties.dataAction.setValue(DataAction.UPDATE);
         properties.useBatch.setValue(false);// reject function can't work with batch function
 
@@ -322,8 +296,9 @@ public class JDBCOutputTestIT {
         }
 
         TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
-        TJDBCInputProperties properties1 = createCommonJDBCInputProperties(definition1);
-        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(tablename, schema, definition1, properties1);
+        TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
+        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(DBTestUtils.getTablename(), schema, definition1,
+                properties1);
 
         assertThat(records, hasSize(3));
         Assert.assertEquals(1, records.get(0).get(0));
@@ -337,13 +312,13 @@ public class JDBCOutputTestIT {
     @Test
     public void testDelete() throws Exception {
         TJDBCOutputDefinition definition = new TJDBCOutputDefinition();
-        TJDBCOutputProperties properties = createCommonJDBCOutputProperties(definition);
+        TJDBCOutputProperties properties = DBTestUtils.createCommonJDBCOutputProperties(allSetting, definition);
 
         Schema schema = DBTestUtils.createTestSchema2();
         properties.main.schema.setValue(schema);
         properties.updateOutputSchemas();
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         properties.dataAction.setValue(DataAction.DELETE);
         properties.dieOnError.setValue(true);
 
@@ -372,8 +347,9 @@ public class JDBCOutputTestIT {
         }
 
         TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
-        TJDBCInputProperties properties1 = createCommonJDBCInputProperties(definition1);
-        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(tablename, schema, definition1, properties1);
+        TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
+        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(DBTestUtils.getTablename(), schema, definition1,
+                properties1);
 
         assertThat(records, hasSize(1));
         Assert.assertEquals(3, records.get(0).get(0));
@@ -384,13 +360,13 @@ public class JDBCOutputTestIT {
     @Test
     public void testDeleteReject() throws Exception {
         TJDBCOutputDefinition definition = new TJDBCOutputDefinition();
-        TJDBCOutputProperties properties = createCommonJDBCOutputProperties(definition);
+        TJDBCOutputProperties properties = DBTestUtils.createCommonJDBCOutputProperties(allSetting, definition);
 
         Schema schema = DBTestUtils.createTestSchema2();
         properties.main.schema.setValue(schema);
         properties.updateOutputSchemas();
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         properties.dataAction.setValue(DataAction.DELETE);
         properties.useBatch.setValue(false);// reject function can't work with batch function
 
@@ -442,8 +418,9 @@ public class JDBCOutputTestIT {
         }
 
         TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
-        TJDBCInputProperties properties1 = createCommonJDBCInputProperties(definition1);
-        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(tablename, schema, definition1, properties1);
+        TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
+        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(DBTestUtils.getTablename(), schema, definition1,
+                properties1);
 
         assertThat(records, hasSize(0));
     }
@@ -451,13 +428,13 @@ public class JDBCOutputTestIT {
     @Test
     public void testInsertOrUpdate() throws Exception {
         TJDBCOutputDefinition definition = new TJDBCOutputDefinition();
-        TJDBCOutputProperties properties = createCommonJDBCOutputProperties(definition);
+        TJDBCOutputProperties properties = DBTestUtils.createCommonJDBCOutputProperties(allSetting, definition);
 
         Schema schema = DBTestUtils.createTestSchema2();
         properties.main.schema.setValue(schema);
         properties.updateOutputSchemas();
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         properties.dataAction.setValue(DataAction.INSERTORUPDATE);
         properties.dieOnError.setValue(true);
 
@@ -495,8 +472,9 @@ public class JDBCOutputTestIT {
         }
 
         TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
-        TJDBCInputProperties properties1 = createCommonJDBCInputProperties(definition1);
-        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(tablename, schema, definition1, properties1);
+        TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
+        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(DBTestUtils.getTablename(), schema, definition1,
+                properties1);
 
         assertThat(records, hasSize(4));
         Assert.assertEquals(1, records.get(0).get(0));
@@ -512,14 +490,14 @@ public class JDBCOutputTestIT {
     @Test
     public void testUpdateOrInsert() throws Exception {
         TJDBCOutputDefinition definition = new TJDBCOutputDefinition();
-        TJDBCOutputProperties properties = createCommonJDBCOutputProperties(definition);
+        TJDBCOutputProperties properties = DBTestUtils.createCommonJDBCOutputProperties(allSetting, definition);
 
         Schema schema = DBTestUtils.createTestSchema2();
 
         properties.main.schema.setValue(schema);
         properties.updateOutputSchemas();
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         properties.dataAction.setValue(DataAction.UPDATEORINSERT);
         properties.dieOnError.setValue(true);
 
@@ -557,8 +535,9 @@ public class JDBCOutputTestIT {
         }
 
         TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
-        TJDBCInputProperties properties1 = createCommonJDBCInputProperties(definition1);
-        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(tablename, schema, definition1, properties1);
+        TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
+        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(DBTestUtils.getTablename(), schema, definition1,
+                properties1);
 
         assertThat(records, hasSize(4));
         Assert.assertEquals(1, records.get(0).get(0));
@@ -574,13 +553,13 @@ public class JDBCOutputTestIT {
     @Test
     public void testClearDataInTable() throws Exception {
         TJDBCOutputDefinition definition = new TJDBCOutputDefinition();
-        TJDBCOutputProperties properties = createCommonJDBCOutputProperties(definition);
+        TJDBCOutputProperties properties = DBTestUtils.createCommonJDBCOutputProperties(allSetting, definition);
 
         Schema schema = DBTestUtils.createTestSchema2();
         properties.main.schema.setValue(schema);
         properties.updateOutputSchemas();
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
 
         DataAction action = DBTestUtils.randomDataAction();
         properties.dataAction.setValue(action);
@@ -614,8 +593,9 @@ public class JDBCOutputTestIT {
         }
 
         TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
-        TJDBCInputProperties properties1 = createCommonJDBCInputProperties(definition1);
-        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(tablename, schema, definition1, properties1);
+        TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
+        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(DBTestUtils.getTablename(), schema, definition1,
+                properties1);
 
         if (action == DataAction.INSERT || action == DataAction.INSERTORUPDATE || action == DataAction.UPDATEORINSERT) {
             assertThat(records, hasSize(2));
@@ -640,13 +620,13 @@ public class JDBCOutputTestIT {
     @Test(expected = ComponentException.class)
     public void testDieOnError() throws Exception {
         TJDBCOutputDefinition definition = new TJDBCOutputDefinition();
-        TJDBCOutputProperties properties = createCommonJDBCOutputProperties(definition);
+        TJDBCOutputProperties properties = DBTestUtils.createCommonJDBCOutputProperties(allSetting, definition);
 
         Schema schema = DBTestUtils.createTestSchema2();
         properties.main.schema.setValue(schema);
         properties.updateOutputSchemas();
 
-        properties.tableSelection.tablename.setValue(tablename);
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
         DataAction action = DBTestUtils.randomDataActionExceptDelete();
         properties.dataAction.setValue(action);
         properties.dieOnError.setValue(true);
@@ -676,30 +656,6 @@ public class JDBCOutputTestIT {
         } finally {
             writer.close();
         }
-    }
-
-    private TJDBCOutputProperties createCommonJDBCOutputProperties(TJDBCOutputDefinition definition) {
-        TJDBCOutputProperties properties = (TJDBCOutputProperties) definition.createRuntimeProperties();
-
-        // TODO now framework doesn't support to load the JDBC jar by the setting
-        // properties.connection.driverJar.setValue(null);
-        properties.connection.driverClass.setValue(driverClass);
-        properties.connection.jdbcUrl.setValue(jdbcUrl);
-        properties.connection.userPassword.userId.setValue(userId);
-        properties.connection.userPassword.password.setValue(password);
-        return properties;
-    }
-
-    private TJDBCInputProperties createCommonJDBCInputProperties(TJDBCInputDefinition definition) {
-        TJDBCInputProperties properties = (TJDBCInputProperties) definition.createRuntimeProperties();
-
-        // TODO now framework doesn't support to load the JDBC jar by the setting
-        // properties.connection.driverJar.setValue("port", props.getProperty("port"));
-        properties.connection.driverClass.setValue(driverClass);
-        properties.connection.jdbcUrl.setValue(jdbcUrl);
-        properties.connection.userPassword.userId.setValue(userId);
-        properties.connection.userPassword.password.setValue(password);
-        return properties;
     }
 
 }
