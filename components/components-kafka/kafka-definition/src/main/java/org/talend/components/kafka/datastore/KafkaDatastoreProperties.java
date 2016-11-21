@@ -1,12 +1,8 @@
 package org.talend.components.kafka.datastore;
 
-import static org.talend.daikon.properties.presentation.Widget.BUTTON_WIDGET_TYPE;
-import static org.talend.daikon.properties.presentation.Widget.widget;
-
 import org.talend.components.common.SslProperties;
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.common.datastore.runtime.DatastoreRuntime;
-import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
@@ -24,8 +20,6 @@ public class KafkaDatastoreProperties extends PropertiesImpl implements Datastor
     public Property<String> brokers = PropertyFactory.newString("brokers").setRequired();
 
     public SslProperties ssl = new SslProperties("ssl");
-
-    public PresentationItem testConnection = new PresentationItem("testConnection", "Test connection");
 
     public KafkaDatastoreProperties(String name) {
         super(name);
@@ -45,7 +39,6 @@ public class KafkaDatastoreProperties extends PropertiesImpl implements Datastor
         mainForm.addRow(version);
         mainForm.addRow(brokers);
         mainForm.addRow(ssl.getForm(Form.MAIN));
-        mainForm.addRow(widget(testConnection).setWidgetType(BUTTON_WIDGET_TYPE));
 
     }
 

@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.service.rest.impl;
 
-import static javax.servlet.http.HttpServletResponse.*;
-import static org.talend.daikon.exception.error.CommonErrorCodes.*;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static org.talend.daikon.exception.error.CommonErrorCodes.UNEXPECTED_EXCEPTION;
 
 import java.io.IOException;
 import java.io.InputStream;

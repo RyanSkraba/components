@@ -42,10 +42,4 @@ public class KafkaDatastorePropertiesTest {
         assertNull(datastore.brokers.getValue());
     }
 
-    @Test
-    public void testTrigger() {
-        Form main = datastore.getForm(Form.MAIN);
-        assertTrue(main.getWidget(datastore.testConnection).isCallValidate());
-    }
-
 }

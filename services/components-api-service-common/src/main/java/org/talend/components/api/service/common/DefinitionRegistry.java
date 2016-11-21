@@ -171,6 +171,8 @@ public class DefinitionRegistry implements ComponentInstaller.ComponentFramework
 
     @Override
     public <P extends Properties> P createProperties(Definition<P> definition, String name) {
-        return PropertiesImpl.createNewInstance(definition.getPropertiesClass(), name);
+        P newInstance = PropertiesImpl.createNewInstance(definition.getPropertiesClass(), name);
+        newInstance.init();
+        return newInstance;
     }
 }

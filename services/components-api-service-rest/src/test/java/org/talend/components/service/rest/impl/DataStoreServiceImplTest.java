@@ -11,26 +11,22 @@
 
 package org.talend.components.service.rest.impl;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.common.datastore.DatastoreDefinition;
-import org.talend.components.service.rest.DataStoreDefinitionDTO;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DataStoreServiceImplTest {
-
-    @InjectMocks
-    private DataStoreControllerImpl dataStoreController;
 
     @Mock
     private ComponentService componentServiceDelegate;
@@ -44,7 +40,8 @@ public class DataStoreServiceImplTest {
         ArrayList<DatastoreDefinition> value = new ArrayList<>();
         when(defRegistryDelegate.getDefinitionsMapByType(DatastoreDefinition.class).values()).thenReturn(value);
 
-        Iterable<DataStoreDefinitionDTO> datastoreDefinitions = dataStoreController.listDataStoreDefinitions();
+        //Iterable<DefinitionDTO> datastoreDefinitions = dataStoreController.listDataStoreDefinitions(
+          //      DefinitionType.DATA_STORE);
 
         // assertEquals(value, datastoreDefinitions);
         // verify(componentServiceDelegate).getDefinitionsByType(DatastoreDefinition.class);

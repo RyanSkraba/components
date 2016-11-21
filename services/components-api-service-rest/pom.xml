@@ -35,10 +35,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jetty</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
 
 		<!-- talend dependencies -->
 		<dependency>
@@ -129,12 +129,19 @@
 						</configuration>
 					</execution>
 					<execution>
-		                <id>test-jar</id>
+						<id>test-jar</id>
 						<goals>
 							<goal>test-jar</goal>
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.webcohesion.enunciate</groupId>
+				<artifactId>enunciate-maven-plugin</artifactId>
+				<configuration>
+					<skipEnunciate>true</skipEnunciate>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
@@ -144,10 +151,10 @@
 			<id>releases</id>
 			<url>http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceRelease/</url>
 		</repository>
-        <repository>
-            <id>talend_nexus</id>
-            <name>snapshots</name>
-            <url>http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
-        </repository>
+		<repository>
+			<id>talend_nexus</id>
+			<name>snapshots</name>
+			<url>http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
+		</repository>
 	</repositories>
 </project>

@@ -2,6 +2,7 @@ package org.talend.components.fullexample.datastore;
 
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.daikon.properties.PropertiesImpl;
+import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
@@ -15,7 +16,7 @@ public class FullExampleDatastoreProperties extends PropertiesImpl implements Da
 
     public Property<Integer> tagId = PropertyFactory.newInteger("tagId");
 
-    FullExampleDatastoreProperties(String name) {
+    public FullExampleDatastoreProperties(String name) {
         super(name);
     }
 
@@ -25,6 +26,14 @@ public class FullExampleDatastoreProperties extends PropertiesImpl implements Da
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addColumn(tag);
         mainForm.addColumn(tagId);
+    }
+
+    public ValidationResult validateTag() {
+        return new ValidationResult().setStatus(ValidationResult.Result.OK);
+    }
+
+    public ValidationResult validateTagId() {
+        return new ValidationResult().setStatus(ValidationResult.Result.OK).setMessage("tagId is OK");
     }
 
 }

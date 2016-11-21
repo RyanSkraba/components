@@ -4,12 +4,15 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.io.IOProperties;
+import org.talend.components.kafka.dataset.KafkaDatasetDefinition;
 import org.talend.components.kafka.dataset.KafkaDatasetProperties;
+import org.talend.daikon.properties.ReferenceProperties;
 
 public abstract class KafkaIOBasedProperties extends FixedConnectorsComponentProperties
         implements IOProperties<KafkaDatasetProperties> {
 
-    public transient KafkaDatasetProperties dataset = new KafkaDatasetProperties("dataset");
+    public transient ReferenceProperties<KafkaDatasetProperties> dataset = new ReferenceProperties<>("dataset",
+            KafkaDatasetDefinition.NAME);
 
     protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "module.main");
 
@@ -30,12 +33,12 @@ public abstract class KafkaIOBasedProperties extends FixedConnectorsComponentPro
 
     @Override
     public KafkaDatasetProperties getDatasetProperties() {
-        return dataset;
+        return dataset.getReference();
     }
 
     @Override
     public void setDatasetProperties(KafkaDatasetProperties datasetProperties) {
-        dataset = datasetProperties;
+        dataset.setReference(datasetProperties);
     }
 
 }
