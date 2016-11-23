@@ -53,4 +53,9 @@ public class JDBCDatastoreDefinition extends SimpleNamedThing implements Datasto
         return JDBCDatastoreProperties.class;
     }
 
+    @Override
+    public String getDisplayName() {
+        return getI18nMessage("datastore." + getName() + I18N_DISPLAY_NAME_SUFFIX);
+    }
+
 }
