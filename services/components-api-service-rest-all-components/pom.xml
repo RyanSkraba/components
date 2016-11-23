@@ -32,6 +32,26 @@
 	<dependencies>
 		<!-- list of embedded components -->
 		<dependency>
+			<!--
+				because common-oauth depends on jetty 9.2 (for java 7 compliance) and it's not compatible with
+				spring-boot 1.4.1, the jetty needs to be excluded.
+			-->
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-common-oauth</artifactId>
+			<version>0.16.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-server</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-jdbc</artifactId>
+			<version>0.16.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>jms-definition</artifactId>
 			<version>0.16.0-SNAPSHOT</version>
