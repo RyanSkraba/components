@@ -12,8 +12,6 @@
 // ============================================================================
 package org.talend.components.jdbc.dataprep;
 
-import static org.junit.Assert.assertEquals;
-
 import org.apache.avro.Schema;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -23,7 +21,6 @@ import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
 import org.talend.components.jdbc.datastore.JDBCDatastoreDefinition;
 import org.talend.components.jdbc.datastore.JDBCDatastoreProperties;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
-import org.talend.daikon.properties.ValidationResult;
 
 public class JDBCDatasetTestIT {
 
@@ -48,13 +45,9 @@ public class JDBCDatasetTestIT {
         datastore.dbTypes.setValue("DERBY");
         datastore.afterDbTypes();
 
-        datastore.driverClass.setValue(allSetting.getDriverClass());
         datastore.jdbcUrl.setValue(allSetting.getJdbcUrl());
         datastore.userPassword.userId.setValue(allSetting.getUsername());
         datastore.userPassword.password.setValue(allSetting.getPassword());
-
-        ValidationResult result = datastore.validateTestConnection();
-        assertEquals("result should be ok, but not", ValidationResult.OK, result);
 
         JDBCDatasetProperties dataset = (JDBCDatasetProperties) def.createDatasetProperties(datastore);
         dataset.sql.setValue(DBTestUtils.getSQL());

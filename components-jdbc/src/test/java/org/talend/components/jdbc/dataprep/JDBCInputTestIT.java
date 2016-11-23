@@ -142,7 +142,6 @@ public class JDBCInputTestIT {
         datastore_props.dbTypes.setValue("DERBY");
         datastore_props.afterDbTypes();
 
-        datastore_props.driverClass.setValue(allSetting.getDriverClass());
         datastore_props.jdbcUrl.setValue(allSetting.getJdbcUrl());
         datastore_props.userPassword.userId.setValue(allSetting.getUsername());
         datastore_props.userPassword.password.setValue(allSetting.getPassword());

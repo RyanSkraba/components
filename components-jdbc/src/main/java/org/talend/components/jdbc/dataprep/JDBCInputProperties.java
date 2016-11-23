@@ -64,7 +64,7 @@ public class JDBCInputProperties extends FixedConnectorsComponentProperties
         JDBCDatastoreProperties datastoreProperties = datasetProperties.getDatastoreProperties();
 
         setting.setDriverPaths(datastoreProperties.getCurrentDriverPaths());
-        setting.setDriverClass(datastoreProperties.driverClass.getValue());
+        setting.setDriverClass(datastoreProperties.getCurrentDriverClass());
         setting.setJdbcUrl(datastoreProperties.jdbcUrl.getValue());
 
         setting.setUsername(datastoreProperties.userPassword.userId.getValue());

@@ -81,7 +81,7 @@ public class JDBCDatasetProperties extends PropertiesImpl
 
         JDBCDatastoreProperties datastoreProperties = this.getDatastoreProperties();
         setting.setDriverPaths(datastoreProperties.getCurrentDriverPaths());
-        setting.setDriverClass(datastoreProperties.driverClass.getValue());
+        setting.setDriverClass(datastoreProperties.getCurrentDriverClass());
         setting.setJdbcUrl(datastoreProperties.jdbcUrl.getValue());
 
         setting.setUsername(datastoreProperties.userPassword.userId.getValue());
