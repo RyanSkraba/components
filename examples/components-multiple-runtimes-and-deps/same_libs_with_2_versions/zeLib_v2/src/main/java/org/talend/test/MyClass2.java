@@ -1,5 +1,3 @@
-package org.talend.test;
-
 // ============================================================================
 //
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
@@ -12,6 +10,7 @@ package org.talend.test;
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
+package org.talend.test;
 
 public class MyClass2 {
 
