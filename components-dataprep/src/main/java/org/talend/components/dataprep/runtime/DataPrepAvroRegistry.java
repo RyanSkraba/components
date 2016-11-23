@@ -17,10 +17,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.talend.components.dataprep.connection.DataPrepField;
+import org.talend.components.dataprep.util.NameUtil;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -84,11 +87,15 @@ public class DataPrepAvroRegistry extends AvroRegistry {
      */
     private Schema inferSchemaDataPrepResult(DataPrepField[] in) {
         List<Schema.Field> fields = new ArrayList<>();
+        int index = 0;
+        Set<String> existNames = new HashSet<String>();
         for (DataPrepField field : in) {
             // forces a String type for all dataprep schemas because schema is not enforced by dataprep.
             // some data may not be of the right type.
             // TODO this makes most of this class not usefull and should be refactored
-            Schema.Field avroField = new Schema.Field(field.getColumnName(), AvroUtils._string(), null, field.getContent());
+            String validName = NameUtil.correct(field.getColumnName(), index++, existNames);
+            existNames.add(validName);
+            Schema.Field avroField = new Schema.Field(validName, AvroUtils._string(), null, field.getContent());
 
             switch (field.getType()) {
             case "date":
