@@ -12,9 +12,8 @@
 // ============================================================================
 package org.talend.components.common.oauth.util;
 
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 /**
@@ -23,28 +22,45 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
  */
 public class HttpsService {
 
-    Server server;
+    private Server server;
 
     /**
-     * DOC bchen HttpService constructor comment.
+     * Create and start a jetty running HTTPS.
      * 
-     * @throws Exception
+     * @throws Exception if an error occurs.
      */
     public HttpsService(String host, int port, Handler handler) throws Exception {
+
         server = new Server();
 
-        SslSelectChannelConnector ssl_connector = new SslSelectChannelConnector();
-        ssl_connector.setHost(host);
-        ssl_connector.setPort(port);
-        SslContextFactory cf = ssl_connector.getSslContextFactory();
-        cf.setKeyStorePath(HttpsService.class.getResource("sslkey").toString());
-        cf.setKeyStorePassword("talend");
-        cf.setKeyManagerPassword("talend");
-        server.addConnector(ssl_connector);
+        // ssl context factory
+        SslContextFactory sslContextFactory = new SslContextFactory();
+        sslContextFactory.setKeyStorePath(HttpsService.class.getResource("sslkey").toString());
+        sslContextFactory.setKeyStorePassword("talend");
+        sslContextFactory.setKeyManagerPassword("talend");
+
+        // ssl connection factory (based on the ssl context factory)
+        final SslConnectionFactory sslConnectionFactory = new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString());
+        HttpConfiguration httpsConfig = new HttpConfiguration();
+        httpsConfig.setSecureScheme("https");
+        httpsConfig.setSecurePort(port);
+
+        // http connection factory (based on the ssl connection factory)
+        final HttpConnectionFactory httpConnectionFactory = new HttpConnectionFactory(httpsConfig);
+        ServerConnector https = new ServerConnector(server, sslConnectionFactory, httpConnectionFactory);
+        https.setPort(port);
+        https.setHost(host);
+
+        // server setup
+        server.addConnector(https);
         server.setHandler(handler);
         server.start();
     }
 
+    /**
+     * Stops the server.
+     * @throws Exception if an error occurs.
+     */
     public void stop() throws Exception {
         server.stop();
         server.join();
