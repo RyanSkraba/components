@@ -61,6 +61,8 @@ public class TJDBCOutputDefinition extends AbstractComponentDefinition {
     @SuppressWarnings("rawtypes")
     @Override
     public Property[] getReturnProperties() {
+        setupI18N(new Property<?>[] { RETURN_INSERT_RECORD_COUNT_PROP, RETURN_UPDATE_RECORD_COUNT_PROP,
+                RETURN_DELETE_RECORD_COUNT_PROP });
         return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP, RETURN_SUCCESS_RECORD_COUNT_PROP,
                 RETURN_REJECT_RECORD_COUNT_PROP, RETURN_INSERT_RECORD_COUNT_PROP, RETURN_UPDATE_RECORD_COUNT_PROP,
                 RETURN_DELETE_RECORD_COUNT_PROP };

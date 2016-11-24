@@ -50,6 +50,7 @@ public class TJDBCInputDefinition extends AbstractComponentDefinition {
     @SuppressWarnings("rawtypes")
     @Override
     public Property[] getReturnProperties() {
+        setupI18N(new Property<?>[] { RETURN_QUERY_PROP });
         return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP, RETURN_QUERY_PROP };
     }
 
