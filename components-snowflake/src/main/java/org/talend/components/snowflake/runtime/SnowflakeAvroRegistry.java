@@ -22,6 +22,7 @@ import org.talend.daikon.avro.SchemaConstants;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.TimeUnit;
 
 public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
 
@@ -107,7 +108,8 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
                 public Object convertToAvro(ResultSet value) {
                     int index = f.pos() + 1;
                     try {
-                        return value.getDate(index).getTime();
+                        // Avro requires number of days, Snowflake represents this as milliseconds
+                        return (int) TimeUnit.MILLISECONDS.toDays(value.getDate(index).getTime());
                     } catch (SQLException e) {
                         throw new ComponentException(e);
                     }
@@ -119,7 +121,8 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
                 public Object convertToAvro(ResultSet value) {
                     int index = f.pos() + 1;
                     try {
-                        return value.getTime(index).getTime();
+                        // Snowflake - milliseconds since midnight
+                        return (int) value.getTime(index).getTime();
                     } catch (SQLException e) {
                         throw new ComponentException(e);
                     }
@@ -131,6 +134,7 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
                 public Object convertToAvro(ResultSet value) {
                     int index = f.pos() + 1;
                     try {
+                        // Milliseconds since epoc
                         return value.getTimestamp(index).getTime();
                     } catch (SQLException e) {
                         throw new ComponentException(e);

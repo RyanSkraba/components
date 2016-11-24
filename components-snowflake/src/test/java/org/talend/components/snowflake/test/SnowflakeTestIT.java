@@ -63,6 +63,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.is;
@@ -110,7 +111,9 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
 
     static {
         try {
+            dateFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
             testDate = dateFormatter.parse("2008-11-04");
+            System.out.println("testDate: " + testDate + " ms: " + testDate.getTime());
             testTime = timeParser.parse(testTimeString + "-0000");
             System.out.println("testTime: " + testTime.getTime());
         } catch (ParseException e) {
@@ -334,13 +337,13 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
             assertEquals(Double.valueOf(checkCount), row.get(iC3));
 
             Object date = row.get(iC4);
-            if (date instanceof Long)
-                date = new Date((Long) date);
+            if (date instanceof Integer)
+                date = new Date(TimeUnit.DAYS.toMillis((Integer) date));
             assertEquals(testDate, date);
 
             Object time = row.get(iC5);
-            if (time instanceof Long)
-                time = new Date((Long) time);
+            if (time instanceof Integer)
+                time = new Date((Integer) time);
             // Do millisecond compare to avoid timezone issues
             assertEquals(testTime.getTime(), ((Date) time).getTime());
 
