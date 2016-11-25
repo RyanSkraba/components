@@ -305,4 +305,28 @@
 			<!-- </plugin> -->
 		</plugins>
 	</build>
+    <profiles>
+        <profile>
+          <id>skipTestRun</id>
+          <activation>
+            <property>
+              <name>skipTests</name>
+            </property>
+          </activation>
+          <properties>
+            <really.skip.tests>true</really.skip.tests>
+          </properties>
+        </profile>
+        <profile>
+          <id>skipTestItRun</id>
+          <activation>
+            <property>
+              <name>skipITs</name>
+            </property>
+          </activation>
+          <properties>
+            <really.skip.tests>true</really.skip.tests>
+          </properties>
+        </profile>
+    </profiles>
 </project>

@@ -254,7 +254,7 @@
                         </goals>
                         <configuration>
                             <registry>${talend_docker_registry}</registry>
-                            <skip>${skipITs}</skip>
+                            <skip>${really.skip.tests}</skip>
                             <images>
                                 <image>
                                     <name>igonchar/atlassian-jira:7.1.7v2</name>
@@ -280,7 +280,7 @@
                             <goal>stop</goal>
                         </goals>
                         <configuration>
-                            <skip>${skipITs}</skip>
+                            <skip>${really.skip.tests}</skip>
                         </configuration>
                     </execution>
                 </executions>

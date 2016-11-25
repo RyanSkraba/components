@@ -82,7 +82,7 @@
                             <goal>start</goal>
                         </goals>
                         <configuration>
-                            <skip>${skipITs}</skip>
+                            <skip>${really.skip.tests}</skip>
                             <images>
                                 <image>
                                     <name>wurstmeister/zookeeper</name>
@@ -126,7 +126,7 @@
                             <goal>stop</goal>
                         </goals>
                         <configuration>
-                            <skip>${skipITs}</skip>
+                            <skip>${really.skip.tests}</skip>
                         </configuration>
                     </execution>
                 </executions>

@@ -169,7 +169,7 @@
 							<goal>start</goal>
 						</goals>
 						<configuration>
-							<skip>${skipITs}</skip>
+						    <skip>${really.skip.tests}</skip>
 							<images>
 								<image>
 									<name>dchmyga/splunk</name>
@@ -199,7 +199,7 @@
 							<goal>stop</goal>
 						</goals>
 						<configuration>
-							<skip>${skipITs}</skip>
+                            <skip>${really.skip.tests}</skip>
 						</configuration>
 					</execution>
 				</executions>
