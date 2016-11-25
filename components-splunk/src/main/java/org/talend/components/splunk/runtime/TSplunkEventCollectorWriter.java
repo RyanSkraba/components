@@ -15,7 +15,9 @@ package org.talend.components.splunk.runtime;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.avro.Schema;
@@ -28,9 +30,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Result;
@@ -48,6 +47,11 @@ import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
+
+import com.cedarsoftware.util.io.JsonIoException;
+import com.cedarsoftware.util.io.JsonObject;
+import com.cedarsoftware.util.io.JsonReader;
+import com.cedarsoftware.util.io.JsonWriter;
 
 public class TSplunkEventCollectorWriter implements Writer<Result> {
 
@@ -87,6 +91,8 @@ public class TSplunkEventCollectorWriter implements Writer<Result> {
 
     private Schema defaultSchema;
 
+    private Map<String, Object> args = new HashMap<>();
+
     public TSplunkEventCollectorWriter(TSplunkEventCollectorWriteOperation writeOperation, String serverUrl, String token,
             int eventsBatchSize, Schema designSchema, RuntimeContainer container) {
         this.writeOperation = writeOperation;
@@ -94,6 +100,7 @@ public class TSplunkEventCollectorWriter implements Writer<Result> {
         this.token = token;
         this.eventsBatchSize = eventsBatchSize;
         setSchema(designSchema);
+        args.put(JsonWriter.TYPE, false);
     }
 
     private void setSchema(Schema designSchema) {
@@ -198,8 +205,8 @@ public class TSplunkEventCollectorWriter implements Writer<Result> {
             throw new IOException(getMessage("error.emptyResponse"));
         }
         try {
-            JSONParser jsonParser = new JSONParser();
-            JSONObject json = (JSONObject) jsonParser.parse(jsonResponseString);
+            // JSONParser jsonParser = new JSONParser();
+            JsonObject<Object, Object> json = (JsonObject<Object, Object>) JsonReader.jsonToJava(jsonResponseString);
             LOGGER.debug("Response String:/r/n" + String.valueOf(json));
             lastErrorCode = ((Long) json.get("code")).intValue();
             lastErrorMessage = (String) json.get("text");
@@ -207,7 +214,7 @@ public class TSplunkEventCollectorWriter implements Writer<Result> {
                 throw new IOException(getMessage("error.codeMessage", lastErrorCode, lastErrorMessage));
             }
             successCount += splunkObjectsForBulk.size();
-        } catch (ParseException e) {
+        } catch (JsonIoException e) {
             throw new IOException(getMessage("error.responseParseException", e.getMessage()));
         }
     }
@@ -217,7 +224,7 @@ public class TSplunkEventCollectorWriter implements Writer<Result> {
         request.addHeader("Authorization", "Splunk " + token);
         StringBuffer requestString = new StringBuffer();
         for (SplunkJSONEvent event : events) {
-            requestString.append(event.toString());
+            requestString.append(JsonWriter.objectToJson(event, args));
         }
         request.setEntity(new StringEntity(requestString.toString()));
         return request;

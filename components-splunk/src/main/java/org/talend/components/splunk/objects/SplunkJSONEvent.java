@@ -14,9 +14,9 @@ package org.talend.components.splunk.objects;
 
 import java.util.Map;
 
-import org.json.simple.JSONObject;
+import com.cedarsoftware.util.io.JsonObject;
 
-public class SplunkJSONEvent extends JSONObject {
+public class SplunkJSONEvent extends JsonObject<String, Object> {
 
     private static final long serialVersionUID = 3205801702373951474L;
 
@@ -24,7 +24,8 @@ public class SplunkJSONEvent extends JSONObject {
     }
 
     public void setEventObjects(Map<String, Object> eventObjects) {
-        JSONObject jsonEventObject = new JSONObject(eventObjects);
+        JsonObject<String, Object> jsonEventObject = new JsonObject<>();
+        jsonEventObject.putAll(eventObjects);
         put(SplunkJSONEventField.EVENT, jsonEventObject);
     }
 
@@ -32,19 +33,19 @@ public class SplunkJSONEvent extends JSONObject {
         if (key == null || object == null) {
             return;
         }
-        JSONObject jsonEventObject = (JSONObject) get(SplunkJSONEventField.EVENT.getName());
+        JsonObject<String, Object> jsonEventObject = (JsonObject<String, Object>) get(SplunkJSONEventField.EVENT.getName());
         if (jsonEventObject == null) {
-            jsonEventObject = new JSONObject();
+            jsonEventObject = new JsonObject<>();
             put(SplunkJSONEventField.EVENT, jsonEventObject);
         }
         jsonEventObject.put(key, object);
     }
 
-    public void put(String name, Object value) {
+    public Object put(String name, Object value) {
         if (name == null || value == null) {
-            return;
+            return null;
         }
-        super.put(name, value);
+        return super.put(name, value);
     }
 
     public void put(SplunkJSONEventField key, Object value) {

@@ -15,8 +15,9 @@ package org.talend.components.splunk.objects;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.json.simple.JSONObject;
 import org.junit.Test;
+
+import com.cedarsoftware.util.io.JsonObject;
 
 public class SplunkJSONEventTest {
 
@@ -43,7 +44,8 @@ public class SplunkJSONEventTest {
         splunkEvent.addEventObject("FieldInt", 123);
 
         // Check event fields
-        JSONObject eventObject = (JSONObject) splunkEvent.get(SplunkJSONEventField.EVENT.getName());
+        JsonObject<String, Object> eventObject = (JsonObject<String, Object>) splunkEvent
+                .get(SplunkJSONEventField.EVENT.getName());
         assertFalse("Event Field should not be null", eventObject == null);
 
         assertTrue("Field1 value should be equal to Value1", "Value1".equals(eventObject.remove("Field1")));
@@ -64,7 +66,7 @@ public class SplunkJSONEventTest {
         // Set event field
         SplunkJSONEventBuilder.setField(event, "Field1", "Value1", true);
 
-        JSONObject eventData = (JSONObject) event.get("event");
+        JsonObject<String, Object> eventData = (JsonObject<String, Object>) event.get("event");
         // Check event data field
         assertTrue("Field1 should be equal to Value1", "Value1".equals(eventData.get("Field1")));
     }
