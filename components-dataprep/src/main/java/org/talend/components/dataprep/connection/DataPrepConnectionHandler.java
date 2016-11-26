@@ -218,6 +218,10 @@ public class DataPrepConnectionHandler {
         this.mode = mode;
         switch (mode) {
         case Create:
+            if (fetchDataSetId() != null) {
+                throw new IOException("The dataset : " + dataSetName
+                        + " exists in the server already, if you want to update it, please use the 'Update' or 'CreateOrUpdate' mode.");
+            }
             return writeToServer("POST", requestEncoding());
         case Update:
             return writeToServer("PUT", url + API_DATASETS + dataSetId);
@@ -249,6 +253,8 @@ public class DataPrepConnectionHandler {
         return uri.toString();
     }
 
+    private static final int CHUNK_SIZE = 4096;
+
     private OutputStream writeToServer(String requestMethod, String request) throws IOException {
         URL connectionUrl = new URL(request);
         urlConnection = (HttpURLConnection) connectionUrl.openConnection();
@@ -258,6 +264,7 @@ public class DataPrepConnectionHandler {
         }
         urlConnection.setRequestProperty("Content-Type", "text/plain");
         urlConnection.setRequestProperty("Accept", "application/json, text/plain");
+        urlConnection.setChunkedStreamingMode(CHUNK_SIZE);
         urlConnection.setDoOutput(true);
         urlConnection.connect();
         return urlConnection.getOutputStream();

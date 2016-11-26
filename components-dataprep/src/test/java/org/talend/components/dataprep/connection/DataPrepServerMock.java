@@ -102,7 +102,7 @@ public class DataPrepServerMock {
 
     @RequestMapping(value = "/api/datasets", method = RequestMethod.GET)
     public ResponseEntity<InputStreamResource> getDataSetIdByName(@RequestParam(value = "name") String name) {
-        if ("mydataset".equals(name)) {
+        if ("my_existed_dataset".equals(name)) {
             InputStreamResource inputStream = new InputStreamResource(
                     DataPrepServerMock.class.getResourceAsStream("success_fetch_dataset_id_by_name_response.json"));
             return new ResponseEntity<InputStreamResource>(inputStream, HttpStatus.OK);
