@@ -72,7 +72,7 @@ public class TDataSetOutputProperties extends DataPrepProperties implements Seri
 
     public final Property<String> dataSetId = PropertyFactory.newString("dataSetId");
 
-    public final PresentationItem fetchSchema = new PresentationItem("fetchSchema", "FetchSchema");
+    public final PresentationItem fetchSchema = new PresentationItem("fetchSchema", "Fetch Schema");
 
     public final Property<Integer> limit = PropertyFactory.newInteger("limit", 100);
 

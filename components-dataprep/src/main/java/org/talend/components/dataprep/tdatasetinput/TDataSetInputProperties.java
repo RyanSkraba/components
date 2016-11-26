@@ -65,7 +65,7 @@ public class TDataSetInputProperties extends DataPrepProperties {
     public final Property<String> dataSetName = PropertyFactory.newString("dataSetName").setRequired()
             .setFlags(EnumSet.of(DESIGN_TIME_ONLY));
 
-    public final PresentationItem fetchSchema = new PresentationItem("fetchSchema", "FetchSchema");
+    public final PresentationItem fetchSchema = new PresentationItem("fetchSchema", "Fetch Schema");
 
     public TDataSetInputProperties(String name) {
         super(name);
