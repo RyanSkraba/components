@@ -13,15 +13,6 @@
 
 package org.talend.components.service.rest.impl;
 
-import static java.util.stream.StreamSupport.stream;
-import static org.slf4j.LoggerFactory.getLogger;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.WebDataBinder;
@@ -35,11 +26,20 @@ import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.service.rest.DefinitionType;
 import org.talend.components.service.rest.DefinitionTypeConverter;
 import org.talend.components.service.rest.DefinitionsController;
+import org.talend.components.service.rest.dto.ConnectorTypology;
+import org.talend.components.service.rest.dto.ConnectorTypologyConverter;
 import org.talend.components.service.rest.dto.DefinitionDTO;
-import org.talend.components.service.rest.dto.TopologyDTO;
-import org.talend.components.service.rest.dto.TopologyDTOConverter;
 import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.stream.StreamSupport.stream;
+import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 /**
  * Definition controller..
@@ -57,7 +57,7 @@ public class DefinitionsControllerImpl implements DefinitionsController {
     @InitBinder
     public void initBinder(WebDataBinder dataBinder) {
         dataBinder.registerCustomEditor(DefinitionType.class, new DefinitionTypeConverter());
-        dataBinder.registerCustomEditor(TopologyDTO.class, new TopologyDTOConverter());
+        dataBinder.registerCustomEditor(ConnectorTypology.class, new ConnectorTypologyConverter());
     }
 
     /**
@@ -88,28 +88,28 @@ public class DefinitionsControllerImpl implements DefinitionsController {
     }
 
     /**
-     * Return components that match the given topology.
+     * Return components that match the given typology.
      *
-     * @param topology the wanted topology.
-     * @return the list of all definitions that match the wanted topology.
+     * @param typology the wanted typology.
+     * @return the list of all definitions that match the wanted typology.
      * @returnWrapped java.lang.Iterable<org.talend.components.service.rest.dto.DefinitionDTO>
      */
     @Override
-    public Iterable<DefinitionDTO> listComponentDefinitions(@RequestParam(value = "topology", required = false) TopologyDTO topology) {
+    public Iterable<DefinitionDTO> listComponentDefinitions(@RequestParam(value = "typology", required = false) ConnectorTypology typology) {
         final Collection<ComponentDefinition> definitions = //
                 definitionServiceDelegate.getDefinitionsMapByType(ComponentDefinition.class).values();
 
         Stream<ComponentDefinition> stream = definitions.stream();
 
-        if (topology != null) {
-            stream = stream.filter(c -> c.getSupportedConnectorTopologies().contains(topology.getTopology()));
+        if (typology != null) {
+            stream = stream.filter(c -> c.getSupportedConnectorTopologies().contains(typology.getTopology()));
         }
 
         final List<DefinitionDTO> result = stream //
                 .map(DefinitionDTO::new) //
                 .collect(Collectors.toList());
 
-        logger.debug("found {} component definitions for topology {}", result.size(), topology);
+        logger.debug("found {} component definitions for typology {}", result.size(), typology);
 
         return result;
     }

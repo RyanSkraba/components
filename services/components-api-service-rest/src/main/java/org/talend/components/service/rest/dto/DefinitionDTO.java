@@ -13,16 +13,15 @@
 
 package org.talend.components.service.rest.dto;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.common.datastore.DatastoreDefinition;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * DTO used for the definitions.
@@ -51,8 +50,8 @@ public class DefinitionDTO {
     /** The definition type. */
     private String type;
 
-    /** The supported topologies.*/
-    private Set<String> topologies = null;
+    /** The supported typologies.*/
+    private Set<String> typologies = null;
 
     /**
      * Default empty constructor.
@@ -89,10 +88,10 @@ public class DefinitionDTO {
     public DefinitionDTO(ComponentDefinition origin) {
         this((RuntimableDefinition)origin);
         this.type = "component";
-        this.topologies = origin.getSupportedConnectorTopologies() //
+        this.typologies = origin.getSupportedConnectorTopologies() //
                 .stream() //
-                .map(TopologyDTO::from) //
-                .map(TopologyDTO::name) //
+                .map(ConnectorTypology::from) //
+                .map(ConnectorTypology::name) //
                 .collect(Collectors.toSet());
     }
 
@@ -157,12 +156,12 @@ public class DefinitionDTO {
         this.type = type;
     }
 
-    public Set<String> getTopologies() {
-        return topologies;
+    public Set<String> getTypologies() {
+        return typologies;
     }
 
-    public void setTopologies(Set<String> topologies) {
-        this.topologies = topologies;
+    public void setTypologies(Set<String> typologies) {
+        this.typologies = typologies;
     }
 
 
@@ -176,7 +175,7 @@ public class DefinitionDTO {
                 ", inputCompName='" + inputCompName + '\'' + //
                 ", outputCompName='" + outputCompName + '\'' + //
                 ", type='" + type + '\'' + //
-                ", topologies=" + topologies + //
+                ", typologies=" + typologies + //
                 '}';
     }
 }

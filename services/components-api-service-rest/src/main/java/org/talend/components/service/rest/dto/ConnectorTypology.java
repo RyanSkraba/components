@@ -12,14 +12,14 @@
 // ============================================================================
 package org.talend.components.service.rest.dto;
 
-import static org.talend.components.api.component.ConnectorTopology.*;
-
 import org.talend.components.api.component.ConnectorTopology;
 
+import static org.talend.components.api.component.ConnectorTopology.*;
+
 /**
- * DTO used to expose topologies  to the outside.
+ * DTO used to expose topologies to the outside world.
  */
-public enum TopologyDTO {
+public enum ConnectorTypology {
 
     /** source -> incoming*/
     SOURCE(INCOMING),
@@ -37,7 +37,7 @@ public enum TopologyDTO {
      * Default constructor.
      * @param topology the topology to map.
      */
-    TopologyDTO(ConnectorTopology topology) {
+    ConnectorTypology(ConnectorTopology topology) {
         this.topology = topology;
     }
 
@@ -45,8 +45,8 @@ public enum TopologyDTO {
      * @param topology the topology to map.
      * @return the dto that matches the given topology.
      */
-    static TopologyDTO from (ConnectorTopology topology) {
-        for (TopologyDTO dto: values()) {
+    static ConnectorTypology from (ConnectorTopology topology) {
+        for (ConnectorTypology dto: values()) {
             if (dto.topology == topology) {
                 return dto;
             }

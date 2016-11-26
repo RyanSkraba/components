@@ -12,28 +12,28 @@
 // ============================================================================
 package org.talend.components.service.rest.dto;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import org.junit.Test;
 import org.talend.components.api.component.ConnectorTopology;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 /**
- * Unit test for the org.talend.components.service.rest.dto.TopologyDTO class.
+ * Unit test for the org.talend.components.service.rest.dto.ConnectorTypology class.
  *
- * @see TopologyDTO
+ * @see ConnectorTypology
  */
-public class TopologyDTOTest {
+public class ConnectorTypologyTest {
 
     @Test
-    public void shouldMapAllTopologies() throws Exception {
+    public void shouldMapAllTypologies() throws Exception {
         // given
         final ConnectorTopology[] topologies = ConnectorTopology.values();
 
         // when
         for (ConnectorTopology expected : topologies) {
             // then
-            final TopologyDTO dto = TopologyDTO.from(expected);
+            final ConnectorTypology dto = ConnectorTypology.from(expected);
             assertNotNull(dto);
             assertEquals(expected, dto.getTopology());
         }

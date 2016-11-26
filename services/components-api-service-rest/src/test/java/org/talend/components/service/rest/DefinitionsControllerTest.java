@@ -12,22 +12,10 @@
 // ============================================================================
 package org.talend.components.service.rest;
 
-import static com.jayway.restassured.RestAssured.*;
-import static java.util.Arrays.*;
-import static org.junit.Assert.*;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.*;
-import static org.springframework.http.HttpStatus.*;
-import static org.talend.components.api.component.ConnectorTopology.*;
-import static org.talend.components.api.component.ConnectorTopology.NONE;
-import static org.talend.components.service.rest.DefinitionType.*;
-import static org.talend.components.service.rest.dto.TopologyDTO.*;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.response.Response;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,16 +29,28 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.common.datastore.DatastoreDefinition;
+import org.talend.components.service.rest.dto.ConnectorTypology;
 import org.talend.components.service.rest.dto.DefinitionDTO;
-import org.talend.components.service.rest.dto.TopologyDTO;
 import org.talend.components.service.rest.mock.MockComponentDefinition;
 import org.talend.components.service.rest.mock.MockDatastoreDefinition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.response.Response;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
+import static com.jayway.restassured.RestAssured.when;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.http.HttpStatus.OK;
+import static org.talend.components.api.component.ConnectorTopology.*;
+import static org.talend.components.service.rest.DefinitionType.COMPONENT;
+import static org.talend.components.service.rest.DefinitionType.DATA_STORE;
+import static org.talend.components.service.rest.dto.ConnectorTypology.*;
 
 /**
  * Unit test for the org.talend.components.service.rest.DefinitionsController class.
@@ -138,27 +138,27 @@ public class DefinitionsControllerTest {
     }
 
     @Test
-    public void shouldFilterSourceTopology() throws Exception {
-        shouldFilterComponentsByTopology(SOURCE, 5); // 3 sources + 2 source & sink
+    public void shouldFilterSourceTypology() throws Exception {
+        shouldFilterComponentsByTypology(SOURCE, 5); // 3 sources + 2 source & sink
     }
 
     @Test
-    public void shouldFilterSinkTopology() throws Exception {
-        shouldFilterComponentsByTopology(SINK, 5); // 3 sources + 2 source & sink
+    public void shouldFilterSinkTypology() throws Exception {
+        shouldFilterComponentsByTypology(SINK, 5); // 3 sources + 2 source & sink
     }
 
     @Test
-    public void shouldFilterTransformerTopology() throws Exception {
-        shouldFilterComponentsByTopology(TRANSFORMER, 3); // 3 transformers
+    public void shouldFilterTransformerTypology() throws Exception {
+        shouldFilterComponentsByTypology(TRANSFORMER, 3); // 3 transformers
     }
 
     @Test
-    public void shouldFilterConfigurationTopology() throws Exception {
-        shouldFilterComponentsByTopology(CONFIGURATION, 3); // 3 configuration
+    public void shouldFilterConfigurationTypology() throws Exception {
+        shouldFilterComponentsByTypology(CONFIGURATION, 3); // 3 configuration
     }
 
     @Test
-    public void shouldNotFilterTopology() throws Exception {
+    public void shouldNotFilterTypology() throws Exception {
         // given
         Map<String, ComponentDefinition> definitions = getComponentsDefinitions();
 
@@ -175,7 +175,7 @@ public class DefinitionsControllerTest {
         assertEquals(14, actual.size());
     }
 
-    public void shouldFilterComponentsByTopology(TopologyDTO wantedTopology, int expectedResults) throws IOException {
+    public void shouldFilterComponentsByTypology(ConnectorTypology wantedTypology, int expectedResults) throws IOException {
         // given
         Map<String, ComponentDefinition> definitions = getComponentsDefinitions();
 
@@ -183,14 +183,14 @@ public class DefinitionsControllerTest {
                 .willReturn(definitions);
 
         // when
-        final Response response = when().get("/definitions/components?topology=" + wantedTopology.name()).andReturn();
+        final Response response = when().get("/definitions/components?typology=" + wantedTypology.name()).andReturn();
 
         // then
         assertEquals(OK.value(), response.getStatusCode());
         List<DefinitionDTO> actual = objectMapper.readValue(response.asInputStream(), new TypeReference<List<DefinitionDTO>>() {
         });
         assertEquals(expectedResults, actual.size());
-        assertEquals(expectedResults, actual.stream().filter(dto -> dto.getTopologies().contains(wantedTopology.name())) // it's a
+        assertEquals(expectedResults, actual.stream().filter(dto -> dto.getTypologies().contains(wantedTypology.name())) // it's a
                                                                                                                          // source
                 .count());
     }

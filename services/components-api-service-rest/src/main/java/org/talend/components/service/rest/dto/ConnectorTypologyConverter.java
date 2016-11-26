@@ -17,12 +17,12 @@ import java.beans.PropertyEditorSupport;
 /**
  *
  */
-public class TopologyDTOConverter extends PropertyEditorSupport {
+public class ConnectorTypologyConverter extends PropertyEditorSupport {
 
     @Override
     public void setAsText(String text) {
-        final TopologyDTO dto = TopologyDTO.valueOf(text.toUpperCase());
-        setValue(dto);
+        final ConnectorTypology typology = ConnectorTypology.valueOf(text.toUpperCase());
+        setValue(typology);
     }
 
 
