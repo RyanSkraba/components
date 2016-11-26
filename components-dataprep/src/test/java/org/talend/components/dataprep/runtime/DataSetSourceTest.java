@@ -27,6 +27,7 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.dataprep.tdatasetinput.TDataSetInputDefinition;
 import org.talend.components.dataprep.tdatasetinput.TDataSetInputProperties;
 import org.talend.components.service.spring.SpringTestApp;
+import org.talend.daikon.properties.ValidationResult;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringTestApp.class)
@@ -52,12 +53,12 @@ public class DataSetSourceTest {
     }
 
     @Test
-    public void testValidateThrowsException() throws Exception {
+    public void testValidate() throws Exception {
 
         TDataSetInputProperties properties = (TDataSetInputProperties) definition.createProperties();
         properties.setValue("url", "http://127.0.0.1");
         inputSource.initialize(null, properties);
-        inputSource.validate(null);
+        Assert.assertNotSame(ValidationResult.OK, inputSource.validate(null));
     }
 
     @Test

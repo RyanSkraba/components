@@ -12,6 +12,9 @@
 // ============================================================================
 package org.talend.components.dataprep.runtime;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
+
 import java.util.Collections;
 
 import javax.inject.Inject;
@@ -22,10 +25,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputDefinition;
 import org.talend.components.dataprep.tdatasetoutput.TDataSetOutputProperties;
 import org.talend.components.service.spring.SpringTestApp;
+import org.talend.daikon.properties.ValidationResult;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = SpringTestApp.class)
@@ -46,14 +51,16 @@ public class DataSetSinkTest {
 
     @Test
     public void testCreateWriteOperation() throws Exception {
-        TDataSetOutputProperties properties = (TDataSetOutputProperties) definition.createProperties();
-        properties.setValue("url", "http://127.0.0.1");
-        outputSink.initialize(null, properties);
-        outputSink.createWriteOperation();
+        WriteOperation<?> writeOperation = outputSink.createWriteOperation();
+        assertThat(writeOperation, instanceOf(DataSetWriteOperation.class));
     }
 
     @Test
     public void testInitialize() throws Exception {
+        TDataSetOutputProperties properties = (TDataSetOutputProperties) definition.createProperties();
+        properties.setValue("url", "http://127.0.0.1");
+        properties.setValue("mode", DataPrepOutputModes.LiveDataset);
+        Assert.assertSame(ValidationResult.OK, outputSink.initialize(null, properties));
 
     }
 
@@ -62,16 +69,16 @@ public class DataSetSinkTest {
         TDataSetOutputProperties properties = (TDataSetOutputProperties) definition.createProperties();
         properties.setValue("url", "http://127.0.0.1");
         outputSink.initialize(null, properties);
-        outputSink.validate(null);
+        Assert.assertNotSame(ValidationResult.OK, outputSink.validate(null));
     }
 
     @Test
-    public void validateLiveDataSet() {
+    public void testValidateLiveDataSet() {
         TDataSetOutputProperties properties = (TDataSetOutputProperties) definition.createProperties();
         properties.setValue("url", "http://127.0.0.1");
         properties.setValue("mode", DataPrepOutputModes.LiveDataset);
         outputSink.initialize(null, properties);
-        outputSink.validate(null);
+        Assert.assertSame(ValidationResult.OK, outputSink.validate(null));
     }
 
     @Test
