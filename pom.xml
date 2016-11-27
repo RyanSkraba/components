@@ -20,7 +20,6 @@
 		<module>components-snowflake</module>
 		<module>components-splunk</module>
 		<module>components-jira</module>
-		<module>components-dataprep</module>
 		<module>components-api-full-example</module>
 		<module>components-jdbc</module>
 		<module>components-filedelimited</module>
