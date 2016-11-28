@@ -1,19 +1,19 @@
 package org.talend.components.common.oauth.util;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.equalTo;
-
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.util.SocketUtils;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 /**
  * Unit test for the org.talend.components.common.oauth.util.HttpsService class.
@@ -26,10 +26,11 @@ public class HttpsServiceTest {
 
     private String host = "127.0.0.1";
 
-    private int port = 8910;
+    private int port;
 
     @Before
     public void setUp() throws Exception {
+        port = SocketUtils.findAvailableTcpPort(10000);
         service = new HttpsService(host, port, new HelloHandler());
     }
 
