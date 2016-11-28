@@ -13,19 +13,12 @@
 package org.talend.components.api.service.internal.osgi;
 
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.avro.Schema;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.Connector;
@@ -42,7 +35,6 @@ import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.runtime.RuntimeInfo;
 
-import aQute.bnd.annotation.component.Activate;
 import aQute.bnd.annotation.component.Component;
 import aQute.bnd.annotation.component.Reference;
 
@@ -62,43 +54,12 @@ public class ComponentServiceOsgi implements ComponentService {
         this.gctx = aGctx;
     }
 
+    @Reference
+    public void osgiInjectDefinitionRegistry(DefinitionRegistry defReg) {
+        this.componentServiceDelegate = new ComponentServiceImpl(defReg);
+    }
+
     private ComponentServiceImpl componentServiceDelegate;
-
-    protected static <T> Map<String, T> populateMap(BundleContext bc, Class<T> cls) {
-        Map<String, T> map = new HashMap<>();
-        try {
-            String typeCanonicalName = cls.getCanonicalName();
-            Collection<ServiceReference<T>> serviceReferences = bc.getServiceReferences(cls, null);
-            for (ServiceReference<T> sr : serviceReferences) {
-                T service = bc.getService(sr);
-                Object nameProp = sr.getProperty("component.name"); //$NON-NLS-1$
-                if (nameProp instanceof String) {
-                    map.put((String) nameProp, service);
-                    LOGGER.info("Registered the component: " + nameProp + "(" + service.getClass().getCanonicalName() + ")"); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
-                } else {// no name set so issue a warning
-                    LOGGER.warn("Failed to register the following component because it is unnamed: " //$NON-NLS-1$
-                            + service.getClass().getCanonicalName());
-                }
-            }
-            if (map.isEmpty()) {// warn if no components were registered
-                LOGGER.warn("Could not find any registered components for type :" + typeCanonicalName); //$NON-NLS-1$
-            } // else everything is fine
-        } catch (InvalidSyntaxException e) {
-            LOGGER.error("Failed to get " + cls.getSimpleName() + " services", e); //$NON-NLS-1$
-        }
-        return map;
-    }
-
-    @Activate
-    void activate(BundleContext bundleContext) throws InvalidSyntaxException {
-        DefinitionRegistry registry = new DefinitionRegistry();
-        Map<String, ComponentInstaller> installers = populateMap(bundleContext, ComponentInstaller.class);
-        for (ComponentInstaller installer : installers.values()) {
-            installer.install(registry);
-        }
-        registry.lock();
-        this.componentServiceDelegate = new ComponentServiceImpl(registry);
-    }
 
     @Override
     public ComponentProperties getComponentProperties(String name) {

@@ -28,6 +28,10 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.error.ComponentsApiErrorCode;
 import org.talend.components.api.service.ComponentService;
 
+/**
+ * @deprecated please use the {@link AbstractComponentTest2} instead
+ */
+@Deprecated
 public abstract class AbstractComponentTest {
 
     // for benchmarking the apis, one suggestion is to use http://openjdk.java.net/projects/code-tools/jmh/.

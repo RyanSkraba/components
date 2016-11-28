@@ -18,10 +18,10 @@ import org.talend.components.jdbc.dataprep.JDBCInputDefinition;
 import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
 import org.talend.components.jdbc.runtime.JDBCTemplate;
 import org.talend.components.jdbc.runtime.dataprep.JDBCDatastoreRuntime;
-import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
-public class JDBCDatastoreDefinition extends SimpleNamedThing implements DatastoreDefinition<JDBCDatastoreProperties> {
+public class JDBCDatastoreDefinition extends I18nDefinition implements DatastoreDefinition<JDBCDatastoreProperties> {
 
     public static final String NAME = "JDBCDatastore";
 
@@ -63,11 +63,6 @@ public class JDBCDatastoreDefinition extends SimpleNamedThing implements Datasto
     @Override
     public Class<JDBCDatastoreProperties> getPropertiesClass() {
         return JDBCDatastoreProperties.class;
-    }
-
-    @Override
-    public String getDisplayName() {
-        return getI18nMessage("datastore." + getName() + I18N_DISPLAY_NAME_SUFFIX);
     }
 
 }

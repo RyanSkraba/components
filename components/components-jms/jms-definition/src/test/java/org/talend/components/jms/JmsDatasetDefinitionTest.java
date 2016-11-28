@@ -37,7 +37,7 @@ public class JmsDatasetDefinitionTest {
      */
     @Test
     public void testGetImagePath() {
-        assertEquals(null, datasetDefinition.getImagePath());
+        assertNotNull(datasetDefinition.getImagePath());
     }
 
     /**

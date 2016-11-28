@@ -19,10 +19,10 @@ import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.jms.input.JmsInputDefinition;
 import org.talend.components.jms.output.JmsOutputDefinition;
-import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
-public class JmsDatastoreDefinition extends SimpleNamedThing implements DatastoreDefinition<JmsDatastoreProperties> {
+public class JmsDatastoreDefinition extends I18nDefinition implements DatastoreDefinition<JmsDatastoreProperties> {
 
     public static final String RUNTIME_1_1 = "org.talend.components.jms.runtime_1_1.DatastoreRuntime";
 
@@ -46,7 +46,7 @@ public class JmsDatastoreDefinition extends SimpleNamedThing implements Datastor
 
     @Override
     public String getImagePath() {
-        return null;
+        return "/org/talend/components/jms/input/JmsInput_icon32.png";
     }
 
     @Override
@@ -65,11 +65,6 @@ public class JmsDatastoreDefinition extends SimpleNamedThing implements Datastor
     @Override
     public String getOutputCompDefinitionName() {
         return JmsOutputDefinition.COMPONENT_NAME;
-    }
-
-    @Override
-    public String getDisplayName() {
-        return getI18nMessage("datastore." + getName() + I18N_DISPLAY_NAME_SUFFIX);
     }
 
 }
