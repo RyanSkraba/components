@@ -12,6 +12,11 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import static org.talend.components.salesforce.SalesforceOutputProperties.OutputAction.UPDATE;
+import static org.talend.components.salesforce.SalesforceOutputProperties.OutputAction.UPSERT;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,11 +24,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
@@ -35,6 +42,7 @@ import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.error.DefaultErrorCode;
+
 import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.Error;
 import com.sforce.soap.partner.PartnerConnection;
@@ -47,9 +55,6 @@ import com.sforce.ws.bind.DateCodec;
 import com.sforce.ws.bind.XmlObject;
 import com.sforce.ws.types.Time;
 import com.sforce.ws.util.Base64;
-
-import static org.talend.components.salesforce.SalesforceOutputProperties.OutputAction.UPDATE;
-import static org.talend.components.salesforce.SalesforceOutputProperties.OutputAction.UPSERT;
 
 final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
@@ -103,6 +108,8 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
 
     private DateCodec dateCodec = new DateCodec();
 
+    private BufferedWriter logWriter;
+
     public SalesforceWriter(SalesforceWriteOperation salesforceWriteOperation, RuntimeContainer container) {
         this.salesforceWriteOperation = salesforceWriteOperation;
         this.container = container;
@@ -134,6 +141,10 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
             } // else schema is fully specified
         }
         upsertKeyColumn = sprops.upsertKeyColumn.getStringValue();
+
+        if (!StringUtils.isEmpty(sprops.logFileName.getValue())) {
+            logWriter = new BufferedWriter(new FileWriter(sprops.logFileName.getValue()));
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -425,10 +436,13 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
 
     private void handleReject(IndexedRecord input, Error[] resultErrors, String[] changedItemKeys, int batchIdx)
             throws IOException {
+        StringBuilder errors = SalesforceRuntime.addLog(resultErrors,
+                batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx] : "Batch index out of bounds", logWriter);
         if (exceptionForErrors) {
-            StringBuilder errors = SalesforceRuntime.addLog(resultErrors,
-                    batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx] : "Batch index out of bounds", null);
             if (errors.toString().length() > 0) {
+                if (logWriter != null) {
+                    logWriter.close();
+                }
                 throw new IOException(errors.toString());
             }
         } else {
@@ -525,6 +539,10 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
     @Override
     public Result close() throws IOException {
         logout();
+        // For "ceaseForError" is false
+        if (logWriter != null) {
+            logWriter.close();
+        }
         return new Result(uId, dataCount, successCount, rejectCount);
     }
 

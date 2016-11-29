@@ -19,12 +19,14 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,7 +43,9 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.AfterClass;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.ComponentDefinition;
@@ -60,6 +64,9 @@ import org.talend.daikon.properties.property.Property;
 import com.sforce.ws.util.Base64;
 
 public class SalesforceWriterTestIT extends SalesforceTestBase {
+
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceWriterTestIT.class);
 
@@ -443,6 +450,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
      */
     @Test
     public void testSinkWorkflow_insertRejected() throws Exception {
+
         // Component framework objects.
         ComponentDefinition sfDef = new TSalesforceOutputDefinition();
 
@@ -517,6 +525,11 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
     protected void testUpdate(boolean ceaseForError) throws Exception {
 
+        // Generate log file path
+        String logFilePath = tempFolder.getRoot().getAbsolutePath() + "/salesforce_error_" + (ceaseForError ? 0 : 1) + ".log";
+        File file = new File(logFilePath);
+        assertFalse(file.exists());
+
         // Component framework objects.
         ComponentDefinition sfDef = new TSalesforceOutputDefinition();
 
@@ -527,6 +540,9 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         sfProps.outputAction.setValue(OutputAction.UPDATE);
         sfProps.extendInsert.setValue(false);
         sfProps.ceaseForError.setValue(ceaseForError);
+        // Setup log file path
+        LOGGER.debug("Error log path: " + logFilePath);
+        sfProps.logFileName.setValue(logFilePath);
         // Automatically generate the out schemas.
         sfProps.module.schemaListener.afterSchema();
 
@@ -539,55 +555,59 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
         SalesforceWriteOperation sfWriteOp = sfSink.createWriteOperation();
         sfWriteOp.initialize(container);
+        try {
 
-        SalesforceWriter sfWriter = sfSink.createWriteOperation().createWriter(container);
-        sfWriter.open("uid1");
+            SalesforceWriter sfWriter = sfSink.createWriteOperation().createWriter(container);
+            sfWriter.open("uid1");
 
-        // Write one record, which should fail for the bad ID
-        IndexedRecord r = new GenericData.Record(SCHEMA_UPDATE_ACCOUNT);
-        r.put(0, "bad id");
-        r.put(1, UNIQUE_NAME + "_" + UNIQUE_ID);
-        r.put(2, "deleteme");
-        r.put(3, "deleteme");
-        r.put(4, "deleteme");
-        if (!ceaseForError) {
-            sfWriter.write(r);
-
-            assertThat(sfWriter.getSuccessfulWrites(), empty());
-            assertThat(sfWriter.getRejectedWrites(), hasSize(1));
-
-            // Check the rejected record.
-            IndexedRecord rejected = sfWriter.getRejectedWrites().get(0);
-            assertThat(rejected.getSchema().getFields(), hasSize(8));
-
-            // Check the values copied from the incoming record.
-            for (int i = 0; i < r.getSchema().getFields().size(); i++) {
-                assertThat(rejected.getSchema().getFields().get(i), is(r.getSchema().getFields().get(i)));
-                assertThat(rejected.get(0), is(r.get(0)));
-            }
-
-            // The enriched fields.
-            assertThat(rejected.getSchema().getFields().get(5).name(), is("errorCode"));
-            assertThat(rejected.getSchema().getFields().get(6).name(), is("errorFields"));
-            assertThat(rejected.getSchema().getFields().get(7).name(), is("errorMessage"));
-            assertThat(rejected.get(5), is((Object) "MALFORMED_ID"));
-            assertThat(rejected.get(6), is((Object) "Id"));
-            assertThat(rejected.get(7), is((Object) "Account ID: id value of incorrect type: bad id"));
-
-            // Finish the Writer, WriteOperation and Sink.
-            Result wr1 = sfWriter.close();
-            sfWriteOp.finalize(Arrays.asList(wr1), container);
-        } else {
-            try {
+            // Write one record, which should fail for the bad ID
+            IndexedRecord r = new GenericData.Record(SCHEMA_UPDATE_ACCOUNT);
+            r.put(0, "bad id");
+            r.put(1, UNIQUE_NAME + "_" + UNIQUE_ID);
+            r.put(2, "deleteme");
+            r.put(3, "deleteme");
+            r.put(4, "deleteme");
+            if (!ceaseForError) {
                 sfWriter.write(r);
-                sfWriter.close();
-                fail("It should get error when insert data!");
-            } catch (IOException e) {
-                assertThat(e.getMessage(), is((Object) "Account ID: id value of incorrect type: bad id\n"));
-                throw e;
-            }
-        }
 
+                assertThat(sfWriter.getSuccessfulWrites(), empty());
+                assertThat(sfWriter.getRejectedWrites(), hasSize(1));
+
+                // Check the rejected record.
+                IndexedRecord rejected = sfWriter.getRejectedWrites().get(0);
+                assertThat(rejected.getSchema().getFields(), hasSize(8));
+
+                // Check the values copied from the incoming record.
+                for (int i = 0; i < r.getSchema().getFields().size(); i++) {
+                    assertThat(rejected.getSchema().getFields().get(i), is(r.getSchema().getFields().get(i)));
+                    assertThat(rejected.get(0), is(r.get(0)));
+                }
+
+                // The enriched fields.
+                assertThat(rejected.getSchema().getFields().get(5).name(), is("errorCode"));
+                assertThat(rejected.getSchema().getFields().get(6).name(), is("errorFields"));
+                assertThat(rejected.getSchema().getFields().get(7).name(), is("errorMessage"));
+                assertThat(rejected.get(5), is((Object) "MALFORMED_ID"));
+                assertThat(rejected.get(6), is((Object) "Id"));
+                assertThat(rejected.get(7), is((Object) "Account ID: id value of incorrect type: bad id"));
+
+                // Finish the Writer, WriteOperation and Sink.
+                Result wr1 = sfWriter.close();
+                sfWriteOp.finalize(Arrays.asList(wr1), container);
+            } else {
+                try {
+                    sfWriter.write(r);
+                    sfWriter.close();
+                    fail("It should get error when insert data!");
+                } catch (IOException e) {
+                    assertThat(e.getMessage(), is((Object) "Account ID: id value of incorrect type: bad id\n"));
+                    throw e;
+                }
+            }
+        } finally {
+            assertTrue(file.exists());
+            assertNotEquals(0, file.length());
+        }
     }
 
     /*
