@@ -25,6 +25,7 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.error.ComponentsApiErrorCode;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.runtime.RuntimeInfo;
+import org.talend.daikon.runtime.RuntimeUtil;
 
 /**
  * create a {@link RuntimeInfo} that will look for a given jar and will look for a dependency.txt file inside this jar given the
@@ -38,9 +39,13 @@ public class JarRuntimeInfo implements RuntimeInfo {
 
     private String depTxtPath;
 
+    static {
+        RuntimeUtil.registerMavenUrlHandler();
+    }
+
     /**
      * uses the <code>mavenGroupId</code> <code>mavenArtifactId</code> to locate the *dependency.txt* file using the rule defined
-     * in {@link DependenciesReader#computeDesignDependenciesPath()}
+     * in {@link DependenciesReader#computeDependenciesFilePath}
      * 
      * @param jarUrl url of the jar to read the depenency.txt from
      * @param depTxtPath, path used to locate the dependency.txt file
@@ -58,7 +63,7 @@ public class JarRuntimeInfo implements RuntimeInfo {
         try {
             // we assume that the url is a jar/zip file.
             try (JarInputStream jarInputStream = new JarInputStream(jarUrl.openStream())) {
-                return extracDependencyFromStream(dependenciesReader, depTxtPath, jarInputStream);
+                return extractDependencyFromStream(dependenciesReader, depTxtPath, jarInputStream);
             }
         } catch (IOException e) {
             throw new ComponentException(ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED, e,
@@ -66,7 +71,7 @@ public class JarRuntimeInfo implements RuntimeInfo {
         }
     }
 
-    static List<URL> extracDependencyFromStream(DependenciesReader dependenciesReader, String depTxtPath,
+    protected static List<URL> extractDependencyFromStream(DependenciesReader dependenciesReader, String depTxtPath,
             JarInputStream jarInputStream) throws IOException, MalformedURLException {
         JarEntry nextJarEntry = jarInputStream.getNextJarEntry();
         while (nextJarEntry != null) {

@@ -98,7 +98,7 @@ public class JarRuntimeInfoTest {
 
     /**
      * Test method for
-     * {@link org.talend.components.api.component.runtime.JarRuntimeInfo#extracDependencyFromStream(org.talend.components.api.component.runtime.DependenciesReader, java.lang.String, java.util.jar.JarInputStream)}
+     * {@link org.talend.components.api.component.runtime.JarRuntimeInfo#extractDependencyFromStream(org.talend.components.api.component.runtime.DependenciesReader, java.lang.String, java.util.jar.JarInputStream)}
      * .
      * 
      * @throws IOException
@@ -109,7 +109,7 @@ public class JarRuntimeInfoTest {
         MavenResolver mavenResolver = MavenResolvers.createMavenResolver(null, "foo");
         File jarWithDeps = mavenResolver.resolve("mvn:org.talend.components/components-api-full-example/0.1.0");
         try (JarInputStream jis = new JarInputStream(new FileInputStream(jarWithDeps))) {
-            List<URL> dependencyFromStream = JarRuntimeInfo.extracDependencyFromStream(new DependenciesReader(null),
+            List<URL> dependencyFromStream = JarRuntimeInfo.extractDependencyFromStream(new DependenciesReader(null),
                     DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-full-example"), jis);
             checkFullExampleDependencies(dependencyFromStream);
 
