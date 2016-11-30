@@ -231,7 +231,7 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
-					<!-- Workaround maven not being able to set a property conditionally 
+					<!-- Workaround maven not being able to set a property conditionally
 						based on the current version being SNAPSHOT or not -->
 					<execution>
 						<id>compute-docker-version</id>

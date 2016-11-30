@@ -47,6 +47,11 @@ public class TSnowflakeOutputDefinition extends SnowflakeDefinition {
     }
 
     @Override
+    public boolean isRejectAfterClose() {
+        return true;
+    }
+
+    @Override
     public String getPartitioning() {
         return AUTO;
     }

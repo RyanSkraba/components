@@ -118,6 +118,11 @@ public interface ComponentDefinition extends RuntimableDefinition<ComponentPrope
 
     boolean isConditionalInputs();
 
+    /**
+     * True if the component needs to report on rejected writes after the close() method in the writer.
+     */
+    boolean isRejectAfterClose();
+
     boolean isStartable();
 
     // FIXME - An ENUM perhaps?
