@@ -53,7 +53,7 @@ public class JDBCDatasetProperties extends PropertiesImpl
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, getClass().getClassLoader())) {
             JDBCDatasetRuntime runtime = (JDBCDatasetRuntime) sandboxedInstance.getInstance();
             runtime.initialize(null, this);
-            Schema schema = runtime.getSchemaFromQuery(null, sql.getValue());
+            Schema schema = runtime.getSchema();
             main.schema.setValue(schema);
         }
     }
@@ -98,6 +98,8 @@ public class JDBCDatasetProperties extends PropertiesImpl
 
         setting.setUsername(datastoreProperties.userPassword.userId.getValue());
         setting.setPassword(datastoreProperties.userPassword.password.getValue());
+
+        setting.setSchema(main.schema.getValue());
 
         setting.setSql(sql.getValue());
 

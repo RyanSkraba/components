@@ -13,14 +13,18 @@
 package org.talend.components.jdbc.dataprep;
 
 import org.apache.avro.Schema;
+import org.apache.avro.generic.IndexedRecord;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.talend.components.jdbc.common.DBTestUtils;
 import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
 import org.talend.components.jdbc.datastore.JDBCDatastoreDefinition;
 import org.talend.components.jdbc.datastore.JDBCDatastoreProperties;
+import org.talend.components.jdbc.runtime.dataprep.JDBCDatasetRuntime;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
+import org.talend.daikon.java8.Consumer;
 
 public class JDBCDatasetTestIT {
 
@@ -30,6 +34,7 @@ public class JDBCDatasetTestIT {
     public static void beforeClass() throws Exception {
         allSetting = DBTestUtils.createAllSetting();
         DBTestUtils.createTable(allSetting);
+        DBTestUtils.truncateTableAndLoadData(allSetting);
     }
 
     @AfterClass
@@ -39,6 +44,48 @@ public class JDBCDatasetTestIT {
 
     @Test
     public void testUpdateSchema() {
+        JDBCDatasetProperties dataset = createDatasetProperties();
+
+        Schema schema = dataset.main.schema.getValue();
+
+        Assert.assertNotNull(schema);
+        DBTestUtils.testMetadata(schema.getFields());
+    }
+
+    @Test
+    public void testGetSchema() {
+        JDBCDatasetProperties dataset = createDatasetProperties();
+
+        JDBCDatasetRuntime runtime = new JDBCDatasetRuntime();
+        runtime.initialize(null, dataset);
+        Schema schema = runtime.getSchema();
+
+        Assert.assertNotNull(schema);
+        DBTestUtils.testMetadata(schema.getFields());
+    }
+
+    @Test
+    public void testGetSample() {
+        JDBCDatasetProperties dataset = createDatasetProperties();
+
+        JDBCDatasetRuntime runtime = new JDBCDatasetRuntime();
+        runtime.initialize(null, dataset);
+        final IndexedRecord[] record = new IndexedRecord[1];
+        Consumer<IndexedRecord> storeTheRecords = new Consumer<IndexedRecord>() {
+
+            @Override
+            public void accept(IndexedRecord data) {
+                record[0] = data;
+
+            }
+        };
+
+        runtime.getSample(1, storeTheRecords);
+        Assert.assertEquals(1, record[0].get(0));
+        Assert.assertEquals("wangwei", record[0].get(1));
+    }
+
+    private JDBCDatasetProperties createDatasetProperties() {
         JDBCDatastoreDefinition def = new JDBCDatastoreDefinition();
         JDBCDatastoreProperties datastore = new JDBCDatastoreProperties("datastore");
 
@@ -53,9 +100,7 @@ public class JDBCDatasetTestIT {
         dataset.sql.setValue(DBTestUtils.getSQL());
 
         dataset.updateSchema();
-
-        Schema schema = dataset.main.schema.getValue();
-        DBTestUtils.testMetadata(schema.getFields());
+        return dataset;
     }
 
 }
