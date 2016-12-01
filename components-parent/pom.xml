@@ -21,12 +21,16 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<docker.removeVolumes>true</docker.removeVolumes>
-        <talend_snapshots_deployment>http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
+		<talend_snapshots_deployment>http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
 	</properties>
 
 	<scm>
 		<connection>scm:git:https://github.com/Talend/components.git</connection>
 	</scm>
+	
+	<modules>
+	   <module>components-p2update-assembly</module>
+	</modules>
 
 	<distributionManagement>
 		<snapshotRepository>
@@ -242,7 +246,7 @@
 						<configuration>
 							<exportAntProperties>true</exportAntProperties>
 							<tasks>
-								<echo message="computing docker version" />
+								<echo message="computing docker version for ${project.build.finalName}-bundle.jar" />
 								<condition property="docker.version"
 									value="${project.version}-${maven.build.timestamp}" else="${project.version}">
 									<contains string="${project.version}" substring="SNAPSHOT" />
@@ -264,7 +268,8 @@
 				<version>2.18</version>
 				<configuration>
 					<systemProperties>
-					<!-- settings.xml and repo are used for pax tests on branch build that mirror the talend_nexus repo -->
+						<!-- settings.xml and repo are used for pax tests on branch build that 
+							mirror the talend_nexus repo -->
 						<org.ops4j.pax.url.mvn.repositories>+http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceSnapshot@snapshots@noreleases@id=talend_nexus,http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceRelease@id=talrelease</org.ops4j.pax.url.mvn.repositories>
 						<org.ops4j.pax.url.mvn.settings>${project.basedir}/settings.xml</org.ops4j.pax.url.mvn.settings>
 					</systemProperties>
@@ -311,28 +316,113 @@
 			<!-- </plugin> -->
 		</plugins>
 	</build>
-    <profiles>
-        <profile>
-          <id>skipTestRun</id>
-          <activation>
-            <property>
-              <name>skipTests</name>
-            </property>
-          </activation>
-          <properties>
-            <really.skip.tests>true</really.skip.tests>
-          </properties>
-        </profile>
-        <profile>
-          <id>skipTestItRun</id>
-          <activation>
-            <property>
-              <name>skipITs</name>
-            </property>
-          </activation>
-          <properties>
-            <really.skip.tests>true</really.skip.tests>
-          </properties>
-        </profile>
-    </profiles>
+	<profiles>
+		<profile>
+			<id>skipTestRun</id>
+			<activation>
+				<property>
+					<name>skipTests</name>
+				</property>
+			</activation>
+			<properties>
+				<really.skip.tests>true</really.skip.tests>
+			</properties>
+		</profile>
+		<profile>
+			<id>skipTestItRun</id>
+			<activation>
+				<property>
+					<name>skipITs</name>
+				</property>
+			</activation>
+			<properties>
+				<really.skip.tests>true</really.skip.tests>
+			</properties>
+		</profile>
+		<profile>
+			<id>generateP2</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<!-- Copy the bundle to a new directory to prepare the update-site -->
+					<plugin>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>3.0.1</version>
+						<executions>
+							<execution>
+								<id>copy-bundles-for-publishing</id>
+								<phase>package</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}/source/plugins</outputDirectory>
+									<overwrite>true</overwrite>
+									<resources>
+										<resource>
+											<directory>${project.build.directory}</directory>
+											<includes>
+												<include>${project.build.finalName}-bundle.jar</include>
+											</includes>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- Create the update site directory with all the repository content -->
+					<plugin>
+						<groupId>org.eclipse.tycho.extras</groupId>
+						<artifactId>tycho-p2-extras-plugin</artifactId>
+						<version>0.26.0</version>
+						<executions>
+							<execution>
+								<id>publish-bundles</id>
+								<phase>package</phase>
+								<goals>
+									<goal>publish-features-and-bundles</goal>
+								</goals>
+								<configuration>
+									<metadataRepositoryLocation>${project.build.directory}/repository</metadataRepositoryLocation>
+									<artifactRepositoryLocation>${project.build.directory}/repository</artifactRepositoryLocation>
+									<sourceLocation>${project.build.directory}/source</sourceLocation>
+									<compress>true</compress>
+									<publishArtifacts>true</publishArtifacts>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- Create the final zip of the update site -->
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>3.0.0</version>
+						<dependencies>
+							<dependency>
+								<groupId>org.talend.components</groupId>
+								<artifactId>components-p2update-assembly</artifactId>
+                                <version>0.16.0-SNAPSHOT</version>								
+							</dependency>
+						</dependencies>
+						<executions>
+							<execution>
+								<id>make-assembly</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- This is where we use our shared assembly descriptor -->
+									<descriptorRefs>
+										<descriptorRef>p2updatesite</descriptorRef>
+									</descriptorRefs>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
