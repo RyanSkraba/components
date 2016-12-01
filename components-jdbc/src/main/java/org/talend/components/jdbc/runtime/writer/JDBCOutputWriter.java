@@ -42,6 +42,10 @@ import org.talend.components.jdbc.runtime.sqlbuilder.JDBCSQLBuilder;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties.DataAction;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
+/**
+ * common JDBC writer
+ *
+ */
 abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
     private transient static final Logger LOG = LoggerFactory.getLogger(JDBCOutputWriter.class);

@@ -18,6 +18,10 @@ import org.talend.components.jdbc.runtime.dataprep.JDBCDatasetRuntime;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.runtime.RuntimeInfo;
 
+/**
+ * the database data set work for dataprep
+ *
+ */
 public class JDBCDatasetDefinition extends SimpleNamedThing implements DatasetDefinition<JDBCDatasetProperties> {
 
     public static final String NAME = "JDBCDataset";

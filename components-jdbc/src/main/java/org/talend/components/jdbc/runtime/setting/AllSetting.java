@@ -20,6 +20,10 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCAvroRegistryInfluencer;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties.DataAction;
 
+/**
+ * All the runtime setting for JDBC components
+ *
+ */
 // Maybe we need to split it?
 public class AllSetting implements Serializable, JDBCAvroRegistryInfluencer {
 

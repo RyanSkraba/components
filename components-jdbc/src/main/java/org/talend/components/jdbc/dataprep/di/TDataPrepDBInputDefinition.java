@@ -23,6 +23,10 @@ import org.talend.components.jdbc.runtime.JDBCTemplate;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
+/**
+ * the database input component which work in Talend studio as a sample component
+ * 
+ */
 public class TDataPrepDBInputDefinition extends AbstractComponentDefinition {
 
     public static final String COMPONENT_NAME = "tDataPrepDBInput";

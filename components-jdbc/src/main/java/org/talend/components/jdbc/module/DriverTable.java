@@ -21,6 +21,10 @@ import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 
+/**
+ * common JDBC driver table properties
+ *
+ */
 // have to implement ComponentProperties, not good
 public class DriverTable extends ComponentPropertiesImpl {
 

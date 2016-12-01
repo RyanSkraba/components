@@ -20,6 +20,10 @@ import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jdbc.ComponentConstants;
 
+/**
+ * JDBC runtime execution object for output action
+ *
+ */
 public class JDBCSink extends JDBCSourceOrSink implements Sink {
 
     private static final long serialVersionUID = 3228265006313531905L;

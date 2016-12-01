@@ -25,6 +25,10 @@ import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.java8.Consumer;
 import org.talend.daikon.properties.ValidationResult;
 
+/**
+ * the data set runtime for database
+ *
+ */
 public class JDBCDatasetRuntime implements DatasetRuntime<JDBCDatasetProperties> {
 
     /**

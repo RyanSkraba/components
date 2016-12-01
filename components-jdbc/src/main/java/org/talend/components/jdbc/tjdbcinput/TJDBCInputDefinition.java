@@ -24,6 +24,10 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.runtime.RuntimeInfo;
 
+/**
+ * JDBC input component
+ *
+ */
 public class TJDBCInputDefinition extends AbstractComponentDefinition {
 
     public static final String COMPONENT_NAME = "tJDBCInputNew";

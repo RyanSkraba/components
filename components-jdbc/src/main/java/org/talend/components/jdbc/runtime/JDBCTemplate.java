@@ -41,8 +41,20 @@ import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.runtime.RuntimeInfo;
 
+/**
+ * provide some tools for JDBC runtime
+ *
+ */
 public class JDBCTemplate {
 
+    /**
+     * get the JDBC connection object by the runtime setting
+     * 
+     * @param setting
+     * @return
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     */
     public static Connection createConnection(AllSetting setting) throws ClassNotFoundException, SQLException {
         java.lang.Class.forName(setting.getDriverClass());
         Connection conn = java.sql.DriverManager.getConnection(setting.getJdbcUrl(), setting.getUsername(),
@@ -50,6 +62,12 @@ public class JDBCTemplate {
         return conn;
     }
 
+    /**
+     * get key columns from the fields
+     * 
+     * @param allFields
+     * @return
+     */
     public static List<Schema.Field> getKeyColumns(List<Schema.Field> allFields) {
         List<Schema.Field> result = new ArrayList<Schema.Field>();
 
@@ -63,6 +81,12 @@ public class JDBCTemplate {
         return result;
     }
 
+    /**
+     * get value columns from the fields
+     * 
+     * @param allFields
+     * @return
+     */
     public static List<Schema.Field> getValueColumns(List<Schema.Field> allFields) {
         List<Schema.Field> result = new ArrayList<Schema.Field>();
 
@@ -77,6 +101,15 @@ public class JDBCTemplate {
         return result;
     }
 
+    /**
+     * create a common RuntimeInfo object which will provide runtime execution entrance class name and the MAVEN paths of the
+     * necessary dependencies, which will be callback in the execution platform.
+     * 
+     * @param classLoader
+     * @param properties
+     * @param runtimeClassName
+     * @return
+     */
     public static RuntimeInfo createCommonRuntime(final ClassLoader classLoader, final Properties properties,
             final String runtimeClassName) {
         return new RuntimeInfo() {
@@ -133,6 +166,15 @@ public class JDBCTemplate {
         return content;
     }
 
+    /**
+     * fill the prepared statement object
+     * 
+     * @param pstmt
+     * @param indexs
+     * @param types
+     * @param values
+     * @throws SQLException
+     */
     public static void setPreparedStatement(final PreparedStatement pstmt, final List<Integer> indexs, final List<String> types,
             final List<Object> values) throws SQLException {
         // TODO : adjust it

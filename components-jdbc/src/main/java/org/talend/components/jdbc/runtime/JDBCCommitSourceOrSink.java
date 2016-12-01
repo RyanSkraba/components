@@ -26,6 +26,10 @@ import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 
+/**
+ * JDBC commit runtime execution object
+ *
+ */
 public class JDBCCommitSourceOrSink implements SourceOrSink {
 
     private static final long serialVersionUID = -7226558840084293603L;

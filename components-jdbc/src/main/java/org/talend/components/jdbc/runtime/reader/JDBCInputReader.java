@@ -33,6 +33,10 @@ import org.talend.components.jdbc.runtime.JDBCSource;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.avro.AvroUtils;
 
+/**
+ * common JDBC reader
+ *
+ */
 public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
 
     protected RuntimeSettingProvider properties;

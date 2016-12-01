@@ -25,6 +25,10 @@ import org.talend.components.jdbc.runtime.JDBCTemplate;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
+/**
+ * JDBC row component
+ *
+ */
 public class TJDBCRowDefinition extends AbstractComponentDefinition {
 
     public static final String COMPONENT_NAME = "tJDBCRowNew";

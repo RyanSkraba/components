@@ -28,15 +28,33 @@ import org.talend.daikon.properties.presentation.Form;
 
 public class CommonUtils {
 
+    /**
+     * get AVRO schema object inside SchemaProperties object
+     * 
+     * @param schema
+     * @return
+     */
     public static Schema getSchema(SchemaProperties schema) {
         return schema.schema.getValue();
     }
 
+    /**
+     * install the form for the properties
+     * 
+     * @param props : the properties which the form install on
+     * @param formName : the name for the form
+     * @return
+     */
     public static Form addForm(Properties props, String formName) {
         return new Form(props, formName);
     }
 
-    // get main schema from the out connector of input components
+    /**
+     * get main schema from the out connector of input components
+     * 
+     * @param properties
+     * @return
+     */
     public static Schema getMainSchemaFromOutputConnector(ComponentProperties properties) {
         Set<? extends Connector> outputConnectors = properties.getPossibleConnectors(true);
 
@@ -53,7 +71,12 @@ public class CommonUtils {
         return null;
     }
 
-    // get main schema from the input connector of output components
+    /**
+     * get main schema from the input connector of output components
+     * 
+     * @param properties
+     * @return
+     */
     public static Schema getMainSchemaFromInputConnector(ComponentProperties properties) {
         Set<? extends Connector> inputConnectors = properties.getPossibleConnectors(false);
 
@@ -70,6 +93,12 @@ public class CommonUtils {
         return null;
     }
 
+    /**
+     * get the output schema from the properties
+     * 
+     * @param properties
+     * @return
+     */
     public static Schema getOutputSchema(ComponentProperties properties) {
         Set<? extends Connector> outputConnectors = properties.getPossibleConnectors(true);
 
@@ -86,6 +115,12 @@ public class CommonUtils {
         return null;
     }
 
+    /**
+     * get the reject schema from the properties
+     * 
+     * @param properties
+     * @return
+     */
     public static Schema getRejectSchema(ComponentProperties properties) {
         Set<? extends Connector> outputConnectors = properties.getPossibleConnectors(true);
 
@@ -102,6 +137,14 @@ public class CommonUtils {
         return null;
     }
 
+    /**
+     * clone the source schema with a new name and add some fields
+     * 
+     * @param metadataSchema
+     * @param newSchemaName
+     * @param moreFields
+     * @return
+     */
     public static Schema newSchema(Schema metadataSchema, String newSchemaName, List<Schema.Field> moreFields) {
         Schema newSchema = Schema.createRecord(newSchemaName, metadataSchema.getDoc(), metadataSchema.getNamespace(),
                 metadataSchema.isError());
@@ -126,6 +169,12 @@ public class CommonUtils {
         return newSchema;
     }
 
+    /**
+     * fill the connection runtime setting by the connection properties
+     * 
+     * @param setting
+     * @param connection
+     */
     public static void setCommonConnectionInfo(AllSetting setting, JDBCConnectionModule connection) {
         setting.setDriverPaths(connection.driverTable.drivers.getValue());
         setting.setDriverClass(connection.driverClass.getValue());

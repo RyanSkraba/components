@@ -21,6 +21,10 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
+/**
+ * common JDBC connection information properties
+ *
+ */
 public class JDBCConnectionModule extends PropertiesImpl {
 
     public Property<String> jdbcUrl = PropertyFactory.newProperty("jdbcUrl").setRequired();

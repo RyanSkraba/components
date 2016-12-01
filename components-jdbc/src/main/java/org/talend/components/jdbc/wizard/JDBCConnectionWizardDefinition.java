@@ -17,6 +17,10 @@ import org.talend.components.api.wizard.AbstractComponentWizardDefintion;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.WizardImageType;
 
+/**
+ * JDBC wizard
+ *
+ */
 public class JDBCConnectionWizardDefinition extends AbstractComponentWizardDefintion {
 
     public static final String COMPONENT_WIZARD_NAME = "JDBC";

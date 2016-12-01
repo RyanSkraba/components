@@ -21,6 +21,10 @@ import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jdbc.runtime.writer.JDBCRowWriter;
 
+/**
+ * JDBC row write operation
+ *
+ */
 public class JDBCRowWriteOperation implements WriteOperation<Result> {
 
     private static final long serialVersionUID = 7572409371695331857L;

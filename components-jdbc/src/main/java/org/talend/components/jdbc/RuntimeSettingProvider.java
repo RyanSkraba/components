@@ -14,8 +14,17 @@ package org.talend.components.jdbc;
 
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 
+/**
+ * the interface which work for split the properties and runtime execution object
+ *
+ */
 public interface RuntimeSettingProvider {
 
+    /**
+     * get the runtime setting which will be used in runtime execution object
+     * 
+     * @return
+     */
     AllSetting getRuntimeSetting();
 
 }

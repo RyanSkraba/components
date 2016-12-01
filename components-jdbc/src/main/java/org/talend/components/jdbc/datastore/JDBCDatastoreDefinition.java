@@ -21,6 +21,10 @@ import org.talend.components.jdbc.runtime.dataprep.JDBCDatastoreRuntime;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.runtime.RuntimeInfo;
 
+/**
+ * the database data store work for dataprep
+ *
+ */
 public class JDBCDatastoreDefinition extends SimpleNamedThing implements DatastoreDefinition<JDBCDatastoreProperties> {
 
     public static final String NAME = "JDBCDatastore";

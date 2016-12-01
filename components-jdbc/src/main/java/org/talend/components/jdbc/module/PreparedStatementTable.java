@@ -23,6 +23,10 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
+/**
+ * common JDBC prepared statement table properties
+ *
+ */
 // have to implement ComponentProperties, not good
 public class PreparedStatementTable extends ComponentPropertiesImpl {
 
