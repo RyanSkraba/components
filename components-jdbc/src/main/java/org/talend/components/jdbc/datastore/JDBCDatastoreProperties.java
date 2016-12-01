@@ -12,11 +12,15 @@
 // ============================================================================
 package org.talend.components.jdbc.datastore;
 
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +30,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.talend.components.api.exception.ComponentException;
-import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.RuntimeSettingProvider;
@@ -82,7 +85,10 @@ public class JDBCDatastoreProperties extends PropertiesImpl implements Datastore
 
     public Property<String> jdbcUrl = PropertyFactory.newProperty("jdbcUrl").setRequired();
 
-    public UserPasswordProperties userPassword = new UserPasswordProperties("userPassword");
+    public Property<String> userId = newProperty("userId").setRequired();
+
+    public Property<String> password = newProperty("password").setRequired()
+            .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
     @Override
     public void setupProperties() {
@@ -110,7 +116,8 @@ public class JDBCDatastoreProperties extends PropertiesImpl implements Datastore
         mainForm.addRow(Widget.widget(dbTypes).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
         mainForm.addRow(jdbcUrl);
 
-        mainForm.addRow(userPassword.getForm(Form.MAIN));
+        mainForm.addRow(userId);
+        mainForm.addRow(widget(password).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
     }
 
     public void afterDbTypes() {
@@ -126,8 +133,8 @@ public class JDBCDatastoreProperties extends PropertiesImpl implements Datastore
         setting.setDriverClass(getCurrentDriverClass());
         setting.setJdbcUrl(jdbcUrl.getValue());
 
-        setting.setUsername(userPassword.userId.getValue());
-        setting.setPassword(userPassword.password.getValue());
+        setting.setUsername(userId.getValue());
+        setting.setPassword(password.getValue());
 
         return setting;
     }

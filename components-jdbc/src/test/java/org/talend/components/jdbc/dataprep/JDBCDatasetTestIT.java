@@ -93,8 +93,8 @@ public class JDBCDatasetTestIT {
         datastore.afterDbTypes();
 
         datastore.jdbcUrl.setValue(allSetting.getJdbcUrl());
-        datastore.userPassword.userId.setValue(allSetting.getUsername());
-        datastore.userPassword.password.setValue(allSetting.getPassword());
+        datastore.userId.setValue(allSetting.getUsername());
+        datastore.password.setValue(allSetting.getPassword());
 
         JDBCDatasetProperties dataset = (JDBCDatasetProperties) def.createDatasetProperties(datastore);
         dataset.sql.setValue(DBTestUtils.getSQL());
