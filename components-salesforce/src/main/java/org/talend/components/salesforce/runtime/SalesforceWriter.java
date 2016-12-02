@@ -13,7 +13,6 @@
 package org.talend.components.salesforce.runtime;
 
 import static org.talend.components.salesforce.SalesforceOutputProperties.OutputAction.UPDATE;
-import static org.talend.components.salesforce.SalesforceOutputProperties.OutputAction.UPSERT;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -208,27 +207,38 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
         nullValueFields.clear();
         for (Schema.Field f : input.getSchema().getFields()) {
             Object value = input.get(f.pos());
-            Schema.Field se = moduleSchema.getField(f.name());
-            if (value != null && !"".equals(value.toString()) && se != null) {
+            Schema.Field se = mainSchema.getField(f.name());
+            if (se == null) {
+                continue;
+            }
+            if (value != null && !"".equals(value.toString())) {
                 if (referenceFieldsMap != null && referenceFieldsMap.get(se.name()) != null) {
                     Map<String, String> relationMap = referenceFieldsMap.get(se.name());
                     String lookupRelationshipFieldName = relationMap.get("lookupRelationshipFieldName");
                     so.setField(lookupRelationshipFieldName, null);
                     so.getChild(lookupRelationshipFieldName).setField("type", relationMap.get("lookupFieldModuleName"));
+                    // No need get the real type. Because of the External IDs should not be special type in addSObjectField()
                     addSObjectField(so.getChild(lookupRelationshipFieldName), se.schema().getType(),
                             relationMap.get("lookupFieldExternalIdName"), value);
                 } else {
-                    addSObjectField(so, se.schema().getType(), se.name(), value);
+                    Schema.Field fieldInModule = moduleSchema.getField(se.name());
+                    if (fieldInModule != null) {
+                        // The real type is need in addSObjectField()
+                        addSObjectField(so, fieldInModule.schema().getType(), se.name(), value);
+                    } else {
+                        // This is keep old behavior, when set a field which is not exist.
+                        // It would throw a exception for this.
+                        addSObjectField(so, se.schema().getType(), se.name(), value);
+                    }
                 }
             } else {
-                if (UPSERT.equals(sprops.outputAction.getValue()) && referenceFieldsMap != null
-                        && referenceFieldsMap.get(se.name()) != null) {
+                if (referenceFieldsMap != null && referenceFieldsMap.get(se.name()) != null) {
                     Map<String, String> relationMap = referenceFieldsMap.get(se.name());
                     String lookupFieldName = relationMap.get("lookupFieldName");
                     if (lookupFieldName != null && !lookupFieldName.trim().isEmpty()) {
                         nullValueFields.add(lookupFieldName);
                     }
-                } else if (se != null && !("Id".equals(se.name()) || se.name().equals(sprops.upsertKeyColumn.getValue()))) {
+                } else if (!("Id".equals(se.name()) || se.name().equals(sprops.upsertKeyColumn.getValue()))) {
                     nullValueFields.add(se.name());
                 }
             }

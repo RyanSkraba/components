@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -59,7 +58,6 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinit
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefinition;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
-import org.talend.daikon.properties.property.Property;
 
 import com.sforce.ws.util.Base64;
 
@@ -251,26 +249,97 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         assertEquals(0, resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
     }
 
-    @Ignore("test not finished")
+    @Ignore("Need to add some custom modules in salesforce account for this test")
     @Test
     public void testOutputUpsert() throws Throwable {
-        TSalesforceOutputProperties props = createSalesforceoutputProperties(EXISTING_MODULE_NAME);
-        props.outputAction.setValue(TSalesforceOutputProperties.OutputAction.UPSERT);
-        props.afterOutputAction();
 
-        Property se = (Property) props.getProperty("upsertKeyColumn");
-        assertTrue(se.getPossibleValues().size() > 10);
+        Schema CUSTOM_LOOKUP_MODULE_SCHEMA = SchemaBuilder.builder().record("Schema").fields() //
+                .name("ExternalID__c").type().stringType().noDefault() // External ID column
+                .name("Name").type().stringType().noDefault() //
+                .name("Id").type().stringType().noDefault() //
+                .endRecord();
 
-        Writer<Result> saleforceWriter = createSalesforceOutputWriter(props);
+        Schema CUSTOM_TEST_MODULE_SCHEMA = SchemaBuilder.builder().record("Schema").fields() //
+                .name("ExternalID__c").type().stringType().noDefault() // External ID column
+                .name("LookupModuleExternalId").type().stringType().noDefault() // Not a module field. keep the value
+                // of lookup module external id
+                .name("Name").type().stringType().noDefault() //
+                .name("Id").type().stringType().noDefault() //
+                .endRecord();
 
-        Map<String, Object> row = new HashMap<>();
-        row.put("Name", "TestName");
-        row.put("BillingStreet", "123 Main Street");
-        row.put("BillingState", "CA");
-        List<Map<String, Object>> outputRows = new ArrayList<>();
-        outputRows.add(row);
-        // FIXME - finish this test
-        // WriterResult writeResult = SalesforceTestHelper.writeRows(saleforceWriter, outputRows);
+        // Component framework objects.
+        ComponentDefinition sfDef = new TSalesforceOutputDefinition();
+
+        // Prepare the lookup module data
+        TSalesforceOutputProperties sfLookupProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
+        SalesforceTestBase.setupProps(sfLookupProps.connection, false);
+        sfLookupProps.module.setValue("moduleName", "TestLookupModule__c");
+        sfLookupProps.module.main.schema.setValue(CUSTOM_LOOKUP_MODULE_SCHEMA);
+        sfLookupProps.ceaseForError.setValue(true);
+        // Automatically generate the out schemas.
+        sfLookupProps.module.schemaListener.afterSchema();
+
+        List<IndexedRecord> records = new ArrayList<>();
+        IndexedRecord r1 = new GenericData.Record(CUSTOM_LOOKUP_MODULE_SCHEMA);
+        r1.put(0, "EXTERNAL_ID_" + UNIQUE_ID);
+        r1.put(1, UNIQUE_NAME + "_" + UNIQUE_ID);
+        records.add(r1);
+
+        SalesforceSink salesforceSink = new SalesforceSink();
+        salesforceSink.initialize(adaptor, sfLookupProps);
+        salesforceSink.validate(adaptor);
+        Writer<Result> batchWriter = salesforceSink.createWriteOperation().createWriter(adaptor);
+        writeRows(batchWriter, records);
+
+        List<IndexedRecord> successRecords = ((SalesforceWriter) batchWriter).getSuccessfulWrites();
+        assertEquals(1, successRecords.size());
+
+        // 2. Upsert "TestModule__c" with upsert relation table
+        TSalesforceOutputProperties sfTestLookupProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties().init();
+        SalesforceTestBase.setupProps(sfTestLookupProps.connection, false);
+        sfTestLookupProps.module.setValue("moduleName", "TestModule__c");
+        sfTestLookupProps.module.main.schema.setValue(CUSTOM_TEST_MODULE_SCHEMA);
+        // Automatically generate the out schemas.
+        sfTestLookupProps.module.schemaListener.afterSchema();
+
+        sfTestLookupProps.outputAction.setValue(OutputAction.UPSERT);
+        sfTestLookupProps.afterOutputAction();
+        assertEquals(4, sfTestLookupProps.upsertKeyColumn.getPossibleValues().size());
+
+        sfTestLookupProps.upsertKeyColumn.setValue("ExternalID__c");
+        sfTestLookupProps.ceaseForError.setValue(true);
+        // setup relation table
+        sfTestLookupProps.upsertRelationTable.columnName.setValue(Arrays.asList("LookupModuleExternalId"));
+        sfTestLookupProps.upsertRelationTable.lookupFieldName.setValue(Arrays.asList("TestLookupModule__c"));
+        sfTestLookupProps.upsertRelationTable.lookupRelationshipFieldName.setValue(Arrays.asList("TestLookupModule__r"));
+        sfTestLookupProps.upsertRelationTable.lookupFieldModuleName.setValue(Arrays.asList("TestLookupModule__c"));
+        sfTestLookupProps.upsertRelationTable.lookupFieldExternalIdName.setValue(Arrays.asList("ExternalID__c"));
+
+        records = new ArrayList<>();
+        r1 = new GenericData.Record(CUSTOM_TEST_MODULE_SCHEMA);
+        r1.put(0, "EXTERNAL_ID_" + UNIQUE_ID);
+        r1.put(1, "EXTERNAL_ID_" + UNIQUE_ID);
+        r1.put(2, UNIQUE_NAME + "_" + UNIQUE_ID);
+        records.add(r1);
+
+        salesforceSink = new SalesforceSink();
+        salesforceSink.initialize(adaptor, sfTestLookupProps);
+        salesforceSink.validate(adaptor);
+        batchWriter = salesforceSink.createWriteOperation().createWriter(adaptor);
+        writeRows(batchWriter, records);
+
+        assertEquals(1, ((SalesforceWriter) batchWriter).getSuccessfulWrites().size());
+
+        ComponentDefinition sfInputDef = new TSalesforceInputDefinition();
+        TSalesforceInputProperties sfInputProps = (TSalesforceInputProperties) sfInputDef.createRuntimeProperties();
+        sfInputProps.copyValuesFrom(sfTestLookupProps);
+        // "LookupModuleExternalId" is not the column of module. So "CUSTOM_LOOKUP_MODULE_SCHEMA" for query
+        sfInputProps.module.main.schema.setValue(CUSTOM_LOOKUP_MODULE_SCHEMA);
+        sfInputProps.condition.setValue("ExternalID__c = 'EXTERNAL_ID_" + UNIQUE_ID + "'");
+
+        List<IndexedRecord> inpuRecords = readRows(sfInputProps);
+        assertEquals(1, inpuRecords.size());
+        LOGGER.debug("Upsert operation insert a record in module \"TestModule__c\" with ID: " + inpuRecords.get(0).get(2));
     }
 
     /**
