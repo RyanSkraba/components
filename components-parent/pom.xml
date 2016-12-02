@@ -113,7 +113,7 @@
 				<groupId>commons-beanutils</groupId>
 				<artifactId>commons-beanutils</artifactId>
 				<version>${commons-beanutils.version}</version>
-			</dependency>
+			</dependency>		
 
 		</dependencies>
 	</dependencyManagement>
