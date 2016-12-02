@@ -28,6 +28,7 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.jira.avro.IssueAdapterFactory;
 import org.talend.components.jira.avro.IssueIndexedRecord;
+import org.talend.components.jira.connection.JiraResponse;
 import org.talend.components.jira.connection.Rest;
 import org.talend.components.jira.datum.Entity;
 import org.talend.components.jira.runtime.JiraSource;
@@ -228,7 +229,8 @@ public abstract class JiraReader implements Reader<IndexedRecord> {
      */
     protected void makeHttpRequest() throws IOException {
         Map<String, Object> parameters = prepareParameters();
-        response = rest.get(resource, parameters);
+        JiraResponse jiraResponse = rest.get(resource, parameters);
+        response = jiraResponse.getBody();
         entities = processResponse(response);
         if (!entities.isEmpty()) {
             hasMoreRecords = true;

@@ -27,6 +27,7 @@ import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.WriteOperation;
+import org.talend.components.jira.connection.JiraResponse;
 import org.talend.components.jira.runtime.JiraWriteOperation;
 
 /**
@@ -69,7 +70,7 @@ public class JiraUpdateWriter extends JiraWriter {
     @Override
     public void write(Object datum) throws IOException {
         if (!opened) {
-            throw new IOException("Writer wasn't opened");
+            throw new IOException(MESSAGES.getMessage("error.writerNotOpened"));
         }
         result.totalCount++;
         if (datum == null) {
@@ -81,12 +82,12 @@ public class JiraUpdateWriter extends JiraWriter {
             dataSchema = record.getSchema();
             Field idField = dataSchema.getField("id");
             if (idField == null) {
-                throw new IOException("Record schema doesn't contain id field");
+                throw new IOException(MESSAGES.getMessage("error.schemaNotContainId"));
             }
             idPos = idField.pos();
             Field jsonField = dataSchema.getField("json");
             if (jsonField == null) {
-                throw new IOException("Record schema doesn't contain json field");
+                throw new IOException(MESSAGES.getMessage("error.schemaNotContainJson"));
             }
             jsonPos = jsonField.pos();
         }
@@ -95,19 +96,22 @@ public class JiraUpdateWriter extends JiraWriter {
         String resourceToUpdate = resource + "/" + id;
         String json = (String) record.get(jsonPos);
 
-        int statusCode = getConnection().put(resourceToUpdate, json);
-        handleResponse(statusCode, resourceToUpdate, record);
+        JiraResponse response = getConnection().put(resourceToUpdate, json);
+        handleResponse(response, json, record);
     }
 
     /**
      * Handles response according status code
      * See Jira REST documentation for details
      * 
-     * @param statusCode HTTP response status code
+     * @param response Jira response, which contains status code and body
      * @param resourceToUpdate path of resource to be updated
      * @param record current {@link IndexedRecord}
+     * @throws IOException IOException in case of status code is not 201 CREATED or 204 NO CONTENT
      */
-    private void handleResponse(int statusCode, String resourceToUpdate, IndexedRecord record) {
+    private void handleResponse(JiraResponse response, String resourceToUpdate, IndexedRecord record) throws IOException {
+        int statusCode = response.getStatusCode();
+        String responseError = response.getBody();
         switch (statusCode) {
         // Jira REST returns different success responses for issue and project
         case SC_CREATED:
@@ -118,19 +122,19 @@ public class JiraUpdateWriter extends JiraWriter {
         }
         case SC_BAD_REQUEST: {
             LOG.debug("{} update failed", resourceToUpdate);
-            handleReject("Record update failed", record);
+            throw createRejectException("error.invalidRecordUpdate", resourceToUpdate, responseError);
         }
         case SC_UNAUTHORIZED: {
             LOG.debug("User is not authenticated. {} wasn't updated", resourceToUpdate);
-            handleReject("User is not authenticated. Record wasn't updated", record);
+            throw createRejectException("error.unauthorizedUpdate", resourceToUpdate, responseError);
         }
         case SC_FORBIDDEN: {
             LOG.debug("User does not have permission to update {}", resourceToUpdate);
-            handleReject("User does not have permission to update record", record);
+            throw createRejectException("error.forbiddenUpdate", resourceToUpdate, responseError);
         }
         case SC_NOT_FOUND: {
             LOG.debug("{} wasn't updated, because it doesn't exist", resourceToUpdate);
-            handleReject("Record wasn't updated, because it doesn't exist", record);
+            throw createRejectException("error.notFoundUpdate", resourceToUpdate, responseError);
         }
         default: {
             LOG.debug("Unexpected status code");

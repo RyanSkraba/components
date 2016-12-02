@@ -27,6 +27,8 @@ import org.talend.components.jira.connection.Rest;
 import org.talend.components.jira.runtime.JiraWriteOperation;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 /**
  * Jira server {@link Writer}
@@ -34,6 +36,8 @@ import org.talend.daikon.avro.converter.IndexedRecordConverter;
 public class JiraWriter implements Writer<Result> {
 
     private static final Logger LOG = LoggerFactory.getLogger(JiraWriter.class);
+
+    protected static final I18nMessages MESSAGES = GlobalI18N.getI18nMessageProvider().getI18nMessages(JiraWriter.class);
 
     /**
      * IndexedRecord converter
@@ -154,17 +158,43 @@ public class JiraWriter implements Writer<Result> {
     }
 
     /**
-     * Throws {@link DataRejectException} with specified error message
+     * Constructs {@link DataRejectException}, includes error message information and
+     * {@link IndexedRecord}
+     * Iterates reject records count
      * 
      * @param error error message
      * @param record current {@link IndexedRecord}
      * @throws DataRejectException with specified error and current {@link IndexedRecord}
      */
-    protected void handleReject(String error, IndexedRecord record) {
+    protected DataRejectException createRejectException(String error, IndexedRecord record) {
         result.rejectCount++;
         Map<String, Object> info = new HashMap<String, Object>();
         info.put("error", error);
         info.put("talend_record", record);
-        throw new DataRejectException(info);
+        return new DataRejectException(info);
+    }
+
+    /**
+     * Constructs error message, which includes information about error reason, record content
+     * and message from Jira server, returns {@link IOException} with this message
+     * Iterates reject records count
+     * 
+     * @param reasonKey reason message i18n key
+     * @param json record json
+     * @param serverMessage error message from Jira server
+     * @return {@link IOException} which provides error message
+     */
+    protected IOException createRejectException(String reasonKey, String json, String serverMessage) {
+        result.rejectCount++;
+        StringBuilder sb = new StringBuilder();
+        sb.append(MESSAGES.getMessage("error.reason"));
+        sb.append(MESSAGES.getMessage(reasonKey));
+        sb.append(System.lineSeparator());
+        sb.append(MESSAGES.getMessage("error.record"));
+        sb.append(json);
+        sb.append(System.lineSeparator());
+        sb.append(MESSAGES.getMessage("error.error"));
+        sb.append(serverMessage);
+        return new IOException(sb.toString());
     }
 }
