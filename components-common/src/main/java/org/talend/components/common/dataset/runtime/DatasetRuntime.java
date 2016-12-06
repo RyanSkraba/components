@@ -16,6 +16,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.common.dataset.DatasetProperties;
+import org.talend.daikon.java8.Consumer;
 import org.talend.daikon.properties.Properties;
 
 /**
@@ -38,7 +39,10 @@ public interface DatasetRuntime<DatasetPropT extends DatasetProperties> extends 
      * There is no requirement for sort order or start position, unless specified in the dataset properties.
      *
      * @param limit the maximum number of records to return.
-     * @return a list of IndexedRecords that the dataset can support.
+     * @param consumer a callback that will be applied to each sampled record. This callback should throw a
+     * {@link org.talend.daikon.exception.TalendRuntimeException} if there was an error processing the record.
+     * @throws org.talend.daikon.exception.TalendRuntimeException propagated from the callback, if any, or if there was
+     * a runtime exception generating the sample.
      */
-    Iterable<? extends IndexedRecord> getSample(int limit);
+    void getSample(int limit, Consumer<IndexedRecord> consumer);
 }

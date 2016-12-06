@@ -10,6 +10,7 @@
 	</parent>
 	<properties>
 		<partner.version>37.0.3</partner.version>
+		<jetty.version>9.2.19.v20160908</jetty.version>
 	</properties>
 
 	<name>Components - Salesforce</name>
@@ -27,7 +28,6 @@
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
-			<version>1.8.0</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-collections</groupId>
@@ -167,7 +167,32 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
+	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-server</artifactId>
+				<version>${jetty.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-http</artifactId>
+				<version>${jetty.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-io</artifactId>
+				<version>${jetty.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-util</artifactId>
+				<version>${jetty.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+			
 	<build>
 
 		<plugins>

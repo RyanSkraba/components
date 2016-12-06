@@ -23,6 +23,10 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.runtime.reader.JDBCInputReader;
 
+/**
+ * JDBC runtime execution object for input action
+ *
+ */
 public class JDBCSource extends JDBCSourceOrSink implements BoundedSource {
 
     private static final long serialVersionUID = -9111994542816954024L;

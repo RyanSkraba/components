@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.talend.components.service.rest.dto.PropertiesValidationResponse;
-import org.talend.components.service.rest.dto.PropertyValidationResponse;
 import org.talend.daikon.annotation.Service;
+import org.talend.daikon.serialize.jsonschema.PropertyTrigger;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -39,10 +39,11 @@ public interface PropertiesController {
                                                                     @RequestBody FormDataContainer formData);
 
     /** Validate one field. */
-    @RequestMapping(value = "{definitionName}/validate/{propName}", method = POST)
-    ResponseEntity<PropertyValidationResponse> validateProperty(@PathVariable("definitionName") String definitionName,
-                                                                @RequestBody FormDataContainer formData,
-                                                                @PathVariable("propName") String propName);
+    @RequestMapping(value = "{definition}/{trigger}/{property}", method = POST)
+    ResponseEntity<String> triggerOnProperty(@PathVariable("definition") String definition, //
+                                             @PathVariable("trigger") PropertyTrigger trigger, //
+                                             @PathVariable("property") String property, //
+                                             @RequestBody String formData);
 
     /** Get dataset properties. Should it be GET? **/
     @RequestMapping(value = "{definitionName}/dataset", method = POST)

@@ -24,6 +24,10 @@ import org.talend.components.jdbc.runtime.JDBCCommitSourceOrSink;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
+/**
+ * JDBC commit component
+ *
+ */
 public class TJDBCCommitDefinition extends AbstractComponentDefinition {
 
     public static final String COMPONENT_NAME = "tJDBCCommitNew";

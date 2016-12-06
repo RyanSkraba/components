@@ -37,6 +37,7 @@ import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
+import org.talend.daikon.runtime.RuntimeUtil;
 
 // import static org.hamcrest.Matchers.*;
 
@@ -175,24 +176,10 @@ public class ComponentTestUtils {
 
     /**
      * this will setup the mvn URL handler if not already setup and use any maven local repo if it exists
+     * @Deprecated use {@link RuntimeUtil#registerMavenUrlHandler()}
      */
     public static void setupMavenUrlHandler() {
-        try {
-            new URL("mvn:foo/bar");
-        } catch (MalformedURLException e) {// setup the mvn protocla handler if not already setup
-            URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
-
-                @Override
-                public URLStreamHandler createURLStreamHandler(String protocol) {
-                    if (ServiceConstants.PROTOCOL.equals(protocol)) {
-                        return new Handler();
-                    } else {
-                        return null;
-                    }
-                }
-            });
-        }
-
+        RuntimeUtil.registerMavenUrlHandler();
     }
 
 }

@@ -37,6 +37,10 @@ import org.talend.components.jdbc.runtime.JDBCRowSource;
 import org.talend.components.jdbc.runtime.JDBCTemplate;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 
+/**
+ * JDBC reader for JDBC row
+ *
+ */
 public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
 
     protected RuntimeSettingProvider properties;

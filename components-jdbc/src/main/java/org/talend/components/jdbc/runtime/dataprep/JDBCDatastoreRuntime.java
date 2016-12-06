@@ -20,6 +20,10 @@ import org.talend.components.jdbc.datastore.JDBCDatastoreProperties;
 import org.talend.components.jdbc.runtime.JDBCSourceOrSink;
 import org.talend.daikon.properties.ValidationResult;
 
+/**
+ * the data store runtime for database
+ *
+ */
 public class JDBCDatastoreRuntime implements DatastoreRuntime<JDBCDatastoreProperties> {
 
     /**

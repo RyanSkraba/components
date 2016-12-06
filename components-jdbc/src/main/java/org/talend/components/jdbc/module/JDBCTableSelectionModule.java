@@ -28,6 +28,10 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.StringProperty;
 
+/**
+ * common database table selection properties
+ *
+ */
 public class JDBCTableSelectionModule extends PropertiesImpl {
 
     public StringProperty tablename = newString("tablename");

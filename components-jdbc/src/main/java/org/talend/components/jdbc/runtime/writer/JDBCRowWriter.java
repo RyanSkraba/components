@@ -41,6 +41,10 @@ import org.talend.components.jdbc.runtime.JDBCTemplate;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
+/**
+ * the JDBC writer for JDBC row
+ *
+ */
 public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
     private transient static final Logger LOG = LoggerFactory.getLogger(JDBCRowWriter.class);

@@ -27,6 +27,10 @@ import org.talend.components.jdbc.runtime.writer.JDBCOutputUpdateOrInsertWriter;
 import org.talend.components.jdbc.runtime.writer.JDBCOutputUpdateWriter;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties.DataAction;
 
+/**
+ * common JDBC output write operation
+ *
+ */
 public class JDBCOutputWriteOperation implements WriteOperation<Result> {
 
     private static final long serialVersionUID = 7572409371695331857L;

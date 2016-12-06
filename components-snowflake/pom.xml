@@ -203,6 +203,20 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- The following plugins are there to make sure they are launched after 
+                the bundle are packaged when used in the package phase.-->
+            <!-- They may be used with the -PgenerateP2 maven profile to build a p2 
+                update site for distribution to the Studio -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.tycho.extras</groupId>
+                <artifactId>tycho-p2-extras-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+            </plugin>            
         </plugins>
     </build>
 

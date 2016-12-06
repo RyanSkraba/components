@@ -13,10 +13,7 @@
 
 package org.talend.components.service.rest.impl;
 
-import static com.jayway.restassured.RestAssured.*;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.*;
-import static org.springframework.http.MediaType.*;
-
+import com.jayway.restassured.response.Response;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.context.embedded.LocalServerPort;
@@ -25,6 +22,11 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.talend.components.service.rest.Application;
 import org.talend.components.service.rest.FormDataContainer;
+
+import static com.jayway.restassured.RestAssured.given;
+import static org.junit.Assert.assertNotNull;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
@@ -35,7 +37,7 @@ public class PropertiesControllerImplTest {
     private int localServerPort;
 
     @Test
-    public void getProperties() throws Exception {
+    public void testGetProperties() throws Exception {
         String dataStoreName = "FullExampleDatastore";
         given().accept(APPLICATION_JSON_UTF8_VALUE) //
                 .expect() //
@@ -47,7 +49,7 @@ public class PropertiesControllerImplTest {
     }
 
     @Test
-    public void validateProperties() throws Exception {
+    public void testValidateProperties() throws Exception {
         String dataStoreName = "FullExampleDatastore";
         FormDataContainer formDataContainer = new FormDataContainer();
         formDataContainer.setFormData("{\"tag\":\"toto\", \"tagId\":\"256\"}");
@@ -61,22 +63,26 @@ public class PropertiesControllerImplTest {
     }
 
     @Test
-    public void validateProperty() throws Exception {
+    public void testTriggerOnProperty() throws Exception {
         String dataStoreName = "FullExampleDatastore";
+        String callback = "validate";
         String propName = "tagId";
         FormDataContainer formDataContainer = new FormDataContainer();
         formDataContainer.setFormData("{\"tag\":\"toto\", \"tagId\":\"256\"}");
-        given().accept(APPLICATION_JSON_UTF8_VALUE) //
+        Response response = given().accept(APPLICATION_JSON_UTF8_VALUE) //
                 .expect() //
-                .statusCode(204).log().ifError() //
+                .statusCode(200).log().ifError() //
                 .with().port(localServerPort) //
                 .content(formDataContainer) //
                 .contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .post("/properties/{name}/validate/{propName}", dataStoreName, propName);
+                .post("/properties/{name}/{callback}/{propName}", dataStoreName, callback, propName);
+        assertNotNull(response);
+        String content = response.asString();
+        assertNotNull(content);
     }
 
     @Test
-    public void getDatasetProperties() throws Exception {
+    public void testGetDatasetProperties() throws Exception {
         String dataStoreName = "FullExampleDatastore";
         FormDataContainer formDataContainer = new FormDataContainer();
         formDataContainer.setFormData("{\"tag\":\"toto\", \"tagId\":\"256\"}");

@@ -21,6 +21,10 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jdbc.runtime.reader.JDBCRowReader;
 import org.talend.daikon.properties.ValidationResult;
 
+/**
+ * JDBC row runtime execution object for input action
+ *
+ */
 public class JDBCRowSource extends JDBCRowSourceOrSink implements BoundedSource {
 
     private static final long serialVersionUID = -9111994542816954024L;

@@ -1,0 +1,24 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.talend.components</groupId>
+	<artifactId>components-p2update-assembly</artifactId>
+	<version>0.16.0-SNAPSHOT</version>
+	<name>Assembly for building P2 updatesite for components</name>
+    <properties>
+        <talend_snapshots_deployment>http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
+    </properties>
+	
+    <distributionManagement>
+        <snapshotRepository>
+            <id>talend_nexus_deployment</id>
+            <url>${talend_snapshots_deployment}</url>
+        </snapshotRepository>
+        <repository>
+            <id>talend_nexus_deployment</id>
+            <url>http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceRelease/</url>
+        </repository>
+    </distributionManagement>	
+	
+</project>

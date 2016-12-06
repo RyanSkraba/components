@@ -14,6 +14,9 @@ package org.talend.components.jdbc;
 
 public interface ComponentConstants {
 
+    /**
+     * key for storing and getting the connection between JDBC components
+     */
     String CONNECTION_KEY = "Connection";
 
 }

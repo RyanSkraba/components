@@ -24,6 +24,10 @@ import org.talend.components.jdbc.runtime.JDBCCloseSourceOrSink;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
+/**
+ * JDBC close component
+ *
+ */
 public class TJDBCCloseDefinition extends AbstractComponentDefinition {
 
     public static final String COMPONENT_NAME = "tJDBCCloseNew";

@@ -25,6 +25,10 @@ import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 
+/**
+ * JDBC close runtime execution object
+ *
+ */
 public class JDBCCloseSourceOrSink implements SourceOrSink {
 
     private static final long serialVersionUID = -7224090141384147842L;

@@ -36,6 +36,10 @@ import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.ValidationResult;
 
+/**
+ * common JDBC runtime execution object
+ *
+ */
 public class JDBCSourceOrSink implements SourceOrSink {
 
     private static final long serialVersionUID = -1730391293657968628L;

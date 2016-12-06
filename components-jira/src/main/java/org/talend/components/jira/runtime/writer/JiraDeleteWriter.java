@@ -29,6 +29,7 @@ import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.WriteOperation;
+import org.talend.components.jira.connection.JiraResponse;
 import org.talend.components.jira.runtime.JiraWriteOperation;
 
 /**
@@ -72,7 +73,7 @@ public class JiraDeleteWriter extends JiraWriter {
     @Override
     public void write(Object datum) throws IOException {
         if (!opened) {
-            throw new IOException("Writer wasn't opened");
+            throw new IOException(MESSAGES.getMessage("error.writerNotOpened"));
         }
         result.totalCount++;
         if (datum == null) {
@@ -83,25 +84,28 @@ public class JiraDeleteWriter extends JiraWriter {
             dataSchema = record.getSchema();
             Field idField = dataSchema.getField("id");
             if (idField == null) {
-                throw new IOException("Record schema doesn't contain id field");
+                throw new IOException(MESSAGES.getMessage("error.schemaNotContainId"));
             }
             idPos = idField.pos();
         }
 
         String id = (String) record.get(idPos);
         String resourceToDelete = resource + "/" + id;
-        int statusCode = getConnection().delete(resourceToDelete, sharedParameters);
-        handleResponse(statusCode, resourceToDelete, record);
+        JiraResponse response = getConnection().delete(resourceToDelete, sharedParameters);
+        handleResponse(response, id, record);
     }
 
     /**
      * Handles response according status code See Jira REST documentation for details
      * 
-     * @param statusCode HTTP response status code
+     * @param response Jira response, which contains status code and body
      * @param resourceToDelete path of resource to be deleted
      * @param record current {@link IndexedRecord}
+     * @throws IOException IOException in case of status code is not 200 OK or 204 NO CONTENT
      */
-    private void handleResponse(int statusCode, String resourceToDelete, IndexedRecord record) {
+    private void handleResponse(JiraResponse response, String resourceToDelete, IndexedRecord record) throws IOException {
+        int statusCode = response.getStatusCode();
+        String responseError = response.getBody();
         switch (statusCode) {
         case SC_OK:
         case SC_NO_CONTENT: {
@@ -111,19 +115,19 @@ public class JiraDeleteWriter extends JiraWriter {
         }
         case SC_BAD_REQUEST: {
             LOG.debug("Error occured during deletion {}", resourceToDelete);
-            handleReject("Error occured during deletion", record);
+            throw createRejectException("error.duringDeletion", resourceToDelete, responseError);
         }
         case SC_UNAUTHORIZED: {
             LOG.debug("User is not authenticated. {} wasn't deleted", resourceToDelete);
-            handleReject("User is not authenticated. Record wasn't deleted", record);
+            throw createRejectException("error.unauthorizedDelete", resourceToDelete, responseError);
         }
         case SC_FORBIDDEN: {
             LOG.debug("User does not have permission to delete {}", resourceToDelete);
-            handleReject("User does not have permission to delete record", record);
+            throw createRejectException("error.forbiddenDelete", resourceToDelete, responseError);
         }
         case SC_NOT_FOUND: {
             LOG.debug("{} wasn't deleted, because it doesn't exist", resourceToDelete);
-            handleReject("Record wasn't deleted, because it doesn't exist", record);
+            throw createRejectException("error.notFoundDelete", resourceToDelete, responseError);
         }
         default: {
             LOG.debug("Unexpected status code");

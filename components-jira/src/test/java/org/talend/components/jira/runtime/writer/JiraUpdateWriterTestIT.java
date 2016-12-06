@@ -12,103 +12,141 @@
 // ============================================================================
 package org.talend.components.jira.runtime.writer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.talend.components.jira.testutils.JiraTestConstants.HOST_PORT;
+import static org.talend.components.jira.testutils.JiraTestConstants.PASS;
+import static org.talend.components.jira.testutils.JiraTestConstants.UPDATE_SCHEMA;
+import static org.talend.components.jira.testutils.JiraTestConstants.USER;
 import static org.talend.components.jira.testutils.JiraTestConstants.WRONG_USER;
 
 import java.io.IOException;
 
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.IndexedRecord;
+import org.junit.Rule;
 import org.junit.Test;
-import org.talend.components.api.exception.DataRejectException;
+import org.junit.rules.ExpectedException;
 import org.talend.components.jira.Action;
+import org.talend.components.jira.Resource;
+import org.talend.components.jira.testutils.JiraTestsHelper;
 
 /**
  * Integration tests for {@link JiraUpdateWriter}
  */
-public class JiraUpdateWriterTestIT extends JiraWriterTestBase {
+public class JiraUpdateWriterTestIT {
 
-    @Override
-    protected void setupProperties() {
-        super.setupProperties();
-        properties.action.setValue(Action.UPDATE);
-    }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     /**
-     * Checks {@link JiraUpdateWriter#write()} throws {@link DataRejectException} with message
-     * "Record update failed" in case server responses with 400 Bad Request status code
+     * Checks {@link JiraUpdateWriter#write()} throws {@link IOException} which message contains
+     * "Reason: record update failed"
+     * in case server responses with 400 Bad Request status code
      * 
      * @throws IOException
      */
     @Test
     public void testWriteBadRequest() throws IOException {
-        String expectedError = "Record update failed";
-        JiraWriter updateProjectWriter = writeOperation.createWriter(null);
+        IndexedRecord badJsonRecord = new GenericData.Record(UPDATE_SCHEMA);
+        String badProject = "{\"name\":\"Updated Integration Test Project\"\"assigneeType\":\"PROJECT_LEAD\"}";
+        badJsonRecord.put(0, "TP");
+        badJsonRecord.put(1, badProject);
+
+        thrown.expect(IOException.class);
+        thrown.expectMessage("Reason: record update failed");
+        thrown.expectMessage("Record: " + badProject);
+        thrown.expectMessage("Error: ");
+        thrown.expectMessage("{\"errorMessages\":[\"Unexpected character (\'\\\"\' (code 34)):");
+
+        JiraWriter updateProjectWriter = JiraTestsHelper.createWriter(HOST_PORT, USER, PASS, Resource.PROJECT, Action.UPDATE);
+
         updateProjectWriter.open("upd");
         try {
             updateProjectWriter.write(badJsonRecord);
-            fail();
-        } catch (DataRejectException e) {
-            String rejectError = e.getRejectInfo().get("error").toString();
-            assertEquals(expectedError, rejectError);
         } finally {
             updateProjectWriter.close();
         }
     }
 
     /**
-     * Checks {@link JiraUpdateWriter#write()} throws {@link DataRejectException} with message
-     * "User is not authenticated. Record wasn't updated" in case server responses with 401 Unauthorized status code
+     * Checks {@link JiraUpdateWriter#write()} throws {@link IOException} which message contains
+     * "Reason: user is not authenticated. Record wasn't updated"
+     * in case server responses with 401 Unauthorized status code
      * 
      * @throws IOException
      */
     @Test
     public void testWriteUnauthorized() throws IOException {
-        changeUserTo(WRONG_USER);
-        String expectedError = "User is not authenticated. Record wasn't updated";
-        JiraWriter updateProjectWriter = writeOperation.createWriter(null);
+        IndexedRecord badJsonRecord = new GenericData.Record(UPDATE_SCHEMA);
+        String badProject = "{\"name\":\"Updated Integration Test Project\"\"assigneeType\":\"PROJECT_LEAD\"}";
+        badJsonRecord.put(0, "TP");
+        badJsonRecord.put(1, badProject);
+
+        JiraWriter updateProjectWriter = JiraTestsHelper.createWriter(HOST_PORT, WRONG_USER, PASS, Resource.PROJECT,
+                Action.UPDATE);
+
+        thrown.expect(IOException.class);
+        thrown.expectMessage("Reason: user is not authenticated. Record wasn't updated");
+        thrown.expectMessage("Record: " + badProject);
+        thrown.expectMessage("Error: ");
+
         updateProjectWriter.open("upd");
         try {
             updateProjectWriter.write(badJsonRecord);
-            fail();
-        } catch (DataRejectException e) {
-            String rejectError = e.getRejectInfo().get("error").toString();
-            assertEquals(expectedError, rejectError);
         } finally {
             updateProjectWriter.close();
         }
     }
 
     /**
-     * Checks {@link JiraUpdateWriter#write()} throws {@link DataRejectException} with message
-     * "Record wasn't updated, because it doesn't exist" in case server responses with 404 Not Found status code
+     * Checks {@link JiraUpdateWriter#write()} throws {@link IOException} which message contains
+     * "Reason: record wasn't updated, because it doesn't exist"
+     * in case server responses with 404 Not Found status code
      * 
      * @throws IOException
      */
     @Test
     public void testWriteNotFound() throws IOException {
-        String expectedError = "Record wasn't updated, because it doesn't exist";
-        JiraWriter updateProjectWriter = writeOperation.createWriter(null);
+        IndexedRecord wrongProjectRecord = new GenericData.Record(UPDATE_SCHEMA);
+        String wrongProject = "{\"name\":\"Updated Integration Test Project\",\"assigneeType\":\"PROJECT_LEAD\"}";
+        wrongProjectRecord.put(0, "WP");
+        wrongProjectRecord.put(1, wrongProject);
+
+        thrown.expect(IOException.class);
+        thrown.expectMessage("Reason: record wasn't updated, because it doesn't exist");
+        thrown.expectMessage("Record: " + wrongProject);
+        thrown.expectMessage("Error: ");
+        thrown.expectMessage("{\"errorMessages\":[\"No project could be found with key \'WP\'.\"],\"errors\":{}}");
+
+        JiraWriter updateProjectWriter = JiraTestsHelper.createWriter(HOST_PORT, USER, PASS, Resource.PROJECT, Action.UPDATE);
+
         updateProjectWriter.open("upd");
         try {
             updateProjectWriter.write(wrongProjectRecord);
-            fail();
-        } catch (DataRejectException e) {
-            String rejectError = e.getRejectInfo().get("error").toString();
-            assertEquals(expectedError, rejectError);
         } finally {
             updateProjectWriter.close();
         }
     }
 
     /**
-     * Checks {@link JiraUpdateWriter#write()} throws {@link IOException} if {@link JiraUpdateWriter#open()}
-     * wasn't called
+     * Checks {@link JiraUpdateWriter#write()} {@link IOException} which message is
+     * 
+     * if {@link JiraUpdateWriter#open()} wasn't called
      * 
      * @throws IOException
      */
-    @Test(expected = IOException.class)
+    @Test
     public void testWriteNotOpened() throws IOException {
-        JiraWriter updateProjectWriter = writeOperation.createWriter(null);
+        IndexedRecord wrongProjectRecord = new GenericData.Record(UPDATE_SCHEMA);
+        String wrongProject = "{\"name\":\"Updated Integration Test Project\",\"assigneeType\":\"PROJECT_LEAD\"}";
+        wrongProjectRecord.put(0, "WP");
+        wrongProjectRecord.put(1, wrongProject);
+
+        thrown.expect(IOException.class);
+        thrown.expectMessage("Writer wasn't opened");
+
+        JiraWriter updateProjectWriter = JiraTestsHelper.createWriter(HOST_PORT, WRONG_USER, PASS, Resource.PROJECT,
+                Action.UPDATE);
+
         updateProjectWriter.write(wrongProjectRecord);
     }
 

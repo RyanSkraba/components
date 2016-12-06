@@ -13,13 +13,23 @@
 package org.talend.components.jdbc.runtime.dataprep;
 
 import org.apache.avro.Schema;
-import org.talend.components.api.component.runtime.RuntimableRuntime;
+import org.apache.avro.generic.IndexedRecord;
+import org.talend.components.api.component.runtime.ReaderDataProvider;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.common.dataset.runtime.DatasetRuntime;
 import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
+import org.talend.components.jdbc.runtime.JDBCSource;
 import org.talend.components.jdbc.runtime.JDBCSourceOrSink;
+import org.talend.components.jdbc.runtime.reader.JDBCInputReader;
+import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.java8.Consumer;
 import org.talend.daikon.properties.ValidationResult;
 
-public class JDBCDatasetRuntime implements RuntimableRuntime<JDBCDatasetProperties> {
+/**
+ * the data set runtime for database
+ *
+ */
+public class JDBCDatasetRuntime implements DatasetRuntime<JDBCDatasetProperties> {
 
     /**
      * 
@@ -28,16 +38,41 @@ public class JDBCDatasetRuntime implements RuntimableRuntime<JDBCDatasetProperti
 
     private JDBCDatasetProperties dataset;
 
+    private RuntimeContainer container;
+
     @Override
     public ValidationResult initialize(RuntimeContainer container, JDBCDatasetProperties properties) {
         this.dataset = properties;
+        this.container = container;
         return ValidationResult.OK;
     }
 
-    public Schema getSchemaFromQuery(RuntimeContainer container, String query) {
+    @Override
+    public Schema getSchema() {
         JDBCSourceOrSink jss = new JDBCSourceOrSink();
         jss.initialize(container, dataset);
-        return jss.getSchemaFromQuery(container, query);
+        return jss.getSchemaFromQuery(container, dataset.getRuntimeSetting().getSql());
+    }
+
+    private void throwExceptionIfValidationResultIsError(ValidationResult validationResult) {
+        if (validationResult == null) {
+            return;
+        }
+
+        if (validationResult.getStatus() == ValidationResult.Result.ERROR) {
+            throw TalendRuntimeException.createUnexpectedException(validationResult.getMessage());
+        }
+    }
+
+    @Override
+    public void getSample(int limit, Consumer<IndexedRecord> consumer) {
+        JDBCSource js = new JDBCSource();
+        throwExceptionIfValidationResultIsError(js.initialize(container, dataset));
+        throwExceptionIfValidationResultIsError(js.validate(container));
+
+        JDBCInputReader reader = (JDBCInputReader) js.createReader(container);
+        ReaderDataProvider<IndexedRecord> readerDataProvider = new ReaderDataProvider<>(reader, limit, consumer);
+        readerDataProvider.retrieveData();
     }
 
 }

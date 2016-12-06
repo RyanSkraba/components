@@ -25,6 +25,7 @@ import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.WriteOperation;
+import org.talend.components.jira.connection.JiraResponse;
 import org.talend.components.jira.runtime.JiraWriteOperation;
 
 /**
@@ -62,7 +63,7 @@ public class JiraInsertWriter extends JiraWriter {
     @Override
     public void write(Object datum) throws IOException {
         if (!opened) {
-            throw new IOException("Writer wasn't opened");
+            throw new IOException(MESSAGES.getMessage("error.writerNotOpened"));
         }
         result.totalCount++;
         if (datum == null) {
@@ -74,24 +75,27 @@ public class JiraInsertWriter extends JiraWriter {
             dataSchema = record.getSchema();
             Field jsonField = dataSchema.getField("json");
             if (jsonField == null) {
-                throw new IOException("Record schema doesn't contain json field");
+                throw new IOException(MESSAGES.getMessage("error.schemaNotContainJson"));
             }
             jsonPos = jsonField.pos();
         }
         String json = (String) record.get(jsonPos);
-        int statusCode = getConnection().post(resource, json);
-        handleResponse(statusCode, json, record);
+        JiraResponse response = getConnection().post(resource, json);
+        handleResponse(response, json, record);
     }
 
     /**
      * Handles response according status code
      * See Jira REST documentation for details
      * 
-     * @param statusCode HTTP response status code
+     * @param response Jira response, which contains status code and body
      * @param resourceToCreate JSON of resource to be created
      * @param record current {@link IndexedRecord}
+     * @throws IOException in case of status code is not 201 CREATED
      */
-    private void handleResponse(int statusCode, String resourceToCreate, IndexedRecord record) {
+    private void handleResponse(JiraResponse response, String resourceToCreate, IndexedRecord record) throws IOException {
+        int statusCode = response.getStatusCode();
+        String responseError = response.getBody();
         switch (statusCode) {
         case SC_CREATED: {
             LOG.debug("Successfully created {}", resourceToCreate);
@@ -100,15 +104,15 @@ public class JiraInsertWriter extends JiraWriter {
         }
         case SC_BAD_REQUEST: {
             LOG.debug("Input is invalid {}", resourceToCreate);
-            handleReject("Record is invalid", record);
+            throw createRejectException("error.invalidRecordCreate", resourceToCreate, responseError);
         }
         case SC_UNAUTHORIZED: {
             LOG.debug("User is not authenticated. {} wasn't inserted", resourceToCreate);
-            handleReject("User is not authenticated. Record wasn't inserted", record);
+            throw createRejectException("error.unauthorizedCreate", resourceToCreate, responseError);
         }
         case SC_FORBIDDEN: {
             LOG.debug("User does not have permission to create {}", resourceToCreate);
-            handleReject("User does not have permission to create record", record);
+            throw createRejectException("error.forbiddenCreate", resourceToCreate, responseError);
         }
         default: {
             LOG.debug("Unexpected status code");

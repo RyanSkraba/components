@@ -15,6 +15,10 @@ package org.talend.components.jdbc.dataprep;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * the bean class for the database information
+ *
+ */
 public class DBType {
 
     public String id;

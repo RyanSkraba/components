@@ -123,6 +123,11 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
     }
 
     @Override
+    public boolean isRejectAfterClose() {
+        return false;
+    }
+
+    @Override
     public boolean isStartable() {
         return getSupportedConnectorTopologies().contains(ConnectorTopology.OUTGOING);
     }

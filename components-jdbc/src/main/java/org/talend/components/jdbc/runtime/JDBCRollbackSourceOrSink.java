@@ -26,6 +26,10 @@ import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 
+/**
+ * JDBC roll back runtime execution object
+ *
+ */
 public class JDBCRollbackSourceOrSink implements SourceOrSink {
 
     private static final long serialVersionUID = -1301033726721076440L;

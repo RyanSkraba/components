@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.jira.connection;
 
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,9 +25,13 @@ import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
+import org.apache.http.client.fluent.Response;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.utils.URIBuilder;
@@ -34,6 +40,7 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,11 +122,11 @@ public class Rest {
      * Executes Http Get request
      * 
      * @param resource REST API resource. E. g. issue/{issueId}
-     * @return response result
+     * @return response status code and body
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
-    public String get(String resource) throws IOException {
+    public JiraResponse get(String resource) throws IOException {
         return get(resource, Collections.EMPTY_MAP);
     }
 
@@ -128,10 +135,10 @@ public class Rest {
      * 
      * @param resource REST API resource. E. g. issue/{issueId}
      * @param parameters http query parameters
-     * @return response result
+     * @return response status code and body
      * @throws IOException
      */
-    public String get(String resource, Map<String, Object> parameters) throws IOException {
+    public JiraResponse get(String resource, Map<String, Object> parameters) throws IOException {
         try {
             URIBuilder builder = new URIBuilder(hostPort + resource);
             for (Map.Entry<String, Object> entry : parameters.entrySet()) {
@@ -143,7 +150,16 @@ public class Rest {
                 get.addHeader(header);
             }
             executor.clearCookies();
-            return executor.execute(get).returnContent().asString();
+            Response response = executor.execute(get);
+            HttpResponse httpResponse = response.returnResponse();
+            HttpEntity entity = httpResponse.getEntity();
+            String entityBody = "";
+            if (entity != null) {
+                entityBody = EntityUtils.toString(entity);
+            }
+            StatusLine statusLine = httpResponse.getStatusLine();
+            int statusCode = statusLine.getStatusCode();
+            return new JiraResponse(statusCode, entityBody);
         } catch (URISyntaxException e) {
             LOG.debug("Wrong URI. {}", e.getMessage());
             throw new IOException("Wrong URI", e);
@@ -154,11 +170,11 @@ public class Rest {
      * Executes Http Delete request
      * 
      * @param resource REST API resource. E. g. issue/{issueId}
-     * @return http status code
+     * @return response status code and body
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
-    public int delete(String resource) throws IOException {
+    public JiraResponse delete(String resource) throws IOException {
         return delete(resource, Collections.EMPTY_MAP);
     }
 
@@ -167,10 +183,10 @@ public class Rest {
      * 
      * @param resource REST API resource. E. g. issue/{issueId}
      * @param parameters http query parameters
-     * @return http status code
+     * @return response status code and body
      * @throws IOException
      */
-    public int delete(String resource, Map<String, Object> parameters) throws IOException {
+    public JiraResponse delete(String resource, Map<String, Object> parameters) throws IOException {
         try {
             URIBuilder builder = new URIBuilder(hostPort + resource);
             for (Map.Entry<String, Object> entry : parameters.entrySet()) {
@@ -182,7 +198,16 @@ public class Rest {
                 delete.addHeader(header);
             }
             executor.clearCookies();
-            return executor.execute(delete).returnResponse().getStatusLine().getStatusCode();
+            Response response = executor.execute(delete);
+            HttpResponse httpResponse = response.returnResponse();
+            StatusLine statusLine = httpResponse.getStatusLine();
+            int statusCode = statusLine.getStatusCode();
+            HttpEntity entity = httpResponse.getEntity();
+            String entityBody = "";
+            if (entity != null && statusCode != SC_UNAUTHORIZED) {
+                entityBody = EntityUtils.toString(entity);
+            }
+            return new JiraResponse(statusCode, entityBody);
         } catch (URISyntaxException e) {
             LOG.debug("Wrong URI. {}", e.getMessage());
             throw new IOException("Wrong URI", e);
@@ -194,17 +219,26 @@ public class Rest {
      * 
      * @param resource REST API resource. E. g. issue/{issueId}
      * @param body message body
-     * @return response status code
+     * @return response status code and body
      * @throws ClientProtocolException
      * @throws IOException
      */
-    public int post(String resource, String body) throws IOException {
+    public JiraResponse post(String resource, String body) throws IOException {
         Request post = Request.Post(hostPort + resource).bodyString(body, contentType);
         for (Header header : headers) {
             post.addHeader(header);
         }
         executor.clearCookies();
-        return executor.execute(post).returnResponse().getStatusLine().getStatusCode();
+        Response response = executor.execute(post);
+        HttpResponse httpResponse = response.returnResponse();
+        StatusLine statusLine = httpResponse.getStatusLine();
+        int statusCode = statusLine.getStatusCode();
+        HttpEntity entity = httpResponse.getEntity();
+        String entityBody = "";
+        if (entity != null && statusCode != SC_UNAUTHORIZED) {
+            entityBody = EntityUtils.toString(entity);
+        }
+        return new JiraResponse(statusCode, entityBody);
     }
 
     /**
@@ -212,17 +246,26 @@ public class Rest {
      * 
      * @param resource REST API resource. E. g. issue/{issueId}
      * @param body message body
-     * @return http status code
+     * @return response status code and body
      * @throws ClientProtocolException
      * @throws IOException
      */
-    public int put(String resource, String body) throws IOException {
+    public JiraResponse put(String resource, String body) throws IOException {
         Request put = Request.Put(hostPort + resource).bodyString(body, contentType);
         for (Header header : headers) {
             put.addHeader(header);
         }
         executor.clearCookies();
-        return executor.execute(put).returnResponse().getStatusLine().getStatusCode();
+        Response response = executor.execute(put);
+        HttpResponse httpResponse = response.returnResponse();
+        StatusLine statusLine = httpResponse.getStatusLine();
+        int statusCode = statusLine.getStatusCode();
+        HttpEntity entity = httpResponse.getEntity();
+        String entityBody = "";
+        if (entity != null && statusCode != SC_UNAUTHORIZED) {
+            entityBody = EntityUtils.toString(entity);
+        }
+        return new JiraResponse(statusCode, entityBody);
     }
 
     public Rest setAuthorizationType(String type) {

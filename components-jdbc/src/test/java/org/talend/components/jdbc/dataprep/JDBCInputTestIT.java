@@ -143,8 +143,8 @@ public class JDBCInputTestIT {
         datastore_props.afterDbTypes();
 
         datastore_props.jdbcUrl.setValue(allSetting.getJdbcUrl());
-        datastore_props.userPassword.userId.setValue(allSetting.getUsername());
-        datastore_props.userPassword.password.setValue(allSetting.getPassword());
+        datastore_props.userId.setValue(allSetting.getUsername());
+        datastore_props.password.setValue(allSetting.getPassword());
 
         JDBCDatasetProperties dataset = (JDBCDatasetProperties) datastore_def.createDatasetProperties(datastore_props);
         dataset.sql.setValue(DBTestUtils.getSQL());
