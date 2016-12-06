@@ -26,7 +26,6 @@ import org.talend.daikon.sandbox.SandboxedInstance;
 abstract public class AbstractMultiRuntimeComponentTests extends AbstractComponentTest {
 
     @Test
-    @Ignore("until we fix this")
     public void testMultiRuntimeComponentRuntime() throws Exception {
         MultiRuntimeComponentDefinition def = (MultiRuntimeComponentDefinition) getComponentService()
                 .getComponentDefinition(MultiRuntimeComponentDefinition.COMPONENT_NAME);
@@ -51,7 +50,6 @@ abstract public class AbstractMultiRuntimeComponentTests extends AbstractCompone
     }
 
     @Test
-    @Ignore("until we fix this")
     public void testMultiRuntimeComponentRuntimeFromProperties() throws Exception {
         MultiRuntimeComponentProperties props = (MultiRuntimeComponentProperties) getComponentService()
                 .getComponentProperties("MultiRuntimeComponent");

@@ -55,7 +55,7 @@
 		<dependency>
 			<groupId>org.talend.daikon</groupId>
 			<artifactId>daikon</artifactId>
-			<version>0.14.0-SNAPSHOT</version>
+			<version>0.15.0-SNAPSHOT</version>
 			<classifier>bundle</classifier>
 			<scope>test</scope>
 		</dependency>
@@ -68,7 +68,7 @@
 		<dependency>
 			<groupId>org.talend.daikon</groupId>
 			<artifactId>daikon</artifactId>
-			<version>0.14.0-SNAPSHOT</version>
+			<version>0.15.0-SNAPSHOT</version>
 			<classifier>bundle</classifier>
 			<scope>test</scope>
 		</dependency>
