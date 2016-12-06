@@ -35,6 +35,7 @@ import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.components.salesforce.SalesforceOutputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -182,14 +183,18 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
         so.setType(sprops.module.moduleName.getStringValue());
         nullValueFields.clear();
         for (Schema.Field f : input.getSchema().getFields()) {
-            Object value = input.get(f.pos());
-            Schema.Field se = moduleSchema.getField(f.name());
-            if (se != null) {
-                if (value != null && !value.toString().isEmpty()) {
-                    addSObjectField(so, se.schema().getType(), se.name(), value);
-                } else {
-                    if (UPDATE.equals(sprops.outputAction.getValue())) {
-                        nullValueFields.add(f.name());
+            // For "Id" column, we should ignore it for "INSERT" action
+            if (!("Id".equals(f.name())
+                    && SalesforceOutputProperties.OutputAction.INSERT.equals(sprops.outputAction.getValue()))) {
+                Object value = input.get(f.pos());
+                Schema.Field se = moduleSchema.getField(f.name());
+                if (se != null) {
+                    if (value != null && !value.toString().isEmpty()) {
+                        addSObjectField(so, se.schema().getType(), se.name(), value);
+                    } else {
+                        if (UPDATE.equals(sprops.outputAction.getValue())) {
+                            nullValueFields.add(f.name());
+                        }
                     }
                 }
             }
@@ -221,14 +226,17 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
                     addSObjectField(so.getChild(lookupRelationshipFieldName), se.schema().getType(),
                             relationMap.get("lookupFieldExternalIdName"), value);
                 } else {
-                    Schema.Field fieldInModule = moduleSchema.getField(se.name());
-                    if (fieldInModule != null) {
-                        // The real type is need in addSObjectField()
-                        addSObjectField(so, fieldInModule.schema().getType(), se.name(), value);
-                    } else {
-                        // This is keep old behavior, when set a field which is not exist.
-                        // It would throw a exception for this.
-                        addSObjectField(so, se.schema().getType(), se.name(), value);
+                    // Skip column "Id" for upsert, when "Id" is not specified as "upsertKeyColumn"
+                    if (!"Id".equals(se.name()) || se.name().equals(sprops.upsertKeyColumn.getValue())) {
+                        Schema.Field fieldInModule = moduleSchema.getField(se.name());
+                        if (fieldInModule != null) {
+                            // The real type is need in addSObjectField()
+                            addSObjectField(so, fieldInModule.schema().getType(), se.name(), value);
+                        } else {
+                            // This is keep old behavior, when set a field which is not exist.
+                            // It would throw a exception for this.
+                            addSObjectField(so, se.schema().getType(), se.name(), value);
+                        }
                     }
                 }
             } else {
@@ -317,10 +325,12 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
                 if (saveResults != null && saveResults.length != 0) {
                     int batch_idx = -1;
                     for (int i = 0; i < saveResults.length; i++) {
-                        if (saveResults[i].getSuccess())
+                        ++batch_idx;
+                        if (saveResults[i].getSuccess()) {
                             handleSuccess(insertItems.get(i), saveResults[i].getId());
-                        else
-                            handleReject(insertItems.get(i), saveResults[i].getErrors(), changedItemKeys, ++batch_idx);
+                        } else {
+                            handleReject(insertItems.get(i), saveResults[i].getErrors(), changedItemKeys, batch_idx);
+                        }
                     }
                 }
                 insertItems.clear();
@@ -359,10 +369,12 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
                 if (saveResults != null && saveResults.length != 0) {
                     int batch_idx = -1;
                     for (int i = 0; i < saveResults.length; i++) {
-                        if (saveResults[i].getSuccess())
+                        ++batch_idx;
+                        if (saveResults[i].getSuccess()) {
                             handleSuccess(updateItems.get(i), saveResults[i].getId());
-                        else
-                            handleReject(updateItems.get(i), saveResults[i].getErrors(), changedItemKeys, ++batch_idx);
+                        } else {
+                            handleReject(updateItems.get(i), saveResults[i].getErrors(), changedItemKeys, batch_idx);
+                        }
                     }
                 }
                 updateItems.clear();
@@ -406,10 +418,12 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
                 if (upsertResults != null && upsertResults.length != 0) {
                     int batch_idx = -1;
                     for (int i = 0; i < upsertResults.length; i++) {
-                        if (upsertResults[i].getSuccess())
+                        ++batch_idx;
+                        if (upsertResults[i].getSuccess()) {
                             handleSuccess(upsertItems.get(i), upsertResults[i].getId());
-                        else
-                            handleReject(upsertItems.get(0), upsertResults[i].getErrors(), changedItemKeys, ++batch_idx);
+                        } else {
+                            handleReject(upsertItems.get(0), upsertResults[i].getErrors(), changedItemKeys, batch_idx);
+                        }
                     }
                 }
                 upsertItems.clear();
@@ -446,8 +460,17 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
 
     private void handleReject(IndexedRecord input, Error[] resultErrors, String[] changedItemKeys, int batchIdx)
             throws IOException {
-        StringBuilder errors = SalesforceRuntime.addLog(resultErrors,
-                batchIdx < changedItemKeys.length ? changedItemKeys[batchIdx] : "Batch index out of bounds", logWriter);
+        String changedItemKey = null;
+        if (batchIdx < changedItemKeys.length) {
+            if (changedItemKeys[batchIdx] != null) {
+                changedItemKey = changedItemKeys[batchIdx];
+            } else {
+                changedItemKey = String.valueOf(batchIdx + 1);
+            }
+        } else {
+            changedItemKey = "Batch index out of bounds";
+        }
+        StringBuilder errors = SalesforceRuntime.addLog(resultErrors, changedItemKey, logWriter);
         if (exceptionForErrors) {
             if (errors.toString().length() > 0) {
                 if (logWriter != null) {
@@ -531,10 +554,12 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
                 if (dr != null && dr.length != 0) {
                     int batch_idx = -1;
                     for (int i = 0; i < dr.length; i++) {
-                        if (dr[i].getSuccess())
+                        ++batch_idx;
+                        if (dr[i].getSuccess()) {
                             handleSuccess(deleteItems.get(i), dr[i].getId());
-                        else
-                            handleReject(deleteItems.get(i), dr[i].getErrors(), changedItemKeys, ++batch_idx);
+                        } else {
+                            handleReject(deleteItems.get(i), dr[i].getErrors(), changedItemKeys, batch_idx);
+                        }
                     }
                 }
                 deleteItems.clear();

@@ -25,6 +25,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties.FIELD_SALESFORCE_ID;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,6 +54,7 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
+import org.talend.components.salesforce.test.SalesforceRuntimeTestUtil;
 import org.talend.components.salesforce.test.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
@@ -71,6 +73,8 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
     private static final String UNIQUE_NAME = "deleteme_" + System.getProperty("user.name");
 
     private static final String UNIQUE_ID = Integer.toString(ThreadLocalRandom.current().nextInt(1, 100000));
+
+    SalesforceRuntimeTestUtil runtimeTestUtil = new SalesforceRuntimeTestUtil();
 
     /** Test schema for inserting accounts. */
     public static Schema SCHEMA_INSERT_ACCOUNT = SchemaBuilder.builder().record("Schema").fields() //
@@ -584,15 +588,16 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
      */
     @Test
     public void testSinkWorkflow_updateRejected() throws Exception {
-        testUpdate(false);
+        testUpdateError(false);
     }
 
     @Test(expected = IOException.class)
     public void testSinkWorkflow_updateCeaseForError() throws Exception {
-        testUpdate(true);
+        testUpdateError(true);
     }
 
-    protected void testUpdate(boolean ceaseForError) throws Exception {
+    // This is for reject and caseForError not real test for update
+    protected void testUpdateError(boolean ceaseForError) throws Exception {
 
         // Generate log file path
         String logFilePath = tempFolder.getRoot().getAbsolutePath() + "/salesforce_error_" + (ceaseForError ? 0 : 1) + ".log";
@@ -677,6 +682,269 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
             assertTrue(file.exists());
             assertNotEquals(0, file.length());
         }
+    }
+
+    /**
+     * This test about:
+     * 1) Insert record which "Id" is passed from input data
+     * 2) Upsert with Id as a upsert key column
+     */
+    @Test
+    public void testSourceIncludedId() throws Throwable {
+
+        // Generate log file path
+        String logFilePath = tempFolder.getRoot().getAbsolutePath() + "/salesforce_error_" + UNIQUE_ID + ".log";
+        File file = new File(logFilePath);
+        assertFalse(file.exists());
+        // Prepare the input properties for check record in server side
+        ComponentDefinition sfInputDef = new TSalesforceInputDefinition();
+        TSalesforceInputProperties inputProperties = (TSalesforceInputProperties) sfInputDef.createRuntimeProperties();
+        List<IndexedRecord> inputRecords = null;
+
+        // Component framework objects.
+        ComponentDefinition sfDef = new TSalesforceOutputDefinition();
+
+        TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
+        SalesforceTestBase.setupProps(sfProps.connection, false);
+        sfProps.module.setValue("moduleName", "Account");
+        sfProps.module.main.schema.setValue(SCHEMA_UPDATE_ACCOUNT);
+        sfProps.extendInsert.setValue(false);
+        sfProps.ceaseForError.setValue(false);
+        // Setup log file path
+        LOGGER.debug("Error log path: " + logFilePath);
+        sfProps.logFileName.setValue(logFilePath);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////// 1. Insert the record and get the record Id //////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        // Automatically generate the out schemas.
+        sfProps.retrieveInsertId.setValue(true);
+        sfProps.module.schemaListener.afterSchema();
+        Schema flowSchema = sfProps.schemaFlow.schema.getValue();
+        Schema.Field field = flowSchema.getField(FIELD_SALESFORCE_ID);
+        assertEquals(6, flowSchema.getFields().size());
+        assertNotNull(field);
+        assertEquals(5, field.pos());
+
+        // Initialize the Writer
+        LOGGER.debug("Try to insert the record");
+        SalesforceWriter sfWriterInsert = (SalesforceWriter) createSalesforceOutputWriter(sfProps);
+        sfWriterInsert.open("uid_insert");
+
+        // Insert one record with Id column. The "Id" column should be ignore and insert successfully
+        IndexedRecord insertRecord_1 = new GenericData.Record(SCHEMA_UPDATE_ACCOUNT);
+        insertRecord_1.put(0, "bad id");
+        insertRecord_1.put(1, UNIQUE_NAME + "_" + UNIQUE_ID + "_insert");
+        insertRecord_1.put(2, "deleteme_insert");
+        insertRecord_1.put(3, "deleteme_insert");
+        insertRecord_1.put(4, "deleteme_insert");
+        IndexedRecord insertRecord_2 = new GenericData.Record(SCHEMA_UPDATE_ACCOUNT);
+        insertRecord_2.put(0, "bad id");
+        insertRecord_2.put(2, "deleteme_insert");
+        insertRecord_2.put(3, "deleteme_insert");
+        insertRecord_2.put(4, "deleteme_insert");
+
+        // Test wrong record
+        sfWriterInsert.write(insertRecord_2);
+        assertThat(sfWriterInsert.getSuccessfulWrites(), empty());
+        assertThat(sfWriterInsert.getRejectedWrites(), hasSize(1));
+        LOGGER.debug("1 record is reject by insert action.");
+
+        sfWriterInsert.write(insertRecord_1);
+        assertThat(sfWriterInsert.getSuccessfulWrites(), hasSize(1));
+        assertThat(sfWriterInsert.getRejectedWrites(), empty());
+        // Check the rejected record.
+        IndexedRecord successRecord = sfWriterInsert.getSuccessfulWrites().get(0);
+        assertThat(successRecord.getSchema().getFields(), hasSize(6));
+        assertEquals(FIELD_SALESFORCE_ID, successRecord.getSchema().getFields().get(5).name());
+        // The enriched fields.
+        String recordID = String.valueOf(successRecord.get(5));
+        LOGGER.debug("1 record insert successfully and get record Id: " + recordID);
+        // Finish the Writer, WriteOperation and Sink for insert action
+        Result wr1 = sfWriterInsert.close();
+
+        inputProperties.copyValuesFrom(sfProps);
+        inputProperties.condition.setValue("Name='" + UNIQUE_NAME + "_" + UNIQUE_ID + "_insert'");
+        inputRecords = readRows(inputProperties);
+        assertEquals(1, inputRecords.size());
+        // Check record in server side
+        successRecord = inputRecords.get(0);
+        assertThat(successRecord.get(1), is((Object) (UNIQUE_NAME + "_" + UNIQUE_ID + "_insert")));
+        assertThat(successRecord.get(2), is((Object) "deleteme_insert"));
+        assertThat(successRecord.get(3), is((Object) "deleteme_insert"));
+        assertThat(successRecord.get(4), is((Object) "deleteme_insert"));
+
+        // Check error log
+        assertTrue(file.exists());
+        assertNotEquals(0, file.length());
+        runtimeTestUtil.compareFileContent(sfProps.logFileName.getValue(),
+                new String[] { "\tStatus Code: REQUIRED_FIELD_MISSING", "", "\tRowKey/RowNo: 1", "\tFields: Name", "",
+                        "\tMessage: Required fields are missing: [Name]",
+                        "\t--------------------------------------------------------------------------------", "" });
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////// 2.Update the inserted record /////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Flow schema change back to same with main schema
+        sfProps.extendInsert.setValue(true);
+        sfProps.outputAction.setValue(OutputAction.UPDATE);
+        sfProps.module.schemaListener.afterSchema();
+        flowSchema = sfProps.schemaFlow.schema.getValue();
+        assertEquals(5, flowSchema.getFields().size());
+
+        // Initialize the Writer
+
+        LOGGER.debug("Try to update the record which Id is: " + recordID);
+        SalesforceWriter sfWriter_Update = (SalesforceWriter) createSalesforceOutputWriter(sfProps);
+        sfWriter_Update.open("uid_update");
+        IndexedRecord updateRecord_1 = new GenericData.Record(SCHEMA_UPDATE_ACCOUNT);
+        updateRecord_1.put(0, "0019000001n3Kasss");
+        updateRecord_1.put(1, UNIQUE_NAME + "_" + UNIQUE_ID + "_update");
+        updateRecord_1.put(2, "deleteme_update");
+        updateRecord_1.put(3, "deleteme_update");
+        updateRecord_1.put(4, "deleteme_update");
+        IndexedRecord updateRecord_2 = new GenericData.Record(SCHEMA_UPDATE_ACCOUNT);
+        updateRecord_2.put(0, recordID);
+        updateRecord_2.put(1, UNIQUE_NAME + "_" + UNIQUE_ID + "_update");
+        updateRecord_2.put(2, "deleteme_update");
+        updateRecord_2.put(3, "deleteme_update");
+        updateRecord_2.put(4, "deleteme_update");
+        IndexedRecord updateRecord_3 = new GenericData.Record(SCHEMA_UPDATE_ACCOUNT);
+        updateRecord_3.put(0, "0019000001n3Kabbb");
+        updateRecord_3.put(1, UNIQUE_NAME + "_" + UNIQUE_ID + "_update");
+        updateRecord_3.put(2, "deleteme_update");
+        updateRecord_3.put(3, "deleteme_update");
+        updateRecord_3.put(4, "deleteme_update");
+        sfWriter_Update.write(updateRecord_1);
+        sfWriter_Update.write(updateRecord_2);
+        sfWriter_Update.write(updateRecord_3);
+
+        // Finish the Writer, WriteOperation and Sink for insert action
+        Result wr2 = sfWriter_Update.close();
+
+        assertEquals(1, wr2.getSuccessCount());
+        assertEquals(2, wr2.getRejectCount());
+
+        // Check record in server side
+        inputProperties.copyValuesFrom(sfProps);
+        inputProperties.condition.setValue("Name='" + UNIQUE_NAME + "_" + UNIQUE_ID + "_update'");
+        inputRecords = readRows(inputProperties);
+        assertEquals(1, inputRecords.size());
+
+        successRecord = inputRecords.get(0);
+        assertThat(successRecord.get(1), is((Object) (UNIQUE_NAME + "_" + UNIQUE_ID + "_update")));
+        assertThat(successRecord.get(2), is((Object) "deleteme_update"));
+        assertThat(successRecord.get(3), is((Object) "deleteme_update"));
+        assertThat(successRecord.get(4), is((Object) "deleteme_update"));
+        LOGGER.debug("1 record update successfully.");
+        LOGGER.debug("2 record is reject by update action");
+
+        // Check error log
+        assertTrue(file.exists());
+        assertNotEquals(0, file.length());
+        runtimeTestUtil.compareFileContent(sfProps.logFileName.getValue(),
+                new String[] { "\tStatus Code: MALFORMED_ID", "", "\tRowKey/RowNo: 0019000001n3Kasss", "\tFields: Id", "",
+                        "\tMessage: Account ID: id value of incorrect type: 0019000001n3Kasss",
+                        "\t--------------------------------------------------------------------------------", "",
+                        "\tStatus Code: MALFORMED_ID", "", "\tRowKey/RowNo: 0019000001n3Kabbb", "\tFields: Id", "",
+                        "\tMessage: Account ID: id value of incorrect type: 0019000001n3Kabbb",
+                        "\t--------------------------------------------------------------------------------", "" });
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////// 3.Upsert the record with Id as upsertKeyColumn ///////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        sfProps.outputAction.setValue(OutputAction.UPSERT);
+        sfProps.module.schemaListener.afterSchema();
+        // Test upsertkey column is "Id"
+        sfProps.upsertKeyColumn.setValue("Id");
+
+        // Initialize the Writer
+
+        LOGGER.debug("Try to upsert the record which Id is: " + recordID);
+        SalesforceWriter sfWriter_Upsert = (SalesforceWriter) createSalesforceOutputWriter(sfProps);
+        sfWriter_Upsert.open("uid_upsert");
+        IndexedRecord upsertRecord_1 = new GenericData.Record(SCHEMA_UPDATE_ACCOUNT);
+        upsertRecord_1.put(0, "0019000001n3Kasss");
+        upsertRecord_1.put(1, UNIQUE_NAME + "_" + UNIQUE_ID + "_upsert");
+        upsertRecord_1.put(2, "deleteme_upsert");
+        upsertRecord_1.put(3, "deleteme_upsert");
+        upsertRecord_1.put(4, "deleteme_upsert");
+        IndexedRecord upsertRecord_2 = new GenericData.Record(SCHEMA_UPDATE_ACCOUNT);
+        upsertRecord_2.put(0, recordID);
+        upsertRecord_2.put(1, UNIQUE_NAME + "_" + UNIQUE_ID + "_upsert");
+        upsertRecord_2.put(2, "deleteme_upsert");
+        upsertRecord_2.put(3, "deleteme_upsert");
+        upsertRecord_2.put(4, "deleteme_upsert");
+        sfWriter_Upsert.write(upsertRecord_1);
+        sfWriter_Upsert.write(upsertRecord_2);
+        // Finish the Writer, WriteOperation and Sink for insert action
+        Result wr3 = sfWriter_Upsert.close();
+        assertEquals(1, wr3.getSuccessCount());
+        assertEquals(1, wr3.getRejectCount());
+
+        // Check record in server side
+        inputProperties.copyValuesFrom(sfProps);
+        inputProperties.condition.setValue("Name='" + UNIQUE_NAME + "_" + UNIQUE_ID + "_upsert'");
+        inputRecords = readRows(inputProperties);
+        assertEquals(1, inputRecords.size());
+
+        successRecord = inputRecords.get(0);
+        assertThat(successRecord.get(1), is((Object) (UNIQUE_NAME + "_" + UNIQUE_ID + "_upsert")));
+        assertThat(successRecord.get(2), is((Object) "deleteme_upsert"));
+        assertThat(successRecord.get(3), is((Object) "deleteme_upsert"));
+        assertThat(successRecord.get(4), is((Object) "deleteme_upsert"));
+        LOGGER.debug("1 record upsert successfully.");
+        LOGGER.debug("1 record is reject by upsert action.");
+
+        // Check error log
+        assertTrue(file.exists());
+        assertNotEquals(0, file.length());
+        runtimeTestUtil.compareFileContent(sfProps.logFileName.getValue(),
+                new String[] { "\tStatus Code: MALFORMED_ID", "", "\tRowKey/RowNo: Id", "\tFields: ", "",
+                        "\tMessage: Id in upsert is not valid",
+                        "\t--------------------------------------------------------------------------------", "", });
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////// 4.Delete the record with Id /////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        sfProps.outputAction.setValue(OutputAction.DELETE);
+
+        // Initialize the Writer
+        LOGGER.debug("Try to delete the record which Id is: " + recordID);
+        SalesforceWriter sfWriter_Delete = (SalesforceWriter) createSalesforceOutputWriter(sfProps);
+        sfWriter_Delete.open("uid_delete");
+
+        IndexedRecord deleteRecord_1 = new GenericData.Record(SCHEMA_UPDATE_ACCOUNT);
+        deleteRecord_1.put(0, recordID);
+        deleteRecord_1.put(1, UNIQUE_NAME + "_" + UNIQUE_ID + "_delete");
+        IndexedRecord deleteRecord_2 = new GenericData.Record(SCHEMA_UPDATE_ACCOUNT);
+        // Id not exist
+        deleteRecord_2.put(0, "0019000001n3Kabbb");
+        deleteRecord_2.put(1, UNIQUE_NAME + "_" + UNIQUE_ID + "_delete");
+        sfWriter_Delete.write(deleteRecord_1);
+        sfWriter_Delete.write(deleteRecord_2);
+
+        // Finish the Writer, WriteOperation and Sink for insert action
+        Result wr4 = sfWriter_Delete.close();
+        assertEquals(1, wr4.getSuccessCount());
+        assertEquals(1, wr4.getRejectCount());
+
+        // Check record in server side
+        inputProperties.copyValuesFrom(sfProps);
+        inputProperties.condition.setValue("Name='" + UNIQUE_NAME + "_" + UNIQUE_ID + "_upsert'");
+        inputRecords = readRows(inputProperties);
+        assertEquals(0, inputRecords.size());
+        LOGGER.debug("1 record delete successfully.");
+        LOGGER.debug("1 record is reject by delete action.");
+
+        // Check error log
+        assertTrue(file.exists());
+        assertNotEquals(0, file.length());
+        runtimeTestUtil.compareFileContent(sfProps.logFileName.getValue(),
+                new String[] { "\tStatus Code: MALFORMED_ID", "", "\tRowKey/RowNo: 0019000001n3Kabbb", "\tFields: ", "",
+                        "\tMessage: bad id 0019000001n3Kabbb",
+                        "\t--------------------------------------------------------------------------------", "", });
     }
 
     /*
