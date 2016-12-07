@@ -33,10 +33,14 @@ import org.talend.daikon.sandbox.SandboxedInstance;
 public class JDBCDatasetProperties extends PropertiesImpl
         implements DatasetProperties<JDBCDatastoreProperties>, RuntimeSettingProvider {
 
-    public transient ReferenceProperties<JDBCDatastoreProperties> datastore = new ReferenceProperties<>("datastore",
+    public ReferenceProperties<JDBCDatastoreProperties> datastore = new ReferenceProperties<>("datastore",
             JDBCDatastoreDefinition.NAME);
 
-    public Property<String> sql = PropertyFactory.newString("sql").setRequired(true);
+    public Property<SourceType> sourceType = PropertyFactory.newEnum("sourceType", SourceType.class);
+
+    public Property<String> tableName = PropertyFactory.newString("tableName");
+
+    public Property<String> sql = PropertyFactory.newString("sql");
 
     public SchemaProperties main = new SchemaProperties("main") {
 
@@ -46,6 +50,14 @@ public class JDBCDatasetProperties extends PropertiesImpl
         }
 
     };
+
+    public JDBCDatasetProperties(String name) {
+        super(name);
+    }
+
+    public void afterSourceType() {
+        refreshLayout(getForm(Form.MAIN));
+    }
 
     public void updateSchema() {
         JDBCDatasetDefinition definition = new JDBCDatasetDefinition();
@@ -58,12 +70,9 @@ public class JDBCDatasetProperties extends PropertiesImpl
         }
     }
 
-    public JDBCDatasetProperties(String name) {
-        super(name);
-    }
-
     @Override
     public void setupProperties() {
+        sourceType.setValue(SourceType.QUERY);
         sql.setValue("select * from mytable");
     }
 
@@ -72,9 +81,19 @@ public class JDBCDatasetProperties extends PropertiesImpl
         super.setupLayout();
 
         Form mainForm = CommonUtils.addForm(this, Form.MAIN);
+        mainForm.addRow(sourceType);
+        mainForm.addRow(tableName);
         mainForm.addRow(sql);
 
         // mainForm.addRow(main.getForm(Form.REFERENCE));
+    }
+
+    @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+
+        form.getWidget(tableName).setVisible(sourceType.getValue() == SourceType.TABLE_NAME);
+        form.getWidget(sql).setVisible(sourceType.getValue() == SourceType.QUERY);
     }
 
     @Override
@@ -101,9 +120,25 @@ public class JDBCDatasetProperties extends PropertiesImpl
 
         setting.setSchema(main.schema.getValue());
 
-        setting.setSql(sql.getValue());
+        setting.setSql(getSql());
+        if (sourceType.getValue() == SourceType.TABLE_NAME) {
+            setting.setTablename(tableName.getValue());
+        }
 
         return setting;
+    }
+
+    public String getSql() {
+        if (sourceType.getValue() == SourceType.TABLE_NAME) {
+            return "select * from " + tableName.getValue();
+        } else {
+            return sql.getValue();
+        }
+    }
+
+    public enum SourceType {
+        TABLE_NAME,
+        QUERY
     }
 
 }

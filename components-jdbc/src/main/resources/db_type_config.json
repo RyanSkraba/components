@@ -13,7 +13,7 @@
 	
 	{
 		"id" : "DERBY",
-		"class" : "org.apache.derby.jdbc.EmbeddedDriver",
+		"class" : "org.apache.derby.jdbc.ClientDriver",
 		"url" : "jdbc:derby://localhost:3306/db",
 		"paths" : 
 	 	[

@@ -29,8 +29,7 @@ import org.talend.daikon.properties.ReferenceProperties;
 public class JDBCInputProperties extends FixedConnectorsComponentProperties
         implements IOProperties<JDBCDatasetProperties>, RuntimeSettingProvider {
 
-    public transient ReferenceProperties<JDBCDatasetProperties> dataset = new ReferenceProperties<>("dataset",
-            JDBCDatasetDefinition.NAME);
+    public ReferenceProperties<JDBCDatasetProperties> dataset = new ReferenceProperties<>("dataset", JDBCDatasetDefinition.NAME);
 
     protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "dataset.main");
 

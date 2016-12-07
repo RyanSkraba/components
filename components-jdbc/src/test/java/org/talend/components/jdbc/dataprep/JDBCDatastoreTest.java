@@ -46,7 +46,7 @@ public class JDBCDatastoreTest {
         properties.afterDbTypes();
         setting = properties.getRuntimeSetting();
         assertTrue("the driver class is not right : " + setting.getDriverClass(),
-                "org.apache.derby.jdbc.EmbeddedDriver".equals(setting.getDriverClass()));
+                "org.apache.derby.jdbc.ClientDriver".equals(setting.getDriverClass()));
         assertTrue("the driver paths is not right : " + setting.getDriverPaths(),
                 setting.getDriverPaths() != null && !setting.getDriverPaths().isEmpty()
                         && "mvn:org.apache.derby/derby/10.12.1.1".equals(setting.getDriverPaths().get(0)));
