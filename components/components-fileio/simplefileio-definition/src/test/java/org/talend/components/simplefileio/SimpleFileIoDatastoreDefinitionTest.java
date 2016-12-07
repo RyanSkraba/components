@@ -20,6 +20,7 @@ import static org.junit.Assert.assertThat;
 import java.net.URL;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -52,6 +53,7 @@ public class SimpleFileIoDatastoreDefinitionTest {
      * Checks the {@link RuntimeInfo} of the definition.
      */
     @Test
+    @Ignore("This can't work unless the runtime jar is already installed in maven!")
     public void testRuntimeInfo() {
         RuntimeInfo runtimeInfo = def.getRuntimeInfo(null, null);
         assertEquals("org.talend.components.simplefileio.runtime.SimpleFileIoDatastoreRuntime", runtimeInfo.getRuntimeClassName());
