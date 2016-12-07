@@ -64,7 +64,7 @@ public class JDBCDatasetProperties extends PropertiesImpl
 
     @Override
     public void setupProperties() {
-        sql.setValue("\"select * from mytable\"");
+        sql.setValue("select * from mytable");
     }
 
     @Override
