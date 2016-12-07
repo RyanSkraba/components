@@ -44,7 +44,7 @@ public class JDBCDatasetTestIT {
 
     @Test
     public void testUpdateSchema() {
-        JDBCDatasetProperties dataset = createDatasetProperties();
+        JDBCDatasetProperties dataset = createDatasetProperties(true);
 
         Schema schema = dataset.main.schema.getValue();
 
@@ -54,7 +54,7 @@ public class JDBCDatasetTestIT {
 
     @Test
     public void testGetSchema() {
-        JDBCDatasetProperties dataset = createDatasetProperties();
+        JDBCDatasetProperties dataset = createDatasetProperties(false);
 
         JDBCDatasetRuntime runtime = new JDBCDatasetRuntime();
         runtime.initialize(null, dataset);
@@ -65,9 +65,18 @@ public class JDBCDatasetTestIT {
     }
 
     @Test
-    public void testGetSample() {
-        JDBCDatasetProperties dataset = createDatasetProperties();
+    public void testGetSampleWithValidDesignSchema() {
+        JDBCDatasetProperties dataset = createDatasetProperties(true);
+        getSampleAction(dataset);
+    }
 
+    @Test
+    public void testGetSampleWithoutDesignSchema() {
+        JDBCDatasetProperties dataset = createDatasetProperties(false);
+        getSampleAction(dataset);
+    }
+
+    private void getSampleAction(JDBCDatasetProperties dataset) {
         JDBCDatasetRuntime runtime = new JDBCDatasetRuntime();
         runtime.initialize(null, dataset);
         final IndexedRecord[] record = new IndexedRecord[1];
@@ -85,7 +94,7 @@ public class JDBCDatasetTestIT {
         Assert.assertEquals("wangwei", record[0].get(1));
     }
 
-    private JDBCDatasetProperties createDatasetProperties() {
+    private JDBCDatasetProperties createDatasetProperties(boolean updateSchema) {
         JDBCDatastoreDefinition def = new JDBCDatastoreDefinition();
         JDBCDatastoreProperties datastore = new JDBCDatastoreProperties("datastore");
 
@@ -99,7 +108,9 @@ public class JDBCDatasetTestIT {
         JDBCDatasetProperties dataset = (JDBCDatasetProperties) def.createDatasetProperties(datastore);
         dataset.sql.setValue(DBTestUtils.getSQL());
 
-        dataset.updateSchema();
+        if (updateSchema) {
+            dataset.updateSchema();
+        }
         return dataset;
     }
 

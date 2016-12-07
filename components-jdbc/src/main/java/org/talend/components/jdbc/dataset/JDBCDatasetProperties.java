@@ -74,7 +74,7 @@ public class JDBCDatasetProperties extends PropertiesImpl
         Form mainForm = CommonUtils.addForm(this, Form.MAIN);
         mainForm.addRow(sql);
 
-        mainForm.addRow(main.getForm(Form.REFERENCE));
+        // mainForm.addRow(main.getForm(Form.REFERENCE));
     }
 
     @Override
