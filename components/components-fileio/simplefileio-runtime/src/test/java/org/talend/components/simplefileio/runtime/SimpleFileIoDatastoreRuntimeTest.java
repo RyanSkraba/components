@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.simplefileio.SimpleFileIoDatastoreDefinition;
@@ -54,6 +55,7 @@ public class SimpleFileIoDatastoreRuntimeTest {
      * Checks the {@link RuntimeInfo} of the definition.
      */
     @Test
+    @Ignore("This can't work unless the runtime jar is already installed in maven!")
     public void testRuntimeInfo() throws MalformedURLException {
         RuntimeInfo runtimeInfo = def.getRuntimeInfo(null, null);
 
