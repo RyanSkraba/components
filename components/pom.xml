@@ -15,6 +15,7 @@
     </properties>
 
     <modules>
+        <module>components-fileio</module>
         <module>components-jms</module>
         <module>components-kafka</module>
     </modules>
