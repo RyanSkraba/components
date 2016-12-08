@@ -3,14 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.talend.components</groupId>
+    <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.16.0-SNAPSHOT</version>
+        <version>0.17.0-SNAPSHOT</version>
         <relativePath>../../components-parent/pom.xml</relativePath>
     </parent>
 
     <groupId>org.talend.components</groupId>
     <artifactId>components-adapter-beam</artifactId>
+    <version>0.17.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Component API - Beam</name>

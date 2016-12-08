@@ -4,13 +4,13 @@
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
-		<version>0.16.0-SNAPSHOT</version>
+		<version>0.17.0-SNAPSHOT</version>
 		<relativePath>../components-parent/pom.xml</relativePath>
 	</parent>
 
 	<name>Component Maven archetypes</name>
 	<artifactId>components-api-archetypes</artifactId>
-	<version>0.16.0-SNAPSHOT</version>
+	<version>0.17.0-SNAPSHOT</version>
 
     <!-- these dependencies allow the build to take place after the dependencies
     build so that the archetype test does not fail when the version changes. -->
@@ -18,13 +18,13 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-osgi</artifactId>
-            <version>0.16.0-SNAPSHOT</version>
+            <version>0.17.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
-            <version>0.16.0-SNAPSHOT</version>
+            <version>0.17.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
 	</dependencies>

@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
-		<version>0.16.0-SNAPSHOT</version>
+		<version>0.17.0-SNAPSHOT</version>
 		<relativePath>../../components-parent/pom.xml</relativePath>
 	</parent>
 
 
 	<artifactId>components-api-service-rest-all-components</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>0.2.0-SNAPSHOT</version>
 
 	<name>Component Rest APIs packaged with all components</name>
 
@@ -38,7 +38,7 @@
 			-->
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-common-oauth</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.17.0-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.eclipse.jetty</groupId>
@@ -49,48 +49,48 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-jdbc</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.17.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>simplefileio-runtime</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.17.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>jms-definition</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.17.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>kafka-definition</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.17.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>jms-runtime_1_1</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.17.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-jira</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.17.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-salesforce</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.17.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-full-example</artifactId>
-			<version>0.2.0-SNAPSHOT</version>
+			<version>0.3.0-SNAPSHOT</version>
 		</dependency>
 		<!-- rest service -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
-            <version>0.16.0-SNAPSHOT</version>
+            <version>0.17.0-SNAPSHOT</version>
             <classifier>lib</classifier>
         </dependency>
         <dependency><!-- this overides the parent definition that limited the artifact
@@ -102,14 +102,14 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
-            <version>0.16.0-SNAPSHOT</version>
+            <version>0.17.0-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.17.0-SNAPSHOT</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>

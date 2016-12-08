@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.16.0-SNAPSHOT</version>
+        <version>0.17.0-SNAPSHOT</version>
         <relativePath>../../../components-parent/pom.xml</relativePath>             
     </parent>
 
@@ -39,13 +39,13 @@
         <dependency>
             <groupId>org.talend.components</groupId>
 		    <artifactId>multiple-runtime-comp</artifactId>
-		    <version>0.1.0-SNAPSHOT</version>
+		    <version>0.2.0-SNAPSHOT</version>
         </dependency>
 		  <!-- APIs for all Components -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.16.0-SNAPSHOT</version>
+            <version>0.17.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>biz.aQute.bnd</groupId>
@@ -56,20 +56,20 @@
         <dependency>
           <groupId>org.talend.components</groupId>
           <artifactId>components-common</artifactId>
-          <version>0.16.0-SNAPSHOT</version>
+          <version>0.17.0-SNAPSHOT</version>
         </dependency>
         
         <!-- Jar containing Test utils methods -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>0.16.0-SNAPSHOT</version>
+            <version>0.17.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>0.16.0-SNAPSHOT</version>
+            <version>0.17.0-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

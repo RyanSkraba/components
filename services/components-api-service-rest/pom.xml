@@ -6,13 +6,13 @@
     <parent>
         <groupId>org.talend.daikon</groupId>
         <artifactId>service-parent</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.2.0-SNAPSHOT</version>
     </parent>
 
 
     <groupId>org.talend.components</groupId>
     <artifactId>components-api-service-rest</artifactId>
-    <version>0.16.0-SNAPSHOT</version>
+    <version>0.17.0-SNAPSHOT</version>
 
     <name>Components REST API</name>
 
@@ -20,8 +20,8 @@
         <java.version>1.8</java.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <daikon.version>0.14.0-SNAPSHOT</daikon.version>
-        <components-api-full-example.version>0.2.0-SNAPSHOT</components-api-full-example.version>
+        <daikon.version>0.15.0-SNAPSHOT</daikon.version>
+        <components-api-full-example.version>0.3.0-SNAPSHOT</components-api-full-example.version>
     </properties>
 
     <dependencies>
@@ -44,17 +44,17 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>0.16.0-SNAPSHOT</version>
+            <version>0.17.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.16.0-SNAPSHOT</version>
+            <version>0.17.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
-            <version>0.16.0-SNAPSHOT</version>
+            <version>0.17.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.talend.daikon</groupId>
@@ -86,7 +86,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>0.16.0-SNAPSHOT</version>
+            <version>0.17.0-SNAPSHOT</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
