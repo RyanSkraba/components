@@ -37,22 +37,9 @@ public class KafkaConfTableProperties extends PropertiesImpl {
     public void setupLayout() {
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
-        // mainForm.addRow(Widget.widget(keyCol).setWidgetType(Widget.NAME_SELECTION_AREA_WIDGET_TYPE));
         mainForm.addRow(keyCol);
         mainForm.addColumn(valueCol);
 
     }
 
-    // //FIXME can be done by front end with feature(new widget type)?
-    // public void beforeKeyCol() {
-    // refreshLayout(getForm(Form.MAIN));
-    // }
-    //
-    // @Override
-    // public void refreshLayout(Form form) {
-    // super.refreshLayout(form);
-    // if (Form.MAIN.equals(form.getName())) {
-    // keyCol.setPossibleValues(keyCol.getPossibleValues().removeAll(keyCol.getValue()));
-    // }
-    // }
 }

@@ -12,7 +12,9 @@
 // ============================================================================
 package org.talend.components.kafka.datastore;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,8 +52,14 @@ public class KafkaDatastorePropertiesTest {
 
     @Test
     public void testDefaultValue() {
-        assertEquals(KafkaDatastoreProperties.KafkaVersion.V_0_10_0_1, datastore.version.getValue());
+        assertEquals(KafkaDatastoreProperties.KafkaVersion.V_0_10_1_0, datastore.version.getValue());
         assertNull(datastore.brokers.getValue());
     }
+
+    // @Test
+    // public void testTrigger() {
+    // Form main = datastore.getForm(Form.MAIN);
+    // assertTrue(main.getWidget(datastore.testConnection).isCallValidate());
+    // }
 
 }

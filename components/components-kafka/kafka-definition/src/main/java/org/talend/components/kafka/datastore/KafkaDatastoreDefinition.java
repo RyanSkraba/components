@@ -63,7 +63,6 @@ public class KafkaDatastoreDefinition extends SimpleNamedThing implements Datast
 
     @Override
     public String getImagePath() {
-        // FIXME add image
-        return null;
+        return NAME + "_icon32.png";
     }
 }

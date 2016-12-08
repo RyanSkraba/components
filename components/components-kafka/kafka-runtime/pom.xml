@@ -103,7 +103,9 @@
                                             <KAFKA_ADVERTISED_HOST_NAME>127.0.0.1</KAFKA_ADVERTISED_HOST_NAME>
                                             <KAFKA_ADVERTISED_PORT>9092</KAFKA_ADVERTISED_PORT>
                                             <KAFKA_ZOOKEEPER_CONNECT>zookeeper:2181</KAFKA_ZOOKEEPER_CONNECT>
-                                            <KAFKA_CREATE_TOPICS>test_in:1:1,test_out:1:1</KAFKA_CREATE_TOPICS>
+                                            <KAFKA_CREATE_TOPICS>
+                                                test_in:1:1,test_out:1:1,test_avro_in:1:1,test_avro_out:1:1,test_avro_custom_in:1:1,test_avro_custom_out:1:1
+                                            </KAFKA_CREATE_TOPICS>
                                         </env>
                                         <ports>
                                             <port>9092:9092</port>

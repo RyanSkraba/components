@@ -40,8 +40,7 @@ public class KafkaDatasetDefinition extends SimpleNamedThing implements DatasetD
 
     @Override
     public String getImagePath() {
-        // FIXME add image
-        return null;
+        return NAME + "_icon32.png";
     }
 
 }

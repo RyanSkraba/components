@@ -73,20 +73,4 @@ public class KafkaDatastoreTestIT {
         assertEquals(ValidationResult.Result.OK, correctValidationResults.get(0).getStatus());
     }
 
-    @Test
-    public void doHealthChecksForProperties() throws Exception {
-        datastoreProperties.brokers.setValue("");
-        ValidationResult emptyValidationResult = datastoreProperties.validateTestConnection();
-        assertEquals(ValidationResult.Result.ERROR, emptyValidationResult.getStatus());
-        assertEquals("Bootstrap server urls should not be empty", emptyValidationResult.getMessage());
-
-        datastoreProperties.brokers.setValue("wronghost:1");
-        ValidationResult wrongValidationResult = datastoreProperties.validateTestConnection();
-        assertEquals(ValidationResult.Result.ERROR, wrongValidationResult.getStatus());
-
-        datastoreProperties.brokers.setValue(BOOTSTRAP_HOST);
-        ValidationResult correctValidationResult = datastoreProperties.validateTestConnection();
-        assertEquals(ValidationResult.Result.OK, correctValidationResult.getStatus());
-    }
-
 }
