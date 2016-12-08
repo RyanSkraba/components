@@ -2,9 +2,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.talend.components</groupId>
+        <artifactId>components-parent</artifactId>
+        <version>0.16.0-SNAPSHOT</version>
+        <relativePath>../../components-parent/pom.xml</relativePath>
+    </parent>
+
     <groupId>org.talend.components</groupId>
     <artifactId>components-adapter-beam</artifactId>
-    <version>0.16.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Component API - Beam</name>
@@ -15,22 +21,22 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <beam.version>0.3.0-incubating</beam.version>
-        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>apache.snapshots</id>
-            <name>Apache Development Snapshot Repository</name>
-            <url>https://repository.apache.org/content/repositories/snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
+    <!-- Necessary if you want to compile with a SNAPSHOT of beam. -->
+    <!--<repositories>-->
+    <!--<repository>-->
+    <!--<id>apache.snapshots</id>-->
+    <!--<name>Apache Development Snapshot Repository</name>-->
+    <!--<url>https://repository.apache.org/content/repositories/snapshots/</url>-->
+    <!--<releases>-->
+    <!--<enabled>false</enabled>-->
+    <!--</releases>-->
+    <!--<snapshots>-->
+    <!--<enabled>true</enabled>-->
+    <!--</snapshots>-->
+    <!--</repository>-->
+    <!--</repositories>-->
 
     <dependencies>
         <!-- Beam must come before daikon in order to override its dependencies. -->
@@ -42,7 +48,6 @@
         <dependency>
             <groupId>org.talend.daikon</groupId>
             <artifactId>daikon</artifactId>
-            <version>0.15.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
