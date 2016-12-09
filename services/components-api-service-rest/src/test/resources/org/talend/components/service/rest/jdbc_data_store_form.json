@@ -1,0 +1,55 @@
+{
+  "jsonSchema": {
+    "title": "Database data store",
+    "type": "object",
+    "properties": {
+      "dbTypes": {
+        "title": "Database type",
+        "type": "string",
+        "enum": [
+          "MYSQL",
+          "DERBY"
+        ]
+      },
+      "jdbcUrl": {
+        "title": "JDBC URL",
+        "type": "string"
+      },
+      "userId": {
+        "title": "Username",
+        "type": "string"
+      },
+      "password": {
+        "title": "Password",
+        "type": "string"
+      }
+    },
+    "required": [
+      "dbTypes",
+      "jdbcUrl",
+      "userId",
+      "password"
+    ]
+  },
+  "properties": {
+    "dbTypes": "MYSQL",
+    "jdbcUrl": "jdbc:mysql://localhost:3306/db",
+    "@definitionName": "JDBCDatastore"
+  },
+  "uiSchema": {
+    "dbTypes": {
+      "ui:trigger": [
+        "after"
+      ]
+    },
+    "password": {
+      "ui:widget": "password"
+    },
+    "ui:order": [
+      "dbTypes",
+      "jdbcUrl",
+      "userId",
+      "password"
+    ]
+  }
+}

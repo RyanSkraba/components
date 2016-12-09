@@ -1,4 +1,4 @@
-// ============================================================================
+//==============================================================================
 //
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
@@ -9,14 +9,14 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-// ============================================================================
+//==============================================================================
 package org.talend.components.service.rest.serialization;
 
 import java.io.InputStream;
 import java.util.HashMap;
-
 import javax.inject.Inject;
 
+import com.cedarsoftware.util.io.JsonWriter;
 import org.springframework.stereotype.Component;
 import org.talend.daikon.definition.Definition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
@@ -24,8 +24,6 @@ import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.serialize.jsonschema.JsonSchemaUtil;
-
-import com.cedarsoftware.util.io.JsonWriter;
 
 /**
  * this provide helper methods from serializing and deserializing TComp object for REST apis

@@ -1,0 +1,66 @@
+{
+  "type": "record",
+  "name": "USERS",
+  "fields": [
+    {
+      "name": "ID",
+      "type": [
+        "int",
+        "null"
+      ],
+      "talend.field.precision": 10,
+      "talend.field.dbType": 4,
+      "talend.field.dbColumnName": "ID"
+    },
+    {
+      "name": "FIRST_NAME",
+      "type": [
+        "string",
+        "null"
+      ],
+      "talend.field.length": 50,
+      "talend.field.dbType": 12,
+      "talend.field.dbColumnName": "FIRST_NAME"
+    },
+    {
+      "name": "LAST_NAME",
+      "type": [
+        "string",
+        "null"
+      ],
+      "talend.field.length": 50,
+      "talend.field.dbType": 12,
+      "talend.field.dbColumnName": "LAST_NAME"
+    },
+    {
+      "name": "EMAIL",
+      "type": [
+        "string",
+        "null"
+      ],
+      "talend.field.length": 50,
+      "talend.field.dbType": 12,
+      "talend.field.dbColumnName": "EMAIL"
+    },
+    {
+      "name": "GENDER",
+      "type": [
+        "string",
+        "null"
+      ],
+      "talend.field.length": 50,
+      "talend.field.dbType": 12,
+      "talend.field.dbColumnName": "GENDER"
+    },
+    {
+      "name": "IP_ADDRESS",
+      "type": [
+        "string",
+        "null"
+      ],
+      "talend.field.length": 20,
+      "talend.field.dbType": 12,
+      "talend.field.dbColumnName": "IP_ADDRESS"
+    }
+  ]
+}

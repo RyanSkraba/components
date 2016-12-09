@@ -1,4 +1,4 @@
-// ============================================================================
+//==============================================================================
 //
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
@@ -9,19 +9,19 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-// ============================================================================
+//==============================================================================
 
 package org.talend.components.service.rest.dto;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.common.datastore.DatastoreDefinition;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * DTO used for the definitions.

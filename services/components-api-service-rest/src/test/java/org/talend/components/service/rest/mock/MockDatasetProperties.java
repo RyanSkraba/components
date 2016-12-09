@@ -12,7 +12,7 @@
 //==============================================================================
 package org.talend.components.service.rest.mock;
 
-import org.talend.components.common.datastore.DatastoreProperties;
+import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
@@ -20,9 +20,9 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
 /**
- * Mock data store properties for tests.
+ * Mock dataset properties for tests.
  */
-public class MockDatastoreProperties extends PropertiesImpl implements DatastoreProperties {
+public class MockDatasetProperties extends PropertiesImpl implements DatasetProperties<MockDatastoreProperties> {
 
     public Property<String> tag = PropertyFactory.newString("tag");
 
@@ -30,9 +30,10 @@ public class MockDatastoreProperties extends PropertiesImpl implements Datastore
 
     /**
      * Default constructor.
+     *
      * @param name the properties name.
      */
-    public MockDatastoreProperties(String name) {
+    public MockDatasetProperties(String name) {
         super(name);
     }
 
@@ -52,4 +53,13 @@ public class MockDatastoreProperties extends PropertiesImpl implements Datastore
         return new ValidationResult().setStatus(ValidationResult.Result.OK).setMessage("tagId is OK");
     }
 
+    @Override
+    public MockDatastoreProperties getDatastoreProperties() {
+        return null;
+    }
+
+    @Override
+    public void setDatastoreProperties(MockDatastoreProperties datastoreProperties) {
+
+    }
 }

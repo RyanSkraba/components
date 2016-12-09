@@ -1,4 +1,4 @@
-// ============================================================================
+//==============================================================================
 //
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
@@ -9,11 +9,8 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-// ============================================================================
+//==============================================================================
 package org.talend.components.service.rest.impl;
-
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static org.talend.daikon.exception.error.CommonErrorCodes.UNEXPECTED_EXCEPTION;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +18,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.List;
 import java.util.Set;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
@@ -43,6 +39,9 @@ import org.talend.components.service.rest.ComponentController;
 import org.talend.components.service.rest.serialization.JsonSerializationHelper;
 import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.properties.Properties;
+
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static org.talend.daikon.exception.error.CommonErrorCodes.UNEXPECTED_EXCEPTION;
 
 /**
  * Default implementation of the ComponentController.

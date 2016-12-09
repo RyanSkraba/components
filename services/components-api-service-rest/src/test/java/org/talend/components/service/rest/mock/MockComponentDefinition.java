@@ -1,4 +1,4 @@
-// ============================================================================
+//==============================================================================
 //
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
@@ -9,10 +9,8 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-// ============================================================================
+//==============================================================================
 package org.talend.components.service.rest.mock;
-
-import static java.util.Arrays.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,6 +22,8 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.fullexample.FullExampleProperties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
+
+import static java.util.Arrays.asList;
 
 /**
  *

@@ -1,4 +1,4 @@
-// ============================================================================
+//==============================================================================
 //
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
@@ -9,12 +9,9 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-// ============================================================================
+//==============================================================================
 
 package org.talend.components.service.rest.impl;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 
@@ -26,6 +23,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DataStoreServiceImplTest {

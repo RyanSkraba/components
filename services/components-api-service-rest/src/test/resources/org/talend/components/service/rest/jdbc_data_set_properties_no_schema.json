@@ -1,0 +1,7 @@
+{
+  "sql": "SELECT * FROM users",
+  "main": {
+    "schema": "{\"type\":\"record\",\"name\":\"EmptyRecord\",\"fields\":[]}"
+  },
+  "@definitionName": "JDBCDataset"
+}
