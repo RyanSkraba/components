@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.exception.ComponentException;
@@ -82,7 +83,7 @@ public class JDBCRowTestIT {
         randomCommit(properties);
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(
-                definition.getRuntimeInfo(properties, ConnectorTopology.NONE), properties.getClass().getClassLoader())) {
+                definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.NONE), properties.getClass().getClassLoader())) {
             JDBCRowSourceOrSink sourceOrSink = (JDBCRowSourceOrSink) sandboxedInstance.getInstance();
             sourceOrSink.initialize(null, properties);
             ValidationResult result = sourceOrSink.validate(null);
@@ -116,7 +117,7 @@ public class JDBCRowTestIT {
         properties.preparedStatementTable.values.setValue(Arrays.<Object> asList(4, "momo"));
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(
-                definition.getRuntimeInfo(properties, ConnectorTopology.NONE), properties.getClass().getClassLoader())) {
+                definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.NONE), properties.getClass().getClassLoader())) {
             JDBCRowSourceOrSink sourceOrSink = (JDBCRowSourceOrSink) sandboxedInstance.getInstance();
             sourceOrSink.initialize(null, properties);
             ValidationResult result = sourceOrSink.validate(null);
@@ -144,7 +145,7 @@ public class JDBCRowTestIT {
         randomCommit(properties);
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(
-                definition.getRuntimeInfo(properties, ConnectorTopology.NONE), properties.getClass().getClassLoader())) {
+                definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.NONE), properties.getClass().getClassLoader())) {
             JDBCRowSourceOrSink sourceOrSink = (JDBCRowSourceOrSink) sandboxedInstance.getInstance();
             sourceOrSink.initialize(null, properties);
             ValidationResult result = sourceOrSink.validate(null);
@@ -174,7 +175,7 @@ public class JDBCRowTestIT {
         properties.useColumn.setValue(properties.useColumn.getPossibleValues().get(0).toString());
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(
-                definition.getRuntimeInfo(properties, ConnectorTopology.OUTGOING), properties.getClass().getClassLoader())) {
+                definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.OUTGOING), properties.getClass().getClassLoader())) {
             JDBCRowSource source = (JDBCRowSource) sandboxedInstance.getInstance();
             source.initialize(null, properties);
             ValidationResult result = source.validate(null);
@@ -235,7 +236,7 @@ public class JDBCRowTestIT {
         properties.preparedStatementTable.values.setValue(Arrays.<Object> asList(1));
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(
-                definition.getRuntimeInfo(properties, ConnectorTopology.OUTGOING), properties.getClass().getClassLoader())) {
+                definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.OUTGOING), properties.getClass().getClassLoader())) {
             JDBCRowSource source = (JDBCRowSource) sandboxedInstance.getInstance();
             source.initialize(null, properties);
             ValidationResult result = source.validate(null);
@@ -283,7 +284,7 @@ public class JDBCRowTestIT {
         properties.useColumn.setValue(properties.useColumn.getPossibleValues().get(0).toString());
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(
-                definition.getRuntimeInfo(properties, ConnectorTopology.OUTGOING), properties.getClass().getClassLoader())) {
+                definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.OUTGOING), properties.getClass().getClassLoader())) {
             JDBCRowSource source = (JDBCRowSource) sandboxedInstance.getInstance();
             source.initialize(null, properties);
             ValidationResult result = source.validate(null);
@@ -334,7 +335,7 @@ public class JDBCRowTestIT {
         properties.preparedStatementTable.values.setValue(Arrays.<Object> asList(4, "momo"));
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(
-                definition.getRuntimeInfo(properties, ConnectorTopology.INCOMING_AND_OUTGOING),
+                definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.INCOMING_AND_OUTGOING),
                 properties.getClass().getClassLoader())) {
             JDBCRowSink sink = (JDBCRowSink) sandboxedInstance.getInstance();
             sink.initialize(null, properties);
@@ -401,7 +402,7 @@ public class JDBCRowTestIT {
         properties.preparedStatementTable.values.setValue(Arrays.<Object> asList(4, "a too long value"));
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(
-                definition.getRuntimeInfo(properties, ConnectorTopology.INCOMING_AND_OUTGOING),
+                definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.INCOMING_AND_OUTGOING),
                 properties.getClass().getClassLoader())) {
             JDBCRowSink sink = (JDBCRowSink) sandboxedInstance.getInstance();
             sink.initialize(null, properties);
@@ -471,7 +472,7 @@ public class JDBCRowTestIT {
         properties.preparedStatementTable.values.setValue(Arrays.<Object> asList(4, "a too long value"));
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(
-                definition.getRuntimeInfo(properties, ConnectorTopology.INCOMING_AND_OUTGOING),
+                definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.INCOMING_AND_OUTGOING),
                 properties.getClass().getClassLoader())) {
             JDBCRowSink sink = (JDBCRowSink) sandboxedInstance.getInstance();
             sink.initialize(null, properties);
@@ -523,7 +524,7 @@ public class JDBCRowTestIT {
         properties.useColumn.setValue(properties.useColumn.getPossibleValues().get(2).toString());
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(
-                definition.getRuntimeInfo(properties, ConnectorTopology.INCOMING_AND_OUTGOING),
+                definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.INCOMING_AND_OUTGOING),
                 properties.getClass().getClassLoader())) {
             JDBCRowSink sink = (JDBCRowSink) sandboxedInstance.getInstance();
             sink.initialize(null, properties);

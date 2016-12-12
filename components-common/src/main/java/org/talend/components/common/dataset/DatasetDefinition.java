@@ -12,10 +12,19 @@
 // ============================================================================
 package org.talend.components.common.dataset;
 
-import org.talend.components.api.RuntimableDefinition;
+import org.talend.daikon.definition.Definition;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
- * Placeholder for DatasetDefinition
+ * A business object that represents a set of records discovered from a data store.
  */
-public interface DatasetDefinition<DatasetPropT extends DatasetProperties> extends RuntimableDefinition<DatasetPropT, Object> {
+public interface DatasetDefinition<DatasetPropT extends DatasetProperties> extends Definition<DatasetPropT> {
+
+    /**
+     * @param properties an instance of the definition.
+     * @return an object that can be used to create a runtime instance of this definition, configured by the properties
+     * of the instance and the context. This can be null if no runtime applies.
+     */
+    RuntimeInfo getRuntimeInfo(DatasetPropT properties);
+
 }

@@ -57,7 +57,7 @@ public class SimpleFileIoDatastoreRuntimeTest {
     @Test
     @Ignore("This can't work unless the runtime jar is already installed in maven!")
     public void testRuntimeInfo() throws MalformedURLException {
-        RuntimeInfo runtimeInfo = def.getRuntimeInfo(null, null);
+        RuntimeInfo runtimeInfo = def.getRuntimeInfo(null);
 
         // We test the maven dependencies in this runtime class, where they are available.
         List<URL> dependencies = runtimeInfo.getMavenUrlDependencies();

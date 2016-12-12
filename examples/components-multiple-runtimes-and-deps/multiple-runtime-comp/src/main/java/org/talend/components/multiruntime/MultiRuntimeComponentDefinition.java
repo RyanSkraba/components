@@ -22,6 +22,7 @@ import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.JarRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.multiruntime.MultiRuntimeComponentProperties.Version;
@@ -40,7 +41,7 @@ public class MultiRuntimeComponentDefinition extends AbstractComponentDefinition
     public static final String COMPONENT_NAME = "MultiRuntimeComponent"; //$NON-NLS-1$
 
     public MultiRuntimeComponentDefinition() {
-        super(COMPONENT_NAME);
+        super(COMPONENT_NAME, ExecutionEngine.DI);
     }
 
     @Override
@@ -100,7 +101,8 @@ public class MultiRuntimeComponentDefinition extends AbstractComponentDefinition
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties prop, ConnectorTopology connectorTopology) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties prop, ConnectorTopology connectorTopology) {
+        assertEngineCompatibility(engine);
         if (connectorTopology == ConnectorTopology.OUTGOING) {
             if (prop != null && prop instanceof MultiRuntimeComponentProperties) {
                 MultiRuntimeComponentProperties mrcpProp = (MultiRuntimeComponentProperties) prop;

@@ -10,16 +10,16 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.api;
-
-import org.talend.daikon.NamedThing;
-import org.talend.daikon.definition.Definition;
+package org.talend.components.api.component.runtime;
 
 /**
- * A component family is a group of logically related {@link Definition} that should be installed together.
+ * When creating a {@link org.talend.daikon.runtime.RuntimeInfo} object via a
+ * {@link org.talend.components.api.component.ComponentDefinition}, you might want to specify where the runtime instance
+ * will be running.
  */
-public interface ComponentFamilyDefinition extends NamedThing {
-
-    Iterable<? extends Definition> getDefinitions();
-
+public enum ExecutionEngine {
+    DI,
+    DI_SPARK_BATCH,
+    DI_SPARK_STREAMING,
+    BEAM
 }

@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 public class JDBCOutputDefinitionTest {
@@ -33,7 +34,7 @@ public class JDBCOutputDefinitionTest {
 
     @Test
     public void getRuntimeInfo() throws Exception {
-        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(null, null);
+        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(ExecutionEngine.DI,null, null);
         assertNotNull(runtimeInfo);
     }
 

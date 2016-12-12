@@ -26,6 +26,7 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.component.runtime.Source;
@@ -44,7 +45,7 @@ public class ${componentName}Definition extends AbstractComponentDefinition {
     public static final String COMPONENT_NAME = "${componentName}"; //$NON-NLS-1$
 
     public ${componentName}Definition() {
-        super(COMPONENT_NAME);
+        super(COMPONENT_NAME, ExecutionEngine.DI, ExecutionEngine.BEAM);
     }
 
     @Override
@@ -74,7 +75,8 @@ public class ${componentName}Definition extends AbstractComponentDefinition {
 
     
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology componentType) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology componentType) {
+        assertEngineCompatibility(engine);
         if (componentType == ConnectorTopology.OUTGOING) {
             return new SimpleRuntimeInfo(this.getClass().getClassLoader(), DependenciesReader.computeDependenciesFilePath("${groupId}", "${artifactId}"), ${componentName}Source.class.getCanonicalName());
         } else {

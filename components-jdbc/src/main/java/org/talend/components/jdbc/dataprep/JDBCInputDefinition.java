@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.runtime.JDBCSource;
 import org.talend.components.jdbc.runtime.JDBCTemplate;
@@ -32,7 +33,7 @@ public class JDBCInputDefinition extends AbstractComponentDefinition {
     public static String NAME = "DataPrepDBInput";
 
     public JDBCInputDefinition() {
-        super(NAME);
+        super(NAME, ExecutionEngine.DI);
     }
 
     @Override
@@ -46,7 +47,8 @@ public class JDBCInputDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology connectorTopology) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology connectorTopology) {
+        assertEngineCompatibility(engine);
         // TODO may need to use the different runtime
         return JDBCTemplate.createCommonRuntime(this.getClass().getClassLoader(), properties,
                 JDBCSource.class.getCanonicalName());

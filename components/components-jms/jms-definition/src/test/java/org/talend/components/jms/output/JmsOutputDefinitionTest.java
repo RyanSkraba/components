@@ -15,6 +15,7 @@ package org.talend.components.jms.output;
 
 import org.junit.Test;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.properties.Properties;
@@ -37,7 +38,7 @@ public class JmsOutputDefinitionTest {
      */
     @Test
     public void testGetRuntimeInfo() {
-        RuntimeInfo runtimeInfo = outputDefinition.getRuntimeInfo(null, null);
+        RuntimeInfo runtimeInfo = outputDefinition.getRuntimeInfo(ExecutionEngine.BEAM, null, null);
         assertEquals("org.talend.components.jms.runtime_1_1.JmsSource", runtimeInfo.getRuntimeClassName());
     }
 

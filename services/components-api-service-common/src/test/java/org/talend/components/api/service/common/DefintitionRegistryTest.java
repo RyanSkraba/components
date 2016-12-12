@@ -21,6 +21,7 @@ import java.util.Iterator;
 import org.junit.Test;
 import org.talend.components.api.ComponentFamilyDefinition;
 import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.service.common.testcomponent.TestComponentDefinition;
 import org.talend.components.api.service.common.testcomponent.TestComponentFamilyDefinition;
 import org.talend.components.api.service.common.testcomponent.TestComponentWizardDefinition;
@@ -91,9 +92,9 @@ public class DefintitionRegistryTest {
     @Test
     public void testGetDefinitionForPropertiesType() {
         // we'll check that 2 derived Properties have thier definition returned.
-        SimpleComponentDefinition compDef = new SimpleComponentDefinition("def");
+        SimpleComponentDefinition compDef = new SimpleComponentDefinition("def", ExecutionEngine.DI);
         compDef.setPropertyClass(NestedComponentProperties.class);
-        SimpleComponentDefinition inheritedDef = new SimpleComponentDefinition("DefOfinherited");
+        SimpleComponentDefinition inheritedDef = new SimpleComponentDefinition("DefOfinherited", ExecutionEngine.DI);
         inheritedDef.setPropertyClass(InheritedComponentProperties.class);
 
         DefinitionRegistry definitionRegistry = new DefinitionRegistry();

@@ -20,6 +20,7 @@ import java.util.Set;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.splunk.runtime.TSplunkEventCollectorSink;
@@ -40,7 +41,7 @@ public class TSplunkEventCollectorDefinition extends AbstractComponentDefinition
     public static final String COMPONENT_NAME = "tSplunkEventCollector"; //$NON-NLS-1$
 
     public TSplunkEventCollectorDefinition() {
-        super(COMPONENT_NAME);
+        super(COMPONENT_NAME, ExecutionEngine.DI);
         setupI18N(new Property<?>[] { RETURN_RESPONSE_CODE_PROP });
     }
 
@@ -70,7 +71,8 @@ public class TSplunkEventCollectorDefinition extends AbstractComponentDefinition
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology componentType) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology componentType) {
+        assertEngineCompatibility(engine);
         if (componentType == ConnectorTopology.INCOMING) {
             return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
                     DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-splunk"),

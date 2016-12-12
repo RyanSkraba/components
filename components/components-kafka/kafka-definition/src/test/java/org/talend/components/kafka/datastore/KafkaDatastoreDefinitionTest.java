@@ -41,7 +41,7 @@ public class KafkaDatastoreDefinitionTest {
 
     @Test
     public void getRuntimeInfo() throws Exception {
-        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(null, null);
+        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(null);
         assertNotNull(runtimeInfo);
     }
 

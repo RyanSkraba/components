@@ -24,7 +24,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.common.dataset.DatasetDefinition;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.service.rest.mock.MockDatasetDefinition;
@@ -77,10 +76,10 @@ public abstract class AbstractSpringIntegrationTests {
         when(delegate.getDefinitionsMapByType(DatasetDefinition.class)) //
                 .thenReturn(datasetMap);
 
-        Map<String, RuntimableDefinition> runtimablesMap = new HashMap<>();
+        Map<String, Definition> runtimablesMap = new HashMap<>();
         runtimablesMap.putAll(datastoresMap);
         runtimablesMap.putAll(datasetMap);
-        when(delegate.getDefinitionsMapByType(RuntimableDefinition.class)) //
+        when(delegate.getDefinitionsMapByType(Definition.class)) //
                 .thenReturn(runtimablesMap);
         when(delegate.getDefinitionsMapByType(Definition.class)) //
                 .thenReturn((Map) runtimablesMap);

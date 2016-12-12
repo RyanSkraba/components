@@ -28,7 +28,7 @@ public class JmsDatasetDefinitionTest {
      */
     @Test
     public void testGetRuntimeInfo() {
-        RuntimeInfo runtimeInfo = datasetDefinition.getRuntimeInfo(null, null);
+        RuntimeInfo runtimeInfo = datasetDefinition.getRuntimeInfo(null);
         assertEquals("org.talend.components.jms.runtime_1_1.DatasetRuntime", runtimeInfo.getRuntimeClassName());
     }
 

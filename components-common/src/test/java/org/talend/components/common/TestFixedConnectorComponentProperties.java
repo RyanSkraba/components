@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
@@ -78,7 +79,7 @@ public class TestFixedConnectorComponentProperties {
     // default implementation for pure java test. Shall be overriden of Spring or OSGI tests
     public ComponentService getComponentService() {
         DefinitionRegistry testComponentRegistry = new DefinitionRegistry();
-        SimpleComponentDefinition componentDef = new SimpleComponentDefinition("foo");
+        SimpleComponentDefinition componentDef = new SimpleComponentDefinition("foo", ExecutionEngine.DI);
         componentDef.setPropertyClass(TestProperties.class);
         testComponentRegistry.registerDefinition(Arrays.asList(componentDef));
         return new ComponentServiceImpl(testComponentRegistry);

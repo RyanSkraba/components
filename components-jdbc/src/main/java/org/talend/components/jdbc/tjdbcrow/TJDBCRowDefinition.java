@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.runtime.JDBCRowSink;
 import org.talend.components.jdbc.runtime.JDBCRowSource;
@@ -34,7 +35,7 @@ public class TJDBCRowDefinition extends AbstractComponentDefinition {
     public static final String COMPONENT_NAME = "tJDBCRowNew";
 
     public TJDBCRowDefinition() {
-        super(COMPONENT_NAME);
+        super(COMPONENT_NAME, ExecutionEngine.DI);
     }
 
     @Override
@@ -55,7 +56,8 @@ public class TJDBCRowDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology connectorTopology) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology connectorTopology) {
+        assertEngineCompatibility(engine);
         switch (connectorTopology) {
         case OUTGOING:
             return JDBCTemplate.createCommonRuntime(this.getClass().getClassLoader(), properties,

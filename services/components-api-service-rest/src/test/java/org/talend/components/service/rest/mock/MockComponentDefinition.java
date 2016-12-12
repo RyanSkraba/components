@@ -18,6 +18,7 @@ import java.util.Set;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.fullexample.FullExampleProperties;
 import org.talend.daikon.properties.property.Property;
@@ -35,7 +36,7 @@ public class MockComponentDefinition extends AbstractComponentDefinition {
     private Set<ConnectorTopology> topologies;
 
     public MockComponentDefinition(String name) {
-        super("mock " + name);
+        super("mock " + name, ExecutionEngine.DI);
         this.name = name;
         this.topologies = new HashSet<>();
     }
@@ -68,7 +69,8 @@ public class MockComponentDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology compType) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology topology) {
+        assertEngineCompatibility(engine);
         return null;
     }
 

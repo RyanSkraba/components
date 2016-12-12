@@ -20,6 +20,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.common.dataset.DatasetDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.runtime.RuntimeUtil;
@@ -53,7 +54,7 @@ public class SimpleFileIoDatasetDefinitionTest {
     @Test
     @Ignore("This can't work unless the runtime jar is already installed in maven!")
     public void testRuntimeInfo() {
-        RuntimeInfo runtimeInfo = def.getRuntimeInfo(null, null);
+        RuntimeInfo runtimeInfo = def.getRuntimeInfo(null);
         assertEquals("org.talend.components.simplefileio.runtime.SimpleFileIoDatasetRuntime", runtimeInfo.getRuntimeClassName());
     }
 }

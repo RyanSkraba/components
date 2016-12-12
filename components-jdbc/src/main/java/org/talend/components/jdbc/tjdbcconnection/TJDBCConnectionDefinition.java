@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.runtime.JDBCSourceOrSink;
 import org.talend.components.jdbc.runtime.JDBCTemplate;
@@ -32,7 +33,7 @@ public class TJDBCConnectionDefinition extends AbstractComponentDefinition {
     public static final String COMPONENT_NAME = "tJDBCConnectionNew";
 
     public TJDBCConnectionDefinition() {
-        super(COMPONENT_NAME);
+        super(COMPONENT_NAME, ExecutionEngine.DI);
     }
 
     @Override
@@ -58,7 +59,8 @@ public class TJDBCConnectionDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology connectorTopology) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology connectorTopology) {
+        assertEngineCompatibility(engine);
         if (connectorTopology == ConnectorTopology.NONE) {
             return JDBCTemplate.createCommonRuntime(this.getClass().getClassLoader(), properties,
                     JDBCSourceOrSink.class.getCanonicalName());

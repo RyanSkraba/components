@@ -24,7 +24,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.talend.components.api.ComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
-import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.daikon.definition.Definition;
@@ -46,7 +45,7 @@ public class DefinitionRegistry implements ComponentInstaller.ComponentFramework
     private static final Logger LOGGER = getLogger(DefinitionRegistry.class);
 
     /**
-     * All of the {@link RuntimableDefinition}s that have been added to the framework, including
+     * All of the {@link Definition}s that have been added to the framework, including
      * {@link ComponentDefinition}s.
      */
     private Map<String, Definition> definitions;
@@ -58,14 +57,14 @@ public class DefinitionRegistry implements ComponentInstaller.ComponentFramework
     }
 
     /**
-     * @return a list of all the extended {@link RuntimableDefinition} that have been added to the framework.
+     * @return a list of all the extended {@link Definition} that have been added to the framework.
      */
     public Iterable<Definition> getIterableDefinitions() {
         return definitions.values();
     }
 
     /**
-     * @return a map of all the extended {@link RuntimableDefinition} that have been added to the framework keyed with their
+     * @return a map of all the extended {@link Definition} that have been added to the framework keyed with their
      *         unique name.
      */
     public Map<String, Definition> getDefinitions() {

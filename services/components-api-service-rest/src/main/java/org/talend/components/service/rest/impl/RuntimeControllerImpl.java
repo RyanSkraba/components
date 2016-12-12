@@ -73,7 +73,7 @@ public class RuntimeControllerImpl implements RuntimesController {
         notNull(definition, "Could not find data store definition of name %s", dataStoreDefinitionName);
         DatastoreProperties properties = (DatastoreProperties) jsonSerializationHelper.toProperties(formData);
 
-        try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(definition.getRuntimeInfo(properties, null),
+        try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(definition.getRuntimeInfo(properties),
                 getClass().getClassLoader())) {
             DatastoreRuntime datastoreRuntime = (DatastoreRuntime) instance.getInstance();
             datastoreRuntime.initialize(null, properties);
@@ -122,7 +122,7 @@ public class RuntimeControllerImpl implements RuntimesController {
 
         // 5) create the runtime
         try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(
-                datasetDefinition.getRuntimeInfo(datasetProperties, null), getClass().getClassLoader())) {
+                datasetDefinition.getRuntimeInfo(datasetProperties), getClass().getClassLoader())) {
             DatasetRuntime<DatasetProperties<DatastoreProperties>> datasetRuntimeInstance = (DatasetRuntime<DatasetProperties<DatastoreProperties>>) instance
                     .getInstance();
 

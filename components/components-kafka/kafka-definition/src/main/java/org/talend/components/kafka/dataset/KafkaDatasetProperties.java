@@ -106,7 +106,7 @@ public class KafkaDatasetProperties extends PropertiesImpl implements DatasetPro
 
     public ValidationResult beforeTopic() {
         KafkaDatasetDefinition definition = new KafkaDatasetDefinition();
-        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(this, null);
+        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(this);
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, getClass().getClassLoader())) {
             IKafkaDatasetRuntime runtime = (IKafkaDatasetRuntime) sandboxedInstance.getInstance();
             runtime.initialize(null, this);

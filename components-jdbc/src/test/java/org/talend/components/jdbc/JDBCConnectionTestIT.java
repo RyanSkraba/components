@@ -23,6 +23,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.jdbc.common.DBTestUtils;
 import org.talend.components.jdbc.runtime.JDBCSourceOrSink;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
@@ -55,7 +56,7 @@ public class JDBCConnectionTestIT {
         properties.connection.driverTable.drivers
                 .setValue(Arrays.asList("mvn:org.talend.libraries/mysql-connector-java-5.1.30-bin/6.3.0"));
 
-        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(properties, ConnectorTopology.NONE);
+        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.NONE);
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo,
                 definition.getClass().getClassLoader())) {
             sandboxedInstance.getInstance();

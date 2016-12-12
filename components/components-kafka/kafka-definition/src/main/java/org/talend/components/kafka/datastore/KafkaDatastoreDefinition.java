@@ -37,7 +37,7 @@ public class KafkaDatastoreDefinition extends SimpleNamedThing implements Datast
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(KafkaDatastoreProperties properties, Object ctx) {
+    public RuntimeInfo getRuntimeInfo(KafkaDatastoreProperties properties) {
         return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
                 DependenciesReader.computeDependenciesFilePath("org.talend.components", "kafka-runtime"),
                 "org.talend.components.kafka.runtime.KafkaDatastoreRuntime");

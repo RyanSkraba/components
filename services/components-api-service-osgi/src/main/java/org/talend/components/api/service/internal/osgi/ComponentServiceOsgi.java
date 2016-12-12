@@ -30,6 +30,7 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.common.ComponentServiceImpl;
@@ -237,8 +238,8 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(String componentName, Properties properties, ConnectorTopology componentType) {
-        return componentServiceDelegate.getRuntimeInfo(componentName, properties, componentType);
+    public RuntimeInfo getRuntimeInfo(String componentName, ExecutionEngine engine, Properties properties, ConnectorTopology componentType) {
+        return componentServiceDelegate.getRuntimeInfo(componentName, engine, properties, componentType);
     }
 
 }

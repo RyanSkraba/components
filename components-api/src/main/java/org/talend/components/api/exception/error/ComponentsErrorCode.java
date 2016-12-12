@@ -20,7 +20,7 @@ import org.talend.daikon.exception.error.DefaultErrorCode;
 import org.talend.daikon.exception.error.ErrorCode;
 
 /**
- * Error codes related to the Component from the component designer perspectve
+ * Error codes related to the Component from the component designer perspective
  */
 public enum ComponentsErrorCode implements ErrorCode {
     /** used when a component schema has a wrong type */
@@ -29,7 +29,9 @@ public enum ComponentsErrorCode implements ErrorCode {
     ,SCHEMA_MISSING(HttpServletResponse.SC_BAD_REQUEST, "component") //$NON-NLS-1$
     /** thrown when a schema is requested and the connector is wrong */
     ,WRONG_CONNECTOR(HttpServletResponse.SC_BAD_REQUEST, "properties") //$NON-NLS-1$
-    /** thrown when a IOException is cought */
+    /** thrown when a component can't supply a runtime for the execution engine. */
+    ,WRONG_EXECUTION_ENGINE(HttpServletResponse.SC_BAD_REQUEST, "component", "requested", "available") //$NON-NLS-1$
+    /** thrown when a IOException is caught */
     ,IO_EXCEPTION(HttpServletResponse.SC_EXPECTATION_FAILED)//
     ;
 

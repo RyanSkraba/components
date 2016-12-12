@@ -13,12 +13,13 @@
 package org.talend.components.kafka;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.daikon.properties.property.Property;
 
 public abstract class KafkaIOBasedDefinition extends AbstractComponentDefinition {
 
     public KafkaIOBasedDefinition(String componentName) {
-        super(componentName);
+        super(componentName, ExecutionEngine.BEAM);
     }
 
     @Override

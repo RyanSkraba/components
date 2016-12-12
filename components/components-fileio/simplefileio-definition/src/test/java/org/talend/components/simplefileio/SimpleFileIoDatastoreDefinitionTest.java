@@ -55,7 +55,7 @@ public class SimpleFileIoDatastoreDefinitionTest {
     @Test
     @Ignore("This can't work unless the runtime jar is already installed in maven!")
     public void testRuntimeInfo() {
-        RuntimeInfo runtimeInfo = def.getRuntimeInfo(null, null);
+        RuntimeInfo runtimeInfo = def.getRuntimeInfo(null);
         assertEquals("org.talend.components.simplefileio.runtime.SimpleFileIoDatastoreRuntime", runtimeInfo.getRuntimeClassName());
 
         // Note that we can't rely on the MavenUrlDependencies being available until after the runtime jar is built, so

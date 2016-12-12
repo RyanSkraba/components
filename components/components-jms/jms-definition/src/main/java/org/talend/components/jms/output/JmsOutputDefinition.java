@@ -19,6 +19,7 @@ import java.util.Set;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Properties;
@@ -32,7 +33,7 @@ public class JmsOutputDefinition extends AbstractComponentDefinition {
     public static final String RUNTIME_1_1 = "org.talend.components.jms.runtime_1_1.JmsSource";
 
     public JmsOutputDefinition() {
-        super(COMPONENT_NAME);
+        super(COMPONENT_NAME, ExecutionEngine.BEAM);
     }
 
     @Override
@@ -40,7 +41,8 @@ public class JmsOutputDefinition extends AbstractComponentDefinition {
         return JmsOutputProperties.class;
     }
 
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology connectorTopology) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology connectorTopology) {
+        assertEngineCompatibility(engine);
         return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
                 DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-jms/jms-runtime_1_1"),
                 RUNTIME_1_1);

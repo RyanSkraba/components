@@ -21,6 +21,7 @@ import java.util.Set;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.JarRuntimeInfo;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
@@ -35,7 +36,7 @@ public class SimpleFileIoInputDefinition extends AbstractComponentDefinition {
     public static final String RUNTIME = "org.talend.components.simplefileio.runtime.SimpleFileIoInputRuntime";
 
     public SimpleFileIoInputDefinition() {
-        super(NAME);
+        super(NAME, ExecutionEngine.BEAM);
     }
 
     @Override
@@ -44,7 +45,8 @@ public class SimpleFileIoInputDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology ctx) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology ctx) {
+        assertEngineCompatibility(engine);
         try {
             return new JarRuntimeInfo(new URL("mvn:org.talend.components/simplefileio-runtime"),
                     DependenciesReader.computeDependenciesFilePath("org.talend.components", "simplefileio-runtime"), RUNTIME);

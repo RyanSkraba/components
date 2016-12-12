@@ -43,7 +43,7 @@ public class SimpleFileIoDatastoreDefinition extends I18nDefinition implements
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(SimpleFileIoDatastoreProperties properties, Object ctx) {
+    public RuntimeInfo getRuntimeInfo(SimpleFileIoDatastoreProperties properties) {
         try {
             return new JarRuntimeInfo(new URL("mvn:org.talend.components/simplefileio-runtime"),
                     DependenciesReader.computeDependenciesFilePath("org.talend.components", "simplefileio-runtime"), RUNTIME);

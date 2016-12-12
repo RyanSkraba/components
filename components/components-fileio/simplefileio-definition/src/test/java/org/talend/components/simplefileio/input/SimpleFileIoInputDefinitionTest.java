@@ -19,6 +19,7 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.runtime.RuntimeUtil;
 
@@ -51,7 +52,7 @@ public class SimpleFileIoInputDefinitionTest {
      */
     @Test
     public void testRuntimeInfo() {
-        RuntimeInfo runtimeInfo = def.getRuntimeInfo(null, null);
+        RuntimeInfo runtimeInfo = def.getRuntimeInfo(ExecutionEngine.BEAM, null, null);
         assertThat(runtimeInfo.getRuntimeClassName(), is("org.talend.components.simplefileio.runtime.SimpleFileIoInputRuntime"));
     }
 }

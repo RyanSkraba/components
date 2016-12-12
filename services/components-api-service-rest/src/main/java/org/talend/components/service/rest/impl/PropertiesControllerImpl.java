@@ -18,7 +18,6 @@ import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.datastore.DatastoreDefinition;
@@ -27,6 +26,7 @@ import org.talend.components.service.rest.PropertiesController;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
 import org.talend.components.service.rest.serialization.JsonSerializationHelper;
 import org.talend.daikon.annotation.ServiceImplementation;
+import org.talend.daikon.definition.Definition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
@@ -56,7 +56,7 @@ public class PropertiesControllerImpl implements PropertiesController {
     @Override
     public String getProperties(String definitionName) {
         notNull(definitionName, "Data store name cannot be null.");
-        final RuntimableDefinition<?, ?> definition = getDefinition(definitionName);
+        final Definition<?> definition = getDefinition(definitionName);
         notNull(definition, "Could not find data store definition of name %s", definitionName);
         log.debug("Found data store definition {} for {}", definition, definitionName);
         return jsonSerializationHelper.toJson(
@@ -67,7 +67,7 @@ public class PropertiesControllerImpl implements PropertiesController {
     // TODO: Verify it is really what's wanted and not just the ValidationResult.Result.(OK|ERROR)
     public ResponseEntity<ValidationResultsDto> validateProperties(String definitionName, String formData) {
         notNull(definitionName, "Data store name cannot be null.");
-        final RuntimableDefinition<?, ?> definition = getDefinition(definitionName);
+        final Definition<?> definition = getDefinition(definitionName);
         notNull(definition, "Could not find data store definition of name %s", definitionName);
         Properties properties = getPropertiesFromJson(definition, formData);
         ValidationResult validationResult = properties.getValidationResult();
@@ -97,7 +97,7 @@ public class PropertiesControllerImpl implements PropertiesController {
                                                     PropertyTrigger trigger, //
                                                     String property, //
                                                     String formData) {
-        final RuntimableDefinition<?, ?> runtimableDefinition = getDefinition(definition);
+        final Definition<?> runtimableDefinition = getDefinition(definition);
         notNull(definition, "Could not find data store definition of name %s", definition);
         Properties properties = getPropertiesFromJson(runtimableDefinition, formData);
         String response;
@@ -149,14 +149,14 @@ public class PropertiesControllerImpl implements PropertiesController {
         return (Exception) throwable;
     }
 
-    private <T extends Properties, U> T getPropertiesFromJson(RuntimableDefinition<T, U> datastoreDefinition,
+    private <T extends Properties> T getPropertiesFromJson(Definition<T> datastoreDefinition,
                                                               String formDataJson) {
         T properties = definitionServiceDelegate.createProperties(datastoreDefinition, "");
         return jsonSerializationHelper.toProperties(toInputStream(formDataJson, StandardCharsets.UTF_8), properties);
     }
 
-    private RuntimableDefinition<?, ?> getDefinition(String definitionName) {
-        return definitionServiceDelegate.getDefinitionsMapByType(RuntimableDefinition.class).get(definitionName);
+    private Definition<?> getDefinition(String definitionName) {
+        return definitionServiceDelegate.getDefinitionsMapByType(Definition.class).get(definitionName);
     }
 
 }

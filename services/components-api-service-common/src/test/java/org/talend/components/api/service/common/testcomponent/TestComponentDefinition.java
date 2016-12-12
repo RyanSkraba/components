@@ -21,6 +21,7 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.common.testcomponent.nestedprop.NestedComponentProperties;
@@ -35,7 +36,7 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     public static final String COMPONENT_NAME = "TestComponent"; //$NON-NLS-1$
 
     public TestComponentDefinition() {
-        super(COMPONENT_NAME);
+        super(COMPONENT_NAME, ExecutionEngine.DI);
     }
 
     protected TestComponentProperties properties;
@@ -71,7 +72,8 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology compType) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology compType) {
+        assertEngineCompatibility(engine);
         return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
                 DependenciesReader.computeDependenciesFilePath("org.talend.components.api.test", "test-components"),
                 COMPONENT_NAME);

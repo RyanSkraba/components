@@ -1,4 +1,4 @@
-//==============================================================================
+// ============================================================================
 //
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
@@ -9,7 +9,7 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-//==============================================================================
+// ============================================================================
 package org.talend.components.service.rest.mock;
 
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
@@ -42,7 +42,7 @@ public class MockDatastoreDefinition extends SimpleNamedThing implements Datasto
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(MockDatastoreProperties properties, Object ctx) {
+    public RuntimeInfo getRuntimeInfo(MockDatastoreProperties properties) {
         return new SimpleRuntimeInfo(getClass().getClassLoader(), "", runtimeClass.getName());
     }
 

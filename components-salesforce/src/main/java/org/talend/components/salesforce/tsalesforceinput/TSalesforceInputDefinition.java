@@ -16,6 +16,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceModuleProperties;
@@ -31,7 +32,7 @@ public class TSalesforceInputDefinition extends SalesforceDefinition {
     public static final String COMPONENT_NAME = "tSalesforceInput"; //$NON-NLS-1$
 
     public TSalesforceInputDefinition() {
-        super(COMPONENT_NAME);
+        super(COMPONENT_NAME, ExecutionEngine.DI, ExecutionEngine.BEAM);
     }
 
     @Override
@@ -52,7 +53,7 @@ public class TSalesforceInputDefinition extends SalesforceDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology componentType) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology componentType) {
         if (componentType == ConnectorTopology.OUTGOING) {
             return getCommonRuntimeInfo(this.getClass().getClassLoader(), SalesforceSource.class);
         } else {

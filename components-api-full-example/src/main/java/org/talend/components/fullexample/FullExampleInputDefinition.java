@@ -19,6 +19,7 @@ import java.util.Set;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
@@ -32,7 +33,7 @@ public class FullExampleInputDefinition extends AbstractComponentDefinition {
     public static final String COMPONENT_NAME = "FullExampleInput"; //$NON-NLS-1$
 
     public FullExampleInputDefinition() {
-        super(COMPONENT_NAME);
+        super(COMPONENT_NAME, ExecutionEngine.DI);
     }
 
     @Override
@@ -61,7 +62,8 @@ public class FullExampleInputDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology compType) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology compType) {
+        assertEngineCompatibility(engine);
         return null;
     }
 

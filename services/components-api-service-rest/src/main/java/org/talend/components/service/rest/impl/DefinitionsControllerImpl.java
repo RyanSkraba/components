@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.service.rest.DefinitionType;
@@ -28,6 +27,7 @@ import org.talend.components.service.rest.DefinitionsController;
 import org.talend.components.service.rest.dto.ConnectorTypology;
 import org.talend.components.service.rest.dto.DefinitionDTO;
 import org.talend.daikon.annotation.ServiceImplementation;
+import org.talend.daikon.definition.Definition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
 
 import static java.util.stream.StreamSupport.stream;
@@ -56,7 +56,7 @@ public class DefinitionsControllerImpl implements DefinitionsController {
     public List<DefinitionDTO> listDefinitions(DefinitionType type) {
         logger.debug("listing definitions for {} ", type);
 
-        Iterable<? extends RuntimableDefinition> definitionsByType = //
+        Iterable<? extends Definition> definitionsByType = //
                 definitionServiceDelegate.getDefinitionsMapByType(type.getTargetClass()).values();
 
         return stream(definitionsByType.spliterator(), false)

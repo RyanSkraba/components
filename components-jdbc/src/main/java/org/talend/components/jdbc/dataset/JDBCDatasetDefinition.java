@@ -31,7 +31,7 @@ public class JDBCDatasetDefinition extends SimpleNamedThing implements DatasetDe
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(JDBCDatasetProperties properties, Object ctx) {
+    public RuntimeInfo getRuntimeInfo(JDBCDatasetProperties properties) {
         return JDBCTemplate.createCommonRuntime(this.getClass().getClassLoader(), properties,
                 JDBCDatasetRuntime.class.getCanonicalName());
     }

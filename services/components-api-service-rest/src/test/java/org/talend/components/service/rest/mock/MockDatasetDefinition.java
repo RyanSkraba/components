@@ -54,7 +54,7 @@ public class MockDatasetDefinition extends SimpleNamedThing implements DatasetDe
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(MockDatasetProperties properties, Object ctx) {
+    public RuntimeInfo getRuntimeInfo(MockDatasetProperties properties) {
         return new SimpleRuntimeInfo(getClass().getClassLoader(), "", MockDatasetRuntime.class.getName());
     }
 }

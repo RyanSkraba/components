@@ -34,7 +34,7 @@ public class JDBCDatastoreDefinition extends SimpleNamedThing implements Datasto
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(JDBCDatastoreProperties properties, Object ctx) {
+    public RuntimeInfo getRuntimeInfo(JDBCDatastoreProperties properties) {
         return JDBCTemplate.createCommonRuntime(this.getClass().getClassLoader(), properties,
                 JDBCDatastoreRuntime.class.getCanonicalName());
     }

@@ -18,6 +18,7 @@ import java.util.Set;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.runtime.JDBCRollbackSourceOrSink;
@@ -33,7 +34,7 @@ public class TJDBCRollbackDefinition extends AbstractComponentDefinition {
     public static final String COMPONENT_NAME = "tJDBCRollbackNew";
 
     public TJDBCRollbackDefinition() {
-        super(COMPONENT_NAME);
+        super(COMPONENT_NAME, ExecutionEngine.DI);
     }
 
     @Override
@@ -59,7 +60,8 @@ public class TJDBCRollbackDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology connectorTopology) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology connectorTopology) {
+        assertEngineCompatibility(engine);
         if (connectorTopology == ConnectorTopology.NONE) {
             return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
                     DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-jdbc"),

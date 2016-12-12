@@ -14,13 +14,14 @@
 package org.talend.components.filedelimited;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.property.Property;
 
 public abstract class FileDelimitedDefinition extends AbstractComponentDefinition {
 
     public FileDelimitedDefinition(String componentName) {
-        super(componentName);
+        super(componentName, ExecutionEngine.DI);
     }
 
     @Override

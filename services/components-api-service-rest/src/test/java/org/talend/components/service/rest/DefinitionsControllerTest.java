@@ -24,13 +24,13 @@ import com.jayway.restassured.response.Response;
 import org.junit.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.service.rest.dto.ConnectorTypology;
 import org.talend.components.service.rest.dto.DefinitionDTO;
 import org.talend.components.service.rest.mock.MockComponentDefinition;
 import org.talend.components.service.rest.mock.MockDatastoreDefinition;
+import org.talend.daikon.definition.Definition;
 
 import static com.jayway.restassured.RestAssured.when;
 import static java.util.Arrays.asList;
@@ -72,7 +72,7 @@ public class DefinitionsControllerTest extends AbstractSpringIntegrationTests {
 
     public void shouldListDefinitions(List<String> names, //
             Class clazz, //
-            Function<List<String>, Map<String, ? extends RuntimableDefinition>> provider, //
+            Function<List<String>, Map<String, ? extends Definition>> provider, //
             DefinitionType wantedType, //
             String expectedType) throws IOException {
         // given

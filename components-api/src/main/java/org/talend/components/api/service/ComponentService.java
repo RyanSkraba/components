@@ -21,6 +21,7 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.wizard.ComponentWizard;
@@ -164,11 +165,12 @@ public interface ComponentService extends PropertiesService<Properties> {
      * list all the depencencies required for this component to be executed at runtime
      * 
      * @param componentName name of the component to get the dependencies of.
+     * @param engine the execution engine that the component should run in.
      * @param properties the properties to compute the dependencies from.
      * @param componentType will determine the runtime class to be used.
      * @return the runtime info for running the given component with the given properties
      */
-    RuntimeInfo getRuntimeInfo(String componentName, Properties properties, ConnectorTopology componentType);
+    RuntimeInfo getRuntimeInfo(String componentName, ExecutionEngine engine, Properties properties, ConnectorTopology componentType);
 
     /**
      * get the schema associated with a given named connection for a componentProperties

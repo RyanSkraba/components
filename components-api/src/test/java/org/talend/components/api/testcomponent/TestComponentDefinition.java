@@ -20,6 +20,7 @@ import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.testcomponent.nestedprop.inherited.InheritedComponentProperties;
@@ -31,8 +32,12 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
 
     public static final String COMPONENT_NAME = "TestComponent"; //$NON-NLS-1$
 
+    public TestComponentDefinition(boolean allEngines) {
+        super(COMPONENT_NAME, allEngines);
+    }
+
     public TestComponentDefinition() {
-        super(COMPONENT_NAME);
+        super(COMPONENT_NAME, ExecutionEngine.DI);
     }
 
     protected TestComponentProperties properties;
@@ -57,6 +62,12 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     }
 
     @Override
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology connectorTopology) {
+        assertEngineCompatibility(engine);
+        return null;
+    }
+
+    @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return TestComponentProperties.class;
     }
@@ -66,11 +77,6 @@ public class TestComponentDefinition extends AbstractComponentDefinition impleme
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return new Class[] { NestedComponentProperties.class, ComponentPropertiesWithDefinedI18N.class,
                 InheritedComponentProperties.class };
-    }
-
-    @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties propertiess, ConnectorTopology compponentType) {
-        return null;
     }
 
     @Override

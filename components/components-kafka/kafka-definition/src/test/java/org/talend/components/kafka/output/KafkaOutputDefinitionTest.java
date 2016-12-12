@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 public class KafkaOutputDefinitionTest {
@@ -43,7 +44,7 @@ public class KafkaOutputDefinitionTest {
 
     @Test
     public void getRuntimeInfo() throws Exception {
-        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(null, null);
+        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(ExecutionEngine.BEAM, null, null);
         assertNotNull(runtimeInfo);
     }
 

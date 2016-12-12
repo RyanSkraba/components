@@ -61,7 +61,7 @@ public class JDBCDatasetProperties extends PropertiesImpl
 
     public void updateSchema() {
         JDBCDatasetDefinition definition = new JDBCDatasetDefinition();
-        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(this, null);
+        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(this);
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, getClass().getClassLoader())) {
             JDBCDatasetRuntime runtime = (JDBCDatasetRuntime) sandboxedInstance.getInstance();
             runtime.initialize(null, this);
