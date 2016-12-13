@@ -12,12 +12,16 @@
 //==============================================================================
 package org.talend.components.service.rest.impl;
 
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static org.talend.daikon.exception.error.CommonErrorCodes.UNEXPECTED_EXCEPTION;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.List;
 import java.util.Set;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
@@ -25,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
@@ -40,9 +45,6 @@ import org.talend.components.service.rest.serialization.JsonSerializationHelper;
 import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.properties.Properties;
 
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static org.talend.daikon.exception.error.CommonErrorCodes.UNEXPECTED_EXCEPTION;
-
 /**
  * Default implementation of the ComponentController.
  */
@@ -57,10 +59,10 @@ public class ComponentControllerImpl implements ComponentController {
     private JsonSerializationHelper jsonSerializer = new JsonSerializationHelper();
 
     @Override
-    public StreamingResponseBody getComponentProperties(@PathVariable String name) {
+    public StreamingResponseBody getComponentProperties(@PathVariable String name, @RequestParam String formName) {
         return outputStream -> {
             try (Writer w = new OutputStreamWriter(outputStream)) {
-                w.write(jsonSerializer.toJson(componentServiceDelegate.getComponentProperties(name), name));
+                w.write(jsonSerializer.toJson(componentServiceDelegate.getComponentProperties(name), formName, name));
             }
         };
     }

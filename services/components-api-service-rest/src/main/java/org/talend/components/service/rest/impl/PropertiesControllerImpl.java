@@ -13,6 +13,11 @@
 
 package org.talend.components.service.rest.impl;
 
+import static org.apache.commons.io.IOUtils.toInputStream;
+import static org.apache.commons.lang3.Validate.notNull;
+import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.http.HttpStatus.*;
+
 import java.nio.charset.StandardCharsets;
 
 import org.slf4j.Logger;
@@ -34,11 +39,6 @@ import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.serialize.jsonschema.PropertyTrigger;
 
-import static org.apache.commons.io.IOUtils.toInputStream;
-import static org.apache.commons.lang3.Validate.notNull;
-import static org.slf4j.LoggerFactory.getLogger;
-import static org.springframework.http.HttpStatus.*;
-
 @ServiceImplementation
 public class PropertiesControllerImpl implements PropertiesController {
 
@@ -54,13 +54,13 @@ public class PropertiesControllerImpl implements PropertiesController {
     private ComponentService componentService;
 
     @Override
-    public String getProperties(String definitionName) {
+    public String getProperties(String definitionName, String formName) {
         notNull(definitionName, "Data store name cannot be null.");
         final Definition<?> definition = getDefinition(definitionName);
         notNull(definition, "Could not find data store definition of name %s", definitionName);
         log.debug("Found data store definition {} for {}", definition, definitionName);
         return jsonSerializationHelper.toJson(
-                definitionServiceDelegate.createProperties(definition, definitionName + " properties"), definitionName);
+                definitionServiceDelegate.createProperties(definition, definitionName + " properties"), formName, definitionName);
     }
 
     @Override
@@ -96,6 +96,7 @@ public class PropertiesControllerImpl implements PropertiesController {
     public ResponseEntity<String> triggerOnProperty(String definition, //
                                                     PropertyTrigger trigger, //
                                                     String property, //
+                                                    String formName, //
                                                     String formData) {
         final Definition<?> runtimableDefinition = getDefinition(definition);
         notNull(definition, "Could not find data store definition of name %s", definition);
@@ -119,7 +120,7 @@ public class PropertiesControllerImpl implements PropertiesController {
             default:
                 throw new IllegalArgumentException("This enum does not contain this value: " + trigger);
             }
-            response = jsonSerializationHelper.toJson(updatedProperties, definition);
+            response = jsonSerializationHelper.toJson(updatedProperties, formName, definition);
         } catch (IllegalStateException e) {
             log.info("Tried to execute an undefined trigger. It show either a bug in the calling client or the definition"
                     + " properties advertised a non-existent trigger", e);
@@ -134,12 +135,12 @@ public class PropertiesControllerImpl implements PropertiesController {
     }
 
     @Override
-    public String getDatasetProperties(String definitionName, String formData) {
+    public String getDatasetProperties(String definitionName, String formName, String formData) {
         DatastoreDefinition<DatastoreProperties> datastoreDefinition = definitionServiceDelegate.getDefinitionsMapByType(DatastoreDefinition.class).get(definitionName);
         notNull(datastoreDefinition, "Could not find data store definition of name %s", definitionName);
         DatastoreProperties properties = getPropertiesFromJson(datastoreDefinition, formData);
         DatasetProperties datasetProperties = datastoreDefinition.createDatasetProperties(properties);
-        return datasetProperties == null ? "{}" : jsonSerializationHelper.toJson(datasetProperties);
+        return datasetProperties == null ? "{}" : jsonSerializationHelper.toJson(formName, datasetProperties);
     }
 
     private static Exception handleErrors(Throwable throwable) {

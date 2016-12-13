@@ -14,9 +14,9 @@ package org.talend.components.service.rest.serialization;
 
 import java.io.InputStream;
 import java.util.HashMap;
+
 import javax.inject.Inject;
 
-import com.cedarsoftware.util.io.JsonWriter;
 import org.springframework.stereotype.Component;
 import org.talend.daikon.definition.Definition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
@@ -24,6 +24,8 @@ import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.serialize.jsonschema.JsonSchemaUtil;
+
+import com.cedarsoftware.util.io.JsonWriter;
 
 /**
  * this provide helper methods from serializing and deserializing TComp object for REST apis
@@ -66,26 +68,29 @@ public class JsonSerializationHelper {
      * Creates a ui-spec representation of the properties including json-schema, json-ui and json-data
      * 
      * @param properties instance of the properties to serialize.
+     * @param formName name of the wanted form.
+     * @param definitionName the component definition name.
      * @return json string in ui-specs representation of the data.
      */
-    public String toJson(Properties properties, String definitionName) {
-        return JsonSchemaUtil.toJson(properties, definitionName);
+    public String toJson(Properties properties, String formName, String definitionName) {
+        return JsonSchemaUtil.toJson(properties, formName, definitionName);
     }
 
     /**
      * Creates a ui-spec representation of the properties including json-schema, json-ui and json-data
-     * 
+     *
+     * @param formName name of the wanted form.
      * @param properties instance of the properties to serialize.
      * @return json string in ui-specs representation of the data.
      */
-    public String toJson(Properties properties) {
-        Iterable<Definition> definitionForPropertiesType = definitionRegistry
-                .getDefinitionForPropertiesType(properties.getClass());
+    public String toJson(String formName, Properties properties) {
+        Iterable<Definition> definitionForPropertiesType = definitionRegistry .getDefinitionForPropertiesType(properties.getClass());
         if (!definitionForPropertiesType.iterator().hasNext()) {
             // did not find any definition for the given properties
             throw TalendRuntimeException.build(CommonErrorCodes.UNREGISTERED_DEFINITION).set(properties.getClass().getName());
-        } // else we got definition so we take the first one.
-        return JsonSchemaUtil.toJson(properties, definitionForPropertiesType.iterator().next().getName());
+        }
+        // else we got definition so we take the first one.
+        return JsonSchemaUtil.toJson(properties, formName, definitionForPropertiesType.iterator().next().getName());
     }
 
 }

@@ -16,6 +16,7 @@ package org.talend.components.simplefileio.input;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.talend.daikon.properties.presentation.Form.MAIN;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,7 +42,7 @@ public class SimpleFileIoInputPropertiesTest {
 
     @Test
     public void testJsonSchemaSerialization() throws JSONException {
-        String jsonString = JsonSchemaUtil.toJson(properties, SimpleFileIoInputDefinition.NAME);
+        String jsonString = JsonSchemaUtil.toJson(properties, MAIN, SimpleFileIoInputDefinition.NAME);
         assertThat(jsonString, notNullValue());
 
         JSONObject node = new JSONObject(jsonString);

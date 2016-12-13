@@ -12,8 +12,13 @@
 //==============================================================================
 package org.talend.components.service.rest;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
 import java.util.List;
 import java.util.Set;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.bind.annotation.*;
@@ -29,10 +34,6 @@ import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.Repository;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-
 /**
  *
  */
@@ -43,12 +44,14 @@ public interface ComponentController {
     /**
      * Get the list of all the component names that are registered
      *
+     * @param name the component name.
+     * @param formName the wanted form name (default value is Main).
      * @return the set of component names, never null.
      * @returnWrapped org.talend.components.api.properties.ComponentProperties
      */
     @RequestMapping(value = "/properties/{name}", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseBody
-    StreamingResponseBody getComponentProperties(@PathVariable(value = "name") String name);
+    StreamingResponseBody getComponentProperties(@PathVariable(value = "name") String name, @RequestParam(required = false) String formName);
 
     /**
      * Get the list of all the components {@link ComponentDefinition} that are registered
