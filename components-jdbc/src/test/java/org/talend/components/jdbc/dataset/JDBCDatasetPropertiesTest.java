@@ -15,6 +15,7 @@ package org.talend.components.jdbc.dataset;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.talend.components.jdbc.dataset.JDBCDatasetProperties.SourceType.TABLE_NAME;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -48,14 +49,12 @@ public class JDBCDatasetPropertiesTest {
         assertTrue(main.getWidget(dataset.sourceType).isVisible());
         assertTrue(main.getWidget(dataset.tableName).isHidden());
         assertTrue(main.getWidget(dataset.sql).isVisible());
-        // assertTrue(main.getWidget(dataset.main).isVisible());
 
-        dataset.sourceType.setValue(JDBCDatasetProperties.SourceType.TABLE_NAME);
+        dataset.sourceType.setValue(TABLE_NAME);
         PropertiesDynamicMethodHelper.afterProperty(dataset, dataset.sourceType.getName());
         assertTrue(main.getWidget(dataset.sourceType).isVisible());
         assertTrue(main.getWidget(dataset.tableName).isVisible());
         assertTrue(main.getWidget(dataset.sql).isHidden());
-        // assertTrue(main.getWidget(dataset.main).isVisible());
     }
 
     @Test
@@ -73,7 +72,7 @@ public class JDBCDatasetPropertiesTest {
     public void testGetSql() {
         dataset.sql.setValue("abc");
         assertEquals("abc", dataset.getSql());
-        dataset.sourceType.setValue(JDBCDatasetProperties.SourceType.TABLE_NAME);
+        dataset.sourceType.setValue(TABLE_NAME);
         dataset.tableName.setValue("abc");
         assertEquals("select * from abc", dataset.getSql());
     }

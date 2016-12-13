@@ -51,6 +51,10 @@ public class JDBCDatasetProperties extends PropertiesImpl
 
     };
 
+    public void afterSourceType() {
+        refreshLayout(getForm(Form.MAIN));
+    }
+
     public JDBCDatasetProperties(String name) {
         super(name);
     }
