@@ -163,6 +163,9 @@
                         <configuration>
                             <classifier>lib</classifier>
                             <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+                            <excludes>
+                                <exclude>**/application*.properties</exclude>
+                            </excludes>                            
                         </configuration>
                     </execution>
                     <execution>

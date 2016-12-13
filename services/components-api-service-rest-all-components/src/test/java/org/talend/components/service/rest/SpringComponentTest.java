@@ -15,6 +15,8 @@ package org.talend.components.service.rest;
 import javax.inject.Inject;
 
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.talend.components.api.service.ComponentService;
@@ -22,7 +24,9 @@ import org.talend.components.api.test.AbstractComponentTest;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
-public class SpringComponentTestIT extends AbstractComponentTest {
+public class SpringComponentTest extends AbstractComponentTest {
+
+    static final Logger LOG = LoggerFactory.getLogger(SpringComponentTest.class);
 
     @Inject
     private ComponentService componentService;
