@@ -47,6 +47,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.talend.components.service.rest.dto.DatasetConnectionInfo;
 import org.talend.components.service.rest.dto.DefinitionDTO;
+import org.talend.components.service.rest.impl.ApiError;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
@@ -204,6 +205,27 @@ public class JdbcComponentIntegrationTest {
         ObjectNode result = getResponseAsObjectNode(response);
         ObjectNode expected = getFileAsObjectNode("jdbc_data_set_schema.json");
         assertEquals(expected, result);
+    }
+
+    @Test
+    public void testGetSchema_wrongSql() throws java.io.IOException {
+        // given
+        DatasetConnectionInfo datasetConnectionInfo = new DatasetConnectionInfo();
+        datasetConnectionInfo.setDataSetFormData(
+                mapper.readValue(getClass().getResourceAsStream("jdbc_data_set_properties_no_schema_wrong_table_name.json"),
+                        ObjectNode.class));
+        datasetConnectionInfo.setDataStoreFormData(getJdbcDataStoreProperties());
+        String dataSetDefinitionName = "JDBCDataset";
+
+        // when
+        ApiError response = given().content(datasetConnectionInfo).contentType(APPLICATION_JSON_UTF8_VALUE) //
+                .accept(APPLICATION_JSON_UTF8_VALUE) //
+                .expect().statusCode(400).log().ifValidationFails() //
+                .post("runtimes/{definitionName}/schema", dataSetDefinitionName).as(ApiError.class);
+
+        // then
+        assertEquals("TCOMP_JDBC_SQL_SYNTAX_ERROR", response.getCode());
+        assertEquals("Table/View 'TOTO' does not exist.", response.getMessage());
     }
 
     @Test

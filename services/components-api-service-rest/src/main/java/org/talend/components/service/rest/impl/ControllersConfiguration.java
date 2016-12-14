@@ -39,9 +39,11 @@ import org.talend.components.service.rest.DefinitionTypeConverter;
 import org.talend.components.service.rest.dto.ConnectorTypology;
 import org.talend.components.service.rest.dto.ConnectorTypologyConverter;
 import org.talend.daikon.exception.TalendRuntimeException;
-import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.exception.error.ErrorCode;
 import org.talend.daikon.serialize.jsonschema.PropertyTrigger;
+
+import static org.talend.daikon.exception.error.CommonErrorCodes.UNEXPECTED_ARGUMENT;
+import static org.talend.daikon.exception.error.CommonErrorCodes.UNEXPECTED_EXCEPTION;
 
 @ControllerAdvice
 public class ControllersConfiguration {
@@ -49,20 +51,30 @@ public class ControllersConfiguration {
     private static final Logger log = LoggerFactory.getLogger(ControllersConfiguration.class);
 
     @ExceptionHandler
+    public ResponseEntity<ApiError> handleTalendExceptions(TalendRuntimeException e) {
+        log.info("A Talend exception reached the API", e);
+        Throwable cause = e.getCause();
+        return buildUnexpectedErrorResponse(e.getCode(), cause == null ? e.getMessage() : cause.getMessage(), cause);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ApiError> handleMappingExceptions(MethodArgumentTypeMismatchException e) {
+        log.info("A Talend exception reached the API", e);
+        return buildUnexpectedErrorResponse(UNEXPECTED_ARGUMENT, e.getMessage(), e.getCause());
+    }
+
+    @ExceptionHandler
     public ResponseEntity<ApiError> handleExceptions(Exception e) {
         log.info("A Talend exception reached the API", e);
+        return buildUnexpectedErrorResponse(UNEXPECTED_EXCEPTION, e.getMessage(), e.getCause());
+    }
+
+    private static ResponseEntity<ApiError> buildUnexpectedErrorResponse(ErrorCode code, String message, Throwable cause) {
         ApiError dto = new ApiError();
-        ErrorCode code;
-        if (e instanceof TalendRuntimeException) {
-            code = ((TalendRuntimeException) e).getCode();
-        } else if (e instanceof IllegalArgumentException || e instanceof MethodArgumentTypeMismatchException) {
-            code = CommonErrorCodes.UNEXPECTED_ARGUMENT;
-        } else {
-            code = CommonErrorCodes.UNEXPECTED_EXCEPTION;
-        }
         dto.setCode(code.getProduct() + "_" + code.getGroup() + "_" + code.getCode());
-        dto.setMessage(e.getMessage());
+        dto.setMessage(message);
         dto.setMessageTitle("An unexpected error occurred");
+        dto.setCause(cause == null ? null : cause.getMessage());
         return new ResponseEntity<>(dto, HttpStatus.valueOf(code.getHttpStatus()));
     }
 

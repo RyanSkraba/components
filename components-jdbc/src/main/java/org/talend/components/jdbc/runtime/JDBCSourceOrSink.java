@@ -13,11 +13,7 @@
 package org.talend.components.jdbc.runtime;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +26,7 @@ import org.talend.components.common.avro.JDBCAvroRegistry;
 import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.jdbc.ComponentConstants;
+import org.talend.components.jdbc.JdbcComponentErrorsCode;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.NamedThing;
@@ -89,6 +86,7 @@ public class JDBCSourceOrSink implements SourceOrSink {
     @Override
     public ValidationResult validate(RuntimeContainer runtime) {
         ValidationResult vr = new ValidationResult();
+        // TODO The connection should not be maintained just for validation. But as it is store in the runtime context, could not close it here.
         try {
             conn = connect(runtime);
         } catch (Exception ex) {
@@ -128,8 +126,12 @@ public class JDBCSourceOrSink implements SourceOrSink {
                 ResultSet resultset = statement.executeQuery(query)) {
             ResultSetMetaData metadata = resultset.getMetaData();
             return JDBCAvroRegistry.get().inferSchema(metadata);
-        } catch (Exception e) {
-            throw new ComponentException(e);
+        } catch (SQLSyntaxErrorException sqlSyntaxException) {
+            throw new ComponentException(JdbcComponentErrorsCode.SQL_SYNTAX_ERROR, sqlSyntaxException);
+        } catch (SQLException e) {
+            throw new ComponentException(JdbcComponentErrorsCode.SQL_ERROR, e);
+        } catch (ClassNotFoundException e) {
+            throw new ComponentException(JdbcComponentErrorsCode.DRIVER_NOT_PRESENT_ERROR, e);
         }
     }
 
