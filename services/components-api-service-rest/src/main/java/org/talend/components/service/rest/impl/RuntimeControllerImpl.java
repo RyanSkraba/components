@@ -13,6 +13,10 @@
 
 package org.talend.components.service.rest.impl;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static java.lang.Integer.MAX_VALUE;
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.function.Function;
@@ -27,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.talend.components.common.dataset.DatasetDefinition;
 import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.dataset.runtime.DatasetRuntime;
@@ -43,10 +46,6 @@ import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static java.lang.Integer.MAX_VALUE;
-import static org.apache.commons.lang3.Validate.notNull;
 
 @ServiceImplementation
 @SuppressWarnings("unchecked")
@@ -84,19 +83,27 @@ public class RuntimeControllerImpl implements RuntimesController {
     }
 
     @Override
-    public StreamingResponseBody getDatasetData(String datasetDefinitionName, PropertiesDto connectionInfo,
-                                                Integer from, Integer limit) {
-        return useDatasetRuntime(datasetDefinitionName, connectionInfo, new DatasetContentWriter(limit, true));
+    public Void getDatasetData(String datasetDefinitionName, //
+                               PropertiesDto connectionInfo, //
+                               Integer from, //
+                               Integer limit, //
+                               OutputStream response) {
+        return useDatasetRuntime(datasetDefinitionName, connectionInfo, new DatasetContentWriter(response, limit, true));
     }
 
     @Override
-    public StreamingResponseBody getDatasetDataAsBinary(String datasetDefinitionName, PropertiesDto connectionInfo,
-                                                        Integer from, Integer limit) {
-        return useDatasetRuntime(datasetDefinitionName, connectionInfo, new DatasetContentWriter(limit, false));
+    public Void getDatasetDataAsBinary(String datasetDefinitionName, //
+                                       PropertiesDto connectionInfo, //
+                                       Integer from,  //
+                                       Integer limit,  //
+                                        OutputStream response) {
+        return useDatasetRuntime(datasetDefinitionName, connectionInfo, new DatasetContentWriter(response, limit, false));
     }
 
-    private <T> T useDatasetRuntime(String datasetDefinitionName, PropertiesDto formData,
+    private <T> T useDatasetRuntime(String datasetDefinitionName, //
+                                    PropertiesDto formData, //
                                     Function<DatasetRuntime<DatasetProperties<DatastoreProperties>>, T> consumer) {
+
         // 1) get dataset properties from supplied data
         DatasetProperties datasetProperties = propertiesHelpers.propertiesFromDto(formData);
 
@@ -117,28 +124,25 @@ public class RuntimeControllerImpl implements RuntimesController {
         }
     }
 
-    private static class DatasetContentWriter
-            implements Function<DatasetRuntime<DatasetProperties<DatastoreProperties>>, StreamingResponseBody> {
+    private static class DatasetContentWriter implements Function<DatasetRuntime<DatasetProperties<DatastoreProperties>>, Void> {
 
         private final Integer limit;
 
         private final boolean json;
+        private final OutputStream output;
 
         /**
          * @param limit the number of records to write
          * @param json  true to write JSon, false for binary Avro
          */
-        public DatasetContentWriter(Integer limit, boolean json) {
+        DatasetContentWriter(OutputStream output, Integer limit, boolean json) {
+            this.output = output;
             this.limit = limit;
             this.json = json;
         }
 
         @Override
-        public StreamingResponseBody apply(DatasetRuntime<DatasetProperties<DatastoreProperties>> dr) {
-            return output -> writeContentInOutput(dr, output);
-        }
-
-        private void writeContentInOutput(DatasetRuntime<DatasetProperties<DatastoreProperties>> dr, OutputStream output) {
+        public Void apply(DatasetRuntime<DatasetProperties<DatastoreProperties>> dr) {
             Schema schema = dr.getSchema();
             GenericDatumWriter<IndexedRecord> writer = new GenericDatumWriter<>(schema);
             try {
@@ -154,6 +158,7 @@ public class RuntimeControllerImpl implements RuntimesController {
                 log.error("Couldn't create Avro records JSon encoder.", e);
                 throw new TalendRuntimeException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
             }
+            return null;
         }
 
         private void writeIndexedRecord(GenericDatumWriter<IndexedRecord> writer, Encoder encoder, IndexedRecord indexedRecord) {
