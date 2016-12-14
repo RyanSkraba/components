@@ -18,5 +18,6 @@
         <module>components-jms</module>
         <module>components-kafka</module>
         <module>components-processing</module>
+		<module>components-jdbc</module>
   </modules>
 </project>

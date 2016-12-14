@@ -197,11 +197,11 @@
 								</goals>
 								<configuration>
                                     <extraArtifacts>
-                                        <extraArtifact>org.talend.components:components-salesforce:0.16.0-SNAPSHOT:jar</extraArtifact>
-                                        <extraArtifact>org.talend.components:components-jdbc:0.16.0-SNAPSHOT:jar</extraArtifact>
-                                        <extraArtifact>org.talend.components:components-jira:0.16.0-SNAPSHOT:jar</extraArtifact>
-                                        <extraArtifact>org.talend.components:jsm-runtime:0.16.0-SNAPSHOT:jar</extraArtifact>
-                                        <extraArtifact>org.talend.components:kafka-runtime:0.16.0-SNAPSHOT:jar</extraArtifact>
+                                        <extraArtifact>org.talend.components:components-salesforce:0.17.0-SNAPSHOT:jar</extraArtifact>
+                                        <extraArtifact>org.talend.components:components-jdbc-runtime:0.17.0-SNAPSHOT:jar</extraArtifact>
+                                        <extraArtifact>org.talend.components:components-jira:0.17.0-SNAPSHOT:jar</extraArtifact>
+                                        <extraArtifact>org.talend.components:jsm-runtime:0.17.0-SNAPSHOT:jar</extraArtifact>
+                                        <extraArtifact>org.talend.components:kafka-runtime:0.17.0-SNAPSHOT:jar</extraArtifact>
                                     </extraArtifacts>
 								</configuration>
 							</execution>

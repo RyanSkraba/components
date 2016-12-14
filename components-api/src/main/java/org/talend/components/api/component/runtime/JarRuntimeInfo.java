@@ -24,6 +24,7 @@ import java.util.jar.JarInputStream;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.error.ComponentsApiErrorCode;
 import org.talend.daikon.exception.ExceptionContext;
+import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.runtime.RuntimeUtil;
 
@@ -55,6 +56,25 @@ public class JarRuntimeInfo implements RuntimeInfo {
         this.jarUrl = jarUrl;
         this.depTxtPath = depTxtPath;
         this.runtimeClassName = runtimeClassName;
+    }
+
+    /**
+     * uses the <code>mavenGroupId</code> <code>mavenArtifactId</code> to locate the *dependency.txt* file using the rule defined
+     * in {@link DependenciesReader#computeDependenciesFilePath}
+     * 
+     * @param jarUrl url of the jar to read the depenency.txt from
+     * @param depTxtPath, path used to locate the dependency.txt file
+     * @param runtimeClassName class to be instanciated
+     * @throws a {@link TalendRuntimeException} if the jarUrlString is malformed
+     */
+    public JarRuntimeInfo(String jarUrlString, String depTxtPath, String runtimeClassName) {
+        try {
+            this.jarUrl = new URL(jarUrlString);
+            this.depTxtPath = depTxtPath;
+            this.runtimeClassName = runtimeClassName;
+        } catch (MalformedURLException e) {
+            throw TalendRuntimeException.createUnexpectedException(e);
+        }
     }
 
     @Override

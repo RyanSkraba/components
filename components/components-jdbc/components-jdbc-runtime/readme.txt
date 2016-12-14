@@ -1,0 +1,2 @@
+//if want to test the components in studio, you need to install the mysql jdbc jar to your local repository firstly, then register the jar in pom.xml.
+mvn install:install-file -DgroupId=org.talend.libraries -DartifactId=mysql-connector-java-5.1.30-bin -Dversion=6.0.0 -Dfile=C:/Users/wangwei/Desktop/mysql-connector-java-5.1.30-bin.jar -Dpackaging=jar -DgeneratePom=true

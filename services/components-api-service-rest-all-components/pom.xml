@@ -46,7 +46,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
-			<artifactId>components-jdbc</artifactId>
+			<artifactId>components-jdbc-definition</artifactId>
 			<version>0.17.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
@@ -89,6 +89,14 @@
 			<version>0.17.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-jdbc-runtime</artifactId>
+			<version>0.17.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>kafka-runtime</artifactId>
@@ -204,11 +212,11 @@
 						<configuration>
 							<extraArtifacts>
 								<extraArtifact>org.talend.components:components-salesforce:0.17.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:components-jdbc:0.17.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:components-jira:0.17.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:jms-runtime_1_1:0.17.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:kafka-runtime:0.17.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:simplefileio-runtime:0.17.0-SNAPSHOT:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:components-jdbc-runtime:0.17.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.libraries:mysql-connector-java-5.1.30-bin:6.0.0:jar</extraArtifact>
 							</extraArtifacts>
 							<pomIncludes>

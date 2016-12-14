@@ -1,4 +1,4 @@
-//==============================================================================
+// ==============================================================================
 //
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
@@ -9,9 +9,15 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-//==============================================================================
+// ==============================================================================
 
 package org.talend.components.service.rest;
+
+import static com.jayway.restassured.RestAssured.*;
+import static java.util.Collections.*;
+import static org.junit.Assert.*;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.*;
+import static org.springframework.http.MediaType.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,11 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.response.Response;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
@@ -34,6 +35,7 @@ import org.apache.avro.io.DecoderFactory;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -48,13 +50,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.talend.components.service.rest.dto.DefinitionDTO;
 import org.talend.components.service.rest.dto.PropertiesDto;
 import org.talend.components.service.rest.impl.ApiError;
+import org.talend.daikon.properties.test.PropertiesTestUtils;
 
-import static com.jayway.restassured.RestAssured.given;
-import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.response.Response;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
@@ -74,16 +77,18 @@ public class JdbcComponentIntegrationTest {
 
     private ObjectMapper mapper = new ObjectMapper();
 
+    @BeforeClass
+    public static void registerPaxUrlMavenHandler() {
+        PropertiesTestUtils.setupPaxUrlFromMavenLaunch();
+    }
+
     @Before
     public void setUp() throws Exception {
-        db = new EmbeddedDatabaseBuilder().generateUniqueName(true)
-                .setType(EmbeddedDatabaseType.DERBY)
-                .setName("testdb")
-                .setScriptEncoding("UTF-8")
-                .addScript("/org/talend/components/service/rest/schema.sql")
-                .addScript("/org/talend/components/service/rest/data_users.sql")
-                .build();
-        // addresss: Starting embedded database: url='jdbc:derby:memory:2dc86c66-5d3a-48fd-b903-56aa27d20e3b;create=true', username='sa'
+        db = new EmbeddedDatabaseBuilder().generateUniqueName(true).setType(EmbeddedDatabaseType.DERBY).setName("testdb")
+                .setScriptEncoding("UTF-8").addScript("/org/talend/components/service/rest/schema.sql")
+                .addScript("/org/talend/components/service/rest/data_users.sql").build();
+        // addresss: Starting embedded database: url='jdbc:derby:memory:2dc86c66-5d3a-48fd-b903-56aa27d20e3b;create=true',
+        // username='sa'
         try (Connection connection = db.getConnection()) {
             dbUrl = connection.getMetaData().getURL();
         }
@@ -182,8 +187,7 @@ public class JdbcComponentIntegrationTest {
     private Stream<String[]> getInsertedValues() throws IOException {
         BufferedReader bufferedReader = new BufferedReader(
                 new InputStreamReader(getClass().getResourceAsStream("data_users.sql")));
-        return bufferedReader.lines()
-                .map(in -> in.substring(in.indexOf("VALUES (") + "VALUES (".length(), in.lastIndexOf("');")))
+        return bufferedReader.lines().map(in -> in.substring(in.indexOf("VALUES (") + "VALUES (".length(), in.lastIndexOf("');")))
                 .map(in -> in.split("'?\\s*,\\s*'?"));
     }
 
@@ -210,10 +214,10 @@ public class JdbcComponentIntegrationTest {
     @Test
     public void testGetSchema_wrongSql() throws java.io.IOException {
         // given
+
         PropertiesDto datasetConnectionInfo = new PropertiesDto();
-        datasetConnectionInfo.setProperties(
-                mapper.readValue(getClass().getResourceAsStream("jdbc_data_set_properties_no_schema_wrong_table_name.json"),
-                        ObjectNode.class));
+        datasetConnectionInfo.setProperties(mapper.readValue(
+                getClass().getResourceAsStream("jdbc_data_set_properties_no_schema_wrong_table_name.json"), ObjectNode.class));
         datasetConnectionInfo.setDependencies(singletonList(getJdbcDataStoreProperties()));
         String dataSetDefinitionName = "JDBCDataset";
 
@@ -314,8 +318,8 @@ public class JdbcComponentIntegrationTest {
                 .get("/definitions/DATA_STORE");
 
         // then
-        List<DefinitionDTO> definitions = mapper.readerFor(
-                TypeFactory.defaultInstance().constructCollectionType(List.class, DefinitionDTO.class))
+        List<DefinitionDTO> definitions = mapper
+                .readerFor(TypeFactory.defaultInstance().constructCollectionType(List.class, DefinitionDTO.class))
                 .readValue(response.asInputStream());
 
         DefinitionDTO jdbcDef = null;

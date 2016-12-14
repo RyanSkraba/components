@@ -21,7 +21,6 @@
 		<module>components-splunk</module>
 		<module>components-jira</module>
 		<module>components-api-full-example</module>
-		<module>components-jdbc</module>
 		<module>components-filedelimited</module>
 		<module>services</module>
 		<module>examples</module>
