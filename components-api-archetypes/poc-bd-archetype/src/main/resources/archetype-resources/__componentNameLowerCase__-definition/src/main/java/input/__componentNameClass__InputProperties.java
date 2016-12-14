@@ -22,14 +22,14 @@ import ${packageTalend}.${componentNameLowerCase}.${componentNameClass}DatasetPr
 import ${packageDaikon}.properties.ReferenceProperties;
 import ${packageDaikon}.properties.presentation.Form;
 
-public class ${componentNameClass}InputProperties extends ComponentPropertiesImpl {
+public class ${componentNameClass}InputProperties extends ComponentPropertiesImpl implements IOProperties {
+
+    public ReferenceProperties<${componentNameClass}DatasetProperties> datasetRef = new ReferenceProperties<>("datasetRef",
+        ${componentNameClass}DatasetDefinition.NAME);
 
     public ${componentNameClass}InputProperties(String name) {
         super(name);
     }
-
-    transient public ReferenceProperties<${componentNameClass}DatasetProperties> datasetRef = new ReferenceProperties<>("datasetRef",
-            ${componentNameClass}DatasetDefinition.NAME);
 
     @Override
     public void setupLayout() {
@@ -37,10 +37,12 @@ public class ${componentNameClass}InputProperties extends ComponentPropertiesImp
         Form mainForm = new Form(this, Form.MAIN);
     }
 
+    @Override
     public ${componentNameClass}DatasetProperties getDatasetProperties() {
         return datasetRef.getReference();
     }
 
+    @Override
     public void setDatasetProperties(DatasetProperties datasetProperties) {
         datasetRef.setReference(datasetProperties);
     }

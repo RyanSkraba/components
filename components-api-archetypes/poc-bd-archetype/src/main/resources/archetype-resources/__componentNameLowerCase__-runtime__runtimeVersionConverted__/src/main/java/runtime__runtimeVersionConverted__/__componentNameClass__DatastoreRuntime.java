@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package ${package}.runtime${runtimeVersion};
+package ${package}.runtime${runtimeVersionConverted};
 
 import ${packageTalend}.api.container.RuntimeContainer;
 import ${packageTalend}.common.datastore.runtime.DatastoreRuntime;

@@ -22,21 +22,24 @@
         </requiredProperty>
 
         <requiredProperty key="runtimeVersion"/>
+        <requiredProperty key="runtimeVersionConverted">
+            <defaultValue>_${runtimeVersion.replace(".","_")}</defaultValue>
+        </requiredProperty>
     </requiredProperties>
 
     <fileSets>
         <!-- Metadata for runtime module -->
         <fileSet filtered="true" packaged="true">
-            <directory>__componentNameLowerCase__-runtime__runtimeVersion__/src/main/java/</directory>
+            <directory>__componentNameLowerCase__-runtime__runtimeVersionConverted__/src/main/java/</directory>
             <includes>
                 <include>**/*.java</include>
             </includes>
         </fileSet>
         <fileSet filtered="true" packaged="true">
-                <directory>__componentNameLowerCase__-runtime__runtimeVersion__/src/main/resources/</directory>
+            <directory>__componentNameLowerCase__-runtime__runtimeVersionConverted__/src/main/resources/</directory>
         </fileSet>
         <fileSet filtered="true">
-            <directory>__componentNameLowerCase__-runtime__runtimeVersion__</directory>
+            <directory>__componentNameLowerCase__-runtime__runtimeVersionConverted__</directory>
             <includes>
                 <include>pom.xml</include>
             </includes>
@@ -49,7 +52,16 @@
             </includes>
         </fileSet>
         <fileSet filtered="true" packaged="true">
-                <directory>__componentNameLowerCase__-definition/src/main/resources/</directory>
+            <directory>__componentNameLowerCase__-definition/src/main/resources/</directory>
+            <includes>
+                <include>**/*.properties</include>
+            </includes>
+        </fileSet>
+        <fileSet packaged="true">
+            <directory>__componentNameLowerCase__-definition/src/main/resources/</directory>
+            <includes>
+                <include>**/*.png</include>
+            </includes>
         </fileSet>
         <fileSet filtered="true">
             <directory>__componentNameLowerCase__-definition</directory>
@@ -64,14 +76,11 @@
                 <include>**/*.java</include>
             </includes>
         </fileSet>
-        <fileSet filtered="true" packaged="true">
-            <directory>__componentNameLowerCase__-definition/src/test/resources/</directory>
-        </fileSet>
         <fileSet filtered="true">
             <directory>__componentNameLowerCase__-definition</directory>
             <includes>
                 <include>pom.xml</include>
             </includes>
         </fileSet>
-    </fileSets> 
+    </fileSets>
 </archetype-descriptor>

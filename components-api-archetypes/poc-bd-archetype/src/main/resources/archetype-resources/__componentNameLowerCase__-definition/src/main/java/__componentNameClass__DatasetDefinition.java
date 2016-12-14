@@ -20,13 +20,13 @@ import ${packageTalend}.api.component.runtime.DependenciesReader;
 import ${packageTalend}.api.component.runtime.JarRuntimeInfo;
 import ${packageTalend}.api.exception.ComponentException;
 import ${packageTalend}.common.dataset.DatasetDefinition;
-import ${packageDaikon}.SimpleNamedThing;
+import ${packageDaikon}.definition.I18nDefinition;
 import ${packageDaikon}.runtime.RuntimeInfo;
 
 
-public class ${componentNameClass}DatasetDefinition extends SimpleNamedThing implements DatasetDefinition<${componentNameClass}DatasetProperties> {
+public class ${componentNameClass}DatasetDefinition extends I18nDefinition implements DatasetDefinition<${componentNameClass}DatasetProperties> {
 
-    public static final String RUNTIME_${runtimeVersion} = "org.talend.components.${componentNameLowerCase}.runtime_${runtimeVersion}.DatasetRuntime";
+    public static final String RUNTIME${runtimeVersionConverted} = "org.talend.components.${componentNameLowerCase}.runtime${runtimeVersionConverted}.${componentNameClass}DatasetRuntime";
 
     public static final String NAME = ${componentNameClass}ComponentFamilyDefinition.NAME + "Dataset";
 
@@ -40,10 +40,10 @@ public class ${componentNameClass}DatasetDefinition extends SimpleNamedThing imp
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(${componentNameClass}DatasetProperties properties, Object ctx) {
+    public RuntimeInfo getRuntimeInfo(${componentNameClass}DatasetProperties properties) {
         try {
             return new JarRuntimeInfo(new URL("mvn:org.talend.components/${componentNameLowerCase}-runtime"),
-                    DependenciesReader.computeDependenciesFilePath("org.talend.components", "${componentNameLowerCase}-runtime"), RUNTIME_${runtimeVersion});
+                    DependenciesReader.computeDependenciesFilePath("org.talend.components", "${componentNameLowerCase}-runtime"), RUNTIME${runtimeVersionConverted});
         } catch (MalformedURLException e) {
             throw new ComponentException(e);
         }
@@ -51,11 +51,7 @@ public class ${componentNameClass}DatasetDefinition extends SimpleNamedThing imp
 
     @Override
     public String getImagePath() {
-        return null;
+        return NAME + "_icon32.png";
     }
 
-    @Override
-    public String getDisplayName() {
-        return getI18nMessage("dataset." + getName() + I18N_DISPLAY_NAME_SUFFIX);
-    }
 }

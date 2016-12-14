@@ -13,7 +13,11 @@
 
 package ${package};
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
+import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 
@@ -25,6 +29,23 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertNull;
 
 public class ${componentNameClass}DatasetPropertiesTest {
+
+    @Rule
+    public ErrorCollector errorCollector = new ErrorCollector();
+
+    ${componentNameClass}DatasetProperties properties;
+
+    @Before
+    public void reset() {
+        properties = new ${componentNameClass}DatasetProperties("test");
+        properties.init();
+    }
+
+    @Test
+    public void testI18N() {
+        ComponentTestUtils.checkAllI18N(properties, errorCollector);
+    }
+
     /**
      * Checks {@link ${componentNameClass}DatasetProperties} sets correctly initial schema
      * property
@@ -39,12 +60,7 @@ public class ${componentNameClass}DatasetPropertiesTest {
      */
     @Test
     public void testSetupLayout() {
-        ${componentNameClass}DatasetProperties properties = new ${componentNameClass}DatasetProperties("test");
-
-        properties.setupLayout();
-
         Form main = properties.getForm(Form.MAIN);
-
         Collection<Widget> mainWidgets = main.getWidgets();
     }
 
@@ -54,8 +70,6 @@ public class ${componentNameClass}DatasetPropertiesTest {
      */
     @Test
     public void testRefreshLayout() {
-        ${componentNameClass}DatasetProperties properties = new ${componentNameClass}DatasetProperties("test");
-        properties.init();
         properties.refreshLayout(properties.getForm(Form.MAIN));
     }
 }

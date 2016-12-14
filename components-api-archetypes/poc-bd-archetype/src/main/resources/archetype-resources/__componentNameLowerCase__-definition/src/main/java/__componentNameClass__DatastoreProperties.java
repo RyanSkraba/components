@@ -22,18 +22,19 @@ import ${packageDaikon}.properties.presentation.Form;
 import ${packageDaikon}.properties.property.Property;
 import ${packageDaikon}.properties.property.PropertyFactory;
 
-public class ${componentNameClass}DatastoreProperties extends PropertiesImpl implements DatastoreProperties{
+public class ${componentNameClass}DatastoreProperties extends PropertiesImpl implements DatastoreProperties {
 
-    public enum ${componentNameClass}Version{
-            V_${runtimeVersion}
+    public ${componentNameClass}DatastoreProperties(String name) {
+        super(name);
     }
 
-    public ${componentNameClass}DatastoreProperties(String name){
-            super(name);
-    }
-
-    @Override public void setupLayout(){
+    @Override
+    public void setupLayout() {
         super.setupLayout();
         Form mainForm=new Form(this,Form.MAIN);
+    }
+
+    public enum ${componentNameClass}Version {
+        V${runtimeVersionConverted}
     }
 }

@@ -23,13 +23,13 @@ import ${packageTalend}.common.dataset.DatasetProperties;
 import ${packageTalend}.common.datastore.DatastoreDefinition;
 import ${packageTalend}.${componentNameLowerCase}.input.${componentName}InputDefinition;
 import ${packageTalend}.${componentNameLowerCase}.output.${componentName}OutputDefinition;
-import ${packageDaikon}.SimpleNamedThing;
+import ${packageDaikon}.definition.I18nDefinition;
 import ${packageDaikon}.runtime.RuntimeInfo;
 
 
-public class ${componentNameClass}DatastoreDefinition extends SimpleNamedThing implements DatastoreDefinition<${componentNameClass}DatastoreProperties> {
+public class ${componentNameClass}DatastoreDefinition extends I18nDefinition implements DatastoreDefinition<${componentNameClass}DatastoreProperties> {
 
-    public static final String RUNTIME_${runtimeVersion} = "org.talend.components.${componentNameLowerCase}.runtime_${runtimeVersion}.DatastoreRuntime";
+    public static final String RUNTIME${runtimeVersionConverted} = "org.talend.components.${componentNameLowerCase}.runtime${runtimeVersionConverted}.${componentNameClass}DatastoreRuntime";
 
     public static final String NAME = ${componentNameClass}ComponentFamilyDefinition.NAME + "Datastore";
 
@@ -43,10 +43,10 @@ public class ${componentNameClass}DatastoreDefinition extends SimpleNamedThing i
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(${componentNameClass}DatastoreProperties properties, Object ctx) {
+    public RuntimeInfo getRuntimeInfo(${componentNameClass}DatastoreProperties properties) {
         try {
             return new JarRuntimeInfo(new URL("mvn:org.talend.components/${componentNameLowerCase}-runtime"),
-                    DependenciesReader.computeDependenciesFilePath("org.talend.components", "${componentNameLowerCase}-runtime"), RUNTIME_${runtimeVersion});
+                    DependenciesReader.computeDependenciesFilePath("org.talend.components", "${componentNameLowerCase}-runtime"), RUNTIME${runtimeVersionConverted});
         } catch (MalformedURLException e) {
             throw new ComponentException(e);
         }
@@ -54,7 +54,7 @@ public class ${componentNameClass}DatastoreDefinition extends SimpleNamedThing i
 
     @Override
     public String getImagePath(){
-        return null;
+        return NAME + "_icon32.png";
     }
 
     @Override
@@ -75,8 +75,4 @@ public class ${componentNameClass}DatastoreDefinition extends SimpleNamedThing i
         return ${componentNameClass}OutputDefinition.NAME;
     }
 
-    @Override
-    public String getDisplayName() {
-        return getI18nMessage("datastore." + getName() + I18N_DISPLAY_NAME_SUFFIX);
-    }
 }

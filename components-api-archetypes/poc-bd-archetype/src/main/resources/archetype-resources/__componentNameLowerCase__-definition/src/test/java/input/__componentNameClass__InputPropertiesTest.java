@@ -13,7 +13,11 @@
 
 package ${package}.input;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
+import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 
@@ -27,6 +31,22 @@ import static org.junit.Assert.assertNull;
 
 
 public class ${componentNameClass}InputPropertiesTest {
+
+    @Rule
+    public ErrorCollector errorCollector = new ErrorCollector();
+
+    ${componentNameClass}InputProperties properties;
+
+    @Before
+    public void reset() {
+        properties = new ${componentNameClass}InputProperties("test");
+        properties.init();
+    }
+
+    @Test
+    public void testI18N() {
+        ComponentTestUtils.checkAllI18N(properties, errorCollector);
+    }
 
     /**
      * Checks {@link ${componentNameClass}InputProperties} sets correctly initial schema
@@ -42,12 +62,7 @@ public class ${componentNameClass}InputPropertiesTest {
      */
     @Test
     public void testSetupLayout() {
-        ${componentNameClass}InputProperties properties = new ${componentNameClass}InputProperties("test");
-
-        properties.setupLayout();
-
         Form main = properties.getForm(Form.MAIN);
-
         Collection<Widget> mainWidgets = main.getWidgets();
     }
 
@@ -57,8 +72,6 @@ public class ${componentNameClass}InputPropertiesTest {
      */
     @Test
     public void testRefreshLayout() {
-        ${componentNameClass}InputProperties properties = new ${componentNameClass}InputProperties("test");
-        properties.init();
         properties.refreshLayout(properties.getForm(Form.MAIN));
     }
 }

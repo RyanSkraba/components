@@ -25,14 +25,14 @@ public class ${componentNameClass}DatasetDefinitionTest {
     private final ${componentNameClass}DatasetDefinition datasetDefinition = new ${componentNameClass}DatasetDefinition();
 
     /**
-     * Check {@link ${componentNameClass}DatasetDefinition#getRuntimeInfo(${componentNameClass}DatasetProperties, Object)} returns RuntimeInfo,
-     * which runtime class name is "org.talend.components.${componentNameLowerCase}.runtime2_2.DatasetRuntime"
+     * Check {@link ${componentNameClass}DatasetDefinition#getRuntimeInfo(${componentNameClass}DatasetProperties)} returns RuntimeInfo,
+     * which runtime class name is "org.talend.components.${componentNameLowerCase}.runtime${runtimeVersionConverted}.${componentNameClass}DatasetRuntime"
      */
     @Test
     @Ignore("This can't work unless the runtime jar is already installed in maven!")
     public void testRuntimeInfo() {
-        RuntimeInfo runtimeInfo = datasetDefinition.getRuntimeInfo(null, null);
-        assertEquals("org.talend.components.${componentLowerCase}.runtime.${componentNameClass}DatasetRuntime", runtimeInfo.getRuntimeClassName());
+        RuntimeInfo runtimeInfo = datasetDefinition.getRuntimeInfo(null);
+        assertEquals("org.talend.components.${componentNameLowerCase}.runtime${runtimeVersionConverted}.${componentNameClass}DatasetRuntime", runtimeInfo.getRuntimeClassName());
 
     }
 }

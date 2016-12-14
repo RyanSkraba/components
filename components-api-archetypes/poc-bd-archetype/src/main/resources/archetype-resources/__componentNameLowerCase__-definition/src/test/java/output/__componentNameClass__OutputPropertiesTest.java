@@ -13,7 +13,11 @@
 
 package ${package}.output;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
+import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 
@@ -26,6 +30,24 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 public class ${componentNameClass}OutputPropertiesTest {
+
+    @Rule
+    public ErrorCollector errorCollector = new ErrorCollector();
+
+    ${componentNameClass}OutputProperties properties;
+
+    @Before
+    public void reset() {
+        properties = new ${componentNameClass}OutputProperties("test");
+        properties.init();
+    }
+
+    @Test
+    public void testI18N() {
+        ComponentTestUtils.checkAllI18N(properties, errorCollector);
+    }
+
+
     /**
      * Checks {@link ${componentNameClass}OutputProperties} sets correctly initial schema
      * property
@@ -40,12 +62,16 @@ public class ${componentNameClass}OutputPropertiesTest {
      */
     @Test
     public void testSetupLayout() {
-        ${componentNameClass}OutputProperties properties = new ${componentNameClass}OutputProperties("test");
-
-        properties.setupLayout();
-
         Form main = properties.getForm(Form.MAIN);
-
         Collection<Widget> mainWidgets = main.getWidgets();
+    }
+
+    /**
+     * Checks {@link ${componentNameClass}DatastoreProperties} sets correctly layout after refresh
+     * properties
+     */
+    @Test
+    public void testRefreshLayout() {
+        properties.refreshLayout(properties.getForm(Form.MAIN));
     }
 }

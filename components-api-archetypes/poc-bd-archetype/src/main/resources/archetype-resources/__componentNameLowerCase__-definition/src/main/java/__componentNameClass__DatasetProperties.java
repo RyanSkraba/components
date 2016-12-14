@@ -22,8 +22,8 @@ import ${packageDaikon}.properties.property.Property;
 
 public class ${componentNameClass}DatasetProperties extends PropertiesImpl implements DatasetProperties<${componentNameClass}DatastoreProperties> {
 
-    public final transient ReferenceProperties<${componentNameClass}DatastoreProperties> datastoreRef = new ReferenceProperties<>("datastoreRef",
-        ${componentNameClass}DatastoreDefinition.NAME);
+    public final ReferenceProperties<${componentNameClass}DatastoreProperties> datastoreRef = new ReferenceProperties<>("datastoreRef",
+            ${componentNameClass}DatastoreDefinition.NAME);
 
     public ${componentNameClass}DatasetProperties(String name) {
         super(name);
@@ -34,7 +34,8 @@ public class ${componentNameClass}DatasetProperties extends PropertiesImpl imple
         return datastoreRef.getReference();
     }
 
-    @Override public void setDatastoreProperties(${componentNameClass}DatastoreProperties datastoreProperties) {
+    @Override
+    public void setDatastoreProperties(${componentNameClass}DatastoreProperties datastoreProperties) {
         datastoreRef.setReference(datastoreProperties);
     }
 

@@ -16,6 +16,7 @@ package ${package}.input;
 import org.junit.Ignore;
 import org.junit.Test;
 import ${packageTalend}.api.component.ConnectorTopology;
+import ${packageTalend}.api.component.runtime.ExecutionEngine;
 import ${packageDaikon}.runtime.RuntimeInfo;
 
 import java.util.Set;
@@ -30,13 +31,13 @@ public class ${componentNameClass}InputDefinitionTest {
 
     /**
      * Check {@link ${componentNameClass}InputDefinition#getRuntimeInfo(ComponentProperties, ConnectorTopology)} returns RuntimeInfo,
-     * which runtime class name is "${package}.runtime_${runtimeVersion}.JmsSink"
+     * which runtime class name is "${package}.runtime${runtimeVersionConverted}.${componentNameClass}InputRuntime"
      */
     @Test
     @Ignore("This can't work unless the runtime jar is already installed in maven!")
     public void testRuntimeInfo() {
-        RuntimeInfo runtimeInfo = inputDefinition.getRuntimeInfo(null, null);
-        assertEquals("org.talend.components.${componentLowerCase}.runtime.${componentNameClass}DatasetRuntime", runtimeInfo.getRuntimeClassName());
+        RuntimeInfo runtimeInfo = inputDefinition.getRuntimeInfo(ExecutionEngine.BEAM, null, null);
+        assertEquals("org.talend.components.${componentNameLowerCase}.runtime${runtimeVersionConverted}.${componentNameClass}InputRuntime", runtimeInfo.getRuntimeClassName());
 
     }
 

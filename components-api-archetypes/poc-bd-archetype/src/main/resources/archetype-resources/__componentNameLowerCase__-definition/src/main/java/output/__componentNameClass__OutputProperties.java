@@ -23,26 +23,26 @@ import ${packageDaikon}.properties.presentation.Form;
 
 public class ${componentNameClass}OutputProperties extends ComponentPropertiesImpl implements IOProperties {
 
+    public ReferenceProperties<${componentNameClass}DatasetProperties> datasetRef = new ReferenceProperties<>("datasetRef",
+            ${componentNameClass}DatasetDefinition.NAME);
+
     public ${componentNameClass}OutputProperties(String name) {
         super(name);
     }
 
-    transient public ReferenceProperties<${componentNameClass}DatasetProperties> datasetRef = new ReferenceProperties<>("datasetRef",
-        ${componentNameClass}DatasetDefinition.NAME);
-
     @Override
     public void setupLayout() {
-             super.setupLayout();
-             Form mainForm = new Form(this, Form.MAIN);
+         super.setupLayout();
+         Form mainForm = new Form(this, Form.MAIN);
     }
 
     @Override
     public ${componentNameClass}DatasetProperties getDatasetProperties() {
-            return datasetRef.getReference();
+        return datasetRef.getReference();
     }
 
     @Override
     public void setDatasetProperties(DatasetProperties datasetProperties) {
-            datasetRef.setReference(datasetProperties);
+        datasetRef.setReference(datasetProperties);
     }
 }

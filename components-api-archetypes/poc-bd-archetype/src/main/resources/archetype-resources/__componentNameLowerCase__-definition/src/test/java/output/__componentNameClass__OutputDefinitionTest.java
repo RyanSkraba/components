@@ -16,6 +16,7 @@ package ${package}.output;
 import org.junit.Ignore;
 import org.junit.Test;
 import ${packageTalend}.api.component.ConnectorTopology;
+import ${packageTalend}.api.component.runtime.ExecutionEngine;
 import ${packageDaikon}.runtime.RuntimeInfo;
 
 import java.util.Set;
@@ -34,8 +35,8 @@ public class ${componentNameClass}OutputDefinitionTest {
     @Test
     @Ignore("This can't work unless the runtime jar is already installed in maven!")
     public void testRuntimeInfo() {
-        RuntimeInfo runtimeInfo = outputDefinition.getRuntimeInfo(null, null);
-        assertEquals("org.talend.components.${componentLowerCase}.runtime.${componentNameClass}DatasetRuntime", runtimeInfo.getRuntimeClassName());
+        RuntimeInfo runtimeInfo = outputDefinition.getRuntimeInfo(ExecutionEngine.BEAM, null, null);
+        assertEquals("org.talend.components.${componentNameLowerCase}.runtime${runtimeVersionConverted}.${componentNameClass}OutputRuntime", runtimeInfo.getRuntimeClassName());
 
     }
 

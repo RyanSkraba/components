@@ -10,45 +10,41 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package ${package}.runtime${runtimeVersion};
-
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+package ${package}.runtime${runtimeVersionConverted};
 
 import org.apache.avro.generic.IndexedRecord;
-
 import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.coders.VoidCoder;
-import org.apache.beam.sdk.io.Write;
-import org.apache.beam.sdk.transforms.DoFn;
-import org.apache.beam.sdk.transforms.PTransform;
-import org.apache.beam.sdk.transforms.ParDo;
+import org.apache.beam.sdk.io.Read;
+
+import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.KV;
+import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.sdk.values.PDone;
-import org.talend.components.adapter.beam.coders.LazyAvroCoder;
+
+import ${packageTalend}.adapter.beam.coders.LazyAvroCoder;
+import ${packageTalend}.adapter.beam.transform.ConvertToIndexedRecord;
 import ${packageTalend}.api.component.runtime.RuntimableRuntime;
 import ${packageTalend}.api.container.RuntimeContainer;
-import ${packageTalend}.${componentNameLowerCase}.output.${componentNameClass}OutputProperties;
+import ${packageTalend}.${componentNameLowerCase}.input.${componentNameClass}InputProperties;
 import ${packageDaikon}.properties.ValidationResult;
 
-public class ${componentNameClass}OutputRuntime extends PTransform<PCollection<IndexedRecord>, PDone> implements
-        RuntimableRuntime<${componentNameClass}OutputProperties> {
+public class ${componentNameClass}InputRuntime extends PTransform<PBegin, PCollection<IndexedRecord>> implements
+        RuntimableRuntime<${componentNameClass}InputProperties> {
 
     /**
      * The component instance that this runtime is configured for.
      */
-    private ${componentNameClass}OutputProperties properties;
+    private ${componentNameClass}InputProperties properties = null;
 
     @Override
-    public ValidationResult initialize(RuntimeContainer container, ${componentNameClass}OutputProperties properties) {
+    public ValidationResult initialize(RuntimeContainer container, ${componentNameClass}InputProperties properties) {
         this.properties = properties;
         return ValidationResult.OK;
     }
 
     @Override
-    public PDone apply(PCollection<IndexedRecord> in) {
+    public PCollection<IndexedRecord> apply(PBegin in) {
         return null;
     }
 }

@@ -25,13 +25,13 @@ public class ${componentNameClass}DatastoreDefinitionTest {
     private final ${componentNameClass}DatastoreDefinition datastoreDefinition = new ${componentNameClass}DatastoreDefinition();
 
     /**
-    * Check {@link ${componentNameClass}DatastoreDefinition#getRuntimeInfo(${componentNameClass}DatastoreProperties, Object) returns RuntimeInfo,
-    * which runtime class name is "${package}.runtime_${runtimeVersion}.DatastoreRuntime"
+    * Check {@link ${componentNameClass}DatastoreDefinition#getRuntimeInfo(${componentNameClass}DatastoreProperties) returns RuntimeInfo,
+    * which runtime class name is "${package}.runtime${runtimeVersionConverted}.${componentNameClass}DatastoreRuntime"
     */
     @Test
     @Ignore("This can't work unless the runtime jar is already installed in maven!")
     public void testRuntimeInfo() {
-        RuntimeInfo runtimeInfo = datastoreDefinition.getRuntimeInfo(null, null);
-        assertEquals("org.talend.components.${componentLowerCase}.runtime.${componentNameClass}DatasetRuntime", runtimeInfo.getRuntimeClassName());
+        RuntimeInfo runtimeInfo = datastoreDefinition.getRuntimeInfo(null);
+        assertEquals("org.talend.components.${componentNameLowerCase}.runtime${runtimeVersionConverted}.${componentNameClass}DatastoreRuntime", runtimeInfo.getRuntimeClassName());
     }
 }

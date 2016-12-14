@@ -21,6 +21,7 @@ import java.util.Set;
 import ${packageTalend}.api.component.AbstractComponentDefinition;
 import ${packageTalend}.api.component.ConnectorTopology;
 import ${packageTalend}.api.component.runtime.DependenciesReader;
+import ${packageTalend}.api.component.runtime.ExecutionEngine;
 import ${packageTalend}.api.component.runtime.JarRuntimeInfo;
 import ${packageTalend}.api.exception.ComponentException;
 import ${packageTalend}.api.properties.ComponentProperties;
@@ -32,10 +33,10 @@ public class ${componentNameClass}OutputDefinition extends AbstractComponentDefi
 
     public static final String NAME = ${componentNameClass}ComponentFamilyDefinition.NAME + "Output";
 
-    public static final String RUNTIME${runtimeVersion} = "org.talend.components.${componentNameLowerCase}.runtime_${runtimeVersion}.${componentNameClass}OutputRuntime";
+    public static final String RUNTIME${runtimeVersionConverted} = "org.talend.components.${componentNameLowerCase}.runtime${runtimeVersionConverted}.${componentNameClass}OutputRuntime";
 
     public ${componentNameClass}OutputDefinition() {
-        super(NAME);
+        super(NAME, ExecutionEngine.BEAM);
     }
 
     @Override
@@ -44,11 +45,11 @@ public class ${componentNameClass}OutputDefinition extends AbstractComponentDefi
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology ctx){
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology ctx){
+        assertEngineCompatibility(engine);
         try{
-
             return new JarRuntimeInfo(new URL("mvn:org.talend.components/${componentNameLowerCase}-runtime"),
-                    DependenciesReader.computeDependenciesFilePath("org.talend.components","${componentNameLowerCase}-runtime"),RUNTIME${runtimeVersion});
+                    DependenciesReader.computeDependenciesFilePath("org.talend.components","${componentNameLowerCase}-runtime"),RUNTIME${runtimeVersionConverted});
         }catch(MalformedURLException e){
             throw new ComponentException(e);
         }
