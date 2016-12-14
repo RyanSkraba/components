@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.talend.components.service.rest.dto.PropertiesWithReferences;
+import org.talend.components.service.rest.dto.PropertiesDto;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
 import org.talend.daikon.annotation.Service;
 import org.talend.daikon.serialize.jsonschema.PropertyTrigger;
@@ -36,7 +36,7 @@ public interface PropertiesController {
 
     /** Validate the coherence of a set of properties for a specific component. **/
     @RequestMapping(value = "{definitionName}/validate", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE)
-    ResponseEntity<ValidationResultsDto> validateProperties(@RequestBody PropertiesWithReferences propertiesContainer);
+    ResponseEntity<ValidationResultsDto> validateProperties(@RequestBody PropertiesDto propertiesContainer);
 
     /** Validate one field. */
     @RequestMapping(value = "{definition}/{trigger}/{property}", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
@@ -44,12 +44,12 @@ public interface PropertiesController {
                                              @PathVariable("trigger") PropertyTrigger trigger, //
                                              @PathVariable("property") String property, //
                                              @RequestParam(required = false) String formName, //
-                                             @RequestBody PropertiesWithReferences propertiesContainer);
+                                             @RequestBody PropertiesDto propertiesContainer);
 
     /** Get dataset properties. Should it be GET? **/
     @RequestMapping(value = "{definitionName}/dataset", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
     String getDatasetProperties(@PathVariable("definitionName") String definitionName, //
                                 @RequestParam(required = false) String formName, //
-                                @RequestBody PropertiesWithReferences propertiesContainer);
+                                @RequestBody PropertiesDto propertiesContainer);
 
 }

@@ -29,7 +29,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.talend.components.common.dataset.DatasetDefinition;
 import org.talend.components.common.datastore.DatastoreDefinition;
-import org.talend.components.service.rest.dto.PropertiesWithReferences;
+import org.talend.components.service.rest.dto.PropertiesDto;
 import org.talend.components.service.rest.mock.MockDatasetDefinition;
 import org.talend.components.service.rest.mock.MockDatasetProperties;
 import org.talend.components.service.rest.mock.MockDatastoreDefinition;
@@ -111,16 +111,16 @@ public abstract class AbstractSpringIntegrationTests {
         });
     }
 
-    protected PropertiesWithReferences buildTestDataSetFormData() throws java.io.IOException {
-        PropertiesWithReferences formDataContainer = new PropertiesWithReferences();
+    protected PropertiesDto buildTestDataSetFormData() throws java.io.IOException {
+        PropertiesDto formDataContainer = new PropertiesDto();
         ObjectReader reader = mapper.readerFor(ObjectNode.class);
         formDataContainer.setDependencies(singletonList(reader.readValue(TEST_DATA_STORE_PROPERTIES)));
         formDataContainer.setProperties(reader.readValue(TEST_DATA_SET_PROPERTIES));
         return formDataContainer;
     }
 
-    protected PropertiesWithReferences buildTestDataStoreFormData() throws java.io.IOException {
-        PropertiesWithReferences formDataContainer = new PropertiesWithReferences();
+    protected PropertiesDto buildTestDataStoreFormData() throws java.io.IOException {
+        PropertiesDto formDataContainer = new PropertiesDto();
         formDataContainer.setProperties(mapper.readerFor(ObjectNode.class).readValue(TEST_DATA_STORE_PROPERTIES));
         return formDataContainer;
     }

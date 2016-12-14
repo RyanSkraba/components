@@ -21,7 +21,7 @@ import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.service.rest.PropertiesController;
-import org.talend.components.service.rest.dto.PropertiesWithReferences;
+import org.talend.components.service.rest.dto.PropertiesDto;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
 import org.talend.components.service.rest.serialization.JsonSerializationHelper;
 import org.talend.daikon.annotation.ServiceImplementation;
@@ -66,7 +66,7 @@ public class PropertiesControllerImpl implements PropertiesController {
 
     @Override
     // TODO: Verify it is really what's wanted and not just the ValidationResult.Result.(OK|ERROR)
-    public ResponseEntity<ValidationResultsDto> validateProperties(PropertiesWithReferences propertiesContainer) {
+    public ResponseEntity<ValidationResultsDto> validateProperties(PropertiesDto propertiesContainer) {
         Properties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
         ValidationResult validationResult = properties.getValidationResult();
         // TODO: I really would prefer return 200 status code any time it process correctly and that the payload determine the
@@ -95,7 +95,7 @@ public class PropertiesControllerImpl implements PropertiesController {
                                                     PropertyTrigger trigger, //
                                                     String property, //
                                                     String formName, //
-                                                    PropertiesWithReferences propertiesContainer) {
+                                                    PropertiesDto propertiesContainer) {
         Properties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
 
         String response;
@@ -132,7 +132,7 @@ public class PropertiesControllerImpl implements PropertiesController {
     }
 
     @Override
-    public String getDatasetProperties(String definitionName, String formName, PropertiesWithReferences propertiesContainer) {
+    public String getDatasetProperties(String definitionName, String formName, PropertiesDto propertiesContainer) {
         DatastoreDefinition<DatastoreProperties> datastoreDefinition = propertiesHelpers.getDataStoreDefinition(definitionName);
         notNull(datastoreDefinition, "Could not find data store definition of name %s", definitionName);
         DatastoreProperties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);

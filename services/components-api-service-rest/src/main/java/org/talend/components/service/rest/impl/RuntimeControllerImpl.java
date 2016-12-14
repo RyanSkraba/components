@@ -35,7 +35,7 @@ import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.common.datastore.runtime.DatastoreRuntime;
 import org.talend.components.service.rest.RuntimesController;
-import org.talend.components.service.rest.dto.PropertiesWithReferences;
+import org.talend.components.service.rest.dto.PropertiesDto;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
 import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.exception.TalendRuntimeException;
@@ -59,7 +59,7 @@ public class RuntimeControllerImpl implements RuntimesController {
 
     @Override
     public ResponseEntity<ValidationResultsDto> validateDataStoreConnection(String dataStoreDefinitionName,
-                                                                            PropertiesWithReferences propertiesContainer) {
+                                                                            PropertiesDto propertiesContainer) {
         final DatastoreDefinition<DatastoreProperties> definition = propertiesHelpers.getDataStoreDefinition(
                 dataStoreDefinitionName);
         notNull(definition, "Could not find data store definition of name %s", dataStoreDefinitionName);
@@ -79,23 +79,23 @@ public class RuntimeControllerImpl implements RuntimesController {
     }
 
     @Override
-    public String getDatasetSchema(String datasetDefinitionName, PropertiesWithReferences connectionInfo) throws IOException {
+    public String getDatasetSchema(String datasetDefinitionName, PropertiesDto connectionInfo) throws IOException {
         return useDatasetRuntime(datasetDefinitionName, connectionInfo, runtime -> runtime.getSchema().toString(false));
     }
 
     @Override
-    public StreamingResponseBody getDatasetData(String datasetDefinitionName, PropertiesWithReferences connectionInfo,
+    public StreamingResponseBody getDatasetData(String datasetDefinitionName, PropertiesDto connectionInfo,
                                                 Integer from, Integer limit) {
         return useDatasetRuntime(datasetDefinitionName, connectionInfo, new DatasetContentWriter(limit, true));
     }
 
     @Override
-    public StreamingResponseBody getDatasetDataAsBinary(String datasetDefinitionName, PropertiesWithReferences connectionInfo,
+    public StreamingResponseBody getDatasetDataAsBinary(String datasetDefinitionName, PropertiesDto connectionInfo,
                                                         Integer from, Integer limit) {
         return useDatasetRuntime(datasetDefinitionName, connectionInfo, new DatasetContentWriter(limit, false));
     }
 
-    private <T> T useDatasetRuntime(String datasetDefinitionName, PropertiesWithReferences formData,
+    private <T> T useDatasetRuntime(String datasetDefinitionName, PropertiesDto formData,
                                     Function<DatasetRuntime<DatasetProperties<DatastoreProperties>>, T> consumer) {
         // 1) get dataset properties from supplied data
         DatasetProperties datasetProperties = propertiesHelpers.propertiesFromDto(formData);

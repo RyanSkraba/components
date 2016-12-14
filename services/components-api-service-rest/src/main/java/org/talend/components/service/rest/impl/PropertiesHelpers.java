@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.common.dataset.DatasetDefinition;
 import org.talend.components.common.datastore.DatastoreDefinition;
-import org.talend.components.service.rest.dto.PropertiesWithReferences;
+import org.talend.components.service.rest.dto.PropertiesDto;
 import org.talend.components.service.rest.serialization.JsonSerializationHelper;
 import org.talend.daikon.definition.Definition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
@@ -44,7 +44,7 @@ public class PropertiesHelpers {
     @Autowired
     private ComponentService componentService;
 
-    public <T extends Properties> T propertiesFromDto(PropertiesWithReferences propertiesContainer) {
+    public <T extends Properties> T propertiesFromDto(PropertiesDto propertiesContainer) {
         T properties = (T) jsonSerializationHelper.toProperties(
                 toInputStream(propertiesContainer.getProperties().toString(), StandardCharsets.UTF_8));
         List<ObjectNode> dependencies = propertiesContainer.getDependencies();

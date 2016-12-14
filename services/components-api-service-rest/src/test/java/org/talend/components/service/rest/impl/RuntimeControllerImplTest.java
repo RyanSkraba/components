@@ -17,7 +17,7 @@ import com.jayway.restassured.response.Response;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.talend.components.service.rest.AbstractSpringIntegrationTests;
-import org.talend.components.service.rest.dto.PropertiesWithReferences;
+import org.talend.components.service.rest.dto.PropertiesDto;
 import org.talend.components.service.rest.mock.MockDatasetRuntime;
 
 import static com.jayway.restassured.RestAssured.given;
@@ -29,12 +29,12 @@ public class RuntimeControllerImplTest extends AbstractSpringIntegrationTests {
 
     @Test
     public void validateConnection() throws Exception {
-        PropertiesWithReferences propertiesWithReferences = buildTestDataStoreFormData();
+        PropertiesDto propertiesDto = buildTestDataStoreFormData();
         // when
         Response response = given().accept(APPLICATION_JSON_UTF8_VALUE) //
                 .expect() //
                 .statusCode(HttpStatus.OK.value()).log().ifError() //
-                .with().content(propertiesWithReferences) //
+                .with().content(propertiesDto) //
                 .contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .post("/runtimes/{definitionName}", DATA_STORE_DEFINITION_NAME);
 
@@ -47,7 +47,7 @@ public class RuntimeControllerImplTest extends AbstractSpringIntegrationTests {
     @Test
     public void getDatasetSchema() throws Exception {
         // given
-        PropertiesWithReferences formDataContainer = buildTestDataSetFormData();
+        PropertiesDto formDataContainer = buildTestDataSetFormData();
 
         // when
         Response response = given().accept(APPLICATION_JSON_UTF8_VALUE) //
@@ -67,7 +67,7 @@ public class RuntimeControllerImplTest extends AbstractSpringIntegrationTests {
     @Test
     public void getDatasetData() throws Exception {
         // given
-        PropertiesWithReferences formDataContainer = buildTestDataSetFormData();
+        PropertiesDto formDataContainer = buildTestDataSetFormData();
 
         // when
         Response response = given().accept(APPLICATION_JSON_UTF8_VALUE) //

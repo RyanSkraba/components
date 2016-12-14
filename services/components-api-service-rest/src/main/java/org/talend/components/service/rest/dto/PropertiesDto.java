@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import static java.util.Collections.emptyList;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class PropertiesWithReferences {
+public class PropertiesDto {
 
     @JsonProperty("dependencies")
     private List<ObjectNode> dependencies = emptyList();
