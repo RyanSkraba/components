@@ -14,7 +14,6 @@
 package org.talend.components.service.rest.impl;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.function.Function;
 
@@ -36,11 +35,9 @@ import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.common.datastore.runtime.DatastoreRuntime;
 import org.talend.components.service.rest.RuntimesController;
-import org.talend.components.service.rest.dto.DatasetConnectionInfo;
+import org.talend.components.service.rest.dto.PropertiesWithReferences;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
-import org.talend.components.service.rest.serialization.JsonSerializationHelper;
 import org.talend.daikon.annotation.ServiceImplementation;
-import org.talend.daikon.definition.service.DefinitionRegistryService;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.ValidationResult;
@@ -49,8 +46,6 @@ import org.talend.daikon.sandbox.SandboxedInstance;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Integer.MAX_VALUE;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.apache.commons.lang3.Validate.notNull;
 
 @ServiceImplementation
@@ -60,22 +55,19 @@ public class RuntimeControllerImpl implements RuntimesController {
     private static final Logger log = LoggerFactory.getLogger(RuntimeControllerImpl.class);
 
     @Autowired
-    private JsonSerializationHelper jsonSerializationHelper;
-
-    @Autowired
-    private DefinitionRegistryService definitionServiceDelegate;
+    private PropertiesHelpers propertiesHelpers;
 
     @Override
     public ResponseEntity<ValidationResultsDto> validateDataStoreConnection(String dataStoreDefinitionName,
-                                                                            InputStream formData) {
-        final DatastoreDefinition<DatastoreProperties> definition = definitionServiceDelegate.getDefinitionsMapByType(
-                DatastoreDefinition.class).get(dataStoreDefinitionName);
+                                                                            PropertiesWithReferences propertiesContainer) {
+        final DatastoreDefinition<DatastoreProperties> definition = propertiesHelpers.getDataStoreDefinition(
+                dataStoreDefinitionName);
         notNull(definition, "Could not find data store definition of name %s", dataStoreDefinitionName);
-        DatastoreProperties properties = (DatastoreProperties) jsonSerializationHelper.toProperties(formData);
+        DatastoreProperties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
 
         try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(definition.getRuntimeInfo(properties),
                 getClass().getClassLoader())) {
-            DatastoreRuntime datastoreRuntime = (DatastoreRuntime) instance.getInstance();
+            DatastoreRuntime<DatastoreProperties> datastoreRuntime = (DatastoreRuntime) instance.getInstance();
             datastoreRuntime.initialize(null, properties);
             Iterable<ValidationResult> healthChecks = datastoreRuntime.doHealthChecks(null);
 
@@ -87,48 +79,40 @@ public class RuntimeControllerImpl implements RuntimesController {
     }
 
     @Override
-    public String getDatasetSchema(String datasetDefinitionName, DatasetConnectionInfo connectionInfo) throws IOException {
+    public String getDatasetSchema(String datasetDefinitionName, PropertiesWithReferences connectionInfo) throws IOException {
         return useDatasetRuntime(datasetDefinitionName, connectionInfo, runtime -> runtime.getSchema().toString(false));
     }
 
     @Override
-    public StreamingResponseBody getDatasetData(String datasetDefinitionName, DatasetConnectionInfo connectionInfo, Integer from,
-                                                Integer limit) {
+    public StreamingResponseBody getDatasetData(String datasetDefinitionName, PropertiesWithReferences connectionInfo,
+                                                Integer from, Integer limit) {
         return useDatasetRuntime(datasetDefinitionName, connectionInfo, new DatasetContentWriter(limit, true));
     }
 
     @Override
-    public StreamingResponseBody getDatasetDataAsBinary(String datasetDefinitionName, DatasetConnectionInfo connectionInfo,
+    public StreamingResponseBody getDatasetDataAsBinary(String datasetDefinitionName, PropertiesWithReferences connectionInfo,
                                                         Integer from, Integer limit) {
         return useDatasetRuntime(datasetDefinitionName, connectionInfo, new DatasetContentWriter(limit, false));
     }
 
-    private <T> T useDatasetRuntime(String datasetDefinitionName, DatasetConnectionInfo formData,
+    private <T> T useDatasetRuntime(String datasetDefinitionName, PropertiesWithReferences formData,
                                     Function<DatasetRuntime<DatasetProperties<DatastoreProperties>>, T> consumer) {
-        // 1) create data store properties from posted data
-        DatastoreProperties datastoreProperties = (DatastoreProperties) jsonSerializationHelper.toProperties(
-                toInputStream(formData.getDataStoreFormData().toString(), UTF_8));
+        // 1) get dataset properties from supplied data
+        DatasetProperties datasetProperties = propertiesHelpers.propertiesFromDto(formData);
 
-        // 2) create data set properties from with posted data
-        DatasetProperties datasetProperties = (DatasetProperties) jsonSerializationHelper.toProperties(
-                toInputStream(formData.getDataSetFormData().toString(), UTF_8));
+        // 2) Retrieve data set definition to be able to create the runtime
+        final DatasetDefinition<DatasetProperties<DatastoreProperties>> datasetDefinition = //
+                propertiesHelpers.getDataSetDefinition(datasetDefinitionName);
 
-        // 3) enrich dataset properties with data store properties
-        datasetProperties.setDatastoreProperties(datastoreProperties);
-
-        // 4) Retrieve data set definition to be able to create the runtime
-        final DatasetDefinition<DatasetProperties<DatastoreProperties>> datasetDefinition = definitionServiceDelegate.getDefinitionsMapByType(
-                DatasetDefinition.class).get(datasetDefinitionName);
-
-        // 5) create the runtime
-        try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(
-                datasetDefinition.getRuntimeInfo(datasetProperties), getClass().getClassLoader())) {
+        // 3) create the runtime
+        try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(datasetDefinition.getRuntimeInfo(datasetProperties),
+                getClass().getClassLoader())) {
             DatasetRuntime<DatasetProperties<DatastoreProperties>> datasetRuntimeInstance = (DatasetRuntime<DatasetProperties<DatastoreProperties>>) instance
                     .getInstance();
 
             datasetRuntimeInstance.initialize(null, datasetProperties);
 
-            // 6) Consume the data set runtime
+            // 4) Consume the data set runtime
             return consumer.apply(datasetRuntimeInstance);
         }
     }

@@ -13,30 +13,36 @@
 
 package org.talend.components.service.rest.dto;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class DatasetConnectionInfo {
+import static java.util.Collections.emptyList;
 
-    @JsonProperty("datastore-properties")
-    private ObjectNode dataStoreFormData;
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+public class PropertiesWithReferences {
 
-    @JsonProperty("dataset-properties")
-    private ObjectNode dataSetFormData;
+    @JsonProperty("dependencies")
+    private List<ObjectNode> dependencies = emptyList();
 
-    public ObjectNode getDataStoreFormData() {
-        return dataStoreFormData;
+    @JsonProperty("properties")
+    private ObjectNode properties;
+
+    public List<ObjectNode> getDependencies() {
+        return dependencies;
     }
 
-    public void setDataStoreFormData(ObjectNode dataStoreFormData) {
-        this.dataStoreFormData = dataStoreFormData;
+    public void setDependencies(List<ObjectNode> dependencies) {
+        this.dependencies = dependencies;
     }
 
-    public ObjectNode getDataSetFormData() {
-        return dataSetFormData;
+    public ObjectNode getProperties() {
+        return properties;
     }
 
-    public void setDataSetFormData(ObjectNode dataSetFormData) {
-        this.dataSetFormData = dataSetFormData;
+    public void setProperties(ObjectNode properties) {
+        this.properties = properties;
     }
 }

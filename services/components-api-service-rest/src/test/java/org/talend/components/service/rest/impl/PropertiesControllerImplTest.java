@@ -39,7 +39,7 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
                 .expect() //
                 .statusCode(204).log().ifError() //
                 .with().port(localServerPort) //
-                .content("{\"tag\":\"toto\", \"tagId\":\"256\"}") //
+                .content(buildTestDataStoreFormData()) //
                 .contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .post("/properties/{name}/validate", DATA_STORE_DEFINITION_NAME);
     }
@@ -52,7 +52,7 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
                 .expect() //
                 .statusCode(200).log().ifError() //
                 .with().port(localServerPort) //
-                .content("{\"tag\":\"toto\", \"tagId\":\"256\"}") //
+                .content(buildTestDataStoreFormData()) //
                 .contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .post("/properties/{name}/{callback}/{propName}", DATA_STORE_DEFINITION_NAME, callback, propName);
         assertNotNull(response);
@@ -69,7 +69,7 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
                 .statusCode(400)
                 .with()
                 .port(localServerPort) //
-                .content("{\"tag\":\"toto\", \"tagId\":\"256\"}") //
+                .content(buildTestDataStoreFormData()) //
                 .contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .post("/properties/{name}/{callback}/{propName}", DATA_STORE_DEFINITION_NAME, callback, propName)
                 .as(ApiError.class);
@@ -85,7 +85,7 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
                 .expect() //
                 .statusCode(200).log().ifError() //
                 .with().port(localServerPort) //
-                .content("{\"tag\":\"toto\", \"tagId\":\"256\"}") //
+                .content(buildTestDataStoreFormData()) //
                 .contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .post("/properties/{name}/dataset", DATA_STORE_DEFINITION_NAME);
     }
@@ -98,7 +98,7 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
                 .statusCode(500) //
                 .with()
                 .port(localServerPort) //
-                .content("{\"tag\":\"toto\", \"tagId\":\"256\"}") //
+                .content(buildTestDataStoreFormData()) //
                 .contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .post("/properties/{name}/dataset", dataStoreName).as(ApiError.class);
 

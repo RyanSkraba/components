@@ -16,6 +16,9 @@ package org.talend.components.service.rest;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.restassured.RestAssured;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -26,9 +29,11 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.talend.components.common.dataset.DatasetDefinition;
 import org.talend.components.common.datastore.DatastoreDefinition;
+import org.talend.components.service.rest.dto.PropertiesWithReferences;
 import org.talend.components.service.rest.mock.MockDatasetDefinition;
 import org.talend.components.service.rest.mock.MockDatasetProperties;
 import org.talend.components.service.rest.mock.MockDatastoreDefinition;
+import org.talend.components.service.rest.mock.MockDatastoreProperties;
 import org.talend.daikon.definition.Definition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
 import org.talend.daikon.properties.Properties;
@@ -59,6 +64,14 @@ public abstract class AbstractSpringIntegrationTests {
 
     protected static final String DATA_SET_DEFINITION_NAME = "dataset definition name";
 
+    public static final String TEST_DATA_STORE_PROPERTIES =
+            "{\"@definitionName\":\"" + DATA_STORE_DEFINITION_NAME + "\",\"tag\":\"tata\", \"tagId\":\"256\"}";
+
+    public static final String TEST_DATA_SET_PROPERTIES =
+            "{\"@definitionName\":\"" + DATA_SET_DEFINITION_NAME + "\",\"tag\":\"tata\", \"tagId\":\"256\"}";
+
+    protected ObjectMapper mapper = new ObjectMapper();
+
     @Before
     public void setUp() {
         // ensure any call from restassured goes to our server isntance
@@ -87,6 +100,8 @@ public abstract class AbstractSpringIntegrationTests {
         // TODO: map the dataset definition on the correct name
 
         when(delegate.getDefinitionForPropertiesType(MockDatasetProperties.class)).thenReturn(singletonList(datasetDefinition));
+        when(delegate.getDefinitionForPropertiesType(MockDatastoreProperties.class)).thenReturn(
+                singletonList(datastoreDefinition));
 
         when(delegate.createProperties(any(Definition.class), anyString())).thenAnswer(i -> {
             Properties properties = PropertiesImpl.createNewInstance(
@@ -94,6 +109,20 @@ public abstract class AbstractSpringIntegrationTests {
             properties.init();
             return properties;
         });
+    }
+
+    protected PropertiesWithReferences buildTestDataSetFormData() throws java.io.IOException {
+        PropertiesWithReferences formDataContainer = new PropertiesWithReferences();
+        ObjectReader reader = mapper.readerFor(ObjectNode.class);
+        formDataContainer.setDependencies(singletonList(reader.readValue(TEST_DATA_STORE_PROPERTIES)));
+        formDataContainer.setProperties(reader.readValue(TEST_DATA_SET_PROPERTIES));
+        return formDataContainer;
+    }
+
+    protected PropertiesWithReferences buildTestDataStoreFormData() throws java.io.IOException {
+        PropertiesWithReferences formDataContainer = new PropertiesWithReferences();
+        formDataContainer.setProperties(mapper.readerFor(ObjectNode.class).readValue(TEST_DATA_STORE_PROPERTIES));
+        return formDataContainer;
     }
 
 }

@@ -14,7 +14,6 @@
 package org.talend.components.service.rest;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-import org.talend.components.service.rest.dto.DatasetConnectionInfo;
+import org.talend.components.service.rest.dto.PropertiesWithReferences;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
 import org.talend.daikon.annotation.Service;
 
@@ -48,19 +47,20 @@ public interface RuntimesController {
     /** Validate connection to datastore */
     @RequestMapping(value = "{dataStoreDefinitionName}", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE)
     ResponseEntity<ValidationResultsDto> validateDataStoreConnection(
-            @PathVariable("dataStoreDefinitionName") String dataStoreDefinitionName, InputStream formData);
+            @PathVariable("dataStoreDefinitionName") String dataStoreDefinitionName,
+            @RequestBody PropertiesWithReferences propertiesContainer);
 
     /** Validate connection to datastore. Should it be GET method? */
     @RequestMapping(value = "{datasetDefinitionName}/schema", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
     String getDatasetSchema(@PathVariable("datasetDefinitionName") String datasetDefinitionName,
-                            @RequestBody DatasetConnectionInfo connectionInfo) throws IOException;
+                            @RequestBody PropertiesWithReferences connectionInfo) throws IOException;
 
     /** Get dataset content. Should it be GET method? */
     @RequestMapping(value = "{datasetDefinitionName}/data", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = {
             APPLICATION_JSON_UTF8_VALUE, AVRO_JSON_MIME_TYPE_OFFICIAL_INVALID, AVRO_JSON_MIME_TYPES_UNOFFICIAL_VALID,
             AVRO_JSON_MIME_TYPES_UNOFFICIAL_VALID_REGISTERED })
     StreamingResponseBody getDatasetData(@PathVariable("datasetDefinitionName") String datasetDefinitionName,
-                                         @RequestBody DatasetConnectionInfo connectionInfo,
+                                         @RequestBody PropertiesWithReferences connectionInfo,
                                          @RequestParam(value = "from", required = false) Integer from,
                                          @RequestParam(value = "limit", required = false) Integer limit);
 
@@ -68,7 +68,7 @@ public interface RuntimesController {
             AVRO_BINARY_MIME_TYPE_OFFICIAL_INVALID, AVRO_BINARY_MIME_TYPES_UNOFFICIAL_VALID,
             AVRO_BINARY_MIME_TYPES_UNOFFICIAL_VALID_REGISTERED })
     StreamingResponseBody getDatasetDataAsBinary(@PathVariable("datasetDefinitionName") String datasetDefinitionName,
-                                                 @RequestBody DatasetConnectionInfo connectionInfo,
+                                                 @RequestBody PropertiesWithReferences connectionInfo,
                                                  @RequestParam(value = "from", required = false) Integer from,
                                                  @RequestParam(value = "limit", required = false) Integer limit);
 

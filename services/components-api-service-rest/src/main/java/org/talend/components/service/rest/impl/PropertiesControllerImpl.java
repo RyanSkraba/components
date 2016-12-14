@@ -13,13 +13,6 @@
 
 package org.talend.components.service.rest.impl;
 
-import static org.apache.commons.io.IOUtils.toInputStream;
-import static org.apache.commons.lang3.Validate.notNull;
-import static org.slf4j.LoggerFactory.getLogger;
-import static org.springframework.http.HttpStatus.*;
-
-import java.nio.charset.StandardCharsets;
-
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +21,7 @@ import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.service.rest.PropertiesController;
+import org.talend.components.service.rest.dto.PropertiesWithReferences;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
 import org.talend.components.service.rest.serialization.JsonSerializationHelper;
 import org.talend.daikon.annotation.ServiceImplementation;
@@ -38,6 +32,10 @@ import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.serialize.jsonschema.PropertyTrigger;
+
+import static org.apache.commons.lang3.Validate.notNull;
+import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.http.HttpStatus.*;
 
 @ServiceImplementation
 public class PropertiesControllerImpl implements PropertiesController {
@@ -53,10 +51,13 @@ public class PropertiesControllerImpl implements PropertiesController {
     @Autowired
     private ComponentService componentService;
 
+    @Autowired
+    private PropertiesHelpers propertiesHelpers;
+
     @Override
     public String getProperties(String definitionName, String formName) {
         notNull(definitionName, "Data store name cannot be null.");
-        final Definition<?> definition = getDefinition(definitionName);
+        final Definition<?> definition = propertiesHelpers.getDefinition(definitionName);
         notNull(definition, "Could not find data store definition of name %s", definitionName);
         log.debug("Found data store definition {} for {}", definition, definitionName);
         return jsonSerializationHelper.toJson(
@@ -65,11 +66,8 @@ public class PropertiesControllerImpl implements PropertiesController {
 
     @Override
     // TODO: Verify it is really what's wanted and not just the ValidationResult.Result.(OK|ERROR)
-    public ResponseEntity<ValidationResultsDto> validateProperties(String definitionName, String formData) {
-        notNull(definitionName, "Data store name cannot be null.");
-        final Definition<?> definition = getDefinition(definitionName);
-        notNull(definition, "Could not find data store definition of name %s", definitionName);
-        Properties properties = getPropertiesFromJson(definition, formData);
+    public ResponseEntity<ValidationResultsDto> validateProperties(PropertiesWithReferences propertiesContainer) {
+        Properties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
         ValidationResult validationResult = properties.getValidationResult();
         // TODO: I really would prefer return 200 status code any time it process correctly and that the payload determine the
         // result of the analysis.
@@ -97,10 +95,9 @@ public class PropertiesControllerImpl implements PropertiesController {
                                                     PropertyTrigger trigger, //
                                                     String property, //
                                                     String formName, //
-                                                    String formData) {
-        final Definition<?> runtimableDefinition = getDefinition(definition);
-        notNull(definition, "Could not find data store definition of name %s", definition);
-        Properties properties = getPropertiesFromJson(runtimableDefinition, formData);
+                                                    PropertiesWithReferences propertiesContainer) {
+        Properties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
+
         String response;
         try {
             Properties updatedProperties;
@@ -135,10 +132,10 @@ public class PropertiesControllerImpl implements PropertiesController {
     }
 
     @Override
-    public String getDatasetProperties(String definitionName, String formName, String formData) {
-        DatastoreDefinition<DatastoreProperties> datastoreDefinition = definitionServiceDelegate.getDefinitionsMapByType(DatastoreDefinition.class).get(definitionName);
+    public String getDatasetProperties(String definitionName, String formName, PropertiesWithReferences propertiesContainer) {
+        DatastoreDefinition<DatastoreProperties> datastoreDefinition = propertiesHelpers.getDataStoreDefinition(definitionName);
         notNull(datastoreDefinition, "Could not find data store definition of name %s", definitionName);
-        DatastoreProperties properties = getPropertiesFromJson(datastoreDefinition, formData);
+        DatastoreProperties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
         DatasetProperties datasetProperties = datastoreDefinition.createDatasetProperties(properties);
         return datasetProperties == null ? "{}" : jsonSerializationHelper.toJson(formName, datasetProperties);
     }
@@ -148,16 +145,6 @@ public class PropertiesControllerImpl implements PropertiesController {
             throw (Error) throwable;
         }
         return (Exception) throwable;
-    }
-
-    private <T extends Properties> T getPropertiesFromJson(Definition<T> datastoreDefinition,
-                                                              String formDataJson) {
-        T properties = definitionServiceDelegate.createProperties(datastoreDefinition, "");
-        return jsonSerializationHelper.toProperties(toInputStream(formDataJson, StandardCharsets.UTF_8), properties);
-    }
-
-    private Definition<?> getDefinition(String definitionName) {
-        return definitionServiceDelegate.getDefinitionsMapByType(Definition.class).get(definitionName);
     }
 
 }

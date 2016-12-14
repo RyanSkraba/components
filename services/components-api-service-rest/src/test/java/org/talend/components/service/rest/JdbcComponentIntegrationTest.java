@@ -45,11 +45,12 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.talend.components.service.rest.dto.DatasetConnectionInfo;
 import org.talend.components.service.rest.dto.DefinitionDTO;
+import org.talend.components.service.rest.dto.PropertiesWithReferences;
 import org.talend.components.service.rest.impl.ApiError;
 
 import static com.jayway.restassured.RestAssured.given;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -98,21 +99,21 @@ public class JdbcComponentIntegrationTest {
     @Test
     public void testGetDataBinary() throws java.io.IOException {
         // given
-        DatasetConnectionInfo datasetConnectionInfo = new DatasetConnectionInfo();
-        datasetConnectionInfo.setDataSetFormData(getFileAsObjectNode("jdbc_data_set_properties_with_schema.json"));
-        datasetConnectionInfo.setDataStoreFormData(getJdbcDataStoreProperties());
+        PropertiesWithReferences propertiesWithReferences = new PropertiesWithReferences();
+        propertiesWithReferences.setProperties(getFileAsObjectNode("jdbc_data_set_properties_with_schema.json"));
+        propertiesWithReferences.setDependencies(singletonList(getJdbcDataStoreProperties()));
 
         String dataSetDefinitionName = "JDBCDataset";
 
         // when
-        Response schemaResponse = given().content(datasetConnectionInfo).contentType(APPLICATION_JSON_UTF8_VALUE) //
+        Response schemaResponse = given().content(propertiesWithReferences).contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .accept(APPLICATION_JSON_UTF8_VALUE) //
                 .expect().statusCode(200).log().ifError() //
                 .post("runtimes/{definitionName}/schema", dataSetDefinitionName);
 
         Schema schema = new Schema.Parser().parse(schemaResponse.asInputStream());
 
-        Response response = given().content(datasetConnectionInfo).contentType(APPLICATION_JSON_UTF8_VALUE) //
+        Response response = given().content(propertiesWithReferences).contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .accept(RuntimesController.AVRO_BINARY_MIME_TYPE_OFFICIAL_INVALID) //
                 .expect().statusCode(200).log().ifError() //
                 .post("runtimes/{definitionName}/data", dataSetDefinitionName);
@@ -127,13 +128,13 @@ public class JdbcComponentIntegrationTest {
     @Test
     public void testGetData() throws java.io.IOException {
         // given
-        DatasetConnectionInfo datasetConnectionInfo = new DatasetConnectionInfo();
-        datasetConnectionInfo.setDataSetFormData(getFileAsObjectNode("jdbc_data_set_properties_with_schema.json"));
-        datasetConnectionInfo.setDataStoreFormData(getJdbcDataStoreProperties());
+        PropertiesWithReferences propertiesWithReferences = new PropertiesWithReferences();
+        propertiesWithReferences.setProperties(getFileAsObjectNode("jdbc_data_set_properties_with_schema.json"));
+        propertiesWithReferences.setDependencies(singletonList(getJdbcDataStoreProperties()));
 
         String dataSetDefinitionName = "JDBCDataset";
 
-        Response schemaResponse = given().content(datasetConnectionInfo).contentType(APPLICATION_JSON_UTF8_VALUE) //
+        Response schemaResponse = given().content(propertiesWithReferences).contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .accept(APPLICATION_JSON_UTF8_VALUE) //
                 .expect().statusCode(200).log().ifError() //
                 .post("runtimes/{definitionName}/schema", dataSetDefinitionName);
@@ -141,7 +142,7 @@ public class JdbcComponentIntegrationTest {
         Schema schema = new Schema.Parser().parse(schemaResponse.asInputStream());
 
         // when
-        Response response = given().content(datasetConnectionInfo).contentType(APPLICATION_JSON_UTF8_VALUE) //
+        Response response = given().content(propertiesWithReferences).contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .accept(RuntimesController.AVRO_JSON_MIME_TYPE_OFFICIAL_INVALID) //
                 .expect().statusCode(200).log().ifError() //
                 .post("runtimes/{definitionName}/data", dataSetDefinitionName);
@@ -189,14 +190,13 @@ public class JdbcComponentIntegrationTest {
     @Test
     public void testGetSchema() throws java.io.IOException {
         // given
-        DatasetConnectionInfo datasetConnectionInfo = new DatasetConnectionInfo();
-        datasetConnectionInfo.setDataSetFormData(
-                mapper.readValue(getClass().getResourceAsStream("jdbc_data_set_properties_no_schema.json"), ObjectNode.class));
-        datasetConnectionInfo.setDataStoreFormData(getJdbcDataStoreProperties());
+        PropertiesWithReferences propertiesWithReferences = new PropertiesWithReferences();
+        propertiesWithReferences.setProperties(getFileAsObjectNode("jdbc_data_set_properties_no_schema.json"));
+        propertiesWithReferences.setDependencies(singletonList(getJdbcDataStoreProperties()));
         String dataSetDefinitionName = "JDBCDataset";
 
         // when
-        Response response = given().content(datasetConnectionInfo).contentType(APPLICATION_JSON_UTF8_VALUE) //
+        Response response = given().content(propertiesWithReferences).contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .accept(APPLICATION_JSON_UTF8_VALUE) //
                 .expect().statusCode(200).log().ifError() //
                 .post("runtimes/{definitionName}/schema", dataSetDefinitionName);
@@ -210,11 +210,11 @@ public class JdbcComponentIntegrationTest {
     @Test
     public void testGetSchema_wrongSql() throws java.io.IOException {
         // given
-        DatasetConnectionInfo datasetConnectionInfo = new DatasetConnectionInfo();
-        datasetConnectionInfo.setDataSetFormData(
+        PropertiesWithReferences datasetConnectionInfo = new PropertiesWithReferences();
+        datasetConnectionInfo.setProperties(
                 mapper.readValue(getClass().getResourceAsStream("jdbc_data_set_properties_no_schema_wrong_table_name.json"),
                         ObjectNode.class));
-        datasetConnectionInfo.setDataStoreFormData(getJdbcDataStoreProperties());
+        datasetConnectionInfo.setDependencies(singletonList(getJdbcDataStoreProperties()));
         String dataSetDefinitionName = "JDBCDataset";
 
         // when
@@ -231,10 +231,11 @@ public class JdbcComponentIntegrationTest {
     @Test
     public void getJdbcDataSetProperties() throws java.io.IOException {
         // given
-        ObjectNode jdbcDatasetProperties = getJdbcDataStoreProperties();
+        PropertiesWithReferences properties = new PropertiesWithReferences();
+        properties.setProperties(getJdbcDataStoreProperties());
 
         // when
-        Response response = given().content(jdbcDatasetProperties).contentType(APPLICATION_JSON_UTF8_VALUE) //
+        Response response = given().content(properties).contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .accept(APPLICATION_JSON_UTF8_VALUE) //
                 .expect().statusCode(200).log().ifError() //
                 .post("properties/{definitionName}/dataset", DATA_STORE_DEFINITION_NAME);
@@ -247,10 +248,11 @@ public class JdbcComponentIntegrationTest {
     @Test
     public void validateDataStoreConnection() throws java.io.IOException {
         // given
-        ObjectNode jdbcDatasetProperties = getJdbcDataStoreProperties();
+        PropertiesWithReferences properties = new PropertiesWithReferences();
+        properties.setProperties(getJdbcDataStoreProperties());
 
         // when
-        given().content(jdbcDatasetProperties).contentType(APPLICATION_JSON_UTF8_VALUE) //
+        given().content(properties).contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .accept(APPLICATION_JSON_UTF8_VALUE) //
                 .expect().statusCode(200).log().ifError() //
                 .post("runtimes/{definitionName}", DATA_STORE_DEFINITION_NAME);
@@ -268,10 +270,11 @@ public class JdbcComponentIntegrationTest {
         String triggerName = "after";
         String triggerProperty = "dbTypes";
 
-        ObjectNode propertiesBeforeTrigger = getFileAsObjectNode("jdbc_data_store_properties.json");
+        PropertiesWithReferences properties = new PropertiesWithReferences();
+        properties.setProperties(getFileAsObjectNode("jdbc_data_store_properties.json"));
 
         // when
-        Response response = given().content(propertiesBeforeTrigger).contentType(APPLICATION_JSON_UTF8_VALUE) //
+        Response response = given().content(properties).contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .accept(APPLICATION_JSON_UTF8_VALUE) //
                 .expect().statusCode(200).log().ifError() //
                 .post("properties/{definition}/{trigger}/{property}", DATA_STORE_DEFINITION_NAME, triggerName, triggerProperty);
