@@ -185,6 +185,7 @@
 							<overWriteReleases>false</overWriteReleases>
 							<overWriteSnapshots>false</overWriteSnapshots>
 							<overWriteIfNewer>true</overWriteIfNewer>
+							<includeScope>compile</includeScope>
 						</configuration>
 					</execution>
 				</executions>
@@ -218,6 +219,7 @@
 								<extraArtifact>org.talend.components:simplefileio-runtime:0.17.0-SNAPSHOT:jar</extraArtifact>
                                 <extraArtifact>org.talend.components:components-jdbc-runtime:0.17.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.libraries:mysql-connector-java-5.1.30-bin:6.0.0:jar</extraArtifact>
+                                <extraArtifact>org.apache.derby:derby:10.12.1.1:jar</extraArtifact>
 							</extraArtifacts>
 							<pomIncludes>
 								<pomInclude>*/pom.xml</pomInclude>
