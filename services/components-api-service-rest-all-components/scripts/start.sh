@@ -42,7 +42,9 @@ APP_CLASSPATH="$APP_CLASSPATH.:./config:./lib:./lib/*"
 
 APP_CLASS="org.talend.components.service.rest.Application"
 
-THE_CMD="$JAVA_BIN $JAVA_OPTS -Xmx2048m -Dfile.encoding=UTF-8 -Dorg.ops4j.pax.url.mvn.localRepository=\"$PWD/.m2\" -cp \"$APP_CLASSPATH\" $APP_CLASS $*"  
+JAVA_OPTS="-Xmx2048m -Dfile.encoding=UTF-8 -Dorg.ops4j.pax.url.mvn.localRepository=\"$PWD/.m2\" -Dorg.talend.component.jdbc.config.file=\"$PWD/config/jdbc_config.json\""
+
+THE_CMD="$JAVA_BIN $JAVA_OPTS -cp \"$APP_CLASSPATH\" $APP_CLASS $*"  
 
 writeAppInfoInTty
 
