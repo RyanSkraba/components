@@ -13,7 +13,7 @@
 
 package org.talend.components.jdbc.runtime.beam;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.Serializable;
 import java.net.InetAddress;
@@ -33,6 +33,7 @@ import org.apache.derby.jdbc.ClientDataSource;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,6 +137,7 @@ public class JDBCBeamRuntimeTest implements Serializable {
         }
     }
 
+    @Ignore
     @Test
     public void testPipeline() throws Exception {
         JDBCDatastoreProperties jdbcDatastoreProperties;
