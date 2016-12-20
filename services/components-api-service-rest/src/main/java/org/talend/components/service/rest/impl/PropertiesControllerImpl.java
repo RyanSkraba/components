@@ -33,9 +33,11 @@ import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.serialize.jsonschema.PropertyTrigger;
 
+import static java.util.Collections.emptyList;
 import static org.apache.commons.lang3.Validate.notNull;
 import static org.slf4j.LoggerFactory.getLogger;
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.OK;
 
 @ServiceImplementation
 public class PropertiesControllerImpl implements PropertiesController {
@@ -74,8 +76,7 @@ public class PropertiesControllerImpl implements PropertiesController {
         // Here we use 400 return code for perfectly acceptable validation request but results with unaccepted properties.
         ResponseEntity<ValidationResultsDto> response;
         if (validationResult == null) {
-            // Workaround for null validation results that should not happen
-            response = new ResponseEntity<>(NO_CONTENT);
+            response = new ResponseEntity<>(new ValidationResultsDto(emptyList()), OK);
         } else {
             switch (validationResult.getStatus()) {
             case ERROR:

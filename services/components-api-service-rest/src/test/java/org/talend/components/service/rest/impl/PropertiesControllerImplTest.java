@@ -13,6 +13,7 @@
 
 package org.talend.components.service.rest.impl;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.restassured.response.Response;
 import org.junit.Test;
 import org.talend.components.service.rest.AbstractSpringIntegrationTests;
@@ -35,13 +36,15 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
 
     @Test
     public void testValidateProperties() throws Exception {
-        given().accept(APPLICATION_JSON_UTF8_VALUE) //
+        ObjectNode validationResult = given().accept(APPLICATION_JSON_UTF8_VALUE) //
                 .expect() //
-                .statusCode(204).log().ifError() //
+                .statusCode(200).log().ifError() //
                 .with().port(localServerPort) //
                 .content(buildTestDataStoreFormData()) //
                 .contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .post("/properties/{name}/validate", DATA_STORE_DEFINITION_NAME);
+                .post("/properties/{name}/validate", DATA_STORE_DEFINITION_NAME).as(ObjectNode.class);
+        assertNotNull(validationResult);
+        assertEquals("OK", validationResult.get("status").textValue());
     }
 
     @Test

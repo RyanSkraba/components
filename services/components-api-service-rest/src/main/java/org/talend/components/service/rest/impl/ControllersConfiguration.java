@@ -59,13 +59,13 @@ public class ControllersConfiguration {
 
     @ExceptionHandler
     public ResponseEntity<ApiError> handleMappingExceptions(MethodArgumentTypeMismatchException e) {
-        log.info("A Talend exception reached the API", e);
+        log.info("A mapping exception reached the API", e);
         return buildUnexpectedErrorResponse(UNEXPECTED_ARGUMENT, e.getMessage(), e.getCause());
     }
 
     @ExceptionHandler
     public ResponseEntity<ApiError> handleExceptions(Exception e) {
-        log.info("A Talend exception reached the API", e);
+        log.info("An exception reached the API", e);
         return buildUnexpectedErrorResponse(UNEXPECTED_EXCEPTION, e.getMessage(), e.getCause());
     }
 
