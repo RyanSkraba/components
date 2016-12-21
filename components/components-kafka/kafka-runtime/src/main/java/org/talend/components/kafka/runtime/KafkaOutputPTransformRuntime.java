@@ -46,7 +46,7 @@ public class KafkaOutputPTransformRuntime extends PTransform<PCollection<Indexed
     private KafkaOutputProperties properties;
 
     @Override
-    public PDone apply(PCollection<IndexedRecord> objectPCollection) {
+    public PDone expand(PCollection<IndexedRecord> objectPCollection) {
         final boolean useAvro = properties.getDatasetProperties().valueFormat
                 .getValue() == KafkaDatasetProperties.ValueFormat.AVRO;
         final boolean useSimpleAvro = !properties.getDatasetProperties().isHierarchy.getValue();

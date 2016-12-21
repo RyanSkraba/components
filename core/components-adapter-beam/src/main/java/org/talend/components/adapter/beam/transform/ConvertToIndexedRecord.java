@@ -63,7 +63,7 @@ public class ConvertToIndexedRecord<DatumT, AvroT extends IndexedRecord> extends
     }
 
     @Override
-    public PCollection<AvroT> apply(PCollection<DatumT> input) {
+    public PCollection<AvroT> expand(PCollection<DatumT> input) {
         return input.apply(ParDo.of(new DoFn<DatumT, AvroT>() {
 
             /** The converter is cached for performance. */

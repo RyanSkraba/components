@@ -13,14 +13,15 @@
 package org.talend.components.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -111,23 +112,6 @@ public class MiniDfsResource extends TemporaryFolder {
      */
     public String getLocalFsNewFolder() throws IOException {
         return getLocalFs().getUri().resolve(newFolder(testName).toString()) + "/";
-    }
-
-    /**
-     * An example of using the MiniDFSCluster.
-     */
-    public void testMiniHdfsExample() throws IOException, URISyntaxException {
-        writeFile(getFs(), "/user/test/stuff.txt", "1;one", "2;two", "3;three");
-
-        assertThat(getFs().exists(new Path("/user/test/stuff.txt")), is(true));
-        FileStatus[] status = getFs().listStatus(new Path("/user/test/"));
-        assertThat(status, arrayWithSize(1));
-
-        // Read the file in one chunk.
-        assertThat(DFSTestUtil.readFile(getFs(), status[0].getPath()), is("1;one\n2;two\n3;three\n"));
-
-        // Read the file as lines.
-        assertReadFile(getFs(), "/user/test/stuff.txt", "1;one", "2;two", "3;three");
     }
 
     /**

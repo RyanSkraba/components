@@ -34,7 +34,7 @@ public class JDBCInputPTransformRuntime extends PTransform<PBegin, PCollection<I
     private JDBCInputProperties properties;
 
     @Override
-    public PCollection<IndexedRecord> apply(PBegin pBegin) {
+    public PCollection<IndexedRecord> expand(PBegin pBegin) {
         return (PCollection<IndexedRecord>) pBegin.apply(JdbcIO.<IndexedRecord> read()
                 .withDataSourceConfiguration(
                         JdbcIO.DataSourceConfiguration

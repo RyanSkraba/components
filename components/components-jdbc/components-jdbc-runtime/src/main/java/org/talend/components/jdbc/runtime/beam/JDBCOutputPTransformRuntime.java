@@ -43,7 +43,7 @@ public class JDBCOutputPTransformRuntime extends PTransform<PCollection<IndexedR
     private JDBCOutputProperties properties;
 
     @Override
-    public PDone apply(PCollection<IndexedRecord> input) {
+    public PDone expand(PCollection<IndexedRecord> input) {
         return input.apply(JdbcIO.<IndexedRecord> write().withDataSourceConfiguration(JdbcIO.DataSourceConfiguration
                 .create(properties.getDatasetProperties().getDatastoreProperties().getCurrentDriverClass(),
                         properties.getDatasetProperties().getDatastoreProperties().jdbcUrl.getValue())

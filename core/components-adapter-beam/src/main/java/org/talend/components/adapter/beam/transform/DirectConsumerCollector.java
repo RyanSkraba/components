@@ -37,10 +37,7 @@ import org.talend.daikon.java8.Consumer;
  */
 public class DirectConsumerCollector<T> extends PTransform<PCollection<T>, PDone> implements Closeable {
 
-    /** An automatically generated UID for storing the collection in memory. */
-    private final String uid;
-
-    /** In-memory storage of callback consumers. */
+    /** In-memory storage of callback consumers, keyed by {@link DirectConsumerCollector#getName()}. */
     private final static Map<String, Consumer<?>> records = new ConcurrentHashMap<>();
 
     /** Used to generate UIDs. */
@@ -50,8 +47,9 @@ public class DirectConsumerCollector<T> extends PTransform<PCollection<T>, PDone
      * Use {@link #of(Consumer<T>)} to create an instance of this transform.
      */
     private DirectConsumerCollector(Consumer<T> c) {
-        this.uid = "row" + count.getAndIncrement();
-        records.put(uid, c);
+        // Use the name as an automatically generated UID for storing the consumer in memory.
+        super("row" + count.getAndIncrement());
+        records.put(getName(), c);
     }
 
     /**
@@ -62,8 +60,8 @@ public class DirectConsumerCollector<T> extends PTransform<PCollection<T>, PDone
     }
 
     @Override
-    public PDone apply(PCollection<T> input) {
-        input.apply(ParDo.of(new CallbackFn<T>(uid)));
+    public PDone expand(PCollection<T> input) {
+        input.apply(ParDo.of(new CallbackFn<T>(getName())));
         return PDone.in(input.getPipeline());
     }
 
@@ -71,7 +69,7 @@ public class DirectConsumerCollector<T> extends PTransform<PCollection<T>, PDone
      * @return The consumer used for callbacks on a specific instance of unclosed {@link DirectConsumerCollector}.
      */
     public <InT, ConsumerT extends Consumer<InT>> ConsumerT getConsumer() {
-        return (ConsumerT) records.get(uid);
+        return (ConsumerT) records.get(getName());
     }
 
     /**
@@ -93,7 +91,7 @@ public class DirectConsumerCollector<T> extends PTransform<PCollection<T>, PDone
      */
     @Override
     public void close() {
-        records.remove(uid);
+        records.remove(getName());
     }
 
     /**

@@ -6,20 +6,15 @@
 
     <parent>
         <groupId>org.talend.components</groupId>
-        <artifactId>components-parent</artifactId>
+        <artifactId>components-adapter-beam-parent</artifactId>
         <version>0.17.0-SNAPSHOT</version>
-        <relativePath>../../../components-parent/pom.xml</relativePath>
+        <relativePath>../../../core/components-adapter-beam-parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>kafka-runtime</artifactId>
+
     <name>Components - Kafka Runtime</name>
     <packaging>jar</packaging>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <beam.version>0.3.0-incubating</beam.version>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -33,12 +28,7 @@
             <artifactId>kafka-clients</artifactId>
             <version>0.9.0.1</version>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
+
         <!-- kafka-clients 0.9.0.1 is dependency of beam-sdks-java-io-kafka -->
         <dependency>
             <groupId>org.apache.beam</groupId>
@@ -46,17 +36,19 @@
             <version>${beam.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.beam</groupId>
-            <artifactId>beam-runners-direct-java</artifactId>
-            <version>${beam.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-aether</artifactId>
             <version>2.4.7</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- Tests -->
+        <dependency>
+            <groupId>org.apache.beam</groupId>
+            <artifactId>beam-runners-direct-java</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>

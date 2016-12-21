@@ -9,10 +9,6 @@
         <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
 
-    <properties>
-        <beam.version>0.3.0-incubating</beam.version>
-    </properties>
-
     <name>Components - JDBC - Definition</name>
     <artifactId>components-jdbc-definition</artifactId>
     <version>0.17.0-SNAPSHOT</version>
@@ -46,19 +42,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.beam</groupId>
-            <artifactId>beam-runners-direct-java</artifactId>
-            <version>${beam.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.beam</groupId>
-            <artifactId>beam-sdks-java-io-jdbc</artifactId>
-            <version>${beam.version}</version>
-        </dependency>
-        
         <dependency>
             <groupId>org.talend.daikon</groupId>
             <artifactId>daikon-spring</artifactId>

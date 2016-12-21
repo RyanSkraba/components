@@ -45,7 +45,7 @@ import org.apache.parquet.avro.AvroParquetOutputFormat;
 import org.apache.parquet.avro.AvroWriteSupport;
 
 /**
- * Copied from HDFSFileSink commit 3ae9425b3a36e34890980647952c61cedbd91ff3
+ * Copied from HDFSFileSink commit 89cf4613465647e2711983674879afd5f67c519d
  *
  * The only changes to this class are in the HDFSWriter, where the old HDFSWriter#open logic is not performed (i.e. a
  * task context is not created) until after the first incoming data to HDFSWriter#write arrives. The HDFSWriter can then

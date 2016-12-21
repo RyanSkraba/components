@@ -62,7 +62,7 @@ public class SimpleFileIoDatastoreRuntimeTest {
         // We test the maven dependencies in this runtime class, where they are available.
         List<URL> dependencies = runtimeInfo.getMavenUrlDependencies();
         assertThat(dependencies, notNullValue());
-        assertThat(dependencies, hasItem(new URL("mvn:org.apache.beam/beam-sdks-java-io-hdfs/0.3.0-incubating/jar")));
+        assertThat(dependencies, hasItem(new URL("mvn:org.apache.beam/beam-sdks-java-io-hdfs/0.4.0-incubating-SNAPSHOT/jar")));
         assertThat(dependencies, hasSize(greaterThan(100)));
     }
 

@@ -13,6 +13,8 @@
 package org.talend.components.simplefileio.runtime;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.talend.components.simplefileio.runtime.SimpleFileIoInputRuntimeTest.createInputComponentProperties;
 import static org.talend.components.simplefileio.runtime.SimpleFileIoOutputRuntimeTest.createOutputComponentProperties;
@@ -146,7 +148,7 @@ public class SimpleFileIoRoundTripRuntimeTest {
         // Generate the set of expected records. By default, CSV turns all columns into String and loses the original
         // column name.
         List<IndexedRecord> expected = rewriteRecordsWithCsvSchema(rs.getAllData());
-        assertThat(actual, containsInAnyOrder(expected.toArray()));
+        assertThat(expected, containsInAnyOrder(actual.toArray()));
 
         // Verify that the file on the filesystem was correctly written.
         mini.assertReadFile(
@@ -179,7 +181,7 @@ public class SimpleFileIoRoundTripRuntimeTest {
         // Generate the set of expected records. By default, CSV turns all columns into String and loses the original
         // column name.
         List<IndexedRecord> expected = rewriteRecordsWithCsvSchema(rs.getAllData());
-        assertThat(actual, containsInAnyOrder(expected.toArray()));
+        assertThat(expected, containsInAnyOrder(actual.toArray()));
 
         // Verify that the file on the filesystem was correctly written.
         mini.assertReadFile(

@@ -71,7 +71,7 @@ public class SimpleFileIoOutputRuntime extends PTransform<PCollection<IndexedRec
     }
 
     @Override
-    public PDone apply(PCollection<IndexedRecord> in) {
+    public PDone expand(PCollection<IndexedRecord> in) {
         switch (properties.getDatasetProperties().format.getValue()) {
 
         case AVRO: {

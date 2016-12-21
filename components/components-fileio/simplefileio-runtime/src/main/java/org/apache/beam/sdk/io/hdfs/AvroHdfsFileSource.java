@@ -68,8 +68,13 @@ public class AvroHdfsFileSource extends HDFSFileSource<AvroKey, NullWritable> {
 
     @Override
     public MyAvroKeyHdfsFileReader createReader(PipelineOptions options) throws IOException {
-        return new MyAvroKeyHdfsFileReader(this, filepattern, formatClass);
+        this.validate();
 
+        if (serializableSplit == null) {
+            return new MyAvroKeyHdfsFileReader(this, filepattern, (Class) formatClass);
+        } else {
+            return new MyAvroKeyHdfsFileReader(this, filepattern, (Class) formatClass, serializableSplit.getSplit());
+        }
     }
 
     @Override

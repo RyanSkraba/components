@@ -37,7 +37,7 @@ public class KafkaInputPTransformRuntime extends PTransform<PBegin, PCollection<
     private KafkaInputProperties properties;
 
     @Override
-    public PCollection<IndexedRecord> apply(PBegin pBegin) {
+    public PCollection<IndexedRecord> expand(PBegin pBegin) {
 
         KafkaIO.Read<byte[], byte[]> kafkaRead = KafkaIO.read()
                 .withBootstrapServers(properties.getDatasetProperties().getDatastoreProperties().brokers.getValue())

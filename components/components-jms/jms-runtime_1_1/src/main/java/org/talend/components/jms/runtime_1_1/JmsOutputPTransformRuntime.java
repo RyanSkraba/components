@@ -45,7 +45,7 @@ public class JmsOutputPTransformRuntime extends PTransform<PCollection<Object>, 
     private String id = UUID.randomUUID().toString();
 
     @Override
-    public PDone apply(PCollection<Object> objectPCollection) {
+    public PDone expand(PCollection<Object> objectPCollection) {
         PCollection<IndexedRecord> indexedCollection = objectPCollection.apply("ExtractIndexedRecord",
                 ParDo.of(new DoFn<Object, IndexedRecord>() {
 

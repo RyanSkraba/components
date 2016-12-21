@@ -106,4 +106,30 @@ public class RecordSetUtil {
             dataFileWriter.close();
         }
     }
+
+    /**
+     * Writes all records from the test set into a single CSV file on the file system.
+     *
+     * @param fs The filesystem.
+     * @param path The path of the file on the filesystem.
+     * @param td The test data to write.
+     * @throws IOException If there was an exception writing to the filesystem.
+     */
+    public static void writeRandomCsvFile(FileSystem fs, String path, RecordSet td) throws IOException {
+        int size = td.getSchema().getFields().size();
+        try (PrintWriter w = new PrintWriter(fs.create(new Path(path)))) {
+            for (List<IndexedRecord> partition : td.getPartitions()) {
+                for (IndexedRecord record : partition) {
+                    if (size > 0)
+                        w.print(record.get(0));
+                    for (int i = 1; i < size; i++) {
+                        w.print(';');
+                        w.print(record.get(i));
+                    }
+                    w.print(System.getProperty("line.separator"));
+                }
+            }
+        }
+    }
+
 }

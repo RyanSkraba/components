@@ -13,10 +13,12 @@
 package org.talend.components.simplefileio.runtime;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.talend.components.test.RecordSetUtil.getSimpleTestData;
 import static org.talend.components.test.RecordSetUtil.writeRandomAvroFile;
+import static org.talend.components.test.RecordSetUtil.writeRandomCsvFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +87,37 @@ public class SimpleFileIoDatasetRuntimeTest {
     }
 
     @Test
-    public void testBasic() throws Exception {
+    public void testGetSampleCsv() throws Exception {
+        RecordSet rs = getSimpleTestData(0);
+        writeRandomCsvFile(mini.getFs(), "/user/test/input.csv", rs);
+        String fileSpec = mini.getFs().getUri().resolve("/user/test/input.csv").toString();
+
+        // Configure the component.
+        SimpleFileIoDatasetProperties props = createDatasetProperties();
+        props.format.setValue(SimpleFileIoFormat.CSV);
+        props.path.setValue(fileSpec);
+
+        // Create the runtime.
+        SimpleFileIoDatasetRuntime runtime = new SimpleFileIoDatasetRuntime();
+        runtime.initialize(null, props);
+
+        // Attempt to get a sample using the runtime methods.
+        final List<IndexedRecord> actual = new ArrayList<>();
+        runtime.getSample(100, new Consumer<IndexedRecord>() {
+
+            @Override
+            public void accept(IndexedRecord ir) {
+                actual.add(ir);
+            }
+        });
+
+        // Check the expected values match.
+        assertThat(actual, hasSize(10));
+        // assertThat(actual, (Matcher) equalTo(rs.getAllData()));
+    }
+
+    @Test
+    public void testGetSampleAvro() throws Exception {
         RecordSet rs = getSimpleTestData(0);
         writeRandomAvroFile(mini.getFs(), "/user/test/input.avro", rs);
         String fileSpec = mini.getFs().getUri().resolve("/user/test/input.avro").toString();
@@ -104,12 +136,13 @@ public class SimpleFileIoDatasetRuntimeTest {
         runtime.getSample(100, new Consumer<IndexedRecord>() {
 
             @Override
-            public void accept(IndexedRecord indexedRecord) {
-                actual.add(indexedRecord);
+            public void accept(IndexedRecord ir) {
+                actual.add(ir);
             }
         });
 
         // Check the expected values.
         assertThat(actual, (Matcher) equalTo(rs.getAllData()));
     }
+
 }

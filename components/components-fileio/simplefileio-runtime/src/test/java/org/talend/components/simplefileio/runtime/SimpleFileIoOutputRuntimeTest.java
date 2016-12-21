@@ -14,7 +14,11 @@ package org.talend.components.simplefileio.runtime;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 
+import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
+import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.transforms.Create;
@@ -120,4 +124,48 @@ public class SimpleFileIoOutputRuntimeTest {
         // TODO(rskraba): Implement a comparison for the file on disk.
         // mini.assertReadFile(mini.getLocalFs(), fileSpec, "1;one", "2;two");
     }
+
+    /**
+     * Basic unit test writing to Avro.
+     */
+    @Test
+    public void testBasicAvroBytes() throws IOException, URISyntaxException {
+        String fileSpec = mini.getLocalFs().getUri().resolve(mini.newFolder() + "/output.avro").toString();
+
+        // Configure the component.
+        SimpleFileIoOutputProperties props = createOutputComponentProperties();
+        props.getDatasetProperties().path.setValue(fileSpec);
+        props.getDatasetProperties().format.setValue(SimpleFileIoFormat.AVRO);
+
+        // Create the runtime.
+        SimpleFileIoOutputRuntime runtime = new SimpleFileIoOutputRuntime();
+        runtime.initialize(null, props);
+
+        Schema s = SchemaBuilder.record("test").fields() //
+                .name("key").type(Schema.create(Schema.Type.BYTES)).noDefault() //
+                .name("value").type(Schema.create(Schema.Type.STRING)).noDefault() //
+                .endRecord();
+
+        IndexedRecord ir1 = new GenericData.Record(s);
+        IndexedRecord ir2 = new GenericData.Record(s);
+        ir1.put(0, ByteBuffer.wrap(new byte[] { 0x00, 0x01, 0x02 }));
+        ir1.put(1, "012");
+        ir2.put(0, ByteBuffer.wrap(new byte[] { 0x01, 0x02, 0x03 }));
+        ir2.put(1, "123");
+
+        // Use the runtime in a direct pipeline to test.
+        final Pipeline p = beam.createPipeline();
+        PCollection<IndexedRecord> input = p.apply( //
+                Create.of(ir1, //
+                        ir2)); //
+        input.apply(runtime);
+
+        // And run the test.
+        p.run();
+
+        // Check the expected values.
+        // TODO(rskraba): Implement a comparison for the file on disk.
+        // mini.assertReadFile(mini.getLocalFs(), fileSpec, "1;one", "2;two");
+    }
+
 }

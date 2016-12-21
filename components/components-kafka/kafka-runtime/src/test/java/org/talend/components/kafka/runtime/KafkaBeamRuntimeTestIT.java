@@ -171,7 +171,7 @@ public class KafkaBeamRuntimeTestIT {
     private static class IndexedRecordToKV extends PTransform<PCollection<IndexedRecord>, PCollection<KV<String, String>>> {
 
         @Override
-        public PCollection<KV<String, String>> apply(PCollection<IndexedRecord> indexedRecordPCollection) {
+        public PCollection<KV<String, String>> expand(PCollection<IndexedRecord> indexedRecordPCollection) {
             PCollection<KV<byte[], byte[]>> kafkaCollection = indexedRecordPCollection.apply("ExtractIndexedRecord",
                     ParDo.of(new DoFn<IndexedRecord, KV<byte[], byte[]>>() {
 

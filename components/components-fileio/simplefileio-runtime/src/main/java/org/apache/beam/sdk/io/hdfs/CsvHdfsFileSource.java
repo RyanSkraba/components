@@ -42,7 +42,7 @@ public class CsvHdfsFileSource extends HDFSFileSource<LongWritable, Text> {
         this.recordDelimiter = recordDelimiter;
     }
 
-    public CsvHdfsFileSource(String filepattern, String recordDelimiter, SerializableSplit serializableSplit) {
+    protected CsvHdfsFileSource(String filepattern, String recordDelimiter, SerializableSplit serializableSplit) {
         super(filepattern, TextInputFormat.class, LongWritable.class, Text.class, serializableSplit);
         this.recordDelimiter = recordDelimiter;
     }
