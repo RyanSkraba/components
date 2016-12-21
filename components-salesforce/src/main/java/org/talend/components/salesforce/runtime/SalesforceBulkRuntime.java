@@ -12,8 +12,22 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -24,7 +38,19 @@ import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.error.DefaultErrorCode;
 
-import com.sforce.async.*;
+import com.sforce.async.AsyncApiException;
+import com.sforce.async.AsyncExceptionCode;
+import com.sforce.async.BatchInfo;
+import com.sforce.async.BatchInfoList;
+import com.sforce.async.BatchStateEnum;
+import com.sforce.async.BulkConnection;
+import com.sforce.async.CSVReader;
+import com.sforce.async.ConcurrencyMode;
+import com.sforce.async.ContentType;
+import com.sforce.async.JobInfo;
+import com.sforce.async.JobStateEnum;
+import com.sforce.async.OperationEnum;
+import com.sforce.async.QueryResultList;
 import com.sforce.ws.ConnectionException;
 
 /**
@@ -59,8 +85,6 @@ public class SalesforceBulkRuntime {
     private com.csvreader.CsvReader baseFileReader;
 
     private List<String> baseFileHeader;
-
-    private int baseFileHeaderSize;
 
     private BulkConnection bulkConnection;
 
@@ -133,7 +157,6 @@ public class SalesforceBulkRuntime {
         if (baseFileReader.readRecord()) {
             baseFileHeader = Arrays.asList(baseFileReader.getValues());
         }
-        baseFileHeaderSize = baseFileHeader.size();
     }
 
     public void setConcurrencyMode(Concurrency mode) {
@@ -435,7 +458,6 @@ public class SalesforceBulkRuntime {
         if (baseFileReader.readRecord()) {
             baseFileHeader = Arrays.asList(baseFileReader.getValues());
         }
-        baseFileHeaderSize = baseFileHeader.size();
         return new BulkResultSet(baseFileReader, baseFileHeader);
     }
 

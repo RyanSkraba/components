@@ -65,6 +65,16 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
     }
 
     /**
+     *
+     * Test when bulk file is empty
+     *
+     */
+    @Test
+    public void testOutputBulkExecWithEmptyFile() throws Throwable {
+        testOutputBulkExec(0);
+    }
+
+    /**
      * This test for tSalesforceOutputBulk and tSalesforceBulkExec The runtime of tSalesforceOutputBulkExec should be
      * work like this.
      *
