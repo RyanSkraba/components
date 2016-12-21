@@ -29,6 +29,6 @@ public class TFilterRowTestBase extends AbstractComponentTest {
 
     @Test
     public void componentHasBeenRegistered() {
-        assertComponentIsRegistered("tFilterRow");
+        assertComponentIsRegistered("tFilterRow_POC");
     }
 }

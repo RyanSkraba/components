@@ -49,7 +49,7 @@ public class TFilterRowTest {
 
     @Test
     public void testTFilterRowRuntime() throws Exception {
-        TFilterRowProperties props = (TFilterRowProperties) getComponentService().getComponentProperties("tFilterRow");
+        TFilterRowProperties props = (TFilterRowProperties) getComponentService().getComponentProperties("tFilterRow_POC");
 
         // Set up the test schema - not really used for anything now
         Schema schema = SchemaBuilder.builder().record("testRecord").fields().name("field1").type().stringType().noDefault()

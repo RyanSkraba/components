@@ -25,7 +25,7 @@ import aQute.bnd.annotation.component.Component;
 @Component(name = Constants.COMPONENT_INSTALLER_PREFIX + TFilterRowFamilyDefinition.NAME, provide = ComponentInstaller.class)
 public class TFilterRowFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
-    public static final String NAME = "TFilterRow";
+    public static final String NAME = "TFilterRow_POC";
 
     public TFilterRowFamilyDefinition() {
         super(NAME, new TFilterRowDefinition());

@@ -31,7 +31,7 @@ import org.talend.daikon.runtime.RuntimeInfo;
  */
 public class TFilterRowDefinition extends AbstractComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tFilterRow"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tFilterRow_POC"; //$NON-NLS-1$
 
     public TFilterRowDefinition() {
         super(COMPONENT_NAME);
@@ -66,6 +66,16 @@ public class TFilterRowDefinition extends AbstractComponentDefinition {
     @Override
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
         return EnumSet.of(ConnectorTopology.INCOMING_AND_OUTGOING);
+    }
+
+    @Override
+    public boolean isSchemaAutoPropagate() {
+        return true;
+    }
+
+    @Override
+    public boolean isDataAutoPropagate() {
+        return true;
     }
 
 }

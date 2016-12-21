@@ -150,6 +150,7 @@
 							<instructions>
 								<Bundle-SymbolicName>org.talend.components.filterrow</Bundle-SymbolicName>
 								<Service-Component>*</Service-Component>
+								<Import-Package>org.talend*,org.slf4j*,org.apache.commons*,org.apache.avro*</Import-Package>
 								<Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*</Embed-Dependency>
 								<Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt</Include-Resource>
 								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
