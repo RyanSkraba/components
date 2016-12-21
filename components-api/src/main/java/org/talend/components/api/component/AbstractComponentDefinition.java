@@ -93,6 +93,14 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
                     .put("available", getSupportedExecutionEngines().toString()).throwIt();
     }
 
+    protected void assertConnectorTopologyCompatibility(ConnectorTopology connectorTopology) throws TalendRuntimeException {
+        if (!getSupportedConnectorTopologies().contains(connectorTopology))
+            TalendRuntimeException.build(ComponentsErrorCode.WRONG_CONNECTOR) //
+                    .put("component", getName()) //
+                    .put("requested", connectorTopology == null ? "null" : connectorTopology.toString()) //
+                    .put("available", getSupportedExecutionEngines().toString()).throwIt();
+    }
+
     /**
      * {@inheritDoc}
      */

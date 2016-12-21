@@ -24,6 +24,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -65,6 +68,46 @@ public class ComponentDefinitionTest {
         ri = cd.getRuntimeInfo(ExecutionEngine.BEAM, null, null);
 
         fail("An exception must have been thrown.");
+    }
+
+    @Test
+    public void testConnectorTopologyEngine_ok() {
+        TestComponentDefinition cd = new TestComponentDefinition() {
+
+            @Override
+            public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+                return EnumSet.of(ConnectorTopology.INCOMING, ConnectorTopology.OUTGOING);
+            }
+        };
+        // The assert will no thorw an exception on these two cases
+        cd.assertConnectorTopologyCompatibility(ConnectorTopology.INCOMING);
+        cd.assertConnectorTopologyCompatibility(ConnectorTopology.OUTGOING);
+    }
+
+    @Test(expected = TalendRuntimeException.class)
+    public void testConnectorTopologyEngine_Error1() {
+        TestComponentDefinition cd = new TestComponentDefinition() {
+
+            @Override
+            public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+                return EnumSet.of(ConnectorTopology.INCOMING, ConnectorTopology.OUTGOING);
+            }
+        };
+        // The assert will throw an exception on this cases
+        cd.assertConnectorTopologyCompatibility(ConnectorTopology.INCOMING_AND_OUTGOING);
+    }
+
+    @Test(expected = TalendRuntimeException.class)
+    public void testConnectorTopologyEngine_Error2() {
+        TestComponentDefinition cd = new TestComponentDefinition() {
+
+            @Override
+            public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+                return EnumSet.of(ConnectorTopology.INCOMING, ConnectorTopology.OUTGOING);
+            }
+        };
+        // The assert will throw an exception on this cases
+        cd.assertConnectorTopologyCompatibility(ConnectorTopology.NONE);
     }
 
     @Test
