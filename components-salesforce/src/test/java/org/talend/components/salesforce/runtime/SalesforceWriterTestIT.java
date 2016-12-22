@@ -900,8 +900,38 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         assertTrue(file.exists());
         assertNotEquals(0, file.length());
         runtimeTestUtil.compareFileContent(sfProps.logFileName.getValue(),
-                new String[] { "\tStatus Code: MALFORMED_ID", "", "\tRowKey/RowNo: Id", "\tFields: ", "",
+                new String[] { "\tStatus Code: MALFORMED_ID", "", "\tRowKey/RowNo: 0019000001n3Kasss", "\tFields: ", "",
                         "\tMessage: Id in upsert is not valid",
+                        "\t--------------------------------------------------------------------------------", "", });
+
+        // Test wrong module name value
+        LOGGER.debug("Try to upsert the record which Id is: " + recordID);
+        sfWriter_Upsert = (SalesforceWriter) createSalesforceOutputWriter(sfProps);
+        sfWriter_Upsert.open("uid_upsert");
+        upsertRecord_1 = new GenericData.Record(SCHEMA_UPDATE_ACCOUNT);
+        upsertRecord_1.put(0, recordID);
+        upsertRecord_1.put(1,
+                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                        + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                        + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n" + "\n");
+        upsertRecord_1.put(2, "deleteme_upsert");
+        upsertRecord_1.put(3, "deleteme_upsert");
+        upsertRecord_2.put(4, "deleteme_upsert");
+        sfWriter_Upsert.write(upsertRecord_1);
+        // Finish the Writer, WriteOperation and Sink for insert action
+        wr3 = sfWriter_Upsert.close();
+        assertEquals(0, wr3.getSuccessCount());
+        assertEquals(1, wr3.getRejectCount());
+
+        // Check error log
+        assertTrue(file.exists());
+        assertNotEquals(0, file.length());
+        runtimeTestUtil.compareFileContent(sfProps.logFileName.getValue(),
+                new String[] { "\tStatus Code: STRING_TOO_LONG", "", "\tRowKey/RowNo: " + recordID, "\tFields: Name", "",
+                        "\tMessage: Account Name: data value too large: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa (max length=255)",
                         "\t--------------------------------------------------------------------------------", "", });
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
