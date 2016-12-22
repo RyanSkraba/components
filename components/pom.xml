@@ -17,6 +17,7 @@
         <module>components-fileio</module>
         <module>components-jms</module>
         <module>components-kafka</module>
+        <module>components-localio</module>
         <module>components-processing</module>
 		<module>components-jdbc</module>
   </modules>
