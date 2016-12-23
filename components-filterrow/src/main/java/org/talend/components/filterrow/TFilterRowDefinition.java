@@ -74,7 +74,7 @@ public class TFilterRowDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public boolean isDataAutoPropagate() {
+    public boolean isConditionalInputs() {
         return true;
     }
 

@@ -12,13 +12,21 @@
 // ============================================================================
 package org.talend.components.filterrow.runtime;
 
+import java.util.Collection;
 import java.util.Map;
 
+import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.filterrow.processing.AndValueProcessor;
+import org.talend.components.filterrow.processing.FilterDescriptor;
+import org.talend.components.filterrow.processing.FiltersFactory;
+import org.talend.components.filterrow.processing.LogicalOperator;
+import org.talend.components.filterrow.processing.OrValueProcessor;
+import org.talend.components.filterrow.processing.ValueProcessor;
 
 /**
  * created by dmytro.chmyga on Dec 19, 2016
@@ -29,19 +37,33 @@ public class TFilterRowWriteOperation implements WriteOperation<Result> {
 
     private final Sink sink;
 
-    public TFilterRowWriteOperation(Sink sink) {
+    private final Collection<FilterDescriptor> filterDescriptors;
+
+    private final Schema schemaFlow;
+
+    private final Schema schemaReject;
+
+    private final LogicalOperator logicalOperator;
+
+    private ValueProcessor valueProcessor;
+
+    public TFilterRowWriteOperation(Sink sink, Collection<FilterDescriptor> filterDescriptors, Schema schemaFlow,
+            Schema schemaReject, LogicalOperator operator) {
         this.sink = sink;
+        this.filterDescriptors = filterDescriptors;
+        this.schemaFlow = schemaFlow;
+        this.schemaReject = schemaReject;
+        this.logicalOperator = operator;
     }
 
     @Override
     public Writer<Result> createWriter(RuntimeContainer arg0) {
-        return new TFilterRowWriter(this);
+        return new TFilterRowWriter(this, schemaFlow, schemaReject, valueProcessor);
     }
 
     @Override
     public Map<String, Object> finalize(Iterable<Result> arg0, RuntimeContainer arg1) {
-        // TODO Auto-generated method stub
-        return null;
+        return Result.accumulateAndReturnMap(arg0);
     }
 
     @Override
@@ -51,8 +73,10 @@ public class TFilterRowWriteOperation implements WriteOperation<Result> {
 
     @Override
     public void initialize(RuntimeContainer arg0) {
-        // TODO Auto-generated method stub
-
+        valueProcessor = logicalOperator == LogicalOperator.And ? new AndValueProcessor() : new OrValueProcessor();
+        for (FilterDescriptor descriptor : filterDescriptors) {
+            valueProcessor.addFilterForColumn(descriptor.getColumnName(), FiltersFactory.createFilter(descriptor));
+        }
     }
 
 }

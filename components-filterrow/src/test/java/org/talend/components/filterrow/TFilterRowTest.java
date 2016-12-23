@@ -54,7 +54,7 @@ public class TFilterRowTest {
         // Set up the test schema - not really used for anything now
         Schema schema = SchemaBuilder.builder().record("testRecord").fields().name("field1").type().stringType().noDefault()
                 .endRecord();
-        // props.schema.schema.setValue(schema);
+        props.schemaMain.schema.setValue(schema);
         //
         // File temp = File.createTempFile("TFilterRowtestFile", ".txt");
         // try {

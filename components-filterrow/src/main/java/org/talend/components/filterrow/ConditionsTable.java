@@ -37,13 +37,16 @@ public class ConditionsTable extends ComponentPropertiesImpl {
     private static final TypeLiteral<List<OperatorType>> LIST_OPERATORS_TYPE = new TypeLiteral<List<OperatorType>>() {// empty
     };
 
+    private static final TypeLiteral<List<Object>> LIST_OBJECT_TYPE = new TypeLiteral<List<Object>>() {// empty
+    };
+
     public Property<List<String>> columnName = PropertyFactory.newProperty(LIST_STRING_TYPE, "columnName");
 
     public Property<List<FunctionType>> function = PropertyFactory.newProperty(LIST_FUNCTION_TYPE, "function");
 
     public Property<List<OperatorType>> operator = PropertyFactory.newProperty(LIST_OPERATORS_TYPE, "operator");
 
-    public Property<Object> value = PropertyFactory.newProperty(Object.class, "value");
+    public Property<List<Object>> value = PropertyFactory.newProperty(LIST_OBJECT_TYPE, "value");
 
     private final List<String> columnNames = new LinkedList<>();
 
