@@ -12,8 +12,11 @@
 	<name>Components - TFilterRow</name>
 	<groupId>org.talend.components</groupId>
 	<artifactId>components-filterrow</artifactId>
-	<version>0.1.0</version>
+	<version>0.16.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
+	<properties>
+		<components.version>0.16.0</components.version>
+	</properties>
 	<repositories>
 		<repository>
 			<id>talend_nexus</id>
@@ -32,7 +35,7 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>0.16.0</version>
+			<version>${components.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>biz.aQute.bnd</groupId>
@@ -43,12 +46,12 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-common</artifactId>
-			<version>0.16.0</version>
+			<version>${components.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-common</artifactId>
-			<version>0.16.0</version>
+			<version>${components.version}</version>
 			<classifier>bundle</classifier>
 			<scope>test</scope>
 		</dependency>
@@ -57,7 +60,7 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>0.16.0</version>
+			<version>${components.version}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
@@ -65,14 +68,14 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-rest</artifactId>
-			<version>0.16.0</version>
+			<version>${components.version}</version>
 			<classifier>lib</classifier>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-rest</artifactId>
-			<version>0.16.0</version>
+			<version>${components.version}</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
@@ -80,7 +83,7 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-osgitest</artifactId>
-			<version>0.16.0</version>
+			<version>${components.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

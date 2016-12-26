@@ -22,6 +22,7 @@
 		<module>components-jira</module>
 		<module>components-api-full-example</module>
 		<module>components-filedelimited</module>
+		<module>components-filterrow</module>
 		<module>services</module>
 		<module>examples</module>
 		<module>components</module>

@@ -78,6 +78,14 @@ public class TFilterRowProperties extends FixedConnectorsComponentProperties {
 
     public TFilterRowProperties(String name) {
         super(name);
+        setSchemaListener(new ISchemaListener() {
+
+            @Override
+            public void afterSchema() {
+                updateOutputSchemas();
+                updateConditionsTable();
+            }
+        });
     }
 
     public void setSchemaListener(ISchemaListener schemaListener) {
@@ -87,14 +95,6 @@ public class TFilterRowProperties extends FixedConnectorsComponentProperties {
     @Override
     public void setupProperties() {
         super.setupProperties();
-        setSchemaListener(new ISchemaListener() {
-
-            @Override
-            public void afterSchema() {
-                updateOutputSchemas();
-                updateConditionsTable();
-            }
-        });
     }
 
     @Override

@@ -48,7 +48,7 @@ public class ConditionsTable extends ComponentPropertiesImpl {
 
     public Property<List<Object>> value = PropertyFactory.newProperty(LIST_OBJECT_TYPE, "value");
 
-    private final List<String> columnNames = new LinkedList<>();
+    private final List<String> schemaColumnNames = new LinkedList<>();
 
     public ConditionsTable(String name) {
         super(name);
@@ -65,16 +65,16 @@ public class ConditionsTable extends ComponentPropertiesImpl {
     }
 
     public void updateSchemaColumnNames(List<String> columnNames) {
-        this.columnNames.clear();
+        this.schemaColumnNames.clear();
         if (columnNames != null) {
-            this.columnNames.addAll(columnNames);
+            this.schemaColumnNames.addAll(columnNames);
             updateColumnsNames();
         }
     }
 
     private void updateColumnsNames() {
-        columnName.setPossibleValues(columnNames);
-        if (columnNames.size() == 0) {
+        columnName.setPossibleValues(schemaColumnNames);
+        if (schemaColumnNames.size() == 0) {
             columnName.setValue(null);
             function.setValue(null);
             operator.setValue(null);
@@ -83,7 +83,7 @@ public class ConditionsTable extends ComponentPropertiesImpl {
     }
 
     public boolean isEditable() {
-        return columnNames != null && columnNames.size() > 0;
+        return schemaColumnNames.size() > 0;
     }
 
     @Override
