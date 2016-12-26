@@ -44,7 +44,8 @@ public class TFilterRowDefinition extends AbstractComponentDefinition {
 
     @Override
     public Property[] getReturnProperties() {
-        return new Property[] {};
+        return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP, RETURN_SUCCESS_RECORD_COUNT_PROP,
+                RETURN_REJECT_RECORD_COUNT_PROP };
     }
 
     @Override

@@ -13,15 +13,35 @@
 // ============================================================================
 package org.talend.components.filterrow;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.IndexedRecord;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import org.talend.components.api.component.runtime.Result;
+import org.talend.components.api.component.runtime.Sink;
+import org.talend.components.api.component.runtime.WriteOperation;
+import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.common.ComponentServiceImpl;
 import org.talend.components.api.service.common.DefinitionRegistry;
+import org.talend.components.filterrow.functions.FunctionType;
+import org.talend.components.filterrow.operators.OperatorType;
+import org.talend.components.filterrow.processing.LogicalOperator;
+import org.talend.components.filterrow.runtime.TFilterRowSink;
+import org.talend.daikon.avro.SchemaConstants;
 
 @SuppressWarnings("nls")
 public class TFilterRowTest {
@@ -51,34 +71,96 @@ public class TFilterRowTest {
     public void testTFilterRowRuntime() throws Exception {
         TFilterRowProperties props = (TFilterRowProperties) getComponentService().getComponentProperties("tFilterRow_POC");
 
-        // Set up the test schema - not really used for anything now
+        props.schemaListener.afterSchema();
+
+        assertThat(props.conditionsTable.isEditable(), is(false));
+
         Schema schema = SchemaBuilder.builder().record("testRecord").fields().name("field1").type().stringType().noDefault()
                 .endRecord();
         props.schemaMain.schema.setValue(schema);
-        //
-        // File temp = File.createTempFile("TFilterRowtestFile", ".txt");
-        // try {
-        // PrintWriter writer = new PrintWriter(temp.getAbsolutePath(), "UTF-8");
-        // writer.println("The first line");
-        // writer.println("The second line");
-        // writer.close();
-        //
-        // props.filename.setValue(temp.getAbsolutePath());
-        // Source source = new TFilterRowSource();
-        // source.initialize(null, props);
-        // assertThat(source, instanceOf(TFilterRowSource.class));
-        //
-        // Reader<?> reader = ((BoundedSource) source).createReader(null);
-        // assertThat(reader.start(), is(true));
-        // assertThat(reader.getCurrent(), is((Object) "The first line"));
-        // // No auto advance when calling getCurrent more than once.
-        // assertThat(reader.getCurrent(), is((Object) "The first line"));
-        // assertThat(reader.advance(), is(true));
-        // assertThat(reader.getCurrent(), is((Object) "The second line"));
-        // assertThat(reader.advance(), is(false));
-        // } finally {// remote the temp file
-        // temp.delete();
-        // }
+
+        final List<Schema.Field> additionalRejectFields = new ArrayList<Schema.Field>();
+
+        Schema.Field field = null;
+        field = new Schema.Field(TFilterRowProperties.FIELD_ERROR_MESSAGE, Schema.create(Schema.Type.STRING), null,
+                (Object) null);
+        field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
+        field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
+        field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
+        additionalRejectFields.add(field);
+
+        Schema rejectSchema = newSchema(schema, "rejectOutput", additionalRejectFields);
+
+        props.schemaListener.afterSchema();
+
+        assertThat(props.schemaReject.schema.getValue(), is((Schema) rejectSchema));
+        assertThat(props.schemaFlow.schema.getValue(), is((Schema) schema));
+        assertThat(props.conditionsTable.isEditable(), is(true));
+
+        props.conditionsTable.columnName.setValue(Arrays.asList("field1"));
+        props.conditionsTable.function.setValue(Arrays.asList(FunctionType.EMPTY));
+        props.conditionsTable.operator.setValue(Arrays.asList(OperatorType.EQUALS));
+        props.conditionsTable.value.setValue(Arrays.asList((Object) "test"));
+
+        props.logicalOperator.setValue(LogicalOperator.Or);
+
+        Sink sink = new TFilterRowSink();
+        sink.initialize(null, props);
+
+        WriteOperation<?> writeOperation = sink.createWriteOperation();
+        writeOperation.initialize(null);
+        WriterWithFeedback<?, ?, ?> writer = (WriterWithFeedback<?, ?, ?>) writeOperation.createWriter(null);
+
+        writer.open("uId");
+        IndexedRecord record = new GenericData.Record(schema);
+        record.put(schema.getField("field1").pos(), "test");
+        writer.write(record);
+        Iterable<?> success = writer.getSuccessfulWrites();
+        Iterator<?> successIterator = success.iterator();
+        assertThat(successIterator.hasNext(), is(true));
+        IndexedRecord successWrite = (IndexedRecord) successIterator.next();
+        assertThat(successWrite.getSchema(), is(schema));
+        assertThat(successWrite, is(record));
+
+        record = new GenericData.Record(schema);
+        record.put(schema.getField("field1").pos(), "test123");
+        writer.write(record);
+        success = writer.getSuccessfulWrites();
+        successIterator = success.iterator();
+        assertThat(successIterator.hasNext(), is(false));
+        Iterable<?> reject = writer.getRejectedWrites();
+        Iterator<?> rejectIterator = reject.iterator();
+        assertThat(rejectIterator.hasNext(), is(true));
+        IndexedRecord rejectWrite = (IndexedRecord) rejectIterator.next();
+        assertThat(rejectWrite.getSchema(), is(rejectSchema));
+        Result result = (Result) writer.close();
+        assertThat(result.totalCount, is(2));
+        assertThat(result.successCount, is(1));
+        assertThat(result.rejectCount, is(1));
+    }
+
+    private Schema newSchema(Schema metadataSchema, String newSchemaName, List<Schema.Field> moreFields) {
+        Schema newSchema = Schema.createRecord(newSchemaName, metadataSchema.getDoc(), metadataSchema.getNamespace(),
+                metadataSchema.isError());
+        // TODO duplicate with salesforce, make it to a common one?
+        List<Schema.Field> copyFieldList = new ArrayList<>();
+        for (Schema.Field se : metadataSchema.getFields()) {
+            Schema.Field field = new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal(), se.order());
+            field.getObjectProps().putAll(se.getObjectProps());
+            for (Map.Entry<String, Object> entry : se.getObjectProps().entrySet()) {
+                field.addProp(entry.getKey(), entry.getValue());
+            }
+            copyFieldList.add(field);
+        }
+
+        copyFieldList.addAll(moreFields);
+
+        newSchema.setFields(copyFieldList);
+        for (Map.Entry<String, Object> entry : metadataSchema.getObjectProps().entrySet()) {
+            newSchema.addProp(entry.getKey(), entry.getValue());
+        }
+
+        return newSchema;
     }
 
 }

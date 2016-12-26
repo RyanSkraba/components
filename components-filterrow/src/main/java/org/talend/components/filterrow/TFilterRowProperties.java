@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
@@ -55,8 +56,7 @@ public class TFilterRowProperties extends FixedConnectorsComponentProperties {
     public SchemaProperties schemaMain = new SchemaProperties("schemaMain") {
 
         public void afterSchema() {
-            updateOutputSchemas();
-            updateConditionsTable();
+            schemaListener.afterSchema();
         }
     };
 
@@ -74,14 +74,27 @@ public class TFilterRowProperties extends FixedConnectorsComponentProperties {
 
     public ConditionsTable conditionsTable = new ConditionsTable("conditionsTable");
 
+    public ISchemaListener schemaListener;
+
     public TFilterRowProperties(String name) {
         super(name);
+    }
+
+    public void setSchemaListener(ISchemaListener schemaListener) {
+        this.schemaListener = schemaListener;
     }
 
     @Override
     public void setupProperties() {
         super.setupProperties();
-        // Code for property initialization goes here
+        setSchemaListener(new ISchemaListener() {
+
+            @Override
+            public void afterSchema() {
+                updateOutputSchemas();
+                updateConditionsTable();
+            }
+        });
     }
 
     @Override
