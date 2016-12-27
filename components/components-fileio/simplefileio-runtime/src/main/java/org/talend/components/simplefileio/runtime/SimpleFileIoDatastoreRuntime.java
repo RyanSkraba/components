@@ -17,6 +17,8 @@ import org.talend.components.common.datastore.runtime.DatastoreRuntime;
 import org.talend.components.simplefileio.SimpleFileIoDatastoreProperties;
 import org.talend.daikon.properties.ValidationResult;
 
+import static java.util.Collections.emptyList;
+
 public class SimpleFileIoDatastoreRuntime implements DatastoreRuntime<SimpleFileIoDatastoreProperties> {
 
     /**
@@ -32,6 +34,6 @@ public class SimpleFileIoDatastoreRuntime implements DatastoreRuntime<SimpleFile
 
     @Override
     public Iterable<ValidationResult> doHealthChecks(RuntimeContainer container) {
-        return null;
+        return emptyList();
     }
 }
