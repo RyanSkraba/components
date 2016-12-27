@@ -12,15 +12,22 @@
 // ============================================================================
 package org.talend.components.filterrow.functions;
 
-/**
- * created by dmytro.chmyga on Dec 22, 2016
- */
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class MatchesFunction implements Function<Boolean, String> {
 
     private final String pattern;
 
+    private final Pattern p;
+
     public MatchesFunction(String pattern) {
         this.pattern = pattern;
+        if (pattern != null) {
+            p = Pattern.compile(this.pattern);
+        } else {
+            p = null;
+        }
     }
 
     @Override
@@ -28,7 +35,8 @@ public class MatchesFunction implements Function<Boolean, String> {
         if (pattern == null || o == null) {
             return false;
         }
-        return o.matches(pattern);
+        Matcher m = p.matcher(o);
+        return m.matches();
     }
 
     @Override

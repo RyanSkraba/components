@@ -12,6 +12,9 @@
 // ============================================================================
 package org.talend.components.filterrow.processing;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.talend.components.filterrow.functions.EmptyFunction;
@@ -32,62 +35,55 @@ import org.talend.components.filterrow.operators.NotEqualsOperator;
 import org.talend.components.filterrow.operators.Operator;
 import org.talend.components.filterrow.operators.OperatorType;
 
-/**
- * created by dmytro.chmyga on Dec 23, 2016
- */
 public class FiltersFactoryTest {
 
     @Test
     public void testCreatingFunctions() {
         String predefinedValue = "Abc";
         Function<String, String> emptyFunction = FiltersFactory.createFunction(FunctionType.EMPTY, predefinedValue);
-        Assert.assertTrue("Function should be instance of EmptyFunction", (emptyFunction instanceof EmptyFunction<?>));
+        assertThat(emptyFunction, instanceOf(EmptyFunction.class));
         String returnedValue = emptyFunction.getValue(predefinedValue);
         Assert.assertEquals("EmptyFunction didn't return the same value", predefinedValue, returnedValue);
 
         Function<?, ?> lengthFunction = FiltersFactory.createFunction(FunctionType.LENGTH, predefinedValue);
-        Assert.assertTrue("Function should be instance of LengthFunction", (lengthFunction instanceof LengthFunction));
+        assertThat(lengthFunction, instanceOf(LengthFunction.class));
 
         Function<?, ?> upperCaseFunction = FiltersFactory.createFunction(FunctionType.UPPER_CASE, predefinedValue);
-        Assert.assertTrue("Function should be instance of UpperCaseFunction", (upperCaseFunction instanceof UpperCaseFunction));
+        assertThat(upperCaseFunction, instanceOf(UpperCaseFunction.class));
 
         Function<?, ?> lowerCaseFunction = FiltersFactory.createFunction(FunctionType.LOWER_CASE, predefinedValue);
-        Assert.assertTrue("Function should be instance of LowerCaseFunction", (lowerCaseFunction instanceof LowerCaseFunction));
+        assertThat(lowerCaseFunction, instanceOf(LowerCaseFunction.class));
 
         Function<?, ?> lowerCaseFirstFunction = FiltersFactory.createFunction(FunctionType.LOWER_CASE_FIRST, predefinedValue);
-        Assert.assertTrue("Function should be instance of LowerCaseFirstFunction",
-                (lowerCaseFirstFunction instanceof LowerCaseFirstFunction));
+        assertThat(lowerCaseFirstFunction, instanceOf(LowerCaseFirstFunction.class));
 
         Function<?, ?> upperCaseFirstFunction = FiltersFactory.createFunction(FunctionType.UPPER_CASE_FIRST, predefinedValue);
-        Assert.assertTrue("Function should be instance of UpperCaseFirstFunction",
-                (upperCaseFirstFunction instanceof UpperCaseFirstFunction));
+        assertThat(upperCaseFirstFunction, instanceOf(UpperCaseFirstFunction.class));
 
         Function<?, ?> matchFunction = FiltersFactory.createFunction(FunctionType.MATCH, predefinedValue);
-        Assert.assertTrue("Function should be instance of MatchFunction", (matchFunction instanceof MatchesFunction));
+        assertThat(matchFunction, instanceOf(MatchesFunction.class));
     }
 
     @Test
     public void testCreatingOperator() {
         Object predefinedValue = "Abc";
         Operator<?> equals = FiltersFactory.createOperator(OperatorType.EQUALS, predefinedValue);
-        Assert.assertTrue("Operator should be instance of EqualsOperator", (equals instanceof EqualsOperator<?>));
+        assertThat(equals, instanceOf(EqualsOperator.class));
 
         Operator<?> notEquals = FiltersFactory.createOperator(OperatorType.NOT_EQUAL_TO, predefinedValue);
-        Assert.assertTrue("Operator should be instance of NotEqualsOperator", (notEquals instanceof NotEqualsOperator<?>));
+        assertThat(notEquals, instanceOf(NotEqualsOperator.class));
 
         Operator<?> greaterThan = FiltersFactory.createOperator(OperatorType.GREATER_THAN, predefinedValue);
-        Assert.assertTrue("Operator should be instance of GreaterThanOperator", (greaterThan instanceof GreaterThanOperator<?>));
+        assertThat(greaterThan, instanceOf(GreaterThanOperator.class));
 
         Operator<?> lessThan = FiltersFactory.createOperator(OperatorType.LOWER_THAN, predefinedValue);
-        Assert.assertTrue("Operator should be instance of LessThanOperator", (lessThan instanceof LessThanOperator<?>));
+        assertThat(lessThan, instanceOf(LessThanOperator.class));
 
         Operator<?> greaterThanOrEquals = FiltersFactory.createOperator(OperatorType.GREATER_OR_EQUAL_TO, predefinedValue);
-        Assert.assertTrue("Operator should be instance of GreaterOrEqualToOperator",
-                (greaterThanOrEquals instanceof GreaterOrEqualToOperator<?>));
+        assertThat(greaterThanOrEquals, instanceOf(GreaterOrEqualToOperator.class));
 
         Operator<?> lowerThanOrEquals = FiltersFactory.createOperator(OperatorType.LOWER_OR_EQUAL_TO, predefinedValue);
-        Assert.assertTrue("Operator should be instance of LowerOrEqualToOperator",
-                (lowerThanOrEquals instanceof LowerOrEqualToOperator<?>));
+        assertThat(lowerThanOrEquals, instanceOf(LowerOrEqualToOperator.class));
     }
 
     @Test
@@ -96,23 +92,22 @@ public class FiltersFactoryTest {
         FunctionType functionType = FunctionType.MATCH;
         OperatorType operatorType = OperatorType.EQUALS;
         Filter<?, ?> filter = FiltersFactory.createFilter(functionType, operatorType, predefinedPattern);
-        Assert.assertTrue("Function should be instance of MatchFunction", (filter.getFunction() instanceof MatchesFunction));
-        Assert.assertTrue("Operator should be instance of EqualsOperator", (filter.getOperator() instanceof EqualsOperator<?>));
+        assertThat(filter.getFunction(), instanceOf(MatchesFunction.class));
+        assertThat(filter.getOperator(), instanceOf(EqualsOperator.class));
 
         String predefinedValue = "ab";
         functionType = FunctionType.LOWER_CASE;
         operatorType = OperatorType.EQUALS;
         filter = FiltersFactory.createFilter(functionType, operatorType, predefinedValue);
-        Assert.assertTrue("Function should be instance of LowerCaseFunction",
-                (filter.getFunction() instanceof LowerCaseFunction));
-        Assert.assertTrue("Operator should be instance of EqualsOperator", (filter.getOperator() instanceof EqualsOperator<?>));
+        assertThat(filter.getFunction(), instanceOf(LowerCaseFunction.class));
+        assertThat(filter.getOperator(), instanceOf(EqualsOperator.class));
 
         Integer predefinedLength = 15;
         functionType = FunctionType.LENGTH;
         operatorType = OperatorType.EQUALS;
         filter = FiltersFactory.createFilter(functionType, operatorType, predefinedLength);
-        Assert.assertTrue("Function should be instance of LengthFunction", (filter.getFunction() instanceof LengthFunction));
-        Assert.assertTrue("Operator should be instance of EqualsOperator", (filter.getOperator() instanceof EqualsOperator<?>));
+        assertThat(filter.getFunction(), instanceOf(LengthFunction.class));
+        assertThat(filter.getOperator(), instanceOf(EqualsOperator.class));
     }
 
 }

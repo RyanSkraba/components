@@ -15,9 +15,6 @@ package org.talend.components.filterrow.functions;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * created by dmytro.chmyga on Dec 22, 2016
- */
 public class FunctionsTest {
 
     @Test

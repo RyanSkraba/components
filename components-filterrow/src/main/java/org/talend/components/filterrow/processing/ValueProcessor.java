@@ -31,6 +31,20 @@ public abstract class ValueProcessor {
 
     protected StringBuilder errorMessage;
 
+    /**
+     * Constructor used to pass the initial and break condition boolean values. It's not required to process all of the
+     * filters to understand if the value matches all of the conditions. If we use "Or" logical operator, it is enough
+     * to get one "true" result from the filter, to understand that the value matches the conditions. As "false || true"
+     * will return "true", it's enough to get only one "true" boolean result. The same goes with "And" logical operator.
+     * It's enough to get only one "false" result to say, that the Record won't pass the filters.
+     * <p>
+     * Initial value is the value to be used as the value for logical operations before we have any result. If we use
+     * "And" logical operator, we assume that the initial value is true, as if we use false, no operations will return
+     * true. False for "Or" logical operator, as any "true" value will change it to true.
+     * 
+     * @param initialValue - value to use for logical operations before we have any result from the filters.
+     * @param breakCondition - condition to check if record matches/doesn't match the filters.
+     */
     public ValueProcessor(boolean initialValue, boolean breakCondition) {
         this.initialValue = initialValue;
         this.breakCondition = breakCondition;

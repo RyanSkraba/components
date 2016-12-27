@@ -15,9 +15,6 @@ package org.talend.components.filterrow.operators;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * created by dmytro.chmyga on Dec 22, 2016
- */
 public class OperatorsTest {
 
     @Test
@@ -42,8 +39,7 @@ public class OperatorsTest {
         byte[] bytesTestValue = new byte[] { 1, 2, 3 };
         byte[] predefinedBytesValue = bytesTestValue;
         EqualsOperator<byte[]> bytesEqualsOperator = new EqualsOperator<>(predefinedBytesValue);
-        Assert.assertTrue("Integer values are equal, but operator returned false.",
-                bytesEqualsOperator.compareToObject(bytesTestValue));
+        Assert.assertTrue("Arrays are equal, but operator returned false.", bytesEqualsOperator.compareToObject(bytesTestValue));
     }
 
     @Test
