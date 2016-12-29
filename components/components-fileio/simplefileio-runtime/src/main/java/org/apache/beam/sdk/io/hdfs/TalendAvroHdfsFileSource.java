@@ -38,24 +38,24 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
  *
  * This implementation fixes a bug with the default coder and ensures that the Avro object is cloned before returning.
  */
-public class AvroHdfsFileSource extends HDFSFileSource<AvroKey, NullWritable> {
+public class TalendAvroHdfsFileSource extends HDFSFileSource<AvroKey, NullWritable> {
 
     private final Coder<KV<AvroKey, NullWritable>> coder;
 
-    protected AvroHdfsFileSource(String filepattern, Coder<KV<AvroKey, NullWritable>> coder) {
+    protected TalendAvroHdfsFileSource(String filepattern, Coder<KV<AvroKey, NullWritable>> coder) {
         // TODO(rskraba): I need to cast to Class here?
         super(filepattern, (Class) AvroKeyInputFormat.class, AvroKey.class, NullWritable.class);
         this.coder = coder;
     }
 
-    protected AvroHdfsFileSource(String filepattern, Coder<KV<AvroKey, NullWritable>> coder, SerializableSplit serializableSplit) {
+    protected TalendAvroHdfsFileSource(String filepattern, Coder<KV<AvroKey, NullWritable>> coder, SerializableSplit serializableSplit) {
         // TODO(rskraba): I need to cast to Class here?
         super(filepattern, (Class) AvroKeyInputFormat.class, AvroKey.class, NullWritable.class, serializableSplit);
         this.coder = coder;
     }
 
-    public static AvroHdfsFileSource from(String filepattern, Coder<KV<AvroKey, NullWritable>> coder) {
-        return new AvroHdfsFileSource(filepattern, coder);
+    public static TalendAvroHdfsFileSource from(String filepattern, Coder<KV<AvroKey, NullWritable>> coder) {
+        return new TalendAvroHdfsFileSource(filepattern, coder);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class AvroHdfsFileSource extends HDFSFileSource<AvroKey, NullWritable> {
 
                         @Override
                         public BoundedSource<KV<AvroKey, NullWritable>> apply(@Nullable InputSplit inputSplit) {
-                            return new AvroHdfsFileSource(filepattern, coder, new SerializableSplit(inputSplit));
+                            return new TalendAvroHdfsFileSource(filepattern, coder, new SerializableSplit(inputSplit));
                         }
                     });
         } else {

@@ -17,7 +17,7 @@ import org.apache.avro.mapred.AvroKey;
 import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.coders.VoidCoder;
 import org.apache.beam.sdk.io.Read;
-import org.apache.beam.sdk.io.hdfs.AvroHdfsFileSource;
+import org.apache.beam.sdk.io.hdfs.TalendAvroHdfsFileSource;
 import org.apache.beam.sdk.io.hdfs.CsvHdfsFileSource;
 import org.apache.beam.sdk.io.hdfs.ParquetHdfsFileSource;
 import org.apache.beam.sdk.io.hdfs.WritableCoder;
@@ -66,7 +66,7 @@ public class SimpleFileIoInputRuntime extends PTransform<PBegin, PCollection<Ind
             // Reuseable coder.
             LazyAvroCoder<Object> lac = LazyAvroCoder.of();
 
-            AvroHdfsFileSource source = AvroHdfsFileSource.from(properties.getDatasetProperties().path.getValue(),
+            TalendAvroHdfsFileSource source = TalendAvroHdfsFileSource.from(properties.getDatasetProperties().path.getValue(),
                     KvCoder.of(LazyAvroKeyWrapper.of(lac), WritableCoder.of(NullWritable.class))); //
             PCollection<KV<AvroKey, NullWritable>> read = in.apply(Read.from(source)) //
                     .setCoder(source.getDefaultOutputCoder());

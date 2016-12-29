@@ -15,7 +15,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <hadoop.version>2.6.0</hadoop.version>
+        <hadoop.version>2.7.0</hadoop.version>
         <parquet.version>1.9.0</parquet.version>
         <spark.version>1.6.0</spark.version>
     </properties>
