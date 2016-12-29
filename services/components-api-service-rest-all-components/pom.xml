@@ -23,7 +23,8 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.boot.version>1.4.1.RELEASE</spring.boot.version>
-
+		<hadoop.version>2.7.0</hadoop.version>
+		<beam.version>0.4.0-incubating-SNAPSHOT</beam.version>
 		<!-- Used for Docker images name -->
 		<git_branch>local</git_branch>
 		<talend_docker_registry>registry.datapwn.com</talend_docker_registry>
@@ -108,6 +109,25 @@
 			<version>0.17.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.beam</groupId>
+			<artifactId>beam-sdks-java-io-hdfs</artifactId>
+			<version>${beam.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-client</artifactId>
+			<version>${hadoop.version}</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
 		<!-- rest service -->
 		<dependency>
 			<groupId>org.talend.components</groupId>
@@ -216,9 +236,11 @@
 								<extraArtifact>org.talend.components:jms-runtime_1_1:0.17.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:kafka-runtime:0.17.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:simplefileio-runtime:0.17.0-SNAPSHOT:jar</extraArtifact>
-                                <extraArtifact>org.talend.components:components-jdbc-runtime:0.17.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:components-jdbc-runtime:0.17.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.libraries:mysql-connector-java-5.1.30-bin:6.0.0:jar</extraArtifact>
-                                <extraArtifact>org.apache.derby:derby:10.12.1.1:jar</extraArtifact>
+								<extraArtifact>org.apache.derby:derby:10.12.1.1:jar</extraArtifact>
+								<extraArtifact>org.apache.beam:beam-sdks-java-io-hdfs:${beam.version}:jar</extraArtifact>
+								<extraArtifact>org.apache.hadoop:hadoop-client:${hadoop.version}:jar</extraArtifact>
 							</extraArtifacts>
 							<pomIncludes>
 								<pomInclude>*/pom.xml</pomInclude>
