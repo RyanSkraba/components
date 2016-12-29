@@ -1,4 +1,4 @@
-// ============================================================================
+//==============================================================================
 //
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
@@ -9,10 +9,8 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-// ============================================================================
+//==============================================================================
 package org.talend.components.service.rest.configuration;
-
-import static org.slf4j.LoggerFactory.*;
 
 import java.util.Map;
 
@@ -26,6 +24,8 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.common.ComponentServiceImpl;
 import org.talend.components.api.service.common.DefinitionRegistry;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Configuration that deals with ComponentRegistry setup.

@@ -18,6 +18,7 @@ import java.util.Set;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.VirtualComponentDefinition;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceModuleProperties;
@@ -32,7 +33,7 @@ public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition im
     public static final String COMPONENT_NAME = "tSalesforceOutputBulkExec"; //$NON-NLS-1$
 
     public TSalesforceOutputBulkExecDefinition() {
-        super(COMPONENT_NAME);
+        super(COMPONENT_NAME, ExecutionEngine.DI);
     }
 
     @Override
@@ -78,7 +79,8 @@ public class TSalesforceOutputBulkExecDefinition extends SalesforceDefinition im
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology connectorTopology) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology connectorTopology) {
+        assertEngineCompatibility(engine);
         return null;// this is a very specific component that delegates the runtime to the output and input components
     }
 

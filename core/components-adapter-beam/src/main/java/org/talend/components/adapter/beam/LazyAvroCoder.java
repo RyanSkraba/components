@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class LazyAvroCoder<T extends IndexedRecord> extends StandardCoder<T> {
 
@@ -38,8 +39,18 @@ public class LazyAvroCoder<T extends IndexedRecord> extends StandardCoder<T> {
 
     private final static HashMap<String, Schema> schemaRegistry = new HashMap<>();
 
+    private final static AtomicInteger count = new AtomicInteger();
+
+    public static LazyAvroCoder of() {
+        return new LazyAvroCoder();
+    }
+
     public static <T extends IndexedRecord> LazyAvroCoder of(String id) {
         return new LazyAvroCoder(id);
+    }
+
+    protected LazyAvroCoder() {
+        this("Lazy" + count.getAndIncrement());
     }
 
     protected LazyAvroCoder(String id) {

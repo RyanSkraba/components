@@ -35,7 +35,7 @@ public class JmsDatasetDefinition extends I18nDefinition implements DatasetDefin
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(JmsDatasetProperties properties, Object ctx) {
+    public RuntimeInfo getRuntimeInfo(JmsDatasetProperties properties) {
         return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
                 DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-jms/jms-runtime_1_1"),
                 RUNTIME_1_1);

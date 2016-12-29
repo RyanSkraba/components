@@ -24,7 +24,7 @@ public class JmsDatastoreDefinitionTest {
 
     @Test
     public void testGetRuntimeInfo() {
-        RuntimeInfo runtimeInfo = datastoreDefinition.getRuntimeInfo(null, null);
+        RuntimeInfo runtimeInfo = datastoreDefinition.getRuntimeInfo(null);
         assertEquals("org.talend.components.jms.runtime_1_1.DatastoreRuntime", runtimeInfo.getRuntimeClassName());
     }
 

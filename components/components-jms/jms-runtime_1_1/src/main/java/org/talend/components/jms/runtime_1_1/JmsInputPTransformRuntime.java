@@ -51,7 +51,7 @@ public class JmsInputPTransformRuntime extends PTransform<PBegin, PCollection> i
     }
 
     @Override
-    public PCollection apply(PBegin pBegin) {
+    public PCollection expand(PBegin pBegin) {
 
         datastoreRuntime = new JmsDatastoreRuntime();
         datastoreRuntime.initialize(null, properties.datasetRef.getReference().getDatastoreProperties());

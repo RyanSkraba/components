@@ -1,4 +1,4 @@
-// ============================================================================
+//==============================================================================
 //
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
@@ -9,7 +9,7 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-// ============================================================================
+//==============================================================================
 package org.talend.components.service.rest;
 
 import org.springframework.boot.SpringApplication;
@@ -19,7 +19,10 @@ import org.springframework.context.annotation.FilterType;
 import org.talend.daikon.spring.BndToSpringBeanNameGenerator;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"org.talend.components", "org.talend.daikon"}, nameGenerator = BndToSpringBeanNameGenerator.class, includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = aQute.bnd.annotation.component.Component.class) , excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = ".*Osgi") )
+@ComponentScan(basePackages = { "org.talend.components", "org.talend.daikon" },
+               nameGenerator = BndToSpringBeanNameGenerator.class,
+               includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = aQute.bnd.annotation.component.Component.class),
+               excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = ".*Osgi"))
 public class Application {
 
     public static void main(String[] args) {

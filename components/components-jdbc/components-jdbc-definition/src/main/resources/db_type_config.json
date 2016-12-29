@@ -1,0 +1,25 @@
+[
+
+	{
+		"id" : "MYSQL",
+		"class" : "org.gjt.mm.mysql.Driver",
+		"url" : "jdbc:mysql://localhost:3306/db",
+		"paths" : 
+	 	[
+	 		{"path" : "mvn:org.talend.libraries/mysql-connector-java-5.1.30-bin/6.0.0/jar"}
+	 	]
+	
+	},
+	
+	{
+		"id" : "DERBY",
+		"class" : "org.apache.derby.jdbc.ClientDriver",
+		"url" : "jdbc:derby://localhost:3306/db",
+		"paths" : 
+	 	[
+	 		{"path" : "mvn:org.apache.derby/derby/10.12.1.1"}
+	 	]
+	
+	}
+
+]

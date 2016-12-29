@@ -1,4 +1,4 @@
-// ============================================================================
+//==============================================================================
 //
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
@@ -9,19 +9,19 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-// ============================================================================
+//==============================================================================
 
 package org.talend.components.service.rest.dto;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import org.talend.components.api.RuntimableDefinition;
-import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.wizard.WizardImageType;
-import org.talend.components.common.datastore.DatastoreDefinition;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.wizard.WizardImageType;
+import org.talend.components.common.datastore.DatastoreDefinition;
+import org.talend.daikon.definition.Definition;
 
 /**
  * DTO used for the definitions.
@@ -64,7 +64,7 @@ public class DefinitionDTO {
      * Constructor for the RuntimableDefinition part.
      * @param origin the RuntimableDefinition.
      */
-    private DefinitionDTO(RuntimableDefinition origin) {
+    private DefinitionDTO(Definition origin) {
         this.name = origin.getName();
         this.label = origin.getDisplayName();
         this.iconURL = buildImageUrl(origin.getName()); // TODO hmdebenque why not use origin.getImagePath() ?
@@ -75,7 +75,7 @@ public class DefinitionDTO {
      * @param origin the datastore definition.
      */
     public DefinitionDTO(DatastoreDefinition origin) {
-        this((RuntimableDefinition)origin);
+        this((Definition)origin);
         this.type ="datastore";
         this.inputCompName = origin.getInputCompDefinitionName();
         this.outputCompName = origin.getOutputCompDefinitionName();
@@ -86,7 +86,7 @@ public class DefinitionDTO {
      * @param origin the component definition.
      */
     public DefinitionDTO(ComponentDefinition origin) {
-        this((RuntimableDefinition)origin);
+        this((Definition)origin);
         this.type = "component";
         this.typologies = origin.getSupportedConnectorTopologies() //
                 .stream() //

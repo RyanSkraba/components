@@ -37,7 +37,7 @@ public class FullExampleDatastoreDefinition extends SimpleNamedThing
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(FullExampleDatastoreProperties properties, Object ctx) {
+    public RuntimeInfo getRuntimeInfo(FullExampleDatastoreProperties properties) {
         return null;
     }
 

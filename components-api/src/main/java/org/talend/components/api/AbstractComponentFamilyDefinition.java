@@ -19,12 +19,12 @@ import java.util.List;
 import org.talend.daikon.definition.Definition;
 
 /**
- * The AbstractComponentFamilyDefinition provides an implementation without any nested definitions.
+ * The AbstractComponentFamilyDefinition provides a simple implementation of a component family.
  */
 public abstract class AbstractComponentFamilyDefinition extends AbstractTopLevelDefinition implements ComponentFamilyDefinition {
 
     /** Family name, must be unique in the framework. */
-    private String familyName;
+    private final String familyName;
 
     private final List<Definition<?>> definitions;
 
@@ -32,7 +32,7 @@ public abstract class AbstractComponentFamilyDefinition extends AbstractTopLevel
      * Construct the subclass with a given, predefined, unmodifiable set of definitions.
      *
      * @param familyName Unique identifier for the family in the component framework.
-     * @param definitionsAndWizards A list of definitions that are related to this component family. If the type of the definition
+     * @param definitions A list of definitions that are related to this component family. If the type of the definition
      *            is not correct or unknown, it will ignored. Otherwise, it will appear in one of the getXxxxDefinitions()
      *            methods.
      */

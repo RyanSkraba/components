@@ -24,6 +24,7 @@ import java.util.concurrent.TimeoutException;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.kafka.dataset.KafkaDatasetProperties;
+import org.talend.components.kafka.datastore.KafkaDatastoreProperties;
 import org.talend.daikon.NamedThing;
 
 public class KafkaDatasetTestIT {
@@ -40,6 +41,8 @@ public class KafkaDatasetTestIT {
 
         datasetProperties = new KafkaDatasetProperties("inputDatasetProperties");
         datasetProperties.init();
+        KafkaDatastoreProperties datastore = new KafkaDatastoreProperties("datastore");
+        datasetProperties.setDatastoreProperties(datastore);
         datasetProperties.getDatastoreProperties().brokers.setValue(KafkaTestConstants.BOOTSTRAP_HOST);
     }
 

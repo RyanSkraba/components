@@ -14,10 +14,17 @@ package org.talend.components.kafka.runtime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.talend.components.kafka.runtime.KafkaTestConstants.*;
+import static org.talend.components.kafka.runtime.KafkaTestConstants.BOOTSTRAP_HOST;
+import static org.talend.components.kafka.runtime.KafkaTestConstants.TOPIC_IN;
+import static org.talend.components.kafka.runtime.KafkaTestConstants.TOPIC_OUT;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -29,7 +36,6 @@ import org.apache.beam.sdk.transforms.PTransform;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.beam.sdk.values.KV;
-import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -108,22 +114,14 @@ public class KafkaBeamRuntimeTestIT {
         KafkaOutputPTransformRuntime outputRuntime = new KafkaOutputPTransformRuntime();
         outputRuntime.initialize(null, outputProperties);
 
-        PCollection indexRecords = inputRuntime.apply(PBegin.in(pipeline)).setCoder(inputRuntime.getDefaultOutputCoder());
-        outputRuntime.apply(indexRecords);
+        PCollection<IndexedRecord> indexRecords = pipeline.apply(inputRuntime);
+        indexRecords.apply(outputRuntime);
         // IndexedRecordToKV indexedRecordToKV = new IndexedRecordToKV();
         // PCollection kv = indexedRecordToKV.apply(indexRecords);
 
         // PAssert.that(kv).satisfies(new StartWith("k", "v"));
 
         PipelineResult result = pipeline.run();
-
-        try {
-            result.waitUntilFinish();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         Properties props = new Properties();
         props.put("bootstrap.servers", BOOTSTRAP_HOST);
@@ -173,7 +171,7 @@ public class KafkaBeamRuntimeTestIT {
     private static class IndexedRecordToKV extends PTransform<PCollection<IndexedRecord>, PCollection<KV<String, String>>> {
 
         @Override
-        public PCollection<KV<String, String>> apply(PCollection<IndexedRecord> indexedRecordPCollection) {
+        public PCollection<KV<String, String>> expand(PCollection<IndexedRecord> indexedRecordPCollection) {
             PCollection<KV<byte[], byte[]>> kafkaCollection = indexedRecordPCollection.apply("ExtractIndexedRecord",
                     ParDo.of(new DoFn<IndexedRecord, KV<byte[], byte[]>>() {
 

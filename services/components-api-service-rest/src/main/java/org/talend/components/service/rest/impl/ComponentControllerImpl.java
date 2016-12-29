@@ -1,4 +1,4 @@
-// ============================================================================
+//==============================================================================
 //
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
@@ -9,7 +9,7 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-// ============================================================================
+//==============================================================================
 package org.talend.components.service.rest.impl;
 
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
@@ -58,10 +59,10 @@ public class ComponentControllerImpl implements ComponentController {
     private JsonSerializationHelper jsonSerializer = new JsonSerializationHelper();
 
     @Override
-    public StreamingResponseBody getComponentProperties(@PathVariable String name) {
+    public StreamingResponseBody getComponentProperties(@PathVariable String name, @RequestParam String formName) {
         return outputStream -> {
             try (Writer w = new OutputStreamWriter(outputStream)) {
-                w.write(jsonSerializer.toJson(componentServiceDelegate.getComponentProperties(name), name));
+                w.write(jsonSerializer.toJson(componentServiceDelegate.getComponentProperties(name), formName, name));
             }
         };
     }

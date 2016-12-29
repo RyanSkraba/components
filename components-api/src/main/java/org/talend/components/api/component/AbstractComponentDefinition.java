@@ -16,30 +16,53 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.talend.components.api.AbstractTopLevelDefinition;
+import org.talend.components.api.component.runtime.ExecutionEngine;
+import org.talend.components.api.exception.error.ComponentsErrorCode;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.NamedThing;
+import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.property.Property;
 
 public abstract class AbstractComponentDefinition extends AbstractTopLevelDefinition implements ComponentDefinition {
 
     /**
-     * Component name.
-     * It is used to define component name, which will be displayed in Studio Palette
-     * Also it is used by bnd library to create OSGi bundle
+     * Component name. It is used to define component name, which will be displayed in Studio Palette Also it is used by
+     * bnd library to create OSGi bundle
      */
     private String componentName;
+
+    private final Set<ExecutionEngine> engines;
+
+    /**
+     * Constructor sets component name
+     *
+     * @param componentName component name
+     * @param allEngines true if available for all execution engines, false if not available for none (this should hide the component).
+     */
+    public AbstractComponentDefinition(String componentName, boolean allEngines) {
+        this.componentName = componentName;
+        this.engines = allEngines ? EnumSet.allOf(ExecutionEngine.class) : EnumSet.noneOf(ExecutionEngine.class);
+        setupI18N(new Property<?>[] { RETURN_ERROR_MESSAGE_PROP, RETURN_REJECT_RECORD_COUNT_PROP,
+                RETURN_SUCCESS_RECORD_COUNT_PROP, RETURN_TOTAL_RECORD_COUNT_PROP });
+    }
 
     /**
      * Constructor sets component name
      * 
      * @param componentName component name
+     * @param engine1 an execution engine that this component is valid for.
+     * @param engineOthers other execution engines that this component can generate runtimes for. (This technique with
+     * varargs is just to guarantee that there is at least one execution engine specified.)
      */
-    public AbstractComponentDefinition(String componentName) {
+    public AbstractComponentDefinition(String componentName, ExecutionEngine engine1, ExecutionEngine... engineOthers) {
         this.componentName = componentName;
+        this.engines = EnumSet.of(engine1, engineOthers);
         setupI18N(new Property<?>[] { RETURN_ERROR_MESSAGE_PROP, RETURN_REJECT_RECORD_COUNT_PROP,
                 RETURN_SUCCESS_RECORD_COUNT_PROP, RETURN_TOTAL_RECORD_COUNT_PROP });
     }
@@ -52,6 +75,30 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
     @Override
     public String getName() {
         return componentName;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<ExecutionEngine> getSupportedExecutionEngines() {
+        return engines;
+    }
+
+    protected void assertEngineCompatibility(ExecutionEngine engine) throws TalendRuntimeException {
+        if (!getSupportedExecutionEngines().contains(engine))
+            TalendRuntimeException.build(ComponentsErrorCode.WRONG_EXECUTION_ENGINE) //
+                    .put("component", getName()) //
+                    .put("requested", engine == null ? "null" : engine.toString()) //
+                    .put("available", getSupportedExecutionEngines().toString()).throwIt();
+    }
+
+    protected void assertConnectorTopologyCompatibility(ConnectorTopology connectorTopology) throws TalendRuntimeException {
+        if (!getSupportedConnectorTopologies().contains(connectorTopology))
+            TalendRuntimeException.build(ComponentsErrorCode.WRONG_CONNECTOR) //
+                    .put("component", getName()) //
+                    .put("requested", connectorTopology == null ? "null" : connectorTopology.toString()) //
+                    .put("available", getSupportedExecutionEngines().toString()).throwIt();
     }
 
     /**
@@ -154,7 +201,7 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
 
     /**
      * @return the associated ComponentProperties class associated with the Component. This shall be used to initialised
-     *         the runtime classes.
+     * the runtime classes.
      */
     // TODO remove this and use the getPropertiesClass()
     abstract public Class<? extends ComponentProperties> getPropertyClass();
@@ -165,7 +212,7 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
      * This method uses static class definition to avoid ComponentProperties instanciation.
      * 
      * @return return the list of ComponentProperties that may be assigned to a nested property of this component
-     *         associated ComponentProperties.
+     * associated ComponentProperties.
      */
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return (Class<? extends ComponentProperties>[]) Array.newInstance(Class.class, 0);

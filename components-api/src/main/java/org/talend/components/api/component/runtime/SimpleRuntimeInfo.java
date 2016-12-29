@@ -24,8 +24,8 @@ import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
- * create a {@link RuntimeInfo} implementation for component that do not have to deal with multiple dependencies because of
- * multiple versions or dynamic dependencies.
+ * create a {@link RuntimeInfo} implementation for component that do not have to deal with multiple dependencies because
+ * of multiple versions or dynamic dependencies.
  */
 public class SimpleRuntimeInfo implements RuntimeInfo {
 
@@ -36,12 +36,11 @@ public class SimpleRuntimeInfo implements RuntimeInfo {
     private String depTxtPath;
 
     /**
-     * uses the <code>mavenGroupId</code> <code>mavenArtifactId</code> to locate the *dependency.txt* file using the rule defined
-     * in {@link DependenciesReader#computeDesignDependenciesPath()}
+     * Explicitly uses the specified dependency path as discovered by {@link ClassLoader#getResourceAsStream(String)}.
      * 
-     * @param classloader classloader used to locate the file thanks to {@link ClassLoader#getResourceAsStream(String)}
+     * @param classloader classloader used to locate the file resource.
      * @param depTxtPath, path used to locate the dependency.txt file
-     * @param runtimeClassName class to be instanciated
+     * @param runtimeClassName class to be instantiated
      */
     public SimpleRuntimeInfo(ClassLoader classloader, String depTxtPath, String runtimeClassName) {
         this.classloader = classloader;
@@ -61,8 +60,8 @@ public class SimpleRuntimeInfo implements RuntimeInfo {
             }
             return result;
         } catch (IOException e) {
-            throw new ComponentException(ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED, e,
-                    ExceptionContext.withBuilder().put("path", dependenciesReader.getDependencyFilePath()).build());
+            throw new ComponentException(ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED, e, ExceptionContext.withBuilder()
+                    .put("path", dependenciesReader.getDependencyFilePath()).build());
         }
 
     }

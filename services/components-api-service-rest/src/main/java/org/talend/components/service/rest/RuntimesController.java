@@ -1,4 +1,4 @@
-// ============================================================================
+//==============================================================================
 //
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
@@ -9,39 +9,69 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-// ============================================================================
+//==============================================================================
 
 package org.talend.components.service.rest;
-
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.talend.daikon.annotation.Service;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.talend.components.service.rest.dto.PropertiesDto;
+import org.talend.components.service.rest.dto.ValidationResultsDto;
+import org.talend.daikon.annotation.Service;
+
 @Service(name = "RuntimesController")
-@RequestMapping(value = "runtimes",
-                consumes = APPLICATION_JSON_UTF8_VALUE,
-                produces = APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping(value = "runtimes")
 public interface RuntimesController {
 
-    /** Validate connection to datastore **/
-    // P2
-    @RequestMapping(value = "{definitionName}", method = POST)
-    void validateConnection(@PathVariable("definitionName") String definitionName);
+    /**
+     * Avro mime types as specified at <a href="http://avro.apache.org/docs/current/spec.html#HTTP+as+Transport>http://avro.apache.org/docs/current/spec.html#HTTP+as+Transport</a>
+     * and discussed at <a href="https://issues.apache.org/jira/browse/AVRO-488>https://issues.apache.org/jira/browse/AVRO-488</a>
+     */
+    String AVRO_BINARY_MIME_TYPE_OFFICIAL_INVALID = "avro/binary";
+    String AVRO_BINARY_MIME_TYPES_UNOFFICIAL_VALID = "application/x-avro-binary";
+    String AVRO_BINARY_MIME_TYPES_UNOFFICIAL_VALID_REGISTERED = "application/avro-binary";
 
-    /** Validate connection to datastore. Should it be GET method? **/
-    // P2
-    @RequestMapping(value = "{definitionName}/schema", method = POST)
-    void getDatasetSchema(@PathVariable("definitionName") String definitionName);
+    String AVRO_JSON_MIME_TYPE_OFFICIAL_INVALID = "avro/json";
+    String AVRO_JSON_MIME_TYPES_UNOFFICIAL_VALID = "application/x-avro-json";
+    String AVRO_JSON_MIME_TYPES_UNOFFICIAL_VALID_REGISTERED = "application/avro-json";
 
-    /** Get dataset content. Should it be GET method? **/
-    // P2
-    @RequestMapping(value = "{definitionName}/data", method = POST)
-    void getDatasetSchema(@PathVariable("definitionName") String definitionName,
-                          @RequestParam(value = "from", defaultValue = "1000") Integer from,
-                          @RequestParam(value = "limit", defaultValue = "5000") Integer limit);
+    /** Validate connection to datastore */
+    @RequestMapping(value = "{dataStoreDefinitionName}", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE)
+    ResponseEntity<ValidationResultsDto> validateDataStoreConnection(
+            @PathVariable("dataStoreDefinitionName") String dataStoreDefinitionName,
+            @RequestBody PropertiesDto propertiesContainer);
+
+    /** Validate connection to datastore. Should it be GET method? */
+    @RequestMapping(value = "{datasetDefinitionName}/schema", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
+    String getDatasetSchema(@PathVariable("datasetDefinitionName") String datasetDefinitionName,
+                            @RequestBody PropertiesDto connectionInfo) throws IOException;
+
+    /** Get dataset content. Should it be GET method? */
+    @RequestMapping(value = "{datasetDefinitionName}/data", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = {
+            APPLICATION_JSON_UTF8_VALUE, AVRO_JSON_MIME_TYPE_OFFICIAL_INVALID, AVRO_JSON_MIME_TYPES_UNOFFICIAL_VALID,
+            AVRO_JSON_MIME_TYPES_UNOFFICIAL_VALID_REGISTERED })
+    Void getDatasetData(@PathVariable("datasetDefinitionName") String datasetDefinitionName,
+                                         @RequestBody PropertiesDto connectionInfo,
+                                         @RequestParam(value = "from", required = false) Integer from,
+                                         @RequestParam(value = "limit", required = false) Integer limit,
+                                         OutputStream response);
+
+    @RequestMapping(value = "{datasetDefinitionName}/data", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = {
+            AVRO_BINARY_MIME_TYPE_OFFICIAL_INVALID, AVRO_BINARY_MIME_TYPES_UNOFFICIAL_VALID,
+            AVRO_BINARY_MIME_TYPES_UNOFFICIAL_VALID_REGISTERED })
+    Void getDatasetDataAsBinary(@PathVariable("datasetDefinitionName") String datasetDefinitionName,
+                                                 @RequestBody PropertiesDto connectionInfo,
+                                                 @RequestParam(value = "from", required = false) Integer from,
+                                                 @RequestParam(value = "limit", required = false) Integer limit,
+                                                 OutputStream response);
 
 }

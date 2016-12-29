@@ -14,10 +14,11 @@ package org.talend.components.api.component;
 
 import java.util.Set;
 
-import org.talend.components.api.RuntimableDefinition;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.definition.Definition;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
@@ -29,8 +30,7 @@ import org.talend.daikon.runtime.RuntimeInfo;
  * A class implementing this interface is the definition of a component. Instances are registered with the
  * {@link org.talend.components.api.service.ComponentService} to allow components to be discovered.
  */
-// TODO make this a RuntimableDefinition<ComponentProperties...
-public interface ComponentDefinition extends RuntimableDefinition<ComponentProperties, ConnectorTopology> {
+public interface ComponentDefinition extends Definition<ComponentProperties> {
 
     /**
      * Returns an array of paths that represent the categories of the component.
@@ -129,18 +129,23 @@ public interface ComponentDefinition extends RuntimableDefinition<ComponentPrope
     String getPartitioning();
 
     /**
+     * @return the set of execution engines that business objects can provide runtimes for.
+     */
+    Set<ExecutionEngine> getSupportedExecutionEngines();
+
+    /**
      * this will create the runtime the information required for running the component. They can depend an the given
      * <code>properties</code> parameter and the connector topology. The <code>connectorTopology</code> shall be one of
      * supported topologies returned by {@link #getSupportedConnectorTopologies()}
-     * 
+     *
+     * @param engine the engine to get a runtime for.
      * @param properties may be used to compute the runtime dependencies or class, may be null.
      * @param connectorTopology the topology of connectors you want to get the Runtime from.
      * 
      * @return the runtime information related to this component and <code>connectorTopology</code>. Should return null if the
      *         <code>componentType</code> is not par of the supported types returned by {@link #getSupportedConnectorTopologies()}
      */
-    @Override
-    RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology connectorTopology);
+    RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology connectorTopology);
 
     /**
      * This will returns a set connectors topologies that this component supports.

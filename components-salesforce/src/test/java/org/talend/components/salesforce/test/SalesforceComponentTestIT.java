@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
@@ -720,8 +721,8 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
         ComponentProperties properties = this.getComponentService()
                 .getComponentProperties(TSalesforceBulkExecDefinition.COMPONENT_NAME);
 
-        assertNotNull("should not null", definition.getRuntimeInfo(properties, ConnectorTopology.NONE));
-        assertNotNull("should not null", definition.getRuntimeInfo(properties, ConnectorTopology.OUTGOING));
+        assertNotNull("should not null", definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.NONE));
+        assertNotNull("should not null", definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.OUTGOING));
     }
 
 }

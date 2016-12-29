@@ -12,7 +12,8 @@
 // ============================================================================
 package org.talend.components.kafka.dataset;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +35,7 @@ public class KafkaDatasetDefinitionTest {
 
     @Test
     public void getRuntimeInfo() throws Exception {
-        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(null, null);
+        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(null);
         assertNotNull(runtimeInfo);
     }
 

@@ -22,11 +22,11 @@ import java.util.Set;
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.RuntimableDefinition;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.exception.error.ComponentsApiErrorCode;
 import org.talend.components.api.properties.ComponentProperties;
@@ -192,10 +192,9 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(String componentName, Properties properties, ConnectorTopology componentType) {
-        RuntimableDefinition componentDef = getComponentDefinition(componentName);
-        return componentDef.getRuntimeInfo(properties, componentType);
-
+    public RuntimeInfo getRuntimeInfo(String componentName, ExecutionEngine engine, Properties properties, ConnectorTopology topology) {
+        ComponentDefinition componentDef = getComponentDefinition(componentName);
+        return componentDef.getRuntimeInfo(engine, (ComponentProperties) properties, topology);
     }
 
     private java.util.Properties toProperties(Map<String, String> dominant, Map<String, String> recessive) {

@@ -16,7 +16,7 @@ import org.talend.daikon.NamedThing;
 import org.talend.daikon.definition.Definition;
 
 /**
- * Placeholder for a Component family catalog item.
+ * A component family is a group of logically related {@link Definition} that should be installed together.
  */
 public interface ComponentFamilyDefinition extends NamedThing {
 

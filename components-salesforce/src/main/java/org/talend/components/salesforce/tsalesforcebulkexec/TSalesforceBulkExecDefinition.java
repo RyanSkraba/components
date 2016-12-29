@@ -16,6 +16,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceModuleProperties;
@@ -29,7 +30,7 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition {
     public static final String COMPONENT_NAME = "tSalesforceBulkExec"; //$NON-NLS-1$
 
     public TSalesforceBulkExecDefinition() {
-        super(COMPONENT_NAME);
+        super(COMPONENT_NAME, ExecutionEngine.DI);
     }
 
     @Override
@@ -61,7 +62,8 @@ public class TSalesforceBulkExecDefinition extends SalesforceDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology componentType) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology componentType) {
+        assertEngineCompatibility(engine);
         if (componentType == ConnectorTopology.OUTGOING || componentType == ConnectorTopology.NONE) {
             return getCommonRuntimeInfo(this.getClass().getClassLoader(), SalesforceSource.class);
         } else {

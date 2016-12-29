@@ -1,4 +1,4 @@
-// ============================================================================
+//==============================================================================
 //
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
@@ -9,31 +9,8 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-// ============================================================================
+//==============================================================================
 package org.talend.components.service.rest;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.response.Response;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.BDDMockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.embedded.LocalServerPort;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.talend.components.api.RuntimableDefinition;
-import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.common.datastore.DatastoreDefinition;
-import org.talend.components.service.rest.dto.ConnectorTypology;
-import org.talend.components.service.rest.dto.DefinitionDTO;
-import org.talend.components.service.rest.mock.MockComponentDefinition;
-import org.talend.components.service.rest.mock.MockDatastoreDefinition;
-import org.talend.daikon.definition.service.DefinitionRegistryService;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -41,11 +18,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.restassured.response.Response;
+import org.junit.Test;
+import org.mockito.BDDMockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.common.datastore.DatastoreDefinition;
+import org.talend.components.service.rest.dto.ConnectorTypology;
+import org.talend.components.service.rest.dto.DefinitionDTO;
+import org.talend.components.service.rest.mock.MockComponentDefinition;
+import org.talend.components.service.rest.mock.MockDatastoreDefinition;
+import org.talend.daikon.definition.Definition;
+
 import static com.jayway.restassured.RestAssured.when;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.talend.components.api.component.ConnectorTopology.*;
 import static org.talend.components.service.rest.DefinitionType.COMPONENT;
@@ -57,28 +47,10 @@ import static org.talend.components.service.rest.dto.ConnectorTypology.*;
  *
  * @see DefinitionsController
  */
-
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT)
-@TestPropertySource(properties = { "server.contextPath=" })
-public class DefinitionsControllerTest {
-
-    @LocalServerPort
-    private int port;
-
-    @MockBean
-    private DefinitionRegistryService delegate;
-
-    @Autowired
-    private DefinitionsController controller;
+public class DefinitionsControllerTest extends AbstractSpringIntegrationTests {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Before
-    public void setUp() throws Exception {
-        RestAssured.port = port;
-    }
 
     @Test
     public void shouldListDatastoreDefinitions() throws Exception {
@@ -100,7 +72,7 @@ public class DefinitionsControllerTest {
 
     public void shouldListDefinitions(List<String> names, //
             Class clazz, //
-            Function<List<String>, Map<String, ? extends RuntimableDefinition>> provider, //
+            Function<List<String>, Map<String, ? extends Definition>> provider, //
             DefinitionType wantedType, //
             String expectedType) throws IOException {
         // given

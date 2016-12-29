@@ -24,12 +24,10 @@ import org.talend.daikon.exception.error.ErrorCode;
  */
 public enum ComponentsApiErrorCode implements ErrorCode {
 
-                                                         WRONG_COMPONENT_NAME(HttpServletResponse.SC_BAD_REQUEST, "name"), //$NON-NLS-1$
-                                                         WRONG_WIZARD_NAME(HttpServletResponse.SC_BAD_REQUEST, "name"), //$NON-NLS-1$
-                                                         COMPUTE_DEPENDENCIES_FAILED(HttpServletResponse.SC_NOT_FOUND, "path"),
-                                                         WRONG_RETURNS_TYPE_NAME(
-                                                                                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                                                                                 "name"); //$NON-NLS-1$
+    WRONG_COMPONENT_NAME(HttpServletResponse.SC_BAD_REQUEST, "name"), //$NON-NLS-1$
+    WRONG_WIZARD_NAME(HttpServletResponse.SC_BAD_REQUEST, "name"), //$NON-NLS-1$
+    COMPUTE_DEPENDENCIES_FAILED(HttpServletResponse.SC_NOT_FOUND, "path"),
+    WRONG_RETURNS_TYPE_NAME(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "name"); //$NON-NLS-1$
 
     private DefaultErrorCode errorCodeDelegate;
 

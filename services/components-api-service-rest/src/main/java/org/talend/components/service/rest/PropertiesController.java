@@ -1,4 +1,4 @@
-// ============================================================================
+//==============================================================================
 //
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
@@ -9,7 +9,7 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-// ============================================================================
+//==============================================================================
 
 package org.talend.components.service.rest;
 
@@ -17,36 +17,39 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.talend.components.service.rest.dto.PropertiesValidationResponse;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.talend.components.service.rest.dto.PropertiesDto;
+import org.talend.components.service.rest.dto.ValidationResultsDto;
 import org.talend.daikon.annotation.Service;
 import org.talend.daikon.serialize.jsonschema.PropertyTrigger;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @Service(name = "PropertiesController")
-@RestController
 @RequestMapping("properties")
 public interface PropertiesController {
 
-    @RequestMapping(value = "{name}", method = GET)
-    String getProperties(@PathVariable("name") String definitionName);
+    @RequestMapping(value = "{definitionName}", method = GET, produces = APPLICATION_JSON_UTF8_VALUE)
+    String getProperties(@PathVariable("definitionName") String definitionName, @RequestParam(required = false) String formName);
 
     /** Validate the coherence of a set of properties for a specific component. **/
-    @RequestMapping(value = "{definitionName}/validate", method = POST)
-    ResponseEntity<PropertiesValidationResponse> validateProperties(@PathVariable("definitionName") String definitionName,
-                                                                    @RequestBody FormDataContainer formData);
+    @RequestMapping(value = "{definitionName}/validate", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE)
+    ResponseEntity<ValidationResultsDto> validateProperties(@RequestBody PropertiesDto propertiesContainer);
 
     /** Validate one field. */
-    @RequestMapping(value = "{definition}/{trigger}/{property}", method = POST)
+    @RequestMapping(value = "{definition}/{trigger}/{property}", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
     ResponseEntity<String> triggerOnProperty(@PathVariable("definition") String definition, //
                                              @PathVariable("trigger") PropertyTrigger trigger, //
                                              @PathVariable("property") String property, //
-                                             @RequestBody String formData);
+                                             @RequestParam(required = false) String formName, //
+                                             @RequestBody PropertiesDto propertiesContainer);
 
     /** Get dataset properties. Should it be GET? **/
-    @RequestMapping(value = "{definitionName}/dataset", method = POST)
-    String getDatasetProperties(@PathVariable("definitionName") String definitionName, @RequestBody FormDataContainer formData);
+    @RequestMapping(value = "{definitionName}/dataset", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
+    String getDatasetProperties(@PathVariable("definitionName") String definitionName, //
+                                @RequestParam(required = false) String formName, //
+                                @RequestBody PropertiesDto propertiesContainer);
 
 }

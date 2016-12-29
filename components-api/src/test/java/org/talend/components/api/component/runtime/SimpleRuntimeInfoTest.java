@@ -67,29 +67,7 @@ public class SimpleRuntimeInfoTest {
      */
     @Test
     public void testGetMavenUriDependencies() throws MalformedURLException {
-        AbstractComponentDefinition cd = new AbstractComponentDefinition("") {
-
-            @Override
-            public Property[] getReturnProperties() {
-                return null;
-            }
-
-            @Override
-            public Class<? extends ComponentProperties> getPropertyClass() {
-                return null;
-            }
-
-            @Override
-            public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology componentType) {
-                return null;
-            }
-
-            @Override
-            public Set<ConnectorTopology> getSupportedConnectorTopologies() {
-                return null;
-            }
-        };
-        SimpleRuntimeInfo runtimeInfo = new SimpleRuntimeInfo(cd.getClass().getClassLoader(),
+        SimpleRuntimeInfo runtimeInfo = new SimpleRuntimeInfo(getClass().getClassLoader(),
                 DependenciesReader.computeDependenciesFilePath("org.talend.components.api.test", "test-components"), null);
         List<URL> mavenUriDependencies = runtimeInfo.getMavenUrlDependencies();
         assertEquals(5, mavenUriDependencies.size());

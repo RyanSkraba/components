@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jira.JiraDefinition;
@@ -56,7 +57,8 @@ public class TJiraInputDefinition extends JiraDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology componentType) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology componentType) {
+        assertEngineCompatibility(engine);
         if (componentType == ConnectorTopology.OUTGOING) {
             return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
                     DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-jira"),

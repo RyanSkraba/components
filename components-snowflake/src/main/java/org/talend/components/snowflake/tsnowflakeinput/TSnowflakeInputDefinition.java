@@ -13,6 +13,7 @@
 package org.talend.components.snowflake.tsnowflakeinput;
 
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.snowflake.SnowflakeDefinition;
 import org.talend.components.snowflake.SnowflakeTableProperties;
@@ -56,7 +57,8 @@ public class TSnowflakeInputDefinition extends SnowflakeDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology componentType) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology componentType) {
+        assertEngineCompatibility(engine);
         if (componentType == ConnectorTopology.OUTGOING) {
             return getCommonRuntimeInfo(this.getClass().getClassLoader(), SnowflakeSource.class);
         } else {

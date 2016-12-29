@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.talend.components</groupId>
-	<version>0.16.0-SNAPSHOT</version>
+	<version>0.17.0-SNAPSHOT</version>
 	<artifactId>components</artifactId>
 	<packaging>pom</packaging>
 
@@ -11,7 +11,7 @@
 	<modules>
 		<module>components-parent</module>
 		<module>components-api</module>
-		<module>core/components-adapter-beam</module>
+		<module>core</module>
 		<module>components-common</module>
 		<module>components-common-oauth</module>
 		<module>components-salesforce</module>
@@ -21,13 +21,12 @@
 		<module>components-splunk</module>
 		<module>components-jira</module>
 		<module>components-api-full-example</module>
-		<module>components-jdbc</module>
 		<module>components-filedelimited</module>
 		<module>services</module>
 		<module>examples</module>
 		<module>components</module>
 		<module>components-api-archetypes</module>
-	</modules>
+  </modules>
 	<profiles>
 		<profile>
 			<id>eclipse</id>

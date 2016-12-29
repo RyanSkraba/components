@@ -405,10 +405,8 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
             String[] changedItemKeys = new String[upds.length];
             for (int ix = 0; ix < upds.length; ++ix) {
                 Object value = upds[ix].getField(upsertKeyColumn);
-                if (value == null) {
-                    changedItemKeys[ix] = "No value for " + upsertKeyColumn + " ";
-                } else {
-                    changedItemKeys[ix] = upsertKeyColumn;
+                if (value != null) {
+                    changedItemKeys[ix] = String.valueOf(value);
                 }
             }
             UpsertResult[] upsertResults;

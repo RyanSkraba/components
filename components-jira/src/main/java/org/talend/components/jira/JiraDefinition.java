@@ -13,6 +13,7 @@
 package org.talend.components.jira;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 
 /**
  * Jira definition common class. It contains some common definition implementation for all Jira components
@@ -27,7 +28,7 @@ public abstract class JiraDefinition extends AbstractComponentDefinition {
      * @param componentName component name
      */
     public JiraDefinition(String componentName) {
-        super(componentName);
+        super(componentName, ExecutionEngine.DI);
     }
 
     @Override

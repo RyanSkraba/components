@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.kafka.KafkaIOBasedDefinition;
@@ -41,9 +42,9 @@ public class KafkaOutputDefinition extends KafkaIOBasedDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology connectorTopology) {
-        return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
-                DependenciesReader.computeDependenciesFilePath("org.talend.components", "kafka-runtime"),
-                "org.talend.components.kafka.runtime.KafkaOutputPTransformRuntime");
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology connectorTopology) {
+        assertEngineCompatibility(engine);
+        return new SimpleRuntimeInfo(this.getClass().getClassLoader(), DependenciesReader.computeDependenciesFilePath(
+                "org.talend.components", "kafka-runtime"), "org.talend.components.kafka.runtime.KafkaOutputPTransformRuntime");
     }
 }

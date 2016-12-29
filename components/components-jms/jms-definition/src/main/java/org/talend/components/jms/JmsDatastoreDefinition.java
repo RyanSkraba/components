@@ -38,7 +38,7 @@ public class JmsDatastoreDefinition extends I18nDefinition implements DatastoreD
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(JmsDatastoreProperties properties, Object ctx) {
+    public RuntimeInfo getRuntimeInfo(JmsDatastoreProperties properties) {
         return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
                 DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-jms/jms-runtime_1_1"),
                 RUNTIME_1_1);

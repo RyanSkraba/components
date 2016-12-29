@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.test.AbstractComponentTest;
 import org.talend.components.multiruntime.MultiRuntimeComponentProperties.Version;
@@ -26,7 +27,6 @@ import org.talend.daikon.sandbox.SandboxedInstance;
 abstract public class AbstractMultiRuntimeComponentTests extends AbstractComponentTest {
 
     @Test
-    @Ignore("until we fix this")
     public void testMultiRuntimeComponentRuntime() throws Exception {
         MultiRuntimeComponentDefinition def = (MultiRuntimeComponentDefinition) getComponentService()
                 .getComponentDefinition(MultiRuntimeComponentDefinition.COMPONENT_NAME);
@@ -35,7 +35,7 @@ abstract public class AbstractMultiRuntimeComponentTests extends AbstractCompone
 
         props.version.setValue(Version.VERSION_0_1);
         try (SandboxedInstance sandboxedInstance = RuntimeUtil
-                .createRuntimeClass(def.getRuntimeInfo(props, ConnectorTopology.OUTGOING), props.getClass().getClassLoader())) {
+                .createRuntimeClass(def.getRuntimeInfo(ExecutionEngine.DI, props, ConnectorTopology.OUTGOING), props.getClass().getClassLoader())) {
             Source source = (Source) sandboxedInstance.getInstance();
             source.initialize(null, props);
             assertEquals("Me", source.validate(null).getMessage());
@@ -43,7 +43,7 @@ abstract public class AbstractMultiRuntimeComponentTests extends AbstractCompone
 
         props.version.setValue(Version.VERSION_0_2);
         try (SandboxedInstance sandboxedInstance = RuntimeUtil
-                .createRuntimeClass(def.getRuntimeInfo(props, ConnectorTopology.OUTGOING), props.getClass().getClassLoader())) {
+                .createRuntimeClass(def.getRuntimeInfo(ExecutionEngine.DI, props, ConnectorTopology.OUTGOING), props.getClass().getClassLoader())) {
             Source source2 = (Source) sandboxedInstance.getInstance();
             source2.initialize(null, props);
             assertEquals("AnotherMe", source2.validate(null).getMessage());
@@ -51,7 +51,6 @@ abstract public class AbstractMultiRuntimeComponentTests extends AbstractCompone
     }
 
     @Test
-    @Ignore("until we fix this")
     public void testMultiRuntimeComponentRuntimeFromProperties() throws Exception {
         MultiRuntimeComponentProperties props = (MultiRuntimeComponentProperties) getComponentService()
                 .getComponentProperties("MultiRuntimeComponent");

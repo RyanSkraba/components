@@ -32,7 +32,7 @@ public class KafkaDatasetDefinition extends I18nDefinition implements DatasetDef
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(KafkaDatasetProperties properties, Object ctx) {
+    public RuntimeInfo getRuntimeInfo(KafkaDatasetProperties properties) {
         return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
                 DependenciesReader.computeDependenciesFilePath("org.talend.components", "kafka-runtime"),
                 "org.talend.components.kafka.runtime.KafkaDatasetRuntime");

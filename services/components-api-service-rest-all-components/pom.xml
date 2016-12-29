@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
-		<version>0.16.0-SNAPSHOT</version>
+		<version>0.17.0-SNAPSHOT</version>
 		<relativePath>../../components-parent/pom.xml</relativePath>
 	</parent>
 
 
 	<artifactId>components-api-service-rest-all-components</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>0.2.0-SNAPSHOT</version>
 
 	<name>Component Rest APIs packaged with all components</name>
 
@@ -32,13 +32,11 @@
 	<dependencies>
 		<!-- list of embedded components -->
 		<dependency>
-			<!--
-				because common-oauth depends on jetty 9.2 (for java 7 compliance) and it's not compatible with
-				spring-boot 1.4.1, the jetty needs to be excluded.
-			-->
+			<!-- because common-oauth depends on jetty 9.2 (for java 7 compliance) 
+				and it's not compatible with spring-boot 1.4.1, the jetty needs to be excluded. -->
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-common-oauth</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.17.0-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.eclipse.jetty</groupId>
@@ -48,149 +46,109 @@
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
-			<artifactId>components-jdbc</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<artifactId>components-jdbc-definition</artifactId>
+			<version>0.17.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>simplefileio-definition</artifactId>
+			<version>0.17.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>jms-definition</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.17.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>kafka-definition</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>jms-runtime_1_1</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.17.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-jira</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.17.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-salesforce</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.17.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-full-example</artifactId>
-			<version>0.2.0-SNAPSHOT</version>
+			<version>0.3.0-SNAPSHOT</version>
+		</dependency>
+		<!-- the runtime artifact are added as test so that the global maven build 
+			builds them before -->
+		<!-- they are used to create the maven repo for runtime hence not real 
+			dependencies for the REST service -->
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>jms-runtime_1_1</artifactId>
+			<version>0.17.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-jdbc-runtime</artifactId>
+			<version>0.17.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>kafka-runtime</artifactId>
+			<version>0.17.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>simplefileio-runtime</artifactId>
+			<version>0.17.0-SNAPSHOT</version>
+			<scope>test</scope>
 		</dependency>
 		<!-- rest service -->
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api-service-rest</artifactId>
-            <version>0.16.0-SNAPSHOT</version>
-            <classifier>lib</classifier>
-        </dependency>
-        <dependency><!-- this overides the parent definition that limited the artifact
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api-service-rest</artifactId>
+			<version>0.17.0-SNAPSHOT</version>
+			<classifier>lib</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.ops4j.pax.url</groupId>
+			<artifactId>pax-url-aether</artifactId>
+			<version>2.4.7</version>
+		</dependency>
+		<dependency><!-- this overides the parent definition that limited the artifact 
 				to tests -->
-            <groupId>org.talend.daikon</groupId>
-            <artifactId>daikon-spring</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api-service-rest</artifactId>
-            <version>0.16.0-SNAPSHOT</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
+			<groupId>org.talend.daikon</groupId>
+			<artifactId>daikon-spring</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api-service-rest</artifactId>
+			<version>0.17.0-SNAPSHOT</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>0.16.0-SNAPSHOT</version>
+			<version>0.17.0-SNAPSHOT</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
-	<profiles>
-		<profile>
-			<id>docker</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>io.fabric8</groupId>
-						<artifactId>docker-maven-plugin</artifactId>
-						<version>0.15.1</version>
-						<executions>
-							<execution>
-								<id>start</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>build</goal>
-								</goals>
-								<configuration>
-									<registry>${talend_docker_registry}</registry>
-									<images>
-										<image>
-											<name>${talend_docker_registry}/talend/tcomp-${project.artifactId}-${git_branch}</name>
-											<build>
-												<from>${talend_docker_registry}/talend/java:1.8u72-alpine</from>
-												<tags>
-													<tag>${docker.version}</tag>
-												</tags>
-												<ports>
-													<port>8080</port>
-												</ports>
-												<entryPoint>
-													<!-- exec form for ENTRYPOINT -->
-													<exec>
-														<arg>java</arg>
-														<arg>-Dfile.encoding=UTF-8</arg>
-														<arg>-jar</arg>
-														<arg>/maven/${project.build.finalName}.jar</arg>
-													</exec>
-												</entryPoint>
-												<assembly><!-- includes the artifact generated by the current pom -->
-												    <descriptorRef>artifact</descriptorRef>
-												</assembly>
-											</build>
-										</image>
-									</images>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<!-- <plugin> -->
-					<!-- <groupId>com.spotify</groupId> -->
-					<!-- <artifactId>docker-maven-plugin</artifactId> -->
-					<!-- <configuration> -->
-					<!-- <imageName>registry.datapwn.com/talend/tcomp-${project.artifactId}:${docker.version}</imageName> -->
-					<!-- <baseImage>registry.datapwn.com/talend/java:1.8u72-alpine</baseImage> -->
-					<!-- <cmd>java -Dfile.encoding=UTF-8 -jar /${project.build.finalName}.jar</cmd> -->
-					<!-- <resources> -->
-					<!-- <resource> -->
-					<!-- <targetPath>/</targetPath> -->
-					<!-- <directory>${project.build.directory}</directory> -->
-					<!-- <include>${project.build.finalName}.jar</include> -->
-					<!-- </resource> -->
-					<!-- </resources> -->
-					<!-- </configuration> -->
-					<!-- <executions> -->
-					<!-- <execution> -->
-					<!-- <phase>install</phase> -->
-					<!-- <goals> -->
-					<!-- <goal>build</goal> -->
-					<!-- </goals> -->
-					<!-- </execution> -->
-					<!-- </executions> -->
-					<!-- </plugin> -->
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
-
+	<repositories>
+		<repository>
+			<id>talend-update</id>
+			<url>https://talend-update.talend.com/nexus/content/repositories/libraries/</url>
+		</repository>
+	</repositories>
 
 
 
@@ -212,8 +170,153 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/lib</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>false</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+							<includeScope>compile</includeScope>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<!-- this will create the mave repository for the application runtime 
+					resolution -->
+				<!-- you must specify the runtime artifacts if the are not part of dependencies 
+					of this pom. -->
+				<artifactId>maven-invoker-plugin</artifactId>
+				<version>2.0.0-TALEND</version>
+				<configuration>
+					<localRepositoryPath>target/local-repo</localRepositoryPath>
+					<skipTestScopeForExtraArtifacts>true</skipTestScopeForExtraArtifacts>
+					<projectsDirectory>src/it</projectsDirectory>
+					<cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+				</configuration>
+				<executions>
+					<execution>
+						<id>generate-maven-repo</id>
+						<phase>package</phase>
+						<goals>
+							<goal>install</goal>
+						</goals>
+						<configuration>
+							<extraArtifacts>
+								<extraArtifact>org.talend.components:components-salesforce:0.17.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:components-jira:0.17.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:jms-runtime_1_1:0.17.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:kafka-runtime:0.17.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:simplefileio-runtime:0.17.0-SNAPSHOT:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:components-jdbc-runtime:0.17.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.libraries:mysql-connector-java-5.1.30-bin:6.0.0:jar</extraArtifact>
+                                <extraArtifact>org.apache.derby:derby:10.12.1.1:jar</extraArtifact>
+							</extraArtifacts>
+							<pomIncludes>
+								<pomInclude>*/pom.xml</pomInclude>
+							</pomIncludes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>no-arch-package</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>assembly/no-arch.xml</descriptor>
+							</descriptors>
+							<appendAssemblyId>false</appendAssemblyId>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>integration test</id>
+						<goals>
+							<goal>integration-test</goal>
+						</goals>
+						<configuration>
+							<argLine>-Dorg.ops4j.pax.url.mvn.localRepository=${project.basedir}/target/local-repo}</argLine>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>docker</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>io.fabric8</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+						<version>0.15.1</version>
+						<executions>
+							<execution>
+								<id>start</id>
+								<phase>package</phase>
+								<goals>
+									<goal>build</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>${talend_docker_registry}/talend/tcomp-${project.artifactId}-${git_branch}</name>
+											<build>
+												<from>java:8-jre-alpine</from>
+												<tags>
+													<tag>${docker.version}</tag>
+												</tags>
+												<ports>
+													<port>8989</port>
+												</ports>
+												<volumes>
+													<volume>/maven/.m2</volume>
+												</volumes>
+												<entryPoint>
+													<exec>
+														<arg>/maven/start.sh</arg>
+													</exec>
+												</entryPoint>
+												<assembly><!-- includes the artifact generated by the current 
+														pom -->
+													<descriptor>${project.basedir}/assembly/no-arch.xml</descriptor>
+												</assembly>
+											</build>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 
 </project>

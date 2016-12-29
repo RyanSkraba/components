@@ -23,10 +23,10 @@ import org.talend.daikon.properties.ReferenceProperties;
 public abstract class KafkaIOBasedProperties extends FixedConnectorsComponentProperties
         implements IOProperties<KafkaDatasetProperties> {
 
-    public transient ReferenceProperties<KafkaDatasetProperties> dataset = new ReferenceProperties<>("dataset",
+    public ReferenceProperties<KafkaDatasetProperties> dataset = new ReferenceProperties<>("dataset",
             KafkaDatasetDefinition.NAME);
 
-    protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "module.main");
+    protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "dataset.main");
 
     public KafkaIOBasedProperties(String name) {
         super(name);
@@ -35,12 +35,6 @@ public abstract class KafkaIOBasedProperties extends FixedConnectorsComponentPro
     @Override
     public void setupLayout() {
         super.setupLayout();
-
-        // Form mainForm = new Form(this, Form.MAIN);
-        // For datastream, do not contains the property in datastore and dataset
-        // For studio, should contains the property in datastore and dataset
-        // mainForm.addRow(dataset.getDatastoreProperties().getForm(Form.REFERENCE));
-        // mainForm.addRow(dataset.getForm(Form.MAIN));
     }
 
     @Override

@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.BoundedReader;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.test.ComponentTestUtils;
@@ -61,6 +62,16 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
     @Test
     public void testOutputBulkExec() throws Throwable {
         testOutputBulkExec(10);
+    }
+
+    /**
+     *
+     * Test when bulk file is empty
+     *
+     */
+    @Test
+    public void testOutputBulkExecWithEmptyFile() throws Throwable {
+        testOutputBulkExec(0);
     }
 
     /**
@@ -111,7 +122,7 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
 
         TSalesforceBulkExecDefinition definition = (TSalesforceBulkExecDefinition) getComponentService()
                 .getComponentDefinition(TSalesforceBulkExecDefinition.COMPONENT_NAME);
-        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(bulkExecProperties, ConnectorTopology.OUTGOING);
+        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(ExecutionEngine.DI, bulkExecProperties, ConnectorTopology.OUTGOING);
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo,
                 definition.getClass().getClassLoader())) {
             SalesforceSource boundedSource = (SalesforceSource) sandboxedInstance.getInstance();

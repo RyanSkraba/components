@@ -17,20 +17,13 @@ import java.util.Set;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 public class SimpleComponentDefinition extends AbstractComponentDefinition {
-
-    /**
-     * 
-     * @param componentName
-     */
-    public SimpleComponentDefinition(String componentName) {
-        super(componentName);
-    }
 
     private String imagePath;
 
@@ -39,6 +32,14 @@ public class SimpleComponentDefinition extends AbstractComponentDefinition {
     private String mavenArtifactId;
 
     private Class<? extends ComponentProperties> propertyClass;
+
+    /**
+     *
+     * @param componentName
+     */
+    public SimpleComponentDefinition(String componentName, ExecutionEngine engine1, ExecutionEngine... engineOthers) {
+        super(componentName, engine1, engineOthers);
+    }
 
     @Override
     public Property[] getReturnProperties() {
@@ -92,7 +93,7 @@ public class SimpleComponentDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ComponentProperties properties, ConnectorTopology componentType) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology componentType) {
         return null;
     }
 

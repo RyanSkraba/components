@@ -121,7 +121,7 @@ public class JarRuntimeInfoTest {
      */
     @Test
     public void testGetRuntimeClassName() {
-        JarRuntimeInfo jarRuntimeInfo = new JarRuntimeInfo(null, null, "foo");
+        JarRuntimeInfo jarRuntimeInfo = new JarRuntimeInfo((URL) null, null, "foo");
         assertEquals("foo", jarRuntimeInfo.getRuntimeClassName());
     }
 

@@ -1,4 +1,4 @@
-// ============================================================================
+//==============================================================================
 //
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
@@ -9,9 +9,11 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-// ============================================================================
+//==============================================================================
 
 package org.talend.components.service.rest;
+
+import java.util.List;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,7 +38,7 @@ public interface DefinitionsController {
      * @returnWrapped java.lang.Iterable<org.talend.components.service.rest.dto.DefinitionDTO>
      */
     @RequestMapping(value = "/definitions/{type}", method = GET)
-    Iterable<DefinitionDTO> listDefinitions(@PathVariable("type") DefinitionType type);
+    List<DefinitionDTO> listDefinitions(@PathVariable("type") DefinitionType type);
 
     /**
      * Return components that match the given typology.
@@ -46,7 +48,7 @@ public interface DefinitionsController {
      * @returnWrapped java.lang.Iterable<org.talend.components.service.rest.dto.DefinitionDTO>
      */
     @RequestMapping(value = "/definitions/components", method = GET)
-    Iterable<DefinitionDTO> listComponentDefinitions(@RequestParam(value="typology", required = false) ConnectorTypology typology);
+    List<DefinitionDTO> listComponentDefinitions(@RequestParam(value = "typology", required = false) ConnectorTypology typology);
 
 
 }

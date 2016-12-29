@@ -39,6 +39,7 @@ import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
@@ -164,7 +165,7 @@ public class ComponentServiceTest extends AbstractComponentTest {
     @Test
     public void testGetRuntimeInfo() throws MalformedURLException {
         // check the comp def return the proper stream for the pom
-        RuntimeInfo runtimeInfo = getComponentService().getRuntimeInfo(TestComponentDefinition.COMPONENT_NAME, null, null);
+        RuntimeInfo runtimeInfo = getComponentService().getRuntimeInfo(TestComponentDefinition.COMPONENT_NAME, ExecutionEngine.DI, null, null);
         assertEquals(5, runtimeInfo.getMavenUrlDependencies().size());
         assertThat(runtimeInfo.getMavenUrlDependencies(),
                 containsInAnyOrder(new URL("mvn:org.apache.maven/maven-core/3.3.3/jar"), //

@@ -14,6 +14,7 @@ package org.talend.components.snowflake;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.properties.ComponentProperties;
@@ -28,7 +29,7 @@ import org.talend.daikon.runtime.RuntimeInfo;
 public abstract class SnowflakeDefinition extends AbstractComponentDefinition {
 
     public SnowflakeDefinition(String componentName) {
-        super(componentName);
+        super(componentName, ExecutionEngine.DI);
     }
 
     @Override

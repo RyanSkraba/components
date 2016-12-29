@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.jira.JiraDefinition;
 import org.talend.components.jira.runtime.JiraSource;
@@ -72,7 +73,7 @@ public class TJiraInputDefinitionTest {
     @Test
     public void testGetRuntime() {
         TJiraInputDefinition definition = new TJiraInputDefinition();
-        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(null, ConnectorTopology.OUTGOING);
+        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(ExecutionEngine.DI, null, ConnectorTopology.OUTGOING);
         SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, definition.getClass().getClassLoader());
         Source source = (Source) sandboxedInstance.getInstance();
         assertThat(source, is(instanceOf(JiraSource.class)));

@@ -12,8 +12,11 @@
 // ============================================================================
 package org.talend.components.service.rest.mock;
 
+import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.datastore.DatastoreDefinition;
+import org.talend.components.common.datastore.DatastoreProperties;
+import org.talend.components.common.datastore.runtime.DatastoreRuntime;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.runtime.RuntimeInfo;
 
@@ -22,7 +25,11 @@ import org.talend.daikon.runtime.RuntimeInfo;
  */
 public class MockDatastoreDefinition extends SimpleNamedThing implements DatastoreDefinition<MockDatastoreProperties> {
 
+    public static final String MOCK_DATASET_PROPERTIES_NAME = "mock dataset";
+
     private String name;
+
+    private Class<? extends DatastoreRuntime<? extends DatastoreProperties>> runtimeClass = MockDatastoreRuntime.class;
 
     public MockDatastoreDefinition(String name) {
         super("mock " + name);
@@ -35,13 +42,13 @@ public class MockDatastoreDefinition extends SimpleNamedThing implements Datasto
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(MockDatastoreProperties properties, Object ctx) {
-        return null;
+    public RuntimeInfo getRuntimeInfo(MockDatastoreProperties properties) {
+        return new SimpleRuntimeInfo(getClass().getClassLoader(), "", runtimeClass.getName());
     }
 
     @Override
     public DatasetProperties createDatasetProperties(MockDatastoreProperties storeProp) {
-        return null;
+        return new MockDatasetProperties(MOCK_DATASET_PROPERTIES_NAME);
     }
 
     @Override

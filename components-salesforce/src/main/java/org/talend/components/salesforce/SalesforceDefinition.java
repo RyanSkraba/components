@@ -14,6 +14,7 @@ package org.talend.components.salesforce;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.properties.ComponentProperties;
@@ -22,8 +23,8 @@ import org.talend.daikon.runtime.RuntimeInfo;
 
 public abstract class SalesforceDefinition extends AbstractComponentDefinition {
 
-    public SalesforceDefinition(String componentName) {
-        super(componentName);
+    public SalesforceDefinition(String componentName, ExecutionEngine engine1, ExecutionEngine... engines) {
+        super(componentName, engine1, engines);
     }
 
     @Override
