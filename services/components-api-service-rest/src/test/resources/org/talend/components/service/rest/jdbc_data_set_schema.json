@@ -1,6 +1,6 @@
 {
   "type": "record",
-  "name": "USERS",
+  "name": "DYNAMIC",
   "fields": [
     {
       "name": "ID",
