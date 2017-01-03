@@ -36,13 +36,22 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.PathFilter;
-import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.JobContext;
+import org.apache.hadoop.mapreduce.JobID;
+import org.apache.hadoop.mapreduce.RecordWriter;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.TaskAttemptID;
+import org.apache.hadoop.mapreduce.TaskID;
+import org.apache.hadoop.mapreduce.TaskType;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.task.JobContextImpl;
 import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl;
 import org.apache.parquet.avro.AvroParquetOutputFormat;
 import org.apache.parquet.avro.AvroWriteSupport;
+import org.apache.parquet.hadoop.ParquetOutputFormat;
+import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 
 /**
  * Copied from HDFSFileSink commit 89cf4613465647e2711983674879afd5f67c519d
@@ -258,6 +267,7 @@ public class ConfigureOnWriteHdfsFileSink<K, V> extends Sink<KV<K, V>> {
                 if (formatClass == (Class<?>) AvroParquetOutputFormat.class) {
                     IndexedRecord record = (IndexedRecord) value.getValue();
                     AvroWriteSupport.setSchema(job.getConfiguration(), record.getSchema());
+                    ParquetOutputFormat.setCompression(job, CompressionCodecName.SNAPPY);
                 }
 
                 context = new TaskAttemptContextImpl(job.getConfiguration(), new TaskAttemptID(taskId, 0));
