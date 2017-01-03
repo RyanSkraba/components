@@ -54,11 +54,6 @@ import org.talend.daikon.properties.ValidationResult;
 public class SimpleFileIoOutputRuntime extends PTransform<PCollection<IndexedRecord>, PDone> implements
         RuntimableRuntime<SimpleFileIoOutputProperties> {
 
-    static {
-        // Ensure that the singleton for the SimpleFileIoAvroRegistry is created.
-        SimpleFileIoAvroRegistry.get();
-    }
-
     /**
      * The component instance that this runtime is configured for.
      */
