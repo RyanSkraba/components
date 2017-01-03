@@ -13,7 +13,9 @@
 
 package org.talend.components.simplefileio;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
@@ -83,25 +85,29 @@ public class SimpleFileIoDatasetPropertiesTest {
             assertThat(w.isVisible(), is(true));
         }
 
-        // These three formats only have format and path visible.
-        for (SimpleFileIoFormat format : Arrays.asList(SimpleFileIoFormat.AVRO, SimpleFileIoFormat.PARQUET,
-                SimpleFileIoFormat.JSON)) {
+        // Check which properties are visible when the format is changed.
+        for (SimpleFileIoFormat format : SimpleFileIoFormat.values()) {
             properties.format.setValue(format);
             properties.afterFormat();
 
+            // Always visible.
             assertThat(main.getWidget("format").isVisible(), is(true));
             assertThat(main.getWidget("path").isVisible(), is(true));
-            assertThat(main.getWidget("recordDelimiter").isVisible(), is(false));
-            assertThat(main.getWidget("fieldDelimiter").isVisible(), is(false));
+
+            switch (format) {
+            case CSV:
+                assertThat(main.getWidget("recordDelimiter").isVisible(), is(true));
+                assertThat(main.getWidget("fieldDelimiter").isVisible(), is(true));
+                break;
+            case AVRO:
+            case PARQUET:
+                assertThat(main.getWidget("recordDelimiter").isVisible(), is(false));
+                assertThat(main.getWidget("fieldDelimiter").isVisible(), is(false));
+                break;
+            default:
+                throw new RuntimeException("Missing test case for " + format);
+            }
+
         }
-
-        // All visible for CSV.
-        properties.format.setValue(SimpleFileIoFormat.CSV);
-        properties.afterFormat();
-
-        assertThat(main.getWidget("format").isVisible(), is(true));
-        assertThat(main.getWidget("path").isVisible(), is(true));
-        assertThat(main.getWidget("recordDelimiter").isVisible(), is(true));
-        assertThat(main.getWidget("fieldDelimiter").isVisible(), is(true));
     }
 }
