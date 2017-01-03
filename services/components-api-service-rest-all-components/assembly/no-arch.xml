@@ -6,6 +6,14 @@
         <format>zip</format>
     </formats>
     <fileSets>
+        <!-- Dependencies -->
+        <fileSet>
+            <directory>${project.basedir}/target/lib</directory>
+            <outputDirectory>${file.separator}lib</outputDirectory>
+            <includes>
+                <include>*.*</include>
+            </includes>
+        </fileSet>
         <!-- configuration files -->
         <fileSet>
             <directory>${project.basedir}/src/main/resources</directory>
