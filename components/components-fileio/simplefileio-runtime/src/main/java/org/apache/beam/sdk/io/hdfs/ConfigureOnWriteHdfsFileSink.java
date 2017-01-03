@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.avro.file.DataFileConstants;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.mapred.AvroKey;
 import org.apache.avro.mapreduce.AvroJob;
@@ -262,9 +263,9 @@ public class ConfigureOnWriteHdfsFileSink<K, V> extends Sink<KV<K, V>> {
                 if (formatClass == (Class<?>) AvroKeyOutputFormat.class) {
                     AvroKey<IndexedRecord> k = (AvroKey<IndexedRecord>) value.getKey();
                     AvroJob.setOutputKeySchema(job, k.datum().getSchema());
-                }
-
-                if (formatClass == (Class<?>) AvroParquetOutputFormat.class) {
+                    FileOutputFormat.setCompressOutput(job, true);
+                    job.getConfiguration().set(AvroJob.CONF_OUTPUT_CODEC, DataFileConstants.SNAPPY_CODEC);
+                } else if (formatClass == (Class<?>) AvroParquetOutputFormat.class) {
                     IndexedRecord record = (IndexedRecord) value.getValue();
                     AvroWriteSupport.setSchema(job.getConfiguration(), record.getSchema());
                     ParquetOutputFormat.setCompression(job, CompressionCodecName.SNAPPY);
