@@ -5,12 +5,11 @@
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
 		<version>0.17.0-SNAPSHOT</version>
-		<relativePath>../components-parent/pom.xml</relativePath>
+		<relativePath>../../../components-parent/pom.xml</relativePath>
 	</parent>
 
 	<name>Component Maven archetypes</name>
-	<artifactId>components-api-archetypes</artifactId>
-	<packaging>pom</packaging>
+	<artifactId>input-component-archetypes</artifactId>
 	<version>0.17.0-SNAPSHOT</version>
 
     <!-- these dependencies allow the build to take place after the dependencies
@@ -18,15 +17,32 @@
 	<dependencies>
         <dependency>
             <groupId>org.talend.components</groupId>
-            <artifactId>components-api-service-osgi</artifactId>
-            <version>0.17.0-SNAPSHOT</version>
+            <artifactId>components-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
-            <artifactId>components-api-service-rest</artifactId>
-            <version>0.17.0-SNAPSHOT</version>
+            <artifactId>components-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-common</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-common-oauth</artifactId>
+            <version>${project.version}</version>
         </dependency>
 	</dependencies>
 	<build>
@@ -49,16 +65,9 @@
 						<goals>
 							<goal>integration-test</goal>
 						</goals>
-						<configuration>
-						<skip>${really.skip.tests}</skip>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 		</plugins>
 	</build>
-    <modules>
-        <module>input-component-archetype</module>
-        <module>poc-bd-archetype</module>
-    </modules>
 </project>

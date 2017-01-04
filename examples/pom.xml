@@ -10,7 +10,8 @@
 	<name>Components examples Aggregator</name>
 	<modules>
 		<module>components-multiple-runtimes-and-deps</module>
-  </modules>
+		<module>components-api-archetypes</module>
+	</modules>
 	<build>
 		<!-- skip the deployment for this aggregator, not necessary -->
 		<plugins>
