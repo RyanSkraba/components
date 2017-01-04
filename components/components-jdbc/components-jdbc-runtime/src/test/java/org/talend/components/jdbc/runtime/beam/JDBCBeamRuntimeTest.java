@@ -147,9 +147,10 @@ public class JDBCBeamRuntimeTest implements Serializable {
         inputDatasetProperties.init();
         inputDatasetProperties.setDatastoreProperties(jdbcDatastoreProperties);
         inputDatasetProperties.sql.setValue("select * from " + TABLE_IN);
-        Schema inputSchema = SchemaBuilder.record("DYNAMIC").fields().name("ID").type(SchemaBuilder.builder().intType())
-                .noDefault().name("NAME").type(SchemaBuilder.builder().stringType()).noDefault().endRecord();
-        inputDatasetProperties.main.schema.setValue(inputSchema);
+        // Schema inputSchema =
+        // SchemaBuilder.record("DYNAMIC").fields().name("ID").type(SchemaBuilder.builder().stringType())
+        // .noDefault().name("NAME").type(SchemaBuilder.builder().stringType()).noDefault().endRecord();
+        // inputDatasetProperties.main.schema.setValue(inputSchema);
 
         JDBCInputProperties inputProperties = new JDBCInputProperties("input");
         inputProperties.init();
@@ -160,9 +161,8 @@ public class JDBCBeamRuntimeTest implements Serializable {
         outputDatasetProperties.setDatastoreProperties(jdbcDatastoreProperties);
         outputDatasetProperties.sourceType.setValue(JDBCDatasetProperties.SourceType.TABLE_NAME);
         outputDatasetProperties.tableName.setValue(TABLE_OUT);
-        Schema outputSchema = SchemaBuilder.record("DYNAMIC").fields()
-                .name("ID").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "ID")
-                .type(SchemaBuilder.builder().intType()).noDefault()
+        Schema outputSchema = SchemaBuilder.record("DYNAMIC").fields().name("ID")
+                .prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "ID").type(SchemaBuilder.builder().intType()).noDefault()
                 .name("NAME").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "NAME")
                 .type(SchemaBuilder.builder().stringType()).noDefault().endRecord();
         outputDatasetProperties.main.schema.setValue(outputSchema);
