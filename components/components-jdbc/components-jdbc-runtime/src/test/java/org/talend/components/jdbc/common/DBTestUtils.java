@@ -12,16 +12,24 @@
 // ============================================================================
 package org.talend.components.jdbc.common;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.sql.Blob;
+import java.sql.Clob;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -37,7 +45,7 @@ import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.common.avro.JDBCAvroRegistry;
+import org.talend.components.jdbc.avro.JDBCAvroRegistryString;
 import org.talend.components.jdbc.runtime.JDBCSink;
 import org.talend.components.jdbc.runtime.JDBCSource;
 import org.talend.components.jdbc.runtime.JdbcRuntimeUtils;
@@ -56,6 +64,8 @@ import org.talend.components.jdbc.tjdbcrow.TJDBCRowProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
+
+import shaded.org.codehaus.plexus.util.StringInputStream;
 
 public class DBTestUtils {
 
@@ -84,6 +94,7 @@ public class DBTestUtils {
     public static void releaseResource(AllSetting allSetting) throws ClassNotFoundException, SQLException {
         try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
             dropTestTable(conn);
+            dropAllTypesTable(conn);
         } finally {
             shutdownDBIfNecessary();
         }
@@ -143,10 +154,145 @@ public class DBTestUtils {
 
         return builder.endRecord();
     }
+    
+    /**
+     * Following several methods are setup and tearDown methods for ALL_TYPES table.
+     * ALL_TYPES tables contains columns for each data type available in Derby DB
+     * This is required to test conversion between SQL -> JDBC -> Avro data types
+     */
+    public static void createAllTypesTable(Connection conn) throws SQLException {
+        try (Statement statement = conn.createStatement()) {
+            statement.execute("create table ALL_TYPES (SMALL_INT_COL smallint, INT_COL integer, BIG_INT_COL bigint, REAL_COL real, DOUBLE_COL double,"
+                    + "DECIMAL_COL decimal(20,10), CHAR_COL char(4), VARCHAR_COL varchar(8), BLOB_COL blob(16), CLOB_COL clob(16), DATE_COL date,"
+                    + "TIME_COL time, TIMESTAMP_COL timestamp, BOOLEAN_COL boolean)");
+        }
+    }
+    
+    public static void dropAllTypesTable(Connection conn) throws SQLException {
+        try (Statement statement = conn.createStatement()) {
+            statement.execute("drop table ALL_TYPES");
+        }
+    }
+
+    public static void truncateAllTypesTable(Connection conn) throws SQLException {
+        try (Statement statement = conn.createStatement()) {
+            statement.execute("delete from ALL_TYPES");
+        }
+    }
+    
+    /**
+     * Load only one record
+     */
+    public static void loadAllTypesData(Connection conn) throws SQLException {
+        try (PreparedStatement statement = conn.prepareStatement("insert into ALL_TYPES values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
+            statement.setShort(1, (short) 32767);
+            statement.setInt(2, 2147483647);
+            statement.setLong(3, 9223372036854775807l);
+            statement.setFloat(4, 1.11111111f);
+            statement.setDouble(5, 2.222222222);
+            statement.setBigDecimal(6, new BigDecimal("1234567890.1234567890"));
+            statement.setString(7, "abcd");
+            statement.setString(8, "abcdefg");
+            
+            Blob blob = conn.createBlob();
+            byte[] bytes = {0,1,2,3,4,5,6,7,8,9};
+            blob.setBytes(1, bytes);
+            statement.setBlob(9, blob);
+            
+            Clob clob = conn.createClob();
+            clob.setString(1, "abcdefg");
+            statement.setClob(10, clob);
+            
+            statement.setDate(11, Date.valueOf("2016-12-28"));
+            statement.setTime(12, Time.valueOf("14:30:33"));
+            statement.setTimestamp(13, Timestamp.valueOf("2016-12-28 14:31:56.12345"));
+            statement.setBoolean(14, true);
+
+            statement.executeUpdate();
+        }
+
+        if (!conn.getAutoCommit()) {
+            conn.commit();
+        }
+    }
+    
+    public static Schema createAllTypesSchema() {
+        FieldAssembler<Schema> builder = SchemaBuilder.builder().record("ALL_TYPES").fields();
+        
+        // sql (smallint)short -> avro int
+        Schema schema = AvroUtils._int();
+        schema = wrap(schema);
+        builder = builder.name("SMALL_INT_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "SMALL_INT_COL").type(schema).noDefault();
+        
+        schema = AvroUtils._int();
+        schema = wrap(schema);
+        builder = builder.name("INT_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "INT_COL").type(schema).noDefault();
+
+        // sql bigint -> avro long
+        schema = AvroUtils._long();
+        schema = wrap(schema);
+        builder = builder.name("BIG_INT_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "BIG_INT_COL").type(schema).noDefault();
+        
+        schema = AvroUtils._float();
+        schema = wrap(schema);
+        builder = builder.name("REAL_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "REAL_COL").type(schema).noDefault();
+        
+        schema = AvroUtils._double();
+        schema = wrap(schema);
+        builder = builder.name("DOUBLE_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "DOUBLE_COL").type(schema).noDefault();
+        
+        // We don't use avro logical type, but use our own implementation of BigDecimal
+        schema = AvroUtils._decimal();
+        schema = wrap(schema);
+        builder = builder.name("DECIMAL_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "DECIMAL_COL").type(schema).noDefault();
+        
+        // sql char -> avro string
+        schema = AvroUtils._string();
+        schema = wrap(schema);
+        builder = builder.name("CHAR_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "CHAR_COL").type(schema).noDefault();
+        
+        // sql varchar -> avro string
+        schema = AvroUtils._string();
+        schema = wrap(schema);
+        builder = builder.name("VARCHAR_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "VARCHAR_COL").type(schema).noDefault();
+        
+        // sql blob -> avro bytes
+        schema = AvroUtils._bytes();
+        schema = wrap(schema);
+        builder = builder.name("BLOB_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "BLOB_COL").type(schema).noDefault();
+        
+        // sql clob -> avro string
+        // TBD it could also be bytes
+        schema = AvroUtils._string();
+        schema = wrap(schema);
+        builder = builder.name("CLOB_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "CLOB_COL").type(schema).noDefault();
+        
+        // sql date -> avro logical date
+        schema = AvroUtils._logicalDate();
+        schema = wrap(schema);
+        builder = builder.name("DATE_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "DATE_COL").type(schema).noDefault();
+        
+        // sql time -> avro logical time
+        schema = AvroUtils._logicalTime();
+        schema = wrap(schema);
+        builder = builder.name("TIME_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "TIME_COL").type(schema).noDefault();
+        
+        // sql timestamp -> avro logical timestamp
+        schema = AvroUtils._logicalTimestamp();
+        schema = wrap(schema);
+        builder = builder.name("TIMESTAMP_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "TIMESTAMP_COL").type(schema).noDefault();
+        
+        schema = AvroUtils._boolean();
+        schema = wrap(schema);
+        builder = builder.name("BOOLEAN_COL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "BOOLEAN_COL").type(schema).noDefault();
+
+        return builder.endRecord();
+    }
 
     public static void createTable(AllSetting allSetting) throws Exception {
         try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
             createTestTable(conn);
+            createAllTypesTable(conn);
         }
     }
 
@@ -154,6 +300,8 @@ public class DBTestUtils {
         try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
             truncateTable(conn);
             loadTestData(conn);
+            truncateAllTypesTable(conn);
+            loadAllTypesData(conn);
         }
     }
 
@@ -563,7 +711,7 @@ public class DBTestUtils {
             return converter;
         }
 
-        return (IndexedRecordConverter<Object, ? extends IndexedRecord>) JDBCAvroRegistry.get()
+        return (IndexedRecordConverter<Object, ? extends IndexedRecord>) JDBCAvroRegistryString.get()
                 .createIndexedRecordConverter(reader.getCurrent().getClass());
     }
 
@@ -748,16 +896,24 @@ public class DBTestUtils {
     public static String getTablename() {
         return "TEST";
     }
+    
+    public static String getAllTypesTablename() {
+        return "ALL_TYPES";
+    }
 
     public static String getSQL() {
         return "select * from TEST";
+    }
+    
+    public static String getAllTypesSQL() {
+        return "select * from ALL_TYPES";
     }
 
     public static void testMetadata(List<Field> columns) {
         Schema.Field field = columns.get(0);
 
         assertEquals("ID", field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
-        assertEquals(Schema.Type.INT, AvroUtils.unwrapIfNullable(field.schema()).getType());
+        assertEquals(Schema.Type.STRING, AvroUtils.unwrapIfNullable(field.schema()).getType());
         assertEquals(java.sql.Types.INTEGER, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
         assertEquals(null, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
         assertEquals(10, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PRECISION));

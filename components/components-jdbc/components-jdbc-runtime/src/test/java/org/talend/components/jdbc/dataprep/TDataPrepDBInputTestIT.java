@@ -115,28 +115,28 @@ public class TDataPrepDBInputTestIT {
             reader.start();
 
             IndexedRecord row = (IndexedRecord) reader.getCurrent();
-            Integer id = (Integer) row.get(0);
+            String id = (String) row.get(0);
             String name = (String) row.get(1);
 
-            assertEquals(new Integer("1"), id);
+            assertEquals("1", id);
             assertEquals("wangwei", name);
 
             reader.advance();
 
             row = (IndexedRecord) reader.getCurrent();
-            id = (Integer) row.get(0);
+            id = (String) row.get(0);
             name = (String) row.get(1);
 
-            assertEquals(new Integer("2"), id);
+            assertEquals("2", id);
             assertEquals("gaoyan", name);
 
             reader.advance();
 
             row = (IndexedRecord) reader.getCurrent();
-            id = (Integer) row.get(0);
+            id = (String) row.get(0);
             name = (String) row.get(1);
 
-            assertEquals(new Integer("3"), id);
+            assertEquals("3", id);
             assertEquals("dabao", name);
 
             reader.close();
@@ -176,7 +176,7 @@ public class TDataPrepDBInputTestIT {
 
                 IndexedRecord record = converter.convertToAvro(reader.getCurrent());
 
-                assertEquals(Integer.class, record.get(0).getClass());
+                assertEquals(String.class, record.get(0).getClass());
                 assertEquals(String.class, record.get(1).getClass());
             }
 

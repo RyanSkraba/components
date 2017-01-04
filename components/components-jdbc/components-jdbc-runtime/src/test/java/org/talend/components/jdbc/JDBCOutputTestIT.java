@@ -102,9 +102,9 @@ public class JDBCOutputTestIT {
                 properties1);
 
         assertThat(records, hasSize(5));
-        Assert.assertEquals(4, records.get(3).get(0));
+        Assert.assertEquals("4", records.get(3).get(0));
         Assert.assertEquals("xiaoming", records.get(3).get(1));
-        Assert.assertEquals(5, records.get(4).get(0));
+        Assert.assertEquals("5", records.get(4).get(0));
         Assert.assertEquals("xiaobai", records.get(4).get(1));
     }
 
@@ -174,11 +174,11 @@ public class JDBCOutputTestIT {
                 properties1);
 
         assertThat(records, hasSize(6));
-        Assert.assertEquals(4, records.get(3).get(0));
+        Assert.assertEquals("4", records.get(3).get(0));
         Assert.assertEquals("wangwei", records.get(3).get(1));
-        Assert.assertEquals(6, records.get(4).get(0));
+        Assert.assertEquals("6", records.get(4).get(0));
         Assert.assertEquals("gaoyan", records.get(4).get(1));
-        Assert.assertEquals(8, records.get(5).get(0));
+        Assert.assertEquals("8", records.get(5).get(0));
         Assert.assertEquals("dabao", records.get(5).get(1));
     }
 
@@ -227,11 +227,11 @@ public class JDBCOutputTestIT {
                 properties1);
 
         assertThat(records, hasSize(3));
-        Assert.assertEquals(1, records.get(0).get(0));
+        Assert.assertEquals("1", records.get(0).get(0));
         Assert.assertEquals("wangwei1", records.get(0).get(1));
-        Assert.assertEquals(2, records.get(1).get(0));
+        Assert.assertEquals("2", records.get(1).get(0));
         Assert.assertEquals(randomInfo, "gaoyan1", records.get(1).get(1));
-        Assert.assertEquals(3, records.get(2).get(0));
+        Assert.assertEquals("3", records.get(2).get(0));
         Assert.assertEquals("dabao", records.get(2).get(1));
     }
 
@@ -301,11 +301,11 @@ public class JDBCOutputTestIT {
                 properties1);
 
         assertThat(records, hasSize(3));
-        Assert.assertEquals(1, records.get(0).get(0));
+        Assert.assertEquals("1", records.get(0).get(0));
         Assert.assertEquals("wangwei", records.get(0).get(1));
-        Assert.assertEquals(2, records.get(1).get(0));
+        Assert.assertEquals("2", records.get(1).get(0));
         Assert.assertEquals("gaoyan1", records.get(1).get(1));
-        Assert.assertEquals(3, records.get(2).get(0));
+        Assert.assertEquals("3", records.get(2).get(0));
         Assert.assertEquals("dabao1", records.get(2).get(1));
     }
 
@@ -352,7 +352,7 @@ public class JDBCOutputTestIT {
                 properties1);
 
         assertThat(records, hasSize(1));
-        Assert.assertEquals(3, records.get(0).get(0));
+        Assert.assertEquals("3", records.get(0).get(0));
         Assert.assertEquals("dabao", records.get(0).get(1));
     }
 
@@ -477,13 +477,13 @@ public class JDBCOutputTestIT {
                 properties1);
 
         assertThat(records, hasSize(4));
-        Assert.assertEquals(1, records.get(0).get(0));
+        Assert.assertEquals("1", records.get(0).get(0));
         Assert.assertEquals("wangwei1", records.get(0).get(1));
-        Assert.assertEquals(2, records.get(1).get(0));
+        Assert.assertEquals("2", records.get(1).get(0));
         Assert.assertEquals("gaoyan1", records.get(1).get(1));
-        Assert.assertEquals(3, records.get(2).get(0));
+        Assert.assertEquals("3", records.get(2).get(0));
         Assert.assertEquals("dabao", records.get(2).get(1));
-        Assert.assertEquals(4, records.get(3).get(0));
+        Assert.assertEquals("4", records.get(3).get(0));
         Assert.assertEquals("new one", records.get(3).get(1));
     }
 
@@ -540,13 +540,13 @@ public class JDBCOutputTestIT {
                 properties1);
 
         assertThat(records, hasSize(4));
-        Assert.assertEquals(1, records.get(0).get(0));
+        Assert.assertEquals("1", records.get(0).get(0));
         Assert.assertEquals("wangwei1", records.get(0).get(1));
-        Assert.assertEquals(2, records.get(1).get(0));
+        Assert.assertEquals("2", records.get(1).get(0));
         Assert.assertEquals("gaoyan1", records.get(1).get(1));
-        Assert.assertEquals(3, records.get(2).get(0));
+        Assert.assertEquals("3", records.get(2).get(0));
         Assert.assertEquals("dabao", records.get(2).get(1));
-        Assert.assertEquals(4, records.get(3).get(0));
+        Assert.assertEquals("4", records.get(3).get(0));
         Assert.assertEquals("new one", records.get(3).get(1));
     }
 
@@ -599,9 +599,9 @@ public class JDBCOutputTestIT {
 
         if (action == DataAction.INSERT || action == DataAction.INSERTORUPDATE || action == DataAction.UPDATEORINSERT) {
             assertThat(records, hasSize(2));
-            Assert.assertEquals(4, records.get(0).get(0));
+            Assert.assertEquals("4", records.get(0).get(0));
             Assert.assertEquals("xiaoming", records.get(0).get(1));
-            Assert.assertEquals(5, records.get(1).get(0));
+            Assert.assertEquals("5", records.get(1).get(0));
             Assert.assertEquals("xiaobai", records.get(1).get(1));
         } else {
             assertThat(records, hasSize(0));

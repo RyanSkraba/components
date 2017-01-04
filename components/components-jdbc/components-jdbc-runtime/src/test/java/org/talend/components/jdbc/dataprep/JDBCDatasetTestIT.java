@@ -92,7 +92,7 @@ public class JDBCDatasetTestIT {
         };
 
         runtime.getSample(1, storeTheRecords);
-        Assert.assertEquals(1, record[0].get(0));
+        Assert.assertEquals("1", record[0].get(0));
         Assert.assertEquals("wangwei", record[0].get(1));
     }
 

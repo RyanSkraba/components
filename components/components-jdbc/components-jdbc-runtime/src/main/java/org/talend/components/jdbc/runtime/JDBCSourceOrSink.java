@@ -28,7 +28,7 @@ import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.common.avro.JDBCAvroRegistry;
+import org.talend.components.jdbc.avro.JDBCAvroRegistryString;
 import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.jdbc.ComponentConstants;
@@ -121,7 +121,7 @@ public class JDBCSourceOrSink implements SourceOrSink {
     public Schema getEndpointSchema(RuntimeContainer runtime, String tableName) throws IOException {
         try (Connection conn = connect(runtime);
                 ResultSet resultset = conn.getMetaData().getColumns(null, null, tableName, null)) {
-            return JDBCAvroRegistry.get().inferSchema(resultset);
+            return JDBCAvroRegistryString.get().inferSchema(resultset);
         } catch (Exception e) {
             throw new ComponentException(e);
         }
@@ -132,7 +132,7 @@ public class JDBCSourceOrSink implements SourceOrSink {
                 Statement statement = conn.createStatement();
                 ResultSet resultset = statement.executeQuery(query)) {
             ResultSetMetaData metadata = resultset.getMetaData();
-            return JDBCAvroRegistry.get().inferSchema(metadata);
+            return JDBCAvroRegistryString.get().inferSchema(metadata);
         } catch (SQLSyntaxErrorException sqlSyntaxException) {
             throw new ComponentException(JdbcComponentErrorsCode.SQL_SYNTAX_ERROR, sqlSyntaxException);
         } catch (SQLException e) {
