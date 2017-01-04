@@ -29,10 +29,14 @@ import org.talend.daikon.runtime.RuntimeInfo;
  */
 public class JDBCInputDefinition extends AbstractComponentDefinition {
 
+    public static final String BEAM_RUNTIME = "org.talend.components.jdbc.runtime.beam.JDBCInputPTransformRuntime";
+
+    public static final String DI_RUNTIME = "org.talend.components.jdbc.runtime.JDBCSource";
+
     public static String NAME = "DataPrepDBInput";
 
     public JDBCInputDefinition() {
-        super(NAME, ExecutionEngine.DI);
+        super(NAME, ExecutionEngine.DI, ExecutionEngine.BEAM);
     }
 
     @Override
@@ -49,8 +53,17 @@ public class JDBCInputDefinition extends AbstractComponentDefinition {
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
-        // TODO may need to use the different runtime
-        return new JdbcRuntimeInfo((JDBCInputProperties) properties, "org.talend.components.jdbc.runtime.JDBCSource");
+        String runtimeClass = "";
+        switch (engine) {
+        case BEAM:
+            runtimeClass = BEAM_RUNTIME;
+            break;
+        case DI:
+        default:
+            runtimeClass = DI_RUNTIME;
+            break;
+        }
+        return new JdbcRuntimeInfo((JDBCInputProperties) properties, runtimeClass);
     }
 
     @SuppressWarnings("rawtypes")

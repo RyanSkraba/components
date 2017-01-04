@@ -68,7 +68,8 @@ public class JDBCMapping {
         }
 
         if (AvroUtils.isSameType(basicSchema, AvroUtils._string())) {
-            statement.setString(index, (String) value);
+            // Avro will convert string to {@link org.apache.avro.util.Utf8}
+            statement.setString(index, String.valueOf(value));
         } else if (AvroUtils.isSameType(basicSchema, AvroUtils._int())) {
             statement.setInt(index, (Integer) value);
         } else if (AvroUtils.isSameType(basicSchema, AvroUtils._date())) {

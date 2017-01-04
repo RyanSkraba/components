@@ -30,8 +30,6 @@ public class JdbcRuntimeInfo extends JarRuntimeInfo {
     private final RuntimeSettingProvider props;
 
     /**
-     * @param jarUrl
-     * @param depTxtPath
      * @param runtimeClassName
      * @param props
      */

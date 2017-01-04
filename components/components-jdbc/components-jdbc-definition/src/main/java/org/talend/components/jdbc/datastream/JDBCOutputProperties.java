@@ -23,6 +23,7 @@ import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.io.IOProperties;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
+import org.talend.components.jdbc.datastore.JDBCDatastoreProperties;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.presentation.Form;
@@ -78,16 +79,29 @@ public class JDBCOutputProperties extends FixedConnectorsComponentProperties
         return connectors;
     }
 
+    @Override
+    public AllSetting getRuntimeSetting() {
+        // TODO only return the Driver paths is enough to get the getRuntimeInfo works, AllSetting should be removed
+        // after refactor
+        AllSetting setting = new AllSetting();
+
+        JDBCDatasetProperties datasetProperties = this.getDatasetProperties();
+        JDBCDatastoreProperties datastoreProperties = datasetProperties.getDatastoreProperties();
+
+        setting.setDriverPaths(datastoreProperties.getCurrentDriverPaths());
+        setting.setDriverClass(datastoreProperties.getCurrentDriverClass());
+        setting.setJdbcUrl(datastoreProperties.jdbcUrl.getValue());
+
+        setting.setUsername(datastoreProperties.userId.getValue());
+        setting.setPassword(datastoreProperties.password.getValue());
+
+        return setting;
+    }
+
     // missing part for JdbcIO, can not run multiple sql same time, so do not support insertOrUpdate/updateOrInsert
     public enum DataAction {
         INSERT,
         UPDATE,
         DELETE
-    }
-
-    @Override
-    public AllSetting getRuntimeSetting() {
-        // TODO now the data stream jdbcoutput can't work, so we keep it empty here, need a discussion with bd team
-        return null;
     }
 }

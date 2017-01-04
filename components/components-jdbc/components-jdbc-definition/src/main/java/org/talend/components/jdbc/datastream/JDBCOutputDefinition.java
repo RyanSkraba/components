@@ -28,8 +28,10 @@ public class JDBCOutputDefinition extends AbstractComponentDefinition {
 
     public final static String NAME = "JdbcOutput";
 
+    public final static String BEAM_RUNTIME = "org.talend.components.jdbc.runtime.beam.JDBCOutputPTransformRuntime";
+
     public JDBCOutputDefinition() {
-        super(NAME, ExecutionEngine.DI);
+        super(NAME, ExecutionEngine.BEAM);
     }
 
     @Override
@@ -41,8 +43,7 @@ public class JDBCOutputDefinition extends AbstractComponentDefinition {
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
-        // TODO may need to use the different runtime
-        return new JdbcRuntimeInfo((JDBCOutputProperties) properties, "org.talend.components.jdbc.runtime.JDBCSink");
+        return new JdbcRuntimeInfo((JDBCOutputProperties) properties, BEAM_RUNTIME);
     }
 
     @Override
