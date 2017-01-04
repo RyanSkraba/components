@@ -123,7 +123,11 @@ public class SimpleFileIoAvroRegistry extends AvroRegistry {
 
         @Override
         public Object get(int i) {
-            return value[i];
+            if (value.length > i) {
+                return value[i];
+            } else {
+                return "";
+            }
         }
 
         @Override
