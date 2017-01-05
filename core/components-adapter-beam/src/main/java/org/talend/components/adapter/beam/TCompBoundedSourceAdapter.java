@@ -22,6 +22,7 @@ import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.io.BoundedSource;
 import org.apache.beam.sdk.options.PipelineOptions;
+import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
