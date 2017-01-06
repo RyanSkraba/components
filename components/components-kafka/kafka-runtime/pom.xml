@@ -22,6 +22,11 @@
             <artifactId>kafka-definition</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-adapter-beam</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- kafka version sync with beam -->
         <dependency>
             <groupId>org.apache.kafka</groupId>
@@ -96,7 +101,7 @@
                                             <KAFKA_ADVERTISED_PORT>9092</KAFKA_ADVERTISED_PORT>
                                             <KAFKA_ZOOKEEPER_CONNECT>zookeeper:2181</KAFKA_ZOOKEEPER_CONNECT>
                                             <KAFKA_CREATE_TOPICS>
-                                                test_in:1:1,test_out:1:1,test_avro_in:1:1,test_avro_out:1:1,test_avro_custom_in:1:1,test_avro_custom_out:1:1
+                                                test_in:1:1,test_out:1:1,test_avro_in:1:1,test_avro_out:1:1
                                             </KAFKA_CREATE_TOPICS>
                                         </env>
                                         <ports>
