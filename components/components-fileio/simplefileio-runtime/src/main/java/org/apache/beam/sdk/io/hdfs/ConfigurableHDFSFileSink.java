@@ -1,36 +1,39 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
- * file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
- */
+// ============================================================================
+//
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+//
+// This source code is available under agreement available at
+// %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
+//
+// You should have received a copy of the agreement
+// along with this program; if not, write to Talend SA
+// 9 rue Pages 92150 Suresnes, France
+//
+// ============================================================================
 package org.apache.beam.sdk.io.hdfs;
 
-import static org.apache.beam.sdk.repackaged.com.google.common.base.Preconditions.checkState;
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
-import org.apache.avro.file.DataFileConstants;
-import org.apache.avro.generic.IndexedRecord;
-import org.apache.avro.mapred.AvroKey;
-import org.apache.avro.mapreduce.AvroJob;
-import org.apache.avro.mapreduce.AvroKeyOutputFormat;
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.io.Sink;
 import org.apache.beam.sdk.options.PipelineOptions;
-import org.apache.beam.sdk.repackaged.com.google.common.collect.Lists;
-import org.apache.beam.sdk.repackaged.com.google.common.collect.Maps;
-import org.apache.beam.sdk.repackaged.com.google.common.collect.Sets;
 import org.apache.beam.sdk.values.KV;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
@@ -49,41 +52,49 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.task.JobContextImpl;
 import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl;
-import org.apache.parquet.avro.AvroParquetOutputFormat;
-import org.apache.parquet.avro.AvroWriteSupport;
-import org.apache.parquet.hadoop.ParquetOutputFormat;
-import org.apache.parquet.hadoop.metadata.CompressionCodecName;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+
+import static org.apache.beam.sdk.repackaged.com.google.common.base.Preconditions.checkState;
+
+import org.apache.beam.sdk.repackaged.com.google.common.collect.Lists;
+import org.apache.beam.sdk.repackaged.com.google.common.collect.Maps;
+import org.apache.beam.sdk.repackaged.com.google.common.collect.Sets;
 
 /**
- * Copied from HDFSFileSink commit 89cf4613465647e2711983674879afd5f67c519d
+ * Copied from https://github.com/apache/beam/commit/89cf4613465647e2711983674879afd5f67c519d
+ * 
+ * This class was modified to add the {@link HDFSWriter#configure(Job)} method.
  *
- * The only changes to this class are in the HDFSWriter, where the old HDFSWriter#open logic is not performed (i.e. a
- * task context is not created) until after the first incoming data to HDFSWriter#write arrives. The HDFSWriter can then
- * use the Schema from the incoming record to initialize the job and task context. This configuration is hard-coded for
- * the {@link org.apache.avro.mapred.AvroOutputFormat} and {@link AvroParquetOutputFormat}
+ * A {@code Sink} for writing records to a Hadoop filesystem using a Hadoop file-based output
+ * format.
  *
  * @param <K> The type of keys to be written to the sink.
  * @param <V> The type of values to be written to the sink.
  */
-public class ConfigureOnWriteHdfsFileSink<K, V> extends Sink<KV<K, V>> {
+public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
 
-    private static final JobID jobId = new JobID(Long.toString(System.currentTimeMillis()),
+    private static final JobID jobId = new JobID(
+            Long.toString(System.currentTimeMillis()),
             new Random().nextInt(Integer.MAX_VALUE));
 
     protected final String path;
-
     protected final Class<? extends FileOutputFormat<K, V>> formatClass;
 
     // workaround to make Configuration serializable
     private final Map<String, String> map;
 
-    public ConfigureOnWriteHdfsFileSink(String path, Class<? extends FileOutputFormat<K, V>> formatClass) {
+    public ConfigurableHDFSFileSink(String path, Class<? extends FileOutputFormat<K, V>> formatClass) {
         this.path = path;
         this.formatClass = formatClass;
         this.map = Maps.newHashMap();
     }
 
-    public ConfigureOnWriteHdfsFileSink(String path, Class<? extends FileOutputFormat<K, V>> formatClass, Configuration conf) {
+    public ConfigurableHDFSFileSink(String path, Class<? extends FileOutputFormat<K, V>> formatClass,
+                        Configuration conf) {
         this(path, formatClass);
         // serialize conf to map
         for (Map.Entry<String, String> entry : conf) {
@@ -122,18 +133,16 @@ public class ConfigureOnWriteHdfsFileSink<K, V> extends Sink<KV<K, V>> {
     // WriteOperation
     // =======================================================================
 
-    /**
-     * {{@link WriteOperation} for HDFS.
-     */
+    /** {{@link WriteOperation}} for HDFS. */
     public static class HDFSWriteOperation<K, V> extends WriteOperation<KV<K, V>, String> {
 
         private final Sink<KV<K, V>> sink;
-
         protected final String path;
-
         protected final Class<? extends FileOutputFormat<K, V>> formatClass;
 
-        public HDFSWriteOperation(Sink<KV<K, V>> sink, String path, Class<? extends FileOutputFormat<K, V>> formatClass) {
+        public HDFSWriteOperation(Sink<KV<K, V>> sink,
+                                  String path,
+                                  Class<? extends FileOutputFormat<K, V>> formatClass) {
             this.sink = sink;
             this.path = path;
             this.formatClass = formatClass;
@@ -141,13 +150,13 @@ public class ConfigureOnWriteHdfsFileSink<K, V> extends Sink<KV<K, V>> {
 
         @Override
         public void initialize(PipelineOptions options) throws Exception {
-            Job job = ((ConfigureOnWriteHdfsFileSink<K, V>) getSink()).jobInstance();
+            Job job = ((ConfigurableHDFSFileSink<K, V>) getSink()).jobInstance();
             FileOutputFormat.setOutputPath(job, new Path(path));
         }
 
         @Override
         public void finalize(Iterable<String> writerResults, PipelineOptions options) throws Exception {
-            Job job = ((ConfigureOnWriteHdfsFileSink<K, V>) getSink()).jobInstance();
+            Job job = ((ConfigurableHDFSFileSink<K, V>) getSink()).jobInstance();
             FileSystem fs = FileSystem.get(job.getConfiguration());
 
             // If there are 0 output shards, just create output folder.
@@ -164,7 +173,6 @@ public class ConfigureOnWriteHdfsFileSink<K, V> extends Sink<KV<K, V>> {
             // get actual output shards
             Set<String> actual = Sets.newHashSet();
             FileStatus[] statuses = fs.listStatus(new Path(path), new PathFilter() {
-
                 @Override
                 public boolean accept(Path path) {
                     String name = path.getName();
@@ -174,7 +182,8 @@ public class ConfigureOnWriteHdfsFileSink<K, V> extends Sink<KV<K, V>> {
 
             // get expected output shards
             Set<String> expected = Sets.newHashSet(writerResults);
-            checkState(expected.size() == Lists.newArrayList(writerResults).size(),
+            checkState(
+                    expected.size() == Lists.newArrayList(writerResults).size(),
                     "Data loss due to writer results hash collision");
             for (FileStatus s : statuses) {
                 String name = s.getPath().getName();
@@ -190,7 +199,9 @@ public class ConfigureOnWriteHdfsFileSink<K, V> extends Sink<KV<K, V>> {
                 String name = s.getPath().getName();
                 int pos = name.indexOf('.');
                 String ext = pos > 0 ? name.substring(pos) : "";
-                fs.rename(s.getPath(), new Path(s.getPath().getParent(), String.format("part-r-%05d%s", i, ext)));
+                fs.rename(
+                        s.getPath(),
+                        new Path(s.getPath().getParent(), String.format("part-r-%05d%s", i, ext)));
                 i++;
             }
         }
@@ -216,77 +227,61 @@ public class ConfigureOnWriteHdfsFileSink<K, V> extends Sink<KV<K, V>> {
     // Writer
     // =======================================================================
 
-    /**
-     * {{@link Writer} for HDFS files.
-     */
+    /** {{@link Writer}} for HDFS files. */
     public static class HDFSWriter<K, V> extends Writer<KV<K, V>, String> {
 
         private final HDFSWriteOperation<K, V> writeOperation;
-
         private final String path;
-
         private final Class<? extends FileOutputFormat<K, V>> formatClass;
 
         // unique hash for each task
         private int hash;
 
         private TaskAttemptContext context;
-
         private RecordWriter<K, V> recordWriter;
-
         private FileOutputCommitter outputCommitter;
 
-        public HDFSWriter(HDFSWriteOperation<K, V> writeOperation, String path,
-                Class<? extends FileOutputFormat<K, V>> formatClass) {
+        public HDFSWriter(HDFSWriteOperation<K, V> writeOperation,
+                          String path,
+                          Class<? extends FileOutputFormat<K, V>> formatClass) {
             this.writeOperation = writeOperation;
             this.path = path;
             this.formatClass = formatClass;
         }
 
+        protected void configure(Job job) {
+        }
+
         @Override
         public void open(String uId) throws Exception {
             this.hash = uId.hashCode();
+
+            Job job = ((ConfigurableHDFSFileSink<K, V>) getWriteOperation().getSink()).jobInstance();
+            FileOutputFormat.setOutputPath(job, new Path(path));
+
+            // Each Writer is responsible for writing one bundle of elements and is represented by one
+            // unique Hadoop task based on uId/hash. All tasks share the same job ID. Since Dataflow
+            // handles retrying of failed bundles, each task has one attempt only.
+            JobID jobId = job.getJobID();
+            TaskID taskId = new TaskID(jobId, TaskType.REDUCE, hash);
+            configure(job);
+            context = new TaskAttemptContextImpl(job.getConfiguration(), new TaskAttemptID(taskId, 0));
+
+            FileOutputFormat<K, V> outputFormat = formatClass.newInstance();
+            recordWriter = outputFormat.getRecordWriter(context);
+            outputCommitter = (FileOutputCommitter) outputFormat.getOutputCommitter(context);
         }
 
         @Override
         public void write(KV<K, V> value) throws Exception {
-            if (context == null) {
-                Job job = ((ConfigureOnWriteHdfsFileSink<K, V>) getWriteOperation().getSink()).jobInstance();
-                FileOutputFormat.setOutputPath(job, new Path(path));
-
-                // Each Writer is responsible for writing one bundle of elements and is represented by one
-                // unique Hadoop task based on uId/hash. All tasks share the same job ID. Since Dataflow
-                // handles retrying of failed bundles, each task has one attempt only.
-                JobID jobId = job.getJobID();
-                TaskID taskId = new TaskID(jobId, TaskType.REDUCE, hash);
-
-                if (formatClass == (Class<?>) AvroKeyOutputFormat.class) {
-                    AvroKey<IndexedRecord> k = (AvroKey<IndexedRecord>) value.getKey();
-                    AvroJob.setOutputKeySchema(job, k.datum().getSchema());
-                    FileOutputFormat.setCompressOutput(job, true);
-                    job.getConfiguration().set(AvroJob.CONF_OUTPUT_CODEC, DataFileConstants.SNAPPY_CODEC);
-                } else if (formatClass == (Class<?>) AvroParquetOutputFormat.class) {
-                    IndexedRecord record = (IndexedRecord) value.getValue();
-                    AvroWriteSupport.setSchema(job.getConfiguration(), record.getSchema());
-                    ParquetOutputFormat.setCompression(job, CompressionCodecName.SNAPPY);
-                }
-
-                context = new TaskAttemptContextImpl(job.getConfiguration(), new TaskAttemptID(taskId, 0));
-
-                FileOutputFormat<K, V> outputFormat = formatClass.newInstance();
-                recordWriter = outputFormat.getRecordWriter(context);
-                outputCommitter = (FileOutputCommitter) outputFormat.getOutputCommitter(context);
-            }
             recordWriter.write(value.getKey(), value.getValue());
         }
 
         @Override
         public String close() throws Exception {
             // task/attempt successful
-            if (context != null) {
-                recordWriter.close(context);
-                outputCommitter.commitTask(context);
-            }
+            recordWriter.close(context);
+            outputCommitter.commitTask(context);
 
             // result is prefix of the output file name
             return String.format("part-r-%d", hash);

@@ -13,8 +13,6 @@
 package org.talend.components.simplefileio.runtime;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.talend.components.simplefileio.runtime.SimpleFileIoInputRuntimeTest.createInputComponentProperties;
 import static org.talend.components.simplefileio.runtime.SimpleFileIoOutputRuntimeTest.createOutputComponentProperties;
@@ -31,7 +29,6 @@ import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.values.PCollection;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;

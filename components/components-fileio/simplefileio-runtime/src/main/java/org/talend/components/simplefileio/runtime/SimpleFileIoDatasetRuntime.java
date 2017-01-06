@@ -62,6 +62,7 @@ public class SimpleFileIoDatasetRuntime implements DatasetRuntime<SimpleFileIoDa
         // Create an input runtime based on the properties.
         SimpleFileIoInputRuntime inputRuntime = new SimpleFileIoInputRuntime();
         SimpleFileIoInputProperties inputProperties = new SimpleFileIoInputProperties(null);
+        inputProperties.limit.setValue(limit);
         inputProperties.init();
         inputProperties.setDatasetProperties(properties);
         inputRuntime.initialize(null, inputProperties);

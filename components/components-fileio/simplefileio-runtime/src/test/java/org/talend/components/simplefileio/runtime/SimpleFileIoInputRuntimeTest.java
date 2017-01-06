@@ -137,6 +137,37 @@ public class SimpleFileIoInputRuntimeTest {
     }
 
     @Test
+    public void testBasicCsvLimit() throws IOException, URISyntaxException {
+
+        String inputFile = writeRandomCsvFile(mini.getFs(), "/user/test/input.csv", 0, 0, 10, 10, 6, ";", "\n");
+        String fileSpec = mini.getFs().getUri().resolve("/user/test/input.csv").toString();
+
+        // Configure the component.
+        SimpleFileIoInputProperties inputProps = createInputComponentProperties();
+        inputProps.getDatasetProperties().path.setValue(fileSpec);
+        inputProps.limit.setValue(2);
+
+        // Create the runtime.
+        SimpleFileIoInputRuntime runtime = new SimpleFileIoInputRuntime();
+        runtime.initialize(null, inputProps);
+
+        // Use the runtime in a direct pipeline to test.
+        // TODO(rskraba): This fails for certain values of targetParallelism! To fix.
+        final Pipeline p = beam.createPipeline(1);
+
+        PCollection<IndexedRecord> readLines = p.apply(runtime);
+
+        List<IndexedRecord> expected = new ArrayList<>();
+        for (String record : inputFile.split("\n")) {
+            expected.add(ConvertToIndexedRecord.convertToAvro(record.split(";")));
+        }
+        expected = expected.subList(0, 2);
+
+        PAssert.that(readLines).containsInAnyOrder(expected);
+        p.run().waitUntilFinish();
+    }
+
+    @Test
     public void testBasicCsvCustomDelimiters() throws IOException, URISyntaxException {
 
         String inputFile = writeRandomCsvFile(mini.getFs(), "/user/test/input.csv", 0, 0, 10, 10, 6, "|", "---");

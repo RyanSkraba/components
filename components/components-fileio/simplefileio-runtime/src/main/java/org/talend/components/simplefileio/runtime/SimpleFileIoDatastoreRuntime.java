@@ -12,12 +12,12 @@
 // ============================================================================
 package org.talend.components.simplefileio.runtime;
 
+import static java.util.Collections.emptyList;
+
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.datastore.runtime.DatastoreRuntime;
 import org.talend.components.simplefileio.SimpleFileIoDatastoreProperties;
 import org.talend.daikon.properties.ValidationResult;
-
-import static java.util.Collections.emptyList;
 
 public class SimpleFileIoDatastoreRuntime implements DatastoreRuntime<SimpleFileIoDatastoreProperties> {
 

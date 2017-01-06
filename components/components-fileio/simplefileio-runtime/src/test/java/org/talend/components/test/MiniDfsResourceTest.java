@@ -24,14 +24,11 @@ import java.net.URISyntaxException;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.mapred.AvroKey;
-import org.apache.beam.runners.direct.DirectOptions;
-import org.apache.beam.runners.direct.DirectRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.coders.AvroCoder;
 import org.apache.beam.sdk.io.Read;
 import org.apache.beam.sdk.io.hdfs.AvroHDFSFileSource;
 import org.apache.beam.sdk.io.hdfs.HDFSFileSource;
-import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Keys;
 import org.apache.beam.sdk.transforms.Sample;

@@ -20,11 +20,9 @@ import java.nio.ByteBuffer;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.mapred.AvroKey;
-import org.apache.avro.mapreduce.AvroKeyOutputFormat;
 import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.coders.VoidCoder;
 import org.apache.beam.sdk.io.Write;
-import org.apache.beam.sdk.io.hdfs.ConfigureOnWriteHdfsFileSink;
 import org.apache.beam.sdk.io.hdfs.HDFSFileSink;
 import org.apache.beam.sdk.io.hdfs.WritableCoder;
 import org.apache.beam.sdk.transforms.DoFn;
@@ -45,17 +43,23 @@ import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.ReflectionUtils;
-import org.apache.parquet.avro.AvroParquetOutputFormat;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.simplefileio.output.SimpleFileIoOutputProperties;
 import org.talend.components.simplefileio.runtime.coders.LazyAvroKeyWrapper;
+import org.talend.components.simplefileio.runtime.sinks.AvroHdfsFileSink;
+import org.talend.components.simplefileio.runtime.sinks.ParquetHdfsFileSink;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.properties.ValidationResult;
 
 public class SimpleFileIoOutputRuntime extends PTransform<PCollection<IndexedRecord>, PDone> implements
         RuntimableRuntime<SimpleFileIoOutputProperties> {
+
+    static {
+        // Ensure that the singleton for the SimpleFileIoAvroRegistry is created.
+        SimpleFileIoAvroRegistry.get();
+    }
 
     /**
      * The component instance that this runtime is configured for.
@@ -74,14 +78,9 @@ public class SimpleFileIoOutputRuntime extends PTransform<PCollection<IndexedRec
 
         case AVRO: {
             LazyAvroKeyWrapper lakw = LazyAvroKeyWrapper.of();
-
-            Configuration conf = new Configuration();
-            ConfigureOnWriteHdfsFileSink<AvroKey<IndexedRecord>, NullWritable> sink = new ConfigureOnWriteHdfsFileSink(
-                    properties.getDatasetProperties().path.getValue(), AvroKeyOutputFormat.class, conf);
-
+            AvroHdfsFileSink sink = new AvroHdfsFileSink(properties.getDatasetProperties().path.getValue());
             PCollection<KV<AvroKey<IndexedRecord>, NullWritable>> pc1 = in.apply(ParDo.of(new FormatAvro()));
             pc1 = pc1.setCoder(KvCoder.of(lakw, WritableCoder.of(NullWritable.class)));
-
             return pc1.apply(Write.to(sink));
         }
 
@@ -97,12 +96,9 @@ public class SimpleFileIoOutputRuntime extends PTransform<PCollection<IndexedRec
         }
 
         case PARQUET: {
-            ConfigureOnWriteHdfsFileSink<Void, IndexedRecord> sink = new ConfigureOnWriteHdfsFileSink<Void, IndexedRecord>(
-                    properties.getDatasetProperties().path.getValue(), (Class) AvroParquetOutputFormat.class);
-
+            ParquetHdfsFileSink sink = new ParquetHdfsFileSink(properties.getDatasetProperties().path.getValue());
             PCollection<KV<Void, IndexedRecord>> pc1 = in.apply(ParDo.of(new FormatParquet()));
             pc1 = pc1.setCoder(KvCoder.of(VoidCoder.of(), LazyAvroCoder.of()));
-
             return pc1.apply(Write.to(sink));
         }
 
@@ -189,7 +185,7 @@ public class SimpleFileIoOutputRuntime extends PTransform<PCollection<IndexedRec
                 if (sb.length() != 0)
                     sb.append(fieldDelimiter);
                 if (Schema.Type.BYTES.equals(AvroUtils.unwrapIfNullable(in.getSchema()).getFields().get(i).schema().getType())) {
-                    sb.append(new String(((ByteBuffer)in.get(i)).array()));
+                    sb.append(new String(((ByteBuffer) in.get(i)).array()));
                 } else {
                     sb.append(in.get(i));
                 }
