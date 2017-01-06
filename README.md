@@ -108,6 +108,6 @@ For pull request contribution please make sure to follow the review process expl
 
 ## License
 
-Copyright (c) 2006-2016 Talend
+Copyright (c) 2006-2017 Talend
 
 Licensed under the Apache V2 License
