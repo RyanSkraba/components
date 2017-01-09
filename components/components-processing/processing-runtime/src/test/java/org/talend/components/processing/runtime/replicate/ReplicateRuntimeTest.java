@@ -1,4 +1,4 @@
-package org.talend.components.processing.runtime;
+package org.talend.components.processing.runtime.replicate;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -11,7 +11,7 @@ import org.apache.beam.sdk.values.PCollection;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.talend.components.adapter.beam.BeamJobContext;
-import org.talend.components.adapter.beam.LazyAvroCoder;
+import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.processing.definition.replicate.ReplicateProperties;
 import org.talend.daikon.avro.GenericDataRecordHelper;

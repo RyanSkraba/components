@@ -1,4 +1,4 @@
-package org.talend.components.processing.runtime;
+package org.talend.components.processing.runtime.replicate;
 
 import org.apache.beam.sdk.values.PCollection;
 

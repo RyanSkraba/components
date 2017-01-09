@@ -15,15 +15,7 @@ package org.talend.components.processing.definition.replicate;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.talend.daikon.properties.presentation.Form;
-import org.talend.daikon.properties.presentation.Widget;
-
-import java.util.Collection;
-
-import static junit.framework.TestCase.assertFalse;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class ReplicatePropertiesTest {
 
@@ -34,7 +26,6 @@ public class ReplicatePropertiesTest {
     public void testDefaultProperties() {
         ReplicateProperties properties = new ReplicateProperties("test");
     }
-
 
     /**
      * Checks {@link ReplicateProperties} sets correctly initial layout properties

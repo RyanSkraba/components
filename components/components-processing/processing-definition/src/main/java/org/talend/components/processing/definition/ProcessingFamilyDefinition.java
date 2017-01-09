@@ -16,6 +16,7 @@ import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.processing.definition.window.WindowDefinition;
 import org.talend.components.processing.definition.replicate.ReplicateDefinition;
 
 import aQute.bnd.annotation.component.Component;
@@ -36,7 +37,7 @@ public class ProcessingFamilyDefinition extends AbstractComponentFamilyDefinitio
     public ProcessingFamilyDefinition() {
         super(NAME,
                 // Components
-                new ReplicateDefinition()
+                new WindowDefinition(), new ReplicateDefinition()
         // Component wizards
         );
     }

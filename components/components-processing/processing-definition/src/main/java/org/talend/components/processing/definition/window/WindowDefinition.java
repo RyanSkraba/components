@@ -10,7 +10,7 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.processing.definition.replicate;
+package org.talend.components.processing.definition.window;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,22 +28,22 @@ import org.talend.components.processing.definition.ProcessingFamilyDefinition;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
-public class ReplicateDefinition extends AbstractComponentDefinition {
+public class WindowDefinition extends AbstractComponentDefinition {
 
-    public static final String COMPONENT_NAME = "Replicate";
+    public static final String NAME = "Window";
 
-    public ReplicateDefinition() {
-        super(COMPONENT_NAME, ExecutionEngine.BEAM);
+    public WindowDefinition() {
+        super(NAME, ExecutionEngine.BEAM);
+    }
+
+    @Override
+    public Class getPropertyClass() {
+        return WindowProperties.class;
     }
 
     @Override
     public String[] getFamilies() {
         return new String[] { ProcessingFamilyDefinition.NAME };
-    }
-
-    @Override
-    public Class getPropertyClass() {
-        return ReplicateProperties.class;
     }
 
     public Property[] getReturnProperties() {
@@ -56,10 +56,9 @@ public class ReplicateDefinition extends AbstractComponentDefinition {
         assertEngineCompatibility(engine);
         assertConnectorTopologyCompatibility(connectorTopology);
         try {
-            return new JarRuntimeInfo(new URL("mvn:org.talend.components/components-processing"),
-                    DependenciesReader.computeDependenciesFilePath(ProcessingFamilyDefinition.MAVEN_GROUP_ID,
-                            ProcessingFamilyDefinition.MAVEN_ARTIFACT_ID),
-                    "org.talend.components.processing.runtime.replicate.ReplicateRuntime");
+            return new JarRuntimeInfo(new URL("mvn:org.talend.components/window-runtime"),
+                    DependenciesReader.computeDependenciesFilePath("org.talend.components", "window-runtime"),
+                    "org.talend.components.processing.runtime.window.WindowRuntime");
         } catch (MalformedURLException e) {
             throw new ComponentException(e);
         }
