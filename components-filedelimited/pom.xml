@@ -5,14 +5,14 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.17.0-SNAPSHOT</version>
+        <version>0.17.0</version>
         <relativePath>../components-parent/pom.xml</relativePath>
     </parent>
 
     <name>Components - File Delimited</name>
     <groupId>org.talend.components</groupId>
     <artifactId>components-filedelimited</artifactId>
-    <version>0.17.0-SNAPSHOT</version>
+    <version>0.17.0</version>
     <packaging>bundle</packaging>
     <dependencies>
 
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.17.0-SNAPSHOT</version>
+            <version>0.17.0</version>
         </dependency>
         <dependency>
             <groupId>biz.aQute.bnd</groupId>
@@ -49,14 +49,14 @@
         <dependency>
           <groupId>org.talend.components</groupId>
           <artifactId>components-common</artifactId>
-          <version>0.17.0-SNAPSHOT</version>
+          <version>0.17.0</version>
         </dependency>
         
         <!-- Jar containing Test utils methods -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.17.0-SNAPSHOT</version>
+            <version>0.17.0</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
@@ -64,14 +64,14 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
-            <version>0.17.0-SNAPSHOT</version>
+            <version>0.17.0</version>
             <classifier>lib</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
-            <version>0.17.0-SNAPSHOT</version>
+            <version>0.17.0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -83,7 +83,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
-            <version>0.17.0-SNAPSHOT</version>
+            <version>0.17.0</version>
             <scope>test</scope>
         </dependency>
         </dependencies>

@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.17.0-SNAPSHOT</version>
+        <version>0.17.0</version>
         <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
 
@@ -107,7 +107,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
-            <version>0.17.0-SNAPSHOT</version>
+            <version>0.17.0</version>
             <scope>test</scope>
         </dependency>
         <!-- dep for OSGI tests -->
