@@ -15,10 +15,9 @@ package org.talend.components.simplefileio.runtime;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.runners.direct.DirectOptions;
-import org.apache.beam.runners.direct.DirectRunner;
 import org.apache.beam.sdk.Pipeline;
-import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Sample;
+import org.talend.components.adapter.beam.BeamLocalRunnerOption;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.adapter.beam.transform.DirectConsumerCollector;
 import org.talend.components.api.container.RuntimeContainer;
@@ -66,12 +65,9 @@ public class SimpleFileIoDatasetRuntime implements DatasetRuntime<SimpleFileIoDa
         inputProperties.init();
         inputProperties.setDatasetProperties(properties);
         inputRuntime.initialize(null, inputProperties);
-
         // Create a pipeline using the input component to get records.
-        DirectOptions options = PipelineOptionsFactory.as(DirectOptions.class);
-        options.setRunner(DirectRunner.class);
-        options.setEnforceEncodability(false);
-        options.setEnforceImmutability(false);
+
+        DirectOptions options = BeamLocalRunnerOption.getOptions();
         final Pipeline p = Pipeline.create(options);
         LazyAvroCoder.registerAsFallback(p);
 

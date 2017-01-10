@@ -115,4 +115,28 @@ public class JarRuntimeInfo implements RuntimeInfo {
         return runtimeClassName;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!JarRuntimeInfo.class.isAssignableFrom(obj.getClass())) {
+            return false;
+        }
+        JarRuntimeInfo other = (JarRuntimeInfo) obj;
+        return this.runtimeClassName.equals(other.runtimeClassName) && this.jarUrl.equals(other.jarUrl)
+                && this.depTxtPath.equals(other.depTxtPath);
+    }
+
+    @Override
+    public int hashCode() {
+        return (runtimeClassName + jarUrl + depTxtPath).hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "JarRunTimeInfo: {" + "runtimeClassName:" + runtimeClassName + ", " + "jarUrl: " + jarUrl + ", " + "depTxtPath: "
+                + depTxtPath + "}";
+    }
+
 }
