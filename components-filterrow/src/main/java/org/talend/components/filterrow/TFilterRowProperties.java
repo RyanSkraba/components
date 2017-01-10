@@ -145,9 +145,6 @@ public class TFilterRowProperties extends FixedConnectorsComponentProperties {
         for (Schema.Field se : metadataSchema.getFields()) {
             Schema.Field field = new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal(), se.order());
             field.getObjectProps().putAll(se.getObjectProps());
-            for (Map.Entry<String, Object> entry : se.getObjectProps().entrySet()) {
-                field.addProp(entry.getKey(), entry.getValue());
-            }
             copyFieldList.add(field);
         }
 
