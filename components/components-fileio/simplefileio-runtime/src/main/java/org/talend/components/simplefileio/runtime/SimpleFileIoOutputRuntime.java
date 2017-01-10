@@ -23,7 +23,6 @@ import org.apache.avro.mapred.AvroKey;
 import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.coders.VoidCoder;
 import org.apache.beam.sdk.io.Write;
-import org.apache.beam.sdk.io.hdfs.HDFSFileSink;
 import org.apache.beam.sdk.io.hdfs.WritableCoder;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.PTransform;
@@ -50,6 +49,8 @@ import org.talend.components.simplefileio.output.SimpleFileIoOutputProperties;
 import org.talend.components.simplefileio.runtime.coders.LazyAvroKeyWrapper;
 import org.talend.components.simplefileio.runtime.sinks.AvroHdfsFileSink;
 import org.talend.components.simplefileio.runtime.sinks.ParquetHdfsFileSink;
+import org.talend.components.simplefileio.runtime.sinks.UgiFileSinkBase;
+import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.properties.ValidationResult;
 
@@ -74,11 +75,14 @@ public class SimpleFileIoOutputRuntime extends PTransform<PCollection<IndexedRec
 
     @Override
     public PDone expand(PCollection<IndexedRecord> in) {
+        // Controls the access security on the cluster.
+        UgiDoAs doAs = SimpleFileIoDatastoreRuntime.getUgiDoAs(properties.getDatasetProperties().getDatastoreProperties());
+
         switch (properties.getDatasetProperties().format.getValue()) {
 
         case AVRO: {
             LazyAvroKeyWrapper lakw = LazyAvroKeyWrapper.of();
-            AvroHdfsFileSink sink = new AvroHdfsFileSink(properties.getDatasetProperties().path.getValue());
+            AvroHdfsFileSink sink = new AvroHdfsFileSink(doAs, properties.getDatasetProperties().path.getValue());
             PCollection<KV<AvroKey<IndexedRecord>, NullWritable>> pc1 = in.apply(ParDo.of(new FormatAvro()));
             pc1 = pc1.setCoder(KvCoder.of(lakw, WritableCoder.of(NullWritable.class)));
             return pc1.apply(Write.to(sink));
@@ -88,15 +92,18 @@ public class SimpleFileIoOutputRuntime extends PTransform<PCollection<IndexedRec
             Configuration conf = new Configuration();
             conf.set(CsvTextOutputFormat.RECORD_DELIMITER, properties.getDatasetProperties().recordDelimiter.getValue());
             conf.set(CsvTextOutputFormat.ENCODING, CsvTextOutputFormat.UTF_8);
-            HDFSFileSink<NullWritable, Text> sink = new HDFSFileSink(properties.getDatasetProperties().path.getValue(),
-                    CsvTextOutputFormat.class, conf);
-            return in.apply(ParDo.of(new FormatCsv(properties.datasetRef.getReference().fieldDelimiter.getValue())))
-                    .setCoder(KvCoder.of(WritableCoder.of(NullWritable.class), WritableCoder.of(Text.class))) //
-                    .apply(Write.to(sink));
+            UgiFileSinkBase<NullWritable, Text> sink = new UgiFileSinkBase<>(doAs,
+                    properties.getDatasetProperties().path.getValue(), CsvTextOutputFormat.class, conf);
+
+            PCollection<KV<NullWritable, Text>> pc1 = in.apply(
+                    ParDo.of(new FormatCsv(properties.getDatasetProperties().fieldDelimiter.getValue()))).setCoder(
+                    KvCoder.of(WritableCoder.of(NullWritable.class), WritableCoder.of(Text.class)));
+
+            return pc1.apply(Write.to(sink));
         }
 
         case PARQUET: {
-            ParquetHdfsFileSink sink = new ParquetHdfsFileSink(properties.getDatasetProperties().path.getValue());
+            ParquetHdfsFileSink sink = new ParquetHdfsFileSink(doAs, properties.getDatasetProperties().path.getValue());
             PCollection<KV<Void, IndexedRecord>> pc1 = in.apply(ParDo.of(new FormatParquet()));
             pc1 = pc1.setCoder(KvCoder.of(VoidCoder.of(), LazyAvroCoder.of()));
             return pc1.apply(Write.to(sink));

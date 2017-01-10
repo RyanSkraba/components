@@ -18,6 +18,7 @@ import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.coders.VoidCoder;
 import org.apache.parquet.avro.AvroParquetInputFormat;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
+import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 
 /**
  * Parquet implementation of HDFSFileSource.
@@ -28,26 +29,26 @@ public class ParquetHdfsFileSource extends FileSourceBase<Void, IndexedRecord, P
 
     private final LazyAvroCoder<IndexedRecord> lac;
 
-    private ParquetHdfsFileSource(String filepattern, LazyAvroCoder<IndexedRecord> lac, SerializableSplit serializableSplit) {
-        super(filepattern, (Class) AvroParquetInputFormat.class, Void.class, IndexedRecord.class, serializableSplit);
+    private ParquetHdfsFileSource(UgiDoAs doAs, String filepattern, LazyAvroCoder<IndexedRecord> lac,
+            SerializableSplit serializableSplit) {
+        super(doAs, filepattern, (Class) AvroParquetInputFormat.class, Void.class, IndexedRecord.class, serializableSplit);
         this.lac = lac;
         setDefaultCoder(VoidCoder.of(), (LazyAvroCoder) lac);
     }
 
-    public static ParquetHdfsFileSource of(String filepattern, LazyAvroCoder<IndexedRecord> lac) {
-        return new ParquetHdfsFileSource(filepattern, lac, null);
+    public static ParquetHdfsFileSource of(UgiDoAs doAs, String filepattern, LazyAvroCoder<IndexedRecord> lac) {
+        return new ParquetHdfsFileSource(doAs, filepattern, lac, null);
     }
 
     @Override
     protected ParquetHdfsFileSource createSourceForSplit(SerializableSplit serializableSplit) {
-        ParquetHdfsFileSource source = new ParquetHdfsFileSource(filepattern, lac, serializableSplit);
+        ParquetHdfsFileSource source = new ParquetHdfsFileSource(doAs, filepattern, lac, serializableSplit);
         source.setLimit(getLimit());
         return source;
     }
 
     @Override
-    protected TalendHdfsFileReader<Void, IndexedRecord, ParquetHdfsFileSource> createReaderForSplit(
-            SerializableSplit serializableSplit) throws IOException {
-        return new TalendHdfsFileReader<>(this);
+    protected UgiFileReader<Void, IndexedRecord> createReaderForSplit(SerializableSplit serializableSplit) throws IOException {
+        return new UgiFileReader<>(this);
     }
 }

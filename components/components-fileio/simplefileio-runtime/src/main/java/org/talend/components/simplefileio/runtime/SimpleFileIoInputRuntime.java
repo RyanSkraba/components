@@ -33,6 +33,7 @@ import org.talend.components.simplefileio.input.SimpleFileIoInputProperties;
 import org.talend.components.simplefileio.runtime.sources.AvroHdfsFileSource;
 import org.talend.components.simplefileio.runtime.sources.CsvHdfsFileSource;
 import org.talend.components.simplefileio.runtime.sources.ParquetHdfsFileSource;
+import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 import org.talend.daikon.properties.ValidationResult;
 
 public class SimpleFileIoInputRuntime extends PTransform<PBegin, PCollection<IndexedRecord>> implements
@@ -56,13 +57,16 @@ public class SimpleFileIoInputRuntime extends PTransform<PBegin, PCollection<Ind
 
     @Override
     public PCollection<IndexedRecord> expand(PBegin in) {
+        // Controls the access security on the cluster.
+        UgiDoAs doAs = SimpleFileIoDatastoreRuntime.getUgiDoAs(properties.getDatasetProperties().getDatastoreProperties());
+
         switch (properties.getDatasetProperties().format.getValue()) {
 
         case AVRO: {
             // Reuseable coder.
             LazyAvroCoder<Object> lac = LazyAvroCoder.of();
 
-            AvroHdfsFileSource source = AvroHdfsFileSource.of(properties.getDatasetProperties().path.getValue(), lac); //
+            AvroHdfsFileSource source = AvroHdfsFileSource.of(doAs, properties.getDatasetProperties().path.getValue(), lac);
             source.setLimit(properties.limit.getValue());
             PCollection<KV<AvroKey, NullWritable>> read = in.apply(Read.from(source)) //
                     .setCoder(source.getDefaultOutputCoder());
@@ -78,7 +82,7 @@ public class SimpleFileIoInputRuntime extends PTransform<PBegin, PCollection<Ind
         }
 
         case CSV: {
-            CsvHdfsFileSource source = CsvHdfsFileSource.of(properties.getDatasetProperties().path.getValue(),
+            CsvHdfsFileSource source = CsvHdfsFileSource.of(doAs, properties.getDatasetProperties().path.getValue(),
                     properties.getDatasetProperties().recordDelimiter.getValue());
             source.setLimit(properties.limit.getValue());
 
@@ -87,7 +91,7 @@ public class SimpleFileIoInputRuntime extends PTransform<PBegin, PCollection<Ind
             PCollection<Text> pc2 = pc1.apply(Values.<Text> create());
 
             PCollection<String[]> pc3 = pc2.apply(ParDo.of(new ExtractCsvSplit(
-                    properties.datasetRef.getReference().fieldDelimiter.getValue())));
+                    properties.getDatasetProperties().fieldDelimiter.getValue())));
 
             PCollection pc4 = pc3.apply(ConvertToIndexedRecord.<String[], IndexedRecord> of());
 
@@ -97,7 +101,7 @@ public class SimpleFileIoInputRuntime extends PTransform<PBegin, PCollection<Ind
         case PARQUET: {
             LazyAvroCoder<IndexedRecord> lac = LazyAvroCoder.of();
 
-            ParquetHdfsFileSource source = ParquetHdfsFileSource.of(properties.getDatasetProperties().path.getValue(), lac);
+            ParquetHdfsFileSource source = ParquetHdfsFileSource.of(doAs, properties.getDatasetProperties().path.getValue(), lac);
             source.setLimit(properties.limit.getValue());
 
             PCollection<KV<Void, IndexedRecord>> read = in.apply(Read.from(source)) //

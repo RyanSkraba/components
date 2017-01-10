@@ -17,6 +17,7 @@ import static java.util.Collections.emptyList;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.datastore.runtime.DatastoreRuntime;
 import org.talend.components.simplefileio.SimpleFileIoDatastoreProperties;
+import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 import org.talend.daikon.properties.ValidationResult;
 
 public class SimpleFileIoDatastoreRuntime implements DatastoreRuntime<SimpleFileIoDatastoreProperties> {
@@ -25,6 +26,21 @@ public class SimpleFileIoDatastoreRuntime implements DatastoreRuntime<SimpleFile
      * The datastore instance that this runtime is configured for.
      */
     private SimpleFileIoDatastoreProperties properties = null;
+
+    /**
+     * Helper method for any runtime to get the appropriate {@link UgiDoAs} for executing.
+     * 
+     * @param properties datastore properties, containing credentials for the cluster.
+     * @return An object that can be used to execute actions with the correct credentials.
+     */
+    public static UgiDoAs getUgiDoAs(SimpleFileIoDatastoreProperties properties) {
+        if (properties.useKerberos.getValue())
+            return UgiDoAs.ofKerberos(properties.kerberosPrincipal.getValue(), properties.kerberosKeytab.getValue());
+        else if (properties.userName.getValue() != null && !properties.userName.getValue().isEmpty())
+            return UgiDoAs.ofSimple(properties.userName.getValue());
+        else
+            return UgiDoAs.ofNone();
+    }
 
     @Override
     public ValidationResult initialize(RuntimeContainer container, SimpleFileIoDatastoreProperties properties) {

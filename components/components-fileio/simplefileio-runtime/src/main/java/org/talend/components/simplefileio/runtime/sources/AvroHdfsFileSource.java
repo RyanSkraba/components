@@ -24,6 +24,7 @@ import org.apache.beam.sdk.values.KV;
 import org.apache.hadoop.io.NullWritable;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.simplefileio.runtime.coders.LazyAvroKeyWrapper;
+import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 
 /**
  * Avro implementation of HDFSFileSource.
@@ -34,31 +35,31 @@ public class AvroHdfsFileSource extends FileSourceBase<AvroKey, NullWritable, Av
 
     private final LazyAvroCoder<?> lac;
 
-    private AvroHdfsFileSource(String filepattern, LazyAvroCoder<?> lac, SerializableSplit serializableSplit) {
-        super(filepattern, (Class) AvroKeyInputFormat.class, AvroKey.class, NullWritable.class, serializableSplit);
+    private AvroHdfsFileSource(UgiDoAs doAs, String filepattern, LazyAvroCoder<?> lac, SerializableSplit serializableSplit) {
+        super(doAs, filepattern, (Class) AvroKeyInputFormat.class, AvroKey.class, NullWritable.class, serializableSplit);
         this.lac = lac;
         setDefaultCoder(LazyAvroKeyWrapper.of(lac), WritableCoder.of(NullWritable.class));
     }
 
-    public static AvroHdfsFileSource of(String filepattern, LazyAvroCoder<?> lac) {
-        return new AvroHdfsFileSource(filepattern, lac, null);
+    public static AvroHdfsFileSource of(UgiDoAs doAs, String filepattern, LazyAvroCoder<?> lac) {
+        return new AvroHdfsFileSource(doAs, filepattern, lac, null);
     }
 
     @Override
     protected AvroHdfsFileSource createSourceForSplit(SerializableSplit serializableSplit) {
-        AvroHdfsFileSource source = new AvroHdfsFileSource(filepattern, lac, serializableSplit);
+        AvroHdfsFileSource source = new AvroHdfsFileSource(doAs, filepattern, lac, serializableSplit);
         source.setLimit(getLimit());
         return source;
     }
 
     @Override
-    protected TalendAvroHdfsFileReader createReaderForSplit(SerializableSplit serializableSplit) throws IOException {
-        return new TalendAvroHdfsFileReader(this, filepattern, serializableSplit);
+    protected AvroHdfsFileReader createReaderForSplit(SerializableSplit serializableSplit) throws IOException {
+        return new AvroHdfsFileReader(this, filepattern, serializableSplit);
     }
 
-    private static class TalendAvroHdfsFileReader extends TalendHdfsFileReader<AvroKey, NullWritable, AvroHdfsFileSource> {
+    private static class AvroHdfsFileReader extends UgiFileReader<AvroKey, NullWritable> {
 
-        public TalendAvroHdfsFileReader(AvroHdfsFileSource source, String filepattern, SerializableSplit serializableSplit)
+        public AvroHdfsFileReader(AvroHdfsFileSource source, String filepattern, SerializableSplit serializableSplit)
                 throws IOException {
             super(source);
         }

@@ -62,7 +62,7 @@ public class SimpleFileIoDatastorePropertiesTest {
 
         Form main = properties.getForm(Form.MAIN);
         assertThat(main, notNullValue());
-        assertThat(main.getWidgets(), hasSize(1));
+        assertThat(main.getWidgets(), hasSize(4));
 
         for (String field : ALL) {
             Widget w = main.getWidget(field);
@@ -76,6 +76,7 @@ public class SimpleFileIoDatastorePropertiesTest {
     @Test
     public void testRefreshLayout() {
         Form main = properties.getForm(Form.MAIN);
+        properties.useKerberos.setValue(false);
         properties.refreshLayout(main);
 
         // All of the fields are visible.

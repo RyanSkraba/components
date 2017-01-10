@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.serialize.jsonschema.JsonSchemaUtil;
 
 public class SimpleFileIoDatasetPropertiesTest {
 
@@ -41,6 +42,9 @@ public class SimpleFileIoDatasetPropertiesTest {
     @Before
     public void setup() {
         properties = new SimpleFileIoDatasetProperties("test");
+        SimpleFileIoDatastoreProperties datastoreProperties = new SimpleFileIoDatastoreProperties("test");
+        datastoreProperties.init();
+        properties.setDatastoreProperties(datastoreProperties);
         properties.init();
     }
 
@@ -53,6 +57,10 @@ public class SimpleFileIoDatasetPropertiesTest {
         assertThat(properties.path.getValue(), is(""));
         assertThat(properties.recordDelimiter.getValue(), is("\n"));
         assertThat(properties.fieldDelimiter.getValue(), is(";"));
+
+        properties.getDatastoreProperties().userName.setValue("ryan");
+        String x = JsonSchemaUtil.toJson(properties, Form.MAIN, SimpleFileIoDatasetDefinition.NAME);
+        System.out.println(x);
     }
 
     /**

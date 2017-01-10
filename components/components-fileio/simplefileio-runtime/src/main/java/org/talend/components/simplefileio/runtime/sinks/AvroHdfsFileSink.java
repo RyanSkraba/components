@@ -17,55 +17,26 @@ import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.mapred.AvroKey;
 import org.apache.avro.mapreduce.AvroJob;
 import org.apache.avro.mapreduce.AvroKeyOutputFormat;
-import org.apache.beam.sdk.io.hdfs.ConfigurableHDFSFileSink;
-import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.values.KV;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 
 /**
  * Sink for Avro files.
  */
-public class AvroHdfsFileSink extends ConfigurableHDFSFileSink<AvroKey<IndexedRecord>, NullWritable> {
+public class AvroHdfsFileSink extends UgiFileSinkBase<AvroKey<IndexedRecord>, NullWritable> {
 
-    public AvroHdfsFileSink(String path) {
-        super(path, (Class) AvroKeyOutputFormat.class);
-    }
-
-    public AvroHdfsFileSink(String path, Configuration conf) {
-        super(path, (Class) AvroKeyOutputFormat.class, conf);
+    public AvroHdfsFileSink(UgiDoAs doAs, String path) {
+        super(doAs, path, (Class) AvroKeyOutputFormat.class);
     }
 
     @Override
-    public WriteOperation<KV<AvroKey<IndexedRecord>, NullWritable>, ?> createWriteOperation(PipelineOptions options) {
-        return new AvroWriteOperation(this, path);
-    }
-
-    public static class AvroWriteOperation extends HDFSWriteOperation<AvroKey<IndexedRecord>, NullWritable> {
-
-        public AvroWriteOperation(AvroHdfsFileSink sink, String path) {
-            super(sink, path, sink.formatClass);
-        }
-
-        @Override
-        public AvroWriter createWriter(PipelineOptions options) throws Exception {
-            return new AvroWriter(this, path);
-        }
-
-        public static class AvroWriter extends ConfigureWithSampleHDFSWriter<AvroKey<IndexedRecord>, NullWritable> {
-
-            public AvroWriter(AvroWriteOperation writeOperation, String path) {
-                super(writeOperation, path, writeOperation.formatClass);
-            }
-
-            protected void configure(Job job) {
-                AvroKey<IndexedRecord> k = (AvroKey<IndexedRecord>) getSample().getKey();
-                AvroJob.setOutputKeySchema(job, k.datum().getSchema());
-                FileOutputFormat.setCompressOutput(job, true);
-                job.getConfiguration().set(AvroJob.CONF_OUTPUT_CODEC, DataFileConstants.SNAPPY_CODEC);
-            }
-        }
+    protected void configure(Job job, KV<AvroKey<IndexedRecord>, NullWritable> sample) {
+        AvroKey<IndexedRecord> k = sample.getKey();
+        AvroJob.setOutputKeySchema(job, k.datum().getSchema());
+        FileOutputFormat.setCompressOutput(job, true);
+        job.getConfiguration().set(AvroJob.CONF_OUTPUT_CODEC, DataFileConstants.SNAPPY_CODEC);
     }
 }

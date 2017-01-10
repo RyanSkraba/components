@@ -13,56 +13,28 @@
 package org.talend.components.simplefileio.runtime.sinks;
 
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.beam.sdk.io.hdfs.ConfigurableHDFSFileSink;
-import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.values.KV;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.parquet.avro.AvroParquetOutputFormat;
 import org.apache.parquet.avro.AvroWriteSupport;
 import org.apache.parquet.hadoop.ParquetOutputFormat;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
+import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 
 /**
  * Sink for Parquet files.
  */
-public class ParquetHdfsFileSink extends ConfigurableHDFSFileSink<Void, IndexedRecord> {
+public class ParquetHdfsFileSink extends UgiFileSinkBase<Void, IndexedRecord> {
 
-    public ParquetHdfsFileSink(String path) {
-        super(path, (Class) AvroParquetOutputFormat.class);
-    }
-
-    public ParquetHdfsFileSink(String path, Configuration conf) {
-        super(path, (Class) AvroParquetOutputFormat.class, conf);
+    public ParquetHdfsFileSink(UgiDoAs doAs, String path) {
+        super(doAs, path, (Class) AvroParquetOutputFormat.class);
     }
 
     @Override
-    public WriteOperation<KV<Void, IndexedRecord>, ?> createWriteOperation(PipelineOptions options) {
-        return new ParquetWriteOperation(this, path);
+    protected void configure(Job job, KV<Void, IndexedRecord> sample) {
+        IndexedRecord record = (IndexedRecord) sample.getValue();
+        AvroWriteSupport.setSchema(job.getConfiguration(), record.getSchema());
+        ParquetOutputFormat.setCompression(job, CompressionCodecName.SNAPPY);
     }
 
-    public static class ParquetWriteOperation extends HDFSWriteOperation<Void, IndexedRecord> {
-
-        public ParquetWriteOperation(ParquetHdfsFileSink sink, String path) {
-            super(sink, path, sink.formatClass);
-        }
-
-        @Override
-        public ParquetWriter createWriter(PipelineOptions options) throws Exception {
-            return new ParquetWriter(this, path);
-        }
-
-        public static class ParquetWriter extends ConfigureWithSampleHDFSWriter<Void, IndexedRecord> {
-
-            public ParquetWriter(ParquetWriteOperation writeOperation, String path) {
-                super(writeOperation, path, writeOperation.formatClass);
-            }
-
-            protected void configure(Job job) {
-                IndexedRecord record = (IndexedRecord) getSample().getValue();
-                AvroWriteSupport.setSchema(job.getConfiguration(), record.getSchema());
-                ParquetOutputFormat.setCompression(job, CompressionCodecName.SNAPPY);
-            }
-        }
-    }
 }
