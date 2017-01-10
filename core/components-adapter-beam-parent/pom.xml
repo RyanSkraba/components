@@ -16,23 +16,23 @@
     <name>Component API - Beam Parent POM</name>
 
     <properties>
-        <beam.version>0.4.0-incubating-SNAPSHOT</beam.version>
+        <beam.version>0.4.0-TLND</beam.version>
     </properties>
 
     <!-- Necessary if you want to compile with a SNAPSHOT of beam. -->
-    <repositories>
-        <repository>
-            <id>apache.snapshots</id>
-            <name>Apache Development Snapshot Repository</name>
-            <url>https://repository.apache.org/content/repositories/snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
+    <!--<repositories>-->
+        <!--<repository>-->
+            <!--<id>apache.snapshots</id>-->
+            <!--<name>Apache Development Snapshot Repository</name>-->
+            <!--<url>https://repository.apache.org/content/repositories/snapshots/</url>-->
+            <!--<releases>-->
+                <!--<enabled>false</enabled>-->
+            <!--</releases>-->
+            <!--<snapshots>-->
+                <!--<enabled>true</enabled>-->
+            <!--</snapshots>-->
+        <!--</repository>-->
+    <!--</repositories>-->
 
     <dependencyManagement>
         <dependencies>
@@ -61,7 +61,7 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.beam</groupId>
-                <artifactId>beam-runners-spark-java</artifactId>
+                <artifactId>beam-runners-spark</artifactId>
                 <version>${beam.version}</version>
             </dependency>
             <dependency>

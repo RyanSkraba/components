@@ -139,6 +139,11 @@
 			<name>snapshots</name>
 			<url>http://newbuild.talend.com:8081/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
 		</repository>
+		<!--<repository>-->
+			<!--<id>talend_beam</id>-->
+			<!--<name>Talend Patched Beam Repository</name>-->
+			<!--<url>http://maven.nanthrax.net/</url>-->
+		<!--</repository>-->
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
