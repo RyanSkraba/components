@@ -76,7 +76,7 @@ public class SimpleFileIoDatasetRuntime implements DatasetRuntime<SimpleFileIoDa
             p.apply(inputRuntime) //
                     .apply(Sample.<IndexedRecord> any(limit)) //
                     .apply(collector);
-            p.run();
+            p.run().waitUntilFinish();
         }
     }
 }

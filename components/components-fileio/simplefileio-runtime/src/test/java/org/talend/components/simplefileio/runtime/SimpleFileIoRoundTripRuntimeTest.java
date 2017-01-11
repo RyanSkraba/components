@@ -33,6 +33,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.components.adapter.beam.transform.DirectCollector;
+import org.talend.components.simplefileio.SimpleFileIoDatasetProperties.FieldDelimiterType;
+import org.talend.components.simplefileio.SimpleFileIoDatasetProperties.RecordDelimiterType;
 import org.talend.components.simplefileio.SimpleFileIoFormat;
 import org.talend.components.simplefileio.input.SimpleFileIoInputProperties;
 import org.talend.components.simplefileio.output.SimpleFileIoOutputProperties;
@@ -80,7 +82,7 @@ public class SimpleFileIoRoundTripRuntimeTest {
             final Pipeline p = beam.createPipeline();
             PCollection<IndexedRecord> input = p.apply(Create.<IndexedRecord> of(initialData));
             input.apply(outputRuntime);
-            p.run();
+            p.run().waitUntilFinish();
         }
 
         // Read the records that were written.
@@ -88,7 +90,7 @@ public class SimpleFileIoRoundTripRuntimeTest {
             final Pipeline p = beam.createPipeline();
             PCollection<IndexedRecord> input = p.apply(inputRuntime);
             input.apply(collector);
-            p.run();
+            p.run().waitUntilFinish();
 
             // Return the list of records from the round trip.
             return collector.getRecords();
@@ -151,8 +153,8 @@ public class SimpleFileIoRoundTripRuntimeTest {
         mini.assertReadFile(
                 mini.getLocalFs(),
                 fileSpec,
-                rewriteRecordsAsCsvLines(expected, inputProps.getDatasetProperties().recordDelimiter.getValue(),
-                        inputProps.getDatasetProperties().fieldDelimiter.getValue()));
+                rewriteRecordsAsCsvLines(expected, inputProps.getDatasetProperties().getRecordDelimiter(),
+                        inputProps.getDatasetProperties().getFieldDelimiter()));
     }
 
     /**
@@ -168,8 +170,10 @@ public class SimpleFileIoRoundTripRuntimeTest {
         SimpleFileIoOutputProperties outputProps = createOutputComponentProperties();
         outputProps.getDatasetProperties().format.setValue(SimpleFileIoFormat.CSV);
         outputProps.getDatasetProperties().path.setValue(fileSpec);
-        outputProps.getDatasetProperties().recordDelimiter.setValue("---");
-        outputProps.getDatasetProperties().fieldDelimiter.setValue("|");
+        outputProps.getDatasetProperties().recordDelimiter.setValue(RecordDelimiterType.OTHER);
+        outputProps.getDatasetProperties().specificRecordDelimiter.setValue("---");
+        outputProps.getDatasetProperties().fieldDelimiter.setValue(FieldDelimiterType.OTHER);
+        outputProps.getDatasetProperties().specificFieldDelimiter.setValue("|");
         SimpleFileIoInputProperties inputProps = createInputComponentProperties();
         inputProps.setDatasetProperties(outputProps.getDatasetProperties());
 
@@ -185,8 +189,8 @@ public class SimpleFileIoRoundTripRuntimeTest {
                 "---",
                 mini.getLocalFs(),
                 fileSpec,
-                rewriteRecordsAsCsvLines(expected, inputProps.getDatasetProperties().recordDelimiter.getValue(),
-                        inputProps.getDatasetProperties().fieldDelimiter.getValue()));
+                rewriteRecordsAsCsvLines(expected, inputProps.getDatasetProperties().getRecordDelimiter(),
+                        inputProps.getDatasetProperties().getFieldDelimiter()));
     }
 
     /**

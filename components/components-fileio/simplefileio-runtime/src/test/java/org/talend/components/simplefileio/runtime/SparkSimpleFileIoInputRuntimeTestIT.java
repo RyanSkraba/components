@@ -63,7 +63,7 @@ public class SparkSimpleFileIoInputRuntimeTestIT {
         PAssert.that(counts).containsInAnyOrder(KV.of("a", 4L), KV.of("b", 1L), KV.of("c", 2L));
 
         // Go!
-        p.run();
+        p.run().waitUntilFinish();
     }
 
     /** Example test DoFn. */
@@ -107,6 +107,6 @@ public class SparkSimpleFileIoInputRuntimeTestIT {
         PAssert.that(readLines).containsInAnyOrder(expected);
 
         // And run the test.
-        p.run();
+        p.run().waitUntilFinish();
     }
 }

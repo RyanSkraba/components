@@ -48,8 +48,8 @@ public abstract class FileSourceBase<K, V, SourceT extends FileSourceBase<K, V, 
 
     private int limit = -1;
 
-    protected FileSourceBase(UgiDoAs doAs, String filepattern, Class<? extends FileInputFormat<?, ?>> formatClass, Class<K> keyClass,
-                             Class<V> valueClass, SerializableSplit serializableSplit) {
+    protected FileSourceBase(UgiDoAs doAs, String filepattern, Class<? extends FileInputFormat<?, ?>> formatClass,
+            Class<K> keyClass, Class<V> valueClass, SerializableSplit serializableSplit) {
         super(doAs, filepattern, formatClass, keyClass, valueClass, serializableSplit);
     }
 

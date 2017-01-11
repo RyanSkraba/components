@@ -36,6 +36,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.simplefileio.SimpleFileIoDatasetProperties.FieldDelimiterType;
+import org.talend.components.simplefileio.SimpleFileIoDatasetProperties.RecordDelimiterType;
 import org.talend.components.simplefileio.SimpleFileIoFormat;
 import org.talend.components.simplefileio.input.SimpleFileIoInputDefinition;
 import org.talend.components.simplefileio.input.SimpleFileIoInputProperties;
@@ -44,6 +46,8 @@ import org.talend.components.test.BeamDirectTestResource;
 import org.talend.components.test.MiniDfsResource;
 import org.talend.components.test.RecordSet;
 import org.talend.daikon.runtime.RuntimeUtil;
+
+import ch.qos.logback.classic.Level;
 
 /**
  * Unit tests for {@link SimpleFileIoInputRuntime}.
@@ -104,7 +108,76 @@ public class SimpleFileIoInputRuntimeTest {
         PAssert.that(readLines).containsInAnyOrder(expected);
 
         // And run the test.
-        p.run();
+        p.run().waitUntilFinish();
+    }
+
+    /**
+     * Basic unit test using all default values (except for the path) on an in-memory DFS cluster.
+     */
+    @Test
+    public void testBasicCSV_changeSeparator() throws IOException, URISyntaxException {
+         ch.qos.logback.classic.Logger rootLogger =
+         (ch.qos.logback.classic.Logger)org.slf4j.LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+         rootLogger.setLevel(Level.toLevel("warn"));
+        String inputFile = writeRandomCsvFile(mini.getFs(), "/user/test/input.csv", 0, 0, 10, 10, 6, " ", "\r\n");
+        String fileSpec = mini.getFs().getUri().resolve("/user/test/input.csv").toString();
+
+        // Configure the component.
+        SimpleFileIoInputProperties inputProps = createInputComponentProperties();
+        inputProps.getDatasetProperties().path.setValue(fileSpec);
+        inputProps.getDatasetProperties().recordDelimiter.setValue(RecordDelimiterType.CRLF);
+        inputProps.getDatasetProperties().fieldDelimiter.setValue(FieldDelimiterType.SPACE);
+
+        // Create the runtime.
+        SimpleFileIoInputRuntime runtime = new SimpleFileIoInputRuntime();
+        runtime.initialize(null, inputProps);
+
+        // Use the runtime in a direct pipeline to test.
+        final Pipeline p = beam.createPipeline();
+        PCollection<IndexedRecord> readLines = p.apply(runtime);
+
+        // Check the expected values.
+        List<IndexedRecord> expected = new ArrayList<>();
+        for (String record : inputFile.split("\r\n")) {
+            expected.add(ConvertToIndexedRecord.convertToAvro(record.split(" ")));
+        }
+        PAssert.that(readLines).containsInAnyOrder(expected);
+
+        // And run the test.
+        p.run().waitUntilFinish();
+    }
+
+    /**
+     * Basic unit test using all default values (except for the path) on an in-memory DFS cluster.
+     */
+    @Test
+    public void testBasicCSV_changeSeparator2() throws IOException, URISyntaxException {
+        String inputFile = writeRandomCsvFile(mini.getFs(), "/user/test/input.csv", 0, 0, 10, 10, 6, "\t", "\r");
+        String fileSpec = mini.getFs().getUri().resolve("/user/test/input.csv").toString();
+
+        // Configure the component.
+        SimpleFileIoInputProperties inputProps = createInputComponentProperties();
+        inputProps.getDatasetProperties().path.setValue(fileSpec);
+        inputProps.getDatasetProperties().recordDelimiter.setValue(RecordDelimiterType.CR);
+        inputProps.getDatasetProperties().fieldDelimiter.setValue(FieldDelimiterType.TABULATION);
+
+        // Create the runtime.
+        SimpleFileIoInputRuntime runtime = new SimpleFileIoInputRuntime();
+        runtime.initialize(null, inputProps);
+
+        // Use the runtime in a direct pipeline to test.
+        final Pipeline p = beam.createPipeline();
+        PCollection<IndexedRecord> readLines = p.apply(runtime);
+
+        // Check the expected values.
+        List<IndexedRecord> expected = new ArrayList<>();
+        for (String record : inputFile.split("\r")) {
+            expected.add(ConvertToIndexedRecord.convertToAvro(record.split("\t")));
+        }
+        PAssert.that(readLines).containsInAnyOrder(expected);
+
+        // And run the test.
+        p.run().waitUntilFinish();
     }
 
     /**
@@ -133,7 +206,7 @@ public class SimpleFileIoInputRuntimeTest {
         PAssert.that(readLines).containsInAnyOrder(rs.getAllData());
 
         // And run the test.
-        p.run();
+        p.run().waitUntilFinish();
     }
 
     @Test
@@ -176,8 +249,10 @@ public class SimpleFileIoInputRuntimeTest {
         // Configure the component.
         SimpleFileIoInputProperties inputProps = createInputComponentProperties();
         inputProps.getDatasetProperties().path.setValue(fileSpec);
-        inputProps.getDatasetProperties().recordDelimiter.setValue("---");
-        inputProps.getDatasetProperties().fieldDelimiter.setValue("|");
+        inputProps.getDatasetProperties().recordDelimiter.setValue(RecordDelimiterType.OTHER);
+        inputProps.getDatasetProperties().specificRecordDelimiter.setValue("---");
+        inputProps.getDatasetProperties().fieldDelimiter.setValue(FieldDelimiterType.OTHER);
+        inputProps.getDatasetProperties().specificFieldDelimiter.setValue("|");
 
         // Create the runtime.
         SimpleFileIoInputRuntime runtime = new SimpleFileIoInputRuntime();
@@ -195,7 +270,43 @@ public class SimpleFileIoInputRuntimeTest {
         }
 
         PAssert.that(readLines).containsInAnyOrder(expected);
-        p.run();
+        p.run().waitUntilFinish();
+    }
+
+    @Test
+    public void testBasicCsvFormatting() throws IOException, URISyntaxException {
+
+        // Create an input file with all of the 3 column examples from the examples.
+        List<IndexedRecord> expected = new ArrayList<>();
+        List<String> file = new ArrayList<>();
+        for (CsvExample csvEx : CsvExample.getCsvExamples()) {
+            // Ignore lines that don't have the same schema (3 columns)
+            if (csvEx.getValues().length == 3) {
+                for (String inputLine : csvEx.getPossibleInputLines()) {
+                    file.add(inputLine);
+                    expected.add(ConvertToIndexedRecord.convertToAvro(csvEx.getValues()));
+                }
+            }
+        }
+
+        mini.writeFile(mini.getFs(), "/user/test/input.csv", file.toArray(new String[0]));
+        String fileSpec = mini.getFs().getUri().resolve("/user/test/input.csv").toString();
+
+        // Configure the component.
+        SimpleFileIoInputProperties inputProps = createInputComponentProperties();
+        inputProps.getDatasetProperties().path.setValue(fileSpec);
+
+        // Create the runtime.
+        SimpleFileIoInputRuntime runtime = new SimpleFileIoInputRuntime();
+        runtime.initialize(null, inputProps);
+
+        // Use the runtime in a direct pipeline to test.
+        final Pipeline p = beam.createPipeline(3);
+
+        PCollection<IndexedRecord> readLines = p.apply(runtime);
+
+        PAssert.that(readLines).containsInAnyOrder(expected);
+        p.run().waitUntilFinish();
     }
 
     /**
@@ -225,7 +336,7 @@ public class SimpleFileIoInputRuntimeTest {
         PAssert.that(readLines).containsInAnyOrder(rs.getAllData());
 
         // And run the test.
-        p.run();
+        p.run().waitUntilFinish();
     }
 
     /**
@@ -264,7 +375,7 @@ public class SimpleFileIoInputRuntimeTest {
         PAssert.that(readLines).containsInAnyOrder(expected);
 
         // And run the test.
-        p.run();
+        p.run().waitUntilFinish();
     }
 
     /**
@@ -303,7 +414,7 @@ public class SimpleFileIoInputRuntimeTest {
         // Use the runtime in a direct pipeline to test.
         final Pipeline p = beam.createPipeline(1);
         p.apply(runtime).apply(runtimeO);
-        p.run();
+        p.run().waitUntilFinish();
 
         mini.assertReadFile(mini.getLocalFs(), fileSpecOutput, "1;rdubois", "2;clombard");
     }

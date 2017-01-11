@@ -13,15 +13,15 @@
 
 package org.talend.components.simplefileio;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.talend.components.simplefileio.SimpleFileIoDatasetProperties.FieldDelimiterType;
+import org.talend.components.simplefileio.SimpleFileIoDatasetProperties.RecordDelimiterType;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
@@ -55,8 +55,10 @@ public class SimpleFileIoDatasetPropertiesTest {
     public void testDefaultProperties() {
         assertThat(properties.format.getValue(), is(SimpleFileIoFormat.CSV));
         assertThat(properties.path.getValue(), is(""));
-        assertThat(properties.recordDelimiter.getValue(), is("\n"));
-        assertThat(properties.fieldDelimiter.getValue(), is(";"));
+        assertThat(properties.recordDelimiter.getValue(), is(RecordDelimiterType.LF));
+        assertThat(properties.specificRecordDelimiter.getValue(), is("\\n"));
+        assertThat(properties.fieldDelimiter.getValue(), is(FieldDelimiterType.SEMICOLON));
+        assertThat(properties.specificFieldDelimiter.getValue(), is(";"));
 
         properties.getDatastoreProperties().userName.setValue("ryan");
         String x = JsonSchemaUtil.toJson(properties, Form.MAIN, SimpleFileIoDatasetDefinition.NAME);
@@ -72,7 +74,7 @@ public class SimpleFileIoDatasetPropertiesTest {
 
         Form main = properties.getForm(Form.MAIN);
         assertThat(main, notNullValue());
-        assertThat(main.getWidgets(), hasSize(4));
+        assertThat(main.getWidgets(), hasSize(6));
 
         for (String field : ALL) {
             Widget w = main.getWidget(field);
@@ -105,7 +107,52 @@ public class SimpleFileIoDatasetPropertiesTest {
             switch (format) {
             case CSV:
                 assertThat(main.getWidget("recordDelimiter").isVisible(), is(true));
+                assertThat(main.getWidget("specificRecordDelimiter").isVisible(), is(false));
                 assertThat(main.getWidget("fieldDelimiter").isVisible(), is(true));
+                assertThat(main.getWidget("specificFieldDelimiter").isVisible(), is(false));
+                break;
+            case AVRO:
+            case PARQUET:
+                assertThat(main.getWidget("recordDelimiter").isVisible(), is(false));
+                assertThat(main.getWidget("fieldDelimiter").isVisible(), is(false));
+                break;
+            default:
+                throw new RuntimeException("Missing test case for " + format);
+            }
+
+        }
+    }
+
+    /**
+     * Checks {@link Properties#refreshLayout(Form)}
+     */
+    @Test
+    public void testRefreshLayout2() {
+        Form main = properties.getForm(Form.MAIN);
+        properties.recordDelimiter.setValue(RecordDelimiterType.OTHER);
+        properties.fieldDelimiter.setValue(FieldDelimiterType.COMMA);
+        properties.refreshLayout(main);
+
+        for (String field : ALL) {
+            Widget w = main.getWidget(field);
+            assertThat(w.isVisible(), is(true));
+        }
+
+        // Check which properties are visible when the format is changed.
+        for (SimpleFileIoFormat format : SimpleFileIoFormat.values()) {
+            properties.format.setValue(format);
+            properties.afterFormat();
+
+            // Always visible.
+            assertThat(main.getWidget("format").isVisible(), is(true));
+            assertThat(main.getWidget("path").isVisible(), is(true));
+
+            switch (format) {
+            case CSV:
+                assertThat(main.getWidget("recordDelimiter").isVisible(), is(true));
+                assertThat(main.getWidget("specificRecordDelimiter").isVisible(), is(true));
+                assertThat(main.getWidget("fieldDelimiter").isVisible(), is(true));
+                assertThat(main.getWidget("specificFieldDelimiter").isVisible(), is(false));
                 break;
             case AVRO:
             case PARQUET:
