@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 
-import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.mapred.AvroKey;
 import org.apache.beam.sdk.coders.KvCoder;
@@ -30,6 +29,7 @@ import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PDone;
+import org.apache.commons.csv.CSVFormat;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -51,7 +51,8 @@ import org.talend.components.simplefileio.runtime.sinks.AvroHdfsFileSink;
 import org.talend.components.simplefileio.runtime.sinks.ParquetHdfsFileSink;
 import org.talend.components.simplefileio.runtime.sinks.UgiFileSinkBase;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
-import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.ValidationResult;
 
 public class SimpleFileIoOutputRuntime extends PTransform<PCollection<IndexedRecord>, PDone> implements
@@ -90,13 +91,20 @@ public class SimpleFileIoOutputRuntime extends PTransform<PCollection<IndexedRec
 
         case CSV: {
             Configuration conf = new Configuration();
-            conf.set(CsvTextOutputFormat.RECORD_DELIMITER, properties.getDatasetProperties().recordDelimiter.getValue());
+            conf.set(CsvTextOutputFormat.RECORD_DELIMITER, properties.getDatasetProperties().getRecordDelimiter());
             conf.set(CsvTextOutputFormat.ENCODING, CsvTextOutputFormat.UTF_8);
             UgiFileSinkBase<NullWritable, Text> sink = new UgiFileSinkBase<>(doAs,
                     properties.getDatasetProperties().path.getValue(), CsvTextOutputFormat.class, conf);
 
-            PCollection<KV<NullWritable, Text>> pc1 = in.apply(
-                    ParDo.of(new FormatCsv(properties.getDatasetProperties().fieldDelimiter.getValue()))).setCoder(
+            String fieldDelimiter = properties.getDatasetProperties().getFieldDelimiter();
+            if (fieldDelimiter.length() > 1) {
+                fieldDelimiter = fieldDelimiter.trim();
+            }
+            if (fieldDelimiter.isEmpty())
+                TalendRuntimeException.build(CommonErrorCodes.UNEXPECTED_ARGUMENT).setAndThrow(
+                        "single character field delimiter", fieldDelimiter);
+
+            PCollection<KV<NullWritable, Text>> pc1 = in.apply(ParDo.of(new FormatCsvRecord(fieldDelimiter.charAt(0)))).setCoder(
                     KvCoder.of(WritableCoder.of(NullWritable.class), WritableCoder.of(Text.class)));
 
             return pc1.apply(Write.to(sink));
@@ -173,29 +181,29 @@ public class SimpleFileIoOutputRuntime extends PTransform<PCollection<IndexedRec
         }
     }
 
-    public static class FormatCsv extends DoFn<IndexedRecord, KV<NullWritable, Text>> {
+    public static class FormatCsvRecord extends DoFn<IndexedRecord, KV<NullWritable, Text>> {
 
-        public final String fieldDelimiter;
+        public final char fieldDelimiter;
+
+        private final CSVFormat format;
 
         private StringBuilder sb = new StringBuilder();
 
-        public FormatCsv(String fieldDelimiter) {
+        public FormatCsvRecord(char fieldDelimiter) {
             this.fieldDelimiter = fieldDelimiter;
+            format = CSVFormat.RFC4180.withDelimiter(fieldDelimiter);
         }
 
         @DoFn.ProcessElement
-        public void processElement(ProcessContext c) {
+        public void processElement(ProcessContext c) throws IOException {
             // Join the strings with the delimiter.
             IndexedRecord in = c.element();
             int size = in.getSchema().getFields().size();
             for (int i = 0; i < size; i++) {
-                if (sb.length() != 0)
-                    sb.append(fieldDelimiter);
-                if (Schema.Type.BYTES.equals(AvroUtils.unwrapIfNullable(in.getSchema()).getFields().get(i).schema().getType())) {
-                    sb.append(new String(((ByteBuffer) in.get(i)).array()));
-                } else {
-                    sb.append(in.get(i));
-                }
+                Object valueToWrite = in.get(i);
+                if (valueToWrite instanceof ByteBuffer)
+                    valueToWrite = new String(((ByteBuffer) valueToWrite).array());
+                format.print(valueToWrite, sb, sb.length() == 0);
             }
             c.output(KV.of(NullWritable.get(), new Text(sb.toString())));
             sb.setLength(0);

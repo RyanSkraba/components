@@ -99,7 +99,7 @@ public class MiniDfsResourceTest {
                     .apply(Values.<Text> create()) //
                     .apply(Sample.<Text> any(100)) //
                     .apply(collector);
-            p.run();
+            p.run().waitUntilFinish();
         }
     }
 
@@ -130,7 +130,7 @@ public class MiniDfsResourceTest {
             p.apply(Read.from(source)) //
                     .apply(Keys.<AvroKey<IndexedRecord>> create()) //
                     .apply(collector);
-            p.run();
+            p.run().waitUntilFinish();
         }
 
         // Assert that each row was counted only once.

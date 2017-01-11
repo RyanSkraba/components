@@ -12,6 +12,9 @@
 // ============================================================================
 package org.talend.components.simplefileio.runtime;
 
+import java.io.IOException;
+import java.io.StringReader;
+
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.mapred.AvroKey;
 import org.apache.beam.sdk.io.Read;
@@ -23,6 +26,8 @@ import org.apache.beam.sdk.transforms.Values;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
@@ -34,6 +39,8 @@ import org.talend.components.simplefileio.runtime.sources.AvroHdfsFileSource;
 import org.talend.components.simplefileio.runtime.sources.CsvHdfsFileSource;
 import org.talend.components.simplefileio.runtime.sources.ParquetHdfsFileSource;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
+import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.ValidationResult;
 
 public class SimpleFileIoInputRuntime extends PTransform<PBegin, PCollection<IndexedRecord>> implements
@@ -83,18 +90,22 @@ public class SimpleFileIoInputRuntime extends PTransform<PBegin, PCollection<Ind
 
         case CSV: {
             CsvHdfsFileSource source = CsvHdfsFileSource.of(doAs, properties.getDatasetProperties().path.getValue(),
-                    properties.getDatasetProperties().recordDelimiter.getValue());
+                    properties.getDatasetProperties().getRecordDelimiter());
             source.setLimit(properties.limit.getValue());
 
             PCollection<KV<org.apache.hadoop.io.LongWritable, Text>> pc1 = in.apply(Read.from(source));
 
             PCollection<Text> pc2 = pc1.apply(Values.<Text> create());
 
-            PCollection<String[]> pc3 = pc2.apply(ParDo.of(new ExtractCsvSplit(
-                    properties.getDatasetProperties().fieldDelimiter.getValue())));
-
-            PCollection pc4 = pc3.apply(ConvertToIndexedRecord.<String[], IndexedRecord> of());
-
+            String fieldDelimiter = properties.getDatasetProperties().getFieldDelimiter();
+            if (fieldDelimiter.length() > 1) {
+                fieldDelimiter = fieldDelimiter.trim();
+            }
+            if (fieldDelimiter.isEmpty())
+                TalendRuntimeException.build(CommonErrorCodes.UNEXPECTED_ARGUMENT).setAndThrow(
+                        "single character field delimiter", fieldDelimiter);
+            PCollection<CSVRecord> pc3 = pc2.apply(ParDo.of(new ExtractCsvRecord(fieldDelimiter.charAt(0))));
+            PCollection pc4 = pc3.apply(ConvertToIndexedRecord.<CSVRecord, IndexedRecord> of());
             return pc4;
         }
 
@@ -129,6 +140,22 @@ public class SimpleFileIoInputRuntime extends PTransform<PBegin, PCollection<Ind
         public void processElement(ProcessContext c) {
             String in = c.element().toString();
             c.output(in.split("\\Q" + fieldDelimiter + "\\E"));
+        }
+    }
+
+    public static class ExtractCsvRecord extends DoFn<Text, CSVRecord> {
+
+        public final char fieldDelimiter;
+
+        public ExtractCsvRecord(char fieldDelimiter) {
+            this.fieldDelimiter = fieldDelimiter;
+        }
+
+        @DoFn.ProcessElement
+        public void processElement(ProcessContext c) throws IOException {
+            String in = c.element().toString();
+            for (CSVRecord r : CSVFormat.RFC4180.withDelimiter(fieldDelimiter).parse(new StringReader(in)))
+                c.output(r);
         }
     }
 
