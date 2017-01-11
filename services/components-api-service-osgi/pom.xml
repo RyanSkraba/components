@@ -4,13 +4,13 @@
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
-		<version>0.17.0</version>
+		<version>0.17.1</version>
 		<relativePath>../../components-parent/pom.xml</relativePath>
 	</parent>
 
 	<name>Component API Service implementation for OSGI</name>
 	<artifactId>components-api-service-osgi</artifactId>
-	<version>0.17.0</version>
+	<version>0.17.1</version>
 	<packaging>bundle</packaging>
 
 	<properties>
@@ -21,12 +21,12 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>0.17.0</version>
+			<version>0.17.1</version>
 		</dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>0.17.0</version>
+            <version>0.17.1</version>
         </dependency>
 		<dependency>
 			<groupId>javax.ws.rs</groupId>

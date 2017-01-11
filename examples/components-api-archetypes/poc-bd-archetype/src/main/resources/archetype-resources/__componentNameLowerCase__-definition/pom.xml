@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.17.0</version>
+        <version>0.17.1</version>
     </parent>
 
     <artifactId>${componentNameLowerCase}-definition</artifactId>
@@ -17,7 +17,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <tcomp.version>0.17.0</tcomp.version>
+        <tcomp.version>0.17.1</tcomp.version>
     </properties>
 
     <dependencies>

@@ -13,7 +13,7 @@
 
     <groupId>org.talend.components</groupId>
     <artifactId>components-api-service-rest</artifactId>
-    <version>0.17.0</version>
+    <version>0.17.1</version>
 
     <name>Components REST API</name>
 
@@ -45,17 +45,17 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>0.17.0</version>
+            <version>0.17.1</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.17.0</version>
+            <version>0.17.1</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
-            <version>0.17.0</version>
+            <version>0.17.1</version>
         </dependency>
         <dependency>
             <groupId>org.talend.daikon</groupId>
@@ -92,7 +92,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>0.17.0</version>
+            <version>0.17.1</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>

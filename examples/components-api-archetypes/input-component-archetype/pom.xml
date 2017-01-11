@@ -4,13 +4,13 @@
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
-		<version>0.17.0</version>
+		<version>0.17.1</version>
 		<relativePath>../../../components-parent/pom.xml</relativePath>
 	</parent>
 
 	<name>Component Maven archetypes</name>
 	<artifactId>input-component-archetypes</artifactId>
-	<version>0.17.0</version>
+	<version>0.17.1</version>
 
     <!-- these dependencies allow the build to take place after the dependencies
     build so that the archetype test does not fail when the version changes. -->

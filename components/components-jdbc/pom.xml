@@ -4,7 +4,7 @@
 
     <groupId>org.talend.components</groupId>
     <artifactId>components-jdbc-aggregator</artifactId>
-    <version>0.17.0</version>
+    <version>0.17.1</version>
 
     <name>Components - JDBC Aggregator</name>
     <packaging>pom</packaging>

@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.17.0</version>
+        <version>0.17.1</version>
         <relativePath>../../../components-parent/pom.xml</relativePath>
 
     </parent>
@@ -46,7 +46,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>0.17.0</version>
+            <version>0.17.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>

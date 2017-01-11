@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
-		<version>0.17.0</version>
+		<version>0.17.1</version>
 		<relativePath>../components-parent/pom.xml</relativePath>
 	</parent>
 
@@ -21,7 +21,7 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>0.17.0</version>
+			<version>0.17.1</version>
 		</dependency>
 		<dependency>
 			<groupId>biz.aQute.bnd</groupId>
@@ -32,14 +32,14 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-common</artifactId>
-			<version>0.17.0</version>
+			<version>0.17.1</version>
 		</dependency>
 
 		<!-- Jar containing Test utils methods -->
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>0.17.0</version>
+			<version>0.17.1</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>0.17.0</version>
+            <version>0.17.1</version>
             <scope>test</scope>
         </dependency>
 	</dependencies>

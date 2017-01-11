@@ -4,13 +4,13 @@
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
-		<version>0.17.0</version>
+		<version>0.17.1</version>
 		<relativePath>../components-parent/pom.xml</relativePath>
 	</parent>
 
 	<name>Components - OAuth</name>
 	<artifactId>components-common-oauth</artifactId>
-	<version>0.17.0</version>
+	<version>0.17.1</version>
 	<packaging>bundle</packaging>
 
 	<dependencies>
@@ -27,25 +27,25 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>0.17.0</version>
+			<version>0.17.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-common</artifactId>
-			<version>0.17.0</version>
+			<version>0.17.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-common</artifactId>
-			<version>0.17.0</version>
+			<version>0.17.1</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>0.17.0</version>
+			<version>0.17.1</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
