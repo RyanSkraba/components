@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -62,10 +62,10 @@ public class JarRuntimeInfo implements RuntimeInfo {
      * uses the <code>mavenGroupId</code> <code>mavenArtifactId</code> to locate the *dependency.txt* file using the rule defined
      * in {@link DependenciesReader#computeDependenciesFilePath}
      * 
-     * @param jarUrl url of the jar to read the depenency.txt from
+     * @param jarUrlString url of the jar to read the depenency.txt from
      * @param depTxtPath, path used to locate the dependency.txt file
      * @param runtimeClassName class to be instanciated
-     * @throws a {@link TalendRuntimeException} if the jarUrlString is malformed
+     * @throws {@link TalendRuntimeException} if the jarUrlString is malformed
      */
     public JarRuntimeInfo(String jarUrlString, String depTxtPath, String runtimeClassName) {
         try {
@@ -113,6 +113,30 @@ public class JarRuntimeInfo implements RuntimeInfo {
     @Override
     public String getRuntimeClassName() {
         return runtimeClassName;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!JarRuntimeInfo.class.isAssignableFrom(obj.getClass())) {
+            return false;
+        }
+        JarRuntimeInfo other = (JarRuntimeInfo) obj;
+        return this.runtimeClassName.equals(other.runtimeClassName) && this.jarUrl.equals(other.jarUrl)
+                && this.depTxtPath.equals(other.depTxtPath);
+    }
+
+    @Override
+    public int hashCode() {
+        return (runtimeClassName + jarUrl + depTxtPath).hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "JarRunTimeInfo: {" + "runtimeClassName:" + runtimeClassName + ", " + "jarUrl: " + jarUrl + ", " + "depTxtPath: "
+                + depTxtPath + "}";
     }
 
 }

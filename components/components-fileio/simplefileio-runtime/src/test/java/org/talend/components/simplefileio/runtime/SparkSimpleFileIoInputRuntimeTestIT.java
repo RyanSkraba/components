@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -63,7 +63,7 @@ public class SparkSimpleFileIoInputRuntimeTestIT {
         PAssert.that(counts).containsInAnyOrder(KV.of("a", 4L), KV.of("b", 1L), KV.of("c", 2L));
 
         // Go!
-        p.run();
+        p.run().waitUntilFinish();
     }
 
     /** Example test DoFn. */
@@ -107,6 +107,6 @@ public class SparkSimpleFileIoInputRuntimeTestIT {
         PAssert.that(readLines).containsInAnyOrder(expected);
 
         // And run the test.
-        p.run();
+        p.run().waitUntilFinish();
     }
 }

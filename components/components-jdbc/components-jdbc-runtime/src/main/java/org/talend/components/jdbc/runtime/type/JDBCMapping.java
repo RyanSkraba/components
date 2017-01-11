@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -68,7 +68,8 @@ public class JDBCMapping {
         }
 
         if (AvroUtils.isSameType(basicSchema, AvroUtils._string())) {
-            statement.setString(index, (String) value);
+            // Avro will convert string to {@link org.apache.avro.util.Utf8}
+            statement.setString(index, String.valueOf(value));
         } else if (AvroUtils.isSameType(basicSchema, AvroUtils._int())) {
             statement.setInt(index, (Integer) value);
         } else if (AvroUtils.isSameType(basicSchema, AvroUtils._date())) {

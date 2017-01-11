@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
+import org.apache.commons.csv.CSVRecord;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.converter.ComparableIndexedRecordBase;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
@@ -35,7 +36,7 @@ public class SimpleFileIoAvroRegistry extends AvroRegistry {
      */
     private SimpleFileIoAvroRegistry() {
 
-        // Ensure that we know how to get Schemas for String arrays.
+        // Ensure that we know how to get Schemas for String arrays and CSVRecords
         registerSchemaInferrer(String[].class, new SerializableFunction<String[], Schema>() {
 
             /** Default serial version UID. */
@@ -47,9 +48,21 @@ public class SimpleFileIoAvroRegistry extends AvroRegistry {
             }
 
         });
+        registerSchemaInferrer(CSVRecord.class, new SerializableFunction<CSVRecord, Schema>() {
+
+            /** Default serial version UID. */
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public Schema apply(CSVRecord t) {
+                return inferCsvRecord(t);
+            }
+
+        });
 
         // Ensure that we know how to get IndexedRecords for String arrays.
         registerIndexedRecordConverter(String[].class, StringArrayToIndexedRecordConverter.class);
+        registerIndexedRecordConverter(CSVRecord.class, CsvRecordToIndexedRecordConverter.class);
     }
 
     public static SimpleFileIoAvroRegistry get() {
@@ -57,10 +70,10 @@ public class SimpleFileIoAvroRegistry extends AvroRegistry {
     }
 
     /**
-     * Infers an Avro schema for the given DescribeSObjectResult. This can be an expensive operation so the schema
-     * should be cached where possible. This is always an {@link Schema.Type#RECORD}.
+     * Infers an Avro schema for the given String array. This can be an expensive operation so the schema should be
+     * cached where possible. This is always an {@link Schema.Type#RECORD}.
      *
-     * @param in the DescribeSObjectResult to analyse.
+     * @param in the String array to analyse.
      * @return the schema for data given from the object.
      */
     private Schema inferStringArray(String[] in) {
@@ -68,6 +81,23 @@ public class SimpleFileIoAvroRegistry extends AvroRegistry {
 
         SchemaBuilder.FieldAssembler<Schema> fa = SchemaBuilder.record(RECORD_NAME).fields();
         for (int i = 0; i < in.length; i++) {
+            fa = fa.name(FIELD_PREFIX + i).type(Schema.create(Schema.Type.STRING)).noDefault();
+        }
+        return fa.endRecord();
+    }
+
+    /**
+     * Infers an Avro schema for the given String array. This can be an expensive operation so the schema should be
+     * cached where possible. This is always an {@link Schema.Type#RECORD}.
+     *
+     * @param in the DescribeSObjectResult to analyse.
+     * @return the schema for data given from the object.
+     */
+    private Schema inferCsvRecord(CSVRecord in) {
+        List<Schema.Field> fields = new ArrayList<>();
+
+        SchemaBuilder.FieldAssembler<Schema> fa = SchemaBuilder.record(RECORD_NAME).fields();
+        for (int i = 0; i < in.size(); i++) {
             fa = fa.name(FIELD_PREFIX + i).type(Schema.create(Schema.Type.STRING)).noDefault();
         }
         return fa.endRecord();
@@ -123,12 +153,75 @@ public class SimpleFileIoAvroRegistry extends AvroRegistry {
 
         @Override
         public Object get(int i) {
-            return value[i];
+            if (value.length > i) {
+                return value[i];
+            } else {
+                return "";
+            }
         }
 
         @Override
         public void put(int i, Object v) {
             value[i] = v == null ? null : String.valueOf(v);
+        }
+    }
+
+    public static class CsvRecordToIndexedRecordConverter implements IndexedRecordConverter<CSVRecord, CsvIndexedRecord> {
+
+        private Schema schema = null;
+
+        @Override
+        public Schema getSchema() {
+            return schema;
+        }
+
+        @Override
+        public void setSchema(Schema schema) {
+            this.schema = schema;
+        }
+
+        @Override
+        public Class<CSVRecord> getDatumClass() {
+            return CSVRecord.class;
+        }
+
+        @Override
+        public CSVRecord convertToDatum(CsvIndexedRecord value) {
+            return value.value;
+        }
+
+        @Override
+        public CsvIndexedRecord convertToAvro(CSVRecord value) {
+            if (schema == null)
+                schema = SimpleFileIoAvroRegistry.get().inferSchema(value);
+            return new CsvIndexedRecord(schema, value);
+        }
+    }
+
+    public static class CsvIndexedRecord extends ComparableIndexedRecordBase {
+
+        private final Schema schema;
+
+        private final CSVRecord value;
+
+        public CsvIndexedRecord(Schema schema, CSVRecord value) {
+            this.schema = schema;
+            this.value = value;
+        }
+
+        @Override
+        public Schema getSchema() {
+            return schema;
+        }
+
+        @Override
+        public Object get(int i) {
+            return value.get(i);
+        }
+
+        @Override
+        public void put(int i, Object v) {
+            throw new IndexedRecordConverter.UnmodifiableAdapterException();
         }
     }
 }

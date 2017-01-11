@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -24,6 +24,7 @@ import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -81,12 +82,12 @@ public class JDBCDatasetProperties extends PropertiesImpl
         Form mainForm = CommonUtils.addForm(this, Form.MAIN);
         mainForm.addRow(sourceType);
         mainForm.addRow(tableName);
-        mainForm.addRow(sql);
+        mainForm.addRow(Widget.widget(sql).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
 
         Form citizenUserForm = CommonUtils.addForm(this, Form.CITIZEN_USER);
         citizenUserForm.addRow(sql);
 
-        //citizenUserForm.addColumn(widget(main).setHidden(true));
+        // citizenUserForm.addColumn(widget(main).setHidden(true));
     }
 
     @Override

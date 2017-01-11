@@ -14,6 +14,7 @@ import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.junit.Test;
+import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.adapter.beam.example.AssertResultProperties;
 import org.talend.components.adapter.beam.example.AssertResultSink;
 import org.talend.components.adapter.beam.example.FixedFlowProperties;

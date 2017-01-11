@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -24,14 +24,11 @@ import java.net.URISyntaxException;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.mapred.AvroKey;
-import org.apache.beam.runners.direct.DirectOptions;
-import org.apache.beam.runners.direct.DirectRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.coders.AvroCoder;
 import org.apache.beam.sdk.io.Read;
 import org.apache.beam.sdk.io.hdfs.AvroHDFSFileSource;
 import org.apache.beam.sdk.io.hdfs.HDFSFileSource;
-import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Keys;
 import org.apache.beam.sdk.transforms.Sample;
@@ -102,7 +99,7 @@ public class MiniDfsResourceTest {
                     .apply(Values.<Text> create()) //
                     .apply(Sample.<Text> any(100)) //
                     .apply(collector);
-            p.run();
+            p.run().waitUntilFinish();
         }
     }
 
@@ -133,7 +130,7 @@ public class MiniDfsResourceTest {
             p.apply(Read.from(source)) //
                     .apply(Keys.<AvroKey<IndexedRecord>> create()) //
                     .apply(collector);
-            p.run();
+            p.run().waitUntilFinish();
         }
 
         // Assert that each row was counted only once.

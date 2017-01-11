@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -98,7 +98,7 @@ public class JDBCRowTestIT {
                 DBTestUtils.createTestSchema(), definition1, properties1);
 
         assertThat(records, hasSize(4));
-        Assert.assertEquals(4, records.get(3).get(0));
+        Assert.assertEquals("4", records.get(3).get(0));
         Assert.assertEquals("momo", records.get(3).get(1));
     }
 
@@ -133,7 +133,7 @@ public class JDBCRowTestIT {
                 DBTestUtils.createTestSchema(), definition1, properties1);
 
         assertThat(records, hasSize(4));
-        Assert.assertEquals(4, records.get(3).get(0));
+        Assert.assertEquals("4", records.get(3).get(0));
         Assert.assertEquals("momo", records.get(3).get(1));
     }
 
@@ -381,9 +381,9 @@ public class JDBCRowTestIT {
                 properties1);
 
         assertThat(records, hasSize(5));
-        Assert.assertEquals(4, records.get(3).get(0));
+        Assert.assertEquals("4", records.get(3).get(0));
         Assert.assertEquals("momo", records.get(3).get(1));
-        Assert.assertEquals(4, records.get(4).get(0));
+        Assert.assertEquals("4", records.get(4).get(0));
         Assert.assertEquals("momo", records.get(4).get(1));
     }
 

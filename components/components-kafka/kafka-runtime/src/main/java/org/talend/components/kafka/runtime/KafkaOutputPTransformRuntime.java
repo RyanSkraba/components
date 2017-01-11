@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -12,26 +12,22 @@
 // ============================================================================
 package org.talend.components.kafka.runtime;
 
-import java.io.ByteArrayOutputStream;
+import java.nio.charset.Charset;
 
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericDatumWriter;
-import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.avro.io.BinaryEncoder;
-import org.apache.avro.io.DatumWriter;
-import org.apache.avro.io.EncoderFactory;
 import org.apache.beam.sdk.coders.ByteArrayCoder;
 import org.apache.beam.sdk.io.kafka.KafkaIO;
-import org.apache.beam.sdk.transforms.DoFn;
+import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.PTransform;
-import org.apache.beam.sdk.transforms.ParDo;
+import org.apache.beam.sdk.transforms.SerializableFunction;
+import org.apache.beam.sdk.transforms.SimpleFunction;
+import org.apache.beam.sdk.transforms.WithKeys;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PDone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.kafka.dataset.KafkaDatasetProperties;
@@ -49,52 +45,37 @@ public class KafkaOutputPTransformRuntime extends PTransform<PCollection<Indexed
     public PDone expand(PCollection<IndexedRecord> objectPCollection) {
         final boolean useAvro = properties.getDatasetProperties().valueFormat
                 .getValue() == KafkaDatasetProperties.ValueFormat.AVRO;
-        final boolean useSimpleAvro = !properties.getDatasetProperties().isHierarchy.getValue();
 
-        PCollection<KV<byte[], byte[]>> kafkaCollection = objectPCollection.apply("ExtractIndexedRecord",
-                ParDo.of(new DoFn<IndexedRecord, KV<byte[], byte[]>>() {
-
-                    @DoFn.ProcessElement
-                    public void processElement(ProcessContext c) throws Exception {
-                        // FIXME auto convert type before here, or use converter with some built-in auto convert
-                        // function for basic type
-                        byte[] value = null;
-                        Schema schema = c.element().getSchema();
-                        if (useAvro) {
-
-                            DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<GenericRecord>(
-                                    properties.getDatasetProperties().getValueAvroSchema());
-                            ByteArrayOutputStream out = new ByteArrayOutputStream();
-                            BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(out, null);
-
-                            GenericRecord payload = null;
-                            if (useSimpleAvro) {
-                                payload = new GenericData.Record(properties.getDatasetProperties().getValueAvroSchema());
-                                for (Schema.Field field : payload.getSchema().getFields()) {
-                                    // put the value in incoming record to the intermediate avro payload
-                                    Object v = c.element().get(schema.getField(field.name()).pos());
-                                    payload.put(field.name(), v);
-                                }
-                            } else {
-                                payload = (GenericRecord) c.element().get(schema.getField("value").pos());
-                            }
-
-                            datumWriter.write(payload, encoder);
-                            encoder.flush();
-                            out.close();
-                            value = out.toByteArray();
-                        } else {
-                            value = (byte[]) c.element().get(schema.getField("value").pos());
-                        }
-                        c.output(KV.of((byte[]) c.element().get(schema.getField("key").pos()), value));
-                    }
-                }));
-
-        return kafkaCollection.apply(KafkaIO.write()
+        KafkaIO.Write<byte[], byte[]> kafkaWrite = KafkaIO.write()
                 .withBootstrapServers(properties.getDatasetProperties().getDatastoreProperties().brokers.getValue())
-                .withTopic(properties.getDatasetProperties().topic.getValue()).withKeyCoder(ByteArrayCoder.of())
-                .withValueCoder(ByteArrayCoder.of()).updateProducerProperties(KafkaConnection.createOutputMaps(properties)));
+                .withTopic(properties.getDatasetProperties().topic.getValue())
+                .updateProducerProperties(KafkaConnection.createOutputMaps(properties));
 
+        switch (properties.partitionType.getValue()) {
+        case COLUMN: {
+            PCollection pc1 = objectPCollection.apply(WithKeys.of(new ProduceKey(properties.keyColumn.getValue())));
+            if (useAvro) {
+                // TODO for now use incoming avro schema directly, do not check configured schema, improvement it.
+                return (PDone) pc1.apply(kafkaWrite.withKeyCoder(ByteArrayCoder.of()).withValueCoder(LazyAvroCoder.of()));
+            } else { // csv
+                return ((PCollection<KV<byte[], byte[]>>) pc1
+                        .apply("formatCsvKV", MapElements.via(new FormatCsvKV(properties.getDatasetProperties().fieldDelimiter.getValue()))))
+                                .apply(kafkaWrite.withKeyCoder(ByteArrayCoder.of()).withValueCoder(ByteArrayCoder.of()));
+            }
+        }
+        case ROUND_ROBIN: {
+            if (useAvro) {
+                // TODO for now use incoming avro schema directly, do not check configured schema, improvement it.
+                return (PDone) objectPCollection.apply(kafkaWrite.withValueCoder(LazyAvroCoder.of()).values());
+            } else { // csv
+                return (PDone) objectPCollection
+                        .apply(MapElements.via(new FormatCsv(properties.getDatasetProperties().fieldDelimiter.getValue())))
+                        .apply(kafkaWrite.withValueCoder(ByteArrayCoder.of()).values());
+            }
+        }
+        default:
+            throw new RuntimeException("To be implemented: " + properties.partitionType.getValue());
+        }
     }
 
     @Override
@@ -103,4 +84,70 @@ public class KafkaOutputPTransformRuntime extends PTransform<PCollection<Indexed
         return ValidationResult.OK;
     }
 
+    public static class FormatCsvKV extends SimpleFunction<KV<byte[], IndexedRecord>, KV<byte[], byte[]>> {
+
+        public final FormatCsvFunction function;
+
+        public FormatCsvKV(String fieldDelimiter) {
+            function = new FormatCsvFunction(fieldDelimiter);
+        }
+
+        @Override
+        public KV<byte[], byte[]> apply(KV<byte[], IndexedRecord> input) {
+            return KV.of(input.getKey(), function.apply(input.getValue()));
+        }
+    }
+
+    public static class FormatCsv extends SimpleFunction<IndexedRecord, byte[]> {
+
+        public final FormatCsvFunction function;
+
+        public FormatCsv(String fieldDelimiter) {
+            function = new FormatCsvFunction(fieldDelimiter);
+        }
+
+        @Override
+        public byte[] apply(IndexedRecord input) {
+            return function.apply(input);
+        }
+    }
+
+    public static class FormatCsvFunction implements SerializableFunction<IndexedRecord, byte[]> {
+
+        public final String fieldDelimiter;
+
+        private StringBuilder sb = new StringBuilder();
+
+        public FormatCsvFunction(String fieldDelimiter) {
+            this.fieldDelimiter = fieldDelimiter;
+        }
+
+        @Override
+        public byte[] apply(IndexedRecord input) {
+            int size = input.getSchema().getFields().size();
+            for (int i = 0; i < size; i++) {
+                if (sb.length() != 0)
+                    sb.append(fieldDelimiter);
+                sb.append(input.get(i));
+            }
+            byte[] bytes = sb.toString().getBytes(Charset.forName("UTF-8"));
+            sb.setLength(0);
+            return bytes;
+        }
+    }
+
+    public static class ProduceKey implements SerializableFunction<IndexedRecord, byte[]> {
+
+        private final String keyName;
+
+        public ProduceKey(String keyName) {
+            this.keyName = keyName;
+        }
+
+        @Override
+        public byte[] apply(IndexedRecord input) {
+            Object k = input.get(input.getSchema().getField(keyName).pos());
+            return String.valueOf(k).getBytes(Charset.forName("UTF-8"));
+        }
+    }
 }

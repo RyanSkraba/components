@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -46,6 +46,8 @@ public class DependenciesReader {
 
     private String depTxtPath;
 
+    private static ClassLoader classLoader = DependenciesReader.class.getClassLoader();
+
     /**
      * we use the <code>mavenGroupId<code> and <code>mavenArtifactId<code> to located the file that should be parsed
      */
@@ -73,7 +75,7 @@ public class DependenciesReader {
     public Set<String> getDependencies(ClassLoader classLoader) throws IOException {
         ClassLoader zeClassLoader = classLoader;
         if (zeClassLoader == null) {
-            zeClassLoader = this.getClass().getClassLoader();
+            zeClassLoader = this.classLoader;
         }
         try (InputStream depStream = zeClassLoader.getResourceAsStream(depTxtPath)) {
             if (depStream == null) {
@@ -121,7 +123,7 @@ public class DependenciesReader {
             String line = reader.readLine();
             if (isRequiredDependency(line)) {
                 mvnUris.add(parseMvnUri(line));
-            } // else not an expected dependencies so ignor it.
+            } // else not an expected dependencies so ignore it.
         }
         return mvnUris;
     }
@@ -169,23 +171,20 @@ public class DependenciesReader {
      * @return pax-url formatted string
      */
     String parseMvnUri(String dependencyString) {
-        String s = dependencyString.trim();
-        int indexOfGpSeparator = s.indexOf(':');
-        String groupId = s.substring(0, indexOfGpSeparator);
-        int indexOfArtIdSep = s.indexOf(':', indexOfGpSeparator + 1);
-        String artifactId = s.substring(indexOfGpSeparator + 1, indexOfArtIdSep);
-        int indexOfTypeSep = s.indexOf(':', indexOfArtIdSep + 1);
-        String type = s.substring(indexOfArtIdSep + 1, indexOfTypeSep);
-        int lastIndex = indexOfTypeSep;
+        String trimedDependency = dependencyString.trim();
+        String[] splitedDependency = trimedDependency.split(":");
+        String groupId = splitedDependency[0];
+        String artifactId = splitedDependency[1];
+        String type = splitedDependency[2];
         String classifier = null;
-        if (StringUtils.countMatches(s, ":") > 4) {// we have a classifier too
-            int indexOfClassifSep = s.indexOf(':', indexOfTypeSep + 1);
-            classifier = s.substring(indexOfTypeSep + 1, indexOfClassifSep);
-            lastIndex = indexOfClassifSep;
-        } // else no classifier.
-        int indexOfVersionSep = s.indexOf(':', lastIndex + 1);
-        String version = s.substring(lastIndex + 1, indexOfVersionSep);
-        // we ignor the scope here
+        String version = null;
+        if (splitedDependency.length > 5) {
+            classifier = splitedDependency[3];
+            version = splitedDependency[4];
+        } else { // else no classifier.
+            version = splitedDependency[3];
+        }
+        // we ignore the scope here
         return "mvn:" + groupId + '/' + artifactId + '/' + version + '/' + type + (classifier != null ? '/' + classifier : "");
     }
 

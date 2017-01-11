@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -15,15 +15,13 @@ package org.talend.components.simplefileio.runtime;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.mapred.AvroKey;
-import org.apache.avro.mapreduce.AvroKeyOutputFormat;
 import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.coders.VoidCoder;
 import org.apache.beam.sdk.io.Write;
-import org.apache.beam.sdk.io.hdfs.ConfigureOnWriteHdfsFileSink;
-import org.apache.beam.sdk.io.hdfs.HDFSFileSink;
 import org.apache.beam.sdk.io.hdfs.WritableCoder;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.PTransform;
@@ -31,6 +29,7 @@ import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PDone;
+import org.apache.commons.csv.CSVFormat;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -43,12 +42,17 @@ import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.ReflectionUtils;
-import org.apache.parquet.avro.AvroParquetOutputFormat;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.simplefileio.output.SimpleFileIoOutputProperties;
 import org.talend.components.simplefileio.runtime.coders.LazyAvroKeyWrapper;
+import org.talend.components.simplefileio.runtime.sinks.AvroHdfsFileSink;
+import org.talend.components.simplefileio.runtime.sinks.ParquetHdfsFileSink;
+import org.talend.components.simplefileio.runtime.sinks.UgiFileSinkBase;
+import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
+import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.ValidationResult;
 
 public class SimpleFileIoOutputRuntime extends PTransform<PCollection<IndexedRecord>, PDone> implements
@@ -72,39 +76,44 @@ public class SimpleFileIoOutputRuntime extends PTransform<PCollection<IndexedRec
 
     @Override
     public PDone expand(PCollection<IndexedRecord> in) {
+        // Controls the access security on the cluster.
+        UgiDoAs doAs = SimpleFileIoDatastoreRuntime.getUgiDoAs(properties.getDatasetProperties().getDatastoreProperties());
+
         switch (properties.getDatasetProperties().format.getValue()) {
 
         case AVRO: {
             LazyAvroKeyWrapper lakw = LazyAvroKeyWrapper.of();
-
-            Configuration conf = new Configuration();
-            ConfigureOnWriteHdfsFileSink<AvroKey<IndexedRecord>, NullWritable> sink = new ConfigureOnWriteHdfsFileSink(
-                    properties.getDatasetProperties().path.getValue(), AvroKeyOutputFormat.class, conf);
-
+            AvroHdfsFileSink sink = new AvroHdfsFileSink(doAs, properties.getDatasetProperties().path.getValue());
             PCollection<KV<AvroKey<IndexedRecord>, NullWritable>> pc1 = in.apply(ParDo.of(new FormatAvro()));
             pc1 = pc1.setCoder(KvCoder.of(lakw, WritableCoder.of(NullWritable.class)));
-
             return pc1.apply(Write.to(sink));
         }
 
         case CSV: {
             Configuration conf = new Configuration();
-            conf.set(CsvTextOutputFormat.RECORD_DELIMITER, properties.getDatasetProperties().recordDelimiter.getValue());
+            conf.set(CsvTextOutputFormat.RECORD_DELIMITER, properties.getDatasetProperties().getRecordDelimiter());
             conf.set(CsvTextOutputFormat.ENCODING, CsvTextOutputFormat.UTF_8);
-            HDFSFileSink<NullWritable, Text> sink = new HDFSFileSink(properties.getDatasetProperties().path.getValue(),
-                    CsvTextOutputFormat.class, conf);
-            return in.apply(ParDo.of(new FormatCsv(properties.datasetRef.getReference().fieldDelimiter.getValue())))
-                    .setCoder(KvCoder.of(WritableCoder.of(NullWritable.class), WritableCoder.of(Text.class))) //
-                    .apply(Write.to(sink));
+            UgiFileSinkBase<NullWritable, Text> sink = new UgiFileSinkBase<>(doAs,
+                    properties.getDatasetProperties().path.getValue(), CsvTextOutputFormat.class, conf);
+
+            String fieldDelimiter = properties.getDatasetProperties().getFieldDelimiter();
+            if (fieldDelimiter.length() > 1) {
+                fieldDelimiter = fieldDelimiter.trim();
+            }
+            if (fieldDelimiter.isEmpty())
+                TalendRuntimeException.build(CommonErrorCodes.UNEXPECTED_ARGUMENT).setAndThrow(
+                        "single character field delimiter", fieldDelimiter);
+
+            PCollection<KV<NullWritable, Text>> pc1 = in.apply(ParDo.of(new FormatCsvRecord(fieldDelimiter.charAt(0)))).setCoder(
+                    KvCoder.of(WritableCoder.of(NullWritable.class), WritableCoder.of(Text.class)));
+
+            return pc1.apply(Write.to(sink));
         }
 
         case PARQUET: {
-            ConfigureOnWriteHdfsFileSink<Void, IndexedRecord> sink = new ConfigureOnWriteHdfsFileSink<Void, IndexedRecord>(
-                    properties.getDatasetProperties().path.getValue(), (Class) AvroParquetOutputFormat.class);
-
+            ParquetHdfsFileSink sink = new ParquetHdfsFileSink(doAs, properties.getDatasetProperties().path.getValue());
             PCollection<KV<Void, IndexedRecord>> pc1 = in.apply(ParDo.of(new FormatParquet()));
             pc1 = pc1.setCoder(KvCoder.of(VoidCoder.of(), LazyAvroCoder.of()));
-
             return pc1.apply(Write.to(sink));
         }
 
@@ -172,25 +181,29 @@ public class SimpleFileIoOutputRuntime extends PTransform<PCollection<IndexedRec
         }
     }
 
-    public static class FormatCsv extends DoFn<IndexedRecord, KV<NullWritable, Text>> {
+    public static class FormatCsvRecord extends DoFn<IndexedRecord, KV<NullWritable, Text>> {
 
-        public final String fieldDelimiter;
+        public final char fieldDelimiter;
+
+        private final CSVFormat format;
 
         private StringBuilder sb = new StringBuilder();
 
-        public FormatCsv(String fieldDelimiter) {
+        public FormatCsvRecord(char fieldDelimiter) {
             this.fieldDelimiter = fieldDelimiter;
+            format = CSVFormat.RFC4180.withDelimiter(fieldDelimiter);
         }
 
         @DoFn.ProcessElement
-        public void processElement(ProcessContext c) {
+        public void processElement(ProcessContext c) throws IOException {
             // Join the strings with the delimiter.
             IndexedRecord in = c.element();
             int size = in.getSchema().getFields().size();
             for (int i = 0; i < size; i++) {
-                if (sb.length() != 0)
-                    sb.append(fieldDelimiter);
-                sb.append(in.get(i));
+                Object valueToWrite = in.get(i);
+                if (valueToWrite instanceof ByteBuffer)
+                    valueToWrite = new String(((ByteBuffer) valueToWrite).array());
+                format.print(valueToWrite, sb, sb.length() == 0);
             }
             c.output(KV.of(NullWritable.get(), new Text(sb.toString())));
             sb.setLength(0);

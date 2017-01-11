@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -60,8 +60,8 @@ public class SimpleRuntimeInfo implements RuntimeInfo {
             }
             return result;
         } catch (IOException e) {
-            throw new ComponentException(ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED, e, ExceptionContext.withBuilder()
-                    .put("path", dependenciesReader.getDependencyFilePath()).build());
+            throw new ComponentException(ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED, e,
+                    ExceptionContext.withBuilder().put("path", dependenciesReader.getDependencyFilePath()).build());
         }
 
     }
@@ -71,4 +71,25 @@ public class SimpleRuntimeInfo implements RuntimeInfo {
         return runtimeClassName;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!SimpleRuntimeInfo.class.isAssignableFrom(obj.getClass())) {
+            return false;
+        }
+        SimpleRuntimeInfo other = (SimpleRuntimeInfo) obj;
+        return this.runtimeClassName.equals(other.runtimeClassName) && this.depTxtPath.equals(other.depTxtPath);
+    }
+
+    @Override
+    public int hashCode() {
+        return (runtimeClassName + depTxtPath).hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "SimpleRuntimeInfo: {" + "runtimeClassName:" + runtimeClassName + ", " + "depTxtPath: " + depTxtPath + "}";
+    }
 }

@@ -44,6 +44,24 @@ APP_CLASS="org.talend.components.service.rest.Application"
 
 JAVA_OPTS="-Xmx2048m -Dfile.encoding=UTF-8 -Dorg.ops4j.pax.url.mvn.localRepository=\"$PWD/.m2\" -Dorg.talend.component.jdbc.config.file=\"$PWD/config/jdbc_config.json\""
 
+# If HADOOP_CONF_DIR is not set, try to get it from in the application properties, then add it to the classpath.
+if [ -z "$HADOOP_CONF_DIR" ] ; then
+  HADOOP_CONF_DIR=$(grep "^hadoop.conf.dir=" config/application.properties) && \
+      export HADOOP_CONF_DIR=$(expr $HADOOP_CONF_DIR : '.*=\(.*\)')
+fi
+if [ ! -z "$HADOOP_CONF_DIR" ] ; then
+  APP_CLASSPATH="$HADOOP_CONF_DIR:$APP_CLASSPATH"
+fi
+
+# If KRB5_CONFIG is not set, try to get it from in the application properties, then add it to the java options.
+if [ -z "$KRB5_CONFIG" ] ; then
+  KRB5_CONFIG=$(grep "^krb5.config=" config/application.properties) && \
+      export KRB5_CONFIG=$(expr $KRB5_CONFIG : '.*=\(.*\)')
+fi
+if [ ! -z "$KRB5_CONFIG" ] ; then
+  JAVA_OPTS="$JAVA_OPTS -Djava.security.krb5.conf=$KRB5_CONFIG"
+fi
+
 THE_CMD="$JAVA_BIN $JAVA_OPTS -cp \"$APP_CLASSPATH\" $APP_CLASS $*"  
 
 writeAppInfoInTty

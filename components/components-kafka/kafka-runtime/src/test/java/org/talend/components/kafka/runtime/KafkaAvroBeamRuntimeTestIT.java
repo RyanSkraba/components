@@ -1,3 +1,15 @@
+// ============================================================================
+//
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+//
+// This source code is available under agreement available at
+// %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
+//
+// You should have received a copy of the agreement
+// along with this program; if not, write to Talend SA
+// 9 rue Pages 92150 Suresnes, France
+//
+// ============================================================================
 package org.talend.components.kafka.runtime;
 
 import static org.junit.Assert.assertEquals;
@@ -5,32 +17,17 @@ import static org.talend.components.kafka.runtime.KafkaTestConstants.BOOTSTRAP_H
 import static org.talend.components.kafka.runtime.KafkaTestConstants.TOPIC_AVRO_IN;
 import static org.talend.components.kafka.runtime.KafkaTestConstants.TOPIC_AVRO_OUT;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 
-import org.apache.avro.Schema;
-import org.apache.avro.SchemaBuilder;
-import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericDatumReader;
-import org.apache.avro.generic.GenericDatumWriter;
-import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.generic.IndexedRecord;
-import org.apache.avro.io.BinaryDecoder;
-import org.apache.avro.io.BinaryEncoder;
-import org.apache.avro.io.DatumReader;
-import org.apache.avro.io.DatumWriter;
-import org.apache.avro.io.DecoderFactory;
-import org.apache.avro.io.EncoderFactory;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.testing.TestPipeline;
-import org.apache.beam.sdk.values.PCollection;
+import org.apache.beam.sdk.transforms.Filter;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -46,10 +43,6 @@ import org.talend.components.kafka.output.KafkaOutputProperties;
 
 public class KafkaAvroBeamRuntimeTestIT {
 
-    public static final String USER_SCHEMA = "{" + "\"type\":\"record\"," + "\"name\":\"abc\"," + "\"fields\":["
-            + "  { \"name\":\"str1\", \"type\":\"string\" }," + "  { \"name\":\"str2\", \"type\":\"string\" },"
-            + "  { \"name\":\"int1\", \"type\":\"int\" }" + "]}";
-
     KafkaDatastoreProperties datastoreProperties;
 
     KafkaDatasetProperties inputDatasetProperties;
@@ -58,39 +51,10 @@ public class KafkaAvroBeamRuntimeTestIT {
 
     Integer maxRecords = 10;
 
-    List<Map<String, String>> assertMessages = new ArrayList<>();
+    List<Person> expectedPersons = new ArrayList<>();
 
     @Before
     public void init() throws IOException {
-
-        Properties props = new Properties();
-        props.put("bootstrap.servers", BOOTSTRAP_HOST);
-        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        props.put("value.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer");
-
-        Schema.Parser parser = new Schema.Parser();
-        Schema schema = parser.parse(USER_SCHEMA);
-
-        Producer<String, byte[]> producer = new KafkaProducer<>(props);
-        for (int i = 0; i < maxRecords; i++) {
-            GenericData.Record avroRecord = new GenericData.Record(schema);
-            avroRecord.put("str1", "v1-" + i);
-            avroRecord.put("str2", "v2-" + i);
-            avroRecord.put("int1", i);
-            DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<GenericRecord>(schema);
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(out, null);
-            datumWriter.write(avroRecord, encoder);
-            encoder.flush();
-            out.close();
-            ProducerRecord<String, byte[]> message = new ProducerRecord<>(TOPIC_AVRO_IN, Integer.toString(i), out.toByteArray());
-            producer.send(message);
-            HashMap<String, String> assertMessage = new HashMap<>();
-            assertMessage.put(message.key(), avroRecord.toString());
-            assertMessages.add(assertMessage);
-        }
-
-        producer.close();
 
         datastoreProperties = new KafkaDatastoreProperties("datastore");
         datastoreProperties.init();
@@ -100,49 +64,56 @@ public class KafkaAvroBeamRuntimeTestIT {
         inputDatasetProperties.init();
         inputDatasetProperties.setDatastoreProperties(datastoreProperties);
         inputDatasetProperties.topic.setValue(TOPIC_AVRO_IN);
-        inputDatasetProperties.isHierarchy.setValue(false);
         inputDatasetProperties.valueFormat.setValue(KafkaDatasetProperties.ValueFormat.AVRO);
-
-        SchemaBuilder.FieldAssembler<Schema> fields = SchemaBuilder.record("row").namespace("kafka").fields();
-        fields = fields.name("key").type(Schema.create(Schema.Type.BYTES)).noDefault();
-        fields = fields.name("str1").type(Schema.create(Schema.Type.STRING)).noDefault();
-        fields = fields.name("str2").type(Schema.create(Schema.Type.STRING)).noDefault();
-        fields = fields.name("int1").type(Schema.create(Schema.Type.INT)).noDefault();
-        Schema customSchema = fields.endRecord();
-
-        inputDatasetProperties.main.schema.setValue(customSchema);
+        inputDatasetProperties.isHierarchy.setValue(false);
+        inputDatasetProperties.main.schema.setValue(Person.schema);
 
         outputDatasetProperties = new KafkaDatasetProperties("outputDataset");
         outputDatasetProperties.init();
         outputDatasetProperties.setDatastoreProperties(datastoreProperties);
         outputDatasetProperties.topic.setValue(TOPIC_AVRO_OUT);
-        outputDatasetProperties.isHierarchy.setValue(false);
         outputDatasetProperties.valueFormat.setValue(KafkaDatasetProperties.ValueFormat.AVRO);
-
-        fields = SchemaBuilder.record("row").namespace("kafka").fields();
-        fields = fields.name("key").type(Schema.create(Schema.Type.BYTES)).noDefault();
-        fields = fields.name("str1").type(Schema.create(Schema.Type.STRING)).noDefault();
-        fields = fields.name("str2").type(Schema.create(Schema.Type.STRING)).noDefault();
-        fields = fields.name("int1").type(Schema.create(Schema.Type.INT)).noDefault();
-        customSchema = fields.endRecord();
-
-        outputDatasetProperties.main.schema.setValue(customSchema);
+        outputDatasetProperties.isHierarchy.setValue(false);
+        outputDatasetProperties.main.schema.setValue(Person.schema);
     }
 
+    /**
+     * Read avro(Person) format and write avro(Person) format with schema.
+     */
     @Test
-    public void pipelineTest() throws IOException {
-        Pipeline pipeline = TestPipeline.create();
+    public void avroBasicTest() throws IOException {
+        String testID = "avroBasicTest" + new Random().nextInt();
+
+        expectedPersons = Person.genRandomList(testID, maxRecords);
+
+        // ----------------- Send data to TOPIC_AVRO_IN start --------------------
+        Properties props = new Properties();
+        props.put("bootstrap.servers", BOOTSTRAP_HOST);
+        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        props.put("value.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer");
+
+        Producer<Void, byte[]> producer = new KafkaProducer<>(props);
+        for (Person person : expectedPersons) {
+            ProducerRecord<Void, byte[]> message = new ProducerRecord<>(TOPIC_AVRO_IN, person.serToAvroBytes());
+            producer.send(message);
+        }
+        producer.close();
+        // ----------------- Send data to TOPIC_AVRO_IN done --------------------
 
         KafkaInputProperties inputProperties = new KafkaInputProperties("input");
         inputProperties.init();
         inputProperties.setDatasetProperties(inputDatasetProperties);
-        // inputProperties.groupID.setValue("test");
-        inputProperties.useMaxNumRecords.setValue(true);
-        inputProperties.maxNumRecords.setValue(maxRecords.longValue());
         inputProperties.autoOffsetReset.setValue(KafkaInputProperties.OffsetType.EARLIEST);
+        inputProperties.useMaxNumRecords.setValue(false);
+        // inputProperties.maxNumRecords.setValue(maxRecords.longValue());
+        inputProperties.useMaxReadTime.setValue(true);
+        inputProperties.maxReadTime.setValue(5000l);
+
         KafkaOutputProperties outputProperties = new KafkaOutputProperties("output");
         outputProperties.init();
         outputProperties.setDatasetProperties(outputDatasetProperties);
+        outputProperties.partitionType.setValue(KafkaOutputProperties.PartitionType.ROUND_ROBIN);
+        outputProperties.useCompress.setValue(false);
 
         KafkaInputPTransformRuntime inputRuntime = new KafkaInputPTransformRuntime();
         inputRuntime.initialize(null, inputProperties);
@@ -150,16 +121,16 @@ public class KafkaAvroBeamRuntimeTestIT {
         KafkaOutputPTransformRuntime outputRuntime = new KafkaOutputPTransformRuntime();
         outputRuntime.initialize(null, outputProperties);
 
-        PCollection<IndexedRecord> indexRecords = pipeline.apply(inputRuntime);
-        indexRecords.apply(outputRuntime);
-        // IndexedRecordToKV indexedRecordToKV = new IndexedRecordToKV();
-        // PCollection kv = indexedRecordToKV.apply(indexRecords);
+        // ----------------- pipeline start --------------------
+        Pipeline pipeline = TestPipeline.create();
 
-        // PAssert.that(kv).satisfies(new StartWith("k", "v"));
+        pipeline.apply(inputRuntime).apply(Filter.by(new KafkaCsvBeamRuntimeTestIT.FilterByGroup(testID))).apply(outputRuntime);
 
         PipelineResult result = pipeline.run();
+        // ----------------- pipeline done --------------------
 
-        Properties props = new Properties();
+        // ----------------- Read data from TOPIC_AVRO_OUT start --------------------
+        props = new Properties();
         props.put("bootstrap.servers", BOOTSTRAP_HOST);
         props.put("group.id", "getResult");
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
@@ -167,24 +138,108 @@ public class KafkaAvroBeamRuntimeTestIT {
         props.put("auto.offset.reset", "earliest");
         KafkaConsumer<String, byte[]> consumer = new KafkaConsumer<>(props);
         consumer.subscribe(Arrays.asList(TOPIC_AVRO_OUT));
-        List<Map<String, String>> results = new ArrayList<>();
+        List<Person> results = new ArrayList<>();
         while (true) {
             ConsumerRecords<String, byte[]> records = consumer.poll(100);
             for (ConsumerRecord<String, byte[]> record : records) {
-                Map<String, String> resultMessage = new HashMap<>();
-                Schema.Parser parser = new Schema.Parser();
-                Schema schema = parser.parse(USER_SCHEMA);
-                DatumReader<GenericRecord> datumReader = new GenericDatumReader<GenericRecord>(schema);
-                BinaryDecoder decoder = null;
-                decoder = DecoderFactory.get().binaryDecoder(record.value(), decoder);
-                GenericRecord avroValue = datumReader.read(null, decoder);
-                resultMessage.put(record.key(), avroValue.toString());
-                results.add(resultMessage);
+                Person person = Person.desFromAvroBytes(record.value());
+                if (testID.equals(person.group)) {
+                    results.add(person);
+                }
             }
             if (results.size() >= maxRecords) {
                 break;
             }
         }
-        assertEquals(assertMessages, results);
+        // ----------------- Read data from TOPIC_AVRO_OUT done --------------------
+        assertEquals(expectedPersons, results);
+    }
+
+    /**
+     * Read avro(Person) format and write avro(Person) format with schema.
+     */
+    @Test
+    public void avroBasicTest2() throws IOException {
+        String testID = "avroBasicTest2" + new Random().nextInt();
+
+        expectedPersons = Person.genRandomList(testID, maxRecords);
+
+        // ----------------- Send data to TOPIC_AVRO_IN start --------------------
+        Properties props = new Properties();
+        props.put("bootstrap.servers", BOOTSTRAP_HOST);
+        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        props.put("value.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer");
+
+        Producer<Void, byte[]> producer = new KafkaProducer<>(props);
+        for (Person person : expectedPersons) {
+            ProducerRecord<Void, byte[]> message = new ProducerRecord<>(TOPIC_AVRO_IN, person.serToAvroBytes());
+            producer.send(message);
+        }
+        producer.close();
+        // ----------------- Send data to TOPIC_AVRO_IN done --------------------
+
+        KafkaInputProperties inputProperties = new KafkaInputProperties("input");
+        inputProperties.init();
+        inputProperties.setDatasetProperties(inputDatasetProperties);
+        inputProperties.autoOffsetReset.setValue(KafkaInputProperties.OffsetType.EARLIEST);
+        inputProperties.useMaxNumRecords.setValue(false);
+        // inputProperties.maxNumRecords.setValue(maxRecords.longValue());
+        inputProperties.useMaxReadTime.setValue(true);
+        inputProperties.maxReadTime.setValue(5000l);
+
+        KafkaOutputProperties outputProperties = new KafkaOutputProperties("output");
+        outputProperties.init();
+        outputProperties.setDatasetProperties(outputDatasetProperties);
+        outputProperties.partitionType.setValue(KafkaOutputProperties.PartitionType.COLUMN);
+        outputProperties.keyColumn.setValue("name");
+        outputProperties.useCompress.setValue(false);
+
+
+        KafkaInputPTransformRuntime inputRuntime = new KafkaInputPTransformRuntime();
+        inputRuntime.initialize(null, inputProperties);
+
+        KafkaOutputPTransformRuntime outputRuntime = new KafkaOutputPTransformRuntime();
+        outputRuntime.initialize(null, outputProperties);
+
+        // ----------------- pipeline start --------------------
+        Pipeline pipeline = TestPipeline.create();
+
+        pipeline.apply(inputRuntime).apply(Filter.by(new KafkaCsvBeamRuntimeTestIT.FilterByGroup(testID))).apply(outputRuntime);
+
+        PipelineResult result = pipeline.run();
+        // ----------------- pipeline done --------------------
+
+        // ----------------- Read data from TOPIC_AVRO_OUT start --------------------
+        props = new Properties();
+        props.put("bootstrap.servers", BOOTSTRAP_HOST);
+        props.put("group.id", "getResult");
+        props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
+        props.put("auto.offset.reset", "earliest");
+        KafkaConsumer<String, byte[]> consumer = new KafkaConsumer<>(props);
+        consumer.subscribe(Arrays.asList(TOPIC_AVRO_OUT));
+        List<Person> results = new ArrayList<>();
+        List<String> keys = new ArrayList<>();
+        while (true) {
+            ConsumerRecords<String, byte[]> records = consumer.poll(100);
+            for (ConsumerRecord<String, byte[]> record : records) {
+                Person person = Person.desFromAvroBytes(record.value());
+                if (testID.equals(person.group)) {
+                    keys.add(record.key());
+                    results.add(person);
+                }
+            }
+            if (results.size() >= maxRecords) {
+                break;
+            }
+        }
+        // ----------------- Read data from TOPIC_AVRO_OUT done --------------------
+        assertEquals(expectedPersons, results);
+        List<String> expectedKeys = new ArrayList<>();
+        for (Person person : results) {
+            expectedKeys.add(person.name);
+        }
+        assertEquals(expectedKeys, keys);
+
     }
 }

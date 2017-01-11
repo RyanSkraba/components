@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -20,8 +20,13 @@ import org.talend.components.simplefileio.SimpleFileIoDatasetDefinition;
 import org.talend.components.simplefileio.SimpleFileIoDatasetProperties;
 import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 public class SimpleFileIoInputProperties extends ComponentPropertiesImpl implements IOProperties {
+
+    /** If non-negative, limits the number of records returned for this component. This is not visible to the user. */
+    public Property<Integer> limit = PropertyFactory.newInteger("limit", -1).setRequired();
 
     public SimpleFileIoInputProperties(String name) {
         super(name);

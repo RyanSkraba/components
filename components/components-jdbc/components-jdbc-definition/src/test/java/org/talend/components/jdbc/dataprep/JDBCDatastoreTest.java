@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -29,7 +29,7 @@ public class JDBCDatastoreTest {
 
         List<?> dbTypes = properties.dbTypes.getPossibleValues();
         assertTrue("the list should not be empty", dbTypes != null && !dbTypes.isEmpty());
-        assertTrue("The size of list is not right", dbTypes.size() == 2);
+        assertTrue("The size of list is not right", dbTypes.size() == 3);
         assertTrue("The first element is not right", "MYSQL".equals(dbTypes.get(0)));
         assertTrue("The second element is not right", "DERBY".equals(dbTypes.get(1)));
 
