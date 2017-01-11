@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.jdbc.datastore;
 
-import static org.talend.daikon.properties.presentation.Widget.*;
-import static org.talend.daikon.properties.property.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -114,7 +114,7 @@ public class JDBCDatastoreProperties extends PropertiesImpl implements Datastore
         Form mainForm = CommonUtils.addForm(this, Form.MAIN);
 
         mainForm.addRow(Widget.widget(dbTypes).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
-        mainForm.addRow(jdbcUrl);
+        mainForm.addRow(Widget.widget(jdbcUrl).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
 
         mainForm.addRow(userId);
         mainForm.addRow(widget(password).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
