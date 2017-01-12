@@ -13,7 +13,11 @@
 package org.talend.components.salesforce.runtime;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -94,11 +98,11 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
             }
             inputRecords = inputResult.getRecords();
             inputRecordsIndex = 0;
-            boolean startable = inputRecords.length > 0;
-            if (startable) {
+            boolean start = inputRecords.length > 0;
+            if (start) {
                 dataCount++;
             }
-            return startable;
+            return start;
         } catch (ConnectionException e) {
             // Wrap the exception in an IOException.
             throw new IOException(e);
@@ -119,10 +123,16 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
         }
 
         try {
+            // Get a new result set based on batch size
             inputResult = getConnection().queryMore(inputResult.getQueryLocator());
             inputRecords = inputResult.getRecords();
             inputRecordsIndex = 0;
-            return inputResult.getSize() > 0;
+            boolean advance = inputResult.getSize() > 0;
+            if (advance) {
+                // New result set available to retrieve
+                dataCount++;
+            }
+            return advance;
         } catch (ConnectionException e) {
             // Wrap the exception in an IOException.
             throw new IOException(e);

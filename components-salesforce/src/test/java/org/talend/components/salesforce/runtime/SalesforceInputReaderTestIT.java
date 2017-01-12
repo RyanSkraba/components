@@ -12,14 +12,17 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -277,6 +280,43 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         }
     }
 
+    @Test
+    public void testInputNBLine() throws Throwable {
+        String random = createNewRandom();
+        TSalesforceInputProperties props = createTSalesforceInputProperties(false, false);
+        List<IndexedRecord> outputRows = new ArrayList<IndexedRecord>();
+        for (int i = 0; i < 210; i++) {
+            IndexedRecord record = new GenericData.Record(SCHEMA_QUERY_ACCOUNT);
+            record.put(1, "TestName_" + random);
+            outputRows.add(record);
+        }
+        TSalesforceOutputProperties outputProps = new TSalesforceOutputProperties("output"); //$NON-NLS-1$
+        outputProps.copyValuesFrom(props);
+        outputProps.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
+        doWriteRows(outputProps, outputRows);
+        List<IndexedRecord> returnRecords = null;
+        String query = "SELECT Id, Name FROM Account WHERE Name = 'TestName_" + random + "'";
+        try {
+            // SOAP query test
+            returnRecords = checkRows(outputProps, query, 210, false);
+            assertThat(returnRecords.size(), is(210));
+            // Bulk query test
+            returnRecords = checkRows(outputProps, query, 210, true);
+            assertThat(returnRecords.size(), is(210));
+        } finally {
+            // Delete test records
+            if (returnRecords != null) {
+                deleteRows(returnRecords, outputProps);
+            } else {
+                props.manualQuery.setValue(true);
+                props.query.setValue(query);
+                returnRecords = readRows(props);
+                deleteRows(returnRecords, outputProps);
+            }
+        }
+
+    }
+
     protected void testBulkQueryNullValue(SalesforceConnectionModuleProperties props, String random) throws Throwable {
         ComponentDefinition sfInputDef = new TSalesforceInputDefinition();
         TSalesforceInputProperties sfInputProps = (TSalesforceInputProperties) sfInputDef.createRuntimeProperties();
@@ -291,5 +331,34 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
             assertNull(record.get(5));
             assertNull(record.get(6));
         }
+    }
+
+    protected List<IndexedRecord> checkRows(SalesforceConnectionModuleProperties props, String soql, int nbLine,
+            boolean bulkQuery) throws IOException {
+        TSalesforceInputProperties inputProps = (TSalesforceInputProperties) new TSalesforceInputProperties("bar").init();
+        inputProps.connection = props.connection;
+        inputProps.module = props.module;
+        inputProps.batchSize.setValue(200);
+        if (bulkQuery) {
+            inputProps.queryMode.setValue(TSalesforceInputProperties.QueryMode.Bulk);
+        } else {
+            inputProps.queryMode.setValue(TSalesforceInputProperties.QueryMode.Query);
+        }
+        inputProps.manualQuery.setValue(true);
+        inputProps.query.setValue(soql);
+        List<IndexedRecord> inputRows = readRows(inputProps);
+        SalesforceReader<IndexedRecord> reader = (SalesforceReader) createBoundedReader(inputProps);
+        boolean hasRecord = reader.start();
+        List<IndexedRecord> rows = new ArrayList<>();
+        while (hasRecord) {
+            org.apache.avro.generic.IndexedRecord unenforced = reader.getCurrent();
+            rows.add(unenforced);
+            hasRecord = reader.advance();
+        }
+        Map<String, Object> result = reader.getReturnValues();
+        Object totalCount = result.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT);
+        assertNotNull(totalCount);
+        assertThat((int) totalCount, is(nbLine));
+        return inputRows;
     }
 }
