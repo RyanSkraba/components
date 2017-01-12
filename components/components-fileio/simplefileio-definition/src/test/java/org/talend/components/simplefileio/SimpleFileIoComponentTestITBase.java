@@ -12,30 +12,33 @@
 // ============================================================================
 package org.talend.components.simplefileio;
 
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import javax.inject.Inject;
 
 import org.junit.Test;
-import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.test.AbstractComponentTest;
+import org.talend.components.api.test.AbstractComponentTest2;
 import org.talend.components.simplefileio.input.SimpleFileIoInputDefinition;
 import org.talend.components.simplefileio.output.SimpleFileIoOutputDefinition;
+import org.talend.daikon.definition.Definition;
+import org.talend.daikon.definition.service.DefinitionRegistryService;
 
-public abstract class SimpleFileIoComponentTestITBase extends AbstractComponentTest {
+public abstract class SimpleFileIoComponentTestITBase extends AbstractComponentTest2 {
 
     @Inject
-    ComponentService componentService;
+    DefinitionRegistryService defReg;
 
     @Override
-    public ComponentService getComponentService() {
-        return componentService;
+    public DefinitionRegistryService getDefinitionRegistry() {
+        return defReg;
     }
 
     @Test
     public void assertComponentsAreRegistered() {
-        assertThat(getComponentService().getComponentDefinition(SimpleFileIoInputDefinition.NAME), notNullValue());
-        assertThat(getComponentService().getComponentDefinition(SimpleFileIoOutputDefinition.NAME), notNullValue());
+        assertThat(getDefinitionRegistry().getDefinitionsMapByType(Definition.class).get(SimpleFileIoInputDefinition.NAME),
+                notNullValue());
+        assertThat(getDefinitionRegistry().getDefinitionsMapByType(Definition.class).get(SimpleFileIoOutputDefinition.NAME),
+                notNullValue());
     }
 }
