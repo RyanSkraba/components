@@ -12,18 +12,14 @@
 // ============================================================================
 package org.talend.components.adapter.beam.transform;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.beam.runners.direct.DirectRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
-import org.apache.beam.sdk.options.PipelineOptions;
-import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Create;
@@ -76,9 +72,9 @@ public class DirectConsumerCollectorTest {
         }
 
         // Validate the contents of the collected outputs.
-        //assertThat(beforeConsumer.consumed, hasSize(3));
+        // assertThat(beforeConsumer.consumed, hasSize(3));
         assertThat(beforeConsumer.consumed, containsInAnyOrder("one", "two", "three"));
-        //assertThat(afterConsumer.consumed, hasSize(3));
+        // assertThat(afterConsumer.consumed, hasSize(3));
         assertThat(afterConsumer.consumed, containsInAnyOrder(3, 3, 5));
 
         // Ensure that the collectors were cleaned up.
@@ -91,7 +87,7 @@ public class DirectConsumerCollectorTest {
         public final List<T> consumed = new ArrayList<>();
 
         @Override
-        public void accept(T t) {
+        public synchronized void accept(T t) {
             consumed.add(t);
         }
     }
