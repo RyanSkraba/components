@@ -12,27 +12,22 @@
 // ============================================================================
 package org.talend.components.jdbc;
 
-import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.service.common.ComponentServiceImpl;
 import org.talend.components.api.service.common.DefinitionRegistry;
-import org.talend.components.api.test.AbstractComponentTest;
+import org.talend.components.api.test.AbstractComponentTest2;
+import org.talend.daikon.definition.service.DefinitionRegistryService;
 
-public class JDBCTest extends AbstractComponentTest {
+public class JDBCTest extends AbstractComponentTest2 {
 
-    private ComponentServiceImpl componentService;
+    private DefinitionRegistry testComponentRegistry;
 
-    /**
-     * test the i18n and the basic setting
-     */
     @Override
-    public ComponentService getComponentService() {
-        if (componentService == null) {
-            DefinitionRegistry testComponentRegistry = new DefinitionRegistry();
+    public DefinitionRegistryService getDefinitionRegistry() {
+        if (testComponentRegistry == null) {
+            testComponentRegistry = new DefinitionRegistry();
 
             testComponentRegistry.registerComponentFamilyDefinition(new JDBCFamilyDefinition());
-            componentService = new ComponentServiceImpl(testComponentRegistry);
         }
-        return componentService;
+        return testComponentRegistry;
     }
 
 }

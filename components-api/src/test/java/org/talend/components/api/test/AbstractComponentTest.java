@@ -29,6 +29,10 @@ import org.talend.components.api.exception.error.ComponentsApiErrorCode;
 import org.talend.components.api.service.ComponentService;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
 
+/**
+ * @deprecated please use the {@link AbstractComponentTest2} instead
+ */
+@Deprecated
 public abstract class AbstractComponentTest {
 
     static {

@@ -15,10 +15,10 @@ package org.talend.components.kafka.dataset;
 import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.common.dataset.DatasetDefinition;
-import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
-public class KafkaDatasetDefinition extends SimpleNamedThing implements DatasetDefinition<KafkaDatasetProperties> {
+public class KafkaDatasetDefinition extends I18nDefinition implements DatasetDefinition<KafkaDatasetProperties> {
 
     public static final String NAME = "KafkaDataset";
 
@@ -40,7 +40,7 @@ public class KafkaDatasetDefinition extends SimpleNamedThing implements DatasetD
 
     @Override
     public String getImagePath() {
-        return NAME + "_icon32.png";
+        return "/org/talend/components/kafka/Kafka.svg";
     }
 
 }

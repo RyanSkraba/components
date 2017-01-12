@@ -16,19 +16,21 @@ import javax.inject.Inject;
 
 import org.junit.Test;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.test.AbstractComponentTest;
+import org.talend.components.api.test.AbstractComponentTest2;
+import org.talend.daikon.definition.service.DefinitionRegistryService;
 
-public class ${componentName}TestBase extends AbstractComponentTest {
+public class ${componentName}TestBase extends AbstractComponentTest2 {
 
     @Inject
-    private ComponentService componentService;
+    private DefinitionRegistryService definitionRegistry;
 
-    public ComponentService getComponentService(){
-        return componentService;
+    @Override
+    public DefinitionRegistryService getDefinitionRegistry() {
+        return definitionRegistry;
     }
     
     @Test
-    public void componentHasBeenRegistered(){
+    public void testComponentHasBeenRegistered(){
         assertComponentIsRegistered("${componentName}");
     }
 }

@@ -15,25 +15,21 @@ package org.talend.components.service.rest;
 import javax.inject.Inject;
 
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.test.AbstractComponentTest;
+import org.talend.components.api.test.AbstractComponentTest2;
+import org.talend.daikon.definition.service.DefinitionRegistryService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
-public class SpringComponentTest extends AbstractComponentTest {
-
-    static final Logger LOG = LoggerFactory.getLogger(SpringComponentTest.class);
+public class SpringComponentTestIT extends AbstractComponentTest2 {
 
     @Inject
-    private ComponentService componentService;
+    private DefinitionRegistryService definitionRegistry;
 
     @Override
-    public ComponentService getComponentService() {
-        return componentService;
+    public DefinitionRegistryService getDefinitionRegistry() {
+        return definitionRegistry;
     }
 
 }
