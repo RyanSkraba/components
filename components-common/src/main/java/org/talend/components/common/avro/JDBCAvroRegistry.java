@@ -15,6 +15,7 @@ package org.talend.components.common.avro;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
+import org.codehaus.jackson.JsonNode;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
@@ -220,7 +221,7 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
     protected Field wrap(boolean nullable, Schema base, String name) {
         Schema schema = nullable ? SchemaBuilder.builder().nullable().type(base) : base;
-        return new Field(name, schema, null, (Object) null);
+        return new Field(name, schema, null, (JsonNode) null);
     }
 
     public JDBCConverter getConverter(final Field f) {
