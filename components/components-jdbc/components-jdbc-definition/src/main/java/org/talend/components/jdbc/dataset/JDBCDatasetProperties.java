@@ -85,7 +85,7 @@ public class JDBCDatasetProperties extends PropertiesImpl
         mainForm.addRow(Widget.widget(sql).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
 
         Form citizenUserForm = CommonUtils.addForm(this, Form.CITIZEN_USER);
-        citizenUserForm.addRow(sql);
+        citizenUserForm.addRow(Widget.widget(sql).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
 
         // citizenUserForm.addColumn(widget(main).setHidden(true));
     }

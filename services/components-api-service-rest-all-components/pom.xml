@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
-		<version>0.17.1</version>
+		<version>0.17.2</version>
 		<relativePath>../../components-parent/pom.xml</relativePath>
 	</parent>
 
@@ -37,7 +37,7 @@
 				and it's not compatible with spring-boot 1.4.1, the jetty needs to be excluded. -->
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-common-oauth</artifactId>
-			<version>0.17.1</version>
+			<version>0.17.2</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.eclipse.jetty</groupId>
@@ -48,32 +48,32 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-jdbc-definition</artifactId>
-			<version>0.17.1</version>
+			<version>0.17.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>simplefileio-definition</artifactId>
-			<version>0.17.1</version>
+			<version>0.17.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>jms-definition</artifactId>
-			<version>0.17.1</version>
+			<version>0.17.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>kafka-definition</artifactId>
-			<version>0.17.1</version>
+			<version>0.17.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-jira</artifactId>
-			<version>0.17.1</version>
+			<version>0.17.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-salesforce</artifactId>
-			<version>0.17.1</version>
+			<version>0.17.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
@@ -87,26 +87,26 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>jms-runtime_1_1</artifactId>
-			<version>0.17.1</version>
+			<version>0.17.2</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-jdbc-runtime</artifactId>
-			<version>0.17.1</version>
+			<version>0.17.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>kafka-runtime</artifactId>
-			<version>0.17.1</version>
+			<version>0.17.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>simplefileio-runtime</artifactId>
-			<version>0.17.1</version>
+			<version>0.17.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -132,7 +132,7 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-rest</artifactId>
-			<version>0.17.1</version>
+			<version>0.17.2</version>
 			<classifier>lib</classifier>
 		</dependency>
 		<dependency>
@@ -149,14 +149,14 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-rest</artifactId>
-			<version>0.17.1</version>
+			<version>0.17.2</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>0.17.1</version>
+			<version>0.17.2</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
@@ -231,12 +231,12 @@
 						</goals>
 						<configuration>
 							<extraArtifacts>
-								<extraArtifact>org.talend.components:components-salesforce:0.17.1:jar</extraArtifact>
-								<extraArtifact>org.talend.components:components-jira:0.17.1:jar</extraArtifact>
-								<extraArtifact>org.talend.components:jms-runtime_1_1:0.17.1:jar</extraArtifact>
-								<extraArtifact>org.talend.components:kafka-runtime:0.17.1:jar</extraArtifact>
-								<extraArtifact>org.talend.components:simplefileio-runtime:0.17.1:jar</extraArtifact>
-								<extraArtifact>org.talend.components:components-jdbc-runtime:0.17.1:jar</extraArtifact>
+								<extraArtifact>org.talend.components:components-salesforce:0.17.2:jar</extraArtifact>
+								<extraArtifact>org.talend.components:components-jira:0.17.2:jar</extraArtifact>
+								<extraArtifact>org.talend.components:jms-runtime_1_1:0.17.2:jar</extraArtifact>
+								<extraArtifact>org.talend.components:kafka-runtime:0.17.2:jar</extraArtifact>
+								<extraArtifact>org.talend.components:simplefileio-runtime:0.17.2:jar</extraArtifact>
+								<extraArtifact>org.talend.components:components-jdbc-runtime:0.17.2:jar</extraArtifact>
 								<extraArtifact>org.talend.libraries:mysql-connector-java-5.1.30-bin:6.0.0:jar</extraArtifact>
 								<extraArtifact>org.apache.derby:derby:10.12.1.1:jar</extraArtifact>
 								<extraArtifact>org.apache.beam:beam-sdks-java-io-hdfs:${beam.version}:jar</extraArtifact>

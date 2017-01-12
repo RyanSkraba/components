@@ -5,12 +5,12 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.17.1</version>
+        <version>0.17.2</version>
         <relativePath>../../components-parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>components-api-service-common</artifactId>
-    <version>0.17.1</version>
+    <version>0.17.2</version>
     <packaging>bundle</packaging>
 
     <name>Commons classes for component service implem</name>
@@ -26,12 +26,12 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.17.1</version>
+            <version>0.17.2</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.17.1</version>
+            <version>0.17.2</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
