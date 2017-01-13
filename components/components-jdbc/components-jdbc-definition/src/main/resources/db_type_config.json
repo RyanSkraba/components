@@ -20,8 +20,7 @@
 	 		{"path" : "mvn:org.apache.derby/derby/10.12.1.1"}
 	 	]
 	
-	}
-	
+	},
 	{
 		"id" : "ORACLE",
 		"class" : "oracle.jdbc.OracleDriver",
