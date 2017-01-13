@@ -13,15 +13,12 @@
 
 package org.talend.components.jdbc.datastream;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.io.IOProperties;
 import org.talend.components.jdbc.RuntimeSettingProvider;
+import org.talend.components.jdbc.dataset.JDBCDatasetDefinition;
 import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
 import org.talend.components.jdbc.datastore.JDBCDatastoreProperties;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
@@ -30,10 +27,14 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 public class JDBCOutputProperties extends FixedConnectorsComponentProperties
         implements IOProperties<JDBCDatasetProperties>, RuntimeSettingProvider {
 
-    public ReferenceProperties<JDBCDatasetProperties> dataset = new ReferenceProperties<>("dataset", JDBCOutputDefinition.NAME);
+    public ReferenceProperties<JDBCDatasetProperties> dataset = new ReferenceProperties<>("dataset", JDBCDatasetDefinition.NAME);
 
     public Property<DataAction> dataAction = PropertyFactory.newEnum("dataAction", DataAction.class).setRequired();
 
