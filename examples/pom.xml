@@ -11,6 +11,7 @@
 	<modules>
 		<module>components-multiple-runtimes-and-deps</module>
 		<module>components-api-archetypes</module>
+		<module>components-api-full-example</module>
 	</modules>
 	<build>
 		<!-- skip the deployment for this aggregator, not necessary -->

@@ -20,5 +20,10 @@
         <module>components-localio</module>
         <module>components-processing</module>
 		<module>components-jdbc</module>
+        <module>components-salesforce</module>
+        <module>components-snowflake</module>
+        <module>components-splunk</module>
+        <module>components-jira</module>
+        <module>components-filedelimited</module>
   </modules>
 </project>

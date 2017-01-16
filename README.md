@@ -12,18 +12,15 @@ This repository contains the Talend Component Framework and implementations of T
 
 The group is: org.talend.components.
 
-| Folder                                         | Module                | Artifact              | Description                                      |
-|:----------------------------------------------:|:---------------------:|:---------------------:|:------------------------------------------------:|
-| root                                           | components-root     | components             | *This whole thing*                               |
-| [components-parent](components-parent)             | components-parent       | components-parent       | *Parent pom for everything*        |
-| [components-api](components-api)             | components-api       | components-api       | *API used to define and access component*        |
-| [components-common](components-common)         | components-common     | components-common     | *Code shared by multiple components*             |
-| [components-common-oauth](components-common-oauth) | components-common-oauth | components-common-oauth | *OAuth impolementation*             |
-| [components-salesforce](components-salesforce) | components-salesforce  | components-salesforce | *SFDC components*                                |
-| [components-proptester](components-proptester)       | components-proptester  | components-proptester | *Command line test program*               |
-| [components-webtest](components-webtest)       | components-webtest  | components-webtest | *Temporary code to start the web services for testing*                                |
-| [components-osgitest](components-osgitest)       | components-osgitest  | components-osgitest | *Integration tests for OSGI services*                                |
-| [tooling]                                      | tooling               |                       | *IDE specific config files + some other stuff*   |
+| Folder                                         | Description                                         |
+|:----------------------------------------------:|:---------------------------------------------------:|
+| root                                           | *This whole thing*                                  |
+| [components-parent](components-parent)         | *Parent pom for everything*                         |
+| [components](components)                       | *All components implementation modules*             |
+| [core](core)                                   | *Framework APIs related modules*                    |
+| [examples](examples)                           | *Archetype for creating new components and examples*|
+| [services](services)                           | *Web and OSGI service related modules*              |
+| [tooling](tooling)                             | *IDE and build related templates and docs*          |
 
 
 ## Build
@@ -46,29 +43,15 @@ To run this, in the top level folder:
 
 ```
 mvn clean install (or 'package' if you do not want the integration tests to be executed see Tests below)
-cd components-proptester
+cd core/components-api-proptester
 mvn exec:java
 ```
 
 Type "help" to get the list of commands.
 
-## Using the Test Web Service
+## Launching the web service
 
-In the top level folder:
-
-```
-mvn clean install (or 'package' if you do not want the integration tests to be executed see Tests below)
-cd components-webtest
-mvn spring-boot:run
-```
-
-*Currently the web part is not working, and probably won't for a while. This is because the default JSON serialization
-will not handle arbitrary object graphs, so some work is needed on that. As the web part is not an immediate requirement, 
-this will be delayed for a while until the Eclipse version gets finished for 6.1*
-
-Recommend using [Google Postman](https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en) as the web client.
-
-Use [http://localhost:8080/components/tSalesforceConnect/properties](http://localhost:8080/components/tSalesforceConnect/properties) after starting the server.
+see the readme here : [services/components-api-service-rest-all-components](/services/components-api-service-rest-all-components/)
 
 
 ## IDE Setup

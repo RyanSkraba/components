@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.talend.components</groupId>
+        <artifactId>components-parent</artifactId>
+        <version>0.17.0-SNAPSHOT</version>
+        <relativePath>../../components-parent/pom.xml</relativePath>
+    </parent>
+
+    <name>Components - Shared Component Parts</name>
+    <artifactId>components-common</artifactId>
+    <packaging>bundle</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.sourceforge.javacsv</groupId>
+            <artifactId>javacsv</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Tests -->
+        <dependency>
+            <groupId>biz.aQute.bnd</groupId>
+            <artifactId>annotation</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api-service-common</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api-service-common</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-api</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-osgitest</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.veithen.alta</groupId>
+                <artifactId>alta-maven-plugin</artifactId>
+                <version>0.4.2-Talend</version>
+                <executions>
+                    <execution>
+                        <id>Generate .link files</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>generate-test-resources</goal>
+                        </goals>
+                        <configuration>
+                            <name>%groupId%-%artifactId%.link</name>
+                            <value>%url%</value>
+                            <separator>${line.separator}</separator>
+                            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                            <dependencySet>
+                                <scope>test</scope>
+                            </dependencySet>
+                            <artifacts>
+                              <artifact>
+                                  <groupId>${project.groupId}</groupId>
+                                  <artifactId>${project.artifactId}</artifactId>
+                                  <classifier>bundle</classifier>
+                                  <version>${project.version}</version>
+                              </artifact>
+                           </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>          
+			<plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>lib-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                        <configuration>
+                            <instructions>
+                                <Bundle-SymbolicName>org.talend.components.common.lib</Bundle-SymbolicName>
+                                <Bundle-Name>${project.name} lib</Bundle-Name>
+                            </instructions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>test-bundle</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>tests</classifier>
+                            <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
+                            <instructions>
+                                <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*,org.hamcrest*</Import-Package>
+                                <Bundle-SymbolicName>org.talend.components.common.test</Bundle-SymbolicName>
+                                <Bundle-Name>Test Fragment for ${project.name}</Bundle-Name>
+                                <Fragment-Host>org.talend.components.common</Fragment-Host>
+                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
+                                <Embed-Dependency></Embed-Dependency>
+                                <Export-Package>*</Export-Package>
+                                <Include-Resource>=target/test-classes/
+                                </Include-Resource>
+                            </instructions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>bundle-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>bundle</classifier>
+                            <instructions>
+                                <Bundle-SymbolicName>org.talend.components.common</Bundle-SymbolicName>
+                                <Import-Package>org.talend*,org.slf4j*,org.apache.commons*,org.apache.avro*</Import-Package>
+                                <Service-Component>*</Service-Component>
+                                <Embed-Dependency>!components*,*;scope=compile|runtime;artifactId=avro;inline=false</Embed-Dependency>
+<!--                                 <Embed-Dependency> -->
+<!--                                     !org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api|javax.servlet-api|javax.inject|daikon -->
+<!--                                 </Embed-Dependency> -->
+                                
+                            </instructions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

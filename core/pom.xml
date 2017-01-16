@@ -16,5 +16,10 @@
     <modules>
         <module>components-adapter-beam-parent</module>
         <module>components-adapter-beam</module>
+        <module>components-api</module>
+        <module>components-api-proptester</module>
+        <module>components-osgitest</module>
+        <module>components-common</module>
+        <module>components-common-oauth</module>
   </modules>
 </project>
