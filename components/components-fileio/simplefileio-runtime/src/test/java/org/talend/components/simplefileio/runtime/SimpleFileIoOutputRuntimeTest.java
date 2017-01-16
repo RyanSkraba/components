@@ -25,6 +25,7 @@ import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.values.PCollection;
+import org.apache.hadoop.fs.Path;
 import org.junit.Rule;
 import org.junit.Test;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
@@ -72,7 +73,8 @@ public class SimpleFileIoOutputRuntimeTest {
      */
     @Test
     public void testBasicDefaults() throws IOException, URISyntaxException {
-        String fileSpec = mini.getLocalFs().getUri().resolve(mini.newFolder() + "/output.csv").toString();
+        String fileSpec = mini.getLocalFs().getUri().resolve(
+                new Path(mini.newFolder().toString(), "output.csv").toUri()).toString();
 
         // Configure the component.
         SimpleFileIoOutputProperties props = createOutputComponentProperties();
@@ -112,7 +114,8 @@ public class SimpleFileIoOutputRuntimeTest {
             }
         }
 
-        String fileSpec = mini.getLocalFs().getUri().resolve(mini.newFolder() + "/output.csv").toString();
+        String fileSpec = mini.getLocalFs().getUri().resolve(
+                new Path(mini.newFolder().toString(), "output.csv").toUri()).toString();
 
         // Configure the component.
         SimpleFileIoOutputProperties props = createOutputComponentProperties();
@@ -139,7 +142,8 @@ public class SimpleFileIoOutputRuntimeTest {
      */
     @Test
     public void testBasicAvro() throws IOException, URISyntaxException {
-        String fileSpec = mini.getLocalFs().getUri().resolve(mini.newFolder() + "/output.avro").toString();
+        String fileSpec = mini.getLocalFs().getUri().resolve(
+                new Path(mini.newFolder().toString(), "output.avro").toUri()).toString();
 
         // Configure the component.
         SimpleFileIoOutputProperties props = createOutputComponentProperties();
@@ -170,7 +174,8 @@ public class SimpleFileIoOutputRuntimeTest {
      */
     @Test
     public void testBasicAvroBytes() throws IOException, URISyntaxException {
-        String fileSpec = mini.getLocalFs().getUri().resolve(mini.newFolder() + "/output.avro").toString();
+        String fileSpec = mini.getLocalFs().getUri().resolve(
+                new Path(mini.newFolder().toString(), "output.avro").toUri()).toString();
 
         // Configure the component.
         SimpleFileIoOutputProperties props = createOutputComponentProperties();

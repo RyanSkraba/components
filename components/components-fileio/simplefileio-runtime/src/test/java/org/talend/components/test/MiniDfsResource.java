@@ -39,7 +39,7 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 /**
- * Reusable for creating a {@link MiniDFSCluster} in a local, temporary directoryt.
+ * Reusable for creating a {@link MiniDFSCluster} in a local, temporary directory.
  */
 public class MiniDfsResource extends TemporaryFolder {
 
@@ -111,7 +111,7 @@ public class MiniDfsResource extends TemporaryFolder {
      * @return A new temporary folder on the local filesystem.
      */
     public String getLocalFsNewFolder() throws IOException {
-        return getLocalFs().getUri().resolve(newFolder(testName).toString()) + "/";
+        return getLocalFs().getUri().resolve(new Path(newFolder(testName).toString()).toUri()) + "/";
     }
 
     /**
