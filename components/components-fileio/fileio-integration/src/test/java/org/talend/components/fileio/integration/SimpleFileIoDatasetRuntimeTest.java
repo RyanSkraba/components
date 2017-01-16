@@ -71,7 +71,7 @@ public class SimpleFileIoDatasetRuntimeTest {
         }
 
         SimpleFileIoDatasetProperties props = createDatasetProperties();
-        props.path.setValue("file://" + input);
+        props.path.setValue(input.toURI().toString());
 
         final List<IndexedRecord> consumed = new ArrayList<>();
 

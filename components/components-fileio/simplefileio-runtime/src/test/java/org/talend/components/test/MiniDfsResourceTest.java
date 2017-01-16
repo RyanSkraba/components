@@ -20,7 +20,9 @@ import static org.hamcrest.Matchers.is;
 import static org.talend.components.test.RecordSetUtil.getSimpleTestData;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.mapred.AvroKey;
@@ -33,6 +35,7 @@ import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Keys;
 import org.apache.beam.sdk.transforms.Sample;
 import org.apache.beam.sdk.transforms.Values;
+import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSTestUtil;
@@ -64,7 +67,8 @@ public class MiniDfsResourceTest {
         assertThat(status, arrayWithSize(1));
 
         // Read the file in one chunk.
-        assertThat(DFSTestUtil.readFile(mini.getFs(), status[0].getPath()), is("1;one\n2;two\n3;three\n"));
+        assertThat(IOUtils.readLines(new StringReader(DFSTestUtil.readFile(mini.getFs(), status[0].getPath()))),
+                is(Arrays.asList("1;one", "2;two", "3;three")));
 
         // Read the file as lines.
         mini.assertReadFile(mini.getFs(), "/user/test/stuff.txt", "1;one", "2;two", "3;three");
