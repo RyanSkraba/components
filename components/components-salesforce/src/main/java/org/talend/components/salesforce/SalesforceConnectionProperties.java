@@ -12,6 +12,12 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
+import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
+import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
+import static org.talend.daikon.properties.property.PropertyFactory.newString;
+
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentReferenceProperties;
@@ -25,12 +31,6 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
-
-import static org.talend.daikon.properties.presentation.Widget.widget;
-import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
-import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
-import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
-import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 public class SalesforceConnectionProperties extends ComponentPropertiesImpl
         implements SalesforceProvideConnectionProperties, ComponentReferencePropertiesEnclosing {
@@ -58,6 +58,10 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
     public Property<LoginType> loginType = newEnum("loginType", LoginType.class).setRequired();
 
     public Property<Boolean> bulkConnection = newBoolean("bulkConnection"); //$NON-NLS-1$
+
+    public Property<Boolean> reuseSession = newBoolean("reuseSession"); //$NON-NLS-1$
+
+    public Property<String> sessionDirectory = newString("sessionDirectory"); //$NON-NLS-1$
 
     public Property<Boolean> needCompression = newBoolean("needCompression"); //$NON-NLS-1$
 
@@ -125,6 +129,8 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
         Form advancedForm = Form.create(this, Form.ADVANCED);
         advancedForm.addRow(endpoint);
         advancedForm.addRow(bulkConnection);
+        advancedForm.addRow(reuseSession);
+        advancedForm.addRow(widget(sessionDirectory).setWidgetType(Widget.DIRECTORY_WIDGET_TYPE));
         advancedForm.addRow(needCompression);
         advancedForm.addRow(httpTraceMessage);
         advancedForm.addRow(httpChunked);
@@ -151,6 +157,10 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
     public void afterReferencedComponent() {
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(Form.REFERENCE));
+        refreshLayout(getForm(Form.ADVANCED));
+    }
+
+    public void afterReuseSession() {
         refreshLayout(getForm(Form.ADVANCED));
     }
 
@@ -215,6 +225,9 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
                 boolean bulkMode = bulkConnection.getValue();
                 form.getWidget(httpChunked.getName()).setHidden(bulkMode);
                 form.getWidget(httpTraceMessage.getName()).setHidden(!bulkMode);
+                boolean isBasicLogin = LoginType.Basic.equals(loginType.getValue());
+                form.getWidget(reuseSession.getName()).setVisible(isBasicLogin && !bulkMode);
+                form.getWidget(sessionDirectory.getName()).setVisible(isBasicLogin && !bulkMode && reuseSession.getValue());
 
                 Form proxyForm = form.getChildForm(proxy.getName());
                 if (proxyForm != null) {

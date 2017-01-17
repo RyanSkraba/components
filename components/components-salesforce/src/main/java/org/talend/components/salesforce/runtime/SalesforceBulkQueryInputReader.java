@@ -25,14 +25,11 @@ import org.talend.components.salesforce.runtime.SalesforceBulkRuntime.BulkResult
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 
 import com.sforce.async.AsyncApiException;
-import com.sforce.async.BulkConnection;
 import com.sforce.ws.ConnectionException;
 
 public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedRecord> {
 
     private static final Logger LOG = LoggerFactory.getLogger(SalesforceBulkQueryInputReader.class);
-
-    protected BulkConnection bulkConnection;
 
     protected SalesforceBulkRuntime bulkRuntime;
 
@@ -46,16 +43,12 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
         this.container = container;
     }
 
-    protected BulkConnection getBulkConnection() throws IOException {
-        if (bulkConnection == null) {
-            bulkConnection = ((SalesforceSource) getCurrentSource()).connect(container).bulkConnection;
-        }
-        return bulkConnection;
-    }
-
     @Override
     public boolean start() throws IOException {
         try {
+            if (bulkRuntime == null) {
+                bulkRuntime = new SalesforceBulkRuntime((SalesforceSource) getCurrentSource(), container);
+            }
             executeSalesforceBulkQuery();
             bulkResultSet = bulkRuntime.getQueryResultSet(bulkRuntime.nextResultId());
             currentRecord = bulkResultSet.next();
@@ -101,7 +94,6 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
         return currentRecord;
     }
 
-    // FIXME some duplicate code
     protected void executeSalesforceBulkQuery() throws IOException, ConnectionException {
         String queryText = getQueryString(properties);
         bulkRuntime = new SalesforceBulkRuntime((SalesforceSource) getCurrentSource(), container);
