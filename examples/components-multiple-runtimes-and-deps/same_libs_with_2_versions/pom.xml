@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.talend.components</groupId>
-	<version>0.17.0-SNAPSHOT</version>
+	<version>0.18.0-SNAPSHOT</version>
 	<artifactId>same_libs_with_2_versions</artifactId>
 	<packaging>pom</packaging>
 
@@ -11,7 +11,7 @@
 	<modules>
 		<module>zeLib</module>
 		<module>zeLib_v2</module>
-  </modules>
+	</modules>
 	<build>
 		<!-- skip the deployment for this aggregator, not necessary -->
 		<plugins>

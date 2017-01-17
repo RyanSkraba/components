@@ -5,14 +5,13 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.17.0-SNAPSHOT</version>
+        <version>0.18.0-SNAPSHOT</version>
         <relativePath>../../../components-parent/pom.xml</relativePath>             
     </parent>
 
     <name>Components - MultiRuntimeComponent - runtime v02</name>
     <groupId>org.talend.components</groupId>
     <artifactId>test-multiple-runtime-comp-runtime-v02</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <repositories>
         <repository>
@@ -39,13 +38,13 @@
         <dependency>
             <groupId>org.talend.components</groupId>
 		    <artifactId>multiple-runtime-comp</artifactId>
-		    <version>0.2.0-SNAPSHOT</version>
+		    <version>${project.version}</version>
         </dependency>
 		  <!-- APIs for all Components -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>0.17.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>biz.aQute.bnd</groupId>
@@ -56,20 +55,20 @@
         <dependency>
           <groupId>org.talend.components</groupId>
           <artifactId>components-common</artifactId>
-          <version>0.17.0-SNAPSHOT</version>
+          <version>${project.version}</version>
         </dependency>
         
         <!-- Jar containing Test utils methods -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>0.17.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>0.17.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

@@ -5,13 +5,12 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.17.0-SNAPSHOT</version>
+        <version>0.18.0-SNAPSHOT</version>
         <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
 
     <name>Components - JDBC - Definition</name>
     <artifactId>components-jdbc-definition</artifactId>
-    <version>0.17.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
