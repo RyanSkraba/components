@@ -12,7 +12,26 @@
 // ============================================================================
 package org.talend.components.snowflake.runtime;
 
-import com.snowflake.client.loader.*;
+import static org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction.UPSERT;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import com.snowflake.client.loader.LoadResultListener;
+import com.snowflake.client.loader.LoaderFactory;
+import com.snowflake.client.loader.LoaderProperty;
+import com.snowflake.client.loader.LoadingError;
+import com.snowflake.client.loader.Operation;
+import com.snowflake.client.loader.StreamLoader;
+import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData;
@@ -27,21 +46,18 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction.UPSERT;
-
 public final class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
+
+    private static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+
+    private static SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss.SSS");
 
     private StreamLoader loader;
 
     private final SnowflakeWriteOperation snowflakeWriteOperation;
 
     private Connection uploadConnection;
+
     private Connection processingConnection;
 
     private Object[] row;
@@ -68,44 +84,45 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
 
     private transient Schema mainSchema;
 
-    @Override
-    public Iterable<IndexedRecord> getSuccessfulWrites() {
+    @Override public Iterable<IndexedRecord> getSuccessfulWrites() {
         return new ArrayList<IndexedRecord>();
     }
 
-    @Override
-    public Iterable<IndexedRecord> getRejectedWrites() {
+    @Override public Iterable<IndexedRecord> getRejectedWrites() {
         return listener.getErrors();
     }
 
     class ResultListener implements LoadResultListener {
+
         final private List<IndexedRecord> errors = new ArrayList<>();
 
         final private AtomicInteger errorCount = new AtomicInteger(0);
+
         final private AtomicInteger errorRecordCount = new AtomicInteger(0);
 
         final public AtomicInteger counter = new AtomicInteger(0);
+
         final public AtomicInteger processed = new AtomicInteger(0);
+
         final public AtomicInteger deleted = new AtomicInteger(0);
+
         final public AtomicInteger updated = new AtomicInteger(0);
+
         final private AtomicInteger submittedRowCount = new AtomicInteger(0);
 
         private Object[] lastRecord = null;
 
         public boolean throwOnError = false; // should not trigger rollback
 
-        @Override
-        public boolean needErrors() {
+        @Override public boolean needErrors() {
             return true;
         }
 
-        @Override
-        public boolean needSuccessRecords() {
+        @Override public boolean needSuccessRecords() {
             return false;
         }
 
-        @Override
-        public void addError(LoadingError error) {
+        @Override public void addError(LoadingError error) {
             Schema rejectSchema = sprops.schemaReject.schema.getValue();
 
             IndexedRecord reject = new GenericData.Record(rejectSchema);
@@ -130,8 +147,7 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
             errors.add(reject);
         }
 
-        @Override
-        public boolean throwOnError() {
+        @Override public boolean throwOnError() {
             return throwOnError;
         }
 
@@ -139,18 +155,15 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
             return errors;
         }
 
-        @Override
-        public void recordProvided(Operation op, Object[] record) {
+        @Override public void recordProvided(Operation op, Object[] record) {
             lastRecord = record;
         }
 
-        @Override
-        public void addProcessedRecordCount(Operation op, int i) {
+        @Override public void addProcessedRecordCount(Operation op, int i) {
             processed.addAndGet(i);
         }
 
-        @Override
-        public void addOperationRecordCount(Operation op, int i) {
+        @Override public void addOperationRecordCount(Operation op, int i) {
             counter.addAndGet(i);
             if (op == Operation.DELETE) {
                 deleted.addAndGet(i);
@@ -163,48 +176,39 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
             return lastRecord;
         }
 
-        @Override
-        public int getErrorCount() {
+        @Override public int getErrorCount() {
             return errorCount.get();
         }
 
-        @Override
-        public int getErrorRecordCount() {
+        @Override public int getErrorRecordCount() {
             return errorRecordCount.get();
         }
 
-        @Override
-        public void resetErrorCount() {
+        @Override public void resetErrorCount() {
             errorCount.set(0);
         }
 
-        @Override
-        public void resetErrorRecordCount() {
+        @Override public void resetErrorRecordCount() {
             errorRecordCount.set(0);
         }
 
-        @Override
-        public void addErrorCount(int count) {
+        @Override public void addErrorCount(int count) {
             errorCount.addAndGet(count);
         }
 
-        @Override
-        public void addErrorRecordCount(int count) {
+        @Override public void addErrorRecordCount(int count) {
             errorRecordCount.addAndGet(count);
         }
 
-        @Override
-        public void resetSubmittedRowCount() {
+        @Override public void resetSubmittedRowCount() {
             submittedRowCount.set(0);
         }
 
-        @Override
-        public void addSubmittedRowCount(int count) {
+        @Override public void addSubmittedRowCount(int count) {
             submittedRowCount.addAndGet(count);
         }
 
-        @Override
-        public int getSubmittedRowCount() {
+        @Override public int getSubmittedRowCount() {
             return submittedRowCount.get();
         }
     }
@@ -218,8 +222,7 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         listener = new ResultListener();
     }
 
-    @Override
-    public void open(String uId) throws IOException {
+    @Override public void open(String uId) throws IOException {
         this.uId = uId;
         processingConnection = sink.connect(container);
         uploadConnection = sink.connect(container);
@@ -238,18 +241,18 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         prop.put(LoaderProperty.schemaName, connectionProperties.schemaName.getStringValue());
         prop.put(LoaderProperty.databaseName, connectionProperties.db.getStringValue());
         switch (sprops.outputAction.getValue()) {
-            case INSERT:
-                prop.put(LoaderProperty.operation, Operation.INSERT);
-                break;
-            case UPDATE:
-                prop.put(LoaderProperty.operation, Operation.MODIFY);
-                break;
-            case UPSERT:
-                prop.put(LoaderProperty.operation, Operation.UPSERT);
-                break;
-            case DELETE:
-                prop.put(LoaderProperty.operation, Operation.DELETE);
-                break;
+        case INSERT:
+            prop.put(LoaderProperty.operation, Operation.INSERT);
+            break;
+        case UPDATE:
+            prop.put(LoaderProperty.operation, Operation.MODIFY);
+            break;
+        case UPSERT:
+            prop.put(LoaderProperty.operation, Operation.UPSERT);
+            break;
+        case DELETE:
+            prop.put(LoaderProperty.operation, Operation.DELETE);
+            break;
         }
 
         List<Field> columns = mainSchema.getFields();
@@ -281,9 +284,7 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         loader.start();
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public void write(Object datum) throws IOException {
+    @SuppressWarnings("unchecked") @Override public void write(Object datum) throws IOException {
         if (null == datum) {
             return;
         }
@@ -295,10 +296,16 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         List<Schema.Field> fields = input.getSchema().getFields();
         for (int i = 0; i < row.length; i++) {
             Field f = fields.get(i);
-            // Date is the only thing that requires conversion
-            if (AvroUtils.isSameType(f.schema(), AvroUtils._date())) {
+            Schema s = AvroUtils.unwrapIfNullable(f.schema());
+            if (AvroUtils.isSameType(s, AvroUtils._date())) {
                 Date date = (Date) input.get(i);
                 row[i] = date.getTime();
+            } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.timestampMillis()) {
+                Date date = new Date((long) input.get(i));
+                row[i] = timeFormatter.format(date);
+            } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.date()) {
+                Date date = new Date((Long) input.get(i));
+                row[i] = dateFormatter.format(date);
             } else {
                 row[i] = input.get(i);
             }
@@ -307,8 +314,7 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         loader.submitRow(row);
     }
 
-    @Override
-    public Result close() throws IOException {
+    @Override public Result close() throws IOException {
         try {
             loader.finish();
         } catch (Exception ex) {
@@ -330,9 +336,7 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         return new Result(uId, listener.getSubmittedRowCount(), listener.counter.get(), listener.getErrorRecordCount());
     }
 
-
-    @Override
-    public WriteOperation<Result> getWriteOperation() {
+    @Override public WriteOperation<Result> getWriteOperation() {
         return snowflakeWriteOperation;
     }
 

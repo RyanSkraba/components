@@ -284,8 +284,8 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
         row.put("C1", "foo_" + i);
         row.put("C2", "true");
         row.put("C3", Double.valueOf(i));
-        row.put("C4", dateFormatter.format(testDate));
-        row.put("C5", testTimeString);
+        row.put("C4", testDate.getTime());
+        row.put("C5", testTime.getTime());
         row.put("C6", testTimestamp);
         row.put("C7", makeJson(i));
         return row;
