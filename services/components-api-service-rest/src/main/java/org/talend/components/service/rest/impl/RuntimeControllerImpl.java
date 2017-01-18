@@ -1,6 +1,6 @@
 //==============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -15,13 +15,13 @@ package org.talend.components.service.rest.impl;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Integer.MAX_VALUE;
+import static java.util.Collections.emptyList;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.function.Function;
 
-import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.io.Encoder;
@@ -43,6 +43,7 @@ import org.talend.components.service.rest.dto.ValidationResultsDto;
 import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
+import org.talend.daikon.java8.Consumer;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
@@ -52,6 +53,8 @@ import org.talend.daikon.sandbox.SandboxedInstance;
 public class RuntimeControllerImpl implements RuntimesController {
 
     private static final Logger log = LoggerFactory.getLogger(RuntimeControllerImpl.class);
+
+    private static final ClassLoader classLoader = RuntimeControllerImpl.class.getClassLoader();
 
     @Autowired
     private PropertiesHelpers propertiesHelpers;
@@ -64,13 +67,13 @@ public class RuntimeControllerImpl implements RuntimesController {
         notNull(definition, "Could not find data store definition of name %s", dataStoreDefinitionName);
         DatastoreProperties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
 
-        try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(definition.getRuntimeInfo(properties),
-                getClass().getClassLoader())) {
+        try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(definition.getRuntimeInfo(properties), classLoader)) {
             DatastoreRuntime<DatastoreProperties> datastoreRuntime = (DatastoreRuntime) instance.getInstance();
             datastoreRuntime.initialize(null, properties);
             Iterable<ValidationResult> healthChecks = datastoreRuntime.doHealthChecks(null);
 
-            ValidationResultsDto response = new ValidationResultsDto(newArrayList(healthChecks));
+            ValidationResultsDto response = new ValidationResultsDto(
+                    healthChecks == null ? emptyList() : newArrayList(healthChecks));
             HttpStatus httpStatus = response.getStatus() == ValidationResult.Result.OK ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
 
             return new ResponseEntity<>(response, httpStatus);
@@ -112,8 +115,7 @@ public class RuntimeControllerImpl implements RuntimesController {
                 propertiesHelpers.getDataSetDefinition(datasetDefinitionName);
 
         // 3) create the runtime
-        try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(datasetDefinition.getRuntimeInfo(datasetProperties),
-                getClass().getClassLoader())) {
+        try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(datasetDefinition.getRuntimeInfo(datasetProperties), classLoader)) {
             DatasetRuntime<DatasetProperties<DatastoreProperties>> datasetRuntimeInstance = (DatasetRuntime<DatasetProperties<DatastoreProperties>>) instance
                     .getInstance();
 
@@ -129,6 +131,7 @@ public class RuntimeControllerImpl implements RuntimesController {
         private final Integer limit;
 
         private final boolean json;
+
         private final OutputStream output;
 
         /**
@@ -143,18 +146,34 @@ public class RuntimeControllerImpl implements RuntimesController {
 
         @Override
         public Void apply(DatasetRuntime<DatasetProperties<DatastoreProperties>> dr) {
-            Schema schema = dr.getSchema();
-            GenericDatumWriter<IndexedRecord> writer = new GenericDatumWriter<>(schema);
             try {
-                Encoder encoder;
-                if (json) {
-                    encoder = EncoderFactory.get().jsonEncoder(schema, output);
-                } else {
-                    encoder = EncoderFactory.get().binaryEncoder(output, null);
-                }
-                dr.getSample(limit == null ? MAX_VALUE : limit, ir -> writeIndexedRecord(writer, encoder, ir));
-                encoder.flush();
-            } catch (IOException e) {
+                final Encoder[] encoder = { null };
+
+                dr.getSample(limit == null ? MAX_VALUE : limit, new Consumer<IndexedRecord>() {
+
+                    GenericDatumWriter<IndexedRecord> writer = null;
+
+                    @Override
+                    public void accept(IndexedRecord ir) {
+                        if (writer == null) {
+                            writer = new GenericDatumWriter<>(ir.getSchema());
+                            try {
+                                if (json) {
+                                    encoder[0] = EncoderFactory.get().jsonEncoder(ir.getSchema(), output);
+                                } else {
+                                    encoder[0] = EncoderFactory.get().binaryEncoder(output, null);
+                                }
+                            } catch (IOException ioe) {
+                                throw new RuntimeException(ioe);
+                            }
+
+                        }
+                        writeIndexedRecord(writer, encoder[0], ir);
+                    }
+                });
+                if (encoder[0] != null)
+                    encoder[0].flush();
+            } catch (RuntimeException | IOException e) {
                 log.error("Couldn't create Avro records JSon encoder.", e);
                 throw new TalendRuntimeException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
             }

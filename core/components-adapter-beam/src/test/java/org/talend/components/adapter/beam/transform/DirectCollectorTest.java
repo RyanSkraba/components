@@ -1,3 +1,15 @@
+// ============================================================================
+//
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+//
+// This source code is available under agreement available at
+// %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
+//
+// You should have received a copy of the agreement
+// along with this program; if not, write to Talend SA
+// 9 rue Pages 92150 Suresnes, France
+//
+// ============================================================================
 package org.talend.components.adapter.beam.transform;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -11,6 +23,7 @@ import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.testing.PAssert;
+import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.ParDo;
@@ -37,9 +50,7 @@ public class DirectCollectorTest {
         try (DirectCollector<String> before = DirectCollector.of(); //
                 DirectCollector<Integer> after = DirectCollector.of();) {
 
-            PipelineOptions options = PipelineOptionsFactory.create();
-            options.setRunner(DirectRunner.class);
-            final Pipeline p = Pipeline.create(options);
+            Pipeline p = TestPipeline.create();
 
             PCollection<String> input = p.apply( //
                     Create.of("one", "two", "three")); //

@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -44,9 +44,6 @@ import org.apache.beam.sdk.values.PDone;
  */
 public class DirectCollector<T> extends PTransform<PCollection<T>, PDone> implements Closeable {
 
-    /** An automatically generated UID for storing the collection in memory. */
-    private final String uid;
-
     /** In-memory storage of collected records. */
     private final static Map<String, List<?>> records = new ConcurrentHashMap<>();
 
@@ -57,8 +54,9 @@ public class DirectCollector<T> extends PTransform<PCollection<T>, PDone> implem
      * Use {@link #of()} to create an instance of this transform.
      */
     private DirectCollector() {
-        this.uid = "row" + count.getAndIncrement();
-        records.put(uid, Collections.synchronizedList(new ArrayList<>()));
+        // Use the name as an automatically generated UID for storing the consumer in memory.
+        super("row" + count.getAndIncrement());
+        records.put(getName(), Collections.synchronizedList(new ArrayList<>()));
     }
 
     /**
@@ -69,8 +67,8 @@ public class DirectCollector<T> extends PTransform<PCollection<T>, PDone> implem
     }
 
     @Override
-    public PDone apply(PCollection<T> input) {
-        input.apply(ParDo.of(new CollectorFn<T>(uid)));
+    public PDone expand(PCollection<T> input) {
+        input.apply(ParDo.of(new CollectorFn<T>(getName())));
         return PDone.in(input.getPipeline());
     }
 
@@ -78,7 +76,7 @@ public class DirectCollector<T> extends PTransform<PCollection<T>, PDone> implem
      * @return The collected records from the input collection (available during and after pipeline execution).
      */
     public List<T> getRecords() {
-        return (List<T>) records.get(uid);
+        return (List<T>) records.get(getName());
     }
 
     /**
@@ -100,7 +98,7 @@ public class DirectCollector<T> extends PTransform<PCollection<T>, PDone> implem
      */
     @Override
     public void close() {
-        records.remove(uid);
+        records.remove(getName());
     }
 
     public static class CollectorFn<T> extends DoFn<T, Void> {

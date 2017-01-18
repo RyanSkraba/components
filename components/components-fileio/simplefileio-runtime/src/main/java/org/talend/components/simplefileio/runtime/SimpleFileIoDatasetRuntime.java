@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -14,11 +14,10 @@ package org.talend.components.simplefileio.runtime;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.beam.runners.direct.DirectRunner;
+import org.apache.beam.runners.direct.DirectOptions;
 import org.apache.beam.sdk.Pipeline;
-import org.apache.beam.sdk.options.PipelineOptions;
-import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Sample;
+import org.talend.components.adapter.beam.BeamLocalRunnerOption;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.adapter.beam.transform.DirectConsumerCollector;
 import org.talend.components.api.container.RuntimeContainer;
@@ -62,21 +61,22 @@ public class SimpleFileIoDatasetRuntime implements DatasetRuntime<SimpleFileIoDa
         // Create an input runtime based on the properties.
         SimpleFileIoInputRuntime inputRuntime = new SimpleFileIoInputRuntime();
         SimpleFileIoInputProperties inputProperties = new SimpleFileIoInputProperties(null);
+        inputProperties.limit.setValue(limit);
         inputProperties.init();
         inputProperties.setDatasetProperties(properties);
         inputRuntime.initialize(null, inputProperties);
-
         // Create a pipeline using the input component to get records.
-        PipelineOptions options = PipelineOptionsFactory.create();
-        options.setRunner(DirectRunner.class);
+
+        DirectOptions options = BeamLocalRunnerOption.getOptions();
         final Pipeline p = Pipeline.create(options);
         LazyAvroCoder.registerAsFallback(p);
 
         try (DirectConsumerCollector<IndexedRecord> collector = DirectConsumerCollector.of(consumer)) {
             // Collect a sample of the input records.
             p.apply(inputRuntime) //
-                    .apply(Sample.<IndexedRecord> any(limit)).apply(collector);
-            p.run();
+                    .apply(Sample.<IndexedRecord> any(limit)) //
+                    .apply(collector);
+            p.run().waitUntilFinish();
         }
     }
 }

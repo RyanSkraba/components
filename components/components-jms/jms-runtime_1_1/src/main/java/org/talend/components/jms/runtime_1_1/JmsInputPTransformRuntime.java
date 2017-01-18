@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -51,7 +51,7 @@ public class JmsInputPTransformRuntime extends PTransform<PBegin, PCollection> i
     }
 
     @Override
-    public PCollection apply(PBegin pBegin) {
+    public PCollection expand(PBegin pBegin) {
 
         datastoreRuntime = new JmsDatastoreRuntime();
         datastoreRuntime.initialize(null, properties.datasetRef.getReference().getDatastoreProperties());

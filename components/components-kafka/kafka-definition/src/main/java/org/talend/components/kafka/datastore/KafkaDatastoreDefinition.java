@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -20,10 +20,10 @@ import org.talend.components.kafka.dataset.KafkaDatasetDefinition;
 import org.talend.components.kafka.dataset.KafkaDatasetProperties;
 import org.talend.components.kafka.input.KafkaInputDefinition;
 import org.talend.components.kafka.output.KafkaOutputDefinition;
-import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
-public class KafkaDatastoreDefinition extends SimpleNamedThing implements DatastoreDefinition<KafkaDatastoreProperties> {
+public class KafkaDatastoreDefinition extends I18nDefinition implements DatastoreDefinition<KafkaDatastoreProperties> {
 
     public static final String NAME = "KafkaDatastore";
 
@@ -63,6 +63,6 @@ public class KafkaDatastoreDefinition extends SimpleNamedThing implements Datast
 
     @Override
     public String getImagePath() {
-        return NAME + "_icon32.png";
+        return "/org/talend/components/kafka/Kafka.svg";
     }
 }

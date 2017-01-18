@@ -6,21 +6,14 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.17.0-SNAPSHOT</version>
+        <version>0.18.0-SNAPSHOT</version>
         <relativePath>../../../components-parent/pom.xml</relativePath>
-
     </parent>
 
     <artifactId>processing-definition</artifactId>
 
     <name>Components - Processing-components Definition</name>
     <packaging>jar</packaging>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <beam.version>0.3.0-incubating</beam.version>
-    </properties>
 
     <dependencies>
         <!-- APIs for all Components -->
@@ -52,7 +45,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>0.16.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

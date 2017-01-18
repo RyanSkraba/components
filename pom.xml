@@ -3,39 +3,18 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.talend.components</groupId>
-	<version>0.17.0-SNAPSHOT</version>
+	<version>0.18.0-SNAPSHOT</version>
 	<artifactId>components</artifactId>
 	<packaging>pom</packaging>
 
 	<name>Component Aggregator</name>
 	<modules>
 		<module>components-parent</module>
-		<module>components-api</module>
-		<module>core/components-adapter-beam</module>
-		<module>components-common</module>
-		<module>components-common-oauth</module>
-		<module>components-salesforce</module>
-		<module>components-osgitest</module>
-		<module>components-api-proptester</module>
-		<module>components-snowflake</module>
-		<module>components-splunk</module>
-		<module>components-jira</module>
-		<module>components-api-full-example</module>
-		<module>components-filedelimited</module>
-		<module>components-filterrow</module>
+		<module>core</module>
 		<module>services</module>
 		<module>examples</module>
 		<module>components</module>
-		<module>components-api-archetypes</module>
   </modules>
-	<profiles>
-		<profile>
-			<id>eclipse</id>
-			<modules>
-				<module>generate-p2-repo</module>
-			</modules>
-		</profile>
-	</profiles>
 	<build>
 		<!-- skip the deployment for this aggregator, not necessary -->
 		<plugins>

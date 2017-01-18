@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -16,10 +16,10 @@ package org.talend.components.jms;
 import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.common.dataset.DatasetDefinition;
-import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
-public class JmsDatasetDefinition extends SimpleNamedThing implements DatasetDefinition<JmsDatasetProperties> {
+public class JmsDatasetDefinition extends I18nDefinition implements DatasetDefinition<JmsDatasetProperties> {
 
     public static final String RUNTIME_1_1 = "org.talend.components.jms.runtime_1_1.DatasetRuntime";
 
@@ -43,12 +43,7 @@ public class JmsDatasetDefinition extends SimpleNamedThing implements DatasetDef
 
     @Override
     public String getImagePath() {
-        return null;
-    }
-
-    @Override
-    public String getDisplayName() {
-        return getI18nMessage("dataset." + getName() + I18N_DISPLAY_NAME_SUFFIX);
+        return "/org/talend/components/jms/input/JmsInput_icon32.png";
     }
 
 }

@@ -1,6 +1,6 @@
 //==============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -59,13 +59,13 @@ public class ControllersConfiguration {
 
     @ExceptionHandler
     public ResponseEntity<ApiError> handleMappingExceptions(MethodArgumentTypeMismatchException e) {
-        log.info("A Talend exception reached the API", e);
+        log.info("A mapping exception reached the API", e);
         return buildUnexpectedErrorResponse(UNEXPECTED_ARGUMENT, e.getMessage(), e.getCause());
     }
 
     @ExceptionHandler
     public ResponseEntity<ApiError> handleExceptions(Exception e) {
-        log.info("A Talend exception reached the API", e);
+        log.info("An exception reached the API", e);
         return buildUnexpectedErrorResponse(UNEXPECTED_EXCEPTION, e.getMessage(), e.getCause());
     }
 

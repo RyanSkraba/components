@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -29,11 +29,12 @@ import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.values.PCollection;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.components.adapter.beam.transform.DirectCollector;
+import org.talend.components.simplefileio.SimpleFileIoDatasetProperties.FieldDelimiterType;
+import org.talend.components.simplefileio.SimpleFileIoDatasetProperties.RecordDelimiterType;
 import org.talend.components.simplefileio.SimpleFileIoFormat;
 import org.talend.components.simplefileio.input.SimpleFileIoInputProperties;
 import org.talend.components.simplefileio.output.SimpleFileIoOutputProperties;
@@ -81,7 +82,7 @@ public class SimpleFileIoRoundTripRuntimeTest {
             final Pipeline p = beam.createPipeline();
             PCollection<IndexedRecord> input = p.apply(Create.<IndexedRecord> of(initialData));
             input.apply(outputRuntime);
-            p.run();
+            p.run().waitUntilFinish();
         }
 
         // Read the records that were written.
@@ -89,7 +90,7 @@ public class SimpleFileIoRoundTripRuntimeTest {
             final Pipeline p = beam.createPipeline();
             PCollection<IndexedRecord> input = p.apply(inputRuntime);
             input.apply(collector);
-            p.run();
+            p.run().waitUntilFinish();
 
             // Return the list of records from the round trip.
             return collector.getRecords();
@@ -146,14 +147,14 @@ public class SimpleFileIoRoundTripRuntimeTest {
         // Generate the set of expected records. By default, CSV turns all columns into String and loses the original
         // column name.
         List<IndexedRecord> expected = rewriteRecordsWithCsvSchema(rs.getAllData());
-        assertThat(actual, containsInAnyOrder(expected.toArray()));
+        assertThat(expected, containsInAnyOrder(actual.toArray()));
 
         // Verify that the file on the filesystem was correctly written.
         mini.assertReadFile(
                 mini.getLocalFs(),
                 fileSpec,
-                rewriteRecordsAsCsvLines(expected, inputProps.getDatasetProperties().recordDelimiter.getValue(),
-                        inputProps.getDatasetProperties().fieldDelimiter.getValue()));
+                rewriteRecordsAsCsvLines(expected, inputProps.getDatasetProperties().getRecordDelimiter(),
+                        inputProps.getDatasetProperties().getFieldDelimiter()));
     }
 
     /**
@@ -169,8 +170,10 @@ public class SimpleFileIoRoundTripRuntimeTest {
         SimpleFileIoOutputProperties outputProps = createOutputComponentProperties();
         outputProps.getDatasetProperties().format.setValue(SimpleFileIoFormat.CSV);
         outputProps.getDatasetProperties().path.setValue(fileSpec);
-        outputProps.getDatasetProperties().recordDelimiter.setValue("---");
-        outputProps.getDatasetProperties().fieldDelimiter.setValue("|");
+        outputProps.getDatasetProperties().recordDelimiter.setValue(RecordDelimiterType.OTHER);
+        outputProps.getDatasetProperties().specificRecordDelimiter.setValue("---");
+        outputProps.getDatasetProperties().fieldDelimiter.setValue(FieldDelimiterType.OTHER);
+        outputProps.getDatasetProperties().specificFieldDelimiter.setValue("|");
         SimpleFileIoInputProperties inputProps = createInputComponentProperties();
         inputProps.setDatasetProperties(outputProps.getDatasetProperties());
 
@@ -179,21 +182,20 @@ public class SimpleFileIoRoundTripRuntimeTest {
         // Generate the set of expected records. By default, CSV turns all columns into String and loses the original
         // column name.
         List<IndexedRecord> expected = rewriteRecordsWithCsvSchema(rs.getAllData());
-        assertThat(actual, containsInAnyOrder(expected.toArray()));
+        assertThat(expected, containsInAnyOrder(actual.toArray()));
 
         // Verify that the file on the filesystem was correctly written.
         mini.assertReadFile(
                 "---",
                 mini.getLocalFs(),
                 fileSpec,
-                rewriteRecordsAsCsvLines(expected, inputProps.getDatasetProperties().recordDelimiter.getValue(),
-                        inputProps.getDatasetProperties().fieldDelimiter.getValue()));
+                rewriteRecordsAsCsvLines(expected, inputProps.getDatasetProperties().getRecordDelimiter(),
+                        inputProps.getDatasetProperties().getFieldDelimiter()));
     }
 
     /**
      * Basic Avro test.
      */
-    @Ignore("TODO")
     @Test
     public void testAvro() throws IOException {
         // The file that we will be creating.

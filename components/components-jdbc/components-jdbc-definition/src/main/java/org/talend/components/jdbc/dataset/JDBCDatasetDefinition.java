@@ -1,6 +1,7 @@
+
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -14,14 +15,14 @@ package org.talend.components.jdbc.dataset;
 
 import org.talend.components.common.dataset.DatasetDefinition;
 import org.talend.components.jdbc.JdbcRuntimeInfo;
-import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
  * the database data set work for dataprep
  *
  */
-public class JDBCDatasetDefinition extends SimpleNamedThing implements DatasetDefinition<JDBCDatasetProperties> {
+public class JDBCDatasetDefinition extends I18nDefinition implements DatasetDefinition<JDBCDatasetProperties> {
 
     public static final String NAME = "JDBCDataset";
 

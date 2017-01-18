@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -23,6 +23,12 @@ public class SimpleFileIoDatastoreProperties extends PropertiesImpl implements D
 
     public Property<String> userName = PropertyFactory.newString("userName");
 
+    public Property<Boolean> useKerberos = PropertyFactory.newBoolean("useKerberos", false);
+
+    public Property<String> kerberosPrincipal = PropertyFactory.newString("kerberosPrincipal", "username@EXAMPLE.COM");
+
+    public Property<String> kerberosKeytab = PropertyFactory.newString("kerberosKeytab", "/home/username/username.keytab");
+
     public SimpleFileIoDatastoreProperties(String name) {
         super(name);
     }
@@ -32,6 +38,23 @@ public class SimpleFileIoDatastoreProperties extends PropertiesImpl implements D
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(userName);
+        mainForm.addRow(useKerberos);
+        mainForm.addRow(kerberosPrincipal);
+        mainForm.addRow(kerberosKeytab);
     }
 
+    @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+        // Main properties
+        if (form.getName().equals(Form.MAIN)) {
+            form.getWidget(kerberosPrincipal.getName()).setVisible(useKerberos);
+            form.getWidget(kerberosKeytab.getName()).setVisible(useKerberos);
+            form.getWidget(userName.getName()).setHidden(useKerberos);
+        }
+    }
+
+    public void afterUseKerberos() {
+        refreshLayout(getForm(Form.MAIN));
+    }
 }

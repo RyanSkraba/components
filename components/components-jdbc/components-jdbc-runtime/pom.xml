@@ -5,24 +5,24 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.17.0-SNAPSHOT</version>
+        <version>0.18.0-SNAPSHOT</version>
         <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
 
+    <!-- TODO: when separating beam and di runtimes, this should be taken from components-adapter-beam-parent. -->
     <properties>
-        <beam.version>0.3.0-incubating</beam.version>
+        <beam.version>0.4.0-TLND</beam.version>
     </properties>
 
     <name>Components - JDBC - Runtime</name>
     <artifactId>components-jdbc-runtime</artifactId>
-    <version>0.17.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
     	<dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-jdbc-definition</artifactId>
-            <version>0.17.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         
     	<dependency>
@@ -37,6 +37,16 @@
             <version>10.12.1.1</version>
             <scope>test</scope>
         </dependency>
+        
+        <!--
+        <dependency>
+            <groupId>oracle</groupId>
+            <artifactId>ojdbc</artifactId>
+            <version>7</version>
+            <scope>test</scope>
+        </dependency>
+        -->
+        
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derbynet</artifactId>
@@ -44,6 +54,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-adapter-beam</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
         <dependency>
             <groupId>org.apache.beam</groupId>
             <artifactId>beam-runners-direct-java</artifactId>
@@ -153,7 +169,7 @@
                         </goals>
                         <configuration>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.jdbc.lib</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>org.talend.components.jdbc.runtime.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                                 <Service-Component>*</Service-Component>                                
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
@@ -172,7 +188,7 @@
                             <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
                             <instructions>
                                 <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*,org.hamcrest*</Import-Package>
-                                <Bundle-SymbolicName>org.talend.components.jdbc.test</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>org.talend.components.jdbc.runtime.test</Bundle-SymbolicName>
                                 <Bundle-Name>Test Fragment for ${project.name}</Bundle-Name>
                                 <Fragment-Host>org.talend.components.jdbc</Fragment-Host>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
@@ -192,7 +208,7 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.jdbc</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>org.talend.components.jdbc.runtime</Bundle-SymbolicName>
                                 <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*,org.apache.avro.*</Import-Package>
                                 <Service-Component>*</Service-Component>
                                 <Embed-Dependency>!components*,*;scope=compile|runtime</Embed-Dependency>

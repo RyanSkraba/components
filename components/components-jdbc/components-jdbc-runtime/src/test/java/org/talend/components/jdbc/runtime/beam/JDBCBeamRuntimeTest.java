@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -13,7 +13,7 @@
 
 package org.talend.components.jdbc.runtime.beam;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.Serializable;
 import java.net.InetAddress;
@@ -25,6 +25,8 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.testing.TestPipeline;
@@ -40,7 +42,7 @@ import org.talend.components.jdbc.dataprep.JDBCInputProperties;
 import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
 import org.talend.components.jdbc.datastore.JDBCDatastoreProperties;
 import org.talend.components.jdbc.datastream.JDBCOutputProperties;
-import org.talend.daikon.properties.test.PropertiesTestUtils;
+import org.talend.daikon.avro.SchemaConstants;
 
 public class JDBCBeamRuntimeTest implements Serializable {
 
@@ -61,11 +63,6 @@ public class JDBCBeamRuntimeTest implements Serializable {
     private static String JDBC_URL;
 
     Map<Integer, String> assertRows = new HashMap<>();
-
-    @BeforeClass
-    public static void registerPaxUrlMavenHandler() {
-        PropertiesTestUtils.setupPaxUrlFromMavenLaunch();
-    }
 
     @BeforeClass
     public static void startDatabase() throws Exception {
@@ -150,7 +147,10 @@ public class JDBCBeamRuntimeTest implements Serializable {
         inputDatasetProperties.init();
         inputDatasetProperties.setDatastoreProperties(jdbcDatastoreProperties);
         inputDatasetProperties.sql.setValue("select * from " + TABLE_IN);
-        inputDatasetProperties.updateSchema();
+        // Schema inputSchema =
+        // SchemaBuilder.record("DYNAMIC").fields().name("ID").type(SchemaBuilder.builder().stringType())
+        // .noDefault().name("NAME").type(SchemaBuilder.builder().stringType()).noDefault().endRecord();
+        // inputDatasetProperties.main.schema.setValue(inputSchema);
 
         JDBCInputProperties inputProperties = new JDBCInputProperties("input");
         inputProperties.init();
@@ -161,7 +161,11 @@ public class JDBCBeamRuntimeTest implements Serializable {
         outputDatasetProperties.setDatastoreProperties(jdbcDatastoreProperties);
         outputDatasetProperties.sourceType.setValue(JDBCDatasetProperties.SourceType.TABLE_NAME);
         outputDatasetProperties.tableName.setValue(TABLE_OUT);
-        outputDatasetProperties.updateSchema();
+        Schema outputSchema = SchemaBuilder.record("DYNAMIC").fields().name("ID")
+                .prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "ID").type(SchemaBuilder.builder().intType()).noDefault()
+                .name("NAME").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "NAME")
+                .type(SchemaBuilder.builder().stringType()).noDefault().endRecord();
+        outputDatasetProperties.main.schema.setValue(outputSchema);
 
         JDBCOutputProperties outputProperties = new JDBCOutputProperties("output");
         outputProperties.init();

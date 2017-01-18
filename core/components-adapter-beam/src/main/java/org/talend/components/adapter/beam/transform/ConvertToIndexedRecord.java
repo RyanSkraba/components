@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -63,7 +63,7 @@ public class ConvertToIndexedRecord<DatumT, AvroT extends IndexedRecord> extends
     }
 
     @Override
-    public PCollection<AvroT> apply(PCollection<DatumT> input) {
+    public PCollection<AvroT> expand(PCollection<DatumT> input) {
         return input.apply(ParDo.of(new DoFn<DatumT, AvroT>() {
 
             /** The converter is cached for performance. */

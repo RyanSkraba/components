@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -12,9 +12,9 @@
 // ============================================================================
 package org.talend.components.test;
 
+import org.apache.beam.runners.direct.DirectOptions;
 import org.apache.beam.runners.direct.DirectRunner;
 import org.apache.beam.sdk.Pipeline;
-import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.junit.rules.TemporaryFolder;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
@@ -25,7 +25,7 @@ import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 public class BeamDirectTestResource extends TemporaryFolder {
 
     /** The current pipeline options for the test. */
-    protected PipelineOptions options = null;
+    protected DirectOptions options = null;
 
     private BeamDirectTestResource() {
 
@@ -38,9 +38,9 @@ public class BeamDirectTestResource extends TemporaryFolder {
     /**
      * @return the options used to create this pipeline. These can be or changed before the Pipeline is created.
      */
-    public PipelineOptions getOptions() {
+    public DirectOptions getOptions() {
         if (options == null) {
-            options = PipelineOptionsFactory.create();
+            options = PipelineOptionsFactory.create().as(DirectOptions.class);
             options.setRunner(DirectRunner.class);
         }
         return options;
@@ -50,6 +50,17 @@ public class BeamDirectTestResource extends TemporaryFolder {
      * @return a new pipeline created from the current state of {@link #getOptions()}.
      */
     public Pipeline createPipeline() {
+        Pipeline p = Pipeline.create(getOptions());
+        LazyAvroCoder.registerAsFallback(p);
+        return p;
+    }
+
+    /**
+     * @return a new pipeline created from the current state of {@link #getOptions()} and with the given target
+     * parallelism.
+     */
+    public Pipeline createPipeline(int targetParallelism) {
+        getOptions().setTargetParallelism(targetParallelism);
         Pipeline p = Pipeline.create(getOptions());
         LazyAvroCoder.registerAsFallback(p);
         return p;

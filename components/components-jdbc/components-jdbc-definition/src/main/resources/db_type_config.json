@@ -20,6 +20,16 @@
 	 		{"path" : "mvn:org.apache.derby/derby/10.12.1.1"}
 	 	]
 	
+	},
+	{
+		"id" : "ORACLE",
+		"class" : "oracle.jdbc.OracleDriver",
+		"url" : "jdbc:oracle:thin:@localhost:1521:db",
+		"paths" : 
+	 	[
+	 		{"path" : "mvn:oracle/ojdbc/7"}
+	 	]
+	
 	}
 
 ]

@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -43,7 +43,7 @@ public class JDBCOutputPTransformRuntime extends PTransform<PCollection<IndexedR
     private JDBCOutputProperties properties;
 
     @Override
-    public PDone apply(PCollection<IndexedRecord> input) {
+    public PDone expand(PCollection<IndexedRecord> input) {
         return input.apply(JdbcIO.<IndexedRecord> write().withDataSourceConfiguration(JdbcIO.DataSourceConfiguration
                 .create(properties.getDatasetProperties().getDatastoreProperties().getCurrentDriverClass(),
                         properties.getDatasetProperties().getDatastoreProperties().jdbcUrl.getValue())

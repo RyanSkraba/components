@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -92,7 +92,7 @@ public class JDBCDatasetTestIT {
         };
 
         runtime.getSample(1, storeTheRecords);
-        Assert.assertEquals(1, record[0].get(0));
+        Assert.assertEquals("1", record[0].get(0));
         Assert.assertEquals("wangwei", record[0].get(1));
     }
 

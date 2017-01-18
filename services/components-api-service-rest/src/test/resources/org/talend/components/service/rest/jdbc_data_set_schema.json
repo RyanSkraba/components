@@ -1,11 +1,11 @@
 {
   "type": "record",
-  "name": "USERS",
+  "name": "DYNAMIC",
   "fields": [
     {
       "name": "ID",
       "type": [
-        "int",
+        "string",
         "null"
       ],
       "talend.field.precision": 10,

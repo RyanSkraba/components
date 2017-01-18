@@ -4,7 +4,7 @@
 
     <groupId>org.talend.components</groupId>
     <artifactId>components-fileio-aggregator</artifactId>
-    <version>0.17.0-SNAPSHOT</version>
+    <version>0.18.0-SNAPSHOT</version>
 
     <name>Components - File IO Aggregator</name>
     <packaging>pom</packaging>
@@ -25,6 +25,9 @@
         <!--<module>fileformat-parquet</module>-->
         <module>simplefileio-definition</module>
         <module>simplefileio-runtime</module>
+        <!-- The integration package must not directly depend on runtime modules,
+             but must be run after they are installed. -->
+        <module>fileio-integration</module>
     </modules>
 
 </project>

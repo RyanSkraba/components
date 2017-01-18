@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -12,19 +12,22 @@
 // ============================================================================
 package org.talend.components.simplefileio.runtime;
 
+import java.io.IOException;
+import java.io.StringReader;
+
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.mapred.AvroKey;
-import org.apache.beam.sdk.coders.KvCoder;
-import org.apache.beam.sdk.coders.VoidCoder;
 import org.apache.beam.sdk.io.Read;
-import org.apache.beam.sdk.io.hdfs.AvroHdfsFileSource;
-import org.apache.beam.sdk.io.hdfs.CsvHdfsFileSource;
-import org.apache.beam.sdk.io.hdfs.ParquetHdfsFileSource;
-import org.apache.beam.sdk.io.hdfs.WritableCoder;
-import org.apache.beam.sdk.transforms.*;
+import org.apache.beam.sdk.transforms.DoFn;
+import org.apache.beam.sdk.transforms.Keys;
+import org.apache.beam.sdk.transforms.PTransform;
+import org.apache.beam.sdk.transforms.ParDo;
+import org.apache.beam.sdk.transforms.Values;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
@@ -32,7 +35,12 @@ import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.simplefileio.input.SimpleFileIoInputProperties;
-import org.talend.components.simplefileio.runtime.coders.LazyAvroKeyWrapper;
+import org.talend.components.simplefileio.runtime.sources.AvroHdfsFileSource;
+import org.talend.components.simplefileio.runtime.sources.CsvHdfsFileSource;
+import org.talend.components.simplefileio.runtime.sources.ParquetHdfsFileSource;
+import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
+import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.ValidationResult;
 
 public class SimpleFileIoInputRuntime extends PTransform<PBegin, PCollection<IndexedRecord>> implements
@@ -55,15 +63,18 @@ public class SimpleFileIoInputRuntime extends PTransform<PBegin, PCollection<Ind
     }
 
     @Override
-    public PCollection<IndexedRecord> apply(PBegin in) {
+    public PCollection<IndexedRecord> expand(PBegin in) {
+        // Controls the access security on the cluster.
+        UgiDoAs doAs = SimpleFileIoDatastoreRuntime.getUgiDoAs(properties.getDatasetProperties().getDatastoreProperties());
+
         switch (properties.getDatasetProperties().format.getValue()) {
 
         case AVRO: {
             // Reuseable coder.
             LazyAvroCoder<Object> lac = LazyAvroCoder.of();
 
-            AvroHdfsFileSource source = AvroHdfsFileSource.from(properties.getDatasetProperties().path.getValue(),
-                    KvCoder.of(LazyAvroKeyWrapper.of(lac), WritableCoder.of(NullWritable.class))); //
+            AvroHdfsFileSource source = AvroHdfsFileSource.of(doAs, properties.getDatasetProperties().path.getValue(), lac);
+            source.setLimit(properties.limit.getValue());
             PCollection<KV<AvroKey, NullWritable>> read = in.apply(Read.from(source)) //
                     .setCoder(source.getDefaultOutputCoder());
 
@@ -78,22 +89,31 @@ public class SimpleFileIoInputRuntime extends PTransform<PBegin, PCollection<Ind
         }
 
         case CSV: {
-            CsvHdfsFileSource source = CsvHdfsFileSource.from(properties.getDatasetProperties().path.getValue(),
-                    properties.getDatasetProperties().recordDelimiter.getValue());
-            // TODO(rskraba): unhappy generics and casts
-            return (PCollection) in.apply(Read.from(source)) //
-                    .apply(Values.<Text> create()) //
-                    .apply(ParDo.of(new ExtractCsvSplit(properties.datasetRef.getReference().fieldDelimiter.getValue()))) //
-                    // TODO(rskraba): unhappy generics and casts
-                    .apply((PTransform) ConvertToIndexedRecord.of());
+            CsvHdfsFileSource source = CsvHdfsFileSource.of(doAs, properties.getDatasetProperties().path.getValue(),
+                    properties.getDatasetProperties().getRecordDelimiter());
+            source.setLimit(properties.limit.getValue());
+
+            PCollection<KV<org.apache.hadoop.io.LongWritable, Text>> pc1 = in.apply(Read.from(source));
+
+            PCollection<Text> pc2 = pc1.apply(Values.<Text> create());
+
+            String fieldDelimiter = properties.getDatasetProperties().getFieldDelimiter();
+            if (fieldDelimiter.length() > 1) {
+                fieldDelimiter = fieldDelimiter.trim();
+            }
+            if (fieldDelimiter.isEmpty())
+                TalendRuntimeException.build(CommonErrorCodes.UNEXPECTED_ARGUMENT).setAndThrow(
+                        "single character field delimiter", fieldDelimiter);
+            PCollection<CSVRecord> pc3 = pc2.apply(ParDo.of(new ExtractCsvRecord(fieldDelimiter.charAt(0))));
+            PCollection pc4 = pc3.apply(ConvertToIndexedRecord.<CSVRecord, IndexedRecord> of());
+            return pc4;
         }
 
         case PARQUET: {
             LazyAvroCoder<IndexedRecord> lac = LazyAvroCoder.of();
 
-            // TODO: generics fix for cast
-            ParquetHdfsFileSource source = ParquetHdfsFileSource.from(properties.getDatasetProperties().path.getValue(),
-                    (KvCoder) KvCoder.of(VoidCoder.of(), lac));
+            ParquetHdfsFileSource source = ParquetHdfsFileSource.of(doAs, properties.getDatasetProperties().path.getValue(), lac);
+            source.setLimit(properties.limit.getValue());
 
             PCollection<KV<Void, IndexedRecord>> read = in.apply(Read.from(source)) //
                     .setCoder(source.getDefaultOutputCoder());
@@ -120,6 +140,22 @@ public class SimpleFileIoInputRuntime extends PTransform<PBegin, PCollection<Ind
         public void processElement(ProcessContext c) {
             String in = c.element().toString();
             c.output(in.split("\\Q" + fieldDelimiter + "\\E"));
+        }
+    }
+
+    public static class ExtractCsvRecord extends DoFn<Text, CSVRecord> {
+
+        public final char fieldDelimiter;
+
+        public ExtractCsvRecord(char fieldDelimiter) {
+            this.fieldDelimiter = fieldDelimiter;
+        }
+
+        @DoFn.ProcessElement
+        public void processElement(ProcessContext c) throws IOException {
+            String in = c.element().toString();
+            for (CSVRecord r : CSVFormat.RFC4180.withDelimiter(fieldDelimiter).parse(new StringReader(in)))
+                c.output(r);
         }
     }
 

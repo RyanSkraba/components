@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -15,7 +15,7 @@ package org.talend.components.test;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.beam.runners.spark.SparkPipelineOptions;
+import org.apache.beam.runners.spark.SparkContextOptions;
 import org.apache.beam.runners.spark.SparkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
@@ -78,7 +78,7 @@ public class SparkIntegrationTestResource extends TemporaryFolder {
     private final Map<String, String> hadoopConf;
 
     /** The current pipeline options for the test. */
-    protected SparkPipelineOptions options = null;
+    protected SparkContextOptions options = null;
 
     /**
      * Use the static constructors to create an instance of this resource.
@@ -107,9 +107,9 @@ public class SparkIntegrationTestResource extends TemporaryFolder {
     /**
      * @return the options used to create this pipeline. These can be or changed before the Pipeline is created.
      */
-    public SparkPipelineOptions getOptions() {
+    public SparkContextOptions getOptions() {
         if (options == null) {
-            options = PipelineOptionsFactory.as(SparkPipelineOptions.class);
+            options = PipelineOptionsFactory.as(SparkContextOptions.class);
             options.setRunner(SparkRunner.class);
         }
         return options;

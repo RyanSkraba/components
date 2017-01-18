@@ -5,17 +5,12 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.17.0-SNAPSHOT</version>
+        <version>0.18.0-SNAPSHOT</version>
         <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
 
-    <properties>
-        <beam.version>0.3.0-incubating</beam.version>
-    </properties>
-
     <name>Components - JDBC - Definition</name>
     <artifactId>components-jdbc-definition</artifactId>
-    <version>0.17.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -46,19 +41,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.beam</groupId>
-            <artifactId>beam-runners-direct-java</artifactId>
-            <version>${beam.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.beam</groupId>
-            <artifactId>beam-sdks-java-io-jdbc</artifactId>
-            <version>${beam.version}</version>
-        </dependency>
-        
         <dependency>
             <groupId>org.talend.daikon</groupId>
             <artifactId>daikon-spring</artifactId>
@@ -140,9 +122,9 @@
         	<scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-adapter-beam</artifactId>
-            <version>${project.version}</version>
+        	<groupId>org.apache.httpcomponents</groupId>
+        	<artifactId>httpcore</artifactId>
+        	<version>4.4.5</version>
         </dependency>
     </dependencies>
 
@@ -168,7 +150,7 @@
                         </goals>
                         <configuration>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.jdbc.lib</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>org.talend.components.jdbc.definition.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                                 <Service-Component>*</Service-Component>                                
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
@@ -187,7 +169,7 @@
                             <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
                             <instructions>
                                 <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*,org.hamcrest*</Import-Package>
-                                <Bundle-SymbolicName>org.talend.components.jdbc.test</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>org.talend.components.jdbc.definition.test</Bundle-SymbolicName>
                                 <Bundle-Name>Test Fragment for ${project.name}</Bundle-Name>
                                 <Fragment-Host>org.talend.components.jdbc</Fragment-Host>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
@@ -207,7 +189,7 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.jdbc</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>org.talend.components.jdbc.definition</Bundle-SymbolicName>
                                 <Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*,org.apache.avro.*</Import-Package>
                                 <Service-Component>*</Service-Component>
                                 <Embed-Dependency>!components*,*;scope=compile|runtime</Embed-Dependency>
