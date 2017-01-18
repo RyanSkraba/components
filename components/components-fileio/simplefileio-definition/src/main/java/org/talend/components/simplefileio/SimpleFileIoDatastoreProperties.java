@@ -37,10 +37,10 @@ public class SimpleFileIoDatastoreProperties extends PropertiesImpl implements D
     public void setupLayout() {
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
-        mainForm.addRow(userName);
         mainForm.addRow(useKerberos);
         mainForm.addRow(kerberosPrincipal);
         mainForm.addRow(kerberosKeytab);
+        mainForm.addRow(userName);
     }
 
     @Override
