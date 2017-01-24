@@ -43,11 +43,6 @@ public class FixedFlowInputBoundedSource extends BoundedSource<IndexedRecord> {
     }
 
     @Override
-    public boolean producesSortedKeys(PipelineOptions options) throws Exception {
-        return false;
-    }
-
-    @Override
     public org.apache.beam.sdk.io.BoundedSource.BoundedReader<IndexedRecord> createReader(PipelineOptions options)
             throws IOException {
         return new FixedFlowInputBoundedReader(this)//

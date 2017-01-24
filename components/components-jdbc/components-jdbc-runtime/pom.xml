@@ -11,8 +11,21 @@
 
     <!-- TODO: when separating beam and di runtimes, this should be taken from components-adapter-beam-parent. -->
     <properties>
-        <beam.version>0.4.0-TLND</beam.version>
+        <beam.version>0.5.0-SNAPSHOT</beam.version>
     </properties>
+    <repositories>
+        <repository>
+            <id>apache.snapshots</id>
+            <name>Apache Development Snapshot Repository</name>
+            <url>https://repository.apache.org/content/repositories/snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <name>Components - JDBC - Runtime</name>
     <artifactId>components-jdbc-runtime</artifactId>

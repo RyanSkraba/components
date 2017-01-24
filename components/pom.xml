@@ -25,5 +25,6 @@
         <module>components-splunk</module>
         <module>components-jira</module>
         <module>components-filedelimited</module>
-  </modules>
+        <module>components-elasticsearch</module>
+    </modules>
 </project>
