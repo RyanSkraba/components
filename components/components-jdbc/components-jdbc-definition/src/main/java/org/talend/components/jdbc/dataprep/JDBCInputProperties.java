@@ -25,6 +25,7 @@ import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
 import org.talend.components.jdbc.datastore.JDBCDatastoreProperties;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.properties.ReferenceProperties;
+import org.talend.daikon.properties.presentation.Form;
 
 public class JDBCInputProperties extends FixedConnectorsComponentProperties
         implements IOProperties<JDBCDatasetProperties>, RuntimeSettingProvider {
@@ -45,6 +46,8 @@ public class JDBCInputProperties extends FixedConnectorsComponentProperties
     @Override
     public void setupLayout() {
         super.setupLayout();
+        // unused form, but we need to create one anyway.
+        Form mainForm = new Form(this, Form.MAIN);
     }
 
     @SuppressWarnings("unchecked")
