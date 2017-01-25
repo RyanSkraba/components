@@ -201,7 +201,6 @@ public class FilterRowDoFnTest {
     public void test_FilterWithNullValue() throws Exception {
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.value.setValue(null);
 
@@ -213,17 +212,17 @@ public class FilterRowDoFnTest {
         function = new FilterRowDoFn().withProperties(properties) //
                 .withOutputSchema(true).withRejectSchema(false);
         fnTester = DoFnTester.of(function);
-        checkSimpleInputNoOutput(fnTester);
+        checkNumericInputValidOutput(fnTester);
 
         function = new FilterRowDoFn().withProperties(properties) //
                 .withOutputSchema(true).withRejectSchema(true);
         fnTester = DoFnTester.of(function);
-        checkSimpleInputInvalidOutput(fnTester);
+        checkSimpleInputValidOutput(fnTester);
 
         function = new FilterRowDoFn().withProperties(properties) //
                 .withOutputSchema(false).withRejectSchema(true);
         fnTester = DoFnTester.of(function);
-        checkSimpleInputInvalidOutput(fnTester);
+        checkSimpleInputNoOutput(fnTester);
     }
 
     @Test
@@ -231,7 +230,6 @@ public class FilterRowDoFnTest {
 
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("a");
         properties.value.setValue("aaa");
@@ -244,7 +242,6 @@ public class FilterRowDoFnTest {
 
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("a");
         properties.value.setValue("c");
@@ -258,7 +255,6 @@ public class FilterRowDoFnTest {
 
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputNumericSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("b");
         properties.function.setValue(ConditionsRowConstant.Function.ABS_VALUE);
@@ -272,7 +268,6 @@ public class FilterRowDoFnTest {
 
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputNumericSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("b");
         properties.function.setValue(ConditionsRowConstant.Function.ABS_VALUE);
@@ -286,7 +281,6 @@ public class FilterRowDoFnTest {
 
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("b");
         properties.function.setValue(ConditionsRowConstant.Function.LOWER_CASE);
@@ -300,7 +294,6 @@ public class FilterRowDoFnTest {
 
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("b");
         properties.function.setValue(ConditionsRowConstant.Function.LOWER_CASE);
@@ -314,7 +307,6 @@ public class FilterRowDoFnTest {
 
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("a");
         properties.function.setValue(ConditionsRowConstant.Function.UPPER_CASE);
@@ -327,7 +319,6 @@ public class FilterRowDoFnTest {
     public void test_FilterUpperCase_Invalid() throws Exception {
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("a");
         properties.function.setValue(ConditionsRowConstant.Function.UPPER_CASE);
@@ -340,7 +331,6 @@ public class FilterRowDoFnTest {
     public void test_FilterFirstCharLowerCase_Valid() throws Exception {
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("b");
         properties.function.setValue(ConditionsRowConstant.Function.FIRST_CHARACTER_LOWER_CASE);
@@ -353,7 +343,6 @@ public class FilterRowDoFnTest {
     public void test_FilterFirstCharLowerCase_Invalid() throws Exception {
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("b");
         properties.function.setValue(ConditionsRowConstant.Function.FIRST_CHARACTER_LOWER_CASE);
@@ -366,7 +355,6 @@ public class FilterRowDoFnTest {
     public void test_FilterFirstCharUpperCase_Valid() throws Exception {
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("a");
         properties.function.setValue(ConditionsRowConstant.Function.FIRST_CHARACTER_UPPER_CASE);
@@ -379,7 +367,6 @@ public class FilterRowDoFnTest {
     public void test_FilterFirstCharUpperCase_Invalid() throws Exception {
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("a");
         properties.function.setValue(ConditionsRowConstant.Function.FIRST_CHARACTER_UPPER_CASE);
@@ -392,7 +379,6 @@ public class FilterRowDoFnTest {
     public void test_FilterLength_Valid() throws Exception {
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("a");
         properties.function.setValue(ConditionsRowConstant.Function.LENGTH);
@@ -405,7 +391,6 @@ public class FilterRowDoFnTest {
     public void test_FilterLength_Invalid() throws Exception {
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("a");
         properties.function.setValue(ConditionsRowConstant.Function.LENGTH);
@@ -419,7 +404,6 @@ public class FilterRowDoFnTest {
 
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("a");
         properties.function.setValue(ConditionsRowConstant.Function.MATCH);
@@ -432,7 +416,6 @@ public class FilterRowDoFnTest {
     public void test_FilterMatch_Invalid() throws Exception {
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("a");
         properties.function.setValue(ConditionsRowConstant.Function.MATCH);
@@ -446,7 +429,6 @@ public class FilterRowDoFnTest {
 
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("a");
         properties.function.setValue(ConditionsRowConstant.Function.CONTAINS);
@@ -459,7 +441,6 @@ public class FilterRowDoFnTest {
     public void test_FilterContains_Invalid() throws Exception {
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("a");
         properties.function.setValue(ConditionsRowConstant.Function.CONTAINS);
@@ -475,7 +456,6 @@ public class FilterRowDoFnTest {
 
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("a");
         properties.operator.setValue(ConditionsRowConstant.Operator.NOT_EQUAL);
@@ -488,7 +468,6 @@ public class FilterRowDoFnTest {
     public void test_FilterNotEquals_Invalid() throws Exception {
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputSimpleSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("a");
         properties.operator.setValue(ConditionsRowConstant.Operator.NOT_EQUAL);
@@ -502,7 +481,6 @@ public class FilterRowDoFnTest {
 
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputNumericSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("c");
         properties.operator.setValue(ConditionsRowConstant.Operator.LOWER);
@@ -516,7 +494,6 @@ public class FilterRowDoFnTest {
 
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputNumericSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("c");
         properties.operator.setValue(ConditionsRowConstant.Operator.LOWER);
@@ -530,7 +507,6 @@ public class FilterRowDoFnTest {
 
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputNumericSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("c");
         properties.operator.setValue(ConditionsRowConstant.Operator.GREATER);
@@ -544,7 +520,6 @@ public class FilterRowDoFnTest {
 
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputNumericSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("c");
         properties.operator.setValue(ConditionsRowConstant.Operator.GREATER);
@@ -558,7 +533,6 @@ public class FilterRowDoFnTest {
 
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputNumericSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("c");
         properties.operator.setValue(ConditionsRowConstant.Operator.LOWER_OR_EQUAL);
@@ -572,7 +546,6 @@ public class FilterRowDoFnTest {
 
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputNumericSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("c");
         properties.operator.setValue(ConditionsRowConstant.Operator.LOWER_OR_EQUAL);
@@ -586,7 +559,6 @@ public class FilterRowDoFnTest {
 
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputNumericSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("c");
         properties.operator.setValue(ConditionsRowConstant.Operator.GREATER_OR_EQUAL);
@@ -600,7 +572,6 @@ public class FilterRowDoFnTest {
 
         FilterRowProperties properties = new FilterRowProperties("test");
         properties.init();
-        properties.main.schema.setValue(inputNumericSchema);
         properties.schemaListener.afterSchema();
         properties.columnName.setValue("c");
         properties.operator.setValue(ConditionsRowConstant.Operator.GREATER_OR_EQUAL);

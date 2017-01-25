@@ -39,6 +39,8 @@ public class FilterRowDoFn extends DoFn<Object, IndexedRecord> {
 
     private IndexedRecordConverter converter = null;
 
+    private transient Schema rejectSchema = null;
+
     @Setup
     public void setup() throws Exception {
     }
@@ -50,6 +52,10 @@ public class FilterRowDoFn extends DoFn<Object, IndexedRecord> {
             converter = registry.createIndexedRecordConverter(context.element().getClass());
         }
         IndexedRecord inputRecord = (IndexedRecord) converter.convertToAvro(context.element());
+
+        if (rejectSchema == null) {
+            rejectSchema = AvroUtils.createRejectSchema(inputRecord.getSchema(), "rejectOutput");
+        }
 
         boolean returnedBooleanValue = true;
         String columnName = properties.columnName.getValue();
@@ -74,7 +80,7 @@ public class FilterRowDoFn extends DoFn<Object, IndexedRecord> {
             }
         } else {
             if (hasRejectSchema) {
-                GenericRecordBuilder rejectRecord = new GenericRecordBuilder(properties.schemaReject.schema.getValue());
+                GenericRecordBuilder rejectRecord = new GenericRecordBuilder(rejectSchema);
                 rejectRecord.set(AvroUtils.REJECT_FIELD_INPUT, inputRecord);
                 // TODO define what we want into the error message
                 rejectRecord.set(AvroUtils.REJECT_FIELD_ERROR_MESSAGE, "error message");
@@ -125,7 +131,7 @@ public class FilterRowDoFn extends DoFn<Object, IndexedRecord> {
         // further implementation may
         ArrayList<Object> inputFields = new ArrayList<Object>();
         String[] path = columnName.split("\\.");
-        Schema schema = properties.main.schema.getValue();
+        Schema schema = inputRecord.getSchema();
 
         for (Integer i = 0; i < path.length; i++) {
             // The column was existing on the input record, we forward it to the
