@@ -150,10 +150,10 @@
 			<artifactId>pax-url-aether</artifactId>
 			<version>2.4.7</version>
 		</dependency>
-		<dependency><!-- this overides the parent definition that limited the artifact 
+		<dependency><!-- this overrides the parent definition that limited the artifact
 				to tests -->
 			<groupId>org.talend.daikon</groupId>
-			<artifactId>daikon-spring</artifactId>
+			<artifactId>daikon-spring-utils</artifactId>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

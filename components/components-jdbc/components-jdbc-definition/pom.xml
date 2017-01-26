@@ -43,7 +43,7 @@
 
         <dependency>
             <groupId>org.talend.daikon</groupId>
-            <artifactId>daikon-spring</artifactId>
+            <artifactId>daikon-spring-utils</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

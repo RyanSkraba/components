@@ -121,13 +121,14 @@
 								<Import-Package>!*internal,org.talend*,javax.xml.namespace,org.junit*,org.hamcrest*</Import-Package>
 								<Bundle-SymbolicName>org.talend.components.api.test</Bundle-SymbolicName>
 								<Fragment-Host>org.talend.components.api</Fragment-Host>
-								<Embed-Dependency>daikon-spring</Embed-Dependency>
+								<Embed-Dependency>daikon-spring-utils</Embed-Dependency>
 								<Export-Package>org.talend.components*</Export-Package>
 								<!-- include test classes -->
 								<Include-Resource>=target/test-classes/</Include-Resource>
 							</instructions>
 						</configuration>
 					</execution>
+<!--
 					<execution>
 						<id>bundle-jar</id>
 						<phase>package</phase>
@@ -148,11 +149,12 @@
 									!org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api|javax.servlet-api|javax.inject|daikon
 								</Embed-Dependency>
 								<_exportcontents>!*.internal,!*.osgi,org.talend.*</_exportcontents>
-								<!-- used to remove the spring classes -->
+								&lt;!&ndash; used to remove the spring classes &ndash;&gt;
 								<Private-Package>!org.talend.components.*.spring,org.talend.components.*</Private-Package>
 							</instructions>
 						</configuration>
 					</execution>
+-->
 
 				</executions>
 			</plugin>
