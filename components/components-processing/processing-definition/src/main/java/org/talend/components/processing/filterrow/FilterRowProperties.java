@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.apache.commons.lang3.StringUtils;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
@@ -26,7 +27,6 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
-
 
 /**
  * TODO We currently support only one condition for each FilterRow.
@@ -66,7 +66,7 @@ public class FilterRowProperties extends FixedConnectorsComponentProperties {
     /**
      * This enum will be filled with the name of the input columns.
      */
-    public Property<String> columnName = PropertyFactory.newString("columnName", "").setPossibleValues("");
+    public Property<String> columnName = PropertyFactory.newString("columnName", "");
 
     /**
      * This enum represent the function applicable to the input value before making the comparison. The functions
@@ -163,15 +163,20 @@ public class FilterRowProperties extends FixedConnectorsComponentProperties {
 
     private void updateOperatorColumn() {
         List<String> possibleOperatorValues = null;
-        if (ConditionsRowConstant.Function.MATCH.equals(function.getValue())
-                || ConditionsRowConstant.Function.CONTAINS.equals(function.getValue())) {
-            possibleOperatorValues = ConditionsRowConstant.RESTRICTED_OPERATORS;
+
+        if (StringUtils.isNotEmpty(columnName.getValue())) {
+            if (ConditionsRowConstant.Function.MATCH.equals(function.getValue())
+                    || ConditionsRowConstant.Function.CONTAINS.equals(function.getValue())) {
+                possibleOperatorValues = ConditionsRowConstant.RESTRICTED_OPERATORS;
+            } else {
+                possibleOperatorValues = ConditionsRowConstant.DEFAULT_OPERATORS;
+            }
+            if (!possibleOperatorValues.contains(operator.getValue())) {
+                // The current value of operator is not on the new list of operator,
+                // we need to reset its value.
+                operator.setValue(ConditionsRowConstant.Operator.EQUAL);
+            }
         } else {
-            Schema.Field f = main.schema.getValue().getField(columnName.getValue());
-            Schema.Type type = f.schema().getType();
-            possibleOperatorValues = ConditionsRowConstant.DEFAULT_OPERATORS;
-        }
-        if (!possibleOperatorValues.contains(operator.getValue())) {
             // The current value of operator is not on the new list of operator,
             // we need to reset its value.
             operator.setValue(ConditionsRowConstant.Operator.EQUAL);
@@ -179,51 +184,34 @@ public class FilterRowProperties extends FixedConnectorsComponentProperties {
         operator.setPossibleValues(possibleOperatorValues);
     }
 
+
+    /**
+     * TODO: This method will be used once the field autocompletion will be implemented
+     */
     private void updateFunctionColumn() {
-        Schema.Field f = main.schema.getValue().getField(columnName.getValue());
-        Schema.Type type = AvroUtils.unwrapIfNullable(f.schema()).getType();
-        List<String> possibleFunctionValues = null;
-        if (isString(type)) {
-            possibleFunctionValues = ConditionsRowConstant.STRING_FUNCTIONS;
-        } else if (isNumerical(type)) {
-            possibleFunctionValues = ConditionsRowConstant.NUMERICAL_FUNCTIONS;
-        } else {
-            possibleFunctionValues = ConditionsRowConstant.DEFAULT_FUNCTIONS;
-        }
-        if (!possibleFunctionValues.contains(function.getValue())) {
-            // The current value of function is not on the new list of function,
-            // we need to reset its value.
-            function.setValue(ConditionsRowConstant.Function.EMPTY);
-        }
-        function.setPossibleValues(possibleFunctionValues);
+        function.setPossibleValues(ConditionsRowConstant.ALL_FUNCTIONS);
 
         // Finally check the operator
         updateOperatorColumn();
     }
 
     /**
-     * TODO: The conditions row is currently listing only the name of the column on the first level of a defined schema.
+     * TODO: This method will be used once the field autocompletion will be implemented
      */
     protected void updateConditionsRow() {
-        List<String> fieldsNames = AvroUtils.getFieldNames(main.schema.getValue());
-        if ((fieldsNames != null) && (fieldsNames.size() > 0)) {
-            if (!fieldsNames.contains(columnName.getValue())) {
-                // The current value of columnName is not on the new list of
-                // field, we need to update its value.
-                columnName.setValue(fieldsNames.get(0));
-            }
-            columnName.setPossibleValues(fieldsNames);
-
-            // The column may have change its type, so we need to check the
-            // compatibility of the function and the operator
-            updateFunctionColumn();
-        }
+        updateFunctionColumn();
     }
 
+    /**
+     * TODO: This method will be used once the field autocompletion will be implemented
+     */
     private Boolean isString(Schema.Type type) {
         return Schema.Type.STRING.equals(type);
     }
 
+    /**
+     * TODO: This method will be used once the field autocompletion will be implemented
+     */
     private Boolean isNumerical(Schema.Type type) {
         return Schema.Type.INT.equals(type) || Schema.Type.LONG.equals(type) //
                 || Schema.Type.DOUBLE.equals(type) || Schema.Type.FLOAT.equals(type);

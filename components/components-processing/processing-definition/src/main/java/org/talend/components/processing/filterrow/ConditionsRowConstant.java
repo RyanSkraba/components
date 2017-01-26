@@ -67,6 +67,12 @@ public class ConditionsRowConstant {
      **/
     public static final List<String> DEFAULT_FUNCTIONS = Arrays.asList(Function.EMPTY);
 
+    /** List containing all the function, currently used until we provide the schema to the component **/
+    public static final List<String> ALL_FUNCTIONS = Arrays.asList(Function.EMPTY, Function.ABS_VALUE , Function.LOWER_CASE, Function.UPPER_CASE,
+            Function.FIRST_CHARACTER_LOWER_CASE, Function.FIRST_CHARACTER_UPPER_CASE, Function.LENGTH, Function.MATCH,
+            Function.CONTAINS);
+
+    
     /** Default list of operators that can be used to compare data **/
     public static final List<String> DEFAULT_OPERATORS = Arrays.asList(Operator.EQUAL, Operator.NOT_EQUAL, Operator.LOWER,
             Operator.GREATER, Operator.LOWER_OR_EQUAL, Operator.GREATER_OR_EQUAL);
