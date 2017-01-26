@@ -16,7 +16,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <beam.version>0.4.0-TLND</beam.version>
+        <beam.version>0.5.0-SNAPSHOT</beam.version>
         <tcomp.version>0.18.0-SNAPSHOT</tcomp.version>
     </properties>
 
