@@ -76,6 +76,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
+			<artifactId>processing-definition</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-full-example</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -105,6 +110,12 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>simplefileio-runtime</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>processing-runtime</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -236,6 +247,7 @@
 								<extraArtifact>org.talend.components:kafka-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:simplefileio-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:components-jdbc-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:processing-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.libraries:mysql-connector-java-5.1.30-bin:6.0.0:jar</extraArtifact>
 								<extraArtifact>org.apache.derby:derby:10.12.1.1:jar</extraArtifact>
 								<extraArtifact>org.apache.beam:beam-sdks-java-io-hdfs:${beam.version}:jar</extraArtifact>
