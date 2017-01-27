@@ -128,7 +128,7 @@
 							</instructions>
 						</configuration>
 					</execution>
-<!--
+
 					<execution>
 						<id>bundle-jar</id>
 						<phase>package</phase>
@@ -149,12 +149,11 @@
 									!org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api|javax.servlet-api|javax.inject|daikon
 								</Embed-Dependency>
 								<_exportcontents>!*.internal,!*.osgi,org.talend.*</_exportcontents>
-								&lt;!&ndash; used to remove the spring classes &ndash;&gt;
+								<!-- used to remove the spring classes -->
 								<Private-Package>!org.talend.components.*.spring,org.talend.components.*</Private-Package>
 							</instructions>
 						</configuration>
 					</execution>
--->
 
 				</executions>
 			</plugin>
