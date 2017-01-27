@@ -19,14 +19,13 @@ import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionTuple;
 import org.apache.beam.sdk.values.TupleTag;
 import org.apache.beam.sdk.values.TupleTagList;
+import org.apache.commons.lang3.StringUtils;
 import org.talend.components.adapter.beam.BeamJobBuilder;
 import org.talend.components.adapter.beam.BeamJobContext;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.processing.filterrow.FilterRowProperties;
 import org.talend.daikon.properties.ValidationResult;
-
-import io.netty.util.internal.StringUtil;
 
 public class FilterRowRuntime extends PTransform<PCollection<Object>, PCollectionTuple>
 		implements BeamJobBuilder, RuntimableRuntime<FilterRowProperties> {
@@ -64,14 +63,14 @@ public class FilterRowRuntime extends PTransform<PCollection<Object>, PCollectio
 	@Override
 	public void build(BeamJobContext ctx) {
 		String mainLink = ctx.getLinkNameByPortName("input_" + properties.MAIN_CONNECTOR.getName());
-		if (!StringUtil.isNullOrEmpty(mainLink)) {
+		if (!StringUtils.isEmpty(mainLink)) {
 			PCollection<Object> mainPCollection = ctx.getPCollectionByLinkName(mainLink);
 			if (mainPCollection != null) {
 				String flowLink = ctx.getLinkNameByPortName("output_" + properties.FLOW_CONNECTOR.getName());
 				String rejectLink = ctx.getLinkNameByPortName("output_" + properties.REJECT_CONNECTOR.getName());
 
-				hasFlow = !StringUtil.isNullOrEmpty(flowLink);
-				hasReject = !StringUtil.isNullOrEmpty(rejectLink);
+				hasFlow = !StringUtils.isEmpty(flowLink);
+				hasReject = !StringUtils.isEmpty(rejectLink);
 
 				PCollectionTuple outputTuples = expand(mainPCollection);
 

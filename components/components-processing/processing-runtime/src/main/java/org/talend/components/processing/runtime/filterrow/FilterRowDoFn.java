@@ -21,13 +21,12 @@ import org.apache.avro.generic.GenericData.Record;
 import org.apache.avro.generic.GenericRecordBuilder;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.transforms.DoFn;
+import org.apache.commons.lang3.StringUtils;
 import org.talend.components.processing.filterrow.ConditionsRowConstant;
 import org.talend.components.processing.filterrow.FilterRowProperties;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
-
-import io.netty.util.internal.StringUtil;
 
 public class FilterRowDoFn extends DoFn<Object, IndexedRecord> {
 
@@ -61,7 +60,7 @@ public class FilterRowDoFn extends DoFn<Object, IndexedRecord> {
         String columnName = properties.columnName.getValue();
 
         // If there is no defined input, we filter nothing
-        if (!StringUtil.isNullOrEmpty(columnName)) {
+        if (!StringUtils.isEmpty(columnName)) {
             List<Object> inputValues = getInputFields(inputRecord, columnName);
             if (inputValues.size() == 0) {
                 // no valid field: reject the input
