@@ -134,6 +134,11 @@ public interface ComponentDefinition extends Definition<ComponentProperties> {
     Set<ExecutionEngine> getSupportedExecutionEngines();
 
     /**
+     * @return true if the execution engine is compatible with the component.
+     */
+    boolean isSupportingExecutionEngines(ExecutionEngine executionEngine);
+
+    /**
      * this will create the runtime the information required for running the component. They can depend an the given
      * <code>properties</code> parameter and the connector topology. The <code>connectorTopology</code> shall be one of
      * supported topologies returned by {@link #getSupportedConnectorTopologies()}

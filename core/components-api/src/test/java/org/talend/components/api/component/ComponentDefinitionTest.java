@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.EnumSet;
@@ -56,6 +57,7 @@ public class ComponentDefinitionTest {
     public void testRuntimeEngine() {
         TestComponentDefinition cd = new TestComponentDefinition();
         assertThat(cd.getSupportedExecutionEngines(), containsInAnyOrder(ExecutionEngine.DI));
+        assertTrue(cd.isSupportingExecutionEngines(ExecutionEngine.DI));
 
         // Nothing is returned, but there isn't any exception.
         RuntimeInfo ri = cd.getRuntimeInfo(ExecutionEngine.DI, null, null);
@@ -116,6 +118,7 @@ public class ComponentDefinitionTest {
         TestComponentDefinition cd = new TestComponentDefinition(true);
         for (ExecutionEngine engine : ExecutionEngine.values()) {
             assertThat(cd.getSupportedExecutionEngines(), hasItem(engine));
+            assertTrue(cd.isSupportingExecutionEngines(engine));
 
             // Nothing is returned, but there isn't any exception.
             RuntimeInfo ri = cd.getRuntimeInfo(engine, null, null);

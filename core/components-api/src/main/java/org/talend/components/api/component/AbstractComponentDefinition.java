@@ -43,7 +43,8 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
      * Constructor sets component name
      *
      * @param componentName component name
-     * @param allEngines true if available for all execution engines, false if not available for none (this should hide the component).
+     * @param allEngines true if available for all execution engines, false if not available for none (this should hide
+     * the component).
      */
     public AbstractComponentDefinition(String componentName, boolean allEngines) {
         this.componentName = componentName;
@@ -83,6 +84,14 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
     @Override
     public Set<ExecutionEngine> getSupportedExecutionEngines() {
         return engines;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSupportingExecutionEngines(ExecutionEngine executionEngine) {
+        return engines.contains(executionEngine);
     }
 
     protected void assertEngineCompatibility(ExecutionEngine engine) throws TalendRuntimeException {
