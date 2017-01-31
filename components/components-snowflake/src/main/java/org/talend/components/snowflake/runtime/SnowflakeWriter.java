@@ -19,18 +19,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.snowflake.client.loader.LoadResultListener;
-import com.snowflake.client.loader.LoaderFactory;
-import com.snowflake.client.loader.LoaderProperty;
-import com.snowflake.client.loader.LoadingError;
-import com.snowflake.client.loader.Operation;
-import com.snowflake.client.loader.StreamLoader;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -46,11 +42,20 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
+import com.snowflake.client.loader.LoadResultListener;
+import com.snowflake.client.loader.LoaderFactory;
+import com.snowflake.client.loader.LoaderProperty;
+import com.snowflake.client.loader.LoadingError;
+import com.snowflake.client.loader.Operation;
+import com.snowflake.client.loader.StreamLoader;
+
 public final class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
     private static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
     private static SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss.SSS");
+
+    private static SimpleDateFormat timestampFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSXXX");
 
     private StreamLoader loader;
 
@@ -84,11 +89,19 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
 
     private transient Schema mainSchema;
 
-    @Override public Iterable<IndexedRecord> getSuccessfulWrites() {
+    static {
+        // Time in milliseconds would mean time from midnight. It shouldn't be influenced by timezone differences.
+        // That's why we have to use GMT.
+        timeFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
+
+    @Override
+    public Iterable<IndexedRecord> getSuccessfulWrites() {
         return new ArrayList<IndexedRecord>();
     }
 
-    @Override public Iterable<IndexedRecord> getRejectedWrites() {
+    @Override
+    public Iterable<IndexedRecord> getRejectedWrites() {
         return listener.getErrors();
     }
 
@@ -114,15 +127,18 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
 
         public boolean throwOnError = false; // should not trigger rollback
 
-        @Override public boolean needErrors() {
+        @Override
+        public boolean needErrors() {
             return true;
         }
 
-        @Override public boolean needSuccessRecords() {
+        @Override
+        public boolean needSuccessRecords() {
             return false;
         }
 
-        @Override public void addError(LoadingError error) {
+        @Override
+        public void addError(LoadingError error) {
             Schema rejectSchema = sprops.schemaReject.schema.getValue();
 
             IndexedRecord reject = new GenericData.Record(rejectSchema);
@@ -147,7 +163,8 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
             errors.add(reject);
         }
 
-        @Override public boolean throwOnError() {
+        @Override
+        public boolean throwOnError() {
             return throwOnError;
         }
 
@@ -155,15 +172,18 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
             return errors;
         }
 
-        @Override public void recordProvided(Operation op, Object[] record) {
+        @Override
+        public void recordProvided(Operation op, Object[] record) {
             lastRecord = record;
         }
 
-        @Override public void addProcessedRecordCount(Operation op, int i) {
+        @Override
+        public void addProcessedRecordCount(Operation op, int i) {
             processed.addAndGet(i);
         }
 
-        @Override public void addOperationRecordCount(Operation op, int i) {
+        @Override
+        public void addOperationRecordCount(Operation op, int i) {
             counter.addAndGet(i);
             if (op == Operation.DELETE) {
                 deleted.addAndGet(i);
@@ -176,39 +196,48 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
             return lastRecord;
         }
 
-        @Override public int getErrorCount() {
+        @Override
+        public int getErrorCount() {
             return errorCount.get();
         }
 
-        @Override public int getErrorRecordCount() {
+        @Override
+        public int getErrorRecordCount() {
             return errorRecordCount.get();
         }
 
-        @Override public void resetErrorCount() {
+        @Override
+        public void resetErrorCount() {
             errorCount.set(0);
         }
 
-        @Override public void resetErrorRecordCount() {
+        @Override
+        public void resetErrorRecordCount() {
             errorRecordCount.set(0);
         }
 
-        @Override public void addErrorCount(int count) {
+        @Override
+        public void addErrorCount(int count) {
             errorCount.addAndGet(count);
         }
 
-        @Override public void addErrorRecordCount(int count) {
+        @Override
+        public void addErrorRecordCount(int count) {
             errorRecordCount.addAndGet(count);
         }
 
-        @Override public void resetSubmittedRowCount() {
+        @Override
+        public void resetSubmittedRowCount() {
             submittedRowCount.set(0);
         }
 
-        @Override public void addSubmittedRowCount(int count) {
+        @Override
+        public void addSubmittedRowCount(int count) {
             submittedRowCount.addAndGet(count);
         }
 
-        @Override public int getSubmittedRowCount() {
+        @Override
+        public int getSubmittedRowCount() {
             return submittedRowCount.get();
         }
     }
@@ -222,7 +251,8 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         listener = new ResultListener();
     }
 
-    @Override public void open(String uId) throws IOException {
+    @Override
+    public void open(String uId) throws IOException {
         this.uId = uId;
         processingConnection = sink.connect(container);
         uploadConnection = sink.connect(container);
@@ -284,7 +314,9 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         loader.start();
     }
 
-    @SuppressWarnings("unchecked") @Override public void write(Object datum) throws IOException {
+    @SuppressWarnings("unchecked")
+    @Override
+    public void write(Object datum) throws IOException {
         if (null == datum) {
             return;
         }
@@ -297,15 +329,43 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         for (int i = 0; i < row.length; i++) {
             Field f = fields.get(i);
             Schema s = AvroUtils.unwrapIfNullable(f.schema());
-            if (AvroUtils.isSameType(s, AvroUtils._date())) {
+            Object inputValue = input.get(i);
+            if (inputValue instanceof String || inputValue == null) {
+                row[i] = input.get(i);
+            } else if (AvroUtils.isSameType(s, AvroUtils._date())) {
                 Date date = (Date) input.get(i);
                 row[i] = date.getTime();
-            } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.timestampMillis()) {
-                Date date = new Date((long) input.get(i));
+            } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.timeMillis()) {
+                Date date = new Date((int) input.get(i));
                 row[i] = timeFormatter.format(date);
             } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.date()) {
-                Date date = new Date((Long) input.get(i));
+                Date date = null;
+                if (input.get(i) instanceof Date) {
+                    // Sometimes it can be sent as a Date object. We need to process it like a common date then.
+                    date = (Date) input.get(i);
+                } else if (input.get(i) instanceof Integer) {
+                    // If the date is int, it represents amount of days from 1970(no timezone). So if the date is
+                    // 14.01.2017 it shouldn't be influenced by timezones time differences. It should be the same date
+                    // in any timezone.
+                    Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+                    c.setTimeInMillis(0);
+                    c.add(Calendar.DATE, (Integer) input.get(i));
+                    c.setTimeZone(TimeZone.getDefault());
+                    long timeInMillis = c.getTime().getTime();
+                    date = new Date(timeInMillis - c.getTimeZone().getOffset(timeInMillis));
+                } else {
+                    // long is just a common timestamp value.
+                    date = new Date((Long) input.get(i));
+                }
                 row[i] = dateFormatter.format(date);
+            } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.timestampMillis()) {
+                if (inputValue instanceof Date) {
+                    row[i] = timestampFormatter.format(inputValue);
+                } else if (inputValue instanceof Long) {
+                    row[i] = timestampFormatter.format(new Date((Long) inputValue));
+                } else {
+                    row[i] = inputValue;
+                }
             } else {
                 row[i] = input.get(i);
             }
@@ -314,7 +374,8 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         loader.submitRow(row);
     }
 
-    @Override public Result close() throws IOException {
+    @Override
+    public Result close() throws IOException {
         try {
             loader.finish();
         } catch (Exception ex) {
@@ -336,7 +397,8 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         return new Result(uId, listener.getSubmittedRowCount(), listener.counter.get(), listener.getErrorRecordCount());
     }
 
-    @Override public WriteOperation<Result> getWriteOperation() {
+    @Override
+    public WriteOperation<Result> getWriteOperation() {
         return snowflakeWriteOperation;
     }
 
