@@ -10,21 +10,19 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.simplefileio;
-
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+package org.talend.components.localio;
 
 import javax.inject.Inject;
 
 import org.junit.Test;
 import org.talend.components.api.test.AbstractComponentTest2;
-import org.talend.components.simplefileio.input.SimpleFileIoInputDefinition;
-import org.talend.components.simplefileio.output.SimpleFileIoOutputDefinition;
+import org.talend.components.localio.fixedflowinput.FixedFlowInputDefinition;
 import org.talend.daikon.definition.Definition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
 
-public abstract class SimpleFileIoComponentTestITBase extends AbstractComponentTest2 {
+// import org.talend.components.localio.rowgenerator.RowGeneratorDefinition;
+
+public abstract class LocalIOTestITBase extends AbstractComponentTest2 {
 
     @Inject
     DefinitionRegistryService defReg;
@@ -36,9 +34,7 @@ public abstract class SimpleFileIoComponentTestITBase extends AbstractComponentT
 
     @Test
     public void assertComponentsAreRegistered() {
-        assertThat(getDefinitionRegistry().getDefinitionsMapByType(Definition.class).get(SimpleFileIoInputDefinition.NAME),
-                notNullValue());
-        assertThat(getDefinitionRegistry().getDefinitionsMapByType(Definition.class).get(SimpleFileIoOutputDefinition.NAME),
-                notNullValue());
+        assertComponentIsRegistered(Definition.class, FixedFlowInputDefinition.NAME, FixedFlowInputDefinition.class);
+        // assertComponentIsRegistered(Definition.class, RowGeneratorDefinition.NAME, RowGeneratorDefinition.class)
     }
 }

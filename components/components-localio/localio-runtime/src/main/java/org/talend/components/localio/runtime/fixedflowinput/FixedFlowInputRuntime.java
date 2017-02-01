@@ -22,8 +22,8 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.localio.fixedflowinput.FixedFlowInputProperties;
 import org.talend.daikon.properties.ValidationResult;
 
-public class FixedFlowInputRuntime extends PTransform<PBegin, PCollection<IndexedRecord>>
-        implements RuntimableRuntime<FixedFlowInputProperties> {
+public class FixedFlowInputRuntime extends PTransform<PBegin, PCollection<IndexedRecord>> implements
+        RuntimableRuntime<FixedFlowInputProperties> {
 
     private FixedFlowInputProperties properties;
 
@@ -33,11 +33,10 @@ public class FixedFlowInputRuntime extends PTransform<PBegin, PCollection<Indexe
     }
 
     @Override
-    public PCollection<IndexedRecord> expand(PBegin empty) {
-        return empty.apply(properties.getName(),
-                Read.from(new FixedFlowInputBoundedSource() //
-                        .withSchema(properties.schemaFlow.schema.getValue())//
-                        .withValues(properties.values.getValue()) //
-                        .withNbRows(properties.nbRows.getValue())));
+    public PCollection<IndexedRecord> expand(PBegin begin) {
+        return begin.apply(properties.getName(), Read.from(new FixedFlowInputBoundedSource() //
+                .withSchema(properties.schemaFlow.schema.getValue())//
+                .withValues(properties.values.getValue()) //
+                .withNbRows(properties.nbRows.getValue())));
     }
 }

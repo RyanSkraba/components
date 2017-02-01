@@ -19,6 +19,6 @@ import org.talend.components.service.spring.SpringTestApp;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringTestApp.class)
-public class SpringSimpleFileIoComponentTestIT extends SimpleFileIoComponentTestITBase {
+public class SpringSimpleFileIoTestIT extends SimpleFileIoTestITBase {
     // all test case are in the parent class.
 }

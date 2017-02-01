@@ -20,23 +20,22 @@ import org.talend.components.localio.fixedflowinput.FixedFlowInputDefinition;
 import aQute.bnd.annotation.component.Component;
 
 /**
- * Install all of the definitions provided for the processing family of components.
+ * Install all of the definitions provided for the LocalIO family of components.
  */
-@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + LocalIOFamilyDefinition.NAME, provide = ComponentInstaller.class)
-public class LocalIOFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
+@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + LocalIOComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
+public class LocalIOComponentFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "LocalIO";
 
     public static final String MAVEN_GROUP_ID = "org.talend.components";
 
-    public static final String MAVEN_ARTIFACT_ID = "localio-runtime";
+    public static final String MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID = "localio-runtime";
 
-    public LocalIOFamilyDefinition() {
-        super(NAME,
-                // Components
-                new FixedFlowInputDefinition()
+    public static final String MAVEN_DEFAULT_RUNTIME_URI = "mvn:" + MAVEN_GROUP_ID + "/" + MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID;
 
-                // Component wizards
+    public LocalIOComponentFamilyDefinition() {
+        super(NAME, new FixedFlowInputDefinition()
+        // , new RowGeneratorDefinition()
         );
     }
 

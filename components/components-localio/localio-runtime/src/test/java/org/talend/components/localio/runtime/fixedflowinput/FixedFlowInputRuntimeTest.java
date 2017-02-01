@@ -29,11 +29,15 @@ import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.values.PCollection;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.talend.components.adapter.beam.transform.DirectCollector;
 import org.talend.components.localio.fixedflowinput.FixedFlowInputProperties;
 import org.talend.daikon.avro.GenericDataRecordHelper;
 
+/**
+ * Unit tests for {@link FixedFlowInputRuntime}.
+ */
 public class FixedFlowInputRuntimeTest {
 
     private static Schema inputSchema = null;
@@ -41,6 +45,9 @@ public class FixedFlowInputRuntimeTest {
     private static IndexedRecord inputIndexedRecord1 = null;
 
     private static IndexedRecord inputIndexedRecord2 = null;
+
+    @Rule
+    public TestPipeline pipeline = TestPipeline.create();
 
     private static String generateInputJSON(Schema inputSchema, IndexedRecord inputIndexedRecord) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -65,7 +72,7 @@ public class FixedFlowInputRuntimeTest {
     }
 
     @Test
-    public void test_NoOutpuRow() throws Exception {
+    public void test_NoOutputRow() throws Exception {
         String inputAsString = generateInputJSON(inputSchema, inputIndexedRecord1);
 
         FixedFlowInputProperties properties = new FixedFlowInputProperties("test");
@@ -74,7 +81,6 @@ public class FixedFlowInputRuntimeTest {
         properties.values.setValue(inputAsString);
         properties.nbRows.setValue(0);
 
-        Pipeline pipeline = TestPipeline.create();
         FixedFlowInputRuntime runtime = new FixedFlowInputRuntime();
         runtime.initialize(null, properties);
 
@@ -83,7 +89,7 @@ public class FixedFlowInputRuntimeTest {
             indexRecords.apply(collector);
 
             // Run the pipeline to fill the collectors.
-            pipeline.run();
+            pipeline.run().waitUntilFinish();;
 
             // Validate the contents of the collected outputs.
             List<IndexedRecord> outputs = collector.getRecords();
@@ -92,7 +98,7 @@ public class FixedFlowInputRuntimeTest {
     }
 
     @Test
-    public void test_OneOutpuRow() throws Exception {
+    public void test_OneOutputRow() throws Exception {
         String inputAsString = generateInputJSON(inputSchema, inputIndexedRecord1);
 
         FixedFlowInputProperties properties = new FixedFlowInputProperties("test");
@@ -101,7 +107,6 @@ public class FixedFlowInputRuntimeTest {
         properties.values.setValue(inputAsString);
         properties.nbRows.setValue(1);
 
-        Pipeline pipeline = TestPipeline.create();
         FixedFlowInputRuntime runtime = new FixedFlowInputRuntime();
         runtime.initialize(null, properties);
 
@@ -110,7 +115,7 @@ public class FixedFlowInputRuntimeTest {
             indexRecords.apply(collector);
 
             // Run the pipeline to fill the collectors.
-            pipeline.run();
+            pipeline.run().waitUntilFinish();;
 
             // Validate the contents of the collected outputs.
             List<IndexedRecord> outputs = collector.getRecords();
@@ -120,7 +125,7 @@ public class FixedFlowInputRuntimeTest {
     }
 
     @Test
-    public void test_TenOutpuRow() throws Exception {
+    public void test_TenOutputRow() throws Exception {
         String inputAsString = generateInputJSON(inputSchema, inputIndexedRecord1);
 
         FixedFlowInputProperties properties = new FixedFlowInputProperties("test");
@@ -129,7 +134,6 @@ public class FixedFlowInputRuntimeTest {
         properties.values.setValue(inputAsString);
         properties.nbRows.setValue(10);
 
-        Pipeline pipeline = TestPipeline.create();
         FixedFlowInputRuntime runtime = new FixedFlowInputRuntime();
         runtime.initialize(null, properties);
 
@@ -138,7 +142,7 @@ public class FixedFlowInputRuntimeTest {
             indexRecords.apply(collector);
 
             // Run the pipeline to fill the collectors.
-            pipeline.run();
+            pipeline.run().waitUntilFinish();;
 
             // Validate the contents of the collected outputs.
             List<IndexedRecord> outputs = collector.getRecords();
@@ -150,7 +154,7 @@ public class FixedFlowInputRuntimeTest {
     }
 
     @Test
-    public void test_MutlipleInput_NoOutpuRow() throws Exception {
+    public void test_MultipleInput_NoOutputRow() throws Exception {
         String inputAsString = generateInputJSON(inputSchema, inputIndexedRecord1)
                 + generateInputJSON(inputSchema, inputIndexedRecord2);
 
@@ -160,7 +164,6 @@ public class FixedFlowInputRuntimeTest {
         properties.values.setValue(inputAsString);
         properties.nbRows.setValue(0);
 
-        Pipeline pipeline = TestPipeline.create();
         FixedFlowInputRuntime runtime = new FixedFlowInputRuntime();
         runtime.initialize(null, properties);
 
@@ -169,7 +172,7 @@ public class FixedFlowInputRuntimeTest {
             indexRecords.apply(collector);
 
             // Run the pipeline to fill the collectors.
-            pipeline.run();
+            pipeline.run().waitUntilFinish();;
 
             // Validate the contents of the collected outputs.
             List<IndexedRecord> outputs = collector.getRecords();
@@ -178,7 +181,7 @@ public class FixedFlowInputRuntimeTest {
     }
 
     @Test
-    public void test_MutlipleInput_OneOutpuRow() throws Exception {
+    public void test_MultipleInput_OneOutputRow() throws Exception {
         String inputAsString = generateInputJSON(inputSchema, inputIndexedRecord1)
                 + generateInputJSON(inputSchema, inputIndexedRecord2);
 
@@ -188,7 +191,6 @@ public class FixedFlowInputRuntimeTest {
         properties.values.setValue(inputAsString);
         properties.nbRows.setValue(1);
 
-        Pipeline pipeline = TestPipeline.create();
         FixedFlowInputRuntime runtime = new FixedFlowInputRuntime();
         runtime.initialize(null, properties);
 
@@ -197,7 +199,7 @@ public class FixedFlowInputRuntimeTest {
             indexRecords.apply(collector);
 
             // Run the pipeline to fill the collectors.
-            pipeline.run();
+            pipeline.run().waitUntilFinish();;
 
             // Validate the contents of the collected outputs.
             List<IndexedRecord> outputs = collector.getRecords();
@@ -208,7 +210,7 @@ public class FixedFlowInputRuntimeTest {
     }
 
     @Test
-    public void test_MutlipleInput_TenOutpuRow() throws Exception {
+    public void test_MultipleInput_TenOutputRow() throws Exception {
         String inputAsString = generateInputJSON(inputSchema, inputIndexedRecord1)
                 + generateInputJSON(inputSchema, inputIndexedRecord2);
 
@@ -218,7 +220,6 @@ public class FixedFlowInputRuntimeTest {
         properties.values.setValue(inputAsString);
         properties.nbRows.setValue(10);
 
-        Pipeline pipeline = TestPipeline.create();
         FixedFlowInputRuntime runtime = new FixedFlowInputRuntime();
         runtime.initialize(null, properties);
 
@@ -227,7 +228,7 @@ public class FixedFlowInputRuntimeTest {
             indexRecords.apply(collector);
 
             // Run the pipeline to fill the collectors.
-            pipeline.run();
+            pipeline.run().waitUntilFinish();
 
             // Validate the contents of the collected outputs.
             List<IndexedRecord> outputs = collector.getRecords();
