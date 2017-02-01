@@ -13,11 +13,9 @@
 package org.talend.components.processing.filterrow;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.avro.Schema;
-import org.apache.commons.lang3.StringUtils;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
@@ -79,7 +77,8 @@ public class FilterRowProperties extends FixedConnectorsComponentProperties {
      * 
      * For any other case, Function will contain "EMPTY".
      */
-    public Property<String> function = PropertyFactory.newString("function", "EMPTY").setPossibleValues("EMPTY");
+    public Property<String> function = PropertyFactory.newString("function", "EMPTY")
+            .setPossibleValues(ConditionsRowConstant.ALL_FUNCTIONS);
 
     /**
      * This enum represent the comparison function. The operator displayed by the UI are dependent of the function
@@ -92,7 +91,8 @@ public class FilterRowProperties extends FixedConnectorsComponentProperties {
      * 
      * For any other case, Operator will contain "==", "!=", "<", "<=", ">" and ">=".
      */
-    public Property<String> operator = PropertyFactory.newString("operator", "==").setPossibleValues("==", "!=");
+    public Property<String> operator = PropertyFactory.newString("operator", "==")
+            .setPossibleValues(ConditionsRowConstant.DEFAULT_OPERATORS);
 
     /**
      * This field is the reference value of the comparison. It will be filled directly by the user.
@@ -161,29 +161,12 @@ public class FilterRowProperties extends FixedConnectorsComponentProperties {
         schemaReject.schema.setValue(rejectSchema);
     }
 
+    /**
+     * TODO: This method will be used once trigger will be implemented on TFD UI
+     */
     private void updateOperatorColumn() {
-        List<String> possibleOperatorValues = null;
-
-        if (StringUtils.isNotEmpty(columnName.getValue())) {
-            if (ConditionsRowConstant.Function.MATCH.equals(function.getValue())
-                    || ConditionsRowConstant.Function.CONTAINS.equals(function.getValue())) {
-                possibleOperatorValues = ConditionsRowConstant.RESTRICTED_OPERATORS;
-            } else {
-                possibleOperatorValues = ConditionsRowConstant.DEFAULT_OPERATORS;
-            }
-            if (!possibleOperatorValues.contains(operator.getValue())) {
-                // The current value of operator is not on the new list of operator,
-                // we need to reset its value.
-                operator.setValue(ConditionsRowConstant.Operator.EQUAL);
-            }
-        } else {
-            // The current value of operator is not on the new list of operator,
-            // we need to reset its value.
-            operator.setValue(ConditionsRowConstant.Operator.EQUAL);
-        }
-        operator.setPossibleValues(possibleOperatorValues);
+        operator.setPossibleValues(ConditionsRowConstant.DEFAULT_OPERATORS);
     }
-
 
     /**
      * TODO: This method will be used once the field autocompletion will be implemented
