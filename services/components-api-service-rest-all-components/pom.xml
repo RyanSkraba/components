@@ -201,25 +201,6 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-							<overWriteReleases>false</overWriteReleases>
-							<overWriteSnapshots>false</overWriteSnapshots>
-							<overWriteIfNewer>true</overWriteIfNewer>
-							<includeScope>compile</includeScope>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<!-- this will create the mave repository for the application runtime 
 					resolution -->
 				<!-- you must specify the runtime artifacts if the are not part of dependencies 
@@ -292,7 +273,57 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			<plugin>
+			<!-- create a class path with all the compile scope dependencies of this pom using the local maven repository -->
+				<groupId>com.github.veithen.alta</groupId>
+				<artifactId>alta-maven-plugin</artifactId>
+				<version>0.5.1-TALEND</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate-properties</goal>
+						</goals>
+						<configuration>
+							<name>classpath.linux</name>
+							<value>.m2/%mavenPath%</value>
+							<separator>${path.separator}</separator>
+							<dependencySet>
+								<scope>compile</scope>
+							</dependencySet>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+			<!-- this computes the tcom service classpath using maven artifacts -->
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<id>compute-classpath</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<exportAntProperties>true</exportAntProperties>
+							<tasks>
+							<!-- replace the local repository path with .m2 in the computed local.classpath -->
+                                <loadresource property="classpath.windows">
+                                    <propertyresource name="classpath.linux" />
+                                    <filterchain>
+                                        <tokenfilter>
+                                            <filetokenizer />
+                                            <replacestring from="/" to="\" />
+                                        </tokenfilter>
+                                    </filterchain>
+                                </loadresource>
+                                <echo message="final classpath:${classpath.linux}" />
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
