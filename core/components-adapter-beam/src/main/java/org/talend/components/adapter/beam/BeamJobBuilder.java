@@ -15,10 +15,9 @@ package org.talend.components.adapter.beam;
 /**
  * Permit a component runtime instance to build itself into a Beam Pipeline.
  *
- * The
- * {@link org.talend.components.api.RuntimableDefinition#getRuntimeInfo(org.talend.daikon.properties.Properties, Object)}
- * can be used to create an object instance from a {@link org.talend.daikon.properties.Properties}. If that instance
- * implements this interface, it knows how to build itself into a Beam {@link org.apache.beam.sdk.Pipeline}.
+ * A {@link org.talend.daikon.runtime.RuntimeInfo} can be used to create an object instance from a
+ * {@link org.talend.daikon.properties.Properties}. If that instance implements this interface, it knows how to build
+ * itself into a Beam {@link org.apache.beam.sdk.Pipeline}.
  */
 public interface BeamJobBuilder {
 

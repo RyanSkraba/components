@@ -61,9 +61,7 @@ public class ConvertToIndexedRecordTest {
         PAssert.that(output).containsInAnyOrder(outputExpected);
 
         // Run the pipeline to fill the collectors.
-        PipelineResult pr = p.run();
-        DirectRunner.DirectPipelineResult dpr = (DirectRunner.DirectPipelineResult) pr;
-
+        p.run().waitUntilFinish();
     }
 
 }
