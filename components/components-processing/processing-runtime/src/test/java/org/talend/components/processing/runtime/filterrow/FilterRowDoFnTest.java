@@ -21,10 +21,12 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.GenericRecordBuilder;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.avro.util.Utf8;
 import org.apache.beam.sdk.transforms.DoFnTester;
 import org.junit.Test;
 import org.talend.components.processing.filterrow.ConditionsRowConstant;
 import org.talend.components.processing.filterrow.FilterRowProperties;
+import org.talend.daikon.exception.TalendRuntimeException;
 
 public class FilterRowDoFnTest {
 
@@ -152,7 +154,7 @@ public class FilterRowDoFnTest {
         fnTester = DoFnTester.of(function);
         checkSimpleInputInvalidOutput(fnTester);
     }
-    
+
     private void runNumericTestValidSession(FilterRowProperties properties) throws Exception {
         FilterRowDoFn function = new FilterRowDoFn().withProperties(properties) //
                 .withOutputSchema(false).withRejectSchema(false);
@@ -247,6 +249,76 @@ public class FilterRowDoFnTest {
         properties.value.setValue("c");
 
         runSimpleTestInvalidSession(properties);
+    }
+
+    @Test(expected = TalendRuntimeException.class)
+    public void test_invalidColumnName() throws Exception {
+        FilterRowProperties properties = new FilterRowProperties("test");
+        properties.init();
+        properties.schemaListener.afterSchema();
+        properties.columnName.setValue("INVALID");
+        properties.value.setValue("aa");
+
+        // Will throw an exception
+        runSimpleTestInvalidSession(properties);
+    }
+
+    @Test
+    public void test_FilterSimple_utf8() throws Exception {
+
+        FilterRowProperties properties = new FilterRowProperties("test");
+        properties.init();
+        properties.schemaListener.afterSchema();
+        properties.columnName.setValue("a");
+        properties.value.setValue("aaa");
+
+        FilterRowDoFn function = new FilterRowDoFn().withProperties(properties) //
+                .withOutputSchema(false).withRejectSchema(false);
+        DoFnTester<Object, IndexedRecord> fnTester = DoFnTester.of(function);
+        checkSimpleInputNoOutput(fnTester);
+
+        Schema inputSimpleSchema = SchemaBuilder.record("inputRow") //
+                .fields() //
+                .name("a").type().optional().stringType() //
+                .name("b").type().optional().stringType() //
+                .name("c").type().optional().stringType() //
+                .endRecord();
+
+        GenericRecord inputSimpleRecord = new GenericRecordBuilder(inputSimpleSchema) //
+                .set("a", new Utf8("aaa")) //
+                .set("b", new Utf8("BBB")) //
+                .set("c", new Utf8("Ccc")) //
+                .build();
+
+        function = new FilterRowDoFn().withProperties(properties) //
+                .withOutputSchema(true).withRejectSchema(false);
+        fnTester = DoFnTester.of(function);
+        List<IndexedRecord> outputs = fnTester.processBundle(inputSimpleRecord);
+        assertEquals(1, outputs.size());
+        assertEquals(new Utf8("aaa"), outputs.get(0).get(0));
+        assertEquals(new Utf8("BBB"), outputs.get(0).get(1));
+        assertEquals(new Utf8("Ccc"), outputs.get(0).get(2));
+        List<IndexedRecord> rejects = fnTester.takeSideOutputElements(FilterRowRuntime.rejectOutput);
+        assertEquals(0, rejects.size());
+
+        function = new FilterRowDoFn().withProperties(properties) //
+                .withOutputSchema(true).withRejectSchema(true);
+        fnTester = DoFnTester.of(function);
+        outputs = fnTester.processBundle(inputSimpleRecord);
+        assertEquals(1, outputs.size());
+        assertEquals(new Utf8("aaa"), outputs.get(0).get(0));
+        assertEquals(new Utf8("BBB"), outputs.get(0).get(1));
+        assertEquals(new Utf8("Ccc"), outputs.get(0).get(2));
+        rejects = fnTester.takeSideOutputElements(FilterRowRuntime.rejectOutput);
+        assertEquals(0, rejects.size());
+
+        function = new FilterRowDoFn().withProperties(properties) //
+                .withOutputSchema(false).withRejectSchema(true);
+        fnTester = DoFnTester.of(function);
+        outputs = fnTester.processBundle(inputSimpleRecord);
+        assertEquals(0, outputs.size());
+        rejects = fnTester.takeSideOutputElements(FilterRowRuntime.rejectOutput);
+        assertEquals(0, rejects.size());
     }
 
     /** Test every function possible */
@@ -399,56 +471,6 @@ public class FilterRowDoFnTest {
         runSimpleTestInvalidSession(properties);
     }
 
-    @Test
-    public void test_FilterMatch_Valid() throws Exception {
-
-        FilterRowProperties properties = new FilterRowProperties("test");
-        properties.init();
-        properties.schemaListener.afterSchema();
-        properties.columnName.setValue("a");
-        properties.function.setValue(ConditionsRowConstant.Function.MATCH);
-        properties.value.setValue("^aaa$");
-
-        runSimpleTestValidSession(properties);
-    }
-
-    @Test
-    public void test_FilterMatch_Invalid() throws Exception {
-        FilterRowProperties properties = new FilterRowProperties("test");
-        properties.init();
-        properties.schemaListener.afterSchema();
-        properties.columnName.setValue("a");
-        properties.function.setValue(ConditionsRowConstant.Function.MATCH);
-        properties.value.setValue("^aaaa$");
-
-        runSimpleTestInvalidSession(properties);
-    }
-
-    @Test
-    public void test_FilterContains_Valid() throws Exception {
-
-        FilterRowProperties properties = new FilterRowProperties("test");
-        properties.init();
-        properties.schemaListener.afterSchema();
-        properties.columnName.setValue("a");
-        properties.function.setValue(ConditionsRowConstant.Function.CONTAINS);
-        properties.value.setValue("aa");
-
-        runSimpleTestValidSession(properties);
-    }
-
-    @Test
-    public void test_FilterContains_Invalid() throws Exception {
-        FilterRowProperties properties = new FilterRowProperties("test");
-        properties.init();
-        properties.schemaListener.afterSchema();
-        properties.columnName.setValue("a");
-        properties.function.setValue(ConditionsRowConstant.Function.CONTAINS);
-        properties.value.setValue("aaaa");
-
-        runSimpleTestInvalidSession(properties);
-    }
-
     /** Test every operation possible */
 
     @Test
@@ -475,7 +497,7 @@ public class FilterRowDoFnTest {
 
         runSimpleTestInvalidSession(properties);
     }
-    
+
     @Test
     public void test_FilterLowerThan_Valid() throws Exception {
 
@@ -501,7 +523,7 @@ public class FilterRowDoFnTest {
 
         runNumericTestInvalidSession(properties);
     }
-    
+
     @Test
     public void test_FilterGreaterThan_Valid() throws Exception {
 
@@ -527,7 +549,7 @@ public class FilterRowDoFnTest {
 
         runNumericTestInvalidSession(properties);
     }
-    
+
     @Test
     public void test_FilterLowerOrEqualsThan_Valid() throws Exception {
 
@@ -553,7 +575,7 @@ public class FilterRowDoFnTest {
 
         runNumericTestInvalidSession(properties);
     }
-    
+
     @Test
     public void test_FilterGreaterOrEqualsThan_Valid() throws Exception {
 
@@ -579,7 +601,106 @@ public class FilterRowDoFnTest {
 
         runNumericTestInvalidSession(properties);
     }
-    
+
+    @Test
+    public void test_FilterMatch_Valid() throws Exception {
+
+        FilterRowProperties properties = new FilterRowProperties("test");
+        properties.init();
+        properties.schemaListener.afterSchema();
+        properties.columnName.setValue("a");
+        properties.operator.setValue(ConditionsRowConstant.Operator.MATCH);
+        properties.value.setValue("^aaa$");
+
+        runSimpleTestValidSession(properties);
+    }
+
+    @Test
+    public void test_FilterMatch_Invalid() throws Exception {
+        FilterRowProperties properties = new FilterRowProperties("test");
+        properties.init();
+        properties.schemaListener.afterSchema();
+        properties.columnName.setValue("a");
+        properties.operator.setValue(ConditionsRowConstant.Operator.MATCH);
+        properties.value.setValue("^aaaa$");
+
+        runSimpleTestInvalidSession(properties);
+    }
+
+    @Test
+    public void test_FilterNotMatch_Valid() throws Exception {
+
+        FilterRowProperties properties = new FilterRowProperties("test");
+        properties.init();
+        properties.schemaListener.afterSchema();
+        properties.columnName.setValue("a");
+        properties.operator.setValue(ConditionsRowConstant.Operator.NOT_MATCH);
+        properties.value.setValue("^aaaa$");
+        runSimpleTestValidSession(properties);
+    }
+
+    @Test
+    public void test_FilterNotMatch_Invalid() throws Exception {
+        FilterRowProperties properties = new FilterRowProperties("test");
+        properties.init();
+        properties.schemaListener.afterSchema();
+        properties.columnName.setValue("a");
+        properties.operator.setValue(ConditionsRowConstant.Operator.NOT_MATCH);
+        properties.value.setValue("^aaa$");
+
+        runSimpleTestInvalidSession(properties);
+    }
+
+    @Test
+    public void test_FilterContains_Valid() throws Exception {
+
+        FilterRowProperties properties = new FilterRowProperties("test");
+        properties.init();
+        properties.schemaListener.afterSchema();
+        properties.columnName.setValue("a");
+        properties.operator.setValue(ConditionsRowConstant.Operator.CONTAINS);
+        properties.value.setValue("aa");
+
+        runSimpleTestValidSession(properties);
+    }
+
+    @Test
+    public void test_FilterContains_Invalid() throws Exception {
+        FilterRowProperties properties = new FilterRowProperties("test");
+        properties.init();
+        properties.schemaListener.afterSchema();
+        properties.columnName.setValue("a");
+        properties.operator.setValue(ConditionsRowConstant.Operator.CONTAINS);
+        properties.value.setValue("aaaa");
+
+        runSimpleTestInvalidSession(properties);
+    }
+
+    @Test
+    public void test_FilterNotContains_Valid() throws Exception {
+
+        FilterRowProperties properties = new FilterRowProperties("test");
+        properties.init();
+        properties.schemaListener.afterSchema();
+        properties.columnName.setValue("a");
+        properties.operator.setValue(ConditionsRowConstant.Operator.NOT_CONTAINS);
+        properties.value.setValue("aaaa");
+
+        runSimpleTestValidSession(properties);
+    }
+
+    @Test
+    public void test_FilterNotContains_Invalid() throws Exception {
+        FilterRowProperties properties = new FilterRowProperties("test");
+        properties.init();
+        properties.schemaListener.afterSchema();
+        properties.columnName.setValue("a");
+        properties.operator.setValue(ConditionsRowConstant.Operator.NOT_CONTAINS);
+        properties.value.setValue("aa");
+
+        runSimpleTestInvalidSession(properties);
+    }
+
     // TODO test function and operator on every single type
 
     // TODO need to test hierarchical => waiting for the definition of the columnName path

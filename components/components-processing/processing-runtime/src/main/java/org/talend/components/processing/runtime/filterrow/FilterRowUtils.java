@@ -16,7 +16,7 @@ import org.talend.components.processing.filterrow.ConditionsRowConstant;
 
 public class FilterRowUtils {
 
-	public static <T extends Comparable<T>> Boolean compare(T inputValue, String operator, T referenceValue) {
+    public static <T extends Comparable<T>> Boolean compare(T inputValue, String operator, T referenceValue) {
 		if (ConditionsRowConstant.Operator.EQUAL.equals(operator)) {
 			return inputValue.compareTo(referenceValue) == 0;
 		} else if (ConditionsRowConstant.Operator.NOT_EQUAL.equals(operator)) {
@@ -29,40 +29,48 @@ public class FilterRowUtils {
 			return inputValue.compareTo(referenceValue) > 0;
 		} else if (ConditionsRowConstant.Operator.GREATER_OR_EQUAL.equals(operator)) {
 			return inputValue.compareTo(referenceValue) >= 0;
-		}
+		} else if (ConditionsRowConstant.Operator.MATCH.equals(operator)) {
+            return TypeConverterUtils.parseToString(inputValue).matches(TypeConverterUtils.parseToString(referenceValue));
+        } else if (ConditionsRowConstant.Operator.NOT_MATCH.equals(operator)) {
+            return !TypeConverterUtils.parseToString(inputValue).matches(TypeConverterUtils.parseToString(referenceValue));
+        } else if (ConditionsRowConstant.Operator.CONTAINS.equals(operator)) {
+            return TypeConverterUtils.parseToString(inputValue).contains(TypeConverterUtils.parseToString(referenceValue));
+        } else if (ConditionsRowConstant.Operator.NOT_CONTAINS.equals(operator)) {
+            return !TypeConverterUtils.parseToString(inputValue).contains(TypeConverterUtils.parseToString(referenceValue));
+        }
 		return false;
 	}
 
-	public static Object applyFunction(Object inputValue, String function) {
-		if (ConditionsRowConstant.Function.EMPTY.equals(function)) {
-			return inputValue;
-		} else if (ConditionsRowConstant.Function.ABS_VALUE.equals(function)) {
-			if (inputValue instanceof Integer) {
-				return Math.abs((Integer) inputValue);
-			} else if (inputValue instanceof Long) {
-				return Math.abs((Long) inputValue);
-			} else if (inputValue instanceof Float) {
-				return Math.abs((Float) inputValue);
-			} else if (inputValue instanceof Double) {
-				return Math.abs((Double) inputValue);
-			} else {
-				// TODO error case
-				return inputValue;
-			}
-		} else if (ConditionsRowConstant.Function.LOWER_CASE.equals(function)) {
-			return inputValue.toString().toLowerCase();
-		} else if (ConditionsRowConstant.Function.UPPER_CASE.equals(function)) {
-			return inputValue.toString().toUpperCase();
-		} else if (ConditionsRowConstant.Function.FIRST_CHARACTER_LOWER_CASE.equals(function)) {
-			return inputValue.toString().substring(0, 1).toLowerCase();
-		} else if (ConditionsRowConstant.Function.FIRST_CHARACTER_UPPER_CASE.equals(function)) {
-			return inputValue.toString().substring(0, 1).toUpperCase();
-		} else if (ConditionsRowConstant.Function.LENGTH.equals(function)) {
-			return inputValue.toString().length();
-		} else {
-			// TODO error case
-			return inputValue;
-		}
-	}
+    public static Object applyFunction(Object inputValue, String function) {
+        if (ConditionsRowConstant.Function.EMPTY.equals(function)) {
+            return inputValue;
+        } else if (ConditionsRowConstant.Function.ABS_VALUE.equals(function)) {
+            if (inputValue instanceof Integer) {
+                return Math.abs((Integer) inputValue);
+            } else if (inputValue instanceof Long) {
+                return Math.abs((Long) inputValue);
+            } else if (inputValue instanceof Float) {
+                return Math.abs((Float) inputValue);
+            } else if (inputValue instanceof Double) {
+                return Math.abs((Double) inputValue);
+            } else {
+                // TODO error case
+                return inputValue;
+            }
+        } else if (ConditionsRowConstant.Function.LOWER_CASE.equals(function)) {
+            return inputValue.toString().toLowerCase();
+        } else if (ConditionsRowConstant.Function.UPPER_CASE.equals(function)) {
+            return inputValue.toString().toUpperCase();
+        } else if (ConditionsRowConstant.Function.FIRST_CHARACTER_LOWER_CASE.equals(function)) {
+            return inputValue.toString().substring(0, 1).toLowerCase();
+        } else if (ConditionsRowConstant.Function.FIRST_CHARACTER_UPPER_CASE.equals(function)) {
+            return inputValue.toString().substring(0, 1).toUpperCase();
+        } else if (ConditionsRowConstant.Function.LENGTH.equals(function)) {
+            return inputValue.toString().length();
+        } else {
+            // TODO error case
+            return inputValue;
+        }
+    }
 
 }

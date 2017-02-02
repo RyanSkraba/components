@@ -163,7 +163,9 @@ public class TypeConverterUtils {
 	}
 
 	public static <T> T parseTo(Object value, Class<T> clazz) {
-		if (value != null && clazz.equals(value.getClass())) {
+	    if (clazz == null) {
+	        return (T) parseToString(value);
+	    } else if (value != null && clazz.equals(value.getClass())) {
 			return (T) value;
 		} else if (clazz.equals(Boolean.class)) {
 			return (T) parseToBoolean(value);
@@ -190,7 +192,7 @@ public class TypeConverterUtils {
 		} else if (clazz.equals(String.class)) {
 			return (T) parseToString(value);
 		} else { // Object
-			// TODO
+			// TODO to define
 		}
 		return (T) value;
 	}
@@ -218,10 +220,10 @@ public class TypeConverterUtils {
 			return (Class<T>) Long.class;
 		} else if (value instanceof Short) {
 			return (Class<T>) Short.class;
-		} else if (value instanceof String) {
+		} else if ((value instanceof String)) {
 			return (Class<T>) String.class;
 		} else {
-			// TODO
+            // TODO to define
 		}
 		return null;
 	}
