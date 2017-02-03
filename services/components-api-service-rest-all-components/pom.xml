@@ -277,7 +277,7 @@
 			<!-- create a class path with all the compile scope dependencies of this pom using the local maven repository -->
 				<groupId>com.github.veithen.alta</groupId>
 				<artifactId>alta-maven-plugin</artifactId>
-				<version>0.5.1-TALEND</version>
+				<version>0.5.2-TALEND</version>
 				<executions>
 					<execution>
 						<goals>
