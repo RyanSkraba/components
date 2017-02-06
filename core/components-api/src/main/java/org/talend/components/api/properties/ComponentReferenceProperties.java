@@ -12,16 +12,12 @@
 // ============================================================================
 package org.talend.components.api.properties;
 
-import static org.talend.daikon.properties.property.Property.Flags.DESIGN_TIME_ONLY;
-import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
-import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+import static org.talend.daikon.properties.property.PropertyFactory.*;
 
-import java.lang.reflect.Field;
-import java.util.EnumSet;
-import java.util.List;
-
-import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.Properties;
+import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.serialize.DeserializeDeletedFieldHandler;
 
 /**
  * A reference to another component. This could be in one of the following states:
@@ -36,7 +32,8 @@ import org.talend.daikon.properties.property.Property;
  * The {@link org.talend.daikon.properties.presentation.WidgetType#COMPONENT_REFERENCE} uses this class as its
  * properties and the Widget will populate these values.
  */
-public class ComponentReferenceProperties extends ComponentPropertiesImpl {
+public class ComponentReferenceProperties<P extends Properties> extends ReferenceProperties<P>
+        implements DeserializeDeletedFieldHandler {
 
     public enum ReferenceType {
         THIS_COMPONENT,
@@ -49,50 +46,27 @@ public class ComponentReferenceProperties extends ComponentPropertiesImpl {
     //
     public Property<ReferenceType> referenceType = newEnum("referenceType", ReferenceType.class);
 
-    public Property<String> componentType = newProperty("componentType").setFlags(EnumSet.of(DESIGN_TIME_ONLY)); //$NON-NLS-1$
+    public Property<String> componentInstanceId = newString("componentInstanceId"); //$NON-NLS-1$
 
-    public Property<String> componentInstanceId = newProperty("componentInstanceId"); //$NON-NLS-1$
-
-    /**
-     * The properties associated with the referenced component. This can be used at design time. This is non-null only
-     * if there is a componentInstanceId specified.
-     */
-    public ComponentProperties componentProperties;
-
-    /**
-     * The properties that encloses this object. The field name of this object in the enclosing properties must be
-     * {@code referencedComponent}.
-     */
-    public ComponentReferencePropertiesEnclosing enclosingProperties;
-
-    public ComponentReferenceProperties(String name, ComponentReferencePropertiesEnclosing enclosing) {
-        super(name);
-        this.enclosingProperties = enclosing;
-    }
-
-    // IMPORTANT - this is the name of the property in the enclosingProperties that uses this
-    // ComponentReferenceProperties
-    public void afterReferencedComponent() {
-        if (enclosingProperties != null) {
-            enclosingProperties.afterReferencedComponent();
-        }
+    public ComponentReferenceProperties(String name, String propDefinitionName) {
+        super(name, propDefinitionName);
     }
 
     @Override
-    public List<Form> getForms() {
-        if (enclosingProperties != null) {
-            return ((ComponentProperties) enclosingProperties).getForms();
+    public boolean deletedField(String fieldName, Object value) {
+        boolean modified = false;
+        if ("componentType".equals(fieldName)) {
+            @SuppressWarnings("unchecked")
+            Property<String> compTypeProp = (Property<String>) value;
+            referenceDefinitionName.setValue(compTypeProp.getValue());
+            modified = true;
+        } else if ("componentProperties".equals(fieldName)) {
+            Properties oldRef = (Properties) value;
+            setReference(oldRef);
+            modified = true;
         }
-        return super.getForms();
-    }
 
-    @Override
-    protected boolean acceptUninitializedField(Field f) {
-        if (super.acceptUninitializedField(f)) {
-            return true;
-        }
-        // we accept that return field is not intialized after setupProperties.
-        return "componentProperties".equals(f.getName());
+        return modified;
     }
 
 }

@@ -12,7 +12,7 @@
 // ============================================================================
 package org.talend.components.jdbc.tjdbcoutput;
 
-import static org.talend.daikon.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,7 +23,6 @@ import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentReferenceProperties;
-import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.jdbc.CommonUtils;
@@ -34,6 +33,7 @@ import org.talend.components.jdbc.module.JDBCTableSelectionModule;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.runtime.setting.JdbcSourceOrSinkWithQuery;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionDefinition;
+import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionProperties;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.ValidationResult;
@@ -45,14 +45,15 @@ import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
 public class TJDBCOutputProperties extends FixedConnectorsComponentProperties
-        implements ComponentReferencePropertiesEnclosing, RuntimeSettingProvider {
+        implements RuntimeSettingProvider {
 
     public TJDBCOutputProperties(String name) {
         super(name);
     }
 
     // main
-    public ComponentReferenceProperties referencedComponent = new ComponentReferenceProperties("referencedComponent", this);
+    public ComponentReferenceProperties<TJDBCConnectionProperties> referencedComponent = new ComponentReferenceProperties<>(
+            "referencedComponent", TJDBCConnectionDefinition.COMPONENT_NAME);
 
     public JDBCConnectionModule connection = new JDBCConnectionModule("connection");
 
@@ -141,7 +142,6 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties
         Form mainForm = CommonUtils.addForm(this, Form.MAIN);
 
         Widget compListWidget = widget(referencedComponent).setWidgetType(Widget.COMPONENT_REFERENCE_WIDGET_TYPE);
-        referencedComponent.componentType.setValue(TJDBCConnectionDefinition.COMPONENT_NAME);
         mainForm.addRow(compListWidget);
 
         mainForm.addRow(connection.getForm(Form.MAIN));
@@ -205,7 +205,6 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties
         }
     }
 
-    @Override
     public void afterReferencedComponent() {
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(Form.ADVANCED));
@@ -254,7 +253,7 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties
         AllSetting setting = new AllSetting();
 
         setting.setReferencedComponentId(referencedComponent.componentInstanceId.getValue());
-        setting.setReferencedComponentProperties(referencedComponent.componentProperties);
+        setting.setReferencedComponentProperties(referencedComponent.getReference());
 
         CommonUtils.setCommonConnectionInfo(setting, connection);
 

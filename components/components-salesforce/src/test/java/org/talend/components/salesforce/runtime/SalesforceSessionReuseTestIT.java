@@ -132,8 +132,9 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
         TSalesforceInputProperties inProps = (TSalesforceInputProperties) getComponentService()
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         inProps.connection.referencedComponent.componentInstanceId.setValue(currentComponentName);
-        inProps.connection.referencedComponent.componentProperties = connProps;
-        checkAndAfter(inProps.connection.getForm(Form.REFERENCE), "referencedComponent", inProps.connection);
+        inProps.connection.referencedComponent.setReference(connProps);
+        checkAndAfter(inProps.connection.referencedComponent.getReference().getForm(Form.REFERENCE), "referencedComponent",
+                inProps.connection);
 
         ComponentTestUtils.checkSerialize(inProps, errorCollector);
 

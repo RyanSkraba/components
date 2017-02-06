@@ -25,7 +25,7 @@ import org.talend.daikon.runtime.RuntimeInfo;
 public class FullExampleDatastoreDefinition extends SimpleNamedThing
         implements DatastoreDefinition<FullExampleDatastoreProperties> {
 
-    private static final String NAME = "FullExampleDatastore";
+    public static final String NAME = "FullExampleDatastore";
 
     public FullExampleDatastoreDefinition() {
         super(NAME);

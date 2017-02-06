@@ -21,7 +21,6 @@ import static org.talend.daikon.properties.property.PropertyFactory.newString;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentReferenceProperties;
-import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
 import org.talend.components.common.ProxyProperties;
 import org.talend.components.common.oauth.OauthProperties;
 import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
@@ -33,7 +32,7 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
 public class SalesforceConnectionProperties extends ComponentPropertiesImpl
-        implements SalesforceProvideConnectionProperties, ComponentReferencePropertiesEnclosing {
+        implements SalesforceProvideConnectionProperties {
 
     public static final String URL = "https://www.salesforce.com/services/Soap/u/37.0";
 
@@ -93,7 +92,8 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
 
     public ProxyProperties proxy = new ProxyProperties("proxy");
 
-    public ComponentReferenceProperties referencedComponent = new ComponentReferenceProperties("referencedComponent", this);
+    public ComponentReferenceProperties<SalesforceConnectionProperties> referencedComponent = new ComponentReferenceProperties<>(
+            "referencedComponent", TSalesforceConnectionDefinition.COMPONENT_NAME);
 
     public SalesforceConnectionProperties(String name) {
         super(name);
@@ -142,7 +142,6 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
         // A form for a reference to a connection, used in a tSalesforceInput for example
         Form refForm = Form.create(this, Form.REFERENCE);
         Widget compListWidget = widget(referencedComponent).setWidgetType(Widget.COMPONENT_REFERENCE_WIDGET_TYPE);
-        referencedComponent.componentType.setValue(TSalesforceConnectionDefinition.COMPONENT_NAME);
         refForm.addRow(compListWidget);
         refForm.addRow(mainForm);
     }
@@ -153,7 +152,8 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
         refreshLayout(getForm(Form.ADVANCED));
     }
 
-    @Override
+
+
     public void afterReferencedComponent() {
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(Form.REFERENCE));
@@ -250,10 +250,11 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
     }
 
     public SalesforceConnectionProperties getReferencedConnectionProperties() {
-        SalesforceConnectionProperties refProps = (SalesforceConnectionProperties) referencedComponent.componentProperties;
+        SalesforceConnectionProperties refProps = referencedComponent.getReference();
         if (refProps != null) {
             return refProps;
         }
         return null;
     }
+
 }

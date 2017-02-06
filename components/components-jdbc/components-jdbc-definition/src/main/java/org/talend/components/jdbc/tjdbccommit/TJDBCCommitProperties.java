@@ -12,29 +12,30 @@
 // ============================================================================
 package org.talend.components.jdbc.tjdbccommit;
 
-import static org.talend.daikon.properties.presentation.Widget.*;
+import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentReferenceProperties;
-import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
 import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionDefinition;
+import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionProperties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
 public class TJDBCCommitProperties extends ComponentPropertiesImpl
-        implements ComponentReferencePropertiesEnclosing, RuntimeSettingProvider {
+        implements RuntimeSettingProvider {
 
     public TJDBCCommitProperties(String name) {
         super(name);
     }
 
     // main
-    public ComponentReferenceProperties referencedComponent = new ComponentReferenceProperties("referencedComponent", this);
+    public ComponentReferenceProperties<TJDBCConnectionProperties> referencedComponent = new ComponentReferenceProperties<>(
+            "referencedComponent", TJDBCConnectionDefinition.COMPONENT_NAME);
 
     public Property<Boolean> closeConnection = PropertyFactory.newBoolean("closeConnection").setRequired();
 
@@ -45,14 +46,8 @@ public class TJDBCCommitProperties extends ComponentPropertiesImpl
         Form mainForm = CommonUtils.addForm(this, Form.MAIN);
 
         Widget compListWidget = widget(referencedComponent).setWidgetType(Widget.COMPONENT_REFERENCE_WIDGET_TYPE);
-        referencedComponent.componentType.setValue(TJDBCConnectionDefinition.COMPONENT_NAME);
         mainForm.addRow(compListWidget);
         mainForm.addRow(closeConnection);
-    }
-
-    @Override
-    public void afterReferencedComponent() {
-        // do nothing
     }
 
     @Override
@@ -60,7 +55,7 @@ public class TJDBCCommitProperties extends ComponentPropertiesImpl
         AllSetting setting = new AllSetting();
 
         setting.setReferencedComponentId(referencedComponent.componentInstanceId.getValue());
-        setting.setReferencedComponentProperties(referencedComponent.componentProperties);
+        setting.setReferencedComponentProperties(referencedComponent.getReference());
         setting.setCloseConnection(this.closeConnection.getValue());
 
         return setting;

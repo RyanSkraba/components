@@ -1,3 +1,4 @@
+
 // ============================================================================
 //
 // Copyright (C) 2006-2017 Talend Inc. - www.talend.com
@@ -857,8 +858,9 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
         props.connection.referencedComponent.referenceType
                 .setValue(ComponentReferenceProperties.ReferenceType.COMPONENT_INSTANCE);
         props.connection.referencedComponent.componentInstanceId.setValue(compId);
-        props.connection.referencedComponent.componentProperties = cProps;
-        PropertiesTestUtils.checkAndAfter(getComponentService(), props.connection.getForm(Form.REFERENCE), "referencedComponent", props.connection);
+        props.connection.referencedComponent.setReference(cProps);
+        PropertiesTestUtils.checkAndAfter(getComponentService(), props.connection.getForm(Form.REFERENCE), "referencedComponent",
+                props.connection);
 
         resetUser();
 
@@ -875,9 +877,10 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
         // Back to using the connection props of the Snowflake input component
         props.connection.referencedComponent.referenceType.setValue(ComponentReferenceProperties.ReferenceType.THIS_COMPONENT);
         props.connection.referencedComponent.componentInstanceId.setValue(null);
-        props.connection.referencedComponent.componentProperties = null;
+        props.connection.referencedComponent.setReference(null);
         // Check that the null referenced component works.
-        PropertiesTestUtils.checkAndAfter(getComponentService(), props.connection.getForm(Form.REFERENCE), "referencedComponent", props.connection);
+        PropertiesTestUtils.checkAndAfter(getComponentService(), props.connection.getForm(Form.REFERENCE), "referencedComponent",
+                props.connection);
 
         resetUser();
 
