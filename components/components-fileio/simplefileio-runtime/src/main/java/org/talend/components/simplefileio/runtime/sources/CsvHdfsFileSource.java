@@ -17,7 +17,7 @@ import java.io.IOException;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
-import org.talend.components.simplefileio.runtime.SimpleFileIoAvroRegistry;
+import org.talend.components.simplefileio.runtime.SimpleFileIOAvroRegistry;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 
 /**
@@ -28,8 +28,8 @@ import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 public class CsvHdfsFileSource extends FileSourceBase<LongWritable, Text, CsvHdfsFileSource> {
 
     static {
-        // Ensure that the singleton for the SimpleFileIoAvroRegistry is created.
-        SimpleFileIoAvroRegistry.get();
+        // Ensure that the singleton for the SimpleFileIOAvroRegistry is created.
+        SimpleFileIOAvroRegistry.get();
     }
 
     private final String recordDelimiter;

@@ -4,13 +4,12 @@
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
-		<version>0.17.0-SNAPSHOT</version>
+		<version>0.18.0-SNAPSHOT</version>
 		<relativePath>../../components-parent/pom.xml</relativePath>
 	</parent>
 
 	<name>Component API</name>
 	<artifactId>components-api</artifactId>
-	<version>0.17.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
 	<properties>
@@ -122,13 +121,14 @@
 								<Import-Package>!*internal,org.talend*,javax.xml.namespace,org.junit*,org.hamcrest*</Import-Package>
 								<Bundle-SymbolicName>org.talend.components.api.test</Bundle-SymbolicName>
 								<Fragment-Host>org.talend.components.api</Fragment-Host>
-								<Embed-Dependency>daikon-spring</Embed-Dependency>
+								<Embed-Dependency>daikon-spring-utils</Embed-Dependency>
 								<Export-Package>org.talend.components*</Export-Package>
 								<!-- include test classes -->
 								<Include-Resource>=target/test-classes/</Include-Resource>
 							</instructions>
 						</configuration>
 					</execution>
+
 					<execution>
 						<id>bundle-jar</id>
 						<phase>package</phase>

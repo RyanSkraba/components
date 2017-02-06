@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
-		<version>0.17.0-SNAPSHOT</version>
+		<version>0.18.0-SNAPSHOT</version>
 		<relativePath>../../components-parent/pom.xml</relativePath>
 	</parent>
 	<properties>
@@ -15,7 +15,6 @@
 
 	<name>Components - Salesforce</name>
 	<artifactId>components-salesforce</artifactId>
-	<version>0.17.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<dependencies>
 
@@ -63,59 +62,59 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-rest</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<classifier>lib</classifier>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-rest</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-common</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-common</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<classifier>bundle</classifier>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-common</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-common-oauth</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-common-oauth</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<classifier>bundle</classifier>
 			<scope>test</scope>
 		</dependency>
@@ -130,7 +129,7 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-rest</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -163,7 +162,7 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-osgitest</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

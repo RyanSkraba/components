@@ -1,4 +1,4 @@
-//==============================================================================
+// ==============================================================================
 //
 // Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
@@ -9,7 +9,7 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-//==============================================================================
+// ==============================================================================
 
 package org.talend.components.service.rest.dto;
 
@@ -17,11 +17,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.daikon.definition.Definition;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * DTO used for the definitions.
@@ -50,8 +52,11 @@ public class DefinitionDTO {
     /** The definition type. */
     private String type;
 
-    /** The supported typologies.*/
+    /** The supported typologies. */
     private Set<String> typologies = null;
+
+    /** The supported execution engines. */
+    private Set<String> engines = null;
 
     /**
      * Default empty constructor.
@@ -62,6 +67,7 @@ public class DefinitionDTO {
 
     /**
      * Constructor for the RuntimableDefinition part.
+     *
      * @param origin the RuntimableDefinition.
      */
     private DefinitionDTO(Definition origin) {
@@ -72,29 +78,34 @@ public class DefinitionDTO {
 
     /**
      * Create a DefinitionDTO out of the given DataStoreDefinition.
+     *
      * @param origin the datastore definition.
      */
     public DefinitionDTO(DatastoreDefinition origin) {
-        this((Definition)origin);
-        this.type ="datastore";
+        this((Definition) origin);
+        this.type = "datastore";
         this.inputCompName = origin.getInputCompDefinitionName();
         this.outputCompName = origin.getOutputCompDefinitionName();
     }
 
     /**
      * Create a DefinitionDTO out of the given ComponentDefinition.
+     *
      * @param origin the component definition.
      */
     public DefinitionDTO(ComponentDefinition origin) {
-        this((Definition)origin);
+        this((Definition) origin);
         this.type = "component";
         this.typologies = origin.getSupportedConnectorTopologies() //
                 .stream() //
                 .map(ConnectorTypology::from) //
                 .map(ConnectorTypology::name) //
                 .collect(Collectors.toSet());
+        this.engines = origin.getSupportedExecutionEngines() //
+                .stream() //
+                .map(ExecutionEngine::toString) //
+                .collect(Collectors.toSet());
     }
-
 
     private String buildImageUrl(String componentName) {
         return "/components/wizards/" + componentName + "/icon/" + WizardImageType.TREE_ICON_16X16;
@@ -164,6 +175,13 @@ public class DefinitionDTO {
         this.typologies = typologies;
     }
 
+    public Set<String> getExecutionEngines() {
+        return engines;
+    }
+
+    public void setExecutionEngines(Set<String> engines) {
+        this.engines = engines;
+    }
 
     @Override
     public String toString() {
@@ -176,6 +194,7 @@ public class DefinitionDTO {
                 ", outputCompName='" + outputCompName + '\'' + //
                 ", type='" + type + '\'' + //
                 ", typologies=" + typologies + //
+                ", executionEngines=" + engines + //
                 '}';
     }
 }

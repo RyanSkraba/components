@@ -57,11 +57,6 @@ public class TCompBoundedSourceAdapter extends BoundedSource<IndexedRecord> {
     }
 
     @Override
-    public boolean producesSortedKeys(PipelineOptions options) throws Exception {
-        return tCompSource.producesSortedKeys(null);
-    }
-
-    @Override
     public BoundedReader<IndexedRecord> createReader(PipelineOptions options) throws IOException {
         return new TCompReaderAdapter(tCompSource.createReader(null), null);
     }

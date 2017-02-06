@@ -12,8 +12,12 @@
 // ============================================================================
 package org.talend.components.api.service.common.testcomponent;
 
-import static org.talend.daikon.properties.presentation.Widget.*;
-import static org.talend.daikon.properties.property.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
+import static org.talend.daikon.properties.property.PropertyFactory.newDate;
+import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+import static org.talend.daikon.properties.property.PropertyFactory.newSchema;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,7 +32,6 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentReferenceProperties;
-import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
 import org.talend.components.api.service.common.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.service.common.testcomponent.nestedprop.inherited.InheritedComponentProperties;
 import org.talend.daikon.properties.PresentationItem;
@@ -40,7 +43,7 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.service.Repository;
 
-public class TestComponentProperties extends ComponentPropertiesImpl implements ComponentReferencePropertiesEnclosing {
+public class TestComponentProperties extends ComponentPropertiesImpl {
 
     public static final String USER_ID_PROP_NAME = "userId"; //$NON-NLS-1$
 
@@ -82,7 +85,8 @@ public class TestComponentProperties extends ComponentPropertiesImpl implements 
 
     public InheritedComponentProperties nestedProp3 = new InheritedComponentProperties("nestedProp3");
 
-    public ComponentReferenceProperties referencedComponent = new ComponentReferenceProperties("referencedComponent", this);
+    public ComponentReferenceProperties referencedComponent = new ComponentReferenceProperties("referencedComponent",
+            TestComponentDefinition.COMPONENT_NAME);
 
     public static final String TESTCOMPONENT = "TestComponent";
 
@@ -111,7 +115,6 @@ public class TestComponentProperties extends ComponentPropertiesImpl implements 
         return new ValidationResult().setStatus(Result.WARNING);
     }
 
-    @Override
     public void afterReferencedComponent() {
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(Form.REFERENCE));
@@ -147,7 +150,6 @@ public class TestComponentProperties extends ComponentPropertiesImpl implements 
 
         Form refForm = new Form(this, Form.REFERENCE);
         Widget compListWidget = widget(referencedComponent).setWidgetType(Widget.COMPONENT_REFERENCE_WIDGET_TYPE);
-        referencedComponent.componentType.setValue("refComp");
         refForm.addRow(compListWidget);
         refForm.addRow(mainForm);
     }

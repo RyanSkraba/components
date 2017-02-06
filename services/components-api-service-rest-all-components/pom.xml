@@ -6,13 +6,12 @@
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
-		<version>0.17.0-SNAPSHOT</version>
+		<version>0.18.0-SNAPSHOT</version>
 		<relativePath>../../components-parent/pom.xml</relativePath>
 	</parent>
 
 
 	<artifactId>components-api-service-rest-all-components</artifactId>
-	<version>0.2.0-SNAPSHOT</version>
 
 	<name>Component Rest APIs packaged with all components</name>
 
@@ -24,7 +23,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.boot.version>1.4.1.RELEASE</spring.boot.version>
 		<hadoop.version>2.7.0</hadoop.version>
-		<beam.version>0.4.0-TLND</beam.version>
+		<beam.version>0.5.0-SNAPSHOT</beam.version>
 		<!-- Used for Docker images name -->
 		<git_branch>local</git_branch>
 		<talend_docker_registry>registry.datapwn.com</talend_docker_registry>
@@ -37,7 +36,7 @@
 				and it's not compatible with spring-boot 1.4.1, the jetty needs to be excluded. -->
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-common-oauth</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.eclipse.jetty</groupId>
@@ -48,37 +47,42 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-jdbc-definition</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>simplefileio-definition</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>jms-definition</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>kafka-definition</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-jira</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-salesforce</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>processing-definition</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-full-example</artifactId>
-			<version>0.3.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<!-- the runtime artifact are added as test so that the global maven build 
 			builds them before -->
@@ -87,26 +91,32 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>jms-runtime_1_1</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-jdbc-runtime</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>kafka-runtime</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>simplefileio-runtime</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>processing-runtime</artifactId>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -132,7 +142,7 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-rest</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<classifier>lib</classifier>
 		</dependency>
 		<dependency>
@@ -140,23 +150,23 @@
 			<artifactId>pax-url-aether</artifactId>
 			<version>2.4.7</version>
 		</dependency>
-		<dependency><!-- this overides the parent definition that limited the artifact 
+		<dependency><!-- this overrides the parent definition that limited the artifact
 				to tests -->
 			<groupId>org.talend.daikon</groupId>
-			<artifactId>daikon-spring</artifactId>
+			<artifactId>daikon-spring-utils</artifactId>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-rest</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>0.17.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
@@ -191,25 +201,6 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-							<overWriteReleases>false</overWriteReleases>
-							<overWriteSnapshots>false</overWriteSnapshots>
-							<overWriteIfNewer>true</overWriteIfNewer>
-							<includeScope>compile</includeScope>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<!-- this will create the mave repository for the application runtime 
 					resolution -->
 				<!-- you must specify the runtime artifacts if the are not part of dependencies 
@@ -231,12 +222,13 @@
 						</goals>
 						<configuration>
 							<extraArtifacts>
-								<extraArtifact>org.talend.components:components-salesforce:0.17.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:components-jira:0.17.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:jms-runtime_1_1:0.17.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:kafka-runtime:0.17.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:simplefileio-runtime:0.17.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:components-jdbc-runtime:0.17.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:components-salesforce:0.18.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:components-jira:0.18.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:jms-runtime_1_1:0.18.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:kafka-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:simplefileio-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:components-jdbc-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:processing-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.libraries:mysql-connector-java-5.1.30-bin:6.0.0:jar</extraArtifact>
 								<extraArtifact>org.apache.derby:derby:10.12.1.1:jar</extraArtifact>
 								<extraArtifact>org.apache.beam:beam-sdks-java-io-hdfs:${beam.version}:jar</extraArtifact>
@@ -281,7 +273,57 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			<plugin>
+			<!-- create a class path with all the compile scope dependencies of this pom using the local maven repository -->
+				<groupId>com.github.veithen.alta</groupId>
+				<artifactId>alta-maven-plugin</artifactId>
+				<version>0.5.2-TALEND</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate-properties</goal>
+						</goals>
+						<configuration>
+							<name>classpath.linux</name>
+							<value>.m2/%mavenPath%</value>
+							<separator>${path.separator}</separator>
+							<dependencySet>
+								<scope>compile</scope>
+							</dependencySet>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+			<!-- this computes the tcom service classpath using maven artifacts -->
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<id>compute-classpath</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<exportAntProperties>true</exportAntProperties>
+							<tasks>
+							<!-- replace the local repository path with .m2 in the computed local.classpath -->
+                                <loadresource property="classpath.windows">
+                                    <propertyresource name="classpath.linux" />
+                                    <filterchain>
+                                        <tokenfilter>
+                                            <filetokenizer />
+                                            <replacestring from="/" to="\" />
+                                        </tokenfilter>
+                                    </filterchain>
+                                </loadresource>
+                                <echo message="final classpath:${classpath.linux}" />
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 

@@ -6,14 +6,13 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.17.0-SNAPSHOT</version>
+        <version>0.18.0-SNAPSHOT</version>
         <relativePath>../../../components-parent/pom.xml</relativePath>
-
     </parent>
 
     <artifactId>processing-definition</artifactId>
 
-    <name>Components - Processing-components Definition</name>
+    <name>Components - Processing Definition</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -46,7 +45,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>0.16.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -61,6 +60,12 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.url</groupId>
+            <artifactId>pax-url-aether</artifactId>
+            <version>2.4.7</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

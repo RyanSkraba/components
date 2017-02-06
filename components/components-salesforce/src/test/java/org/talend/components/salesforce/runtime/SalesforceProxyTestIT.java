@@ -18,6 +18,7 @@ import java.net.PasswordAuthentication;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.littleshoot.proxy.HttpProxyServer;
 import org.littleshoot.proxy.ProxyAuthenticator;
@@ -26,8 +27,6 @@ import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Source;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
-import org.talend.components.salesforce.runtime.SalesforceSource;
-import org.talend.components.salesforce.runtime.SalesforceSourceOrSink;
 import org.talend.components.salesforce.test.SalesforceRuntimeTestUtil;
 import org.talend.components.salesforce.test.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceconnection.TSalesforceConnectionDefinition;
@@ -36,6 +35,7 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputPropert
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties.QueryMode;
 import org.talend.daikon.properties.ValidationResult;
 
+@Ignore
 public class SalesforceProxyTestIT extends SalesforceTestBase {
 
     private static HttpProxyServer server;

@@ -13,16 +13,17 @@
 
 package org.talend.components.service.rest;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
 import java.util.List;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.service.rest.dto.ConnectorTypology;
 import org.talend.components.service.rest.dto.DefinitionDTO;
 import org.talend.daikon.annotation.Service;
-
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 /**
  * Definition controller..
@@ -41,14 +42,15 @@ public interface DefinitionsController {
     List<DefinitionDTO> listDefinitions(@PathVariable("type") DefinitionType type);
 
     /**
-     * Return components that match the given typology.
+     * Return components that match the given typology and/or execution engine.
      *
      * @param typology the wanted typology.
+     * @param executionEngine the wanted execution engine.
      * @return the list of all definitions that match the wanted typology.
      * @returnWrapped java.lang.Iterable<org.talend.components.service.rest.dto.DefinitionDTO>
      */
     @RequestMapping(value = "/definitions/components", method = GET)
-    List<DefinitionDTO> listComponentDefinitions(@RequestParam(value = "typology", required = false) ConnectorTypology typology);
-
+    List<DefinitionDTO> listComponentDefinitions(@RequestParam(value = "typology", required = false) ConnectorTypology typology,
+	    @RequestParam(value = "executionEngine", required = false) ExecutionEngine executionEngine);
 
 }

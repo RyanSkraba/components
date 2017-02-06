@@ -19,11 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
+import org.talend.components.api.properties.ComponentReferenceProperties;
+import org.talend.components.fullexample.datastore.FullExampleDatastoreProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.PresentationItem;
-import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
@@ -41,7 +43,7 @@ public class FullExampleProperties extends ComponentPropertiesImpl {
      */
     static final String POPUP_FORM_NAME = "popup";
 
-    public static class TableProperties extends PropertiesImpl {
+    public static class TableProperties extends ComponentPropertiesImpl {
 
         public enum ColEnum {
             FOO,
@@ -58,6 +60,15 @@ public class FullExampleProperties extends ComponentPropertiesImpl {
             super(name);
         }
 
+        @Override
+        public void setupLayout() {
+            super.setupLayout();
+            Form mainForm = new Form(this, Form.MAIN);
+            mainForm.addColumn(colString);
+            mainForm.addColumn(colEnum);
+            mainForm.addColumn(colBoolean);
+        }
+
     }
 
     /** use the default widget for this String type */
@@ -69,7 +80,8 @@ public class FullExampleProperties extends ComponentPropertiesImpl {
     /** property to check the {@link WidgetType#NAME_SELECTION_AREA} and {@link WidgetType#NAME_SELECTION_REFERENCE} widgets. */
     public final Property<String> multipleSelectionProp = newProperty("multipleSelectionProp");
 
-    // TODO some Component Reference widget use case.
+    public final ComponentReferenceProperties<FullExampleDatastoreProperties> datastoreRef = new ComponentReferenceProperties<>(
+            "datastoreRef", "tSalesforceInput");
 
     /** checking {@link WidgetType#BUTTON} */
     public final PresentationItem showNewForm = new PresentationItem("showNewForm", "Show new form");
@@ -111,6 +123,7 @@ public class FullExampleProperties extends ComponentPropertiesImpl {
         multipleSelectableList.add(new SimpleNamedThing("bar"));
         multipleSelectableList.add(new SimpleNamedThing("foobar"));
         multipleSelectionProp.setPossibleValues(multipleSelectableList);
+        schema.setValue(SchemaBuilder.builder().record("EmptyRecord").fields().endRecord()); //$NON-NLS-1$
     }
 
     @Override
@@ -120,6 +133,7 @@ public class FullExampleProperties extends ComponentPropertiesImpl {
         mainForm.addRow(stringProp);
         mainForm.addRow(widget(schema).setWidgetType(Widget.SCHEMA_EDITOR_WIDGET_TYPE));
         mainForm.addRow(widget(schema).setWidgetType(Widget.SCHEMA_REFERENCE_WIDGET_TYPE));
+        mainForm.addRow(widget(datastoreRef).setWidgetType(COMPONENT_REFERENCE_WIDGET_TYPE));
         mainForm.addRow(widget(multipleSelectionProp).setWidgetType(Widget.NAME_SELECTION_AREA_WIDGET_TYPE));
         mainForm.addRow(widget(multipleSelectionProp).setWidgetType(Widget.NAME_SELECTION_REFERENCE_WIDGET_TYPE));
         mainForm.addRow(widget(showNewForm).setWidgetType(Widget.BUTTON_WIDGET_TYPE));

@@ -5,7 +5,7 @@
     <groupId>org.talend.components</groupId>
     <name>Component Implementations Aggregator</name>
     <artifactId>components-implementation-aggregator</artifactId>
-    <version>0.17.0-SNAPSHOT</version>
+    <version>0.18.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -25,5 +25,6 @@
         <module>components-splunk</module>
         <module>components-jira</module>
         <module>components-filedelimited</module>
-  </modules>
+        <module>components-elasticsearch</module>
+    </modules>
 </project>

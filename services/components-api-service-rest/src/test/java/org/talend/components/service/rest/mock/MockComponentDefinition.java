@@ -12,6 +12,8 @@
 //==============================================================================
 package org.talend.components.service.rest.mock;
 
+import static java.util.Arrays.asList;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,8 +25,6 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.fullexample.FullExampleProperties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
-
-import static java.util.Arrays.asList;
 
 /**
  *
@@ -43,6 +43,15 @@ public class MockComponentDefinition extends AbstractComponentDefinition {
 
     public MockComponentDefinition(String name, ConnectorTopology... topologies) {
         this(name);
+        if (topologies != null) {
+            this.topologies.addAll(asList(topologies));
+        }
+    }
+
+    public MockComponentDefinition(String name, ExecutionEngine engine, ConnectorTopology... topologies) {
+        super("mock " + name, engine);
+        this.name = name;
+        this.topologies = new HashSet<>();
         if (topologies != null) {
             this.topologies.addAll(asList(topologies));
         }

@@ -105,6 +105,10 @@ public class SalesforceBulkRuntime {
         }
     }
 
+    public BulkConnection getBulkConnection() {
+        return bulkConnection;
+    }
+
     private void setBulkOperation(String sObjectType, OutputAction userOperation, String externalIdFieldName,
             String contentTypeStr, String bulkFileName, int maxBytes, int maxRows) {
         this.sObjectType = sObjectType;
@@ -452,7 +456,7 @@ public class SalesforceBulkRuntime {
     }
 
     public BulkResultSet getQueryResultSet(String resultId) throws AsyncApiException, IOException, ConnectionException {
-        baseFileReader = new com.csvreader.CsvReader(new java.io.BufferedReader(new java.io.InputStreamReader(
+        baseFileReader = new com.csvreader.CsvReader(new BufferedReader(new InputStreamReader(
                 getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId), FILE_ENCODING)), ',');
 
         if (baseFileReader.readRecord()) {

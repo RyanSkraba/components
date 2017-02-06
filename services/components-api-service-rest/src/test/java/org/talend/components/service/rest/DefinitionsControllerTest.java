@@ -1,4 +1,4 @@
-//==============================================================================
+// ==============================================================================
 //
 // Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
@@ -9,8 +9,24 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-//==============================================================================
+// ==============================================================================
 package org.talend.components.service.rest;
+
+import static com.jayway.restassured.RestAssured.when;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.http.HttpStatus.OK;
+import static org.talend.components.api.component.ConnectorTopology.INCOMING;
+import static org.talend.components.api.component.ConnectorTopology.INCOMING_AND_OUTGOING;
+import static org.talend.components.api.component.ConnectorTopology.NONE;
+import static org.talend.components.api.component.ConnectorTopology.OUTGOING;
+import static org.talend.components.service.rest.DefinitionType.COMPONENT;
+import static org.talend.components.service.rest.DefinitionType.DATA_STORE;
+import static org.talend.components.service.rest.dto.ConnectorTypology.CONFIGURATION;
+import static org.talend.components.service.rest.dto.ConnectorTypology.SINK;
+import static org.talend.components.service.rest.dto.ConnectorTypology.SOURCE;
+import static org.talend.components.service.rest.dto.ConnectorTypology.TRANSFORMER;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -18,13 +34,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.restassured.response.Response;
 import org.junit.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.talend.components.api.component.ComponentDefinition;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.service.rest.dto.ConnectorTypology;
 import org.talend.components.service.rest.dto.DefinitionDTO;
@@ -32,15 +46,9 @@ import org.talend.components.service.rest.mock.MockComponentDefinition;
 import org.talend.components.service.rest.mock.MockDatastoreDefinition;
 import org.talend.daikon.definition.Definition;
 
-import static com.jayway.restassured.RestAssured.when;
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.http.HttpStatus.OK;
-import static org.talend.components.api.component.ConnectorTopology.*;
-import static org.talend.components.service.rest.DefinitionType.COMPONENT;
-import static org.talend.components.service.rest.DefinitionType.DATA_STORE;
-import static org.talend.components.service.rest.dto.ConnectorTypology.*;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.restassured.response.Response;
 
 /**
  * Unit test for the org.talend.components.service.rest.DefinitionsController class.
@@ -130,6 +138,32 @@ public class DefinitionsControllerTest extends AbstractSpringIntegrationTests {
     }
 
     @Test
+    public void shouldFilterDIExecutionEngine() throws Exception {
+        shouldFilterComponentsByExecutionEngine(ExecutionEngine.DI, 8);
+    }
+
+    @Test
+    public void shouldFilterBEAMExecutionEngine() throws Exception {
+        shouldFilterComponentsByExecutionEngine(ExecutionEngine.BEAM, 1);
+    }
+
+    @Test
+    public void shouldFilterSparkBatchExecutionEngine() throws Exception {
+        shouldFilterComponentsByExecutionEngine(ExecutionEngine.DI_SPARK_BATCH, 2);
+    }
+
+    @Test
+    public void shouldFilterSparkStreamingExecutionEngine() throws Exception {
+        shouldFilterComponentsByExecutionEngine(ExecutionEngine.DI_SPARK_STREAMING, 3);
+    }
+
+    @Test
+    public void shouldFilterSourceTypologyAndDIExecutionEngine() throws Exception {
+        // 1 sources (two of the three OUTGOING sources is BEAM compatible) + 2 source & sink
+        shouldFilterComponentsByTypologyAndExecutionEngine(SOURCE, ExecutionEngine.DI, 3);
+    }
+
+    @Test
     public void shouldNotFilterTypology() throws Exception {
         // given
         Map<String, ComponentDefinition> definitions = getComponentsDefinitions();
@@ -162,22 +196,67 @@ public class DefinitionsControllerTest extends AbstractSpringIntegrationTests {
         List<DefinitionDTO> actual = objectMapper.readValue(response.asInputStream(), new TypeReference<List<DefinitionDTO>>() {
         });
         assertEquals(expectedResults, actual.size());
-        assertEquals(expectedResults, actual.stream().filter(dto -> dto.getTypologies().contains(wantedTypology.name())) // it's a
+        assertEquals(expectedResults, actual.stream().filter(dto -> dto.getTypologies().contains(wantedTypology.name())) // it's
+                                                                                                                         // a
                                                                                                                          // source
                 .count());
+    }
+
+    public void shouldFilterComponentsByExecutionEngine(ExecutionEngine executionEngine, int expectedResults) throws IOException {
+        // given
+        Map<String, ComponentDefinition> definitions = getComponentsDefinitions();
+
+        BDDMockito.given(delegate.getDefinitionsMapByType(ComponentDefinition.class)) //
+                .willReturn(definitions);
+
+        // when
+        final Response response = when().get("/definitions/components?executionEngine=" + executionEngine.name()).andReturn();
+
+        // then
+        assertEquals(OK.value(), response.getStatusCode());
+        List<DefinitionDTO> actual = objectMapper.readValue(response.asInputStream(), new TypeReference<List<DefinitionDTO>>() {
+        });
+        assertEquals(expectedResults, actual.size());
+        assertEquals(expectedResults,
+                actual.stream().filter(dto -> dto.getExecutionEngines().contains(executionEngine.name())).count());
+    }
+
+    public void shouldFilterComponentsByTypologyAndExecutionEngine(ConnectorTypology wantedTypology,
+            ExecutionEngine executionEngine, int expectedResults) throws IOException {
+        // given
+        Map<String, ComponentDefinition> definitions = getComponentsDefinitions();
+
+        BDDMockito.given(delegate.getDefinitionsMapByType(ComponentDefinition.class)) //
+                .willReturn(definitions);
+
+        // when
+        final Response response = when()
+                .get("/definitions/components?typology=" + wantedTypology + "&executionEngine=" + executionEngine.name())
+                .andReturn();
+
+        // then
+        assertEquals(OK.value(), response.getStatusCode());
+        List<DefinitionDTO> actual = objectMapper.readValue(response.asInputStream(), new TypeReference<List<DefinitionDTO>>() {
+        });
+        assertEquals(expectedResults, actual.size());
+        assertEquals(expectedResults, actual.stream().filter(dto -> dto.getTypologies().contains(wantedTypology.name()))
+                .filter(dto -> dto.getExecutionEngines().contains(executionEngine.name())).count());
     }
 
     private Map<String, ComponentDefinition> getComponentsDefinitions() {
         Map<String, ComponentDefinition> definitions = new HashMap<>();
         definitions.put("source_1", new MockComponentDefinition("source_1", INCOMING));
         definitions.put("source_2", new MockComponentDefinition("source_2", INCOMING));
-        definitions.put("source_3", new MockComponentDefinition("source_2", INCOMING));
+        definitions.put("source_3", new MockComponentDefinition("source_2", ExecutionEngine.BEAM, INCOMING));
         definitions.put("sink_1", new MockComponentDefinition("sink_1", OUTGOING));
-        definitions.put("sink_2", new MockComponentDefinition("sink_2", OUTGOING));
-        definitions.put("sink_3", new MockComponentDefinition("sink_3", OUTGOING));
-        definitions.put("transformer_1", new MockComponentDefinition("transformer_1", INCOMING_AND_OUTGOING));
-        definitions.put("transformer_2", new MockComponentDefinition("transformer_2", INCOMING_AND_OUTGOING));
-        definitions.put("transformer_3", new MockComponentDefinition("transformer_3", INCOMING_AND_OUTGOING));
+        definitions.put("sink_2", new MockComponentDefinition("sink_2", ExecutionEngine.DI_SPARK_BATCH, OUTGOING));
+        definitions.put("sink_3", new MockComponentDefinition("sink_3", ExecutionEngine.DI_SPARK_BATCH, OUTGOING));
+        definitions.put("transformer_1",
+                new MockComponentDefinition("transformer_1", ExecutionEngine.DI_SPARK_STREAMING, INCOMING_AND_OUTGOING));
+        definitions.put("transformer_2",
+                new MockComponentDefinition("transformer_2", ExecutionEngine.DI_SPARK_STREAMING, INCOMING_AND_OUTGOING));
+        definitions.put("transformer_3",
+                new MockComponentDefinition("transformer_3", ExecutionEngine.DI_SPARK_STREAMING, INCOMING_AND_OUTGOING));
         definitions.put("config_1", new MockComponentDefinition("config_1", NONE));
         definitions.put("config_2", new MockComponentDefinition("config_2", NONE));
         definitions.put("config_3", new MockComponentDefinition("config_3", NONE));
