@@ -27,21 +27,25 @@ import org.talend.components.salesforce.tsalesforceoutputbulkexec.TSalesforceOut
 
 import aQute.bnd.annotation.component.Component;
 
+import com.google.auto.service.AutoService;
+
 /**
  * Install all of the definitions provided for the Salesforce family of components.
  */
+@AutoService(ComponentInstaller.class)
 @Component(name = Constants.COMPONENT_INSTALLER_PREFIX + SalesforceFamilyDefinition.NAME, provide = ComponentInstaller.class)
 public class SalesforceFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "Salesforce";
 
     public SalesforceFamilyDefinition() {
-        super(NAME,
+        super(
+                NAME,
                 // Components
-                new TSalesforceBulkExecDefinition(), new TSalesforceConnectionDefinition(), new TSalesforceGetDeletedDefinition(),
-                new TSalesforceGetServerTimestampDefinition(), new TSalesforceGetUpdatedDefinition(),
-                new TSalesforceInputDefinition(), new TSalesforceOutputDefinition(), new TSalesforceOutputBulkDefinition(),
-                new TSalesforceOutputBulkExecDefinition(),
+                new TSalesforceBulkExecDefinition(), new TSalesforceConnectionDefinition(),
+                new TSalesforceGetDeletedDefinition(), new TSalesforceGetServerTimestampDefinition(),
+                new TSalesforceGetUpdatedDefinition(), new TSalesforceInputDefinition(), new TSalesforceOutputDefinition(),
+                new TSalesforceOutputBulkDefinition(), new TSalesforceOutputBulkExecDefinition(),
                 // Component wizards
                 new SalesforceConnectionEditWizardDefinition(), new SalesforceConnectionWizardDefinition(),
                 new SalesforceModuleWizardDefinition());

@@ -22,9 +22,12 @@ import org.talend.components.filedelimited.wizard.FileDelimitedWizardDefinition;
 
 import aQute.bnd.annotation.component.Component;
 
+import com.google.auto.service.AutoService;
+
 /**
  * Install all of the definitions provided for the FileDelimited family of components.
  */
+@AutoService(ComponentInstaller.class)
 @Component(name = Constants.COMPONENT_INSTALLER_PREFIX + FileDelimitedFamilyDefinition.NAME, provide = ComponentInstaller.class)
 public class FileDelimitedFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
@@ -32,7 +35,7 @@ public class FileDelimitedFamilyDefinition extends AbstractComponentFamilyDefini
 
     public FileDelimitedFamilyDefinition() {
         super(NAME,
-                // Components
+        // Components
                 new TFileInputDelimitedDefinition(), new TFileOutputDelimitedDefinition(),
                 // Component wizards
                 new FileDelimitedWizardDefinition(), new FieldDelimitedEditWizardDefinition());

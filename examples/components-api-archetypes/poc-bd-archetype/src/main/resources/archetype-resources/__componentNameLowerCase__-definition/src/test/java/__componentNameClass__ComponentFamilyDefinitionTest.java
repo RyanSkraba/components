@@ -51,4 +51,5 @@ public class ${componentNameClass}ComponentFamilyDefinitionTest{
         componentFamilyDefinition.install(ctx);
         Mockito.verify(ctx, times(1)).registerComponentFamilyDefinition(any(ComponentFamilyDefinition.class));
     }
+
 }

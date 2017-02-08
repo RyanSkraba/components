@@ -13,6 +13,7 @@
 
 package org.talend.components.elasticsearch;
 
+import com.google.auto.service.AutoService;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
@@ -24,15 +25,15 @@ import aQute.bnd.annotation.component.Component;
 /**
  * Install all of the definitions provided for the Elasticsearch family of components.
  */
-@Component(name = Constants.COMPONENT_INSTALLER_PREFIX
-        + ElasticsearchComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
+@AutoService(ComponentInstaller.class)
+@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + ElasticsearchComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
 public class ElasticsearchComponentFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "Elasticsearch";
 
     public ElasticsearchComponentFamilyDefinition() {
-        super(NAME, new ElasticsearchDatastoreDefinition(), new ElasticsearchDatasetDefinition(), new ElasticsearchInputDefinition(),
-                new ElasticsearchOutputDefinition());
+        super(NAME, new ElasticsearchDatastoreDefinition(), new ElasticsearchDatasetDefinition(),
+                new ElasticsearchInputDefinition(), new ElasticsearchOutputDefinition());
     }
 
     public void install(ComponentFrameworkContext ctx) {

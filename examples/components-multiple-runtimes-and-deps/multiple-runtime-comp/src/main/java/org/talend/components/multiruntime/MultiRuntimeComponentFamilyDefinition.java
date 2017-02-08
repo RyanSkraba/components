@@ -18,11 +18,13 @@ import org.talend.components.api.Constants;
 
 import aQute.bnd.annotation.component.Component;
 
+import com.google.auto.service.AutoService;
+
 /**
  * Install all of the definitions provided for the MultiRuntime family of components.
  */
-@Component(name = Constants.COMPONENT_INSTALLER_PREFIX
-        + MultiRuntimeComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
+@AutoService(ComponentInstaller.class)
+@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + MultiRuntimeComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
 public class MultiRuntimeComponentFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "MultiRuntimeExample";

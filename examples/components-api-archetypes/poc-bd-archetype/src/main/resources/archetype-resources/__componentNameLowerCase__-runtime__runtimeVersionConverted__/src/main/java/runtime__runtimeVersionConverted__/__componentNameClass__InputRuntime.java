@@ -44,7 +44,7 @@ public class ${componentNameClass}InputRuntime extends PTransform<PBegin, PColle
     }
 
     @Override
-    public PCollection<IndexedRecord> apply(PBegin in) {
+    public PCollection<IndexedRecord> expand(PBegin in) {
         return null;
     }
 }

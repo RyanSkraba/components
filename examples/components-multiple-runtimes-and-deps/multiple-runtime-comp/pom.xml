@@ -43,9 +43,15 @@
 			<artifactId>components-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<!-- Annotation processing -->
 		<dependency>
 			<groupId>biz.aQute.bnd</groupId>
 			<artifactId>annotation</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.auto.service</groupId>
+			<artifactId>auto-service</artifactId>
 		</dependency>
 
 		<!-- Shared component properties such as Use/Password or Schema -->
@@ -86,7 +92,9 @@
 							<instructions>
 								<Bundle-SymbolicName>org.talend.poc.multiple-runtime-comp</Bundle-SymbolicName>
 								<Bundle-Name>${project.name}</Bundle-Name>
-                                <Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt</Include-Resource>
+                                <Include-Resource>
+                                    {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
+                                </Include-Resource>
 								<Service-Component>*</Service-Component>
 								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
 							</instructions>
@@ -104,7 +112,7 @@
 <!-- 								<Bundle-SymbolicName>org.talend.poc.multiple-runtime-comp</Bundle-SymbolicName> -->
 <!-- 								<Service-Component>*</Service-Component> -->
 <!-- 								<Import-Package>org.talend.components.multiruntime,org.talend*,org.talend.daikon*,org.apache.avro.*</Import-Package> -->
-<!-- 								<Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*</Embed-Dependency> -->
+<!-- 								<Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*|auto-service</Embed-Dependency> -->
 <!--                                 <Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt</Include-Resource> -->
 <!-- 								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy> -->
 <!-- 							</instructions> -->

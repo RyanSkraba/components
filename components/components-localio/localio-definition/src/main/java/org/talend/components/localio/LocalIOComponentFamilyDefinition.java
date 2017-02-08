@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.localio;
 
+import com.google.auto.service.AutoService;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
@@ -22,6 +23,7 @@ import aQute.bnd.annotation.component.Component;
 /**
  * Install all of the definitions provided for the LocalIO family of components.
  */
+@AutoService(ComponentInstaller.class)
 @Component(name = Constants.COMPONENT_INSTALLER_PREFIX + LocalIOComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
 public class LocalIOComponentFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 

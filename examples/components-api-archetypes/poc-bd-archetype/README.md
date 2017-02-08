@@ -11,11 +11,11 @@ Then you can use the command :
 mvn archetype:generate 
 -DarchetypeGroupId=org.talend.components 
 -DarchetypeArtifactId=tcomp-bd-archetype 
--DarchetypeVersion=1.0-SNAPSHOT 
+-DarchetypeVersion=<TCompVersion> 
 -DarchetypeCatalog=local 
 -DgroupId=org.talend.components 
 -DartifactId=<NameOfTheComponentFamily> 
--Dversion=<TCompVersion> 
+-Dversion=0.0.1-SNAPSHOT
 -Dpackage=org.talend.components.<NameOfTheComponentFamilyLowerCase>
 ```
 It will generate your archetype into your current folder.
@@ -24,14 +24,14 @@ Example:
 
 Run:
 ```
-mvn archetype:generate 
--DarchetypeGroupId=org.talend.components 
--DarchetypeArtifactId=tcomp-bd-archetype 
--DarchetypeVersion=1.0-SNAPSHOT 
--DarchetypeCatalog=local 
--DgroupId=org.talend.components 
--DartifactId=ElasticSearch 
--Dversion=0.17.0-SNAPSHOT 
+mvn archetype:generate \
+-DarchetypeGroupId=org.talend.components \
+-DarchetypeArtifactId=tcomp-bd-archetype \
+-DarchetypeVersion=0.18.0-SNAPSHOT \
+-DarchetypeCatalog=local \
+-DgroupId=org.talend.components \
+-DartifactId=Elasticsearch \
+-Dversion=0.0.1-SNAPSHOT \
 -Dpackage=org.talend.components.elasticsearch
 ```
 It will ask you for some values, you can left all by default values except runtimeVersion,

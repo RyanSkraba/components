@@ -34,10 +34,14 @@
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
+        <!-- Annotation processing -->
         <dependency>
             <groupId>biz.aQute.bnd</groupId>
             <artifactId>annotation</artifactId>
-            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>

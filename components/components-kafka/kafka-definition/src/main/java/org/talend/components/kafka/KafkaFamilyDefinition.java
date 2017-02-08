@@ -22,9 +22,12 @@ import org.talend.components.kafka.output.KafkaOutputDefinition;
 
 import aQute.bnd.annotation.component.Component;
 
+import com.google.auto.service.AutoService;
+
 /**
  * Install all of the definitions provided for the Kafka family of components.
  */
+@AutoService(ComponentInstaller.class)
 @Component(name = Constants.COMPONENT_INSTALLER_PREFIX + KafkaFamilyDefinition.NAME, provide = ComponentInstaller.class)
 public class KafkaFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 

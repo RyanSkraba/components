@@ -21,9 +21,12 @@ import org.talend.components.simplefileio.output.SimpleFileIOOutputDefinition;
 
 import aQute.bnd.annotation.component.Component;
 
+import com.google.auto.service.AutoService;
+
 /**
  * Install all of the definitions provided for the SimpleFileIO family of components.
  */
+@AutoService(ComponentInstaller.class)
 @Component(name = Constants.COMPONENT_INSTALLER_PREFIX + SimpleFileIOComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
 public class SimpleFileIOComponentFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 

@@ -21,6 +21,9 @@ import org.talend.components.jms.output.JmsOutputDefinition;
 
 import aQute.bnd.annotation.component.Component;
 
+import com.google.auto.service.AutoService;
+
+@AutoService(ComponentInstaller.class)
 @Component(name = Constants.COMPONENT_INSTALLER_PREFIX + JmsComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
 public class JmsComponentFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
@@ -28,7 +31,7 @@ public class JmsComponentFamilyDefinition extends AbstractComponentFamilyDefinit
 
     public JmsComponentFamilyDefinition() {
         super(NAME,
-                // Components
+        // Components
                 new JmsDatastoreDefinition(), new JmsDatasetDefinition(), new JmsInputDefinition(), new JmsOutputDefinition());
     }
 
