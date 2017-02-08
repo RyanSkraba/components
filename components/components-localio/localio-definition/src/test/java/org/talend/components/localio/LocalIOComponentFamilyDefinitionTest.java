@@ -45,7 +45,7 @@ public class LocalIOComponentFamilyDefinitionTest {
     public void testBasic() {
         assertThat(def.getName(), is("LocalIO"));
         assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("FixedFlowInput"))));
-        // assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("RowGenerator"))));
+        assertThat(def.getDefinitions(), (Matcher) hasItem(hasProperty("name", is("RowGenerator"))));
     }
 
     /**

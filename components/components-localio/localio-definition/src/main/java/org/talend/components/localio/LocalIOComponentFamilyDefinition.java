@@ -17,6 +17,7 @@ import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
 import org.talend.components.localio.fixedflowinput.FixedFlowInputDefinition;
+import org.talend.components.localio.rowgenerator.RowGeneratorDefinition;
 
 import aQute.bnd.annotation.component.Component;
 
@@ -36,9 +37,7 @@ public class LocalIOComponentFamilyDefinition extends AbstractComponentFamilyDef
     public static final String MAVEN_DEFAULT_RUNTIME_URI = "mvn:" + MAVEN_GROUP_ID + "/" + MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID;
 
     public LocalIOComponentFamilyDefinition() {
-        super(NAME, new FixedFlowInputDefinition()
-        // , new RowGeneratorDefinition()
-        );
+        super(NAME, new FixedFlowInputDefinition(), new RowGeneratorDefinition());
     }
 
     @Override

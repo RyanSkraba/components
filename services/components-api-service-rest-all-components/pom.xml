@@ -56,6 +56,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
+			<artifactId>localio-definition</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
 			<artifactId>jms-definition</artifactId>
 			<version>${project.version}</version>
 		</dependency>
