@@ -15,6 +15,8 @@ package org.talend.components.azurestorage.table.runtime;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -24,6 +26,7 @@ import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
+import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
@@ -128,11 +131,11 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
             // FIXME How does this will behave in a distributed runtime ? See where to place correctly this
             // instruction...
             switch (actionTable) {
-            case Drop_and_create_table:
-            case Drop_table_if_exist_and_create:
-                table.deleteIfExists();
-                break;
-            default:
+                case Drop_and_create_table :
+                case Drop_table_if_exist_and_create :
+                    table.deleteIfExists();
+                    break;
+                default :
             }
             //
             try {
@@ -178,10 +181,15 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
             if (useNameMappings) {
                 if (nameMappings.containsKey(sName)) {
                     mName = nameMappings.get(sName);
-                    // LOGGER.warn("Name mapping(S/P) {} <---> {}.", sName, mName);
                 }
             }
-
+            Schema fSchema = f.schema();
+            if (fSchema.getType() == Type.UNION)
+                for (Schema s : f.schema().getTypes())
+                    if (s.getType() != Type.NULL) {
+                        fSchema = s;
+                        break;
+                    }
             if (sName.equals(AzureStorageTableProperties.TABLE_PARTITION_KEY)
                     || mName.equals(AzureStorageTableProperties.TABLE_PARTITION_KEY)) {
                 entity.setPartitionKey((String) inputRecord.get(f.pos()));
@@ -192,25 +200,35 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
                     || mName.equals(AzureStorageTableProperties.TABLE_TIMESTAMP)) {
                 // nop : managed by server
             } else { // that's some properties !
-                if (f.schema().getType() == Schema.Type.BOOLEAN) {
+                if (fSchema.getType().equals(Type.BOOLEAN)) {
                     entityProps.put(mName, new EntityProperty((Boolean) inputRecord.get(f.pos())));
-                } else if (f.schema().getType() == Schema.Type.DOUBLE) {
+                } else if (fSchema.getType().equals(Type.DOUBLE)) {
                     entityProps.put(mName, new EntityProperty((Double) inputRecord.get(f.pos())));
-                } else if (f.schema().getType() == Schema.Type.INT) {
+                } else if (fSchema.getType().equals(Type.INT)) {
                     entityProps.put(mName, new EntityProperty((Integer) inputRecord.get(f.pos())));
-                } else if (f.schema().getType() == Schema.Type.BYTES) {
+                } else if (fSchema.getType().equals(Type.BYTES)) {
                     entityProps.put(mName, new EntityProperty((byte[]) inputRecord.get(f.pos())));
                 }
                 //
-                else if (f.schema().getType() == Schema.Type.LONG) {
-                    String clazz = f.schema().getProp(SchemaConstants.JAVA_CLASS_FLAG);
-                    if (clazz != null && clazz.equals(Date.class.getCanonicalName()))
-                        entityProps.put(mName, new EntityProperty((Date) inputRecord.get(f.pos())));
-                    else
+                else if (fSchema.getType().equals(Type.LONG)) {
+                    String clazz = fSchema.getProp(SchemaConstants.JAVA_CLASS_FLAG);
+                    if (clazz != null && clazz.equals(Date.class.getCanonicalName())) {
+                        Date dt = null;
+                        try {
+                            dt = new SimpleDateFormat(fSchema.getProp(SchemaConstants.TALEND_COLUMN_PATTERN))
+                                    .parse(inputRecord.get(f.pos()).toString());
+                            entityProps.put(mName, new EntityProperty(dt));
+                        } catch (ParseException e) {
+                            LOGGER.error("Error while parsing date : {}", e);
+                            if (properties.dieOnError.getValue()) {
+                                throw new ComponentException(e);
+                            }
+                        }
+                    } else
                         entityProps.put(mName, new EntityProperty((Long) inputRecord.get(f.pos())));
                 }
                 //
-                else if (f.schema().getType() == Schema.Type.STRING) {
+                else if (fSchema.getType().equals(Type.STRING)) {
                     entityProps.put(mName, new EntityProperty((String) inputRecord.get(f.pos())));
                 } else { // use string as default type...
                     entityProps.put(mName, new EntityProperty((String) inputRecord.get(f.pos())));
@@ -266,26 +284,26 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
     private TableOperation getTableOperation(DynamicTableEntity entity) {
         TableOperation tableOpe = null;
         switch (actionData) {
-        case Insert:
-            tableOpe = TableOperation.insert(entity);
-            break;
-        case Insert_Or_Merge:
-            tableOpe = TableOperation.insertOrMerge(entity);
-            break;
-        case Insert_Or_Replace:
-            tableOpe = TableOperation.insertOrReplace(entity);
-            break;
-        case Merge:
-            tableOpe = TableOperation.merge(entity);
-            break;
-        case Replace:
-            tableOpe = TableOperation.replace(entity);
-            break;
-        case Delete:
-            tableOpe = TableOperation.delete(entity);
-            break;
-        default:
-            LOGGER.error("No specified operation for table");
+            case Insert :
+                tableOpe = TableOperation.insert(entity);
+                break;
+            case Insert_Or_Merge :
+                tableOpe = TableOperation.insertOrMerge(entity);
+                break;
+            case Insert_Or_Replace :
+                tableOpe = TableOperation.insertOrReplace(entity);
+                break;
+            case Merge :
+                tableOpe = TableOperation.merge(entity);
+                break;
+            case Replace :
+                tableOpe = TableOperation.replace(entity);
+                break;
+            case Delete :
+                tableOpe = TableOperation.delete(entity);
+                break;
+            default :
+                LOGGER.error("No specified operation for table");
         }
 
         return tableOpe;
