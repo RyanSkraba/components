@@ -12,11 +12,12 @@
 // ============================================================================
 package org.talend.components.adapter.beam.transform;
 
+import java.util.Arrays;
+
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.runners.direct.DirectRunner;
 import org.apache.beam.sdk.Pipeline;
-import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.testing.PAssert;
@@ -51,7 +52,7 @@ public class ConvertToIndexedRecordTest {
         // TODO(rskraba): How should this be correctly registered in the pipeline?
         p.getCoderRegistry().registerCoder(IndexedRecord.class, LazyAvroCoder.coderFactory());
 
-        PCollection<String> input = p.apply(Create.of(inputValues)); //
+        PCollection<String> input = p.apply(Create.of(Arrays.asList(inputValues))); //
 
         // Collect the results before and after the transformation.
         PCollection<IndexedRecord> output = input.apply(ConvertToIndexedRecord.<String, IndexedRecord> of());

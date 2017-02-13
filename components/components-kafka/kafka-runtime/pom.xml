@@ -20,11 +20,11 @@
             <id>docker-host</id>
             <activation>
                 <property>
-		    <name>env.DOCKER_HOST</name>
+                    <name>env.DOCKER_HOST</name>
                 </property>
             </activation>
             <properties>
-	        <docker_host>${env.DOCKER_HOST}</docker_host>
+                <docker_host>${env.DOCKER_HOST}</docker_host>
             </properties>
         </profile>
 
@@ -32,7 +32,7 @@
             <id>docker-host-127.0.0.1</id>
             <activation>
                 <property>
-		    <name>!env.DOCKER_HOST</name>
+                    <name>!env.DOCKER_HOST</name>
                 </property>
             </activation>
             <properties>
@@ -94,7 +94,7 @@
                         <configuration>
                             <name>docker.parsed.address</name>
                             <value>${docker_host}</value>
-			    <regex>tcp://(.+):(.+)</regex>
+                            <regex>tcp://(.+):(.+)</regex>
                             <replacement>$1</replacement>
                         </configuration>
                     </execution>
@@ -105,7 +105,7 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
-		        <kafka.bootstrap>${docker.host.address}:9092</kafka.bootstrap>
+                        <kafka.bootstrap>${docker.host.address}:9092</kafka.bootstrap>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
@@ -140,7 +140,8 @@
                                     <name>wurstmeister/kafka:0.10.1.0</name>
                                     <run>
                                         <env>
-				            <KAFKA_ADVERTISED_HOST_NAME>${docker.parsed.address}</KAFKA_ADVERTISED_HOST_NAME>
+                                            <KAFKA_ADVERTISED_HOST_NAME>${docker.parsed.address}
+                                            </KAFKA_ADVERTISED_HOST_NAME>
                                             <KAFKA_ADVERTISED_PORT>9092</KAFKA_ADVERTISED_PORT>
                                             <KAFKA_ZOOKEEPER_CONNECT>zookeeper:2181</KAFKA_ZOOKEEPER_CONNECT>
                                             <KAFKA_CREATE_TOPICS>
@@ -148,7 +149,7 @@
                                             </KAFKA_CREATE_TOPICS>
                                         </env>
                                         <ports>
-					    <port>9092:9092</port>
+                                            <port>9092:9092</port>
                                         </ports>
                                         <links>
                                             <link>zookeeper</link>

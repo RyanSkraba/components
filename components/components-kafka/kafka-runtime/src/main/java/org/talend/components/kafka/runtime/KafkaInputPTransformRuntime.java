@@ -50,11 +50,11 @@ public class KafkaInputPTransformRuntime extends PTransform<PBegin, PCollection<
     @Override
     public PCollection<IndexedRecord> expand(PBegin pBegin) {
 
-        KafkaIO.Read<byte[], byte[]> kafkaRead = KafkaIO.read()
+        KafkaIO.Read<byte[], byte[]> kafkaRead = KafkaIO.readBytes()
                 .withBootstrapServers(properties.getDatasetProperties().getDatastoreProperties().brokers.getValue())
                 .withTopics(Arrays.asList(new String[] { properties.getDatasetProperties().topic.getValue() }))
-                .withKeyCoder(ByteArrayCoder.of()).withValueCoder(ByteArrayCoder.of())
                 .updateConsumerProperties(KafkaConnection.createInputMaps(properties));
+
         if (properties.useMaxReadTime.getValue()) {
             kafkaRead = kafkaRead.withMaxReadTime(new Duration(properties.maxReadTime.getValue()));
         }
