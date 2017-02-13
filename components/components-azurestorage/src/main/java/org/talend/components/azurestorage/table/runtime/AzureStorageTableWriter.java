@@ -150,7 +150,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
                     throw new IOException("Wait process for recreating table interrupted.");
                 }
                 table.createIfNotExists();
-                LOGGER.info("Table {} created.", tableName);
+                LOGGER.debug("Table {} created.", tableName);
             }
 
         } catch (InvalidKeyException | URISyntaxException | StorageException e) {

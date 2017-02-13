@@ -51,7 +51,7 @@ public class AzureStorageContainerDeleteReader extends AzureStorageReader<Boolea
                     mycontainer);
             result = container.deleteIfExists();
             if (!result) {
-                LOGGER.warn("Container " + mycontainer + " didn't exist or cannot be deleted !");
+                LOGGER.warn("Container {} didn't exist or cannot be deleted !", mycontainer);
             } else
                 dataCount++;
             return result;

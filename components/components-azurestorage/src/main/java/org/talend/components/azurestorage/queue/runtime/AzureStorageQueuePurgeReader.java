@@ -55,7 +55,7 @@ public class AzureStorageQueuePurgeReader extends AzureStorageReader<IndexedReco
         try {
             CloudQueue queue = ((AzureStorageQueueSourceOrSink) getCurrentSource()).getCloudQueue(runtime, queueName);
             dataCount = (int) queue.getApproximateMessageCount();
-            LOGGER.warn("About to purge {} messages in {}", dataCount, queue.getName());
+            LOGGER.debug("About to purge {} messages in {}", dataCount, queue.getName());
             queue.clear();
             startable = true;
         } catch (InvalidKeyException | URISyntaxException | StorageException e) {

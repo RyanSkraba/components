@@ -72,7 +72,7 @@ public class AzureStorageQueueCreateReader extends AzureStorageReader<IndexedRec
                     throw new IOException("Wait process for recreating table interrupted.");
                 }
                 startable = cqueue.createIfNotExists();
-                LOGGER.info("Container {} created.", cqueue.getName());
+                LOGGER.debug("Queue {} created.", cqueue.getName());
             }
             if (startable) {
                 dataCount++;

@@ -46,7 +46,6 @@ public class AzureStorageQueueInputLoopReader extends AzureStorageQueueInputRead
 
     @Override
     public boolean start() throws IOException {
-        LOGGER.warn("start");
         Boolean startable = false;
         String queueName = properties.queueName.getValue();
         loopWaitTime = properties.loopWaitTime.getValue();
@@ -55,7 +54,6 @@ public class AzureStorageQueueInputLoopReader extends AzureStorageQueueInputRead
         try {
             queue = ((AzureStorageQueueSource) getCurrentSource()).getCloudQueue(runtime, queueName);
             messages = queue.retrieveMessages(nbMsg).iterator();
-            LOGGER.warn("Messages : {}.", messages);
 
         } catch (InvalidKeyException | URISyntaxException | StorageException e) {
             LOGGER.error(e.getLocalizedMessage());
@@ -79,7 +77,6 @@ public class AzureStorageQueueInputLoopReader extends AzureStorageQueueInputRead
         // first loop to wait for a first message batch
         while (true) {
             try {
-                LOGGER.warn("Checking for new messages");
                 messages = queue.retrieveMessages(nbMsg).iterator();
                 startable = messages.hasNext();
                 if (startable) {
@@ -97,7 +94,6 @@ public class AzureStorageQueueInputLoopReader extends AzureStorageQueueInputRead
 
     @Override
     public boolean advance() throws IOException {
-        LOGGER.warn("advance");
         Boolean advanceable = messages.hasNext();
         if (advanceable) {
             try {
@@ -112,7 +108,7 @@ public class AzureStorageQueueInputLoopReader extends AzureStorageQueueInputRead
         // loop to wait for a message batch
         while (true) {
             try {
-                LOGGER.warn("Checking for new messages");
+                LOGGER.debug("Checking for new messages");
                 messages = queue.retrieveMessages(nbMsg).iterator();
                 advanceable = messages.hasNext();
                 if (advanceable) {
@@ -130,13 +126,11 @@ public class AzureStorageQueueInputLoopReader extends AzureStorageQueueInputRead
 
     @Override
     public IndexedRecord getCurrent() throws NoSuchElementException {
-        LOGGER.warn("getCurrent");
         return super.getCurrent();
     }
 
     @Override
     public Map<String, Object> getReturnValues() {
-        LOGGER.warn("getReturnValues");
         return super.getReturnValues();
     }
 

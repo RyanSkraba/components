@@ -68,7 +68,7 @@ public class AzureStorageContainerCreateReader extends AzureStorageReader<Boolea
                     throw new IOException("Wait process for recreating table interrupted.");
                 }
                 result = container.createIfNotExists();
-                LOGGER.info("Container {} created.", mycontainer);
+                LOGGER.debug("Container {} created.", mycontainer);
             }
             // Manage accessControl
             if (access.equals("Public") && result) {
@@ -80,7 +80,7 @@ public class AzureStorageContainerCreateReader extends AzureStorageReader<Boolea
                 container.uploadPermissions(containerPermissions);
             }
             if (!result) {
-                LOGGER.warn("Container " + mycontainer + " already exists !");
+                LOGGER.warn("Container {} already exists !", mycontainer);
             }
             dataCount++;
             return result;

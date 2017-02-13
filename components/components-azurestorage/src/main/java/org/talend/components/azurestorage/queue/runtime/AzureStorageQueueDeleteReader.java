@@ -55,7 +55,7 @@ public class AzureStorageQueueDeleteReader extends AzureStorageReader<IndexedRec
         try {
             CloudQueue cqueue = ((AzureStorageQueueSource) getCurrentSource()).getCloudQueue(runtime, queue);
             startable = cqueue.deleteIfExists();
-            LOGGER.warn("queue {} is deleted ", cqueue.getName());
+            LOGGER.debug("queue {} is deleted ", cqueue.getName());
             if (startable) {
                 dataCount++;
             } else {
