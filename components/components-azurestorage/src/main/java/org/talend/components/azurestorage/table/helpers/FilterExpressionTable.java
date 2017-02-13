@@ -34,6 +34,8 @@ public class FilterExpressionTable extends ComponentPropertiesImpl {
 
     private static final long serialVersionUID = -5175064100089239187L;
 
+    public static final String ADD_QUOTES = "ADD_QUOTES";
+
     public static final String COMPARISON_EQUAL = "EQUAL";
 
     public static final String COMPARISON_NOT_EQUAL = "NOT EQUAL";
@@ -93,7 +95,11 @@ public class FilterExpressionTable extends ComponentPropertiesImpl {
     public void setupProperties() {
         super.setupProperties();
 
+        column.setTaggedValue(ADD_QUOTES, true);
+        operand.setTaggedValue(ADD_QUOTES, true);
+
         column.setPossibleValues(Arrays.asList("PartitionKey", "RowKey", "Timestamp"));
+        operand.setPossibleValues(Arrays.asList("US Customers", "UKey", "2018-01-01"));
         function.setPossibleValues(COMPARISONS);
         predicate.setPossibleValues(PREDICATES);
         fieldType.setPossibleValues(FIELD_TYPES);
@@ -104,8 +110,7 @@ public class FilterExpressionTable extends ComponentPropertiesImpl {
         super.setupLayout();
 
         Form mainForm = new Form(this, Form.MAIN);
-        // mainForm.addRow(Widget.widget(column).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
-        mainForm.addRow(column);
+        mainForm.addColumn(column);
         mainForm.addColumn(Widget.widget(function).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
         mainForm.addColumn(operand);
         mainForm.addColumn(Widget.widget(predicate).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));

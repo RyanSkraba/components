@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.azurestorage.table.tazurestorageinputtable;
 
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.ADD_QUOTES;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
@@ -86,8 +87,8 @@ public class TAzureStorageInputTableProperties extends AzureStorageTableProperti
         //
         useFilterExpression.setValue(false);
         producedFilter.setValue("");
+        producedFilter.setTaggedValue(ADD_QUOTES, true);
         filterExpression.column.setPossibleValues(getSchemaFields());
-
         schemaListener = new ISchemaListener() {
 
             @Override
