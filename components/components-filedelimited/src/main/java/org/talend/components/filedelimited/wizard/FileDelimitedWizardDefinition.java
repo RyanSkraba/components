@@ -19,6 +19,7 @@ import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.filedelimited.FileDelimitedProperties;
 import org.talend.components.filedelimited.tfileinputdelimited.TFileInputDelimitedProperties;
 import org.talend.components.filedelimited.tfileoutputdelimited.TFileOutputDelimitedProperties;
+import org.talend.daikon.definition.DefinitionImageType;
 
 public class FileDelimitedWizardDefinition extends AbstractComponentWizardDefintion {
 
@@ -47,17 +48,36 @@ public class FileDelimitedWizardDefinition extends AbstractComponentWizardDefint
         return wizard;
     }
 
+    @Deprecated
     @Override
     public String getPngImagePath(WizardImageType imageType) {
         switch (imageType) {
-        case TREE_ICON_16X16:
-            return "fileDelimitedWizardIcon.gif";
-        case WIZARD_BANNER_75X66:
-            return "fileDelimitedWizardBanner.png";
-        default:
-            // will return null
+            case TREE_ICON_16X16:
+                return getImagePath(DefinitionImageType.TREE_ICON_16X16);
+            case WIZARD_BANNER_75X66:
+                return getImagePath(DefinitionImageType.WIZARD_BANNER_75X66);
+            default:
+                // will return null
         }
         return null;
+    }
+
+    @Override
+    public String getImagePath(DefinitionImageType type) {
+        switch (type) {
+            case TREE_ICON_16X16:
+                return "fileDelimitedWizardIcon.gif";
+            case WIZARD_BANNER_75X66:
+                return "fileDelimitedWizardBanner.png";
+            default:
+                // will return null
+        }
+        return null;
+    }
+
+    @Override
+    public String getIconKey() {
+        return "file-csv-o";
     }
 
     @Override

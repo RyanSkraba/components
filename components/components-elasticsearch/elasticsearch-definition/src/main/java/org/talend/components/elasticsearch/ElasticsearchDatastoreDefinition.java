@@ -23,6 +23,7 @@ import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.elasticsearch.input.ElasticsearchInputDefinition;
 import org.talend.components.elasticsearch.output.ElasticsearchOutputDefinition;
+import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
@@ -57,9 +58,24 @@ public class ElasticsearchDatastoreDefinition extends I18nDefinition
         }
     }
 
+    @Deprecated
     @Override
     public String getImagePath() {
         return NAME + "_icon32.png";
+    }
+
+    @Override
+    public String getImagePath(DefinitionImageType type) {
+        switch (type) {
+            case PALETTE_ICON_32X32:
+                return NAME + "_icon32.png";
+        }
+        return null;
+    }
+
+    @Override
+    public String getIconKey() {
+        return "elastic";
     }
 
     @Override

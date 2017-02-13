@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Writer;
@@ -36,6 +37,7 @@ public abstract class AbstractComponentTest2 extends AbstractPropertiesTest {
         ComponentTestUtils.assertReturnProperties18nAreSet(getDefinitionRegistry(), errorCollector);
     }
 
+    @Ignore
     @Override
     @Test
     public void testAllImages() {

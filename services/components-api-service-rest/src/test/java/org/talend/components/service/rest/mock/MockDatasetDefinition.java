@@ -17,6 +17,7 @@ import org.talend.components.common.dataset.DatasetDefinition;
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.common.datastore.runtime.DatastoreRuntime;
 import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
@@ -48,9 +49,20 @@ public class MockDatasetDefinition extends SimpleNamedThing implements DatasetDe
         return "mock " + name;
     }
 
+    @Deprecated
     @Override
     public String getImagePath() {
         return "/org/talend/components/mock/mock_" + name + "_icon32.png";
+    }
+
+    @Override
+    public String getImagePath(DefinitionImageType type) {
+        return null;
+    }
+
+    @Override
+    public String getIconKey() {
+        return null;
     }
 
     @Override

@@ -61,7 +61,9 @@ public interface ComponentWizardDefinition extends Definition {
      * @see {@link java.lang.Class#getResourceAsStream(String)}
      * @param imageType the type of image requested
      * @return the path to the png resource
+     * @deprecated use {@link #getImagePath(org.talend.daikon.definition.DefinitionImageType)}.
      */
+    @Deprecated
     String getPngImagePath(WizardImageType imageType);
 
     /**

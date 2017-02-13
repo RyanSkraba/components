@@ -19,6 +19,7 @@ import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.jms.input.JmsInputDefinition;
 import org.talend.components.jms.output.JmsOutputDefinition;
+import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
@@ -44,9 +45,26 @@ public class JmsDatastoreDefinition extends I18nDefinition implements DatastoreD
                 RUNTIME_1_1);
     }
 
+    @Deprecated
     @Override
     public String getImagePath() {
         return "/org/talend/components/jms/input/JmsInput_icon32.png";
+    }
+
+    @Override
+    public String getImagePath(DefinitionImageType type) {
+        switch (type) {
+        case PALETTE_ICON_32X32:
+            return NAME + "/org/talend/components/jms/input/JmsInput_icon32.png";
+        case SVG_ICON:
+            return null;
+        }
+        return null;
+    }
+
+    @Override
+    public String getIconKey() {
+        return null;
     }
 
     @Override

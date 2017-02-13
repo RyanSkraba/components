@@ -20,6 +20,7 @@ import ${packageTalend}.api.component.runtime.DependenciesReader;
 import ${packageTalend}.api.component.runtime.JarRuntimeInfo;
 import ${packageTalend}.api.exception.ComponentException;
 import ${packageTalend}.common.dataset.DatasetDefinition;
+import ${packageDaikon}.definition.DefinitionImageType;
 import ${packageDaikon}.definition.I18nDefinition;
 import ${packageDaikon}.runtime.RuntimeInfo;
 
@@ -49,9 +50,25 @@ public class ${componentNameClass}DatasetDefinition extends I18nDefinition imple
         }
     }
 
+    @Deprecated
     @Override
-    public String getImagePath() {
+    public String getImagePath(){
         return NAME + "_icon32.png";
     }
 
+    @Override
+    public String getImagePath(DefinitionImageType type) {
+        switch (type) {
+            case PALETTE_ICON_32X32:
+                return NAME + "_icon32.png";
+            case SVG_ICON:
+                return NAME + ".svg";
+        }
+        return null;
+    }
+
+    @Override
+    public String getIconKey() {
+        return null;
+    }
 }

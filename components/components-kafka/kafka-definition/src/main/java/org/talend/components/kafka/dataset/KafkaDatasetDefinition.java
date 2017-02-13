@@ -15,6 +15,7 @@ package org.talend.components.kafka.dataset;
 import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.common.dataset.DatasetDefinition;
+import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
@@ -38,9 +39,25 @@ public class KafkaDatasetDefinition extends I18nDefinition implements DatasetDef
                 "org.talend.components.kafka.runtime.KafkaDatasetRuntime");
     }
 
+    @Deprecated
     @Override
     public String getImagePath() {
         return "/org/talend/components/kafka/Kafka.svg";
     }
 
+    @Override
+    public String getImagePath(DefinitionImageType type) {
+        switch (type) {
+        case PALETTE_ICON_32X32:
+            return null;
+        case SVG_ICON:
+            return "/org/talend/components/kafka/Kafka.svg";
+        }
+        return null;
+    }
+
+    @Override
+    public String getIconKey() {
+        return "kafka";
+    }
 }

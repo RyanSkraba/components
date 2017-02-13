@@ -16,8 +16,8 @@ import org.apache.avro.Schema;
 import org.talend.daikon.NamedThing;
 
 /**
- * A connector is a token used by a component to define the avaialble inputs and outputs it has. It shall be used to
- * retreive the schema {@link Schema} associated with a connector if any. WARNING: this interface should not be
+ * A connector is a token used by a component to define the available inputs and outputs it has. It shall be used to
+ * retrieve the schema {@link Schema} associated with a connector if any. WARNING: this interface should not be
  * implemented by clients of the APIs, only the components will provide an implementations for it.
  */
 public interface Connector extends NamedThing {

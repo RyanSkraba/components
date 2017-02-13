@@ -45,6 +45,11 @@ public class SimpleFileIOInputDefinition extends AbstractComponentDefinition {
     }
 
     @Override
+    public String getIconKey() {
+        return "file-o";
+    }
+
+    @Override
     public String[] getFamilies() {
         return new String[] { SimpleFileIOComponentFamilyDefinition.NAME };
     }

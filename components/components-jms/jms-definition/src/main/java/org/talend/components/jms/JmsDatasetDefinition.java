@@ -16,6 +16,7 @@ package org.talend.components.jms;
 import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.common.dataset.DatasetDefinition;
+import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
@@ -41,9 +42,25 @@ public class JmsDatasetDefinition extends I18nDefinition implements DatasetDefin
                 RUNTIME_1_1);
     }
 
+    @Deprecated
     @Override
     public String getImagePath() {
         return "/org/talend/components/jms/input/JmsInput_icon32.png";
     }
 
+    @Override
+    public String getImagePath(DefinitionImageType type) {
+        switch (type) {
+        case PALETTE_ICON_32X32:
+            return "/org/talend/components/jms/input/JmsInput_icon32.png";
+        case SVG_ICON:
+            return null;
+        }
+        return null;
+    }
+
+    @Override
+    public String getIconKey() {
+        return null;
+    }
 }

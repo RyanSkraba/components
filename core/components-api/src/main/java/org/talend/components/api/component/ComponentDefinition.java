@@ -19,6 +19,7 @@ import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.definition.Definition;
+import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
@@ -105,7 +106,9 @@ public interface ComponentDefinition extends Definition<ComponentProperties> {
      * @see {@link java.lang.Class#getResourceAsStream(String)}
      * @param imageType the type of image requested
      * @return the path to the png resource or null if an image is not required.
+     * @deprecated use {@link #getImagePath(DefinitionImageType)}.
      */
+    @Deprecated
     String getPngImagePath(ComponentImageType imageType);
 
     //

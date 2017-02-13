@@ -45,8 +45,9 @@ public class ${componentNameClass}OutputDefinition extends AbstractComponentDefi
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology ctx){
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology topology){
         assertEngineCompatibility(engine);
+        assertConnectorTopologyCompatibility(topology);
         try{
             return new JarRuntimeInfo(new URL("mvn:org.talend.components/${componentNameLowerCase}-runtime"),
                     DependenciesReader.computeDependenciesFilePath("org.talend.components","${componentNameLowerCase}-runtime"),RUNTIME${runtimeVersionConverted});

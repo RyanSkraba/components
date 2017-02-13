@@ -1,4 +1,3 @@
-
 // ============================================================================
 //
 // Copyright (C) 2006-2017 Talend Inc. - www.talend.com
@@ -15,6 +14,7 @@ package org.talend.components.jdbc.dataset;
 
 import org.talend.components.common.dataset.DatasetDefinition;
 import org.talend.components.jdbc.JdbcRuntimeInfo;
+import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
@@ -35,9 +35,26 @@ public class JDBCDatasetDefinition extends I18nDefinition implements DatasetDefi
         return new JdbcRuntimeInfo(properties, "org.talend.components.jdbc.runtime.dataprep.JDBCDatasetRuntime");
     }
 
+    @Deprecated
     @Override
     public String getImagePath() {
         return NAME + "_icon32.png";
+    }
+
+    @Override
+    public String getImagePath(DefinitionImageType type) {
+        switch (type) {
+        case PALETTE_ICON_32X32:
+            return NAME + "_icon32.png";
+        case SVG_ICON:
+            return null;
+        }
+        return null;
+    }
+
+    @Override
+    public String getIconKey() {
+        return null;
     }
 
     @Override

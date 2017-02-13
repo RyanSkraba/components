@@ -20,6 +20,7 @@ import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.JarRuntimeInfo;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.dataset.DatasetDefinition;
+import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
@@ -38,9 +39,20 @@ public class SimpleFileIODatasetDefinition extends I18nDefinition implements Dat
         return SimpleFileIODatasetProperties.class;
     }
 
+    @Deprecated
     @Override
     public String getImagePath() {
-        return NAME + "_icon32.png";
+        return null;
+    }
+
+    @Override
+    public String getImagePath(DefinitionImageType type) {
+        return null;
+    }
+
+    @Override
+    public String getIconKey() {
+        return "file-o";
     }
 
     @Override
