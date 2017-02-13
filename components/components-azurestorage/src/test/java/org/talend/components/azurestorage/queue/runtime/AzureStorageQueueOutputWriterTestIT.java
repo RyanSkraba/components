@@ -18,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.properties.ComponentProperties;
@@ -26,6 +27,7 @@ import org.talend.components.azurestorage.queue.tazurestoragequeueoutput.TAzureS
 
 import com.microsoft.azure.storage.queue.CloudQueueMessage;
 
+@Ignore
 public class AzureStorageQueueOutputWriterTestIT extends AzureStorageBaseQueueTestIT {
 
     public AzureStorageQueueOutputWriterTestIT() {

@@ -15,6 +15,7 @@ package org.talend.components.azurestorage.queue.runtime;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.azurestorage.AzureStorageProvideConnectionProperties;
@@ -22,6 +23,7 @@ import org.talend.components.azurestorage.queue.tazurestoragequeueinput.TAzureSt
 
 import com.microsoft.azure.storage.queue.CloudQueueMessage;
 
+@Ignore
 public class AzureStorageQueueInputReaderTestIT extends AzureStorageBaseQueueTestIT {
 
     private TAzureStorageQueueInputProperties inputProps;

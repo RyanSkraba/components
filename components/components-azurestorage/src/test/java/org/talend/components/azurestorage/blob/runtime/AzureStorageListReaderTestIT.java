@@ -22,11 +22,13 @@ import java.util.List;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.azurestorage.blob.helpers.RemoteBlobsTable;
 import org.talend.components.azurestorage.blob.tazurestoragelist.TAzureStorageListProperties;
 
+@Ignore
 public class AzureStorageListReaderTestIT extends AzureStorageBaseBlobTestIT {
 
     private String CONTAINER;

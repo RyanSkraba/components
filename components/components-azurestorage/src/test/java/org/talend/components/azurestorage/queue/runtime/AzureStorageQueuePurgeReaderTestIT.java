@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.Writer;
@@ -26,6 +27,7 @@ import org.talend.components.azurestorage.AzureStorageProvideConnectionPropertie
 import org.talend.components.azurestorage.queue.tazurestoragequeueoutput.TAzureStorageQueueOutputProperties;
 import org.talend.components.azurestorage.queue.tazurestoragequeuepurge.TAzureStorageQueuePurgeProperties;
 
+@Ignore
 public class AzureStorageQueuePurgeReaderTestIT extends AzureStorageBaseQueueTestIT {
 
     public AzureStorageQueuePurgeReaderTestIT() {

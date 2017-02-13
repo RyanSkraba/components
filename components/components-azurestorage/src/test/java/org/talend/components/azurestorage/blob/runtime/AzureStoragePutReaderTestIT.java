@@ -18,11 +18,13 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.azurestorage.blob.tazurestoragecontainercreate.TAzureStorageContainerCreateProperties.AccessControl;
 import org.talend.components.azurestorage.blob.tazurestorageput.TAzureStoragePutProperties;
 
+@Ignore
 public class AzureStoragePutReaderTestIT extends AzureStorageBaseBlobTestIT {
 
     private String CONTAINER;

@@ -33,6 +33,7 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.Writer;
@@ -47,6 +48,7 @@ import org.talend.daikon.properties.ValidationResult;
 
 import com.microsoft.azure.storage.StorageException;
 
+@Ignore
 public class TAzureStorageOuputTableTestIT extends AzureStorageTableBaseTestIT {
 
     private String testString;

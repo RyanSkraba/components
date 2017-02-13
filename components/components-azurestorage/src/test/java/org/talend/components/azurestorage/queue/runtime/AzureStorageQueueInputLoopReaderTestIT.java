@@ -13,8 +13,10 @@
 package org.talend.components.azurestorage.queue.runtime;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.talend.components.azurestorage.queue.tazurestoragequeueinputloop.TAzureStorageQueueInputLoopProperties;
 
+@Ignore
 public class AzureStorageQueueInputLoopReaderTestIT extends AzureStorageBaseQueueTestIT {
 
     static AzureStorageQueueInputLoopReader reader;

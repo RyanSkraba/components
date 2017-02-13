@@ -16,9 +16,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.azurestorage.blob.tazurestoragecontainercreate.TAzureStorageContainerCreateProperties;
 
+@Ignore
 public class AzureStorageContainerDeleteReaderTestIT extends AzureStorageBaseBlobTestIT {
 
     public AzureStorageContainerDeleteReaderTestIT() {

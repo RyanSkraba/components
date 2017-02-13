@@ -28,6 +28,7 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.Writer;
@@ -37,6 +38,7 @@ import org.talend.components.azurestorage.table.tazurestorageoutputtable.TAzureS
 import org.talend.components.azurestorage.table.tazurestorageoutputtable.TAzureStorageOutputTableProperties.ActionOnTable;
 import org.talend.daikon.avro.AvroUtils;
 
+@Ignore
 public class TAzureStorageInputTableTestIT extends AzureStorageTableBaseTestIT {
 
     private TAzureStorageInputTableProperties properties;

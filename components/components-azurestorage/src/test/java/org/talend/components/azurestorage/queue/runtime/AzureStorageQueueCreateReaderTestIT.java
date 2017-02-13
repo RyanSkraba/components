@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.AfterClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.azurestorage.AzureStorageDefinition;
@@ -27,6 +28,7 @@ import org.talend.components.azurestorage.queue.tazurestoragequeuecreate.TAzureS
 
 import com.microsoft.azure.storage.queue.CloudQueue;
 
+@Ignore
 public class AzureStorageQueueCreateReaderTestIT extends AzureStorageBaseQueueTestIT {
 
     public AzureStorageQueueCreateReaderTestIT() {
