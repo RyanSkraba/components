@@ -12,6 +12,14 @@
 // ============================================================================
 package org.talend.components.snowflake.runtime;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
@@ -23,14 +31,6 @@ import org.talend.components.common.avro.JDBCResultSetIndexedRecordConverter;
 import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
 import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputProperties;
 import org.talend.daikon.avro.AvroUtils;
-
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Map;
-import java.util.NoSuchElementException;
 
 public class SnowflakeReader<T> extends AbstractBoundedReader<IndexedRecord> {
 
@@ -51,7 +51,6 @@ public class SnowflakeReader<T> extends AbstractBoundedReader<IndexedRecord> {
     private Statement statement;
 
     private Result result;
-
 
     public SnowflakeReader(RuntimeContainer container, BoundedSource source, TSnowflakeInputProperties props) throws IOException {
         super(source);
@@ -107,7 +106,6 @@ public class SnowflakeReader<T> extends AbstractBoundedReader<IndexedRecord> {
         return sb.toString();
     }
 
-
     @Override
     public boolean start() throws IOException {
         result = new Result();
@@ -162,7 +160,8 @@ public class SnowflakeReader<T> extends AbstractBoundedReader<IndexedRecord> {
             }
 
             if (connection != null) {
-                getConnection().close();
+                // getConnection().close();
+                ((SnowflakeSource) getCurrentSource()).closeConnection(container, connection);
             }
         } catch (SQLException e) {
             throw new IOException(e);
@@ -175,6 +174,5 @@ public class SnowflakeReader<T> extends AbstractBoundedReader<IndexedRecord> {
         result.totalCount = dataCount;
         return result.toMap();
     }
-
 
 }

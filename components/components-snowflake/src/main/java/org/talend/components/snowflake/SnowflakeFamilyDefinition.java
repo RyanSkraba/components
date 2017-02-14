@@ -15,13 +15,14 @@ package org.talend.components.snowflake;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
+import org.talend.components.snowflake.tsnowflakeclose.TSnowflakeCloseDefinition;
 import org.talend.components.snowflake.tsnowflakeconnection.TSnowflakeConnectionDefinition;
 import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputDefinition;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputDefinition;
 
-import aQute.bnd.annotation.component.Component;
-
 import com.google.auto.service.AutoService;
+
+import aQute.bnd.annotation.component.Component;
 
 /**
  * Install all of the definitions provided for the Snowflake family of components.
@@ -36,6 +37,7 @@ public class SnowflakeFamilyDefinition extends AbstractComponentFamilyDefinition
         super(NAME,
                 // Components
                 new TSnowflakeConnectionDefinition(), new TSnowflakeInputDefinition(), new TSnowflakeOutputDefinition(),
+                new TSnowflakeCloseDefinition(),
                 // Component wizards
                 new SnowflakeConnectionWizardDefinition(), new SnowflakeConnectionEditWizardDefinition(),
                 new SnowflakeTableWizardDefinition());
