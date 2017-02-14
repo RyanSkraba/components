@@ -9,6 +9,7 @@
 		<relativePath>../../components-parent/pom.xml</relativePath>
 	</parent>
 	<properties>
+	    <antlr4.version>4.6</antlr4.version>
 		<partner.version>37.0.3</partner.version>
 		<jetty.version>9.2.19.v20160908</jetty.version>
 	</properties>
@@ -58,6 +59,13 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+		<!-- guess schema feature dependency -->
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>${antlr4.version}</version>
+        </dependency>
 
 		<dependency>
 			<groupId>org.talend.components</groupId>
@@ -296,6 +304,23 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- used to generate soql antlr4 parser; is not included to lifecycle -->
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>${antlr4.version}</version>
+                <executions>
+                    <execution>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <outputDirectory>${project.build.sourceDirectory}/org/talend/components/salesforce/soql/parser</outputDirectory>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 </project>
