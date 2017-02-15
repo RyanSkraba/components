@@ -60,9 +60,9 @@ public abstract class AbstractSpringIntegrationTests {
     @MockBean
     protected DefinitionRegistryService delegate;
 
-    protected static final String DATA_STORE_DEFINITION_NAME = "data store definition name";
+    protected static final String DATA_STORE_DEFINITION_NAME = "MockDatastore";
 
-    protected static final String DATA_SET_DEFINITION_NAME = "dataset definition name";
+    protected static final String DATA_SET_DEFINITION_NAME = "MockDataset";
 
     public static final String TEST_DATA_STORE_PROPERTIES =
             "{\"@definitionName\":\"" + DATA_STORE_DEFINITION_NAME + "\",\"tag\":\"tata\", \"tagId\":\"256\"}";

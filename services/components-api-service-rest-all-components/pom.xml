@@ -13,7 +13,7 @@
 
 	<artifactId>components-api-service-rest-all-components</artifactId>
 
-	<name>Component Rest APIs packaged with all components</name>
+	<name>Component REST API packaged with all components</name>
 
 	<properties>
 		<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>

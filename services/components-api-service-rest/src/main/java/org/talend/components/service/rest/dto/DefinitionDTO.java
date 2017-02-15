@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.ExecutionEngine;
-import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.daikon.definition.Definition;
+import org.talend.daikon.definition.DefinitionImageType;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -39,6 +39,9 @@ public class DefinitionDTO {
 
     /** Icon representing the DS. */
     private String iconURL;
+
+    /** Optional icon key representing the DS. */
+    private String iconKey;
 
     /** Types supported by the DS. */
     private List<String> types;
@@ -73,7 +76,15 @@ public class DefinitionDTO {
     private DefinitionDTO(Definition origin) {
         this.name = origin.getName();
         this.label = origin.getDisplayName();
-        this.iconURL = buildImageUrl(origin.getName()); // TODO hmdebenque why not use origin.getImagePath() ?
+
+        // Get the first icon URL from the definition.
+        for (DefinitionImageType imageType : DefinitionImageType.values()) {
+            if (origin.getImagePath(imageType) != null) {
+                this.iconURL = buildIconUrl(origin, imageType);
+                break;
+            }
+        }
+        this.iconKey = origin.getIconKey();
     }
 
     /**
@@ -107,8 +118,8 @@ public class DefinitionDTO {
                 .collect(Collectors.toSet());
     }
 
-    private String buildImageUrl(String componentName) {
-        return "/components/wizards/" + componentName + "/icon/" + WizardImageType.TREE_ICON_16X16;
+    private String buildIconUrl(Definition origin, DefinitionImageType imageType) {
+        return "/properties/" + origin.getName() + "/icon/" + imageType;
     }
 
     public String getName() {
@@ -133,6 +144,14 @@ public class DefinitionDTO {
 
     public void setIconURL(String iconURL) {
         this.iconURL = iconURL;
+    }
+
+    public String getIconKey() {
+        return iconKey;
+    }
+
+    public void setIconKey(String iconURL) {
+        this.iconKey = iconURL;
     }
 
     public List<String> getTypes() {
@@ -189,6 +208,7 @@ public class DefinitionDTO {
                 "name='" + name + '\'' + //
                 ", label='" + label + '\'' + //
                 ", iconURL='" + iconURL + '\'' + //
+                ", iconKey='" + iconKey + '\'' + //
                 ", types=" + types + //
                 ", inputCompName='" + inputCompName + '\'' + //
                 ", outputCompName='" + outputCompName + '\'' + //

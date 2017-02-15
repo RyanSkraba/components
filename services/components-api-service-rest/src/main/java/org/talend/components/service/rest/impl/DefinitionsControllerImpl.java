@@ -76,7 +76,7 @@ public class DefinitionsControllerImpl implements DefinitionsController {
      * Return components that match the given typology and/or execution engine.
      *
      * @param typology the wanted typology.
-     * @param exeuctionEngine the wanted execution engine.
+     * @param executionEngine the wanted execution engine.
      * @return the list of all definitions that match the wanted typology.
      * @returnWrapped java.lang.Iterable<org.talend.components.service.rest.dto.DefinitionDTO>
      */

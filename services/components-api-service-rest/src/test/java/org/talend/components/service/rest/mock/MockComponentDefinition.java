@@ -1,4 +1,4 @@
-//==============================================================================
+// ==============================================================================
 //
 // Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
@@ -9,7 +9,7 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-//==============================================================================
+// ==============================================================================
 package org.talend.components.service.rest.mock;
 
 import static java.util.Arrays.asList;
@@ -33,28 +33,43 @@ public class MockComponentDefinition extends AbstractComponentDefinition {
 
     private String name;
 
+    private String iconKey;
+
     private Set<ConnectorTopology> topologies;
 
     public MockComponentDefinition(String name) {
-        super("mock " + name, ExecutionEngine.DI);
-        this.name = name;
-        this.topologies = new HashSet<>();
+        this(name, null, ExecutionEngine.DI);
     }
 
     public MockComponentDefinition(String name, ConnectorTopology... topologies) {
-        this(name);
+        this(name, (String) null, ExecutionEngine.DI, topologies);
+    }
+
+    public MockComponentDefinition(String name, ExecutionEngine engine, ConnectorTopology... topologies) {
+        this(name, null, engine, topologies);
+    }
+
+    public MockComponentDefinition(String name, String iconKey) {
+        this(name, iconKey, ExecutionEngine.DI);
+    }
+
+    public MockComponentDefinition(String name, String iconKey, ConnectorTopology... topologies) {
+        this(name, iconKey, ExecutionEngine.DI, topologies);
+    }
+
+    public MockComponentDefinition(String name, String iconKey, ExecutionEngine engine, ConnectorTopology... topologies) {
+        super("mock " + name, engine);
+        this.name = name;
+        this.iconKey = iconKey;
+        this.topologies = new HashSet<>();
         if (topologies != null) {
             this.topologies.addAll(asList(topologies));
         }
     }
 
-    public MockComponentDefinition(String name, ExecutionEngine engine, ConnectorTopology... topologies) {
-        super("mock " + name, engine);
-        this.name = name;
-        this.topologies = new HashSet<>();
-        if (topologies != null) {
-            this.topologies.addAll(asList(topologies));
-        }
+    @Override
+    public String getIconKey() {
+        return iconKey;
     }
 
     @Override

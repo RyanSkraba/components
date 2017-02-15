@@ -14,6 +14,7 @@ package org.talend.components.service.rest;
 
 import static com.jayway.restassured.RestAssured.when;
 import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpStatus.OK;
@@ -164,6 +165,20 @@ public class DefinitionsControllerTest extends AbstractSpringIntegrationTests {
     }
 
     @Test
+    public void shouldHaveIconKeyIfPresent() throws Exception {
+        // given
+        Map<String, ComponentDefinition> definitions = getComponentsDefinitions();
+        BDDMockito.given(delegate.getDefinitionsMapByType(ComponentDefinition.class)) //
+                .willReturn(definitions);
+
+        // then
+        when().get("/definitions/components").then() //
+                .statusCode(OK.value()) //
+                .body("iconKey", hasSize(14)) // total including nulls
+                .body("iconKey.findAll { iconKey -> iconKey != null }", hasSize(5)); // total non-null
+    }
+
+    @Test
     public void shouldNotFilterTypology() throws Exception {
         // given
         Map<String, ComponentDefinition> definitions = getComponentsDefinitions();
@@ -245,23 +260,23 @@ public class DefinitionsControllerTest extends AbstractSpringIntegrationTests {
 
     private Map<String, ComponentDefinition> getComponentsDefinitions() {
         Map<String, ComponentDefinition> definitions = new HashMap<>();
-        definitions.put("source_1", new MockComponentDefinition("source_1", INCOMING));
+        definitions.put("source_1", new MockComponentDefinition("source_1", "icon_key_source_1", INCOMING));
         definitions.put("source_2", new MockComponentDefinition("source_2", INCOMING));
         definitions.put("source_3", new MockComponentDefinition("source_2", ExecutionEngine.BEAM, INCOMING));
-        definitions.put("sink_1", new MockComponentDefinition("sink_1", OUTGOING));
+        definitions.put("sink_1", new MockComponentDefinition("sink_1", "icon_key_sink_1", OUTGOING));
         definitions.put("sink_2", new MockComponentDefinition("sink_2", ExecutionEngine.DI_SPARK_BATCH, OUTGOING));
         definitions.put("sink_3", new MockComponentDefinition("sink_3", ExecutionEngine.DI_SPARK_BATCH, OUTGOING));
-        definitions.put("transformer_1",
-                new MockComponentDefinition("transformer_1", ExecutionEngine.DI_SPARK_STREAMING, INCOMING_AND_OUTGOING));
-        definitions.put("transformer_2",
-                new MockComponentDefinition("transformer_2", ExecutionEngine.DI_SPARK_STREAMING, INCOMING_AND_OUTGOING));
-        definitions.put("transformer_3",
-                new MockComponentDefinition("transformer_3", ExecutionEngine.DI_SPARK_STREAMING, INCOMING_AND_OUTGOING));
-        definitions.put("config_1", new MockComponentDefinition("config_1", NONE));
+        definitions.put("transformer_1", new MockComponentDefinition("transformer_1", "icon_key_transformer_1",
+                ExecutionEngine.DI_SPARK_STREAMING, INCOMING_AND_OUTGOING));
+        definitions.put("transformer_2", new MockComponentDefinition("transformer_2", ExecutionEngine.DI_SPARK_STREAMING,
+                INCOMING_AND_OUTGOING));
+        definitions.put("transformer_3", new MockComponentDefinition("transformer_3", ExecutionEngine.DI_SPARK_STREAMING,
+                INCOMING_AND_OUTGOING));
+        definitions.put("config_1", new MockComponentDefinition("config_1", "icon_key_config_1", NONE));
         definitions.put("config_2", new MockComponentDefinition("config_2", NONE));
         definitions.put("config_3", new MockComponentDefinition("config_3", NONE));
-        definitions.put("s&s_1", new MockComponentDefinition("config_3", INCOMING, OUTGOING));
-        definitions.put("s&s_2", new MockComponentDefinition("config_3", INCOMING, OUTGOING));
+        definitions.put("s&s_1", new MockComponentDefinition("ss_1", "icon_key_ss_1", INCOMING, OUTGOING));
+        definitions.put("s&s_2", new MockComponentDefinition("ss_2", INCOMING, OUTGOING));
         return definitions;
     }
 }

@@ -1,4 +1,4 @@
-//==============================================================================
+// ==============================================================================
 //
 // Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
@@ -9,12 +9,25 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-//==============================================================================
+// ==============================================================================
 
 package org.talend.components.service.rest.impl;
 
+import static java.util.Collections.emptyList;
+import static org.apache.commons.lang3.Validate.notNull;
+import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.OK;
+
+import java.io.InputStream;
+
+import javax.activation.MimetypesFileTypeMap;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.common.dataset.DatasetProperties;
@@ -26,18 +39,13 @@ import org.talend.components.service.rest.dto.ValidationResultsDto;
 import org.talend.components.service.rest.serialization.JsonSerializationHelper;
 import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.definition.Definition;
+import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.serialize.jsonschema.PropertyTrigger;
-
-import static java.util.Collections.emptyList;
-import static org.apache.commons.lang3.Validate.notNull;
-import static org.slf4j.LoggerFactory.getLogger;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.OK;
 
 @ServiceImplementation
 public class PropertiesControllerImpl implements PropertiesController {
@@ -92,11 +100,43 @@ public class PropertiesControllerImpl implements PropertiesController {
     }
 
     @Override
+    public ResponseEntity<InputStreamResource> getIcon(String definitionName, DefinitionImageType imageType) {
+        notNull(definitionName, "Definition name cannot be null.");
+        notNull(imageType, "Definition image type cannot be null.");
+        final Definition<?> definition = propertiesHelpers.getDefinition(definitionName);
+        notNull(definition, "Could not find definition of name %s", definitionName);
+
+        // Undefined and missing icon resources are simply 404.
+        String imagePath = definition.getImagePath(imageType);
+        if (imagePath == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        InputStream is = definition.getClass().getResourceAsStream(imagePath);
+        if (is == null) {
+            log.info("The image type %s should exist for %s at %s, but is missing. "
+                    + "The component should provide this resource.", imageType, definitionName, imagePath);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // At this point, we have enough information for a correct response.
+        ResponseEntity.BodyBuilder response = ResponseEntity.ok();
+
+        // Add the content type if it can be determined.
+        MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
+        String contentType = mimeTypesMap.getContentType(imagePath);
+        if (contentType != null) {
+            response = response.contentType(MediaType.parseMediaType(contentType));
+        }
+
+        return response.body(new InputStreamResource(is));
+    }
+
+    @Override
     public ResponseEntity<String> triggerOnProperty(String definition, //
-                                                    PropertyTrigger trigger, //
-                                                    String property, //
-                                                    String formName, //
-                                                    PropertiesDto propertiesContainer) {
+            PropertyTrigger trigger, //
+            String property, //
+            String formName, //
+            PropertiesDto propertiesContainer) {
         Properties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
 
         String response;

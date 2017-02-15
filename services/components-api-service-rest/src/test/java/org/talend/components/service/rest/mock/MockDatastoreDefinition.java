@@ -80,6 +80,16 @@ public class MockDatastoreDefinition extends SimpleNamedThing implements Datasto
 
     @Override
     public String getImagePath(DefinitionImageType type) {
+        switch(type) {
+            case SVG_ICON:
+                break;
+            case PALETTE_ICON_32X32:
+                return "/org/talend/components/mock/mock_" + name + "_icon32.png";
+            case TREE_ICON_16X16:
+                break;
+            case WIZARD_BANNER_75X66:
+                break;
+        }
         return null;
     }
 

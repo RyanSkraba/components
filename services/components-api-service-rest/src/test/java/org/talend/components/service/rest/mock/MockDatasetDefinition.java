@@ -1,4 +1,4 @@
-//==============================================================================
+// ==============================================================================
 //
 // Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
@@ -9,7 +9,7 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-//==============================================================================
+// ==============================================================================
 package org.talend.components.service.rest.mock;
 
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
@@ -41,7 +41,7 @@ public class MockDatasetDefinition extends SimpleNamedThing implements DatasetDe
 
     @Override
     public String getDisplayName() {
-        return "mock " + name + " datastore";
+        return "mock " + name + " dataset";
     }
 
     @Override
@@ -57,6 +57,16 @@ public class MockDatasetDefinition extends SimpleNamedThing implements DatasetDe
 
     @Override
     public String getImagePath(DefinitionImageType type) {
+        switch (type) {
+        case SVG_ICON:
+            return "/org/talend/components/mock/mock_" + name + ".svg";
+        case PALETTE_ICON_32X32:
+            break;
+        case TREE_ICON_16X16:
+            break;
+        case WIZARD_BANNER_75X66:
+            break;
+        }
         return null;
     }
 
