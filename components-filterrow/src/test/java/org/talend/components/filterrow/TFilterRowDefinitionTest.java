@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.filterrow.runtime.TFilterRowSink;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -68,7 +69,7 @@ public class TFilterRowDefinitionTest {
     @Test
     public void testGetRuntime() {
         TFilterRowDefinition definition = new TFilterRowDefinition();
-        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(null, ConnectorTopology.INCOMING_AND_OUTGOING);
+        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(ExecutionEngine.DI, null, ConnectorTopology.INCOMING_AND_OUTGOING);
         SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, definition.getClass().getClassLoader());
         Sink source = (Sink) sandboxedInstance.getInstance();
         assertThat(source, is(instanceOf(TFilterRowSink.class)));
