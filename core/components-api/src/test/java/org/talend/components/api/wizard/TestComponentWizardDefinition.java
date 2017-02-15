@@ -14,6 +14,7 @@ package org.talend.components.api.wizard;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.testcomponent.TestComponentProperties;
+import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.i18n.GlobalI18N;
 
 public class TestComponentWizardDefinition extends AbstractComponentWizardDefintion {
@@ -52,4 +53,17 @@ public class TestComponentWizardDefinition extends AbstractComponentWizardDefint
         return true;
     }
 
+    @Override
+    public String getImagePath(DefinitionImageType type) {
+        switch (type) {
+            case TREE_ICON_16X16:
+                return "connectionWizardIcon.png";
+        }
+        return null;
+    }
+
+    @Override
+    public String getIconKey() {
+        return null;
+    }
 }

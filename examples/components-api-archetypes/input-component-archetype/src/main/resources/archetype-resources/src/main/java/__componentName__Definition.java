@@ -59,25 +59,21 @@ public class ${componentName}Definition extends AbstractComponentDefinition {
     }
 
     @Override
-    public String getPngImagePath(ComponentImageType imageType) {
-        switch (imageType) {
-        case PALLETE_ICON_32X32:
-            return "fileReader_icon32.png"; //$NON-NLS-1$
-        default:
-            return "fileReader_icon32.png"; //$NON-NLS-1$
-        }
+    public String getIconKey() {
+        // Icon keys are standard icons that can be used by a product.
+        return "file-o";
     }
-    
+
     @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return ${componentName}Properties.class;
     }
 
-    
     @Override
-    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology componentType) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology topology) {
         assertEngineCompatibility(engine);
-        if (componentType == ConnectorTopology.OUTGOING) {
+        assertConnectorTopologyCompatibility(topology);
+        if (topology == ConnectorTopology.OUTGOING) {
             return new SimpleRuntimeInfo(this.getClass().getClassLoader(), DependenciesReader.computeDependenciesFilePath("${groupId}", "${artifactId}"), ${componentName}Source.class.getCanonicalName());
         } else {
             return null;
@@ -88,5 +84,4 @@ public class ${componentName}Definition extends AbstractComponentDefinition {
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
         return EnumSet.of(ConnectorTopology.OUTGOING);
     } 
-    
 }

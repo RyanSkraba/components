@@ -23,9 +23,9 @@ import ${packageTalend}.common.dataset.DatasetProperties;
 import ${packageTalend}.common.datastore.DatastoreDefinition;
 import ${packageTalend}.${componentNameLowerCase}.input.${componentName}InputDefinition;
 import ${packageTalend}.${componentNameLowerCase}.output.${componentName}OutputDefinition;
+import ${packageDaikon}.definition.DefinitionImageType;
 import ${packageDaikon}.definition.I18nDefinition;
 import ${packageDaikon}.runtime.RuntimeInfo;
-
 
 public class ${componentNameClass}DatastoreDefinition extends I18nDefinition implements DatastoreDefinition<${componentNameClass}DatastoreProperties> {
 
@@ -52,9 +52,26 @@ public class ${componentNameClass}DatastoreDefinition extends I18nDefinition imp
         }
     }
 
+    @Deprecated
     @Override
     public String getImagePath(){
         return NAME + "_icon32.png";
+    }
+
+    @Override
+    public String getImagePath(DefinitionImageType type) {
+        switch (type) {
+            case PALETTE_ICON_32X32:
+                return NAME + "_icon32.png";
+            case SVG_ICON:
+                return NAME + ".svg";
+        }
+        return null;
+    }
+
+    @Override
+    public String getIconKey() {
+        return null;
     }
 
     @Override

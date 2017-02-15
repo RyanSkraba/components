@@ -14,6 +14,7 @@ package org.talend.components.api.wizard;
 
 import org.talend.components.api.AbstractTopLevelDefinition;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.definition.DefinitionImageType;
 
 public abstract class AbstractComponentWizardDefintion extends AbstractTopLevelDefinition implements ComponentWizardDefinition {
 
@@ -40,9 +41,10 @@ public abstract class AbstractComponentWizardDefintion extends AbstractTopLevelD
         return false;
     }
 
+    @Deprecated
     @Override
     public String getImagePath() {
-        return getPngImagePath(WizardImageType.TREE_ICON_16X16);
+        return getImagePath(DefinitionImageType.TREE_ICON_16X16);
     }
 
     @Override

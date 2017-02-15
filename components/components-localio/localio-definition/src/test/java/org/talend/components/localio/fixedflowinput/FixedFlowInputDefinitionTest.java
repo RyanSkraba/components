@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
-import org.talend.components.localio.LocalIOFamilyDefinition;
+import org.talend.components.localio.LocalIOComponentFamilyDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 public class FixedFlowInputDefinitionTest {
@@ -39,7 +39,7 @@ public class FixedFlowInputDefinitionTest {
     @Test
     public void testGetFamilies() {
         String[] families = definition.getFamilies();
-        assertThat(families, arrayContaining(LocalIOFamilyDefinition.NAME));
+        assertThat(families, arrayContaining(LocalIOComponentFamilyDefinition.NAME));
     }
 
     /**

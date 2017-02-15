@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.adapter.beam.transform;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +26,7 @@ import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.hamcrest.Matchers;
+import org.junit.Rule;
 import org.junit.Test;
 import org.talend.daikon.java8.Consumer;
 
@@ -33,6 +34,8 @@ import org.talend.daikon.java8.Consumer;
  * Unit tests for {@link DirectConsumerCollector}.
  */
 public class DirectConsumerCollectorTest {
+    @Rule
+    public TestPipeline pipeline = TestPipeline.create();
 
     /**
      * Demonstrates the basic use case for the {@link DirectConsumerCollector}.
@@ -51,9 +54,7 @@ public class DirectConsumerCollectorTest {
         try (DirectConsumerCollector<String> before = DirectConsumerCollector.of(beforeConsumer); //
                 DirectConsumerCollector<Integer> after = DirectConsumerCollector.of(afterConsumer);) {
 
-            Pipeline p = TestPipeline.create();
-
-            PCollection<String> input = p.apply( //
+            PCollection<String> input = pipeline.apply( //
                     Create.of("one", "two", "three")); //
 
             // Collect the results before and after the transformation.
@@ -66,7 +67,7 @@ public class DirectConsumerCollectorTest {
             PAssert.that(output).containsInAnyOrder(3, 3, 5);
 
             // Run the pipeline to fill the collectors.
-            PipelineResult pr = p.run();
+            pipeline.run().waitUntilFinish();
 
             assertThat(DirectConsumerCollector.getUids(), Matchers.<String> iterableWithSize(2));
         }

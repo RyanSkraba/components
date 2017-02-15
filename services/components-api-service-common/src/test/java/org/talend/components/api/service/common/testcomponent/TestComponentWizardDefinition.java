@@ -16,6 +16,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.wizard.AbstractComponentWizardDefintion;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.WizardImageType;
+import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.i18n.GlobalI18N;
 
 public class TestComponentWizardDefinition extends AbstractComponentWizardDefintion {
@@ -27,9 +28,20 @@ public class TestComponentWizardDefinition extends AbstractComponentWizardDefint
         return COMPONENT_WIZARD_NAME;
     }
 
+    @Deprecated
     @Override
     public String getPngImagePath(WizardImageType imageType) {
         return "connectionWizardIcon.png";
+    }
+
+    @Override
+    public String getImagePath(DefinitionImageType type) {
+        return "connectionWizardIcon.png";
+    }
+
+    @Override
+    public String getIconKey() {
+        return null;
     }
 
     @Override

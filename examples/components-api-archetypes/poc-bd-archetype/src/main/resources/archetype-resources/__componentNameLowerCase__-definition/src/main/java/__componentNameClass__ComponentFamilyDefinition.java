@@ -21,9 +21,12 @@ import ${package}.output.${componentNameClass}OutputDefinition;
 
 import aQute.bnd.annotation.component.Component;
 
+import com.google.auto.service.AutoService;
+
 /**
  * Install all of the definitions provided for the ${componentName} family of components.
  */
+@AutoService(ComponentInstaller.class)
 @Component(name = Constants.COMPONENT_INSTALLER_PREFIX
         + ${componentNameClass}ComponentFamilyDefinition.NAME, provide = ComponentInstaller.class)
 public class ${componentNameClass}ComponentFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {

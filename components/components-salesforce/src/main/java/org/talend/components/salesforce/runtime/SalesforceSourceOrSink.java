@@ -25,6 +25,7 @@ import java.util.Properties;
 import javax.xml.namespace.QName;
 
 import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +38,12 @@ import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
 import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnection;
+import org.talend.components.salesforce.schema.SalesforceSchemaHelper;
+import org.talend.components.salesforce.soql.FieldDescription;
+import org.talend.components.salesforce.soql.SoqlQuery;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.runtime.RuntimeUtil;
@@ -46,18 +51,16 @@ import org.talend.daikon.sandbox.SandboxedInstance;
 
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.BulkConnection;
-import com.sforce.soap.partner.DescribeGlobalResult;
-import com.sforce.soap.partner.DescribeGlobalSObjectResult;
-import com.sforce.soap.partner.DescribeSObjectResult;
-import com.sforce.soap.partner.GetUserInfoResult;
-import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.*;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 import com.sforce.ws.SessionRenewer;
 
-public class SalesforceSourceOrSink implements SourceOrSink {
+public class SalesforceSourceOrSink implements SourceOrSink, SalesforceSchemaHelper<Schema> {
 
     private transient static final Logger LOG = LoggerFactory.getLogger(SalesforceSourceOrSink.class);
+
+    private transient static final Schema DEFAULT_GUESS_SCHEMA_TYPE = AvroUtils._string();
 
     protected static final String API_VERSION = "34.0";
 
@@ -72,6 +75,8 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     protected static final String MAX_VALID_SECONDS = "MAX_VALID_SECONDS";
 
     protected static final String SESSION_FILE_PREFX = "sessionIDFile_";
+
+    private static final String EXCEPTION_MESSAGE = "Failed!";
 
     private String sessionFilePath;
 
@@ -159,6 +164,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
 
     /**
      * Create a connection with specified connector configuration
+     * 
      * @param config connector configuration with endpoint/userId/password
      * @param openNewSession whether need to create new session
      * @return PartnerConnection object with correct session id
@@ -184,7 +190,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
             this.sessionId = config.getSessionId();
             this.serviceEndPoint = config.getServiceEndpoint();
             if (this.sessionId != null && this.serviceEndPoint != null) {
-                //update session file with current sessionId/serviceEndPoint
+                // update session file with current sessionId/serviceEndPoint
                 setupSessionProperties(connection);
             }
         }
@@ -415,8 +421,7 @@ public class SalesforceSourceOrSink implements SourceOrSink {
     }
 
     /**
-     * This is for Buck connection session renew
-     * It can't called automatically with current force-wsc api
+     * This is for Buck connection session renew It can't called automatically with current force-wsc api
      */
     protected void renewSession(ConnectorConfig config) throws ConnectionException {
         LOG.debug("renew session bulk connection");
@@ -496,6 +501,34 @@ public class SalesforceSourceOrSink implements SourceOrSink {
                 + connectionProperties.userPassword.userId.getValue();
         return (SalesforceConnectionProperties.LoginType.Basic == connectionProperties.loginType.getValue())
                 && connectionProperties.reuseSession.getValue() && !StringUtils.isEmpty(sessionFilePath);
+    }
+
+    @Override
+    public Schema guessSchema(String soqlQuery) throws IOException, ConnectionException {
+        SoqlQuery query = SoqlQuery.getInstance();
+        query.init(soqlQuery);
+
+        List<FieldDescription> fieldDescriptions = query.getFieldDescriptions();
+        String drivingEntityName = query.getDrivingEntityName();
+
+        SchemaBuilder.FieldAssembler fieldAssembler = SchemaBuilder.record("GuessedSchema").fields();
+
+        DescribeSObjectResult describeSObjectResult = connect(null).connection.describeSObject(drivingEntityName);
+
+        Schema entitySchema = SalesforceAvroRegistry.get().inferSchema(describeSObjectResult);
+
+        for (FieldDescription fieldDescription : fieldDescriptions) {
+            Schema.Field schemaField = entitySchema.getField(fieldDescription.getSimpleName());
+            Schema fieldType = null;
+            if (schemaField != null) {
+                fieldType = schemaField.schema();
+            } else {
+                fieldType = DEFAULT_GUESS_SCHEMA_TYPE;
+            }
+            fieldAssembler.name(fieldDescription.getFullName()).type(fieldType).noDefault();
+        }
+
+        return (Schema) fieldAssembler.endRecord();
     }
 
 }

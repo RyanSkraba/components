@@ -1,0 +1,14 @@
+WS=1
+COMMA=2
+DOT=3
+LPAR=4
+RPAR=5
+FROM=6
+SELECT=7
+NAME=8
+ANYCHAR=9
+BY=10
+','=2
+'.'=3
+'('=4
+')'=5

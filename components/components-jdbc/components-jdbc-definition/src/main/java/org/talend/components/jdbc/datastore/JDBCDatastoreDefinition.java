@@ -18,6 +18,7 @@ import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.jdbc.JdbcRuntimeInfo;
 import org.talend.components.jdbc.dataprep.JDBCInputDefinition;
 import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
+import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
@@ -58,9 +59,26 @@ public class JDBCDatastoreDefinition extends I18nDefinition implements Datastore
         return null;
     }
 
+    @Deprecated
     @Override
     public String getImagePath() {
         return NAME + "_icon32.png";
+    }
+
+    @Override
+    public String getImagePath(DefinitionImageType type) {
+        switch (type) {
+        case PALETTE_ICON_32X32:
+            return NAME + "_icon32.png";
+        case SVG_ICON:
+            return null;
+        }
+        return null;
+    }
+
+    @Override
+    public String getIconKey() {
+        return null;
     }
 
     @Override

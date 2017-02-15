@@ -18,6 +18,7 @@ import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.common.datastore.runtime.DatastoreRuntime;
 import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
@@ -71,9 +72,21 @@ public class MockDatastoreDefinition extends SimpleNamedThing implements Datasto
         return "mock " + name;
     }
 
+    @Deprecated
     @Override
     public String getImagePath() {
         return "/org/talend/components/mock/mock_" + name + "_icon32.png";
     }
+
+    @Override
+    public String getImagePath(DefinitionImageType type) {
+        return null;
+    }
+
+    @Override
+    public String getIconKey() {
+        return null;
+    }
+
 
 }

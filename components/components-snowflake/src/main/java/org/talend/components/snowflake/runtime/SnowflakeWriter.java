@@ -12,7 +12,22 @@
 // ============================================================================
 package org.talend.components.snowflake.runtime;
 
-import com.snowflake.client.loader.*;
+import static org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction.UPSERT;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData;
@@ -27,21 +42,27 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction.UPSERT;
+import com.snowflake.client.loader.LoadResultListener;
+import com.snowflake.client.loader.LoaderFactory;
+import com.snowflake.client.loader.LoaderProperty;
+import com.snowflake.client.loader.LoadingError;
+import com.snowflake.client.loader.Operation;
+import com.snowflake.client.loader.StreamLoader;
 
 public final class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
+
+    private static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+
+    private static SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss.SSS");
+
+    private static SimpleDateFormat timestampFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSXXX");
 
     private StreamLoader loader;
 
     private final SnowflakeWriteOperation snowflakeWriteOperation;
 
     private Connection uploadConnection;
+
     private Connection processingConnection;
 
     private Object[] row;
@@ -68,6 +89,12 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
 
     private transient Schema mainSchema;
 
+    static {
+        // Time in milliseconds would mean time from midnight. It shouldn't be influenced by timezone differences.
+        // That's why we have to use GMT.
+        timeFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
+
     @Override
     public Iterable<IndexedRecord> getSuccessfulWrites() {
         return new ArrayList<IndexedRecord>();
@@ -79,15 +106,21 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
     }
 
     class ResultListener implements LoadResultListener {
+
         final private List<IndexedRecord> errors = new ArrayList<>();
 
         final private AtomicInteger errorCount = new AtomicInteger(0);
+
         final private AtomicInteger errorRecordCount = new AtomicInteger(0);
 
         final public AtomicInteger counter = new AtomicInteger(0);
+
         final public AtomicInteger processed = new AtomicInteger(0);
+
         final public AtomicInteger deleted = new AtomicInteger(0);
+
         final public AtomicInteger updated = new AtomicInteger(0);
+
         final private AtomicInteger submittedRowCount = new AtomicInteger(0);
 
         private Object[] lastRecord = null;
@@ -238,18 +271,18 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         prop.put(LoaderProperty.schemaName, connectionProperties.schemaName.getStringValue());
         prop.put(LoaderProperty.databaseName, connectionProperties.db.getStringValue());
         switch (sprops.outputAction.getValue()) {
-            case INSERT:
-                prop.put(LoaderProperty.operation, Operation.INSERT);
-                break;
-            case UPDATE:
-                prop.put(LoaderProperty.operation, Operation.MODIFY);
-                break;
-            case UPSERT:
-                prop.put(LoaderProperty.operation, Operation.UPSERT);
-                break;
-            case DELETE:
-                prop.put(LoaderProperty.operation, Operation.DELETE);
-                break;
+        case INSERT:
+            prop.put(LoaderProperty.operation, Operation.INSERT);
+            break;
+        case UPDATE:
+            prop.put(LoaderProperty.operation, Operation.MODIFY);
+            break;
+        case UPSERT:
+            prop.put(LoaderProperty.operation, Operation.UPSERT);
+            break;
+        case DELETE:
+            prop.put(LoaderProperty.operation, Operation.DELETE);
+            break;
         }
 
         List<Field> columns = mainSchema.getFields();
@@ -295,10 +328,44 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         List<Schema.Field> fields = input.getSchema().getFields();
         for (int i = 0; i < row.length; i++) {
             Field f = fields.get(i);
-            // Date is the only thing that requires conversion
-            if (AvroUtils.isSameType(f.schema(), AvroUtils._date())) {
+            Schema s = AvroUtils.unwrapIfNullable(f.schema());
+            Object inputValue = input.get(i);
+            if (inputValue instanceof String || inputValue == null) {
+                row[i] = input.get(i);
+            } else if (AvroUtils.isSameType(s, AvroUtils._date())) {
                 Date date = (Date) input.get(i);
                 row[i] = date.getTime();
+            } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.timeMillis()) {
+                Date date = new Date((int) input.get(i));
+                row[i] = timeFormatter.format(date);
+            } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.date()) {
+                Date date = null;
+                if (input.get(i) instanceof Date) {
+                    // Sometimes it can be sent as a Date object. We need to process it like a common date then.
+                    date = (Date) input.get(i);
+                } else if (input.get(i) instanceof Integer) {
+                    // If the date is int, it represents amount of days from 1970(no timezone). So if the date is
+                    // 14.01.2017 it shouldn't be influenced by timezones time differences. It should be the same date
+                    // in any timezone.
+                    Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+                    c.setTimeInMillis(0);
+                    c.add(Calendar.DATE, (Integer) input.get(i));
+                    c.setTimeZone(TimeZone.getDefault());
+                    long timeInMillis = c.getTime().getTime();
+                    date = new Date(timeInMillis - c.getTimeZone().getOffset(timeInMillis));
+                } else {
+                    // long is just a common timestamp value.
+                    date = new Date((Long) input.get(i));
+                }
+                row[i] = dateFormatter.format(date);
+            } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.timestampMillis()) {
+                if (inputValue instanceof Date) {
+                    row[i] = timestampFormatter.format(inputValue);
+                } else if (inputValue instanceof Long) {
+                    row[i] = timestampFormatter.format(new Date((Long) inputValue));
+                } else {
+                    row[i] = inputValue;
+                }
             } else {
                 row[i] = input.get(i);
             }
@@ -329,7 +396,6 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
 
         return new Result(uId, listener.getSubmittedRowCount(), listener.counter.get(), listener.getErrorRecordCount());
     }
-
 
     @Override
     public WriteOperation<Result> getWriteOperation() {

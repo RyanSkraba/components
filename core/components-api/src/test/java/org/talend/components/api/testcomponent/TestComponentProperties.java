@@ -82,7 +82,8 @@ public class TestComponentProperties extends ComponentPropertiesImpl implements 
 
     public InheritedComponentProperties nestedProp3 = new InheritedComponentProperties("nestedProp3");
 
-    public ComponentReferenceProperties referencedComponent = new ComponentReferenceProperties("referencedComponent", this);
+    public ComponentReferenceProperties referencedComponent = new ComponentReferenceProperties("referencedComponent",
+            TestComponentDefinition.COMPONENT_NAME);
 
     public static final String TESTCOMPONENT = "TestComponent";
 
@@ -147,7 +148,6 @@ public class TestComponentProperties extends ComponentPropertiesImpl implements 
 
         Form refForm = new Form(this, Form.REFERENCE);
         Widget compListWidget = widget(referencedComponent).setWidgetType(Widget.COMPONENT_REFERENCE_WIDGET_TYPE);
-        referencedComponent.componentType.setValue("refComp");
         refForm.addRow(compListWidget);
         refForm.addRow(mainForm);
     }

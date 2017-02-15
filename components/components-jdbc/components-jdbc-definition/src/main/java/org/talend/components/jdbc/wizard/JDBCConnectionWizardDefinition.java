@@ -16,6 +16,7 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.wizard.AbstractComponentWizardDefintion;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.WizardImageType;
+import org.talend.daikon.definition.DefinitionImageType;
 
 /**
  * JDBC wizard
@@ -47,18 +48,35 @@ public class JDBCConnectionWizardDefinition extends AbstractComponentWizardDefin
         return wizard;
     }
 
+    @Deprecated
     @Override
     public String getPngImagePath(WizardImageType imageType) {
-        // TODO change the picture content for JDBC, now only rename it
         switch (imageType) {
-        case TREE_ICON_16X16:
-            return "connectionWizardIcon.png"; //$NON-NLS-1$
-        case WIZARD_BANNER_75X66:
-            return "JDBCWizardBanner.png"; //$NON-NLS-1$
-
-        default:
-            // will return null
+            case TREE_ICON_16X16:
+                return getImagePath(DefinitionImageType.TREE_ICON_16X16);
+            case WIZARD_BANNER_75X66:
+                return getImagePath(DefinitionImageType.WIZARD_BANNER_75X66);
+            default:
+                // will return null
         }
+        return null;
+    }
+
+    @Override
+    public String getImagePath(DefinitionImageType type) {
+        switch (type) {
+            case TREE_ICON_16X16:
+                return "connectionWizardIcon.png"; //$NON-NLS-1$
+            case WIZARD_BANNER_75X66:
+                return "JDBCWizardBanner.png"; //$NON-NLS-1$
+            default:
+                // will return null
+        }
+        return null;
+    }
+
+    @Override
+    public String getIconKey() {
         return null;
     }
 

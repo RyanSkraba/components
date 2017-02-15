@@ -18,13 +18,19 @@
 
 		<!-- APIs for all Components -->
 		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- Annotation processing -->
+		<dependency>
 			<groupId>biz.aQute.bnd</groupId>
 			<artifactId>annotation</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-api</artifactId>
-			<version>${project.version}</version>
+			<groupId>com.google.auto.service</groupId>
+			<artifactId>auto-service</artifactId>
 		</dependency>
 
 		<!-- Shared component properties such as Use/Password or Schema -->
@@ -87,7 +93,9 @@
 							<instructions>
 								<Bundle-SymbolicName>org.talend.components.splunk.lib</Bundle-SymbolicName>
 								<Bundle-Name>${project.name} lib</Bundle-Name>
-								<Include-Resource>{maven-resources},META-INF/maven/org.talend.components/components-splunk/dependencies.txt=target/classes/META-INF/maven/org.talend.components/components-splunk/dependencies.txt</Include-Resource>
+								<Include-Resource>
+									{maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
+								</Include-Resource>
 								<Service-Component>*</Service-Component>
 								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
 							</instructions>
@@ -127,8 +135,10 @@
 								<Bundle-SymbolicName>org.talend.components.splunk</Bundle-SymbolicName>
 								<Service-Component>*</Service-Component>
 								<Import-Package>*,aQute.bnd.annotation.component</Import-Package>
-								<Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*</Embed-Dependency>
-								<Include-Resource>{maven-resources},META-INF/maven/org.talend.components/components-splunk/dependencies.txt=target/classes/META-INF/maven/org.talend.components/components-splunk/dependencies.txt</Include-Resource>
+								<Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*|auto-service</Embed-Dependency>
+								<Include-Resource>
+									{maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
+								</Include-Resource>
 								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
 							</instructions>
 						</configuration>

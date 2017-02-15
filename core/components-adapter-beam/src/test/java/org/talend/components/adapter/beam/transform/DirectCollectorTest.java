@@ -20,8 +20,6 @@ import java.util.List;
 import org.apache.beam.runners.direct.DirectRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
-import org.apache.beam.sdk.options.PipelineOptions;
-import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Create;
@@ -29,12 +27,16 @@ import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.hamcrest.Matchers;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * Unit tests for {@link DirectCollector}.
  */
 public class DirectCollectorTest {
+
+    @Rule
+    public TestPipeline pipeline = TestPipeline.create();
 
     /**
      * Demonstrates the basic use case for the {@link DirectCollector}.
@@ -50,9 +52,7 @@ public class DirectCollectorTest {
         try (DirectCollector<String> before = DirectCollector.of(); //
                 DirectCollector<Integer> after = DirectCollector.of();) {
 
-            Pipeline p = TestPipeline.create();
-
-            PCollection<String> input = p.apply( //
+            PCollection<String> input = pipeline.apply( //
                     Create.of("one", "two", "three")); //
 
             // Collect the results before and after the transformation.
@@ -65,8 +65,7 @@ public class DirectCollectorTest {
             PAssert.that(output).containsInAnyOrder(3, 3, 5);
 
             // Run the pipeline to fill the collectors.
-            PipelineResult pr = p.run();
-            DirectRunner.DirectPipelineResult dpr = (DirectRunner.DirectPipelineResult) pr;
+            pipeline.run().waitUntilFinish();;
 
             // Validate the contents of the collected outputs.
             List<String> beforeCollection = before.getRecords();

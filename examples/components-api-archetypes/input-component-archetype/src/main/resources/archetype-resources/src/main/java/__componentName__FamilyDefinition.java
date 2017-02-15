@@ -29,9 +29,12 @@ import org.talend.daikon.i18n.I18nMessages;
 
 import aQute.bnd.annotation.component.Component;
 
+import com.google.auto.service.AutoService;
+
 /**
  * Install all of the definitions provided for the ${componentName} family of components.
  */
+@AutoService(ComponentInstaller.class)
 @Component(name = Constants.COMPONENT_INSTALLER_PREFIX + ${componentName}FamilyDefinition.NAME, provide = ComponentInstaller.class)
 public class ${componentName}FamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 

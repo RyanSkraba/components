@@ -12,9 +12,13 @@
 // ============================================================================
 package org.talend.components.api.service.common.testcomponent;
 
-import aQute.bnd.annotation.component.Component;
 import org.talend.components.api.ComponentInstaller;
 
+import aQute.bnd.annotation.component.Component;
+
+import com.google.auto.service.AutoService;
+
+@AutoService(ComponentInstaller.class)
 @Component(name = "test", provide = ComponentInstaller.class)
 public class TestComponentInstaller implements ComponentInstaller {
 

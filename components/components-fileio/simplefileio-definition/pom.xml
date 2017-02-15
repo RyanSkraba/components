@@ -14,36 +14,24 @@
     <name>Components - Simple File IO Definition</name>
     <packaging>jar</packaging>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <!-- Annotation processing -->
         <dependency>
             <groupId>biz.aQute.bnd</groupId>
             <artifactId>annotation</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-common</artifactId>
-            <version>${project.version}</version>
-            <classifier>bundle</classifier>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Tests -->
+        <!-- Test dependencies -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -71,20 +59,15 @@
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
+
+        <!-- Spring test dependencies -->
         <dependency>
             <groupId>org.talend.components</groupId>
-            <artifactId>components-api-service-common</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api-service-common</artifactId>
+            <artifactId>components-api-service-rest</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <!-- spring jar for integration tests -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
@@ -92,43 +75,6 @@
             <classifier>lib</classifier>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api-service-rest</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api-service-rest</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- dep for OSGI tests -->
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-osgitest</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		    <version>1.7.12</version>
-		</dependency>
-		<dependency>
-		    <groupId>ch.qos.logback</groupId>
-		    <artifactId>logback-classic</artifactId>
-		    <version>1.1.8</version>
-		</dependency>
-
     </dependencies>
 
     <build>
@@ -181,7 +127,7 @@
                                 <Bundle-SymbolicName>org.talend.components.simplefileio.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                                 <Include-Resource>
-                                    {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
+                                    {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
                                 </Include-Resource>
                                 <Service-Component>*</Service-Component>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
@@ -199,10 +145,10 @@
                             <instructions>
                                 <Bundle-SymbolicName>org.talend.components.simplefileio</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
-                                <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*
+                                <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*|auto-service
                                 </Embed-Dependency>
                                 <Include-Resource>
-                                    {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
+                                    {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
                                 </Include-Resource>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                             </instructions>

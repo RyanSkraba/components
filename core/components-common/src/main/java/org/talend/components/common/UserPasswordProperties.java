@@ -12,8 +12,9 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.daikon.properties.presentation.Widget.*;
-import static org.talend.daikon.properties.property.PropertyFactory.*;
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 import java.util.EnumSet;
 
@@ -24,21 +25,59 @@ import org.talend.daikon.properties.property.Property;
 
 public class UserPasswordProperties extends PropertiesImpl {
 
-    public Property<String> userId = newProperty("userId").setRequired(); //$NON-NLS-1$
+    public Property<Boolean> useAuth = newBoolean("useAuth", false);
 
-    public Property<String> password = newProperty("password").setRequired()
+    public Property<String> userId = newProperty("userId");
+
+    public Property<String> password = newProperty("password")
             .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
+
+    private boolean needSwitch = false;
 
     public UserPasswordProperties(String name) {
         super(name);
+    }
+
+    public UserPasswordProperties(String name, Boolean withSwitch) {
+        super(name);
+        needSwitch = withSwitch;
+    }
+
+    @Override
+    public void setupProperties() {
+        super.setupProperties();
+        if (needSwitch) {
+            useAuth.setRequired();
+        } else {
+            userId.setRequired();
+            password.setRequired();
+        }
     }
 
     @Override
     public void setupLayout() {
         super.setupLayout();
         Form form = Form.create(this, Form.MAIN);
+        if (needSwitch) {
+            form.addRow(useAuth);
+        }
         form.addRow(userId);
         form.addRow(widget(password).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
+    }
+
+    public void afterUseAuth() {
+        refreshLayout(getForm(Form.MAIN));
+    }
+
+    @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+        if (form.getName().equals(Form.MAIN)) {
+            if (needSwitch) {
+                form.getWidget(userId).setVisible(useAuth);
+                form.getWidget(password).setVisible(useAuth);
+            }
+        }
     }
 
 }

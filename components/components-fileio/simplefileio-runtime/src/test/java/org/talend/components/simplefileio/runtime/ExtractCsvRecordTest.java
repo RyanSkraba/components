@@ -13,12 +13,12 @@ import org.apache.hadoop.io.Text;
 import org.junit.Test;
 
 /**
- * Unit tests for {@link SimpleFileIoInputRuntime.ExtractCsvRecord}.
+ * Unit tests for {@link SimpleFileIOInputRuntime.ExtractCsvRecord}.
  */
 public class ExtractCsvRecordTest {
 
     /** The DoFn under test. */
-    private final DoFnTester<Text, CSVRecord> fnBasic = DoFnTester.of(new SimpleFileIoInputRuntime.ExtractCsvRecord(';'));
+    private final DoFnTester<Text, CSVRecord> fnBasic = DoFnTester.of(new SimpleFileIOInputRuntime.ExtractCsvRecord(';'));
 
     public static String[] toArray(CSVRecord record) {
         String[] fields = new String[record.size()];

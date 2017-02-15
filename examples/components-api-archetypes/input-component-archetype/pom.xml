@@ -8,7 +8,7 @@
 		<relativePath>../../../components-parent/pom.xml</relativePath>
 	</parent>
 
-	<name>Component Maven archetypes</name>
+	<name>Component Maven Archetype - Input</name>
 	<artifactId>input-component-archetypes</artifactId>
 
     <!-- these dependencies allow the build to take place after the dependencies

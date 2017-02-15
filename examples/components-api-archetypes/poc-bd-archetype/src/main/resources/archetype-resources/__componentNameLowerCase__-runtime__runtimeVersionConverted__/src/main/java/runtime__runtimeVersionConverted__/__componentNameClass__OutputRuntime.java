@@ -48,7 +48,7 @@ public class ${componentNameClass}OutputRuntime extends PTransform<PCollection<I
     }
 
     @Override
-    public PDone apply(PCollection<IndexedRecord> in) {
+    public PDone expand(PCollection<IndexedRecord> in) {
         return null;
     }
 }

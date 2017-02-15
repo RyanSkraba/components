@@ -8,8 +8,7 @@ import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.processing.definition.replicate.ReplicateProperties;
 import org.talend.daikon.properties.ValidationResult;
-
-import io.netty.util.internal.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 
 public class ReplicateRuntime implements BeamJobBuilder, RuntimableRuntime<ReplicateProperties> {
 
@@ -22,14 +21,14 @@ public class ReplicateRuntime implements BeamJobBuilder, RuntimableRuntime<Repli
     @Override
     public void build(BeamJobContext ctx) {
         String mainLink = ctx.getLinkNameByPortName("input_" + properties.MAIN_CONNECTOR.getName());
-        if (!StringUtil.isNullOrEmpty(mainLink)) {
+        if (!StringUtils.isEmpty(mainLink)) {
             PCollection<Object> mainPCollection = ctx.getPCollectionByLinkName(mainLink);
             if (mainPCollection != null) {
                 String flowLink = ctx.getLinkNameByPortName("output_" + properties.FLOW_CONNECTOR.getName());
                 String secondFlowLink = ctx.getLinkNameByPortName("output_" + properties.SECOND_FLOW_CONNECTOR.getName());
 
-                hasFlow = !StringUtil.isNullOrEmpty(flowLink);
-                hasSecondFlow = !StringUtil.isNullOrEmpty(secondFlowLink);
+                hasFlow = !StringUtils.isEmpty(flowLink);
+                hasSecondFlow = !StringUtils.isEmpty(secondFlowLink);
 
                 if (hasFlow) {
                     ctx.putPCollectionByLinkName(flowLink, mainPCollection);

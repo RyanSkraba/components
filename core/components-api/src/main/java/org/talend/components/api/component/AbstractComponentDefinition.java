@@ -25,6 +25,7 @@ import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.exception.error.ComponentsErrorCode;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.daikon.NamedThing;
+import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.property.Property;
@@ -43,7 +44,8 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
      * Constructor sets component name
      *
      * @param componentName component name
-     * @param allEngines true if available for all execution engines, false if not available for none (this should hide the component).
+     * @param allEngines true if available for all execution engines, false if not available for none (this should hide
+     * the component).
      */
     public AbstractComponentDefinition(String componentName, boolean allEngines) {
         this.componentName = componentName;
@@ -85,6 +87,14 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
         return engines;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSupportingExecutionEngines(ExecutionEngine executionEngine) {
+        return engines.contains(executionEngine);
+    }
+
     protected void assertEngineCompatibility(ExecutionEngine engine) throws TalendRuntimeException {
         if (!getSupportedExecutionEngines().contains(engine))
             TalendRuntimeException.build(ComponentsErrorCode.WRONG_EXECUTION_ENGINE) //
@@ -105,10 +115,11 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     public String getPngImagePath(ComponentImageType imageType) {
         switch (imageType) {
         case PALLETE_ICON_32X32:
-            return componentName + "_icon32.png";
+            return getImagePath(DefinitionImageType.PALETTE_ICON_32X32);
         }
         return null;
     }
@@ -235,9 +246,25 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
         return namedThings;
     }
 
+    @Deprecated
     @Override
     public String getImagePath() {
-        return getPngImagePath(ComponentImageType.PALLETE_ICON_32X32);
+        return getImagePath(DefinitionImageType.PALETTE_ICON_32X32);
     }
 
+    @Override
+    public String getImagePath(DefinitionImageType type) {
+        switch (type) {
+            case PALETTE_ICON_32X32:
+                return componentName + "_icon32.png";
+            case SVG_ICON:
+                return null;
+        }
+        return null;
+    }
+
+    @Override
+    public String getIconKey() {
+        return null;
+    }
 }

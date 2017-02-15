@@ -59,7 +59,7 @@
         </dependency>
         <dependency>
             <groupId>org.talend.daikon</groupId>
-            <artifactId>daikon-spring</artifactId>
+            <artifactId>daikon-spring-utils</artifactId>
             <version>${daikon.version}</version>
         </dependency>
 

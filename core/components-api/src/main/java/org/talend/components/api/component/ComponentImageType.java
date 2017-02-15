@@ -12,6 +12,10 @@
 // ============================================================================
 package org.talend.components.api.component;
 
+/**
+ * @Deprecated use {@link org.talend.daikon.definition.DefinitionImageType}
+ */
+@Deprecated
 public enum ComponentImageType {
-                                PALLETE_ICON_32X32
+    PALLETE_ICON_32X32
 }

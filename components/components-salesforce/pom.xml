@@ -9,6 +9,7 @@
 		<relativePath>../../components-parent/pom.xml</relativePath>
 	</parent>
 	<properties>
+	    <antlr4.version>4.6</antlr4.version>
 		<partner.version>37.0.3</partner.version>
 		<jetty.version>9.2.19.v20160908</jetty.version>
 	</properties>
@@ -58,6 +59,13 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+		<!-- guess schema feature dependency -->
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>${antlr4.version}</version>
+        </dependency>
 
 		<dependency>
 			<groupId>org.talend.components</groupId>
@@ -118,9 +126,14 @@
 			<classifier>bundle</classifier>
 			<scope>test</scope>
 		</dependency>
+		<!-- Annotation processing -->
 		<dependency>
 			<groupId>biz.aQute.bnd</groupId>
 			<artifactId>annotation</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.auto.service</groupId>
+			<artifactId>auto-service</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>javax.inject</groupId>
@@ -263,7 +276,9 @@
 								<Bundle-Name>${project.name} lib</Bundle-Name>
 								<Service-Component>*</Service-Component>
 								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-								<Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt</Include-Resource>
+								<Include-Resource>
+									{maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
+								</Include-Resource>
 							</instructions>
 						</configuration>
 					</execution>
@@ -279,14 +294,33 @@
 								<Bundle-SymbolicName>org.talend.components.salesforce</Bundle-SymbolicName>
 								<Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*,org.apache.avro.*,org.apache.oltu.oauth2*,org.codehaus.jackson*</Import-Package>
 								<Service-Component>*</Service-Component>
-								<Embed-Dependency>!components*,*;scope=compile|runtime;artifactId=!commons-beanutils|commons-collections</Embed-Dependency>
+								<Embed-Dependency>!components*|auto-service,*;scope=compile|runtime;artifactId=!commons-beanutils|commons-collections</Embed-Dependency>
 								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-								<Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt</Include-Resource>
+								<Include-Resource>
+									{maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
+								</Include-Resource>
 							</instructions>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
+			<!-- used to generate soql antlr4 parser; is not included to lifecycle -->
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>${antlr4.version}</version>
+                <executions>
+                    <execution>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <outputDirectory>${project.build.sourceDirectory}/org/talend/components/salesforce/soql/parser</outputDirectory>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 </project>

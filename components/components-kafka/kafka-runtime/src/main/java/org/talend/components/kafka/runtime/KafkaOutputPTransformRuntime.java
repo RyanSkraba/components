@@ -34,8 +34,8 @@ import org.talend.components.kafka.dataset.KafkaDatasetProperties;
 import org.talend.components.kafka.output.KafkaOutputProperties;
 import org.talend.daikon.properties.ValidationResult;
 
-public class KafkaOutputPTransformRuntime extends PTransform<PCollection<IndexedRecord>, PDone>
-        implements RuntimableRuntime<KafkaOutputProperties> {
+public class KafkaOutputPTransformRuntime extends PTransform<PCollection<IndexedRecord>, PDone> implements
+        RuntimableRuntime<KafkaOutputProperties> {
 
     private static Logger LOG = LoggerFactory.getLogger(KafkaOutputPTransformRuntime.class);
 
@@ -46,7 +46,7 @@ public class KafkaOutputPTransformRuntime extends PTransform<PCollection<Indexed
         final boolean useAvro = properties.getDatasetProperties().valueFormat
                 .getValue() == KafkaDatasetProperties.ValueFormat.AVRO;
 
-        KafkaIO.Write<byte[], byte[]> kafkaWrite = KafkaIO.write()
+        KafkaIO.Write<byte[], byte[]> kafkaWrite = KafkaIO.<byte[], byte[]> write()
                 .withBootstrapServers(properties.getDatasetProperties().getDatastoreProperties().brokers.getValue())
                 .withTopic(properties.getDatasetProperties().topic.getValue())
                 .updateProducerProperties(KafkaConnection.createOutputMaps(properties));
@@ -58,19 +58,20 @@ public class KafkaOutputPTransformRuntime extends PTransform<PCollection<Indexed
                 // TODO for now use incoming avro schema directly, do not check configured schema, improvement it.
                 return (PDone) pc1.apply(kafkaWrite.withKeyCoder(ByteArrayCoder.of()).withValueCoder(LazyAvroCoder.of()));
             } else { // csv
-                return ((PCollection<KV<byte[], byte[]>>) pc1
-                        .apply("formatCsvKV", MapElements.via(new FormatCsvKV(properties.getDatasetProperties().fieldDelimiter.getValue()))))
-                                .apply(kafkaWrite.withKeyCoder(ByteArrayCoder.of()).withValueCoder(ByteArrayCoder.of()));
+                return ((PCollection<KV<byte[], byte[]>>) pc1.apply("formatCsvKV",
+                        MapElements.via(new FormatCsvKV(properties.getDatasetProperties().fieldDelimiter.getValue()))))
+                        .apply(kafkaWrite.withKeyCoder(ByteArrayCoder.of()).withValueCoder(ByteArrayCoder.of()));
             }
         }
         case ROUND_ROBIN: {
             if (useAvro) {
                 // TODO for now use incoming avro schema directly, do not check configured schema, improvement it.
-                return (PDone) objectPCollection.apply(kafkaWrite.withValueCoder(LazyAvroCoder.of()).values());
+                return (PDone) objectPCollection.apply(kafkaWrite.withKeyCoder(ByteArrayCoder.of())
+                        .withValueCoder(LazyAvroCoder.of()).values());
             } else { // csv
-                return (PDone) objectPCollection
-                        .apply(MapElements.via(new FormatCsv(properties.getDatasetProperties().fieldDelimiter.getValue())))
-                        .apply(kafkaWrite.withValueCoder(ByteArrayCoder.of()).values());
+                return (PDone) objectPCollection.apply(
+                        MapElements.via(new FormatCsv(properties.getDatasetProperties().fieldDelimiter.getValue()))).apply(
+                        kafkaWrite.withKeyCoder(ByteArrayCoder.of()).withValueCoder(ByteArrayCoder.of()).values());
             }
         }
         default:

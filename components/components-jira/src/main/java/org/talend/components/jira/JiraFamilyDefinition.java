@@ -20,9 +20,12 @@ import org.talend.components.jira.tjiraoutput.TJiraOutputDefinition;
 
 import aQute.bnd.annotation.component.Component;
 
+import com.google.auto.service.AutoService;
+
 /**
  * Install all of the definitions provided for the JIRA family of components.
  */
+@AutoService(ComponentInstaller.class)
 @Component(name = Constants.COMPONENT_INSTALLER_PREFIX + JiraFamilyDefinition.NAME, provide = ComponentInstaller.class)
 public class JiraFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
@@ -30,7 +33,7 @@ public class JiraFamilyDefinition extends AbstractComponentFamilyDefinition impl
 
     public JiraFamilyDefinition() {
         super(NAME,
-                // Components
+        // Components
                 new TJiraInputDefinition(), new TJiraOutputDefinition());
     }
 

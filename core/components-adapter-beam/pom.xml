@@ -26,6 +26,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.google.auto.value</groupId>
+            <artifactId>auto-value</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
             <version>${project.version}</version>
@@ -36,6 +42,13 @@
         </dependency>
 
         <!-- Tests -->
+        <dependency>
+            <groupId>org.talend.daikon</groupId>
+            <artifactId>daikon</artifactId>
+            <version>${daikon.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

@@ -17,6 +17,7 @@ import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.fullexample.FullExampleInputDefinition;
 import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
@@ -25,7 +26,7 @@ import org.talend.daikon.runtime.RuntimeInfo;
 public class FullExampleDatastoreDefinition extends SimpleNamedThing
         implements DatastoreDefinition<FullExampleDatastoreProperties> {
 
-    private static final String NAME = "FullExampleDatastore";
+    public static final String NAME = "FullExampleDatastore";
 
     public FullExampleDatastoreDefinition() {
         super(NAME);
@@ -66,8 +67,19 @@ public class FullExampleDatastoreDefinition extends SimpleNamedThing
         return "Full example datastore";
     }
 
+    @Deprecated
     @Override
     public String getImagePath() {
         return "/org/talend/components/fullexample/fullExample_icon32.png";
+    }
+
+    @Override
+    public String getImagePath(DefinitionImageType type) {
+        return "/org/talend/components/fullexample/fullExample_icon32.png";
+    }
+
+    @Override
+    public String getIconKey() {
+        return null;
     }
 }

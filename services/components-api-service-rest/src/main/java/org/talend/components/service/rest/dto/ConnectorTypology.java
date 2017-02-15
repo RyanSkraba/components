@@ -21,13 +21,13 @@ import static org.talend.components.api.component.ConnectorTopology.*;
  */
 public enum ConnectorTypology {
 
-    /** source -> incoming*/
-    SOURCE(INCOMING),
-    /** sink -> outgoing. */
-    SINK(OUTGOING),
-    /** Transformer -> incoming and outgoing. */
+    /** source -> has outgoing connectors. */
+    SOURCE(OUTGOING),
+    /** sink -> has incoming connectors. */
+    SINK(INCOMING),
+    /** Transformer -> both incoming and outgoing connectors. */
     TRANSFORMER(INCOMING_AND_OUTGOING),
-    /** configuration -> none. */
+    /** configuration -> no connectors. */
     CONFIGURATION(NONE);
 
     /** The connector topology to map. */

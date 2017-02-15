@@ -23,7 +23,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.boot.version>1.4.1.RELEASE</spring.boot.version>
 		<hadoop.version>2.7.0</hadoop.version>
-		<beam.version>0.4.0-TLND</beam.version>
+		<beam.version>0.6.0-SNAPSHOT</beam.version>
 		<!-- Used for Docker images name -->
 		<git_branch>local</git_branch>
 		<talend_docker_registry>registry.datapwn.com</talend_docker_registry>
@@ -56,6 +56,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
+			<artifactId>localio-definition</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
 			<artifactId>jms-definition</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -72,6 +77,11 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-salesforce</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>processing-definition</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -109,6 +119,12 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>processing-runtime</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.beam</groupId>
 			<artifactId>beam-sdks-java-io-hdfs</artifactId>
 			<version>${beam.version}</version>
@@ -139,10 +155,10 @@
 			<artifactId>pax-url-aether</artifactId>
 			<version>2.4.7</version>
 		</dependency>
-		<dependency><!-- this overides the parent definition that limited the artifact 
+		<dependency><!-- this overrides the parent definition that limited the artifact
 				to tests -->
 			<groupId>org.talend.daikon</groupId>
-			<artifactId>daikon-spring</artifactId>
+			<artifactId>daikon-spring-utils</artifactId>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -190,25 +206,6 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-							<overWriteReleases>false</overWriteReleases>
-							<overWriteSnapshots>false</overWriteSnapshots>
-							<overWriteIfNewer>true</overWriteIfNewer>
-							<includeScope>compile</includeScope>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<!-- this will create the mave repository for the application runtime 
 					resolution -->
 				<!-- you must specify the runtime artifacts if the are not part of dependencies 
@@ -236,6 +233,7 @@
 								<extraArtifact>org.talend.components:kafka-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:simplefileio-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:components-jdbc-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:processing-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.libraries:mysql-connector-java-5.1.30-bin:6.0.0:jar</extraArtifact>
 								<extraArtifact>org.apache.derby:derby:10.12.1.1:jar</extraArtifact>
 								<extraArtifact>org.apache.beam:beam-sdks-java-io-hdfs:${beam.version}:jar</extraArtifact>
@@ -280,7 +278,57 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			<plugin>
+			<!-- create a class path with all the compile scope dependencies of this pom using the local maven repository -->
+				<groupId>com.github.veithen.alta</groupId>
+				<artifactId>alta-maven-plugin</artifactId>
+				<version>0.5.2-TALEND</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate-properties</goal>
+						</goals>
+						<configuration>
+							<name>classpath.linux</name>
+							<value>.m2/%mavenPath%</value>
+							<separator>${path.separator}</separator>
+							<dependencySet>
+								<scope>compile</scope>
+							</dependencySet>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+			<!-- this computes the tcom service classpath using maven artifacts -->
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<id>compute-classpath</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<exportAntProperties>true</exportAntProperties>
+							<tasks>
+							<!-- replace the local repository path with .m2 in the computed local.classpath -->
+                                <loadresource property="classpath.windows">
+                                    <propertyresource name="classpath.linux" />
+                                    <filterchain>
+                                        <tokenfilter>
+                                            <filetokenizer />
+                                            <replacestring from="/" to="\" />
+                                        </tokenfilter>
+                                    </filterchain>
+                                </loadresource>
+                                <echo message="final classpath:${classpath.linux}" />
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
