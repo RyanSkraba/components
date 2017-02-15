@@ -76,6 +76,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         normalizeDelimiter.setValue(";");
         columnNameDelimiter.setValue("_");
         query.setTaggedValue(ComponentConstants.LINE_SEPARATOR_REPLACED_TO, " ");
+        query.setValue("\"SELECT Id, Name, IsDeleted FROM Account\"");
     }
 
     @Override
@@ -87,9 +88,8 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         mainForm.addRow(manualQuery);
 
         mainForm.addColumn(Widget.widget(guessSchema).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
-
         mainForm.addRow(Widget.widget(query).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
-        query.setValue("\"SELECT Id, Name, IsDeleted FROM Account\"");
+
         mainForm.addRow(includeDeleted);
 
         Form advancedForm = getForm(Form.ADVANCED);
