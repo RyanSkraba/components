@@ -15,31 +15,6 @@
 
     <name>Components - Kafka Runtime</name>
     <packaging>jar</packaging>
-    <profiles>
-        <profile>
-            <id>docker-host</id>
-            <activation>
-                <property>
-                    <name>env.DOCKER_HOST</name>
-                </property>
-            </activation>
-            <properties>
-                <docker_host>${env.DOCKER_HOST}</docker_host>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>docker-host-127.0.0.1</id>
-            <activation>
-                <property>
-                    <name>!env.DOCKER_HOST</name>
-                </property>
-            </activation>
-            <properties>
-                <docker_host>tcp://127.0.0.1:2375</docker_host>
-            </properties>
-        </profile>
-    </profiles>
     <dependencies>
         <dependency>
             <groupId>org.talend.components</groupId>
@@ -82,30 +57,11 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.12</version>
-                <executions>
-                    <execution>
-                        <id>regex-property</id>
-                        <goals>
-                            <goal>regex-property</goal>
-                        </goals>
-                        <configuration>
-                            <name>docker.parsed.address</name>
-                            <value>${docker_host}</value>
-                            <regex>tcp://(.+):(.+)</regex>
-                            <replacement>$1</replacement>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
-                        <kafka.bootstrap>${docker.host.address}:9092</kafka.bootstrap>
+                        <kafka.bootstrap>${docker.host.address}:${kafka.port}</kafka.bootstrap>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
@@ -140,8 +96,7 @@
                                     <name>wurstmeister/kafka:0.10.1.0</name>
                                     <run>
                                         <env>
-                                            <KAFKA_ADVERTISED_HOST_NAME>${docker.parsed.address}
-                                            </KAFKA_ADVERTISED_HOST_NAME>
+                                            <HOSTNAME_COMMAND>hostname -i</HOSTNAME_COMMAND>
                                             <KAFKA_ADVERTISED_PORT>9092</KAFKA_ADVERTISED_PORT>
                                             <KAFKA_ZOOKEEPER_CONNECT>zookeeper:2181</KAFKA_ZOOKEEPER_CONNECT>
                                             <KAFKA_CREATE_TOPICS>
@@ -149,7 +104,7 @@
                                             </KAFKA_CREATE_TOPICS>
                                         </env>
                                         <ports>
-                                            <port>9092:9092</port>
+                                            <port>kafka.port:9092</port>
                                         </ports>
                                         <links>
                                             <link>zookeeper</link>
