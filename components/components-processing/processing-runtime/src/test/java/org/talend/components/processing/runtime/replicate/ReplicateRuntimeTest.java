@@ -13,7 +13,7 @@ import org.mockito.Mockito;
 import org.talend.components.adapter.beam.BeamJobContext;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.processing.definition.replicate.ReplicateProperties;
+import org.talend.components.processing.replicate.ReplicateProperties;
 import org.talend.daikon.avro.GenericDataRecordHelper;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;

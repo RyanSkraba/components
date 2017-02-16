@@ -1,4 +1,4 @@
-package org.talend.components.processing.definition;
+package org.talend.components.processing;
 
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -6,6 +6,7 @@ import org.talend.components.api.ComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 
 import org.hamcrest.Matcher;
+import org.talend.components.processing.ProcessingFamilyDefinition;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;

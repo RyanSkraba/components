@@ -10,14 +10,14 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.processing.definition.replicate;
+package org.talend.components.processing.replicate;
 
 import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
-import org.talend.components.processing.definition.ProcessingFamilyDefinition;
+import org.talend.components.processing.ProcessingFamilyDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 import java.util.Set;
@@ -55,13 +55,13 @@ public class ReplicateDefinitionTest {
     /**
      * Check {@link ReplicateDefinition#getPropertyClass()} returns class, which
      * canonical name is
-     * "org.talend.components.processing.definition.replicate.ReplicateProperties"
+     * "org.talend.components.processing.replicate.ReplicateProperties"
      */
     @Test
     public void testGetPropertyClass() {
         Class<?> propertyClass = definition.getPropertyClass();
         String canonicalName = propertyClass.getCanonicalName();
-        assertThat(canonicalName, equalTo("org.talend.components.processing.definition.replicate.ReplicateProperties"));
+        assertThat(canonicalName, equalTo("org.talend.components.processing.replicate.ReplicateProperties"));
     }
 
     @Test

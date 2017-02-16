@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
-import org.talend.components.processing.definition.ProcessingFamilyDefinition;
+import org.talend.components.processing.ProcessingFamilyDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 public class PythonRowDefinitionTest {

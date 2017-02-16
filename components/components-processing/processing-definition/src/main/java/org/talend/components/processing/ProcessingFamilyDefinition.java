@@ -10,15 +10,15 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.processing.definition;
+package org.talend.components.processing;
 
 import com.google.auto.service.AutoService;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.runtime.DependenciesReader;
-import org.talend.components.processing.definition.window.WindowDefinition;
-import org.talend.components.processing.definition.replicate.ReplicateDefinition;
+import org.talend.components.processing.window.WindowDefinition;
+import org.talend.components.processing.replicate.ReplicateDefinition;
 import org.talend.components.processing.filterrow.FilterRowDefinition;
 import org.talend.components.processing.pythonrow.PythonRowDefinition;
 

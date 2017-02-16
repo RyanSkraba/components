@@ -1,4 +1,4 @@
-package org.talend.components.processing.definition.window;
+package org.talend.components.processing.window;
 
 import org.junit.Test;
 import org.talend.daikon.properties.presentation.Form;

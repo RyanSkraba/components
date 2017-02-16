@@ -22,7 +22,7 @@ import org.apache.beam.sdk.values.PCollection;
 import org.joda.time.Duration;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.processing.definition.window.WindowProperties;
+import org.talend.components.processing.window.WindowProperties;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.Properties;

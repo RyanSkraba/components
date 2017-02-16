@@ -1,4 +1,4 @@
-package org.talend.components.processing.definition.window;
+package org.talend.components.processing.window;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
@@ -12,7 +12,7 @@ import org.mockito.Mockito;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
-import org.talend.components.processing.definition.ProcessingFamilyDefinition;
+import org.talend.components.processing.ProcessingFamilyDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 import java.util.Set;
@@ -54,7 +54,7 @@ public class WindowDefinitionTest {
     public void testGetPropertyClass() {
         Class<?> propertyClass = definition.getPropertyClass();
         String canonicalName = propertyClass.getCanonicalName();
-        assertThat(canonicalName, equalTo("org.talend.components.processing.definition.window.WindowProperties"));
+        assertThat(canonicalName, equalTo("org.talend.components.processing.window.WindowProperties"));
     }
 
     @Test

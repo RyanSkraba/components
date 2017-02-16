@@ -10,16 +10,19 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.processing.definition.replicate;
+package org.talend.components.processing.replicate;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
-import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.presentation.Form;
 
-public class ReplicateProperties extends PropertiesImpl {
+public class ReplicateProperties extends FixedConnectorsComponentProperties {
 
     // input schema
     public transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "main");
@@ -47,6 +50,20 @@ public class ReplicateProperties extends PropertiesImpl {
      */
     public ReplicateProperties(String name) {
         super(name);
+    }
+
+    @Override
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        HashSet<PropertyPathConnector> connectors = new HashSet<PropertyPathConnector>();
+        if (isOutputConnection) {
+            // output schemas
+            connectors.add(FLOW_CONNECTOR);
+            connectors.add(SECOND_FLOW_CONNECTOR);
+        } else {
+            // input schema
+            connectors.add(MAIN_CONNECTOR);
+        }
+        return connectors;
     }
 
     @Override
