@@ -28,5 +28,6 @@
         <module>components-jira</module>
         <module>components-filedelimited</module>
         <module>components-elasticsearch</module>
+        <module>components-filterrow</module>
     </modules>
 </project>
