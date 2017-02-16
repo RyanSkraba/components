@@ -35,11 +35,8 @@ public class TSnowflakeCloseDefinition extends SnowflakeDefinition {
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
-        if (connectorTopology == ConnectorTopology.NONE) {
-            return getCommonRuntimeInfo(this.getClass().getClassLoader(), SnowflakeCloseSourceOrSink.class);
-        } else {
-            return null;
-        }
+        assertConnectorTopologyCompatibility(connectorTopology);
+        return getCommonRuntimeInfo(this.getClass().getClassLoader(), SnowflakeCloseSourceOrSink.class);
     }
 
     @Override

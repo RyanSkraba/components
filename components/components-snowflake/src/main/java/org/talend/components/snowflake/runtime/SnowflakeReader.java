@@ -160,7 +160,6 @@ public class SnowflakeReader<T> extends AbstractBoundedReader<IndexedRecord> {
             }
 
             if (connection != null) {
-                // getConnection().close();
                 ((SnowflakeSource) getCurrentSource()).closeConnection(container, connection);
             }
         } catch (SQLException e) {

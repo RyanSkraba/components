@@ -34,11 +34,9 @@ public class TSnowflakeCloseProperties extends ComponentPropertiesImpl {
     public void setupLayout() {
         super.setupLayout();
 
-        Form refForm = Form.create(this, Form.REFERENCE);
+        Form mainForm = Form.create(this, Form.MAIN);
         Widget compListWidget = widget(referencedComponent).setWidgetType(Widget.COMPONENT_REFERENCE_WIDGET_TYPE);
-        refForm.addRow(compListWidget);
-        Form mainForm = new Form(this, Form.MAIN);
-        mainForm.addRow(refForm);
+        mainForm.addRow(compListWidget);
     }
 
     public String getReferencedComponentId() {
