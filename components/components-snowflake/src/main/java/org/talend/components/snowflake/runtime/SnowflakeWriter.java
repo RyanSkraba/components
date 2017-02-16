@@ -383,13 +383,13 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         }
 
         try {
-            processingConnection.close();
+            sink.closeConnection(container, processingConnection);
         } catch (SQLException e) {
             throw new IOException(e);
         }
 
         try {
-            uploadConnection.close();
+            sink.closeConnection(container, uploadConnection);
         } catch (SQLException e) {
             throw new IOException(e);
         }

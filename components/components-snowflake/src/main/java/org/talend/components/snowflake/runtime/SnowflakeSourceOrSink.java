@@ -15,6 +15,19 @@
  */
 package org.talend.components.snowflake.runtime;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.DriverPropertyInfo;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.slf4j.Logger;
@@ -30,12 +43,6 @@ import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
-import java.io.IOException;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
 public class SnowflakeSourceOrSink implements SourceOrSink {
 
     private static final long serialVersionUID = 1L;
@@ -45,6 +52,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
     protected SnowflakeProvideConnectionProperties properties;
 
     protected static final String KEY_CONNECTION = "Connection";
+
     protected static final String KEY_CONNECTION_PROPERTIES = "ConnectionProperties";
 
     @Override
@@ -102,6 +110,14 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
             return connProps.getReferencedConnectionProperties();
         }
         return connProps;
+    }
+
+    protected void closeConnection(RuntimeContainer container, Connection conn) throws SQLException {
+        SnowflakeConnectionProperties connProps = properties.getConnectionProperties();
+        String refComponentId = connProps.getReferencedComponentId();
+        if ((refComponentId == null || container == null) && (conn != null && !conn.isClosed())) {
+            conn.close();
+        }
     }
 
     protected Connection connect(RuntimeContainer container) throws IOException {
@@ -204,7 +220,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
             DatabaseMetaData metaData = connection.getMetaData();
 
             // Fetch all tables in the db and schema provided
-            String[] types = {"TABLE"};
+            String[] types = { "TABLE" };
             ResultSet resultIter = metaData.getTables(getCatalog(connProps), getDbSchema(connProps), null, types);
             String tableName = null;
             while (resultIter.next()) {
@@ -212,7 +228,8 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
                 returnList.add(new SimpleNamedThing(tableName, tableName));
             }
         } catch (SQLException se) {
-            throw new IOException("Error when searching for tables in: " + getCatalog(connProps) + "." + getDbSchema(connProps) + ": " + se.getMessage(), se);
+            throw new IOException("Error when searching for tables in: " + getCatalog(connProps) + "." + getDbSchema(connProps)
+                    + ": " + se.getMessage(), se);
         }
         return returnList;
     }

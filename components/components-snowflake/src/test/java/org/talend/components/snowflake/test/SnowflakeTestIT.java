@@ -82,11 +82,14 @@ import org.talend.components.snowflake.SnowflakeConnectionWizardDefinition;
 import org.talend.components.snowflake.SnowflakeFamilyDefinition;
 import org.talend.components.snowflake.SnowflakeTableListProperties;
 import org.talend.components.snowflake.SnowflakeTableProperties;
+import org.talend.components.snowflake.runtime.SnowflakeCloseSourceOrSink;
 import org.talend.components.snowflake.runtime.SnowflakeSink;
 import org.talend.components.snowflake.runtime.SnowflakeSource;
 import org.talend.components.snowflake.runtime.SnowflakeSourceOrSink;
 import org.talend.components.snowflake.runtime.SnowflakeWriteOperation;
 import org.talend.components.snowflake.runtime.SnowflakeWriter;
+import org.talend.components.snowflake.tsnowflakeclose.TSnowflakeCloseDefinition;
+import org.talend.components.snowflake.tsnowflakeclose.TSnowflakeCloseProperties;
 import org.talend.components.snowflake.tsnowflakeconnection.TSnowflakeConnectionDefinition;
 import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputDefinition;
 import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputProperties;
@@ -194,10 +197,14 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
     }
 
     public <T> BoundedReader<T> createBoundedReader(ComponentProperties tsip) {
+        return createBoundedReader(tsip, null);
+    }
+
+    public <T> BoundedReader<T> createBoundedReader(ComponentProperties tsip, RuntimeContainer container) {
         SnowflakeSource SnowflakeSource = new SnowflakeSource();
-        SnowflakeSource.initialize(null, tsip);
-        SnowflakeSource.validate(null);
-        return SnowflakeSource.createReader(null);
+        SnowflakeSource.initialize(container, tsip);
+        SnowflakeSource.validate(container);
+        return SnowflakeSource.createReader(container);
     }
 
     public ComponentProperties setupProps(SnowflakeConnectionProperties props) {
@@ -390,6 +397,11 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
     }
 
     protected List<IndexedRecord> readRows(SnowflakeConnectionTableProperties props) throws IOException {
+        return readRows(props, null);
+    }
+
+    protected List<IndexedRecord> readRows(SnowflakeConnectionTableProperties props, RuntimeContainer container)
+            throws IOException {
         TSnowflakeInputProperties inputProps = null;
         if (props instanceof TSnowflakeInputProperties)
             inputProps = (TSnowflakeInputProperties) props;
@@ -397,7 +409,7 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
             inputProps = (TSnowflakeInputProperties) new TSnowflakeInputProperties("bar").init();
         inputProps.connection = props.connection;
         inputProps.table = props.table;
-        BoundedReader<IndexedRecord> reader = createBoundedReader(inputProps);
+        BoundedReader<IndexedRecord> reader = createBoundedReader(inputProps, container);
         boolean hasRecord = reader.start();
         List<IndexedRecord> rows = new ArrayList<>();
         while (hasRecord) {
@@ -405,6 +417,7 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
             rows.add(unenforced);
             hasRecord = reader.advance();
         }
+        reader.close();
         return rows;
     }
 
@@ -935,6 +948,84 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
         SnowflakeSourceOrSink SnowflakeInputSourceOrSink = new SnowflakeSourceOrSink();
         SnowflakeInputSourceOrSink.initialize(connContainer, inProps);
         assertEquals(ValidationResult.Result.OK, SnowflakeInputSourceOrSink.validate(connContainer).getStatus());
+    }
+
+    @Test
+    public void testCloseExistingConnection() throws Throwable {
+        SnowflakeConnectionProperties connProps = (SnowflakeConnectionProperties) getComponentService()
+                .getComponentProperties(TSnowflakeConnectionDefinition.COMPONENT_NAME);
+        setupProps(connProps);
+
+        final String currentComponentName = TSnowflakeConnectionDefinition.COMPONENT_NAME + "_1";
+        RuntimeContainer connContainer = new DefaultComponentRuntimeContainerImpl() {
+
+            @Override
+            public String getCurrentComponentId() {
+                return currentComponentName;
+            }
+        };
+
+        SnowflakeSourceOrSink snowflakeSourceOrSink = new SnowflakeSourceOrSink();
+        snowflakeSourceOrSink.initialize(connContainer, connProps);
+        assertEquals(ValidationResult.Result.OK, snowflakeSourceOrSink.validate(connContainer).getStatus());
+
+        ComponentDefinition closeDefinition = getComponentService()
+                .getComponentDefinition(TSnowflakeCloseDefinition.COMPONENT_NAME);
+        TSnowflakeCloseProperties closeProps = (TSnowflakeCloseProperties) getComponentService()
+                .getComponentProperties(TSnowflakeCloseDefinition.COMPONENT_NAME);
+        closeProps.referencedComponent.componentInstanceId.setValue(currentComponentName);
+
+        SnowflakeCloseSourceOrSink snowflakeCloseSourceOrSink = new SnowflakeCloseSourceOrSink();
+        snowflakeCloseSourceOrSink.initialize(connContainer, closeProps);
+        assertEquals(ValidationResult.Result.OK, snowflakeCloseSourceOrSink.validate(connContainer).getStatus());
+    }
+
+    @Test
+    public void testSameConnectionForSeveralReaders() throws Throwable {
+        SnowflakeConnectionProperties connProps = (SnowflakeConnectionProperties) getComponentService()
+                .getComponentProperties(TSnowflakeConnectionDefinition.COMPONENT_NAME);
+        setupProps(connProps);
+
+        final String currentComponentName = TSnowflakeConnectionDefinition.COMPONENT_NAME + "_1";
+        RuntimeContainer connContainer = new DefaultComponentRuntimeContainerImpl() {
+
+            @Override
+            public String getCurrentComponentId() {
+                return currentComponentName;
+            }
+        };
+
+        SnowflakeSourceOrSink SnowflakeSourceOrSink = new SnowflakeSourceOrSink();
+        SnowflakeSourceOrSink.initialize(connContainer, connProps);
+        assertEquals(ValidationResult.Result.OK, SnowflakeSourceOrSink.validate(connContainer).getStatus());
+
+        SnowflakeConnectionTableProperties props = populateOutput(10);
+
+        props.connection.referencedComponent.componentInstanceId.setValue(currentComponentName);
+
+        List<IndexedRecord> rows = readRows(props, connContainer);
+        assertEquals(10, rows.size());
+
+        // Read second time with the same properties but with new reader.
+        rows = readRows(props, connContainer);
+        assertEquals(10, rows.size());
+
+        ComponentDefinition closeDefinition = getComponentService()
+                .getComponentDefinition(TSnowflakeCloseDefinition.COMPONENT_NAME);
+        TSnowflakeCloseProperties closeProps = (TSnowflakeCloseProperties) getComponentService()
+                .getComponentProperties(TSnowflakeCloseDefinition.COMPONENT_NAME);
+        closeProps.referencedComponent.componentInstanceId.setValue(currentComponentName);
+
+        SnowflakeCloseSourceOrSink snowflakeCloseSourceOrSink = new SnowflakeCloseSourceOrSink();
+        snowflakeCloseSourceOrSink.initialize(connContainer, closeProps);
+        assertEquals(ValidationResult.Result.OK, snowflakeCloseSourceOrSink.validate(connContainer).getStatus());
+
+        // After close, exception should be thrown by the reader, if we try to read with the same connection.
+        try {
+            rows = readRows(props, connContainer);
+            fail();
+        } catch (IOException e) {
+        }
     }
 
     @Test
