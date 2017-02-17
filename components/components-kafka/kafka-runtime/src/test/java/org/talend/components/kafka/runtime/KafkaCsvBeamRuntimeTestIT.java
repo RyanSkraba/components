@@ -24,7 +24,6 @@ import java.util.Properties;
 import java.util.Random;
 
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Filter;
@@ -36,6 +35,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.talend.components.kafka.dataset.KafkaDatasetProperties;
 import org.talend.components.kafka.datastore.KafkaDatastoreProperties;
@@ -55,6 +55,9 @@ public class KafkaCsvBeamRuntimeTestIT {
     String fieldDelimiter = ";";
 
     List<Person> expectedPersons = new ArrayList<>();
+
+    @Rule
+    public final TestPipeline pipeline = TestPipeline.create();
 
     @Before
     public void init() {
@@ -124,8 +127,6 @@ public class KafkaCsvBeamRuntimeTestIT {
         outputRuntime.initialize(null, outputProperties);
 
         // ----------------- pipeline start --------------------
-        Pipeline pipeline = TestPipeline.create();
-
         pipeline.apply(inputRuntime).apply(Filter.by(new FilterByGroup(testID))).apply(outputRuntime);
 
         PipelineResult result = pipeline.run();
@@ -204,8 +205,6 @@ public class KafkaCsvBeamRuntimeTestIT {
         outputRuntime.initialize(null, outputProperties);
 
         // ----------------- pipeline start --------------------
-        Pipeline pipeline = TestPipeline.create();
-
         pipeline.apply(inputRuntime).apply(Filter.by(new FilterByGroup(testID))).apply(outputRuntime);
 
         PipelineResult result = pipeline.run();

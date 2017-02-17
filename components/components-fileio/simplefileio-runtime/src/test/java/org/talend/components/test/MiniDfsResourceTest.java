@@ -53,7 +53,10 @@ import org.talend.daikon.java8.Consumer;
 public class MiniDfsResourceTest {
 
     @Rule
-    public MiniDfsResource mini = new MiniDfsResource();
+    public final MiniDfsResource mini = new MiniDfsResource();
+
+    @Rule
+    public final TestPipeline pipeline = TestPipeline.create();
 
     /**
      * An example of using the MiniDFSCluster.
@@ -87,8 +90,6 @@ public class MiniDfsResourceTest {
                 Text.class);
 
         // Create a pipeline using the input component to get records.
-        Pipeline p = TestPipeline.create();
-
         Consumer<Text> consumer = new Consumer<Text>() {
 
             @Override
@@ -99,11 +100,11 @@ public class MiniDfsResourceTest {
 
         try (DirectConsumerCollector<Text> collector = DirectConsumerCollector.of(consumer)) {
             // Collect a sample of the input records.
-            p.apply(Read.from(source)) //
+            pipeline.apply(Read.from(source)) //
                     .apply(Values.<Text> create()) //
                     .apply(Sample.<Text> any(100)) //
                     .apply(collector);
-            p.run().waitUntilFinish();
+            pipeline.run().waitUntilFinish();
         }
     }
 
@@ -117,8 +118,6 @@ public class MiniDfsResourceTest {
         AvroHDFSFileSource<IndexedRecord> source = new AvroHDFSFileSource(fileSpec, AvroCoder.of(rs.getSchema()));
 
         // Create a pipeline using the input component to get records.
-        Pipeline p = TestPipeline.create();
-
         final Integer[] count = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
         Consumer<AvroKey<IndexedRecord>> consumer = new Consumer<AvroKey<IndexedRecord>>() {
@@ -131,10 +130,10 @@ public class MiniDfsResourceTest {
 
         try (DirectConsumerCollector collector = DirectConsumerCollector.of(consumer)) {
             // Collect a sample of the input records.
-            p.apply(Read.from(source)) //
+            pipeline.apply(Read.from(source)) //
                     .apply(Keys.<AvroKey<IndexedRecord>> create()) //
                     .apply(collector);
-            p.run().waitUntilFinish();
+            pipeline.run().waitUntilFinish();
         }
 
         // Assert that each row was counted only once.

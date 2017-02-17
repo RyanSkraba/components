@@ -43,7 +43,7 @@ import org.talend.daikon.avro.SampleSchemas;
 public class RowGeneratorIOTest {
 
     @Rule
-    public TestPipeline pipeline = TestPipeline.create();
+    public final TestPipeline pipeline = TestPipeline.create();
 
     @Test
     @Category(RunnableOnService.class)

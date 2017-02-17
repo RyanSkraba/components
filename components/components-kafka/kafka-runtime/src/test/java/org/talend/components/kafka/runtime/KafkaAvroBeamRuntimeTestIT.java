@@ -35,6 +35,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.talend.components.kafka.dataset.KafkaDatasetProperties;
 import org.talend.components.kafka.datastore.KafkaDatastoreProperties;
@@ -52,6 +53,9 @@ public class KafkaAvroBeamRuntimeTestIT {
     Integer maxRecords = 10;
 
     List<Person> expectedPersons = new ArrayList<>();
+
+    @Rule
+    public final TestPipeline pipeline = TestPipeline.create();
 
     @Before
     public void init() throws IOException {
@@ -122,8 +126,6 @@ public class KafkaAvroBeamRuntimeTestIT {
         outputRuntime.initialize(null, outputProperties);
 
         // ----------------- pipeline start --------------------
-        Pipeline pipeline = TestPipeline.create();
-
         pipeline.apply(inputRuntime).apply(Filter.by(new KafkaCsvBeamRuntimeTestIT.FilterByGroup(testID))).apply(outputRuntime);
 
         PipelineResult result = pipeline.run();
@@ -202,8 +204,6 @@ public class KafkaAvroBeamRuntimeTestIT {
         outputRuntime.initialize(null, outputProperties);
 
         // ----------------- pipeline start --------------------
-        Pipeline pipeline = TestPipeline.create();
-
         pipeline.apply(inputRuntime).apply(Filter.by(new KafkaCsvBeamRuntimeTestIT.FilterByGroup(testID))).apply(outputRuntime);
 
         PipelineResult result = pipeline.run();

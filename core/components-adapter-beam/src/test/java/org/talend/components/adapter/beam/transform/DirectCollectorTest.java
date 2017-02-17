@@ -36,7 +36,7 @@ import org.junit.Test;
 public class DirectCollectorTest {
 
     @Rule
-    public TestPipeline pipeline = TestPipeline.create();
+    public final TestPipeline pipeline = TestPipeline.create();
 
     /**
      * Demonstrates the basic use case for the {@link DirectCollector}.

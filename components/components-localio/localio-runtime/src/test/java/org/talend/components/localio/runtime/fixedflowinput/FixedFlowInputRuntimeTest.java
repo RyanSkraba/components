@@ -47,7 +47,7 @@ public class FixedFlowInputRuntimeTest {
     private static IndexedRecord inputIndexedRecord2 = null;
 
     @Rule
-    public TestPipeline pipeline = TestPipeline.create();
+    public final TestPipeline pipeline = TestPipeline.create();
 
     private static String generateInputJSON(Schema inputSchema, IndexedRecord inputIndexedRecord) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

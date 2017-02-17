@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Create;
@@ -36,6 +35,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
@@ -53,6 +53,9 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
     ElasticsearchDatastoreProperties datastoreProperties;
 
     Client client;
+
+    @Rule
+    public final TestPipeline pipeline = TestPipeline.create();
 
     @Before
     public void init() throws IOException, ExecutionException, InterruptedException {
@@ -98,13 +101,11 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
         outputProperties.init();
         outputProperties.setDatasetProperties(datasetProperties);
 
-        Pipeline pipeline = TestPipeline.create();
-
         ElasticsearchOutputRuntime outputRuntime = new ElasticsearchOutputRuntime();
         outputRuntime.initialize(null, outputProperties);
 
-        PCollection<IndexedRecord> inputRecords = (PCollection<IndexedRecord>) pipeline
-                .apply(Create.of(avroRecords).withCoder(LazyAvroCoder.of()));
+        PCollection<IndexedRecord> inputRecords = (PCollection<IndexedRecord>) pipeline.apply(Create.of(avroRecords).withCoder(
+                LazyAvroCoder.of()));
         inputRecords.apply(outputRuntime);
 
         pipeline.run();
@@ -115,8 +116,6 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
         ElasticsearchInputProperties inputProperties = new ElasticsearchInputProperties("inputProperties");
         inputProperties.init();
         inputProperties.setDatasetProperties(datasetProperties);
-
-        pipeline = TestPipeline.create();
 
         ElasticsearchInputRuntime inputRuntime = new ElasticsearchInputRuntime();
         inputRuntime.initialize(null, inputProperties);
@@ -151,13 +150,11 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
         outputProperties.init();
         outputProperties.setDatasetProperties(datasetProperties);
 
-        Pipeline pipeline = TestPipeline.create();
-
         ElasticsearchOutputRuntime outputRuntime = new ElasticsearchOutputRuntime();
         outputRuntime.initialize(null, outputProperties);
 
-        PCollection<IndexedRecord> inputRecords = (PCollection<IndexedRecord>) pipeline
-                .apply(Create.of(avroRecords).withCoder(LazyAvroCoder.of()));
+        PCollection<IndexedRecord> inputRecords = (PCollection<IndexedRecord>) pipeline.apply(Create.of(avroRecords).withCoder(
+                LazyAvroCoder.of()));
         inputRecords.apply(outputRuntime);
 
         pipeline.run();
@@ -169,8 +166,6 @@ public class ElasticsearchBeamRuntimeTestIT implements Serializable {
         inputProperties.init();
         inputProperties.setDatasetProperties(datasetProperties);
         inputProperties.query.setValue("{\"query\":{\"regexp\":{\"field\":\"r[1-3]\"}}}");
-
-        pipeline = TestPipeline.create();
 
         ElasticsearchInputRuntime inputRuntime = new ElasticsearchInputRuntime();
         inputRuntime.initialize(null, inputProperties);

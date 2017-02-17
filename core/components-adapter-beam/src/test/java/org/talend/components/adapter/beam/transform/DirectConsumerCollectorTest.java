@@ -35,7 +35,7 @@ import org.talend.daikon.java8.Consumer;
  */
 public class DirectConsumerCollectorTest {
     @Rule
-    public TestPipeline pipeline = TestPipeline.create();
+    public final TestPipeline pipeline = TestPipeline.create();
 
     /**
      * Demonstrates the basic use case for the {@link DirectConsumerCollector}.

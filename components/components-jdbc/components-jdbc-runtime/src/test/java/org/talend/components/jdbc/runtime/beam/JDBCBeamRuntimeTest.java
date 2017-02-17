@@ -27,7 +27,6 @@ import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
-import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.derby.drda.NetworkServerControl;
@@ -35,6 +34,7 @@ import org.apache.derby.jdbc.ClientDataSource;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +63,9 @@ public class JDBCBeamRuntimeTest implements Serializable {
     private static String JDBC_URL;
 
     Map<Integer, String> assertRows = new HashMap<>();
+
+    @Rule
+    public final TestPipeline pipeline = TestPipeline.create();
 
     @BeforeClass
     public static void startDatabase() throws Exception {
@@ -140,8 +143,6 @@ public class JDBCBeamRuntimeTest implements Serializable {
         jdbcDatastoreProperties.init();
         jdbcDatastoreProperties.dbTypes.setValue("DERBY");
         jdbcDatastoreProperties.jdbcUrl.setValue(JDBC_URL);
-
-        Pipeline pipeline = TestPipeline.create();
 
         JDBCDatasetProperties inputDatasetProperties = new JDBCDatasetProperties("inputDataset");
         inputDatasetProperties.init();
