@@ -13,7 +13,13 @@
 
 package org.talend.components.simplefileio.input;
 
-import org.talend.components.api.properties.ComponentPropertiesImpl;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.io.IOProperties;
 import org.talend.components.simplefileio.SimpleFileIODatasetDefinition;
@@ -23,7 +29,7 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
-public class SimpleFileIOInputProperties extends ComponentPropertiesImpl implements IOProperties {
+public class SimpleFileIOInputProperties extends FixedConnectorsComponentProperties implements IOProperties {
 
     /** If non-negative, limits the number of records returned for this component. This is not visible to the user. */
     public Property<Integer> limit = PropertyFactory.newInteger("limit", -1).setRequired();
@@ -32,8 +38,10 @@ public class SimpleFileIOInputProperties extends ComponentPropertiesImpl impleme
         super(name);
     }
 
-    transient public ReferenceProperties<SimpleFileIODatasetProperties> datasetRef = new ReferenceProperties<>("datasetRef",
+    public transient ReferenceProperties<SimpleFileIODatasetProperties> datasetRef = new ReferenceProperties<>("datasetRef",
             SimpleFileIODatasetDefinition.NAME);
+
+    protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "dataset.main");
 
     @Override
     public void setupLayout() {
@@ -50,4 +58,16 @@ public class SimpleFileIOInputProperties extends ComponentPropertiesImpl impleme
     public void setDatasetProperties(DatasetProperties datasetProperties) {
         datasetRef.setReference(datasetProperties);
     }
+
+    @Override
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        HashSet<PropertyPathConnector> connectors = new HashSet<>();
+        if (isOutputConnection) {
+            connectors.add(MAIN_CONNECTOR);
+        } else {
+            return Collections.EMPTY_SET;
+        }
+        return connectors;
+    }
+
 }

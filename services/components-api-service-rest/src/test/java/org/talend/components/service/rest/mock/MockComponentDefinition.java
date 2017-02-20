@@ -22,7 +22,6 @@ import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.fullexample.FullExampleProperties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
@@ -36,6 +35,8 @@ public class MockComponentDefinition extends AbstractComponentDefinition {
     private String iconKey;
 
     private Set<ConnectorTopology> topologies;
+
+    private Class<? extends ComponentProperties> componentProperties = MockComponentProperties.class;
 
     public MockComponentDefinition(String name) {
         this(name, null, ExecutionEngine.DI);
@@ -67,6 +68,11 @@ public class MockComponentDefinition extends AbstractComponentDefinition {
         }
     }
 
+    // TODO: At this point, we should probably have a fluent interface to configure the mocked class.
+    public void setPropertyClass(Class<? extends ComponentProperties> componentProperties) {
+        this.componentProperties = componentProperties;
+    }
+
     @Override
     public String getIconKey() {
         return iconKey;
@@ -89,7 +95,7 @@ public class MockComponentDefinition extends AbstractComponentDefinition {
 
     @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
-        return FullExampleProperties.class;
+        return componentProperties;
     }
 
     @Override

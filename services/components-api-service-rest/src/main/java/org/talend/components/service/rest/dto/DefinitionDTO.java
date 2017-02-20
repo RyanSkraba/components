@@ -61,6 +61,9 @@ public class DefinitionDTO {
     /** The supported execution engines. */
     private Set<String> engines = null;
 
+    /** Connectors supported by the definition (only for components). */
+    private List<ConnectorDto> connectors;
+
     /**
      * Default empty constructor.
      */
@@ -116,6 +119,7 @@ public class DefinitionDTO {
                 .stream() //
                 .map(ExecutionEngine::toString) //
                 .collect(Collectors.toSet());
+        this.connectors = ConnectorDto.createConnectorList(origin);
     }
 
     private String buildIconUrl(Definition origin, DefinitionImageType imageType) {
@@ -200,6 +204,14 @@ public class DefinitionDTO {
 
     public void setExecutionEngines(Set<String> engines) {
         this.engines = engines;
+    }
+
+    public List<ConnectorDto> getConnectors() {
+        return connectors;
+    }
+
+    public void setConnectors(List<ConnectorDto> connectors) {
+        this.connectors = connectors;
     }
 
     @Override

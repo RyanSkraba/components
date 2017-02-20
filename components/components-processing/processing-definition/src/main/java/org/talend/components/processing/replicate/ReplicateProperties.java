@@ -38,7 +38,7 @@ public class ReplicateProperties extends FixedConnectorsComponentProperties {
     // output schema
     public transient PropertyPathConnector FLOW_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schemaFlow");
 
-    public transient PropertyPathConnector SECOND_FLOW_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME,
+    public transient PropertyPathConnector SECOND_FLOW_CONNECTOR = new PropertyPathConnector(Connector.REJECT_NAME,
             "schemaSecondFlow");
 
     public SchemaProperties schemaFlow = new SchemaProperties("schemaFlow");

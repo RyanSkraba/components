@@ -69,4 +69,9 @@ public class ElasticsearchInputDefinition extends AbstractComponentDefinition {
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
         return EnumSet.of(ConnectorTopology.OUTGOING);
     }
+
+    @Override
+    public String getIconKey() {
+        return "elastic";
+    }
 }

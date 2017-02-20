@@ -23,6 +23,11 @@ public abstract class KafkaIOBasedDefinition extends AbstractComponentDefinition
     }
 
     @Override
+    public String getIconKey() {
+        return "kafka";
+    }
+
+    @Override
     public Property[] getReturnProperties() {
         return new Property[0];
     }

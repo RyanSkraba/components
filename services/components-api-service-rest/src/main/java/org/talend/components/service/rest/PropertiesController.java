@@ -18,6 +18,8 @@ import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import java.util.List;
+
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.talend.components.service.rest.dto.ConnectorDto;
 import org.talend.components.service.rest.dto.PropertiesDto;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
 import org.talend.daikon.annotation.Service;
@@ -57,6 +60,15 @@ public interface PropertiesController {
     @RequestMapping(value = "{definitionName}/icon/{imageType}", method = GET, produces = { IMAGE_PNG_VALUE, IMAGE_SVG_VALUE })
     ResponseEntity<InputStreamResource> getIcon(@PathVariable("definitionName") String definitionName,
             @PathVariable("imageType") DefinitionImageType imageType);
+
+    /**
+     * Gets connector information for the properties and a given definition.
+     *
+     * @param definitionName The definition to use when getting connectors for some properties..
+     * @return
+     */
+    @RequestMapping(value = "{definitionName}/connectors", method = GET, produces = APPLICATION_JSON_UTF8_VALUE)
+    ResponseEntity<List<ConnectorDto>> getConnectors(@PathVariable("definitionName") String definitionName);
 
     /** Validate one field. */
     @RequestMapping(value = "{definition}/{trigger}/{property}", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)

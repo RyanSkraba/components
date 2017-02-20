@@ -13,9 +13,16 @@
 
 package org.talend.components.jms.output;
 
-import static org.talend.daikon.properties.property.PropertyFactory.*;
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
+import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 
-import org.talend.components.api.properties.ComponentPropertiesImpl;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.io.IOProperties;
 import org.talend.components.jms.JmsDatasetDefinition;
@@ -25,10 +32,7 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
-import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
-import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
-
-public class JmsOutputProperties extends ComponentPropertiesImpl implements IOProperties {
+public class JmsOutputProperties extends FixedConnectorsComponentProperties implements IOProperties {
 
     public enum JmsAdvancedDeliveryMode {
         NON_PERSISTENT,
@@ -58,8 +62,10 @@ public class JmsOutputProperties extends ComponentPropertiesImpl implements IOPr
 
     public Property<String> pool_eviction_soft_min_idle_time = PropertyFactory.newString("pool_eviction_soft_min_idle_time", "0");
 
-    transient public ReferenceProperties<JmsDatasetProperties> datasetRef = new ReferenceProperties<>("datasetRef",
+    public transient ReferenceProperties<JmsDatasetProperties> datasetRef = new ReferenceProperties<>("datasetRef",
             JmsDatasetDefinition.NAME);
+
+    protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "datasetRef.main");
 
     @Override
     public DatasetProperties getDatasetProperties() {
@@ -101,4 +107,16 @@ public class JmsOutputProperties extends ComponentPropertiesImpl implements IOPr
     public void afterPool_use_eviction() {
         refreshLayout(getForm(Form.MAIN));
     }
+
+    @Override
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        HashSet<PropertyPathConnector> connectors = new HashSet<>();
+        if (isOutputConnection) {
+            return Collections.EMPTY_SET;
+        } else {
+            connectors.add(MAIN_CONNECTOR);
+        }
+        return connectors;
+    }
+
 }

@@ -47,4 +47,5 @@ public class KafkaInputDefinition extends KafkaIOBasedDefinition {
         return new SimpleRuntimeInfo(this.getClass().getClassLoader(), DependenciesReader.computeDependenciesFilePath(
                 "org.talend.components", "kafka-runtime"), "org.talend.components.kafka.runtime.KafkaInputPTransformRuntime");
     }
+
 }

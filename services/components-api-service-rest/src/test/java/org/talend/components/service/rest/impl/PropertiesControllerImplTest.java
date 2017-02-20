@@ -43,6 +43,7 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
     public void testGetIcon_imageTypeNotFound() throws Exception {
         given().expect() //
                 .statusCode(404) //
+                .log().ifValidationFails() //
                 .get("/properties/{name}/icon/{type}", DATA_STORE_DEFINITION_NAME, DefinitionImageType.SVG_ICON);
     }
 
@@ -62,6 +63,16 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
                 .body(Matchers.containsString("</svg>")) //
                 .contentType(IMAGE_SVG_VALUE) //
                 .get("/properties/{name}/icon/{type}", DATA_SET_DEFINITION_NAME, DefinitionImageType.SVG_ICON);
+    }
+
+    @Test
+    public void testGetConnectors_badDefinition() throws Exception {
+        given().expect() //
+                .statusCode(400) //
+                .log().ifValidationFails() //
+                // TODO: check returned error
+                .body(Matchers.containsString("definitionClass")) //
+                .get("/properties/{name}/connectors", DATA_SET_DEFINITION_NAME);
     }
 
     @Test
@@ -100,6 +111,7 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
         ApiError errorContainer = given().accept(APPLICATION_JSON_UTF8_VALUE) //
                 .expect() //
                 .statusCode(400)
+                .log().ifValidationFails() //
                 .with() //
                 .content(buildTestDataStoreFormData()) //
                 .contentType(APPLICATION_JSON_UTF8_VALUE) //
@@ -128,6 +140,7 @@ public class PropertiesControllerImplTest extends AbstractSpringIntegrationTests
         ApiError errorContainer = given().accept(APPLICATION_JSON_UTF8_VALUE) //
                 .expect() //
                 .statusCode(500) //
+                .log().ifValidationFails() //
                 .with() //
                 .content(buildTestDataStoreFormData()) //
                 .contentType(APPLICATION_JSON_UTF8_VALUE) //

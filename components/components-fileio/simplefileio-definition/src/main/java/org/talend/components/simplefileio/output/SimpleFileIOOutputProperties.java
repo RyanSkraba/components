@@ -13,7 +13,13 @@
 
 package org.talend.components.simplefileio.output;
 
-import org.talend.components.api.properties.ComponentPropertiesImpl;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.talend.components.api.component.Connector;
+import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.io.IOProperties;
 import org.talend.components.simplefileio.SimpleFileIODatasetDefinition;
@@ -21,14 +27,16 @@ import org.talend.components.simplefileio.SimpleFileIODatasetProperties;
 import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.presentation.Form;
 
-public class SimpleFileIOOutputProperties extends ComponentPropertiesImpl implements IOProperties {
+public class SimpleFileIOOutputProperties extends FixedConnectorsComponentProperties implements IOProperties {
 
     public SimpleFileIOOutputProperties(String name) {
         super(name);
     }
 
-    transient public ReferenceProperties<SimpleFileIODatasetProperties> datasetRef = new ReferenceProperties<>("datasetRef",
+    public transient ReferenceProperties<SimpleFileIODatasetProperties> datasetRef = new ReferenceProperties<>("datasetRef",
             SimpleFileIODatasetDefinition.NAME);
+
+    protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "dataset.main");
 
     @Override
     public void setupLayout() {
@@ -44,5 +52,16 @@ public class SimpleFileIOOutputProperties extends ComponentPropertiesImpl implem
     @Override
     public void setDatasetProperties(DatasetProperties datasetProperties) {
         datasetRef.setReference(datasetProperties);
+    }
+
+    @Override
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        HashSet<PropertyPathConnector> connectors = new HashSet<>();
+        if (isOutputConnection) {
+            return Collections.EMPTY_SET;
+        } else {
+            connectors.add(MAIN_CONNECTOR);
+        }
+        return connectors;
     }
 }

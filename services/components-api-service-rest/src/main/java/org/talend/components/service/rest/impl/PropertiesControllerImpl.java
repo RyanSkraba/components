@@ -20,6 +20,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.io.InputStream;
+import java.util.List;
 
 import javax.activation.MimetypesFileTypeMap;
 
@@ -29,11 +30,13 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.datastore.DatastoreDefinition;
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.service.rest.PropertiesController;
+import org.talend.components.service.rest.dto.ConnectorDto;
 import org.talend.components.service.rest.dto.PropertiesDto;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
 import org.talend.components.service.rest.serialization.JsonSerializationHelper;
@@ -129,6 +132,21 @@ public class PropertiesControllerImpl implements PropertiesController {
         }
 
         return response.body(new InputStreamResource(is));
+    }
+
+    @Override
+    public ResponseEntity<List<ConnectorDto>> getConnectors(String definitionName) {
+        notNull(definitionName, "Definition name cannot be null.");
+        final Definition<?> definition = propertiesHelpers.getDefinition(definitionName);
+        notNull(definition, "Could not find definition of name %s", definitionName);
+
+        // Error code 400 if the definition is not a component (Cannot have connectors).
+        if (!(definition instanceof ComponentDefinition)) {
+            throw TalendRuntimeException.build(CommonErrorCodes.UNEXPECTED_ARGUMENT).set("definitionClass",
+                    definition.getClass().getName());
+        }
+
+        return new ResponseEntity<>(ConnectorDto.createConnectorList((ComponentDefinition) definition), OK);
     }
 
     @Override
