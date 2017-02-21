@@ -76,8 +76,6 @@ public class SalesforceSourceOrSink implements SourceOrSink, SalesforceSchemaHel
 
     protected static final String SESSION_FILE_PREFX = "sessionIDFile_";
 
-    private static final String EXCEPTION_MESSAGE = "Failed!";
-
     private String sessionFilePath;
 
     private String sessionId;
