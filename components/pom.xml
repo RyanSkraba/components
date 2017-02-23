@@ -16,7 +16,7 @@
 
     <modules>
         <module>components-azurestorage</module>
-        <module>components-fileio</module>
+        <!--<module>components-fileio</module>-->
         <module>components-jms</module>
         <module>components-kafka</module>
         <module>components-localio</module>
