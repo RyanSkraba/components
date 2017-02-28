@@ -61,7 +61,6 @@ public class AzureStorageQueueListReader extends AzureStorageReader<IndexedRecor
                 current = queues.next();
                 dataCount++;
             }
-            return true;
         } catch (InvalidKeyException | URISyntaxException e) {
             LOGGER.error(e.getLocalizedMessage());
             if (properties.dieOnError.getValue())
