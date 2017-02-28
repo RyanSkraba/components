@@ -29,5 +29,6 @@
         <module>components-filedelimited</module>
         <module>components-elasticsearch</module>
         <module>components-filterrow</module>
-    </modules>
+        <module>components-bigquery</module>
+  </modules>
 </project>
