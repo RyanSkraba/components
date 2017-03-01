@@ -124,7 +124,8 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
                     int index = f.pos() + 1;
                     try {
                         // Snowflake - milliseconds since midnight
-                        return (int) value.getTime(index).getTime();
+                        java.sql.Time time = value.getTime(index);
+                        return (time != null) ? (int) value.getTime(index).getTime() : null;
                     } catch (SQLException e) {
                         throw new ComponentException(e);
                     }
@@ -138,7 +139,8 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
                     int index = f.pos() + 1;
                     try {
                         // Milliseconds since epoc
-                        return value.getTimestamp(index).getTime();
+                        java.sql.Timestamp timestamp = value.getTimestamp(index);
+                        return (timestamp != null) ? timestamp.getTime() : null;
                     } catch (SQLException e) {
                         throw new ComponentException(e);
                     }
