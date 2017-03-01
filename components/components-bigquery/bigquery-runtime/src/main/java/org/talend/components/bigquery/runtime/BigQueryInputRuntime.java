@@ -25,6 +25,8 @@ import org.apache.beam.sdk.transforms.PTransform;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
+import org.talend.components.adapter.beam.gcp.GcpServiceAccountOptions;
+import org.talend.components.adapter.beam.gcp.ServiceAccountCredentialFactory;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.bigquery.BigQueryDatasetProperties;
@@ -70,11 +72,13 @@ public class BigQueryInputRuntime extends PTransform<PBegin, PCollection<Indexed
         BigQueryDatasetProperties dataset = properties.getDatasetProperties();
         BigQueryDatastoreProperties datastore = dataset.getDatastoreProperties();
 
-        // TODO(bchen): Does it safe to set pipeline option here?
-        BigQueryOptions bigQueryOptions = in.getPipeline().getOptions().as(BigQueryOptions.class);
-        bigQueryOptions.setProject(datastore.projectName.getValue());
-        bigQueryOptions.setTempLocation(datastore.tempGsFolder.getValue());
-        bigQueryOptions.setGcpCredential(BigQueryConnection.createCredentials(datastore));
+        GcpServiceAccountOptions gcpOptions = in.getPipeline().getOptions().as
+                (GcpServiceAccountOptions.class);
+        gcpOptions.setProject(datastore.projectName.getValue());
+        gcpOptions.setTempLocation(datastore.tempGsFolder.getValue());
+        gcpOptions.setCredentialFactoryClass(ServiceAccountCredentialFactory.class);
+        gcpOptions.setServiceAccountFile(datastore.serviceAccountFile.getValue());
+        gcpOptions.setGcpCredential(BigQueryConnection.createCredentials(datastore));
 
         BigQueryIO.Read.Bound bigQueryIOPTransform;
         switch (dataset.sourceType.getValue()) {

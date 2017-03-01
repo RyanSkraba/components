@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -18,6 +19,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <tcomp.version>0.18.0-SNAPSHOT</tcomp.version>
+        <spark.version>1.6.0</spark.version>
+        <hadoop.version>2.7.0</hadoop.version>
     </properties>
 
     <dependencies>
@@ -64,6 +67,18 @@
             <version>1.3</version>
             <scope>test</scope>
         </dependency>
+        <!-- necessary for Spark unit tests -->
+        <dependency>
+            <groupId>org.apache.beam</groupId>
+            <artifactId>beam-runners-spark</artifactId>
+            <version>${beam.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming_2.10</artifactId>
+            <version>${spark.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -84,8 +99,10 @@
                     <argLine>-Xms512m -Xmx1024m</argLine>
                     <systemPropertyVariables>
                         <bigquery.project>${bigquery.project}</bigquery.project>
-                        <bigquery.service.account.file>${bigquery.service.account.file}</bigquery.service.account.file>
-                        <bigquery.gcp.temp.folder>${bigquery.gcp.temp.folder}</bigquery.gcp.temp.folder>
+                        <bigquery.service.account.file>${bigquery.service.account.file}
+                        </bigquery.service.account.file>
+                        <bigquery.gcp.temp.folder>${bigquery.gcp.temp.folder}
+                        </bigquery.gcp.temp.folder>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

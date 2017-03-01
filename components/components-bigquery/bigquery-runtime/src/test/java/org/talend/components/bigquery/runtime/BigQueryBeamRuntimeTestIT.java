@@ -13,7 +13,11 @@
 
 package org.talend.components.bigquery.runtime;
 
-import java.io.FileInputStream;
+import static org.talend.components.bigquery.runtime.BigQueryTestConstants.createDatasetFromTable;
+import static org.talend.components.bigquery.runtime.BigQueryTestConstants.createDatastore;
+import static org.talend.components.bigquery.runtime.BigQueryTestConstants.createInput;
+import static org.talend.components.bigquery.runtime.BigQueryTestConstants.createOutput;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -21,20 +25,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.api.services.bigquery.BigqueryScopes;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.bigquery.BigQuery;
-import com.google.cloud.bigquery.BigQueryOptions;
-import com.google.cloud.bigquery.DatasetId;
-import com.google.cloud.bigquery.DatasetInfo;
 import org.apache.avro.Schema;
+import org.apache.beam.runners.spark.SparkContextOptions;
+import org.apache.beam.runners.spark.SparkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.coders.TableRowJsonCoder;
+import org.apache.beam.sdk.options.PipelineOptions;
+import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -45,26 +48,23 @@ import org.talend.components.bigquery.input.BigQueryInputProperties;
 import org.talend.components.bigquery.output.BigQueryOutputProperties;
 
 import com.google.api.services.bigquery.model.TableRow;
-
-import static org.talend.components.bigquery.runtime.BigQueryTestConstants.createDatasetFromTable;
-import static org.talend.components.bigquery.runtime.BigQueryTestConstants.createDatastore;
-import static org.talend.components.bigquery.runtime.BigQueryTestConstants.createInput;
-import static org.talend.components.bigquery.runtime.BigQueryTestConstants.createOutput;
+import com.google.cloud.bigquery.BigQuery;
+import com.google.cloud.bigquery.DatasetId;
+import com.google.cloud.bigquery.DatasetInfo;
 
 public class BigQueryBeamRuntimeTestIT implements Serializable {
 
-    BigQueryDatastoreProperties datastore;
     final static String datasetName = "bqcomponentio";
-
     @Rule
     public final TestPipeline pipeline = TestPipeline.create();
+    BigQueryDatastoreProperties datastore;
 
     @BeforeClass
     public static void initDataset() throws IOException {
         BigQuery bigquery = BigQueryConnection.createClient(createDatastore());
-            DatasetId datasetId = DatasetId.of(BigQueryTestConstants.PROJECT, datasetName);
-            bigquery.delete(datasetId, BigQuery.DatasetDeleteOption.deleteContents());
-            bigquery.create(DatasetInfo.of(datasetId));
+        DatasetId datasetId = DatasetId.of(BigQueryTestConstants.PROJECT, datasetName);
+        bigquery.delete(datasetId, BigQuery.DatasetDeleteOption.deleteContents());
+        bigquery.create(DatasetInfo.of(datasetId));
     }
 
     @Before
@@ -73,7 +73,28 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
     }
 
     @Test
-    public void testAllTypesInputOutput() throws UnsupportedEncodingException {
+    public void testAllTypesInputOutput_Local() throws UnsupportedEncodingException {
+        testAllTypesInputOutput(pipeline);
+    }
+
+    //TODO extract this to utils
+    private Pipeline createSparkRunnerPipeline() {
+        JavaSparkContext jsc = new JavaSparkContext("local[2]", this.getClass().getName());
+        PipelineOptions o = PipelineOptionsFactory.create();
+        SparkContextOptions options = o.as(SparkContextOptions.class);
+        options.setProvidedSparkContext(jsc);
+        options.setUsesProvidedSparkContext(true);
+        options.setRunner(SparkRunner.class);
+
+        return Pipeline.create(options);
+    }
+
+    @Test
+    public void testAllTypesInputOutput_Spark() throws UnsupportedEncodingException {
+        testAllTypesInputOutput(createSparkRunnerPipeline());
+    }
+
+    private void testAllTypesInputOutput(Pipeline pipeline) throws UnsupportedEncodingException {
         String tableName = "testalltypes";
         BigQueryOutputProperties outputProperties = createOutput(createDatasetFromTable(datastore, datasetName, tableName));
         outputProperties.tableOperation.setValue(BigQueryOutputProperties.TableOperation.DROP_IF_EXISTS_AND_CREATE);
@@ -144,8 +165,8 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
         BigQueryInputRuntime inputRuntime = new BigQueryInputRuntime();
         inputRuntime.initialize(null, inputProperties);
 
-        PCollection<TableRow> tableRowPCollection = pipeline.apply(inputRuntime).apply(ParDo.of(new BigQueryOutputRuntime.IndexedRecordToTableRowFn(schema)))
-                .setCoder(TableRowJsonCoder.of());
+        PCollection<TableRow> tableRowPCollection = pipeline.apply(inputRuntime)
+                .apply(ParDo.of(new BigQueryOutputRuntime.IndexedRecordToTableRowFn(schema))).setCoder(TableRowJsonCoder.of());
 
         PAssert.that(tableRowPCollection).containsInAnyOrder(rows);
 
