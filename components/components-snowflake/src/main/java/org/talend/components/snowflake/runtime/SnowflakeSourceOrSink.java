@@ -47,6 +47,8 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
 
     private static final long serialVersionUID = 1L;
 
+    private static final String LOGIN_TIMEOUT = "1";
+
     private transient static final Logger LOG = LoggerFactory.getLogger(SnowflakeSourceOrSink.class);
 
     protected SnowflakeProvideConnectionProperties properties;
@@ -179,7 +181,12 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
             Driver driver = (Driver) Class.forName(JDBC_DRIVER).newInstance();
             DriverManager.registerDriver(new DriverWrapper(driver));
 
-            conn = DriverManager.getConnection(connectionURL, user, password);
+            Properties properties = new Properties();
+            properties.put("user", user);
+            properties.put("password", password);
+            properties.put("loginTimeout", LOGIN_TIMEOUT);
+
+            conn = DriverManager.getConnection(connectionURL, properties);
         } catch (Exception e) {
             throw new IOException(e);
         }
