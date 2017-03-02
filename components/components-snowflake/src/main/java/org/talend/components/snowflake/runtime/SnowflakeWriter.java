@@ -18,13 +18,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.avro.LogicalTypes;
@@ -42,12 +36,7 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
-import com.snowflake.client.loader.LoadResultListener;
-import com.snowflake.client.loader.LoaderFactory;
-import com.snowflake.client.loader.LoaderProperty;
-import com.snowflake.client.loader.LoadingError;
-import com.snowflake.client.loader.Operation;
-import com.snowflake.client.loader.StreamLoader;
+import com.snowflake.client.loader.*;
 
 public final class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
@@ -326,8 +315,18 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         }
         IndexedRecord input = factory.convertToAvro(datum);
         List<Schema.Field> fields = input.getSchema().getFields();
+
+        // input and mainSchema synchronization. Such situation is useful in case of Dynamic
+        List<Schema.Field> collectedFields = new ArrayList<>();
+        for (Schema.Field item : fields) {
+            Schema.Field fieldFromMainSchema = mainSchema.getField(item.name());
+            if (fieldFromMainSchema != null) {
+                collectedFields.add(fieldFromMainSchema);
+            }
+        }
+
         for (int i = 0; i < row.length; i++) {
-            Field f = fields.get(i);
+            Field f = collectedFields.get(i);
             Schema s = AvroUtils.unwrapIfNullable(f.schema());
             Object inputValue = input.get(i);
             if (inputValue instanceof String || inputValue == null) {
