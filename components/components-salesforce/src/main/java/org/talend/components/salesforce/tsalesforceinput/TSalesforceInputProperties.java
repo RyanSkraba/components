@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 
-import com.sforce.ws.ConnectionException;
 import org.apache.avro.Schema;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.component.runtime.DependenciesReader;
@@ -35,6 +34,7 @@ import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sforce.ws.ConnectionException;
 
 public class TSalesforceInputProperties extends SalesforceConnectionModuleProperties {
 
@@ -52,6 +52,8 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
     public Property<String> query = newProperty("query"); //$NON-NLS-1$
 
     public transient PresentationItem guessSchema = new PresentationItem("guessSchema", "Guess schema");
+
+    public transient PresentationItem guessQuery = new PresentationItem("guessQuery", "Guess query");
 
     public Property<Boolean> includeDeleted = newBoolean("includeDeleted"); //$NON-NLS-1$
 
@@ -88,6 +90,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         mainForm.addRow(manualQuery);
 
         mainForm.addColumn(Widget.widget(guessSchema).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
+        mainForm.addColumn(Widget.widget(guessQuery).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
         mainForm.addRow(Widget.widget(query).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
 
         mainForm.addRow(includeDeleted);
@@ -116,14 +119,40 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
             validationResult.setStatus(ValidationResult.Result.OK);
 
         } catch (ConnectionException e1) {
-            validationResult.setStatus(ValidationResult.Result.ERROR).setMessage("Could not call Salesforce API. Schema cannot be guessed.");
+            validationResult.setStatus(ValidationResult.Result.ERROR)
+                    .setMessage("Could not call Salesforce API. Schema cannot be guessed.");
         } catch (IOException e2) {
-            validationResult.setStatus(ValidationResult.Result.ERROR).setMessage("Could not connect to Salesforce server. Schema cannot be guessed.");
+            validationResult.setStatus(ValidationResult.Result.ERROR)
+                    .setMessage("Could not connect to Salesforce server. Schema cannot be guessed.");
+        }
+        return validationResult;
+    }
+
+    public ValidationResult validateGuessQuery() {
+        ValidationResult validationResult = new ValidationResult();
+
+        try (SandboxedInstance sandboxISalesforceSourceOrSink = RuntimeUtil.createRuntimeClass(
+                new SimpleRuntimeInfo(this.getClass().getClassLoader(),
+                        DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-salesforce"),
+                        "org.talend.components.salesforce.runtime.SalesforceSourceOrSink"),
+                connection.getClass().getClassLoader())) {
+
+            SalesforceSourceOrSink salesforceSourceOrSink = (SalesforceSourceOrSink) sandboxISalesforceSourceOrSink.getInstance();
+            salesforceSourceOrSink.initialize(null, this);
+
+            String soqlQuery = salesforceSourceOrSink.guessQuery(module.main.schema.getValue(), module.moduleName.getValue());
+            query.setValue(soqlQuery);
+
+            validationResult.setStatus(ValidationResult.Result.OK);
         }
         return validationResult;
     }
 
     public void afterGuessSchema() {
+        refreshLayout(getForm(Form.MAIN));
+    }
+
+    public void afterGuessQuery() {
         refreshLayout(getForm(Form.MAIN));
     }
 
@@ -146,6 +175,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
             form.getWidget(query.getName()).setHidden(!manualQuery.getValue());
             form.getWidget(condition.getName()).setHidden(manualQuery.getValue());
             form.getWidget(guessSchema.getName()).setHidden(!manualQuery.getValue());
+            form.getWidget(guessQuery.getName()).setHidden(!manualQuery.getValue());
         }
         if (Form.ADVANCED.equals(form.getName())) {
             boolean isBulkQuery = queryMode.getValue().equals(QueryMode.Bulk);
