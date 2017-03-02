@@ -42,7 +42,11 @@ public class BigQueryDatastoreProperties extends PropertiesImpl implements Datas
         super.setupLayout();
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(projectName);
-        mainForm.addRow(Widget.widget(serviceAccountFile).setWidgetType(Widget.FILE_WIDGET_TYPE));
+
+        // Temporarily disable file widgets since their JSON Schema representation is the contents, 
+        // not the path
+        // mainForm.addRow(Widget.widget(serviceAccountFile).setWidgetType(Widget.FILE_WIDGET_TYPE));
+        mainForm.addRow(serviceAccountFile);
         mainForm.addRow(tempGsFolder);
     }
 
