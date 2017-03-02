@@ -41,6 +41,8 @@ public class BigQueryAvroRegistry extends AvroRegistry {
 
     private static final String NULLABLE_MODE = "NULLABLE";
 
+    private static final String REQUIRED_MODE = "REQUIRED";
+
     private BigQueryAvroRegistry() {
         registerSchemaInferrer(Schema.class, new SerializableFunction<Schema, org.apache.avro.Schema>() {
 
@@ -71,8 +73,8 @@ public class BigQueryAvroRegistry extends AvroRegistry {
         String fieldName = field.name();
         TableFieldSchema tableFieldSchema = new TableFieldSchema().setName(fieldName);
         boolean nullable = AvroUtils.isNullable(field.schema());
-        if (nullable) {
-            tableFieldSchema = tableFieldSchema.setMode(NULLABLE_MODE);
+        if (!nullable) {
+            tableFieldSchema = tableFieldSchema.setMode(REQUIRED_MODE);
         }
         org.apache.avro.Schema fieldSchema = AvroUtils.unwrapIfNullable(field.schema());
         if (fieldSchema.getType() == org.apache.avro.Schema.Type.ARRAY) {
