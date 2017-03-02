@@ -11,7 +11,7 @@
 
     <!-- TODO: when separating beam and di runtimes, this should be taken from components-adapter-beam-parent. -->
     <properties>
-        <beam.version>0.6.0-SNAPSHOT</beam.version>
+        <beam.version>0.6.0-tlnd</beam.version>
     </properties>
     <repositories>
         <repository>

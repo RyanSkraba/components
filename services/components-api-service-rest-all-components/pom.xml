@@ -23,7 +23,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.boot.version>1.4.1.RELEASE</spring.boot.version>
 		<hadoop.version>2.7.0</hadoop.version>
-		<beam.version>0.6.0-SNAPSHOT</beam.version>
+		<beam.version>0.6.0-tlnd</beam.version>
 		<!-- Used for Docker images name -->
 		<git_branch>local</git_branch>
 		<talend_docker_registry>registry.datapwn.com</talend_docker_registry>
@@ -54,11 +54,11 @@
 			<artifactId>components-jdbc-definition</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.talend.components</groupId> -->
-<!-- 			<artifactId>simplefileio-definition</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>simplefileio-definition</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>localio-definition</artifactId>
@@ -133,12 +133,12 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.talend.components</groupId> -->
-<!-- 			<artifactId>simplefileio-runtime</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 			<scope>test</scope> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>simplefileio-runtime</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>processing-runtime</artifactId>
@@ -270,7 +270,7 @@
 								<extraArtifact>org.talend.components:jms-runtime_1_1:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:kafka-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:elasticsearch-runtime_2_4:0.18.0-SNAPSHOT:jar</extraArtifact>
-<!-- 								<extraArtifact>org.talend.components:simplefileio-runtime:0.18.0-SNAPSHOT:jar</extraArtifact> -->
+								<extraArtifact>org.talend.components:simplefileio-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:components-jdbc-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:processing-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:bigquery-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
