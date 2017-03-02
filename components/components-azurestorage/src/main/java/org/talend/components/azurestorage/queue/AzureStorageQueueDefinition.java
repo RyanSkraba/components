@@ -29,7 +29,7 @@ public abstract class AzureStorageQueueDefinition extends AzureStorageDefinition
 
     public static final String RETURN_NB_QUEUE = "numberOfQueues";
 
-    public static final Property<String> RETURN_NB_QUEUE_PROP = PropertyFactory.newString(RETURN_NB_QUEUE);
+    public static final Property<Integer> RETURN_NB_QUEUE_PROP = PropertyFactory.newInteger(RETURN_NB_QUEUE);
 
     public static final String RETURN_QUEUE_NAME = "queueName";
 
