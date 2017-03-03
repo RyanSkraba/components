@@ -35,7 +35,6 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.talend.components.kafka.dataset.KafkaDatasetProperties;
@@ -87,7 +86,6 @@ public class KafkaCsvBeamRuntimeTestIT {
      * Read csv format value and write csv format value without schema and do not write key
      */
     @Test
-    @Ignore("Temp fix to unlock others")
     public void csvBasicTest() {
         String testID = "csvBasicTest" + new Random().nextInt();
 
@@ -165,7 +163,6 @@ public class KafkaCsvBeamRuntimeTestIT {
      * Read csv format value and write csv format value without schema and do not write key
      */
     @Test
-    @Ignore("Temp fix to unlock others")
     public void csvBasicTest2() {
         String testID = "csvBasicTest2" + new Random().nextInt();
 

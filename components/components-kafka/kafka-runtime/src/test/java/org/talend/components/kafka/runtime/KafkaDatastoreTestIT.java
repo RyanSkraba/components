@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +43,6 @@ public class KafkaDatastoreTestIT {
     }
 
     @Test
-    @Ignore("Temp fix to unlock others")
     public void doHealthChecksForRuntimeEmpty() throws Exception {
         datastoreProperties.brokers.setValue("");
         Iterable<ValidationResult> emptyValidationResultIter = runtime.doHealthChecks(null);

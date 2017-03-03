@@ -26,19 +26,33 @@
             <artifactId>components-adapter-beam</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- kafka version sync with beam -->
+
+        <!-- use Kafka client 0.9 to support Kafka 0.9 and above -->
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
             <version>0.9.0.1</version>
         </dependency>
 
-        <!-- kafka-clients 0.9.0.1 is dependency of beam-sdks-java-io-kafka -->
         <dependency>
             <groupId>org.apache.beam</groupId>
             <artifactId>beam-sdks-java-io-kafka</artifactId>
             <version>${beam.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-expression</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+        <!-- KafkaIO using spring-expression 4.3.5, but TCOMP spring environment using spring
+        4.3.3 -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-expression</artifactId>
+            <version>4.3.3.RELEASE</version>
+        </dependency>
+
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-aether</artifactId>
