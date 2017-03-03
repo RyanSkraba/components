@@ -18,6 +18,7 @@ import java.io.StringReader;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.mapred.AvroKey;
 import org.apache.beam.sdk.io.Read;
+import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.Keys;
 import org.apache.beam.sdk.transforms.PTransform;
@@ -89,13 +90,20 @@ public class SimpleFileIOInputRuntime extends PTransform<PBegin, PCollection<Ind
         }
 
         case CSV: {
-            CsvHdfsFileSource source = CsvHdfsFileSource.of(doAs, properties.getDatasetProperties().path.getValue(),
-                    properties.getDatasetProperties().getRecordDelimiter());
-            source.setLimit(properties.limit.getValue());
+            String path = properties.getDatasetProperties().path.getValue();
 
-            PCollection<KV<org.apache.hadoop.io.LongWritable, Text>> pc1 = in.apply(Read.from(source));
+            PCollection<?> pc2;
+            if (path.startsWith("gs://")) {
+                pc2 = in.apply(TextIO.Read.from(path));
+            } else {
+                CsvHdfsFileSource source = CsvHdfsFileSource.of(doAs, path, properties.getDatasetProperties()
+                        .getRecordDelimiter());
+                source.setLimit(properties.limit.getValue());
 
-            PCollection<Text> pc2 = pc1.apply(Values.<Text> create());
+                PCollection<KV<org.apache.hadoop.io.LongWritable, Text>> pc1 = in.apply(Read.from(source));
+
+                pc2 = pc1.apply(Values.<Text> create());
+            }
 
             String fieldDelimiter = properties.getDatasetProperties().getFieldDelimiter();
             if (fieldDelimiter.length() > 1) {
@@ -104,7 +112,7 @@ public class SimpleFileIOInputRuntime extends PTransform<PBegin, PCollection<Ind
             if (fieldDelimiter.isEmpty())
                 TalendRuntimeException.build(CommonErrorCodes.UNEXPECTED_ARGUMENT).setAndThrow(
                         "single character field delimiter", fieldDelimiter);
-            PCollection<CSVRecord> pc3 = pc2.apply(ParDo.of(new ExtractCsvRecord(fieldDelimiter.charAt(0))));
+            PCollection<CSVRecord> pc3 = pc2.apply(ParDo.of(new ExtractCsvRecord<>(fieldDelimiter.charAt(0))));
             PCollection pc4 = pc3.apply(ConvertToIndexedRecord.<CSVRecord, IndexedRecord> of());
             return pc4;
         }
@@ -143,7 +151,7 @@ public class SimpleFileIOInputRuntime extends PTransform<PBegin, PCollection<Ind
         }
     }
 
-    public static class ExtractCsvRecord extends DoFn<Text, CSVRecord> {
+    public static class ExtractCsvRecord<T> extends DoFn<T, CSVRecord> {
 
         public final char fieldDelimiter;
 
