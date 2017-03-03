@@ -16,14 +16,7 @@
 package org.talend.components.snowflake.runtime;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.DriverPropertyInfo;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -47,7 +40,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String LOGIN_TIMEOUT = "1";
+    private static final String INCORRECRT_SNOWFLAKE_ACCOUNT = " Incorrect Snowflake Account was specified..";
 
     private transient static final Logger LOG = LoggerFactory.getLogger(SnowflakeSourceOrSink.class);
 
@@ -67,6 +60,11 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
     public ValidationResult validate(RuntimeContainer container) {
         try {
             connect(container);
+        } catch (IllegalArgumentException e) {
+            ValidationResult vr = new ValidationResult();
+            vr.setMessage(e.getMessage().concat(INCORRECRT_SNOWFLAKE_ACCOUNT));
+            vr.setStatus(ValidationResult.Result.ERROR);
+            return vr;
         } catch (Exception ex) {
             return exceptionToValidationResult(ex);
         }
@@ -181,14 +179,18 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
             Driver driver = (Driver) Class.forName(JDBC_DRIVER).newInstance();
             DriverManager.registerDriver(new DriverWrapper(driver));
 
-            Properties properties = new Properties();
-            properties.put("user", user);
-            properties.put("password", password);
-            properties.put("loginTimeout", LOGIN_TIMEOUT);
+            Properties snowFlakeProperties = new Properties();
+            snowFlakeProperties.put("user", user);
+            snowFlakeProperties.put("password", password);
+            snowFlakeProperties.put("loginTimeout", this.properties.getConnectionProperties().loginTimeout.getValue());
 
-            conn = DriverManager.getConnection(connectionURL, properties);
+            conn = DriverManager.getConnection(connectionURL, snowFlakeProperties);
         } catch (Exception e) {
-            throw new IOException(e);
+            if (e.getMessage().contains("HTTP status=403")) {
+                throw new IllegalArgumentException(e.getMessage());
+            } else {
+                throw new IOException(e);
+            }
         }
 
         if (container != null) {
@@ -326,5 +328,4 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
             return this.driver.getParentLogger();
         }
     }
-
 }

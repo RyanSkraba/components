@@ -27,8 +27,7 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
-public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
-        implements SnowflakeProvideConnectionProperties{
+public class SnowflakeConnectionProperties extends ComponentPropertiesImpl implements SnowflakeProvideConnectionProperties {
 
     private static final String USERPASSWORD = "userPassword";
 
@@ -55,6 +54,8 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         }
     }
 
+    public Property<String> loginTimeout = newString("loginTimeout");
+
     public Property<String> account = newString("account").setRequired(); //$NON-NLS-1$
 
     public UserPasswordProperties userPassword = new UserPasswordProperties(USERPASSWORD);
@@ -74,7 +75,8 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
 
     public PresentationItem advanced = new PresentationItem("advanced", "Advanced...");
 
-    // protected transient PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
+    // protected transient PropertyPathConnector mainConnector = new PropertyPathConnector(Connector.MAIN_NAME,
+    // "schema");
 
     public ComponentReferenceProperties<SnowflakeConnectionProperties> referencedComponent = new ComponentReferenceProperties<>(
             "referencedComponent", TSnowflakeConnectionDefinition.COMPONENT_NAME);
@@ -87,7 +89,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
     public void setupProperties() {
         super.setupProperties();
         // Code for property initialization goes here
-
+        loginTimeout.setValue("1");
         tracing.setValue(Tracing.OFF);
     }
 
@@ -113,6 +115,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         mainForm.addRow(db);
 
         Form advancedForm = Form.create(this, Form.ADVANCED);
+        advancedForm.addRow(loginTimeout);
         advancedForm.addRow(widget(tracing).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
         advancedForm.addRow(role);
         advanced.setFormtoShow(advancedForm);
@@ -156,6 +159,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         }
 
         if (form.getName().equals(Form.ADVANCED)) {
+            loginTimeout.setValue("\"1\"");
             if (useOtherConnection) {
                 form.setHidden(true);
             } else {
