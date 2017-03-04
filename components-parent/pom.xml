@@ -182,6 +182,11 @@
 					<artifactId>maven-bundle-plugin</artifactId>
 					<version>3.0.1</version>
 					<extensions>true</extensions>
+					<configuration>
+						<instructions>
+							<DynamicImport-Package>org.talend.daikon.*</DynamicImport-Package>
+						</instructions>
+					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>

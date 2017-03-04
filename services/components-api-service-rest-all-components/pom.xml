@@ -54,11 +54,19 @@
 			<artifactId>components-jdbc-definition</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>simplefileio-definition</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-salesforce-definition</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>localio-definition</artifactId>
@@ -82,11 +90,6 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-jira</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-salesforce</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -118,6 +121,12 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-jdbc-runtime</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-salesforce-runtime</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -265,7 +274,7 @@
 						</goals>
 						<configuration>
 							<extraArtifacts>
-								<extraArtifact>org.talend.components:components-salesforce:0.18.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:components-salesforce-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:components-jira:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:jms-runtime_1_1:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:kafka-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
