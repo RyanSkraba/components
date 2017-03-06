@@ -18,25 +18,33 @@ import org.apache.beam.sdk.io.hdfs.ConfigurableHDFSFileSink;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.values.KV;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 
 /**
  * Subclass of ConfigurableHDFSFileSink that saves {@link org.apache.hadoop.security.UserGroupInformation}.
+ *
+ * If the path is the local filesystem, the UGI is still used, but the job is configured to ignore any existing default
+ * filesystem information.
  */
 public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
 
     private final UgiDoAs doAs;
 
+    final boolean isLocalMode;
+
     public UgiFileSinkBase(UgiDoAs doAs, String path, Class<? extends FileOutputFormat<K, V>> formatClass) {
         super(path, formatClass);
         this.doAs = doAs;
+        this.isLocalMode = path.toLowerCase().startsWith("file:");
     }
 
     public UgiFileSinkBase(UgiDoAs doAs, String path, Class<? extends FileOutputFormat<K, V>> formatClass, Configuration conf) {
         super(path, formatClass, conf);
         this.doAs = doAs;
+        this.isLocalMode = path.toLowerCase().startsWith("file:");
     }
 
     /**
@@ -47,6 +55,10 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
      * @param sample A sample of the incoming data.
      */
     protected void configure(Job job, KV<K, V> sample) {
+        if (isLocalMode) {
+            job.getConfiguration().set(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY,
+                    CommonConfigurationKeysPublic.FS_DEFAULT_NAME_DEFAULT);
+        }
     }
 
     @Override

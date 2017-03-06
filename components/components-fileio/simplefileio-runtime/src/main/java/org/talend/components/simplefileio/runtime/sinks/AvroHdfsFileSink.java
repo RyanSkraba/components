@@ -34,6 +34,7 @@ public class AvroHdfsFileSink extends UgiFileSinkBase<AvroKey<IndexedRecord>, Nu
 
     @Override
     protected void configure(Job job, KV<AvroKey<IndexedRecord>, NullWritable> sample) {
+        super.configure(job, sample);
         AvroKey<IndexedRecord> k = sample.getKey();
         AvroJob.setOutputKeySchema(job, k.datum().getSchema());
         FileOutputFormat.setCompressOutput(job, true);

@@ -78,11 +78,15 @@ public class ConvertToIndexedRecord<DatumT, AvroT extends IndexedRecord> extends
                 if (converter == null) {
                     converter = (IndexedRecordConverter<? super DatumT, ? extends IndexedRecord>) new AvroRegistry()
                             .createIndexedRecordConverter(in.getClass());
+                    // If the converter was still not successful, the pipeline should fail.
+                    if (converter == null) {
+                        // TODO: talend exception
+                        throw new RuntimeException("Cannot find converter for " + in.getClass());
+                    }
                 }
                 c.output((AvroT) converter.convertToAvro(in));
             }
 
         }));
     }
-
 }

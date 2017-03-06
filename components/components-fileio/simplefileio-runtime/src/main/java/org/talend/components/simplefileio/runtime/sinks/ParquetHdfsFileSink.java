@@ -32,6 +32,7 @@ public class ParquetHdfsFileSink extends UgiFileSinkBase<Void, IndexedRecord> {
 
     @Override
     protected void configure(Job job, KV<Void, IndexedRecord> sample) {
+        super.configure(job, sample);
         IndexedRecord record = (IndexedRecord) sample.getValue();
         AvroWriteSupport.setSchema(job.getConfiguration(), record.getSchema());
         ParquetOutputFormat.setCompression(job, CompressionCodecName.SNAPPY);
