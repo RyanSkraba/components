@@ -13,10 +13,8 @@
 
 package org.talend.components.service.rest;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.http.MediaType.*;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 import java.util.List;
 
@@ -32,6 +30,7 @@ import org.talend.components.service.rest.dto.PropertiesDto;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
 import org.talend.daikon.annotation.Service;
 import org.talend.daikon.definition.DefinitionImageType;
+import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.serialize.jsonschema.PropertyTrigger;
 
 @Service(name = "PropertiesController")
@@ -44,7 +43,8 @@ public interface PropertiesController {
     String IMAGE_SVG_VALUE = "image/svg+xml";
 
     @RequestMapping(value = "{definitionName}", method = GET, produces = APPLICATION_JSON_UTF8_VALUE)
-    String getProperties(@PathVariable("definitionName") String definitionName, @RequestParam(required = false) String formName);
+    String getProperties(@PathVariable("definitionName") String definitionName,
+            @RequestParam(required = false, defaultValue = Form.MAIN) String formName);
 
     /** Validate the coherence of a set of properties for a specific component. **/
     @RequestMapping(value = "{definitionName}/validate", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE)
@@ -75,13 +75,13 @@ public interface PropertiesController {
     ResponseEntity<String> triggerOnProperty(@PathVariable("definition") String definition, //
             @PathVariable("trigger") PropertyTrigger trigger, //
             @PathVariable("property") String property, //
-            @RequestParam(required = false) String formName, //
+            @RequestParam(required = false, defaultValue = Form.MAIN) String formName, //
             @RequestBody PropertiesDto propertiesContainer);
 
     /** Get dataset properties. Should it be GET? **/
     @RequestMapping(value = "{definitionName}/dataset", method = POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
     String getDatasetProperties(@PathVariable("definitionName") String definitionName, //
-            @RequestParam(required = false) String formName, //
+            @RequestParam(required = false, defaultValue = Form.MAIN) String formName, //
             @RequestBody PropertiesDto propertiesContainer);
 
 }

@@ -12,16 +12,20 @@
 //==============================================================================
 package org.talend.components.service.rest;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.http.MediaType.*;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
@@ -119,7 +123,7 @@ public interface ComponentController {
      * @returnWrapped org.talend.daikon.properties.Properties
      */
     @RequestMapping(value = "/makeFormCancelable", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
-    Properties makeFormCancelable(@RequestBody Properties properties, String formName);
+    Properties makeFormCancelable(@RequestBody Properties properties, @RequestParam(required = false, defaultValue = Form.MAIN) String formName);
 
     /**
      * Cancels the changes to the values in the specified {@link Form} object after the it was made cancelable.
@@ -133,7 +137,7 @@ public interface ComponentController {
      * @returnWrapped org.talend.daikon.properties.Properties
      */
     @RequestMapping(value = "/commitFormValues", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
-    Properties cancelFormValues(@RequestBody Properties properties, String formName);
+    Properties cancelFormValues(@RequestBody Properties properties, @RequestParam(required = false, defaultValue = Form.MAIN) String formName);
 
     /**
      * @return the {@link Properties} object specified as modified by this service.
