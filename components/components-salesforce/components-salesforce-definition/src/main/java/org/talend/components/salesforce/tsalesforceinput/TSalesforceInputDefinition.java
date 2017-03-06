@@ -30,7 +30,7 @@ public class TSalesforceInputDefinition extends SalesforceDefinition {
     public static final String COMPONENT_NAME = "tSalesforceInput"; //$NON-NLS-1$
 
     public TSalesforceInputDefinition() {
-        super(COMPONENT_NAME, ExecutionEngine.DI, ExecutionEngine.BEAM);
+        super(COMPONENT_NAME, ExecutionEngine.DI);
     }
 
     @Override
