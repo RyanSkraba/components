@@ -24,6 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.avro.Schema;
 import org.apache.beam.runners.spark.SparkContextOptions;
@@ -38,6 +39,7 @@ import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -54,7 +56,9 @@ import com.google.cloud.bigquery.DatasetInfo;
 
 public class BigQueryBeamRuntimeTestIT implements Serializable {
 
-    final static String datasetName = "bqcomponentio";
+    final static String uuid = UUID.randomUUID().toString().replace("-", "_");
+
+    final static String datasetName = "bqcomponentio" + uuid;
     @Rule
     public final TestPipeline pipeline = TestPipeline.create();
     BigQueryDatastoreProperties datastore;
@@ -63,8 +67,14 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
     public static void initDataset() throws IOException {
         BigQuery bigquery = BigQueryConnection.createClient(createDatastore());
         DatasetId datasetId = DatasetId.of(BigQueryTestConstants.PROJECT, datasetName);
-        bigquery.delete(datasetId, BigQuery.DatasetDeleteOption.deleteContents());
         bigquery.create(DatasetInfo.of(datasetId));
+    }
+
+    @AfterClass
+    public static void cleanDataset() {
+        BigQuery bigquery = BigQueryConnection.createClient(createDatastore());
+        DatasetId datasetId = DatasetId.of(BigQueryTestConstants.PROJECT, datasetName);
+        bigquery.delete(datasetId, BigQuery.DatasetDeleteOption.deleteContents());
     }
 
     @Before

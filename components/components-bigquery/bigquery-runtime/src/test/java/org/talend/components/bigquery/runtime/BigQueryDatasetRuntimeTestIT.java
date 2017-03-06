@@ -4,20 +4,18 @@ import static org.junit.Assert.assertTrue;
 import static org.talend.components.bigquery.runtime.BigQueryTestConstants.createDatasetFromTable;
 import static org.talend.components.bigquery.runtime.BigQueryTestConstants.createDatastore;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.google.api.services.bigquery.BigqueryScopes;
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.bigquery.BigQuery;
-import com.google.cloud.bigquery.BigQueryOptions;
 import com.google.cloud.bigquery.DatasetId;
 import com.google.cloud.bigquery.DatasetInfo;
 import com.google.cloud.bigquery.Field;
@@ -29,18 +27,19 @@ import com.google.cloud.bigquery.TableInfo;
 
 public class BigQueryDatasetRuntimeTestIT {
 
-    BigQueryDatasetRuntime runtime;
+    final static String uuid = UUID.randomUUID().toString().replace("-", "_");
 
-    final static List<String> datasets = Arrays.asList("bqcomponentds1", "bqcomponentds2", "bqcomponentds3");
+    final static List<String> datasets = Arrays.asList("bqcomponentds1" + uuid, "bqcomponentds2" + uuid, "bqcomponentds3" + uuid);
 
     final static List<String> tables = Arrays.asList("tb1", "tb2", "tb3");
+
+    BigQueryDatasetRuntime runtime;
 
     @BeforeClass
     public static void initDatasetAndTable() throws IOException {
         BigQuery bigquery = BigQueryConnection.createClient(createDatastore());
         for (String dataset : datasets) {
             DatasetId datasetId = DatasetId.of(BigQueryTestConstants.PROJECT, dataset);
-            bigquery.delete(datasetId, BigQuery.DatasetDeleteOption.deleteContents());
             bigquery.create(DatasetInfo.of(datasetId));
         }
 
@@ -48,6 +47,15 @@ public class BigQueryDatasetRuntimeTestIT {
             TableDefinition tableDefinition = StandardTableDefinition.of(Schema.of(Field.of("test", Field.Type.string())));
             TableId tableId = TableId.of(BigQueryTestConstants.PROJECT, datasets.get(0), table);
             bigquery.create(TableInfo.of(tableId, tableDefinition));
+        }
+    }
+
+    @AfterClass
+    public static void cleanDatasetAndTable() {
+        BigQuery bigquery = BigQueryConnection.createClient(createDatastore());
+        for (String dataset : datasets) {
+            DatasetId datasetId = DatasetId.of(BigQueryTestConstants.PROJECT, dataset);
+            bigquery.delete(datasetId, BigQuery.DatasetDeleteOption.deleteContents());
         }
     }
 

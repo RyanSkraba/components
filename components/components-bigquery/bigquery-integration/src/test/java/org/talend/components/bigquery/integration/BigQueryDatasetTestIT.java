@@ -13,7 +13,6 @@
 package org.talend.components.bigquery.integration;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -26,8 +25,8 @@ import org.apache.avro.generic.IndexedRecord;
 import org.junit.Test;
 import org.talend.components.bigquery.BigQueryDatasetDefinition;
 import org.talend.components.bigquery.BigQueryDatasetProperties;
-import org.talend.components.bigquery.BigQueryDatastoreProperties;
 import org.talend.components.bigquery.BigQueryDatasetProperties.SourceType;
+import org.talend.components.bigquery.BigQueryDatastoreProperties;
 import org.talend.components.common.dataset.runtime.DatasetRuntime;
 import org.talend.daikon.java8.Consumer;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -63,11 +62,10 @@ public class BigQueryDatasetTestIT {
 
     @Test
     public void testBasic() throws Exception {
-        //TODO the fixed dataset/table name should be change later
         BigQueryDatasetProperties props = createDatasetProperties();
-        props.bqDataset.setValue("bqcomponentio");
-        props.sourceType.setValue(SourceType.TABLE_NAME);
-        props.tableName.setValue("testalltypes");
+        props.sourceType.setValue(SourceType.QUERY);
+        props.query.setValue("SELECT * FROM [bigquery-public-data:samples.shakespeare] LIMIT 1");
+        props.useLegacySql.setValue(true);
 
         final List<IndexedRecord> consumed = new ArrayList<>();
 
@@ -90,6 +88,6 @@ public class BigQueryDatasetTestIT {
             });
         }
 
-        assertThat(consumed, hasSize(5));
+        assertThat(consumed, hasSize(1));
     }
 }

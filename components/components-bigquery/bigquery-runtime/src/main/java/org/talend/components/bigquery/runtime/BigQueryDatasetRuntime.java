@@ -28,8 +28,10 @@ import org.talend.components.adapter.beam.BeamLocalRunnerOption;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 import org.talend.components.adapter.beam.transform.DirectConsumerCollector;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.bigquery.BigQueryDatasetProperties;
 import org.talend.components.bigquery.input.BigQueryInputProperties;
+import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.java8.Consumer;
 import org.talend.daikon.properties.ValidationResult;
 
@@ -108,28 +110,31 @@ public class BigQueryDatasetRuntime implements IBigQueryDatasetRuntime {
     }
 
     /**
-     * Get the schema by table name or query.
-     * This method also needed for read and write, because we can not get schema from the ongoing data.
-     * BigQueryIO.Read return TableRow, which do not include schema in itself.
-     * So use BigQuery client to get it before read and write.
+     * Get the schema by table name or query. This method also needed for read and write, because we can not get schema
+     * from the ongoing data. BigQueryIO.Read return TableRow, which do not include schema in itself. So use BigQuery
+     * client to get it before read and write.
+     * 
      * @return
      */
     @Override
     public Schema getSchema() {
         BigQuery bigquery = BigQueryConnection.createClient(properties.getDatastoreProperties());
-        DatasetId datasetId = DatasetId.of(properties.getDatastoreProperties().projectName.getValue(),
-                properties.bqDataset.getValue());
         com.google.cloud.bigquery.Schema bqRowSchema = null;
         switch (properties.sourceType.getValue()) {
         case TABLE_NAME: {
             TableId tableId = TableId.of(properties.getDatastoreProperties().projectName.getValue(),
                     properties.bqDataset.getValue(), properties.tableName.getValue());
             Table table = bigquery.getTable(tableId);
+            if (table == null) {
+                ComponentException.build(CommonErrorCodes.UNEXPECTED_EXCEPTION)
+                        .setAndThrow("Table not found:" + tableId.toString());
+            }
             bqRowSchema = table.getDefinition().getSchema();
             break;
         }
         case QUERY: {
-            QueryRequest queryRequest = QueryRequest.newBuilder(properties.query.getValue()).setUseLegacySql(properties.useLegacySql.getValue()).build();
+            QueryRequest queryRequest = QueryRequest.newBuilder(properties.query.getValue())
+                    .setUseLegacySql(properties.useLegacySql.getValue()).build();
             QueryResponse queryResponse = bigquery.query(queryRequest);
             bqRowSchema = queryResponse.getResult().getSchema();
             break;
