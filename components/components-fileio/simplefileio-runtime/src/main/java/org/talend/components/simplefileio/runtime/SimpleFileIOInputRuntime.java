@@ -153,6 +153,11 @@ public class SimpleFileIOInputRuntime extends PTransform<PBegin, PCollection<Ind
 
     public static class ExtractCsvRecord<T> extends DoFn<T, CSVRecord> {
 
+        static {
+            // Ensure that the singleton for the SimpleFileIOAvroRegistry is created.
+            SimpleFileIOAvroRegistry.get();
+        }
+
         public final char fieldDelimiter;
 
         public ExtractCsvRecord(char fieldDelimiter) {
