@@ -18,12 +18,12 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Date;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -42,12 +42,12 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
+import com.snowflake.client.loader.LoadResultListener;
+import com.snowflake.client.loader.LoaderFactory;
+import com.snowflake.client.loader.LoaderProperty;
 import com.snowflake.client.loader.LoadingError;
 import com.snowflake.client.loader.Operation;
 import com.snowflake.client.loader.StreamLoader;
-import com.snowflake.client.loader.LoadResultListener;
-import com.snowflake.client.loader.LoaderProperty;
-import com.snowflake.client.loader.LoaderFactory;
 
 public final class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
