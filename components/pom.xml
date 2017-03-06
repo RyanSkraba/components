@@ -30,5 +30,6 @@
         <module>components-elasticsearch</module>
         <module>components-filterrow</module>
         <module>components-bigquery</module>
-  </modules>
+        <module>components-pubsub</module>
+    </modules>
 </project>
