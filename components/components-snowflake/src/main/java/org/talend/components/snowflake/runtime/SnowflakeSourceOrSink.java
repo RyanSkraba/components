@@ -16,7 +16,14 @@
 package org.talend.components.snowflake.runtime;
 
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverPropertyInfo;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -41,6 +48,8 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
     private static final long serialVersionUID = 1L;
 
     private static final String INCORRECRT_SNOWFLAKE_ACCOUNT = " Incorrect Snowflake Account was specified..";
+
+    private static final String JDBC_DRIVER = "com.snowflake.client.jdbc.SnowflakeDriver";
 
     private transient static final Logger LOG = LoggerFactory.getLogger(SnowflakeSourceOrSink.class);
 
@@ -142,49 +151,11 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
                 throw new IOException("Referenced component: " + refComponentId + " does not have properties set");
         }
 
-        // Establish a new connection
-        String queryString = "";
-
-        String user = connProps.userPassword.userId.getStringValue();
-        String password = connProps.userPassword.password.getStringValue();
-        String account = connProps.account.getStringValue();
-
-        String warehouse = connProps.warehouse.getStringValue();
-        String db = connProps.db.getStringValue();
-        String schema = connProps.schemaName.getStringValue();
-
-        String role = connProps.role.getStringValue();
-        String tracing = connProps.tracing.getStringValue();
-
-        if (null != warehouse && !"".equals(warehouse)) {
-            queryString = queryString + "warehouse=" + warehouse;
-        }
-        if (null != db && !"".equals(db)) {
-            queryString = queryString + "&db=" + db;
-        }
-        if (null != schema && !"".equals(schema)) {
-            queryString = queryString + "&schema=" + schema;
-        }
-
-        if (null != role && !"".equals(role)) {
-            queryString = queryString + "&role=" + role;
-        }
-        if (null != tracing && !"".equals(tracing)) {
-            queryString = queryString + "&tracing=" + tracing;
-        }
-        String connectionURL = "jdbc:snowflake://" + account + ".snowflakecomputing.com" + "/?" + queryString;
-        String JDBC_DRIVER = "com.snowflake.client.jdbc.SnowflakeDriver";
-
         try {
             Driver driver = (Driver) Class.forName(JDBC_DRIVER).newInstance();
             DriverManager.registerDriver(new DriverWrapper(driver));
 
-            Properties snowFlakeProperties = new Properties();
-            snowFlakeProperties.put("user", user);
-            snowFlakeProperties.put("password", password);
-            snowFlakeProperties.put("loginTimeout", this.properties.getConnectionProperties().loginTimeout.getValue());
-
-            conn = DriverManager.getConnection(connectionURL, snowFlakeProperties);
+            conn = DriverManager.getConnection(connProps.getConnectionUrl(), connProps.getJdbcProperties());
         } catch (Exception e) {
             if (e.getMessage().contains("HTTP status=403")) {
                 throw new IllegalArgumentException(e.getMessage());
