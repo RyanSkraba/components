@@ -89,6 +89,10 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
 
     private transient Schema mainSchema;
 
+    private transient boolean isFirst = true;
+
+    private transient List<Schema.Field> collectedFields;
+
     static {
         // Time in milliseconds would mean time from midnight. It shouldn't be influenced by timezone differences.
         // That's why we have to use GMT.
@@ -326,8 +330,21 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         }
         IndexedRecord input = factory.convertToAvro(datum);
         List<Schema.Field> fields = input.getSchema().getFields();
+
+        // input and mainSchema synchronization. Such situation is useful in case of Dynamic
+        if (isFirst) {
+             collectedFields = new ArrayList<>();
+            for (Schema.Field item : fields) {
+                Schema.Field fieldFromMainSchema = mainSchema.getField(item.name());
+                if (fieldFromMainSchema != null) {
+                    collectedFields.add(fieldFromMainSchema);
+                }
+            }
+            isFirst = false;
+        }
+
         for (int i = 0; i < row.length; i++) {
-            Field f = fields.get(i);
+            Field f = collectedFields.get(i);
             Schema s = AvroUtils.unwrapIfNullable(f.schema());
             Object inputValue = input.get(i);
             if (inputValue instanceof String || inputValue == null) {
