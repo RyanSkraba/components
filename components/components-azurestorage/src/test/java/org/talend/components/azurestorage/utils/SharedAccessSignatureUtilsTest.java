@@ -14,17 +14,21 @@ package org.talend.components.azurestorage.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class SharedAccessSignatureUtilsTest {
 
     private SharedAccessSignatureUtils sharedAccessSignatureUtils;
+    
+	@Rule
+	public ExpectedException thrown= ExpectedException.none();
 
     String account = "undx";
 
@@ -62,8 +66,10 @@ public class SharedAccessSignatureUtilsTest {
      */
     @Test
     public void getSharedAccessSignatureUtils() {
+    	thrown.expect(IllegalArgumentException.class);
+	    thrown.expectMessage("Shared Acces Signature is invalid.");
         SharedAccessSignatureUtils sharedaccesssignatureutils = SharedAccessSignatureUtils.getSharedAccessSignatureUtils("");
-        assertNull("sharedaccesssignatureutils cannot be null", sharedaccesssignatureutils);
+        
         sharedaccesssignatureutils = sharedAccessSignatureUtils.getSharedAccessSignatureUtils(sas);
         assertNotNull("sharedaccesssignatureutils cannot be null", sharedaccesssignatureutils);
     }

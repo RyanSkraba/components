@@ -38,12 +38,12 @@ public class SharedAccessSignatureUtils {
         this.token = sap;
     }
 
-    public static SharedAccessSignatureUtils getSharedAccessSignatureUtils(String sas) {
+    public static SharedAccessSignatureUtils getSharedAccessSignatureUtils(String sas){
         Matcher m = Pattern.compile(SharedAccessSignatureUtils.SAS_PATTERN).matcher(sas);
         if (m.matches()) {
             return new SharedAccessSignatureUtils(sas, m.group(1), m.group(2), m.group(3), m.group(4));
         }
-        return null;
+        throw new IllegalArgumentException("Shared Acces Signature is invalid.");
     }
 
     public URI getURI() throws Throwable {
