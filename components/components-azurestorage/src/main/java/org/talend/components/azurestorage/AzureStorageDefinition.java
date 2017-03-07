@@ -31,18 +31,6 @@ public abstract class AzureStorageDefinition extends AbstractComponentDefinition
 
     private static final String MAVEN_GROUP_ID = "org.talend.components";
 
-    /** Azure storage account key. */
-    public static final String RETURN_ACCOUNT_KEY = "accountKey"; //$NON-NLS-1$
-
-    /** RETURN_ACCOUNT_KEY_PROP. */
-    public static final Property<String> RETURN_ACCOUNT_KEY_PROP = PropertyFactory.newString(RETURN_ACCOUNT_KEY);
-
-    /** Azure storage account. */
-    public static final String RETURN_ACCOUNT_NAME = "accountName"; //$NON-NLS-1$
-
-    /** RETURN_ACCOUNT_NAME_PROP. */
-    public static final Property<String> RETURN_ACCOUNT_NAME_PROP = PropertyFactory.newString(RETURN_ACCOUNT_NAME);
-
     /**
      * Instantiates a new AzureStorageDefinition(String componentName).
      *
@@ -50,7 +38,7 @@ public abstract class AzureStorageDefinition extends AbstractComponentDefinition
      */
     public AzureStorageDefinition(String componentName) {
         super(componentName, true);
-        setupI18N(new Property<?>[]{RETURN_ERROR_MESSAGE_PROP, RETURN_ACCOUNT_KEY_PROP, RETURN_ACCOUNT_NAME_PROP});
+        setupI18N(new Property<?>[]{RETURN_ERROR_MESSAGE_PROP});
     }
 
     @Override
@@ -61,7 +49,7 @@ public abstract class AzureStorageDefinition extends AbstractComponentDefinition
     @SuppressWarnings("rawtypes")
     @Override
     public Property[] getReturnProperties() {
-        return new Property[]{RETURN_ERROR_MESSAGE_PROP, RETURN_ACCOUNT_NAME_PROP, RETURN_ACCOUNT_KEY_PROP};
+        return new Property[]{RETURN_ERROR_MESSAGE_PROP};
     }
 
     @Override

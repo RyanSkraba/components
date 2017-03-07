@@ -48,9 +48,6 @@ public abstract class AzureStorageReader<T> extends AbstractBoundedReader<T> imp
         Result res = new Result();
         res.totalCount = dataCount;
         Map<String, Object> resultMap = res.toMap();
-        resultMap.put(AzureStorageDefinition.RETURN_ACCOUNT_NAME, getConnectionProperties().accountName.getValue());
-        resultMap.put(AzureStorageDefinition.RETURN_ACCOUNT_KEY, getConnectionProperties().accountKey.getValue());
-
         return resultMap;
     }
 }

@@ -31,7 +31,7 @@ public class TAzureStorageGetDefinition extends AzureStorageBlobDefinition {
     @SuppressWarnings("rawtypes")
     @Override
     public Property[] getReturnProperties() {
-        return new Property[]{RETURN_ERROR_MESSAGE_PROP, RETURN_ACCOUNT_NAME_PROP, RETURN_ACCOUNT_KEY_PROP, RETURN_CONTAINER_PROP,
+        return new Property[]{RETURN_ERROR_MESSAGE_PROP,RETURN_CONTAINER_PROP,
                 RETURN_LOCAL_FOLDER_PROP};
     }
 

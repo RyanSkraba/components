@@ -31,8 +31,7 @@ public class TAzureStorageDeleteDefinition extends AzureStorageBlobDefinition {
     @SuppressWarnings("rawtypes")
     @Override
     public Property[] getReturnProperties() {
-        return new Property[]{RETURN_ERROR_MESSAGE_PROP, RETURN_ACCOUNT_NAME_PROP, RETURN_ACCOUNT_KEY_PROP,
-                RETURN_CONTAINER_PROP};
+        return new Property[]{RETURN_ERROR_MESSAGE_PROP,RETURN_CONTAINER_PROP};
     }
 
     @Override
