@@ -13,15 +13,15 @@
 
 package org.talend.components.simplefileio.input;
 
-import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.talend.daikon.properties.presentation.Form.MAIN;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+import static org.talend.daikon.properties.presentation.Form.*;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.talend.daikon.serialize.jsonschema.JsonSchemaUtil;
 
 /**
@@ -48,7 +48,7 @@ public class SimpleFileIOInputPropertiesTest {
         JSONObject node = new JSONObject(jsonString);
         // TODO: look at the contents of the JSON node.
         assertThat(node, notNullValue());
-        assertThat(JSONObject.getNames(node), arrayContainingInAnyOrder("jsonSchema", "uiSchema", "properties"));
+        JSONAssert.assertEquals("{\"jsonSchema\": {},\"uiSchema\": {},\"properties\": {}} ", node, false);
     }
 
 }

@@ -21,7 +21,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.boot.version>1.4.1.RELEASE</spring.boot.version>
+		<spring.boot.version>1.5.1.RELEASE</spring.boot.version>
 		<hadoop.version>2.7.0</hadoop.version>
 		<beam.version>0.6.0-tlnd</beam.version>
 		<!-- Used for Docker images name -->
