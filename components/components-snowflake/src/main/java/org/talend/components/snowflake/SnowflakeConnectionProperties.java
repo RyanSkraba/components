@@ -17,6 +17,7 @@ import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 
+
 import java.util.Properties;
 
 import org.talend.components.api.properties.ComponentPropertiesImpl;
@@ -216,22 +217,22 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl imple
         String tracing = this.tracing.getStringValue();
 
         if (null != warehouse && !"".equals(warehouse)) {
-            queryString = queryString.concat("warehouse=").concat(warehouse);
+            queryString = queryString + "warehouse=" + warehouse;
         }
         if (null != db && !"".equals(db)) {
-            queryString = queryString.concat("&db=").concat(db);
+            queryString = queryString + "&db=" + db;
         }
         if (null != schema && !"".equals(schema)) {
-            queryString = queryString.concat("&schema=").concat(schema);
+            queryString = queryString + "&schema=" + schema;
         }
 
         if (null != role && !"".equals(role)) {
-            queryString = queryString.concat("&role=").concat(role);
+            queryString = queryString + "&role=" + role;
         }
         if (null != tracing && !"".equals(tracing)) {
-            queryString = queryString.concat("&tracing=").concat(tracing);
+            queryString = queryString + "&tracing=" + tracing;
         }
-        return "jdbc:snowflake://".concat(account).concat(".snowflakecomputing.com").concat("/?").concat(queryString);
+        return "jdbc:snowflake://" + account + ".snowflakecomputing.com" + "/?" + queryString;
     }
 
 }
