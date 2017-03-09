@@ -12,11 +12,10 @@
 // ============================================================================
 package org.talend.components.kafka.runtime;
 
-import static org.junit.Assert.assertTrue;
-import static org.talend.components.kafka.runtime.KafkaTestConstants.TOPIC_IN;
-import static org.talend.components.kafka.runtime.KafkaTestConstants.TOPIC_OUT;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+import static org.talend.components.kafka.runtime.KafkaTestConstants.*;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
@@ -25,18 +24,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.kafka.dataset.KafkaDatasetProperties;
 import org.talend.components.kafka.datastore.KafkaDatastoreProperties;
-import org.talend.daikon.NamedThing;
 
 public class KafkaDatasetTestIT {
 
     KafkaDatasetProperties datasetProperties;
 
-    Set expectedTopics = new HashSet();
 
     @Before
     public void init() throws TimeoutException {
-        expectedTopics.add(TOPIC_IN);
-        expectedTopics.add(TOPIC_OUT);
         // there may exists other topics than these build in(configured in pom.xml) topics, but ignore them
 
         datasetProperties = new KafkaDatasetProperties("inputDatasetProperties");
@@ -51,23 +46,14 @@ public class KafkaDatasetTestIT {
         KafkaDatasetRuntime runtime = new KafkaDatasetRuntime();
         runtime.initialize(null, datasetProperties);
         Set<String> topics = runtime.listTopic();
-        for (Object expectedTopic : expectedTopics) {
-            assertTrue(topics.contains(expectedTopic));
-        }
-
+        assertThat(topics, hasItems(TOPIC_IN, TOPIC_OUT));
     }
 
     @Test
     public void listTopicForProperties() throws Exception {
         datasetProperties.beforeTopic();
-        List<NamedThing> possibleTopics = (List<NamedThing>) datasetProperties.topic.getPossibleValues();
-        Set<String> topics = new HashSet<>();
-        for (NamedThing possibleTopic : possibleTopics) {
-            topics.add(possibleTopic.getName());
-        }
-        for (Object expectedTopic : expectedTopics) {
-            assertTrue(topics.contains(expectedTopic));
-        }
+        List<String> possibleTopics = (List<String>) datasetProperties.topic.getPossibleValues();
+        assertThat(possibleTopics, hasItems(TOPIC_IN, TOPIC_OUT));
     }
 
 }

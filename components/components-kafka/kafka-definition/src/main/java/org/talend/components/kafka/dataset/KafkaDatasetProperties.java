@@ -15,18 +15,13 @@ package org.talend.components.kafka.dataset;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.avro.Schema;
-import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.kafka.datastore.KafkaDatastoreDefinition;
 import org.talend.components.kafka.datastore.KafkaDatastoreProperties;
 import org.talend.components.kafka.runtime.IKafkaDatasetRuntime;
-import org.talend.daikon.NamedThing;
-import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.ValidationResult;
@@ -50,10 +45,10 @@ public class KafkaDatasetProperties extends PropertiesImpl implements DatasetPro
 
     public EnumProperty<ValueFormat> valueFormat = PropertyFactory.newEnum("valueFormat", ValueFormat.class);
 
-    //Property for csv
+    // Property for csv
     public Property<String> fieldDelimiter = PropertyFactory.newString("fieldDelimiter", ";");
 
-    //Property for avro
+    // Property for avro
     public Property<Boolean> isHierarchy = PropertyFactory.newBoolean("isHierarchy", false);
 
     public Property<String> avroSchema = PropertyFactory.newString("avroSchema");
@@ -105,11 +100,7 @@ public class KafkaDatasetProperties extends PropertiesImpl implements DatasetPro
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, getClass().getClassLoader())) {
             IKafkaDatasetRuntime runtime = (IKafkaDatasetRuntime) sandboxedInstance.getInstance();
             runtime.initialize(null, this);
-            List<NamedThing> topics = new ArrayList<>();
-            for (String topic : runtime.listTopic()) {
-                topics.add(new SimpleNamedThing(topic, topic));
-            }
-            this.topic.setPossibleValues(topics);
+            this.topic.setPossibleValues(new ArrayList(runtime.listTopic()));
             return ValidationResult.OK;
         } catch (Exception e) {
             return new ValidationResult(new ComponentException(e));
