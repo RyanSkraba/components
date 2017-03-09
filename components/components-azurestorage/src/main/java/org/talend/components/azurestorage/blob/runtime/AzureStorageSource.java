@@ -35,6 +35,8 @@ import org.talend.components.azurestorage.blob.tazurestoragedelete.TAzureStorage
 import org.talend.components.azurestorage.blob.tazurestorageget.TAzureStorageGetProperties;
 import org.talend.components.azurestorage.blob.tazurestoragelist.TAzureStorageListProperties;
 import org.talend.components.azurestorage.blob.tazurestorageput.TAzureStoragePutProperties;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 
 /**
@@ -53,6 +55,9 @@ import org.talend.daikon.properties.ValidationResult;
 public class AzureStorageSource extends AzureStorageSourceOrSink implements BoundedSource {
 
     private static final long serialVersionUID = 8358040916857157407L;
+    
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(AzureStorageSource.class);
 
     @Override
     public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
@@ -126,21 +131,21 @@ public class AzureStorageSource extends AzureStorageSourceOrSink implements Boun
             // not empty
             if (StringUtils.isEmpty(cnt)) {
                 ValidationResult vr = new ValidationResult();
-                vr.setMessage("The container name cannot be empty."); //$NON-NLS-1$
+                vr.setMessage(messages.getMessage("error.ContainerEmpty")); //$NON-NLS-1$
                 vr.setStatus(ValidationResult.Result.ERROR);
                 return vr;
             }
             // valid characters 0-9 a-z and -
             if (!StringUtils.isAlphanumeric(cnt.replaceAll("-", ""))) {
                 ValidationResult vr = new ValidationResult();
-                vr.setMessage("The container name must contain only alphanumeric chars and dash(-)."); //$NON-NLS-1$
+                vr.setMessage(messages.getMessage("error.IncorrectName")); //$NON-NLS-1$
                 vr.setStatus(ValidationResult.Result.ERROR);
                 return vr;
             }
             // all lowercase
             if (!StringUtils.isAllLowerCase(cnt.replaceAll("-", ""))) {
                 ValidationResult vr = new ValidationResult();
-                vr.setMessage("The container name must be in lowercase."); //$NON-NLS-1$
+                vr.setMessage(messages.getMessage("error.UppercaseName")); //$NON-NLS-1$
                 vr.setStatus(ValidationResult.Result.ERROR);
                 return vr;
             }
@@ -148,7 +153,7 @@ public class AzureStorageSource extends AzureStorageSourceOrSink implements Boun
             int cntl = cnt.length();
             if ((cntl < 3) || (cntl > 63)) {
                 ValidationResult vr = new ValidationResult();
-                vr.setMessage("The container name length must be between 3 and 63 characters."); //$NON-NLS-1$
+                vr.setMessage(messages.getMessage("error.LengthError")); //$NON-NLS-1$
                 vr.setStatus(ValidationResult.Result.ERROR);
                 return vr;
             }
@@ -162,14 +167,14 @@ public class AzureStorageSource extends AzureStorageSourceOrSink implements Boun
                 // checks local folder
                 if (!new File(folder).exists()) {
                     ValidationResult vr = new ValidationResult();
-                    vr.setMessage("The local folder cannot be empty."); //$NON-NLS-1$
+                    vr.setMessage(messages.getMessage("error.EmptyLocalFolder")); //$NON-NLS-1$
                     vr.setStatus(ValidationResult.Result.ERROR);
                     return vr;
                 }
                 // checks file list if set.
                 if (p.useFileList.getValue() && p.files.fileMask.getValue().size() == 0) {
                     ValidationResult vr = new ValidationResult();
-                    vr.setMessage("The file list cannot be empty."); //$NON-NLS-1$
+                    vr.setMessage(messages.getMessage("error.EmptyFileList")); //$NON-NLS-1$
                     vr.setStatus(ValidationResult.Result.ERROR);
                     return vr;
                 }
@@ -181,14 +186,14 @@ public class AzureStorageSource extends AzureStorageSourceOrSink implements Boun
                 //
                 if (((TAzureStorageGetProperties) this.properties).remoteBlobsGet.prefix.getValue().size() == 0) {
                     ValidationResult vr = new ValidationResult();
-                    vr.setMessage("The remote blobs prefix cannot be empty."); //$NON-NLS-1$
+                    vr.setMessage(messages.getMessage("error.EmptyBlobs")); //$NON-NLS-1$
                     vr.setStatus(ValidationResult.Result.ERROR);
                     return vr;
                 }
                 String folder = ((TAzureStorageGetProperties) this.properties).localFolder.getValue();
                 if (!new File(folder).exists()) {
                     ValidationResult vr = new ValidationResult();
-                    vr.setMessage("The local folder doesn't exist."); //$NON-NLS-1$
+                    vr.setMessage(messages.getMessage("error.NonentityLocal")); //$NON-NLS-1$
                     vr.setStatus(ValidationResult.Result.ERROR);
                     return vr;
                 }
@@ -198,7 +203,7 @@ public class AzureStorageSource extends AzureStorageSourceOrSink implements Boun
             // We need at least one blob filter
             if (((AzureStorageBlobProperties) this.properties).remoteBlobs.prefix.getValue().size() == 0) {
                 ValidationResult vr = new ValidationResult();
-                vr.setMessage("The remote blobs prefix cannot be empty."); //$NON-NLS-1$
+                vr.setMessage(messages.getMessage("error.EmptyBlobs")); //$NON-NLS-1$
                 vr.setStatus(ValidationResult.Result.ERROR);
                 return vr;
             }

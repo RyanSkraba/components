@@ -27,6 +27,8 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.azurestorage.blob.AzureStorageContainerDefinition;
 import org.talend.components.azurestorage.blob.helpers.RemoteBlob;
 import org.talend.components.azurestorage.blob.tazurestoragedelete.TAzureStorageDeleteProperties;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
@@ -41,6 +43,9 @@ public class AzureStorageDeleteReader extends AzureStorageReader<Boolean> {
     private Boolean result = Boolean.FALSE;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageDeleteReader.class);
+    
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(AzureStorageDeleteReader.class);
 
     public AzureStorageDeleteReader(RuntimeContainer container, BoundedSource source, TAzureStorageDeleteProperties properties) {
         super(container, source);
@@ -61,7 +66,7 @@ public class AzureStorageDeleteReader extends AzureStorageReader<Boolean> {
                         if (((CloudBlockBlob) blob).deleteIfExists()) {
                             dataCount++;
                         } else
-                            LOGGER.warn("Failed for deleting CloudBlob : " + ((CloudBlockBlob) blob).getName() + ".");
+                            LOGGER.warn(messages.getMessage("warn.FaildDelete", ((CloudBlockBlob) blob).getName()));
                     }
                 }
             }

@@ -43,6 +43,8 @@ import org.talend.components.common.runtime.GenericIndexedRecordConverter;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 import com.microsoft.azure.storage.StorageErrorCodeStrings;
 import com.microsoft.azure.storage.StorageException;
@@ -101,6 +103,9 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
     private Boolean useNameMappings = Boolean.FALSE;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageTableWriter.class);
+    
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(AzureStorageTableWriter.class);
 
     public AzureStorageTableWriter(WriteOperation<Result> writeOperation, RuntimeContainer adaptor) {
         runtime = adaptor;
@@ -131,6 +136,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
             client = sink.getStorageTableClient(runtime);
             table = client.getTableReference(tableName);
             handleActionOnTable(properties.actionOnTable.getValue());
+
         } catch (InvalidKeyException | URISyntaxException | StorageException e) {
             LOGGER.error(e.getLocalizedMessage());
             throw new ComponentException(e);
@@ -250,7 +256,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
                                     .parse(inputRecord.get(f.pos()).toString());
                             entityProps.put(mName, new EntityProperty(dt));
                         } catch (ParseException e) {
-                            LOGGER.error("Error while parsing date : {}", e);
+                            LOGGER.error(i18nMessages.getMessage("error.ParseError",e));
                             if (properties.dieOnError.getValue()) {
                                 throw new ComponentException(e);
                             }
@@ -281,7 +287,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
     @Override
     public Result close() throws IOException {
         if (batchOperationsCount > 0) {
-            LOGGER.debug("{} operation(s) remaining in batch queue, executing batch.", batchOperationsCount);
+            LOGGER.debug(i18nMessages.getMessage("debug.ExecutingBrtch",batchOperationsCount));
             processBatch();
         }
         table = null;
@@ -346,7 +352,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
             table.execute(ope);
             handleSuccess(inputRecord, 1);
         } catch (StorageException e) {
-            LOGGER.error("processSingleOperation::" + actionData + " : " + e.getLocalizedMessage());
+            LOGGER.error(i18nMessages.getMessage("error.ProcessSingleOperation",actionData,e.getLocalizedMessage()));
 
             if (properties.dieOnError.getValue()) {
                 throw new ComponentException(e);
@@ -381,7 +387,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
             handleSuccess(null, batchOperationsCount);
 
         } catch (StorageException e) {
-            LOGGER.error("processBatch::" + actionData + " : " + e.getLocalizedMessage());
+            LOGGER.error(i18nMessages.getMessage("error.ProcessBatch",actionData,e.getLocalizedMessage()));
 
             handleReject(null, e, batchOperationsCount);
 
@@ -411,7 +417,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
         result.rejectCount = result.rejectCount + counted;
         Schema rejectSchema = properties.schemaReject.schema.getValue();
         if (rejectSchema == null || rejectSchema.getFields().isEmpty()) {
-            LOGGER.warn("handleReject: Not reject schema defined!");
+            LOGGER.warn(i18nMessages.getMessage("warn.NoRejectSchema"));
             return;
         }
         if (record != null && record.getSchema().equals(rejectSchema)) {
@@ -421,7 +427,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
                 for (IndexedRecord r : batchRecords) {
                     IndexedRecord reject = new GenericData.Record(rejectSchema);
                     reject.put(rejectSchema.getField("errorCode").pos(), e.getErrorCode());
-                    reject.put(rejectSchema.getField("errorMessage").pos(), e.getMessage());
+                    reject.put(rejectSchema.getField("errorMessage").pos(), e.getLocalizedMessage());
                     for (Schema.Field outField : reject.getSchema().getFields()) {
                         Object outValue;
                         Schema.Field inField = r.getSchema().getField(outField.name());
@@ -436,7 +442,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
             } else {
                 IndexedRecord reject = new GenericData.Record(rejectSchema);
                 reject.put(rejectSchema.getField("errorCode").pos(), e.getErrorCode());
-                reject.put(rejectSchema.getField("errorMessage").pos(), e.getMessage());
+                reject.put(rejectSchema.getField("errorMessage").pos(), e.getLocalizedMessage());
                 for (Schema.Field outField : reject.getSchema().getFields()) {
                     Object outValue;
                     Schema.Field inField = record.getSchema().getField(outField.name());

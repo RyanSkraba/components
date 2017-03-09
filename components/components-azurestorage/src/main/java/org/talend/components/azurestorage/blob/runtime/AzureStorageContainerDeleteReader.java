@@ -25,6 +25,8 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.azurestorage.blob.AzureStorageContainerDefinition;
 import org.talend.components.azurestorage.blob.tazurestoragecontainerdelete.TAzureStorageContainerDeleteProperties;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
@@ -35,7 +37,10 @@ public class AzureStorageContainerDeleteReader extends AzureStorageReader<Boolea
 
     private Boolean result = Boolean.FALSE;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageContainerCreateReader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageContainerDeleteReader.class);
+    
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(AzureStorageContainerDeleteReader.class);
 
     public AzureStorageContainerDeleteReader(RuntimeContainer container, BoundedSource source,
             TAzureStorageContainerDeleteProperties properties) {
@@ -51,7 +56,7 @@ public class AzureStorageContainerDeleteReader extends AzureStorageReader<Boolea
                     mycontainer);
             result = container.deleteIfExists();
             if (!result) {
-                LOGGER.warn("Container {} didn't exist or cannot be deleted !", mycontainer);
+                LOGGER.warn(messages.getMessage("error.ContainerNotExist", mycontainer));
             } else
                 dataCount++;
             return result;

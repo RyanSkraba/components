@@ -33,6 +33,8 @@ import org.talend.components.azurestorage.queue.AzureStorageQueueDefinition;
 import org.talend.components.azurestorage.queue.tazurestoragequeuedelete.TAzureStorageQueueDeleteProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.queue.CloudQueue;
@@ -42,6 +44,9 @@ public class AzureStorageQueueDeleteReader extends AzureStorageReader<IndexedRec
     private TAzureStorageQueueDeleteProperties properties;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageQueueDeleteReader.class);
+    
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(AzureStorageQueueDeleteReader.class);
 
     public AzureStorageQueueDeleteReader(RuntimeContainer container, BoundedSource source, ComponentProperties properties2) {
         super(container, source);
@@ -55,11 +60,11 @@ public class AzureStorageQueueDeleteReader extends AzureStorageReader<IndexedRec
         try {
             CloudQueue cqueue = ((AzureStorageQueueSource) getCurrentSource()).getCloudQueue(runtime, queue);
             startable = cqueue.deleteIfExists();
-            LOGGER.debug("queue {} is deleted ", cqueue.getName());
+            LOGGER.debug(messages.getMessage("debug.QueueDeleted",cqueue.getName()));
             if (startable) {
                 dataCount++;
             } else {
-                LOGGER.warn("Queue {} cannot be deleted or it doesn't exists...", queue);
+                LOGGER.warn(messages.getMessage("warn.CannotDelete",queue));
             }
         } catch (InvalidKeyException | URISyntaxException | StorageException e) {
             LOGGER.error(e.getLocalizedMessage());

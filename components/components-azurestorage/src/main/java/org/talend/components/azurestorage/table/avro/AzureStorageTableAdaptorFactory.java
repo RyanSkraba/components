@@ -93,7 +93,7 @@ public class AzureStorageTableAdaptorFactory implements IndexedRecordConverter<D
                     values[i] = fieldConverter[i].convertToAvro(record);
                 }
             } catch (Exception e) {
-                LOGGER.error(e.getMessage());
+                LOGGER.error(e.getLocalizedMessage());
                 throw new ComponentException(e);
             }
         }

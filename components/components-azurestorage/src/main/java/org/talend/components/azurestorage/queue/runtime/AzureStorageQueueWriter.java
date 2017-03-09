@@ -30,6 +30,8 @@ import org.talend.components.azurestorage.queue.AzureStorageQueueProperties;
 import org.talend.components.azurestorage.queue.tazurestoragequeueoutput.TAzureStorageQueueOutputProperties;
 import org.talend.components.common.runtime.GenericIndexedRecordConverter;
 import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.queue.CloudQueue;
@@ -52,6 +54,9 @@ public class AzureStorageQueueWriter implements Writer<Result> {
     private Result result;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageQueueWriter.class);
+    
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(AzureStorageQueueWriter.class);
 
     public AzureStorageQueueWriter(RuntimeContainer runtime, AzureStorageQueueWriteOperation ope) {
         super();
@@ -97,9 +102,9 @@ public class AzureStorageQueueWriter implements Writer<Result> {
         int visibility = props.initialVisibilityDelayInSeconds.getValue();
         try {
             if (msgContent == null) {
-                LOGGER.error("Message content is null !");
+                LOGGER.error(i18nMessages.getMessage("error.error.VacantMessage"));
                 if (props.dieOnError.getValue()) {
-                    throw new ComponentException(new Exception("Message content is null."));
+                    throw new ComponentException(new Exception(i18nMessages.getMessage("error.error.VacantMessage")));
                 }
             } else {
                 content = (String) inputRecord.get(msgContent.pos());

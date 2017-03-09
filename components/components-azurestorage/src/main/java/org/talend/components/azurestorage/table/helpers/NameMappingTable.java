@@ -20,6 +20,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
@@ -35,6 +37,9 @@ public class NameMappingTable extends ComponentPropertiesImpl {
     public Property<List<String>> schemaColumnName = newProperty(LIST_STRING_TYPE, "schemaColumnName"); //$NON-NLS-1$
 
     public Property<List<String>> entityPropertyName = newProperty(LIST_STRING_TYPE, "entityPropertyName"); //$NON-NLS-1$
+    
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(NameMappingTable.class);
 
     public NameMappingTable(String name) {
         super(name);
@@ -80,7 +85,7 @@ public class NameMappingTable extends ComponentPropertiesImpl {
             if (!mappingOk) {
                 ValidationResult vr = new ValidationResult();
                 vr.setStatus(Result.ERROR);
-                vr.setMessage("Missing schema column's name or entity property's name !");
+                vr.setMessage(i18nMessages.getMessage("error.MissSchemaName"));
                 return vr;
             }
         }

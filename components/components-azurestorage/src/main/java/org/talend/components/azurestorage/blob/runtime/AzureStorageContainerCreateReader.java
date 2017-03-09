@@ -25,6 +25,8 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.azurestorage.blob.AzureStorageContainerDefinition;
 import org.talend.components.azurestorage.blob.tazurestoragecontainercreate.TAzureStorageContainerCreateProperties;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 import com.microsoft.azure.storage.StorageErrorCodeStrings;
 import com.microsoft.azure.storage.StorageException;
@@ -39,6 +41,9 @@ public class AzureStorageContainerCreateReader extends AzureStorageReader<Boolea
     private Boolean result = Boolean.FALSE;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageContainerCreateReader.class);
+    
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
+    		             .getI18nMessages(AzureStorageContainerCreateReader.class);
 
     public AzureStorageContainerCreateReader(RuntimeContainer container, BoundedSource source,
             TAzureStorageContainerCreateProperties properties) {
@@ -59,16 +64,16 @@ public class AzureStorageContainerCreateReader extends AzureStorageReader<Boolea
                 if (!e.getErrorCode().equals(StorageErrorCodeStrings.CONTAINER_BEING_DELETED)) {
                     throw e;
                 }
-                LOGGER.error("Container '{}' is currently being deleted. We'll retry in a few moments...", mycontainer);
+                LOGGER.error(messages.getMessage("error.CONTAINER_BEING_DELETED", mycontainer));
                 // wait 40 seconds (min is 30s) before retrying.
                 // See https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/delete-container
                 try {
                     Thread.sleep(40000);
                 } catch (InterruptedException eint) {
-                    throw new IOException("Wait process for recreating table interrupted.");
+                    throw new IOException(messages.getMessage("error.InterruptedException"));
                 }
                 result = container.createIfNotExists();
-                LOGGER.debug("Container {} created.", mycontainer);
+                LOGGER.debug(messages.getMessage("debug.ContainerCreated", mycontainer));
             }
             // Manage accessControl
             if (access.equals("Public") && result) {
@@ -80,7 +85,7 @@ public class AzureStorageContainerCreateReader extends AzureStorageReader<Boolea
                 container.uploadPermissions(containerPermissions);
             }
             if (!result) {
-                LOGGER.warn("Container {} already exists !", mycontainer);
+                LOGGER.warn(messages.getMessage("warn.ContainerExists", mycontainer));
             }
             dataCount++;
             return result;

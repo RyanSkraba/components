@@ -32,6 +32,8 @@ import org.talend.components.azurestorage.queue.AzureStorageQueueDefinition;
 import org.talend.components.azurestorage.queue.tazurestoragequeuepurge.TAzureStorageQueuePurgeProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.queue.CloudQueue;
@@ -41,6 +43,9 @@ public class AzureStorageQueuePurgeReader extends AzureStorageReader<IndexedReco
     private TAzureStorageQueuePurgeProperties properties;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageQueuePurgeReader.class);
+    
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(AzureStorageQueuePurgeReader.class);
 
     protected AzureStorageQueuePurgeReader(RuntimeContainer container, BoundedSource source,
             TAzureStorageQueuePurgeProperties properties) {
@@ -55,7 +60,7 @@ public class AzureStorageQueuePurgeReader extends AzureStorageReader<IndexedReco
         try {
             CloudQueue queue = ((AzureStorageQueueSourceOrSink) getCurrentSource()).getCloudQueue(runtime, queueName);
             dataCount = (int) queue.getApproximateMessageCount();
-            LOGGER.debug("About to purge {} messages in {}", dataCount, queue.getName());
+            LOGGER.debug(i18nMessages.getMessage("debug.Purgeing", dataCount, queue.getName()));
             queue.clear();
             startable = true;
         } catch (InvalidKeyException | URISyntaxException | StorageException e) {

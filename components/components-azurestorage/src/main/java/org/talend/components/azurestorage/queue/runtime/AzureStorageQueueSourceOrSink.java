@@ -31,6 +31,8 @@ import org.talend.components.azurestorage.queue.tazurestoragequeuelist.TAzureSto
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 
 import com.microsoft.azure.storage.StorageException;
@@ -44,6 +46,9 @@ public class AzureStorageQueueSourceOrSink extends AzureStorageSourceOrSink impl
     protected RuntimeContainer runtime;
 
     private final Pattern queueCheckNamePattern = Pattern.compile("^[a-z][a-z0-9]{2,61}[a-z]$");
+    
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(AzureStorageQueueSourceOrSink.class);
 
     @Override
     public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
@@ -66,26 +71,26 @@ public class AzureStorageQueueSourceOrSink extends AzureStorageSourceOrSink impl
             if (q.isEmpty()) {
                 vr = new ValidationResult();
                 vr.setStatus(ValidationResult.Result.ERROR);
-                vr.setMessage("Queue name cannot be empty.");
+                vr.setMessage(i18nMessages.getMessage("error.NameEmpty"));
                 return vr;
             }
             if (q.length() < 3 || q.length() > 63) {
                 vr = new ValidationResult();
                 vr.setStatus(ValidationResult.Result.ERROR);
-                vr.setMessage("Queue name doesn't follow AzureStorage specification length : 3..63 characters long.");
+                vr.setMessage(i18nMessages.getMessage("error.LengthError"));
                 return vr;
             }
             if (q.indexOf("--") > -1) {
                 vr = new ValidationResult();
                 vr.setStatus(ValidationResult.Result.ERROR);
-                vr.setMessage("Queue name doesn't follow AzureStorage specification : You can't have 2 following dashes.");
+                vr.setMessage(i18nMessages.getMessage("error.TwoDashError"));
                 return vr;
             }
 
             if (!queueCheckNamePattern.matcher(q.replaceAll("-", "")).matches()) {
                 vr = new ValidationResult();
                 vr.setStatus(ValidationResult.Result.ERROR);
-                vr.setMessage("Queue name doesn't follow AzureStorage specification.");
+                vr.setMessage(i18nMessages.getMessage("error.QueueNameError"));
                 return vr;
             }
         }
@@ -94,14 +99,14 @@ public class AzureStorageQueueSourceOrSink extends AzureStorageSourceOrSink impl
             if (nom < 1 || nom > 32) {
                 vr = new ValidationResult();
                 vr.setStatus(ValidationResult.Result.ERROR);
-                vr.setMessage("The value of the parameter 'numberOfMessages' should be between 1 and 32.");
+                vr.setMessage(i18nMessages.getMessage("error.ParameterLengthError"));
                 return vr;
             }
             int vtimeout = ((TAzureStorageQueueInputProperties) properties).visibilityTimeoutInSeconds.getValue();
             if (vtimeout < 0) {
                 vr = new ValidationResult();
                 vr.setStatus(ValidationResult.Result.ERROR);
-                vr.setMessage("The value of the parameter 'visibilityTimeoutInSeconds' should be positive or 0.");
+                vr.setMessage(i18nMessages.getMessage("error.ParameterValueError"));
                 return vr;
             }
 

@@ -31,6 +31,8 @@ import org.talend.components.azurestorage.table.avro.AzureStorageAvroRegistry;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 
 import com.microsoft.azure.storage.StorageException;
@@ -52,6 +54,9 @@ public class AzureStorageTableSourceOrSink extends AzureStorageSourceOrSink impl
     private final Pattern tableCheckNamePattern = Pattern.compile("^[A-Za-z][A-Za-z0-9]{2,62}$");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageTableSourceOrSink.class);
+    
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(AzureStorageTableSourceOrSink.class);
 
     @Override
     public ValidationResult validate(RuntimeContainer container) {
@@ -62,13 +67,13 @@ public class AzureStorageTableSourceOrSink extends AzureStorageSourceOrSink impl
             if (tn.isEmpty()) {
                 vr = new ValidationResult();
                 vr.setStatus(ValidationResult.Result.ERROR);
-                vr.setMessage("TableName cannot be empty.");
+                vr.setMessage(i18nMessages.getMessage("message.VacantName"));
                 return vr;
             }
             if (!tableCheckNamePattern.matcher(tn).matches()) {
                 vr = new ValidationResult();
                 vr.setStatus(ValidationResult.Result.ERROR);
-                vr.setMessage("TableName doesn't follow the naming convention.");
+                vr.setMessage(i18nMessages.getMessage("message.IncorrectName"));
                 return vr;
             }
         } else

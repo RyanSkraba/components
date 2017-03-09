@@ -21,6 +21,8 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 /**
  * This class comes from a decompilation of the {@code talend-azure-storage-utils-1.0.0.jar} provided by the
@@ -30,6 +32,9 @@ import org.slf4j.LoggerFactory;
 public class AzureStorageUtils {
 
     private transient static final Logger LOG = LoggerFactory.getLogger(AzureStorageUtils.class);
+    
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(AzureStorageUtils.class);
 
     class LocalFileFilter implements FileFilter {
 
@@ -126,7 +131,7 @@ public class AzureStorageUtils {
                         m++;
                     }
                 } else {
-                    LOG.error("No match file(" + key + ") exist!");
+                    LOG.error(i18nMessages.getMessage("error.FileNotExist", key));
                 }
             }
         }

@@ -22,6 +22,8 @@ import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.azurestorage.AzureStorageProvideConnectionProperties;
 import org.talend.components.azurestorage.blob.runtime.AzureStorageSourceOrSink;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
@@ -46,6 +48,9 @@ public class TAzureStorageConnectionProperties extends ComponentPropertiesImpl
     public static final String FORM_WIZARD = "Wizard";
 
     private String repositoryLocation;
+    
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(TAzureStorageConnectionProperties.class);
     //
 
     public enum Protocol {
@@ -148,7 +153,7 @@ public class TAzureStorageConnectionProperties extends ComponentPropertiesImpl
     public ValidationResult validateTestConnection() throws Exception {
         ValidationResult vr = AzureStorageSourceOrSink.validateConnection(this);
         if (vr.getStatus() == ValidationResult.Result.OK) {
-            vr.setMessage("Connection successful");
+            vr.setMessage(i18nMessages.getMessage("message.success"));
             getForm(FORM_WIZARD).setAllowForward(true);
             getForm(FORM_WIZARD).setAllowFinish(true);
         } else {

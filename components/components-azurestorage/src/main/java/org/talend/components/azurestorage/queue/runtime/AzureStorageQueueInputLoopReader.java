@@ -25,6 +25,8 @@ import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.azurestorage.queue.tazurestoragequeueinputloop.TAzureStorageQueueInputLoopProperties;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 import com.microsoft.azure.storage.StorageException;
 
@@ -37,6 +39,9 @@ public class AzureStorageQueueInputLoopReader extends AzureStorageQueueInputRead
     private int loopWaitTime;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageQueueInputLoopReader.class);
+    
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(AzureStorageQueueInputLoopReader.class);
 
     public AzureStorageQueueInputLoopReader(RuntimeContainer container, BoundedSource source,
             TAzureStorageQueueInputLoopProperties properties) {
@@ -102,13 +107,13 @@ public class AzureStorageQueueInputLoopReader extends AzureStorageQueueInputRead
                 queue.deleteMessage(current);
                 return advanceable;
             } catch (StorageException e) {
-                LOGGER.error("Could not delete message {} ! Cause: {}.", current.getId(), e.getLocalizedMessage());
+                LOGGER.error(i18nMessages.getMessage("error.Cannotdelete",current.getId(),e.getLocalizedMessage()));
             }
         }
         // loop to wait for a message batch
         while (true) {
             try {
-                LOGGER.debug("Checking for new messages");
+                LOGGER.debug(i18nMessages.getMessage("debug.Checking"));
                 messages = queue.retrieveMessages(nbMsg).iterator();
                 advanceable = messages.hasNext();
                 if (advanceable) {

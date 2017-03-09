@@ -29,6 +29,8 @@ import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageC
 import org.talend.components.azurestorage.utils.SharedAccessSignatureUtils;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
@@ -48,6 +50,9 @@ public class AzureStorageSourceOrSink implements SourceOrSink {
     public AzureStorageProvideConnectionProperties properties;
 
     protected transient Schema schema;
+    
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(AzureStorageSourceOrSink.class);
 
     @Override
     public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
@@ -62,7 +67,7 @@ public class AzureStorageSourceOrSink implements SourceOrSink {
             // checks SAS
             if (StringUtils.isEmpty(conn.sharedAccessSignature.getStringValue())) {
                 ValidationResult vr = new ValidationResult();
-                vr.setMessage("The Shared Access Signature (SAS) cannot be empty."); //$NON-NLS-1$
+                vr.setMessage(messages.getMessage("error.EmptySAS")); //$NON-NLS-1$
                 vr.setStatus(ValidationResult.Result.ERROR);
                 return vr;
             }
@@ -70,7 +75,7 @@ public class AzureStorageSourceOrSink implements SourceOrSink {
             // checks connection's account and key
             if (StringUtils.isEmpty(conn.accountName.getStringValue()) || StringUtils.isEmpty(conn.accountKey.getStringValue())) {
                 ValidationResult vr = new ValidationResult();
-                vr.setMessage("The account name or key cannot be empty."); //$NON-NLS-1$
+                vr.setMessage(messages.getMessage("error.EmptyKey")); //$NON-NLS-1$
                 vr.setStatus(ValidationResult.Result.ERROR);
                 return vr;
             }

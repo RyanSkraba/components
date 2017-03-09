@@ -19,6 +19,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
@@ -86,6 +88,9 @@ public class FilterExpressionTable extends ComponentPropertiesImpl {
     public Property<List<String>> predicate = newProperty(LIST_STRING_TYPE, "predicate");
 
     public Property<List<String>> fieldType = newProperty(LIST_STRING_TYPE, "fieldType");
+    
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(FilterExpressionTable.class);
 
     public FilterExpressionTable(String name) {
         super(name);
@@ -184,7 +189,7 @@ public class FilterExpressionTable extends ComponentPropertiesImpl {
             if (!filterOk) {
                 ValidationResult vr = new ValidationResult();
                 vr.setStatus(Result.ERROR);
-                vr.setMessage("Missing column name or value !");
+                vr.setMessage(i18nMessages.getMessage("error.MissName"));
                 return vr;
             }
         }

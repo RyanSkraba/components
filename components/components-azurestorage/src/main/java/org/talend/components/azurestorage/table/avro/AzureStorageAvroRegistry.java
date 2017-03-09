@@ -26,6 +26,8 @@ import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.AvroConverter;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.java8.SerializableFunction;
 
 import com.microsoft.azure.storage.table.DynamicTableEntity;
@@ -46,6 +48,9 @@ public class AzureStorageAvroRegistry extends AvroRegistry {
     private static AzureStorageAvroRegistry instance;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageAvroRegistry.class);
+    
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(AzureStorageAvroRegistry.class);
 
     /**
      * Instantiates a new AzureStorageAvroRegistry().
@@ -212,7 +217,7 @@ public class AzureStorageAvroRegistry extends AvroRegistry {
                         }
                         return value.getProperties().get(mappedName).getValueAsString();
                     } catch (Exception e) {
-                        LOGGER.error("Conversion error: {}", e);
+                        LOGGER.error(i18nMessages.getMessage("error.ConversionError", e));
                         throw new ComponentException(e);
                     }
                 }
@@ -226,7 +231,7 @@ public class AzureStorageAvroRegistry extends AvroRegistry {
                     try {
                         return value.getProperties().get(mappedName).getValueAsInteger();
                     } catch (Exception e) {
-                        LOGGER.error("Conversion error: {}", e);
+                        LOGGER.error(i18nMessages.getMessage("error.ConversionError", e));
                         throw new ComponentException(e);
                     }
                 }
@@ -241,7 +246,7 @@ public class AzureStorageAvroRegistry extends AvroRegistry {
                             return value.getTimestamp();
                         return value.getProperties().get(mappedName).getValueAsDate();
                     } catch (Exception e) {
-                        LOGGER.error("Conversion error: {}", e);
+                        LOGGER.error(i18nMessages.getMessage("error.ConversionError", e));
                         throw new ComponentException(e);
                     }
                 }
@@ -256,7 +261,7 @@ public class AzureStorageAvroRegistry extends AvroRegistry {
                     try {
                         return value.getProperties().get(mappedName).getValueAsDouble();
                     } catch (Exception e) {
-                        LOGGER.error("Conversion error: {}", e);
+                        LOGGER.error(i18nMessages.getMessage("error.ConversionError", e));
                         throw new ComponentException(e);
                     }
                 }
@@ -271,7 +276,7 @@ public class AzureStorageAvroRegistry extends AvroRegistry {
                             return value.getTimestamp();
                         return value.getProperties().get(mappedName).getValueAsLong();
                     } catch (Exception e) {
-                        LOGGER.error("Conversion error: {}", e);
+                        LOGGER.error(i18nMessages.getMessage("error.ConversionError", e));
                         throw new ComponentException(e);
                     }
                 }
@@ -284,7 +289,7 @@ public class AzureStorageAvroRegistry extends AvroRegistry {
                     try {
                         return value.getProperties().get(mappedName).getValueAsBoolean();
                     } catch (Exception e) {
-                        LOGGER.error("Conversion error: {}", e);
+                        LOGGER.error(i18nMessages.getMessage("error.ConversionError", e));
                         throw new ComponentException(e);
                     }
                 }
@@ -297,7 +302,7 @@ public class AzureStorageAvroRegistry extends AvroRegistry {
                     try {
                         return value.getProperties().get(mappedName).getValueAsString();
                     } catch (Exception e) {
-                        LOGGER.error("Conversion error: {}", e);
+                        LOGGER.error(i18nMessages.getMessage("error.ConversionError", e));
                         throw new ComponentException(e);
                     }
                 }
@@ -310,7 +315,7 @@ public class AzureStorageAvroRegistry extends AvroRegistry {
                     try {
                         return value.getProperties().get(mappedName).getValueAsByteArray();
                     } catch (Exception e) {
-                        LOGGER.error("Conversion error: {}", e);
+                        LOGGER.error(i18nMessages.getMessage("error.ConversionError", e));
                         throw new ComponentException(e);
                     }
                 }
@@ -323,7 +328,7 @@ public class AzureStorageAvroRegistry extends AvroRegistry {
                     try {
                         return value.getProperties().get(mappedName).getValueAsString();
                     } catch (Exception e) {
-                        LOGGER.error("Conversion error: {}", e);
+                        LOGGER.error(i18nMessages.getMessage("error.ConversionError", e));
                         throw new ComponentException(e);
                     }
                 }

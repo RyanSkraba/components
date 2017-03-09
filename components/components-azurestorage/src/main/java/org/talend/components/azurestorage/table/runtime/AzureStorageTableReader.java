@@ -32,6 +32,8 @@ import org.talend.components.azurestorage.table.avro.AzureStorageAvroRegistry;
 import org.talend.components.azurestorage.table.avro.AzureStorageTableAdaptorFactory;
 import org.talend.components.azurestorage.table.tazurestorageinputtable.TAzureStorageInputTableProperties;
 import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.table.CloudTable;
@@ -57,6 +59,9 @@ public class AzureStorageTableReader extends AbstractBoundedReader<IndexedRecord
     private transient Map<String, String> nameMappings;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageTableReader.class);
+    
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(AzureStorageTableReader.class);
 
     public AzureStorageTableReader(RuntimeContainer container, BoundedSource source,
             TAzureStorageInputTableProperties properties) {
@@ -95,7 +100,7 @@ public class AzureStorageTableReader extends AbstractBoundedReader<IndexedRecord
         String filter = "";
         if (properties.useFilterExpression.getValue()) {
             filter = properties.filterExpression.getCombinedFilterConditions();
-            LOGGER.debug("Filter applied : {}.", filter);
+            LOGGER.debug(i18nMessages.getMessage("debug.FilterApplied", filter));
         }
         try {
             CloudTable table = ((AzureStorageTableSource) getCurrentSource()).getStorageTableReference(runtime, tableName);

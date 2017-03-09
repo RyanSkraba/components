@@ -16,6 +16,9 @@ import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
+
 public class SharedAccessSignatureUtils {
 
     String sharedAccessSignature;
@@ -29,6 +32,9 @@ public class SharedAccessSignatureUtils {
     String token;
 
     private static final String SAS_PATTERN = "(http.?)?://(.*)\\.(blob|file|queue|table)\\.core\\.windows\\.net\\/(.*)";
+    
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(SharedAccessSignatureUtils.class);
 
     public SharedAccessSignatureUtils(String sas, String protocol, String account, String service, String sap) {
         this.sharedAccessSignature = sas;
@@ -43,7 +49,7 @@ public class SharedAccessSignatureUtils {
         if (m.matches()) {
             return new SharedAccessSignatureUtils(sas, m.group(1), m.group(2), m.group(3), m.group(4));
         }
-        throw new IllegalArgumentException("Shared Acces Signature is invalid.");
+        throw new IllegalArgumentException(i18nMessages.getMessage("error.InvalidSAS"));
     }
 
     public URI getURI() throws Throwable {

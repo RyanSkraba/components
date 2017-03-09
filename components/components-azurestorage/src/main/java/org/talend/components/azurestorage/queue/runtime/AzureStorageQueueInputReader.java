@@ -31,6 +31,8 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.azurestorage.blob.runtime.AzureStorageReader;
 import org.talend.components.azurestorage.queue.AzureStorageQueueDefinition;
 import org.talend.components.azurestorage.queue.tazurestoragequeueinput.TAzureStorageQueueInputProperties;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.queue.CloudQueue;
@@ -49,6 +51,9 @@ public class AzureStorageQueueInputReader extends AzureStorageReader<IndexedReco
     protected CloudQueue queue;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageQueueInputReader.class);
+    
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(AzureStorageQueueInputReader.class);
 
     public AzureStorageQueueInputReader(RuntimeContainer container, BoundedSource source,
             TAzureStorageQueueInputProperties properties) {
@@ -79,7 +84,7 @@ public class AzureStorageQueueInputReader extends AzureStorageReader<IndexedReco
                     try {
                         queue.deleteMessage(current);
                     } catch (StorageException e) {
-                        LOGGER.error("Could not delete message {} ! Cause: {}.", current.getId(), e.getLocalizedMessage());
+                        LOGGER.error(i18nMessages.getMessage("error.Cannotdelete",current.getId(),e.getLocalizedMessage()));
                     }
                 }
             }
@@ -102,7 +107,7 @@ public class AzureStorageQueueInputReader extends AzureStorageReader<IndexedReco
                 try {
                     queue.deleteMessage(current);
                 } catch (StorageException e) {
-                    LOGGER.error("Could not delete message {} ! Cause: {}.", current.getId(), e.getLocalizedMessage());
+                    LOGGER.error(i18nMessages.getMessage("error.Cannotdelete",current.getId(),e.getLocalizedMessage()));
                 }
             }
         }
@@ -139,7 +144,7 @@ public class AzureStorageQueueInputReader extends AzureStorageReader<IndexedReco
                     record.put(f.pos(), msg.getNextVisibleTime());
                     break;
                 default:
-                    LOGGER.warn("Unknow field {}.", f);
+                    LOGGER.warn(i18nMessages.getMessage("warn.UnknowField", f));
                 }
             }
         } catch (StorageException e) {
