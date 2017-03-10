@@ -111,8 +111,10 @@ public class AzureStorageQueueWriter implements Writer<Result> {
                 CloudQueueMessage msg = new CloudQueueMessage(content);
                 msg.setMessageContent(content);
                 queue.addMessage(msg, ttl, visibility, null, null);
+                result.successCount++;
             }
         } catch (StorageException e) {
+            result.rejectCount++;
             LOGGER.error(e.getLocalizedMessage());
         }
     }

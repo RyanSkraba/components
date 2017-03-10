@@ -46,7 +46,7 @@ public class TAzureStorageQueueOutputDefinition extends AzureStorageQueueDefinit
     @SuppressWarnings("rawtypes")
     @Override
     public Property[] getReturnProperties() {
-        return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_QUEUE_NAME_PROP };
+        return new Property[] { RETURN_ERROR_MESSAGE_PROP,RETURN_TOTAL_RECORD_COUNT_PROP,RETURN_SUCCESS_RECORD_COUNT_PROP,RETURN_REJECT_RECORD_COUNT_PROP};
     }
 
 }
