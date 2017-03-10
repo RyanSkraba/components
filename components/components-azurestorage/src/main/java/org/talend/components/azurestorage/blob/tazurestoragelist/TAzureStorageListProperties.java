@@ -14,6 +14,9 @@ package org.talend.components.azurestorage.blob.tazurestoragelist;
 
 import static org.talend.daikon.properties.presentation.Widget.widget;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.component.Connector;
@@ -52,6 +55,11 @@ public class TAzureStorageListProperties extends AzureStorageBlobProperties {
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//$NON-NLS-1$
                 .type(AvroUtils._string()).noDefault().endRecord();
         schema.schema.setValue(s);
+    }
+    
+    @Override
+    public Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        return Collections.singleton(new PropertyPathConnector(Connector.MAIN_NAME, "schema")); //$NON-NLS-1$
     }
 
 }
