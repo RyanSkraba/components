@@ -202,9 +202,15 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl imple
 
         Properties properties = new Properties();
 
-        if (user != null && password != null && loginTimeout != null) {
+        if (user != null) {
             properties.put("user", user);
+        }
+
+        if (password != null) {
             properties.put("password", password);
+        }
+
+        if (loginTimeout != null) {
             properties.put("loginTimeout", String.valueOf(this.loginTimeout.getValue()));
         }
 
