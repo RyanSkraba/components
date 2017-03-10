@@ -63,6 +63,13 @@ public class AzureStorageSourceOrSink implements SourceOrSink {
     @Override
     public ValidationResult validate(RuntimeContainer container) {
         TAzureStorageConnectionProperties conn = validateConnection(container);
+        if(conn==null){
+        	//check connection failure
+        	ValidationResult vr = new ValidationResult();
+            vr.setMessage("Cannot get connection."); //$NON-NLS-1$
+            vr.setStatus(ValidationResult.Result.ERROR);
+            return vr;
+        }
         if (conn.useSharedAccessSignature.getValue()) {
             // checks SAS
             if (StringUtils.isEmpty(conn.sharedAccessSignature.getStringValue())) {
