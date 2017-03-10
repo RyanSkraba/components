@@ -12,22 +12,16 @@
 // ============================================================================
 package org.talend.components.azurestorage.table.avro;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
-import org.talend.daikon.avro.converter.AvroConverter;
-import org.talend.daikon.i18n.GlobalI18N;
-import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.java8.SerializableFunction;
 
 import com.microsoft.azure.storage.table.DynamicTableEntity;
@@ -47,10 +41,6 @@ public class AzureStorageAvroRegistry extends AvroRegistry {
     /** instance - instance. */
     private static AzureStorageAvroRegistry instance;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageAvroRegistry.class);
-    
-    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
-            .getI18nMessages(AzureStorageAvroRegistry.class);
 
     /**
      * Instantiates a new AzureStorageAvroRegistry().
@@ -194,164 +184,9 @@ public class AzureStorageAvroRegistry extends AvroRegistry {
         return field;
     }
 
-    public DTEConverter getConverter(final Field f, final String mappedName) {
-        Schema basicSchema = AvroUtils.unwrapIfNullable(f.schema());
+    public AzureStorageDTEConverters.DTEConverter getConverter(final Field f, final String mappedName) {
 
-        if (AvroUtils.isSameType(basicSchema, AvroUtils._string())) {
-            return new DTEConverter() {
-
-                @Override
-                public Object convertToAvro(DynamicTableEntity value) {
-                    try {
-                        if (f.name().equals(COL_PARITION_KEY) || mappedName.equals(COL_PARITION_KEY))
-                            return value.getPartitionKey();
-                        if (f.name().equals(COL_ROW_KEY) || mappedName.equals(COL_ROW_KEY))
-                            return value.getRowKey();
-                        if (f.name().equals(COL_TIMESTAMP) || mappedName.equals(COL_TIMESTAMP)) { // should be set to DT
-                                                                                                  // but...
-                            String pattern = f.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
-                            if (pattern != null && !pattern.isEmpty())
-                                return new SimpleDateFormat(pattern).format(value.getTimestamp());
-                            else
-                                return value.getTimestamp();
-                        }
-                        return value.getProperties().get(mappedName).getValueAsString();
-                    } catch (Exception e) {
-                        LOGGER.error(i18nMessages.getMessage("error.ConversionError", e));
-                        throw new ComponentException(e);
-                    }
-                }
-            };
-        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._int()) || AvroUtils.isSameType(basicSchema, AvroUtils._short())
-                || AvroUtils.isSameType(basicSchema, AvroUtils._byte())) {
-            return new DTEConverter() {
-
-                @Override
-                public Object convertToAvro(DynamicTableEntity value) {
-                    try {
-                        return value.getProperties().get(mappedName).getValueAsInteger();
-                    } catch (Exception e) {
-                        LOGGER.error(i18nMessages.getMessage("error.ConversionError", e));
-                        throw new ComponentException(e);
-                    }
-                }
-            };
-        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._date())) {
-            return new DTEConverter() {
-
-                @Override
-                public Object convertToAvro(DynamicTableEntity value) {
-                    try {
-                        if (f.name().equals(COL_TIMESTAMP) || mappedName.equals(COL_TIMESTAMP))
-                            return value.getTimestamp();
-                        return value.getProperties().get(mappedName).getValueAsDate();
-                    } catch (Exception e) {
-                        LOGGER.error(i18nMessages.getMessage("error.ConversionError", e));
-                        throw new ComponentException(e);
-                    }
-                }
-            };
-        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._decimal())
-                || AvroUtils.isSameType(basicSchema, AvroUtils._double())
-                || AvroUtils.isSameType(basicSchema, AvroUtils._float())) {
-            return new DTEConverter() {
-
-                @Override
-                public Object convertToAvro(DynamicTableEntity value) {
-                    try {
-                        return value.getProperties().get(mappedName).getValueAsDouble();
-                    } catch (Exception e) {
-                        LOGGER.error(i18nMessages.getMessage("error.ConversionError", e));
-                        throw new ComponentException(e);
-                    }
-                }
-            };
-        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._long())) {
-            return new DTEConverter() {
-
-                @Override
-                public Object convertToAvro(DynamicTableEntity value) {
-                    try {
-                        if (f.name().equals(COL_TIMESTAMP) || mappedName.equals(COL_TIMESTAMP))
-                            return value.getTimestamp();
-                        return value.getProperties().get(mappedName).getValueAsLong();
-                    } catch (Exception e) {
-                        LOGGER.error(i18nMessages.getMessage("error.ConversionError", e));
-                        throw new ComponentException(e);
-                    }
-                }
-            };
-        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._boolean())) {
-            return new DTEConverter() {
-
-                @Override
-                public Object convertToAvro(DynamicTableEntity value) {
-                    try {
-                        return value.getProperties().get(mappedName).getValueAsBoolean();
-                    } catch (Exception e) {
-                        LOGGER.error(i18nMessages.getMessage("error.ConversionError", e));
-                        throw new ComponentException(e);
-                    }
-                }
-            };
-        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._character())) {
-            return new DTEConverter() {
-
-                @Override
-                public Object convertToAvro(DynamicTableEntity value) {
-                    try {
-                        return value.getProperties().get(mappedName).getValueAsString();
-                    } catch (Exception e) {
-                        LOGGER.error(i18nMessages.getMessage("error.ConversionError", e));
-                        throw new ComponentException(e);
-                    }
-                }
-            };
-        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._bytes())) {
-            return new DTEConverter() {
-
-                @Override
-                public Object convertToAvro(DynamicTableEntity value) {
-                    try {
-                        return value.getProperties().get(mappedName).getValueAsByteArray();
-                    } catch (Exception e) {
-                        LOGGER.error(i18nMessages.getMessage("error.ConversionError", e));
-                        throw new ComponentException(e);
-                    }
-                }
-            };
-        } else {
-            return new DTEConverter() {
-
-                @Override
-                public Object convertToAvro(DynamicTableEntity value) {
-                    try {
-                        return value.getProperties().get(mappedName).getValueAsString();
-                    } catch (Exception e) {
-                        LOGGER.error(i18nMessages.getMessage("error.ConversionError", e));
-                        throw new ComponentException(e);
-                    }
-                }
-            };
-        }
+        return AzureStorageDTEConverterFactory.createConverter(f, mappedName);
     }
 
-    public abstract class DTEConverter implements AvroConverter<DynamicTableEntity, Object> {
-
-        @Override
-        public Schema getSchema() {
-            return null;
-        }
-
-        @Override
-        public Class<DynamicTableEntity> getDatumClass() {
-            return null;
-        }
-
-        @Override
-        public DynamicTableEntity convertToDatum(Object value) {
-            return null;
-        }
-
-    }
 }

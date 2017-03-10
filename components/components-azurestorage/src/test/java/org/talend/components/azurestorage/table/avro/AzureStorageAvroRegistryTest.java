@@ -27,7 +27,7 @@ import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
-import org.talend.components.azurestorage.table.avro.AzureStorageAvroRegistry.DTEConverter;
+import org.talend.components.azurestorage.table.avro.AzureStorageDTEConverters.DTEConverter;
 import org.talend.components.azurestorage.table.runtime.AzureStorageTableBaseTestIT;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
@@ -158,6 +158,7 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
     @Test
     public void testGetConverter() {
         String mname = "test";
+        String nonExistingKey = "nonExistingKey";
         Field f = new Field("test", AvroUtils._date(), null, (Object) null);
         DTEConverter converter = registry.getConverter(f, mname);
         assertNotNull("converter cannot be null", converter);
@@ -177,6 +178,11 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
         entity.setProperties((HashMap<String, EntityProperty>) props);
         assertNotNull(converter.convertToAvro(entity));
         //
+        props.clear();
+        props.put(mname, null);
+        entity.setProperties((HashMap<String, EntityProperty>) props);
+        assertNull(converter.convertToAvro(entity));
+        //
         props.put(mname, new EntityProperty("sdsds"));
         entity.setProperties((HashMap<String, EntityProperty>) props);
         try {
@@ -185,6 +191,10 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("UNEXPECTED_EXCEPTION"));
         }
+        //
+        f = new Field(nonExistingKey, AvroUtils._date(), null, (Object) null);
+        converter = registry.getConverter(f, nonExistingKey);
+        assertNull(converter.convertToAvro(entity));
         //
         // String
         //
@@ -195,14 +205,27 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
         entity.setProperties((HashMap<String, EntityProperty>) props);
         assertNotNull(converter.convertToAvro(entity));
         //
+        props.clear();
         props.put(mname, null);
+        entity.setProperties((HashMap<String, EntityProperty>) props);
+        assertNull(converter.convertToAvro(entity));
+        //
+        f = new Field("Timestamp", AvroUtils._string(), null, (Object) null);
+        f.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "Non valide pattern");
+        converter = registry.getConverter(f, mname);
+        props.clear();
+        props.put(mname, new EntityProperty(new Date()));
         entity.setProperties((HashMap<String, EntityProperty>) props);
         try {
             converter.convertToAvro(entity);
-            // fail("Expected an UNEXPECTED_EXCEPTION to be thrown");
+            fail("Expected an UNEXPECTED_EXCEPTION to be thrown");
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("UNEXPECTED_EXCEPTION"));
         }
+        //
+        f = new Field(nonExistingKey, AvroUtils._string(), null, (Object) null);
+        converter = registry.getConverter(f, nonExistingKey);
+        assertNull(converter.convertToAvro(entity));
         //
         // decimal
         //
@@ -213,6 +236,12 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
         entity.setProperties((HashMap<String, EntityProperty>) props);
         assertNotNull(converter.convertToAvro(entity));
         //
+        props.clear();
+        props.put(mname, null);
+        entity.setProperties((HashMap<String, EntityProperty>) props);
+        assertNull(converter.convertToAvro(entity));
+        //
+        props.clear();
         props.put(mname, new EntityProperty(new Date()));
         entity.setProperties((HashMap<String, EntityProperty>) props);
         try {
@@ -221,6 +250,10 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("UNEXPECTED_EXCEPTION"));
         }
+        //
+        f = new Field(nonExistingKey, AvroUtils._decimal(), null, (Object) null);
+        converter = registry.getConverter(f, nonExistingKey);
+        assertNull(converter.convertToAvro(entity));
         //
         // character
         //
@@ -231,14 +264,14 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
         entity.setProperties((HashMap<String, EntityProperty>) props);
         assertNotNull(converter.convertToAvro(entity));
         //
+        props.clear();
         props.put(mname, null);
         entity.setProperties((HashMap<String, EntityProperty>) props);
-        try {
-            converter.convertToAvro(entity);
-            fail("Expected an UNEXPECTED_EXCEPTION to be thrown");
-        } catch (Exception e) {
-            assertTrue(e.getMessage().contains("UNEXPECTED_EXCEPTION"));
-        }
+        assertNull(converter.convertToAvro(entity));
+        //
+        f = new Field(nonExistingKey, AvroUtils._character(), null, (Object) null);
+        converter = registry.getConverter(f, nonExistingKey);
+        assertNull(converter.convertToAvro(entity));
         //
         // long
         //
@@ -249,6 +282,13 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
         entity.setProperties((HashMap<String, EntityProperty>) props);
         assertNotNull(converter.convertToAvro(entity));
         //
+        //
+        props.clear();
+        props.put(mname, null);
+        entity.setProperties((HashMap<String, EntityProperty>) props);
+        assertNull(converter.convertToAvro(entity));
+        //
+        props.clear();
         props.put(mname, new EntityProperty("fdfdfd"));
         entity.setProperties((HashMap<String, EntityProperty>) props);
         try {
@@ -257,6 +297,10 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("UNEXPECTED_EXCEPTION"));
         }
+        //
+        f = new Field(nonExistingKey, AvroUtils._long(), null, (Object) null);
+        converter = registry.getConverter(f, nonExistingKey);
+        assertNull(converter.convertToAvro(entity));
         //
         // int
         //
@@ -267,6 +311,12 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
         entity.setProperties((HashMap<String, EntityProperty>) props);
         assertNotNull(converter.convertToAvro(entity));
         //
+        props.clear();
+        props.put(mname, null);
+        entity.setProperties((HashMap<String, EntityProperty>) props);
+        assertNull(converter.convertToAvro(entity));
+        //
+        props.clear();
         props.put(mname, new EntityProperty("fdfdfd"));
         entity.setProperties((HashMap<String, EntityProperty>) props);
         try {
@@ -275,6 +325,10 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("UNEXPECTED_EXCEPTION"));
         }
+        //
+        f = new Field(nonExistingKey, AvroUtils._int(), null, (Object) null);
+        converter = registry.getConverter(f, nonExistingKey);
+        assertNull(converter.convertToAvro(entity));
         //
         // bool
         //
@@ -285,6 +339,7 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
         entity.setProperties((HashMap<String, EntityProperty>) props);
         assertNotNull(converter.convertToAvro(entity));
         //
+        props.clear();
         props.put(mname, null);
         entity.setProperties((HashMap<String, EntityProperty>) props);
         try {
@@ -293,6 +348,10 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("UNEXPECTED_EXCEPTION"));
         }
+        //
+        f = new Field(nonExistingKey, AvroUtils._boolean(), null, (Object) null);
+        converter = registry.getConverter(f, nonExistingKey);
+        assertNull(converter.convertToAvro(entity));
         //
         // bytes
         //
@@ -303,7 +362,13 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
         entity.setProperties((HashMap<String, EntityProperty>) props);
         assertNotNull(converter.convertToAvro(entity));
         //
+        props.clear();
         props.put(mname, null);
+        entity.setProperties((HashMap<String, EntityProperty>) props);
+        assertNull(converter.convertToAvro(entity));
+        //
+        props.clear();
+        props.put(mname, new EntityProperty(":")); // non valid base64 String cannot be converted to bytes
         entity.setProperties((HashMap<String, EntityProperty>) props);
         try {
             converter.convertToAvro(entity);
@@ -311,6 +376,10 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("UNEXPECTED_EXCEPTION"));
         }
+        //
+        f = new Field(nonExistingKey, AvroUtils._bytes(), null, (Object) null);
+        converter = registry.getConverter(f, nonExistingKey);
+        assertNull(converter.convertToAvro(entity));
         //
         // other
         //
@@ -321,7 +390,13 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
         entity.setProperties((HashMap<String, EntityProperty>) props);
         assertNotNull(converter.convertToAvro(entity));
         //
+        props.clear();
         props.put(mname, null);
+        entity.setProperties((HashMap<String, EntityProperty>) props);
+        assertNull(converter.convertToAvro(entity));
+        //
+        props.clear();
+        props.put(mname, new EntityProperty("abc"));
         entity.setProperties((HashMap<String, EntityProperty>) props);
         try {
             converter.convertToAvro(entity);
@@ -329,7 +404,10 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("UNEXPECTED_EXCEPTION"));
         }
-
+        //
+        f = new Field(nonExistingKey, AvroUtils._logicalTimestamp(), null, (Object) null);
+        converter = registry.getConverter(f, nonExistingKey);
+        assertNull(converter.convertToAvro(entity));
         //
         // timestamp
         //
@@ -354,7 +432,6 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
         props.put(mname, new EntityProperty(new Date()));
         entity.setProperties((HashMap<String, EntityProperty>) props);
         assertNotNull(converter.convertToAvro(entity));
-
     }
 
 }
