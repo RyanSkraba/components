@@ -12,6 +12,10 @@
 // ============================================================================
 package org.talend.components.azurestorage.queue.tazurestoragequeuecreate;
 
+import java.util.Collections;
+import java.util.Set;
+
+import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.azurestorage.queue.AzureStorageQueueProperties;
 import org.talend.daikon.properties.presentation.Form;
 
@@ -30,5 +34,10 @@ public class TAzureStorageQueueCreateProperties extends AzureStorageQueuePropert
         mainForm.addRow(queueName);
         mainForm.addRow(dieOnError);
     }
+    
+	@Override
+	public Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+		return Collections.emptySet();
+	}
 
 }
