@@ -159,7 +159,6 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl imple
         }
 
         if (form.getName().equals(Form.ADVANCED)) {
-            loginTimeout.setValue(1);
             if (useOtherConnection) {
                 form.setHidden(true);
             } else {
@@ -197,10 +196,17 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl imple
     }
 
     public Properties getJdbcProperties() {
+        String user = userPassword.userId.getStringValue();
+        String password = userPassword.password.getStringValue();
+        String loginTimeout = String.valueOf(this.loginTimeout.getValue());
+
         Properties properties = new Properties();
-        properties.put("user", userPassword.userId.getStringValue());
-        properties.put("password", userPassword.password.getStringValue());
-        properties.put("loginTimeout", String.valueOf(this.loginTimeout.getValue()));
+
+        if (user != null && password != null && loginTimeout != null) {
+            properties.put("user", user);
+            properties.put("password", password);
+            properties.put("loginTimeout", String.valueOf(this.loginTimeout.getValue()));
+        }
 
         return properties;
     }
