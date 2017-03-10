@@ -143,7 +143,7 @@ public class AzureStorageSource extends AzureStorageSourceOrSink implements Boun
                 return vr;
             }
             // all lowercase
-            if (!StringUtils.isAllLowerCase(cnt.replaceAll("-", ""))) {
+            if (!StringUtils.isAllLowerCase(cnt.replaceAll("(-|\\d)", ""))) {
                 ValidationResult vr = new ValidationResult();
                 vr.setMessage(messages.getMessage("error.UppercaseName")); //$NON-NLS-1$
                 vr.setStatus(ValidationResult.Result.ERROR);
