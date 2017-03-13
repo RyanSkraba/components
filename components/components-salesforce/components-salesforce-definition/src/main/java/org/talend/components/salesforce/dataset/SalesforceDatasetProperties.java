@@ -12,25 +12,42 @@
 // ============================================================================
 package org.talend.components.salesforce.dataset;
 
+import java.io.IOException;
+import java.util.List;
+
+import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.JarRuntimeInfo;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.common.dataset.DatasetProperties;
+import org.talend.components.salesforce.common.SalesforceRuntimeSourceOrSink;
+import org.talend.components.salesforce.dataprep.SalesforceInputProperties;
 import org.talend.components.salesforce.datastore.SalesforceDatastoreDefinition;
 import org.talend.components.salesforce.datastore.SalesforceDatastoreProperties;
+import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
+import org.talend.daikon.properties.property.StringProperty;
+import org.talend.daikon.runtime.RuntimeInfo;
+import org.talend.daikon.runtime.RuntimeUtil;
+import org.talend.daikon.sandbox.SandboxedInstance;
 
 public class SalesforceDatasetProperties extends PropertiesImpl implements DatasetProperties<SalesforceDatastoreProperties> {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8035880860245867110L;
 
     public ReferenceProperties<SalesforceDatastoreProperties> datastore = new ReferenceProperties<>("datastore",
             SalesforceDatastoreDefinition.NAME);
 
     public Property<SourceType> sourceType = PropertyFactory.newEnum("sourceType", SourceType.class);
 
-    public Property<String> moduleName = PropertyFactory.newString("moduleName");
+    public StringProperty moduleName = PropertyFactory.newString("moduleName");
 
     public Property<String> query = PropertyFactory.newString("query");
 
@@ -40,8 +57,26 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
         super(name);
     }
 
-    public void afterSourceType() {
+    public void afterSourceType() throws IOException {
         refreshLayout(getForm(Form.MAIN));
+
+        // refresh the module list
+        if (sourceType.getValue() == SourceType.MODULE_SELECTION) {
+            ClassLoader classLoader = this.getClass().getClassLoader();
+            RuntimeInfo runtimeInfo = new JarRuntimeInfo("mvn:org.talend.components/components-salesforce-runtime",
+                    DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-salesforce-runtime"),
+                    "org.talend.components.salesforce.runtime.dataprep.SalesforceDataprepSource");
+            try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, classLoader)) {
+                SalesforceRuntimeSourceOrSink runtime = (SalesforceRuntimeSourceOrSink) sandboxedInstance.getInstance();
+                
+                SalesforceInputProperties properties = new SalesforceInputProperties("model");
+                properties.setDatasetProperties(this);
+                
+                runtime.initialize(null, properties);
+                List<NamedThing> moduleNames = runtime.getSchemaNames(null);
+                moduleName.setPossibleNamedThingValues(moduleNames);
+            }
+        }
     }
 
     @Override
@@ -54,17 +89,20 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
     public void setupLayout() {
         Form mainForm = Form.create(this, Form.MAIN);
 
-        mainForm.addRow(sourceType);
-        mainForm.addRow(moduleName);
+        mainForm.addRow(Widget.widget(sourceType).setWidgetType(Widget.RADIO_WIDGET_TYPE));
+        mainForm.addRow(Widget.widget(moduleName).setWidgetType(Widget.SELECT_WIDGET_TYPE));
         mainForm.addRow(Widget.widget(query).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
     }
 
+    /**
+     * the method is called back at many places, even some strange places, so it should work only for basic layout, not some
+     * action which need runtime support.
+     */
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
         form.getWidget(moduleName).setVisible(sourceType.getValue() == SourceType.MODULE_SELECTION);
-
         form.getWidget(query).setVisible(sourceType.getValue() == SourceType.SOQL_QUERY);
     }
 
