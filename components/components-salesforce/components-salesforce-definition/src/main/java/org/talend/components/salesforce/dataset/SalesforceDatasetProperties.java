@@ -45,11 +45,11 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
     public ReferenceProperties<SalesforceDatastoreProperties> datastore = new ReferenceProperties<>("datastore",
             SalesforceDatastoreDefinition.NAME);
 
-    public Property<SourceType> sourceType = PropertyFactory.newEnum("sourceType", SourceType.class);
+    public Property<SourceType> sourceType = PropertyFactory.newEnum("sourceType", SourceType.class).setRequired();
 
     public StringProperty moduleName = PropertyFactory.newString("moduleName");
 
-    public Property<String> query = PropertyFactory.newString("query");
+    public Property<String> query = PropertyFactory.newString("query").setRequired();
 
     public SchemaProperties main = new SchemaProperties("main");
 
@@ -75,6 +75,7 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
                 runtime.initialize(null, properties);
                 List<NamedThing> moduleNames = runtime.getSchemaNames(null);
                 moduleName.setPossibleNamedThingValues(moduleNames);
+                moduleName.setRequired(true);
             }
         }
     }
