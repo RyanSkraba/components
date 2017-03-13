@@ -614,7 +614,6 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
     }
 
     @Test
-    @Ignore("faling right now until it gets resoleved")
     public void testOutputBadConnection() throws Throwable {
         TSnowflakeOutputProperties outputProps = (TSnowflakeOutputProperties) getComponentService()
                 .getComponentProperties(TSnowflakeOutputDefinition.COMPONENT_NAME);
