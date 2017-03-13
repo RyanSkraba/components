@@ -90,7 +90,7 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
         Form mainForm = Form.create(this, Form.MAIN);
 
         mainForm.addRow(Widget.widget(sourceType).setWidgetType(Widget.RADIO_WIDGET_TYPE));
-        mainForm.addRow(Widget.widget(moduleName).setWidgetType(Widget.SELECT_WIDGET_TYPE));
+        mainForm.addRow(Widget.widget(moduleName).setWidgetType(Widget.DATALIST_WIDGET_TYPE));
         mainForm.addRow(Widget.widget(query).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
     }
 
