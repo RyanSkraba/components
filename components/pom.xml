@@ -31,5 +31,6 @@
         <module>components-filterrow</module>
         <module>components-bigquery</module>
         <module>components-pubsub</module>
+        <module>components-netsuite</module>
     </modules>
 </project>

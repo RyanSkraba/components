@@ -96,19 +96,31 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
     }
 
     protected void assertEngineCompatibility(ExecutionEngine engine) throws TalendRuntimeException {
-        if (!getSupportedExecutionEngines().contains(engine))
-            TalendRuntimeException.build(ComponentsErrorCode.WRONG_EXECUTION_ENGINE) //
-                    .put("component", getName()) //
-                    .put("requested", engine == null ? "null" : engine.toString()) //
-                    .put("available", getSupportedExecutionEngines().toString()).throwIt();
+        if (!getSupportedExecutionEngines().contains(engine)) {
+            throwIncompatibleEngineException(engine);
+        }
+    }
+
+    protected void throwIncompatibleEngineException(ExecutionEngine engine) throws TalendRuntimeException {
+        TalendRuntimeException.build(ComponentsErrorCode.WRONG_EXECUTION_ENGINE) //
+                .put("component", getName()) //
+                .put("requested", engine == null ? "null" : engine.toString()) //
+                .put("available", getSupportedExecutionEngines().toString())
+                .throwIt();
     }
 
     protected void assertConnectorTopologyCompatibility(ConnectorTopology connectorTopology) throws TalendRuntimeException {
-        if (!getSupportedConnectorTopologies().contains(connectorTopology))
-            TalendRuntimeException.build(ComponentsErrorCode.WRONG_CONNECTOR) //
-                    .put("component", getName()) //
-                    .put("requested", connectorTopology == null ? "null" : connectorTopology.toString()) //
-                    .put("available", getSupportedExecutionEngines().toString()).throwIt();
+        if (!getSupportedConnectorTopologies().contains(connectorTopology)) {
+            throwIncompatibleConnectorTopologyException(connectorTopology);
+        }
+    }
+
+    protected void throwIncompatibleConnectorTopologyException(ConnectorTopology connectorTopology) throws TalendRuntimeException {
+        TalendRuntimeException.build(ComponentsErrorCode.WRONG_CONNECTOR) //
+                .put("component", getName()) //
+                .put("requested", connectorTopology == null ? "null" : connectorTopology.toString()) //
+                .put("available", getSupportedExecutionEngines().toString())
+                .throwIt();
     }
 
     /**

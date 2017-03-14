@@ -77,6 +77,14 @@ public class JarRuntimeInfo implements RuntimeInfo {
         }
     }
 
+    public URL getJarUrl() {
+        return jarUrl;
+    }
+
+    public String getDepTxtPath() {
+        return depTxtPath;
+    }
+
     @Override
     public List<URL> getMavenUrlDependencies() {
         DependenciesReader dependenciesReader = new DependenciesReader(depTxtPath);
