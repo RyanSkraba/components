@@ -65,27 +65,27 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
 
     private void retrieveModules() throws IOException {
         // refresh the module list
-        ClassLoader classLoader = this.getClass().getClassLoader();
-        RuntimeInfo runtimeInfo = new JarRuntimeInfo("mvn:org.talend.components/components-salesforce-runtime",
-                DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-salesforce-runtime"),
-                "org.talend.components.salesforce.runtime.dataprep.SalesforceDataprepSource");
-        try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, classLoader)) {
-            SalesforceRuntimeSourceOrSink runtime = (SalesforceRuntimeSourceOrSink) sandboxedInstance.getInstance();
+        if (sourceType.getValue() == SourceType.MODULE_SELECTION) {
+            ClassLoader classLoader = this.getClass().getClassLoader();
+            RuntimeInfo runtimeInfo = new JarRuntimeInfo("mvn:org.talend.components/components-salesforce-runtime",
+                    DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-salesforce-runtime"),
+                    "org.talend.components.salesforce.runtime.dataprep.SalesforceDataprepSource");
+            try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, classLoader)) {
+                SalesforceRuntimeSourceOrSink runtime = (SalesforceRuntimeSourceOrSink) sandboxedInstance.getInstance();
 
-            SalesforceInputProperties properties = new SalesforceInputProperties("model");
-            properties.setDatasetProperties(this);
+                SalesforceInputProperties properties = new SalesforceInputProperties("model");
+                properties.setDatasetProperties(this);
 
-            runtime.initialize(null, properties);
-            List<NamedThing> moduleNames = runtime.getSchemaNames(null);
-            moduleName.setPossibleNamedThingValues(moduleNames);
+                runtime.initialize(null, properties);
+                List<NamedThing> moduleNames = runtime.getSchemaNames(null);
+                moduleName.setPossibleNamedThingValues(moduleNames);
+            }
         }
     }
 
     public void afterSourceType() throws IOException {
         // refresh the module list
-        if (sourceType.getValue() == SourceType.MODULE_SELECTION) {
-            retrieveModules ();
-        }
+        retrieveModules();
         refreshLayout(getForm(Form.MAIN));
     }
 
