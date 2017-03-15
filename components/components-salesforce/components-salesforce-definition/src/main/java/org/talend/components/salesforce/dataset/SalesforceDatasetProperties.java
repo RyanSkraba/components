@@ -15,15 +15,19 @@ package org.talend.components.salesforce.dataset;
 import java.io.IOException;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.JarRuntimeInfo;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.common.dataset.DatasetProperties;
+import org.talend.components.salesforce.common.SalesforceErrorCodes;
 import org.talend.components.salesforce.common.SalesforceRuntimeSourceOrSink;
 import org.talend.components.salesforce.dataprep.SalesforceInputProperties;
 import org.talend.components.salesforce.datastore.SalesforceDatastoreDefinition;
 import org.talend.components.salesforce.datastore.SalesforceDatastoreProperties;
 import org.talend.daikon.NamedThing;
+import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.presentation.Form;
@@ -42,10 +46,12 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
      */
     private static final long serialVersionUID = -8035880860245867110L;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceDatasetProperties.class);
+
     public ReferenceProperties<SalesforceDatastoreProperties> datastore = new ReferenceProperties<>("datastore",
             SalesforceDatastoreDefinition.NAME);
 
-    public Property<SourceType> sourceType = PropertyFactory.newEnum("sourceType", SourceType.class);
+    public Property<SourceType> sourceType = PropertyFactory.newEnum("sourceType", SourceType.class).setRequired();
 
     public StringProperty moduleName = PropertyFactory.newString("moduleName");
 
@@ -57,9 +63,7 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
         super(name);
     }
 
-    public void afterSourceType() throws IOException {
-        refreshLayout(getForm(Form.MAIN));
-
+    private void retrieveModules() throws IOException {
         // refresh the module list
         if (sourceType.getValue() == SourceType.MODULE_SELECTION) {
             ClassLoader classLoader = this.getClass().getClassLoader();
@@ -68,10 +72,10 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
                     "org.talend.components.salesforce.runtime.dataprep.SalesforceDataprepSource");
             try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClass(runtimeInfo, classLoader)) {
                 SalesforceRuntimeSourceOrSink runtime = (SalesforceRuntimeSourceOrSink) sandboxedInstance.getInstance();
-                
+
                 SalesforceInputProperties properties = new SalesforceInputProperties("model");
                 properties.setDatasetProperties(this);
-                
+
                 runtime.initialize(null, properties);
                 List<NamedThing> moduleNames = runtime.getSchemaNames(null);
                 moduleName.setPossibleNamedThingValues(moduleNames);
@@ -79,10 +83,15 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
         }
     }
 
+    public void afterSourceType() throws IOException {
+        // refresh the module list
+        retrieveModules();
+        refreshLayout(getForm(Form.MAIN));
+    }
+
     @Override
     public void setupProperties() {
-        sourceType.setValue(SourceType.SOQL_QUERY);
-        query.setValue("SELECT Id, Name FROM Account");
+        sourceType.setValue(SourceType.MODULE_SELECTION);
     }
 
     @Override
@@ -90,7 +99,7 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
         Form mainForm = Form.create(this, Form.MAIN);
 
         mainForm.addRow(Widget.widget(sourceType).setWidgetType(Widget.RADIO_WIDGET_TYPE));
-        mainForm.addRow(Widget.widget(moduleName).setWidgetType(Widget.SELECT_WIDGET_TYPE));
+        mainForm.addRow(Widget.widget(moduleName).setWidgetType(Widget.DATALIST_WIDGET_TYPE));
         mainForm.addRow(Widget.widget(query).setWidgetType(Widget.TEXT_AREA_WIDGET_TYPE));
     }
 
@@ -100,10 +109,21 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
      */
     @Override
     public void refreshLayout(Form form) {
+        if (sourceType.getValue() == SourceType.MODULE_SELECTION) {
+            form.getWidget(moduleName).setVisible(true);
+            moduleName.setRequired(true);
+            //We can not have a hidden field which is required
+            form.getWidget(query).setVisible(false);
+            query.setRequired(false);
+        }
+        else if (sourceType.getValue() == SourceType.SOQL_QUERY) {
+            form.getWidget(query).setVisible(true);
+            query.setRequired();
+            //We can not have a hidden field which is required
+            form.getWidget(moduleName).setVisible(false);
+            moduleName.setRequired(false);
+        }
         super.refreshLayout(form);
-
-        form.getWidget(moduleName).setVisible(sourceType.getValue() == SourceType.MODULE_SELECTION);
-        form.getWidget(query).setVisible(sourceType.getValue() == SourceType.SOQL_QUERY);
     }
 
     @Override
@@ -114,6 +134,13 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
     @Override
     public void setDatastoreProperties(SalesforceDatastoreProperties datastoreProperties) {
         datastore.setReference(datastoreProperties);
+        try {
+            retrieveModules();
+        }
+        catch(IOException e) {
+            LOGGER.error("error getting salesforce modules", e);
+            throw new TalendRuntimeException(SalesforceErrorCodes.UNABLE_TO_RETRIEVE_MODULES, e);
+        }
     }
 
     public enum SourceType {

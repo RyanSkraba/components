@@ -34,7 +34,7 @@ public class SalesforceDatastoreProperties extends PropertiesImpl implements Dat
     public Property<String> password = newProperty("password").setRequired()
             .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
     
-    public Property<String> securityKey = newProperty("securityKey")
+    public Property<String> securityKey = newProperty("securityKey").setRequired()
             .setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
     @Override

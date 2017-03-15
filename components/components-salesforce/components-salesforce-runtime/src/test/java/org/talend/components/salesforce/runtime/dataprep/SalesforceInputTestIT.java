@@ -182,6 +182,7 @@ public class SalesforceInputTestIT {
 
         SalesforceDatasetProperties dataset = (SalesforceDatasetProperties) datastore_def
                 .createDatasetProperties(datastore_props);
+        dataset.sourceType.setValue(SalesforceDatasetProperties.SourceType.SOQL_QUERY);
         dataset.query.setValue("SELECT Id, Name FROM Account");
 
         SalesforceInputDefinition input_def = new SalesforceInputDefinition();

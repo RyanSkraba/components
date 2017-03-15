@@ -35,6 +35,8 @@ public class SalesforceDatastoreRuntime implements DatastoreRuntime<SalesforceDa
 
         SalesforceInputProperties properties = new SalesforceInputProperties("model");
         SalesforceDatasetProperties dataset = new SalesforceDatasetProperties("dataset");
+        //set the sourcetype to soql to prevent loading of all modules during health check
+        dataset.sourceType.setValue(SalesforceDatasetProperties.SourceType.SOQL_QUERY);
         properties.setDatasetProperties(dataset);
         dataset.setDatastoreProperties(datastore);
 

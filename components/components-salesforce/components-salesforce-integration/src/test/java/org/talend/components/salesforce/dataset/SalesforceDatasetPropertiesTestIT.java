@@ -15,12 +15,13 @@ public class SalesforceDatasetPropertiesTestIT extends SalesforceTestBase {
     public void testAfterSourceType() {
         SalesforceDatasetProperties dataset = new SalesforceDatasetProperties("dataset");
         dataset.init();
-        
+
         SalesforceDatastoreProperties datastore = new SalesforceDatastoreProperties("datastore");
         datastore.init();
-        
+
+        dataset.sourceType.setValue(SourceType.SOQL_QUERY);
         dataset.setDatastoreProperties(datastore);
-        
+
         datastore.userId.setValue(userId);
         datastore.password.setValue(password);
         datastore.securityKey.setValue(securityKey);
