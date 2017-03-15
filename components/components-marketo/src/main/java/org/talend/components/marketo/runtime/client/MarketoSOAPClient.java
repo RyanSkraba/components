@@ -97,6 +97,7 @@ import com.marketo.mktows.ParamsGetLead;
 import com.marketo.mktows.ParamsGetLeadActivity;
 import com.marketo.mktows.ParamsGetLeadChanges;
 import com.marketo.mktows.ParamsGetMultipleLeads;
+import com.marketo.mktows.ParamsListMObjects;
 import com.marketo.mktows.ParamsListOperation;
 import com.marketo.mktows.ParamsSyncLead;
 import com.marketo.mktows.ParamsSyncMultipleLeads;
@@ -178,15 +179,16 @@ public class MarketoSOAPClient extends MarketoClient {
             header.setMktowsUserId(userId);
             header.setRequestTimestamp(requestTimestamp);
             header.setRequestSignature(signature);
+            // bug/TDI-38439_MarketoWizardConnection : make a dummy call to check auth and not just URL.
+            port.listMObjects(new ParamsListMObjects(), header);
         } catch (MalformedURLException | NoSuchAlgorithmException | InvalidKeyException e) {
-            LOG.error("Client connection error : {}.", e.getMessage());
+            // LOG.error("Client connection error : {}.", e.getMessage());
             throw new MarketoException(SOAP, e.getMessage());
         } catch (WebServiceException e) {
-            LOG.error("[WebServiceException] {}", e.getCause().toString());
             // TODO manage connection reset and socket closed error with timeout and retry properties.
             // String socket_close = "Socket closed";
             // String connection_reset = "Connection reset";
-            throw new MarketoException(SOAP, e);
+            throw new MarketoException(SOAP, e.getMessage());
         }
     }
 

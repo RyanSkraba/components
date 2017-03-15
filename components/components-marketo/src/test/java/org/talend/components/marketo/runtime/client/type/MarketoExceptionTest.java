@@ -20,6 +20,7 @@ import org.junit.Test;
 public class MarketoExceptionTest {
 
     MarketoException e;
+
     @Before
     public void setUp() throws Exception {
         e = new MarketoException("REST", "erreur");
@@ -28,18 +29,17 @@ public class MarketoExceptionTest {
     @Test
     public void testConstruct() throws Exception {
         e = new MarketoException("REST", "898", "898T");
-        assertEquals("MarketoException{api='REST', code='898', message='898T', cause='null'}", e.toString());
+        assertEquals("MarketoException{api='REST', code='898', message='898T'}", e.toString());
         e = new MarketoException("REST", 898, "898T");
-        assertEquals("MarketoException{api='REST', code='898', message='898T', cause='null'}", e.toString());
+        assertEquals("MarketoException{api='REST', code='898', message='898T'}", e.toString());
         e = new MarketoException("REST", "898", "898T", new Throwable());
         assertEquals("MarketoException{api='REST', code='898', message='898T', cause='java.lang.Throwable'}", e.toString());
         e = new MarketoException("REST", 898, "898T", new Throwable());
         assertEquals("MarketoException{api='REST', code='898', message='898T', cause='java.lang.Throwable'}", e.toString());
         e = new MarketoException("REST", "898T", new Throwable());
-        assertEquals("MarketoException{api='REST', code='', message='898T', cause='java.lang.Throwable'}", e.toString());
+        assertEquals("MarketoException{api='REST', message='898T', cause='java.lang.Throwable'}", e.toString());
         e = new MarketoException("REST", new Throwable());
-        assertEquals("MarketoException{api='REST', code='', message='java.lang.Throwable', cause='java.lang.Throwable'}",
-                e.toString());
+        assertEquals("MarketoException{api='REST', message='java.lang.Throwable', cause='java.lang.Throwable'}", e.toString());
     }
 
     @Test
@@ -72,7 +72,7 @@ public class MarketoExceptionTest {
 
     @Test
     public void testToString() throws Exception {
-        String s = "MarketoException{api='REST', code='', message='erreur', cause='null'}";
+        String s = "MarketoException{api='REST', message='erreur'}";
         assertEquals(s, e.toString());
     }
 

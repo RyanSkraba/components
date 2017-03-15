@@ -808,4 +808,26 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         }
     }
 
+    @Test(expected = IOException.class)
+    public void testBUG_TDI38439_MarketoWizardConnectionFail() throws Exception {
+        inputProperties.connection.endpoint.setValue(ENDPOINT_SOAP);
+        inputProperties.connection.clientAccessId.setValue(USERID_SOAP);
+        inputProperties.connection.secretKey.setValue("false");
+        MarketoSource source = new MarketoSource();
+        source.initialize(null, inputProperties);
+        MarketoClientService client = source.getClientService(null);
+        fail("Shouldn't be here");
+    }
+
+    @Test
+    public void testBUG_TDI38439_MarketoWizardConnection() throws Exception {
+        inputProperties.connection.endpoint.setValue(ENDPOINT_SOAP);
+        inputProperties.connection.clientAccessId.setValue(USERID_SOAP);
+        inputProperties.connection.secretKey.setValue(SECRETKEY_SOAP);
+        MarketoSource source = new MarketoSource();
+        source.initialize(null, inputProperties);
+        MarketoClientService client = source.getClientService(null);
+        assertNotNull(client);
+    }
+
 }

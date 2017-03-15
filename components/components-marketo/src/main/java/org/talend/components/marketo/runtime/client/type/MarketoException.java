@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.marketo.runtime.client.type;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class MarketoException extends Exception {
 
     private String apiMode = "";
@@ -22,6 +24,7 @@ public class MarketoException extends Exception {
         super(message);
         this.apiMode = apiMode;
     }
+
     public MarketoException(String apiMode, String code, String message) {
         super(message);
         this.apiMode = apiMode;
@@ -80,9 +83,11 @@ public class MarketoException extends Exception {
     public String toString() {
         final StringBuffer sb = new StringBuffer("MarketoException{");
         sb.append("api='").append(apiMode).append('\'');
-        sb.append(", code='").append(code).append('\'');
+        if (!StringUtils.isEmpty(code))
+            sb.append(", code='").append(code).append('\'');
         sb.append(", message='").append(getMessage()).append('\'');
-        sb.append(", cause='").append(getCause()).append('\'');
+        if (getCause() != null)
+            sb.append(", cause='").append(getCause()).append('\'');
         sb.append('}');
         return sb.toString();
     }
