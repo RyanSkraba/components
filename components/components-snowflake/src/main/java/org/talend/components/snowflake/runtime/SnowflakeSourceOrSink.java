@@ -15,19 +15,6 @@
  */
 package org.talend.components.snowflake.runtime;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverPropertyInfo;
-import java.sql.SQLFeatureNotSupportedException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.slf4j.Logger;
@@ -42,6 +29,12 @@ import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
+
+import java.io.IOException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 public class SnowflakeSourceOrSink implements SourceOrSink {
 
@@ -140,8 +133,13 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
             // In a runtime container
             if (container != null) {
                 conn = (Connection) container.getComponentData(refComponentId, KEY_CONNECTION);
-                if (conn != null)
-                    return conn;
+                try {
+                    if (conn != null && !conn.isClosed()) {
+                        return conn;
+                    }
+                } catch (SQLException ex) {
+                    throw new IOException(ex);
+                }
                 throw new IOException("Referenced component: " + refComponentId + " not connected");
             }
             // Design time
