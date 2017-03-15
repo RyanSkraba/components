@@ -29,7 +29,6 @@ import org.talend.components.bigquery.BigQueryComponentFamilyDefinition;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
-
 public class BigQueryInputDefinition extends AbstractComponentDefinition {
 
     public static final String NAME = BigQueryComponentFamilyDefinition.NAME + "Input";

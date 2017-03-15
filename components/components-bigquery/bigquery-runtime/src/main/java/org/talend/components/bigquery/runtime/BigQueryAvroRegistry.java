@@ -269,7 +269,7 @@ public class BigQueryAvroRegistry extends AvroRegistry {
 
                 @Override
                 public Double convertToAvro(Number number) {
-                    return number.doubleValue();
+                    return number == null ? null : number.doubleValue();
                 }
             };
         }
@@ -293,7 +293,9 @@ public class BigQueryAvroRegistry extends AvroRegistry {
 
                 @Override
                 public Long convertToAvro(Object number) {
-                    return Long.valueOf(String.valueOf(number));
+                    if (number instanceof Number)
+                        return ((Number) number).longValue();
+                    return number == null ? null : Long.valueOf(String.valueOf(number));
                 }
             };
         }

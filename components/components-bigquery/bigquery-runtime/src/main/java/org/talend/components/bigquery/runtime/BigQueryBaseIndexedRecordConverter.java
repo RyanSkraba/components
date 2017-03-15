@@ -23,6 +23,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.AvroConverter;
+import org.talend.daikon.avro.converter.ComparableIndexedRecordBase;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
 import com.google.api.services.bigquery.model.TableRow;
@@ -64,7 +65,7 @@ public abstract class BigQueryBaseIndexedRecordConverter<T extends Map> implemen
         return new BigQueryIndexedRecord(row);
     }
 
-    public class BigQueryIndexedRecord implements IndexedRecord {
+    public class BigQueryIndexedRecord extends ComparableIndexedRecordBase {
 
         private Object[] values;
 
