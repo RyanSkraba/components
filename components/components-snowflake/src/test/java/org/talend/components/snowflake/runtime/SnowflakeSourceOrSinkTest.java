@@ -18,18 +18,13 @@ public class SnowflakeSourceOrSinkTest {
     @Mock
     private RuntimeContainer runtimeContainerMock = Mockito.mock(RuntimeContainer.class);
 
-    private SnowflakeSourceOrSink snowflakeSourceOrSink;
+    private final SnowflakeSourceOrSink snowflakeSourceOrSink = new SnowflakeSourceOrSink();
 
     @Before
     public void setUp() throws Exception {
-        this.snowflakeSourceOrSink = new SnowflakeSourceOrSink();
-        this.snowflakeSourceOrSink.properties = new SnowflakeConnectionProperties("name") {
-
-            @Override
-            public String getReferencedComponentId() {
-                return "referencedComponentId";
-            }
-        };
+        SnowflakeConnectionProperties properties = new SnowflakeConnectionProperties("test");
+        properties.referencedComponent.componentInstanceId.setValue("referencedComponentId");
+        this.snowflakeSourceOrSink.initialize(runtimeContainerMock, properties);
     }
 
     /**
@@ -39,7 +34,7 @@ public class SnowflakeSourceOrSinkTest {
     public void testConnectWhenConnectionIsNull() throws Exception {
         Mockito.when(runtimeContainerMock.getComponentData(Matchers.anyString(), Matchers.anyString())).thenReturn(null);
 
-        snowflakeSourceOrSink.connect(runtimeContainerMock);
+        this.snowflakeSourceOrSink.connect(runtimeContainerMock);
     }
 
     /**
@@ -53,6 +48,6 @@ public class SnowflakeSourceOrSinkTest {
         Mockito.when(connectionMock.isClosed()).thenReturn(true);
         Mockito.when(runtimeContainerMock.getComponentData(Matchers.anyString(), Matchers.anyString())).thenReturn(connectionMock);
 
-        snowflakeSourceOrSink.connect(runtimeContainerMock);
+        this.snowflakeSourceOrSink.connect(runtimeContainerMock);
     }
 }
