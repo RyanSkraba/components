@@ -66,7 +66,7 @@ public class AzureStorageSourceOrSink implements SourceOrSink {
         if(conn==null){
         	//check connection failure
         	ValidationResult vr = new ValidationResult();
-            vr.setMessage("Cannot get connection."); //$NON-NLS-1$
+            vr.setMessage(messages.getMessage("error.VacantConnection")); //$NON-NLS-1$
             vr.setStatus(ValidationResult.Result.ERROR);
             return vr;
         }

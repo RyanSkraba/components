@@ -102,9 +102,9 @@ public class AzureStorageQueueWriter implements Writer<Result> {
         int visibility = props.initialVisibilityDelayInSeconds.getValue();
         try {
             if (msgContent == null) {
-                LOGGER.error(i18nMessages.getMessage("error.error.VacantMessage"));
+                LOGGER.error(i18nMessages.getMessage("error.VacantMessage"));
                 if (props.dieOnError.getValue()) {
-                    throw new ComponentException(new Exception(i18nMessages.getMessage("error.error.VacantMessage")));
+                    throw new ComponentException(new Exception(i18nMessages.getMessage("error.VacantMessage")));
                 }
             } else {
                 content = (String) inputRecord.get(msgContent.pos());
