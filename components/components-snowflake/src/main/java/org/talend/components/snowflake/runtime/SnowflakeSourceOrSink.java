@@ -140,8 +140,13 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
             // In a runtime container
             if (container != null) {
                 conn = (Connection) container.getComponentData(refComponentId, KEY_CONNECTION);
-                if (conn != null)
-                    return conn;
+                try {
+                    if (conn != null && !conn.isClosed()) {
+                        return conn;
+                    }
+                } catch (SQLException ex) {
+                    throw new IOException(ex);
+                }
                 throw new IOException("Referenced component: " + refComponentId + " not connected");
             }
             // Design time
