@@ -118,7 +118,7 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
         return new HDFSWriteOperation<>(this, path, formatClass);
     }
 
-    private Job jobInstance() throws IOException {
+    protected Job jobInstance() throws IOException {
         Job job = Job.getInstance();
         // deserialize map to conf
         Configuration conf = job.getConfiguration();

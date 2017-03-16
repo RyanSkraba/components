@@ -12,7 +12,9 @@
 // ============================================================================
 package org.talend.components.simplefileio.runtime.sinks;
 
+import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
+import java.util.Map;
 
 import org.apache.beam.sdk.io.hdfs.ConfigurableHDFSFileSink;
 import org.apache.beam.sdk.options.PipelineOptions;
@@ -47,6 +49,16 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
         this.isLocalMode = path.toLowerCase().startsWith("file:");
     }
 
+    @Override
+    protected Job jobInstance() throws IOException {
+        Job job = super.jobInstance();
+        if (isLocalMode) {
+            job.getConfiguration().set(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY,
+                    CommonConfigurationKeysPublic.FS_DEFAULT_NAME_DEFAULT);
+        }
+        return job;
+    }
+
     /**
      * Helper method for overriding the {@link ConfigureWithSampleHDFSWriter#configure(Job)} that is automatically
      * created within this sink.
@@ -55,10 +67,6 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
      * @param sample A sample of the incoming data.
      */
     protected void configure(Job job, KV<K, V> sample) {
-        if (isLocalMode) {
-            job.getConfiguration().set(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY,
-                    CommonConfigurationKeysPublic.FS_DEFAULT_NAME_DEFAULT);
-        }
     }
 
     @Override
