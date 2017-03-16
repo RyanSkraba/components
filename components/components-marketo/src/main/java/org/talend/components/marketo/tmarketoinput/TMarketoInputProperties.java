@@ -337,6 +337,7 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
             }
         });
         schemaInput.schema.setValue(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads());
+        schemaFlow.schema.setValue(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads());
         updateMappings();
 
         setIncludeTypes.setValue(false);
@@ -602,6 +603,7 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
             }
         }
         schemaInput.schema.setValue(s);
+        schemaFlow.schema.setValue(s);
         updateMappings();
     }
 

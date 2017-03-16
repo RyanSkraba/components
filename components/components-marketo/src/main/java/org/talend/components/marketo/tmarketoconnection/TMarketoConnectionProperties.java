@@ -185,7 +185,6 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
             return vr;
         }
         String repoLoc = repo.storeProperties(this, this.name.getValue(), repositoryLocation, null);
-        LOG.warn("Stored connection to {}.", repoLoc);
         return ValidationResult.OK;
     }
 
