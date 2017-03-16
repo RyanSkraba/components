@@ -78,22 +78,8 @@ public class NetSuiteInputModuleProperties extends NetSuiteModuleProperties {
     public ValidationResult afterModuleName() throws Exception {
         try {
             setupSchema();
-
-            SearchInfo searchSchema = getSearchInfo(moduleName.getValue());
-            List<String> fieldNames = new ArrayList<>(searchSchema.getFields().size());
-            for (SearchFieldInfo field : searchSchema.getFields()) {
-                fieldNames.add(field.getName());
-            }
-
-            searchQuery.field.setPossibleValues(fieldNames);
-            searchQuery.field.setValue(new ArrayList<String>());
-
-            searchQuery.operator.setPossibleValues(getSearchFieldOperators());
-            searchQuery.operator.setValue(new ArrayList<String>());
-
-            searchQuery.value1.setValue(new ArrayList<String>());
-            searchQuery.value2.setValue(new ArrayList<String>());
-
+            setupSearchSchema();
+            refreshLayout(getForm(Form.MAIN));
             return ValidationResult.OK;
 
         } catch (Exception ex) {
@@ -101,8 +87,31 @@ public class NetSuiteInputModuleProperties extends NetSuiteModuleProperties {
         }
     }
 
+    public void afterSearchQuery() {
+        refreshLayout(getForm(Form.MAIN));
+    }
+
     protected void setupSchema() {
         Schema schema = getSchema(moduleName.getStringValue());
         main.schema.setValue(schema);
+    }
+
+    protected void setupSearchSchema() {
+        SearchInfo searchSchema = getSearchInfo(moduleName.getValue());
+        List<String> fieldNames = new ArrayList<>(searchSchema.getFields().size());
+        for (SearchFieldInfo field : searchSchema.getFields()) {
+            fieldNames.add(field.getName());
+        }
+
+        searchQuery.field.setPossibleValues(fieldNames);
+        searchQuery.field.setValue(new ArrayList<String>());
+
+        searchQuery.operator.setPossibleValues(getSearchFieldOperators());
+        searchQuery.operator.setValue(new ArrayList<String>());
+
+        searchQuery.value1.setValue(new ArrayList<String>());
+        searchQuery.value2.setValue(new ArrayList<String>());
+
+        searchQuery.refreshLayout(searchQuery.getForm(Form.MAIN));
     }
 }
