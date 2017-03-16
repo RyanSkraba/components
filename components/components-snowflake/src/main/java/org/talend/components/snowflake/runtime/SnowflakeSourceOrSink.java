@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.slf4j.Logger;
@@ -39,6 +40,7 @@ import org.talend.components.snowflake.SnowflakeConnectionProperties;
 import org.talend.components.snowflake.SnowflakeProvideConnectionProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
@@ -50,6 +52,8 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
     private static final String INCORRECRT_SNOWFLAKE_ACCOUNT = " Incorrect Snowflake Account was specified..";
 
     private static final String JDBC_DRIVER = "com.snowflake.client.jdbc.SnowflakeDriver";
+
+    private static final String TALEND_DEFAULT_DATE_PATTERN = "yyyy-MM-dd";
 
     private transient static final Logger LOG = LoggerFactory.getLogger(SnowflakeSourceOrSink.class);
 
@@ -254,6 +258,9 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
             }
 
             for (Field f : tableSchema.getFields()) {
+                if (LogicalTypes.fromSchemaIgnoreInvalid(AvroUtils.unwrapIfNullable(f.schema())) == LogicalTypes.date()) {
+                    f.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, TALEND_DEFAULT_DATE_PATTERN);
+                }
                 if (pkColumns.contains(f.name())) {
                     f.schema().addProp(SchemaConstants.TALEND_COLUMN_IS_KEY, "true");
                 }
