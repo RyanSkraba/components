@@ -172,7 +172,7 @@ public class MarketoConstantsTest {
     }
 
     @Test
-    public void testNGetLeadChangesSchemaREST() throws Exception {
+    public void testGetLeadChangesSchemaREST() throws Exception {
         Schema ref = MarketoConstants.getRESTSchemaForGetLeadChanges();
         assertEquals("INT", ref.getField("id").schema().getTypes().get(0).getType().toString());
         assertEquals("true", ref.getField("id").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
@@ -186,7 +186,7 @@ public class MarketoConstantsTest {
     }
 
     @Test
-    public void testgGetLeadActivitySchemaREST() throws Exception {
+    public void testGetLeadActivitySchemaREST() throws Exception {
         Schema ref = MarketoConstants.getRESTSchemaForGetLeadActivity();
         assertEquals("INT", ref.getField("id").schema().getTypes().get(0).getType().toString());
         assertEquals("true", ref.getField("id").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
