@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.azurestorage.table;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -85,10 +86,10 @@ public class AzureStorageTableComponentsTest {
         assertNotNull(azureStorageTableDefinition.getRuntimeInfo(null, null, ConnectorTopology.INCOMING));
     }
 
-    @SuppressWarnings("deprecation")
+
     @Test
     public void testGetNestedCompatibleComponentPropertiesClass() {
-        assertEquals(new Class[] { TAzureStorageConnectionProperties.class, AzureStorageTableProperties.class },
+        assertArrayEquals(new Class[] { TAzureStorageConnectionProperties.class, AzureStorageTableProperties.class },
                 azureStorageTableDefinition.getNestedCompatibleComponentPropertiesClass());
     }
 

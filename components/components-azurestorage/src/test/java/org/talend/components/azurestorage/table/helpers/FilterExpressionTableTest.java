@@ -15,7 +15,22 @@ package org.talend.components.azurestorage.table.helpers;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.*;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.COMPARISON_EQUAL;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.COMPARISON_GREATER_THAN;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.COMPARISON_GREATER_THAN_OR_EQUAL;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.COMPARISON_LESS_THAN;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.COMPARISON_LESS_THAN_OR_EQUAL;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.COMPARISON_NOT_EQUAL;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.FIELD_TYPE_BINARY;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.FIELD_TYPE_BOOLEAN;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.FIELD_TYPE_DATE;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.FIELD_TYPE_GUID;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.FIELD_TYPE_INT64;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.FIELD_TYPE_NUMERIC;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.FIELD_TYPE_STRING;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.PREDICATE_AND;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.PREDICATE_NOT;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.PREDICATE_OR;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,6 +87,9 @@ public class FilterExpressionTableTest {
                 fet.function.getValue().toString());
 
         assertEquals(Arrays.asList(COMPARISON_GREATER_THAN, COMPARISON_EQUAL, COMPARISON_LESS_THAN), fet.function.getValue());
+
+        assertEquals(Arrays.asList(FIELD_TYPE_STRING, FIELD_TYPE_NUMERIC, FIELD_TYPE_DATE, FIELD_TYPE_INT64, FIELD_TYPE_BOOLEAN,
+                FIELD_TYPE_BINARY, FIELD_TYPE_GUID), fet.fieldType.getPossibleValues());
     }
 
     @Test
@@ -116,6 +134,19 @@ public class FilterExpressionTableTest {
         query = fet.getCombinedFilterConditions();
         assertEquals(query,
                 "(((PartitionKey eq '12345') and (RowKey gt 'AVID12345')) or (Timestamp ge datetime'2016-01-01 00:00:00')) or (AnUnknownProperty lt 'WEB345')");
+
+        // Boolean
+        columns.add("ABooleanProperty");
+        functions.add(COMPARISON_EQUAL);
+        values.add("true");
+        predicates.add(PREDICATE_AND);
+        fieldTypes.add(FIELD_TYPE_BOOLEAN);
+        setTableVals();
+        query = fet.getCombinedFilterConditions();
+        assertEquals(
+                "((((PartitionKey eq '12345') and (RowKey gt 'AVID12345')) or (Timestamp ge datetime'2016-01-01 00:00:00')) or (AnUnknownProperty lt 'WEB345')) and (ABooleanProperty eq true)",
+                query);
+
     }
 
     @Test
@@ -154,6 +185,7 @@ public class FilterExpressionTableTest {
         assertEquals(EdmType.BINARY, fet.getType(FIELD_TYPE_BINARY));
         assertEquals(EdmType.GUID, fet.getType(FIELD_TYPE_GUID));
         assertEquals(EdmType.DATE_TIME, fet.getType(FIELD_TYPE_DATE));
+        assertEquals(EdmType.BOOLEAN, fet.getType(FIELD_TYPE_BOOLEAN));
     }
 
     @Test

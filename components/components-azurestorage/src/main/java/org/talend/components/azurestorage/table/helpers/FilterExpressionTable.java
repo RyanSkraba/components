@@ -68,13 +68,15 @@ public class FilterExpressionTable extends ComponentPropertiesImpl {
 
     public static final String FIELD_TYPE_GUID = "GUID";
 
-    public static final String[] COMPARISONS = {COMPARISON_EQUAL, COMPARISON_NOT_EQUAL, COMPARISON_GREATER_THAN,
-            COMPARISON_GREATER_THAN_OR_EQUAL, COMPARISON_LESS_THAN, COMPARISON_LESS_THAN_OR_EQUAL};
+    public static final String FIELD_TYPE_BOOLEAN = "BOOLEAN";
 
-    public static final String[] PREDICATES = {PREDICATE_AND, PREDICATE_OR, PREDICATE_NOT};
+    public static final String[] COMPARISONS = { COMPARISON_EQUAL, COMPARISON_NOT_EQUAL, COMPARISON_GREATER_THAN,
+            COMPARISON_GREATER_THAN_OR_EQUAL, COMPARISON_LESS_THAN, COMPARISON_LESS_THAN_OR_EQUAL };
 
-    public static final String[] FIELD_TYPES = {FIELD_TYPE_STRING, FIELD_TYPE_NUMERIC, FIELD_TYPE_DATE, FIELD_TYPE_INT64,
-            FIELD_TYPE_BINARY, FIELD_TYPE_GUID};
+    public static final String[] PREDICATES = { PREDICATE_AND, PREDICATE_OR, PREDICATE_NOT };
+
+    public static final String[] FIELD_TYPES = { FIELD_TYPE_STRING, FIELD_TYPE_NUMERIC, FIELD_TYPE_DATE, FIELD_TYPE_INT64,
+            FIELD_TYPE_BOOLEAN, FIELD_TYPE_BINARY, FIELD_TYPE_GUID };
 
     public static final TypeLiteral<List<String>> LIST_STRING_TYPE = new TypeLiteral<List<String>>() {
     };
@@ -88,7 +90,7 @@ public class FilterExpressionTable extends ComponentPropertiesImpl {
     public Property<List<String>> predicate = newProperty(LIST_STRING_TYPE, "predicate");
 
     public Property<List<String>> fieldType = newProperty(LIST_STRING_TYPE, "fieldType");
-    
+
     private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(FilterExpressionTable.class);
 
@@ -124,52 +126,54 @@ public class FilterExpressionTable extends ComponentPropertiesImpl {
 
     public String getComparison(String f) {
         switch (f) {
-            case COMPARISON_EQUAL :
-                return QueryComparisons.EQUAL;
-            case COMPARISON_NOT_EQUAL :
-                return QueryComparisons.NOT_EQUAL;
-            case COMPARISON_GREATER_THAN :
-                return QueryComparisons.GREATER_THAN;
-            case COMPARISON_GREATER_THAN_OR_EQUAL :
-                return QueryComparisons.GREATER_THAN_OR_EQUAL;
-            case COMPARISON_LESS_THAN :
-                return QueryComparisons.LESS_THAN;
-            case COMPARISON_LESS_THAN_OR_EQUAL :
-                return QueryComparisons.LESS_THAN_OR_EQUAL;
-            default :
-                return null;
+        case COMPARISON_EQUAL:
+            return QueryComparisons.EQUAL;
+        case COMPARISON_NOT_EQUAL:
+            return QueryComparisons.NOT_EQUAL;
+        case COMPARISON_GREATER_THAN:
+            return QueryComparisons.GREATER_THAN;
+        case COMPARISON_GREATER_THAN_OR_EQUAL:
+            return QueryComparisons.GREATER_THAN_OR_EQUAL;
+        case COMPARISON_LESS_THAN:
+            return QueryComparisons.LESS_THAN;
+        case COMPARISON_LESS_THAN_OR_EQUAL:
+            return QueryComparisons.LESS_THAN_OR_EQUAL;
+        default:
+            return null;
         }
     }
 
     public String getOperator(String p) {
         switch (p) {
-            case PREDICATE_AND :
-                return Operators.AND;
-            case PREDICATE_OR :
-                return Operators.OR;
-            case PREDICATE_NOT :
-                return Operators.NOT;
-            default :
-                return null;
+        case PREDICATE_AND:
+            return Operators.AND;
+        case PREDICATE_OR:
+            return Operators.OR;
+        case PREDICATE_NOT:
+            return Operators.NOT;
+        default:
+            return null;
         }
     }
 
     public EdmType getType(String ft) {
         switch (ft) {
-            case FIELD_TYPE_STRING :
-                return EdmType.STRING;
-            case FIELD_TYPE_NUMERIC :
-                return EdmType.INT32;
-            case FIELD_TYPE_INT64 :
-                return EdmType.INT64;
-            case FIELD_TYPE_DATE :
-                return EdmType.DATE_TIME;
-            case FIELD_TYPE_BINARY :
-                return EdmType.BINARY;
-            case FIELD_TYPE_GUID :
-                return EdmType.GUID;
-            default :
-                return null;
+        case FIELD_TYPE_STRING:
+            return EdmType.STRING;
+        case FIELD_TYPE_NUMERIC:
+            return EdmType.INT32;
+        case FIELD_TYPE_INT64:
+            return EdmType.INT64;
+        case FIELD_TYPE_DATE:
+            return EdmType.DATE_TIME;
+        case FIELD_TYPE_BINARY:
+            return EdmType.BINARY;
+        case FIELD_TYPE_GUID:
+            return EdmType.GUID;
+        case FIELD_TYPE_BOOLEAN:
+            return EdmType.BOOLEAN;
+        default:
+            return null;
         }
     }
 
