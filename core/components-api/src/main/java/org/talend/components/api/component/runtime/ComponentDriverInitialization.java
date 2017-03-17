@@ -12,11 +12,14 @@
 // ============================================================================
 package org.talend.components.api.component.runtime;
 
+import org.talend.components.api.container.RuntimeContainer;
+import org.talend.daikon.properties.Properties;
+
 /**
  * Basic interface for defining properties and common methods required for Runtimes of components without connectors, or
  * components which need some pre-processing before performing the actual job.
  */
-public interface ComponentDriverInitialization extends RuntimableRuntime {
+public interface ComponentDriverInitialization<P extends Properties> extends RuntimableRuntime<P> {
 
     /**
      * Execute some code before the job or flow is started. This code will be called on driver node only, before actual
@@ -27,8 +30,9 @@ public interface ComponentDriverInitialization extends RuntimableRuntime {
      * will be called after runtime initialization.
      * </p>
      * 
+     * @param container container instance to get access or share data with the running container.
      * @throw an RuntimeException if anything fails during the run of this method.
      */
-    void runAtDriver();
+    void runAtDriver(RuntimeContainer container);
 
 }
