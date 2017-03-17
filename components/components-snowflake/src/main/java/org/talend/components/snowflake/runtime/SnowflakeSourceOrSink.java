@@ -235,6 +235,10 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
         return getSchema(container, connect(container), schemaName);
     }
 
+    protected SnowflakeAvroRegistry getSnowflakeAvroRegistry() {
+        return SnowflakeAvroRegistry.get();
+    }
+
     protected Schema getSchema(RuntimeContainer container, Connection connection, String tableName) throws IOException {
         Schema tableSchema = null;
 
@@ -243,7 +247,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
             DatabaseMetaData metaData = connection.getMetaData();
 
             ResultSet resultSet = metaData.getColumns(getCatalog(connProps), getDbSchema(connProps), tableName, null);
-            tableSchema = SnowflakeAvroRegistry.get().inferSchema(resultSet);
+            tableSchema = getSnowflakeAvroRegistry().inferSchema(resultSet);
             // FIXME - I18N for this message
             if (tableSchema == null)
                 throw new IOException("Table: " + tableName + " not found");
