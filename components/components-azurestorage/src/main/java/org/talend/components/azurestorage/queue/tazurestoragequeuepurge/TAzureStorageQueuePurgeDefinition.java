@@ -14,6 +14,7 @@ package org.talend.components.azurestorage.queue.tazurestoragequeuepurge;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.azurestorage.queue.AzureStorageQueueDefinition;
+import org.talend.daikon.properties.property.Property;
 
 public class TAzureStorageQueuePurgeDefinition extends AzureStorageQueueDefinition {
 
@@ -26,5 +27,11 @@ public class TAzureStorageQueuePurgeDefinition extends AzureStorageQueueDefiniti
     @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return TAzureStorageQueuePurgeProperties.class;
+    }
+    
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_QUEUE_NAME_PROP };
     }
 }
