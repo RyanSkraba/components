@@ -45,4 +45,9 @@ public class TAzureStorageOutputTableDefinition extends AzureStorageTableDefinit
         return TAzureStorageOutputTableProperties.class;
     }
 
+    @Override
+    public boolean isConditionalInputs() {
+        return true;
+    }
+
 }
