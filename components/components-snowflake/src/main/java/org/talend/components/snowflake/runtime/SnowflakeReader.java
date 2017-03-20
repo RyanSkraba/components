@@ -169,8 +169,6 @@ public class SnowflakeReader<T> extends AbstractBoundedReader<IndexedRecord> {
 
     @Override
     public Map<String, Object> getReturnValues() {
-        Result result = new Result();
-        result.totalCount = dataCount;
         return result.toMap();
     }
 
