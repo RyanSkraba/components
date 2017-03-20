@@ -17,7 +17,7 @@ import static org.talend.daikon.properties.property.PropertyFactory.*;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ReferenceProperties;
 import org.talend.daikon.properties.property.Property;
-import org.talend.daikon.serialize.DeserializeDeletedFieldHandler;
+import org.talend.daikon.serialize.migration.DeserializeDeletedFieldHandler;
 
 /**
  * A reference to another component. This could be in one of the following states:
