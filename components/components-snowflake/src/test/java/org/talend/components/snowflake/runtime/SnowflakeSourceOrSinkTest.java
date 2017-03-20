@@ -25,10 +25,6 @@ import java.sql.ResultSet;
 public class SnowflakeSourceOrSinkTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(SnowflakeSourceOrSinkTest.class);
 
-    private static final String TALEND_EXPECTED_DATE_PATTERN = "yyyy-MM-dd";
-
-    private static final String TALEND_EXPECTED_TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
-
     private final SnowflakeSourceOrSink snowflakeSourceOrSink = new SnowflakeSourceOrSink();
 
     @Mock
@@ -71,13 +67,13 @@ public class SnowflakeSourceOrSinkTest {
      */
     @Test
     public void testGetSchemaAddKeyProperty() throws Exception {
-        Schema schemaToEdit = SchemaBuilder.builder().record("SchemaToEdit").fields()
+        Schema schemaToEdit = SchemaBuilder.builder().record("Schema").fields()
                 .name("field").type().stringType().noDefault()
                 .endRecord();
 
         LOGGER.debug("schema to add key property: " + schemaToEdit);
 
-        Schema expectedSchema = SchemaBuilder.builder().record("ExpectedSchema").fields()
+        Schema expectedSchema = SchemaBuilder.builder().record("Schema").fields()
                 .name("field").type().stringType().noDefault()
                 .endRecord();
         expectedSchema.getField("field").schema().addProp(SchemaConstants.TALEND_COLUMN_IS_KEY, "true");
@@ -130,11 +126,10 @@ public class SnowflakeSourceOrSinkTest {
 
         LOGGER.debug("result schema: " + resultSchema);
 
-        Assert.assertNotNull(resultSchema.getField("field").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
-
-        Assert.assertEquals(expectedSchema.getField("field").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY),
-                resultSchema.getField("field").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
-
+        Assert.assertNotNull(resultSchema);
+        Assert.assertEquals(expectedSchema.getField("field").schema().getProp(SchemaConstants.TALEND_COLUMN_IS_KEY),
+                resultSchema.getField("field").schema().getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
+        Assert.assertEquals(expectedSchema, resultSchema);
     }
 
 }
