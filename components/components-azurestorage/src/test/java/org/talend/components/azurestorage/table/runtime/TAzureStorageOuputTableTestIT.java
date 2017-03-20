@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -37,6 +38,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.Writer;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.azurestorage.AzureStorageProvideConnectionProperties;
 import org.talend.components.azurestorage.table.tazurestorageinputtable.TAzureStorageInputTableProperties;
 import org.talend.components.azurestorage.table.tazurestorageoutputtable.TAzureStorageOutputTableProperties;
@@ -196,6 +198,7 @@ public class TAzureStorageOuputTableTestIT extends AzureStorageTableBaseTestIT {
                 .name("bytys").type(AvroUtils._bytes()).noDefault()//
                 //
                 .endRecord();
+
     }
 
     public Schema getMappingSchema() {
@@ -261,9 +264,9 @@ public class TAzureStorageOuputTableTestIT extends AzureStorageTableBaseTestIT {
         writer.close();
     }
 
-    @Test
-    public void testDropAndCreateTable() throws IOException, StorageException, URISyntaxException {
-        String tblDrop = tbl_test + "Drop";
+    @Test(expected = ComponentException.class)
+    public void testDropNonExistingTable() throws IOException, StorageException, URISyntaxException {
+        String tblDrop = tbl_test + "NonExistingDrop";
         properties.schema.schema.setValue(getDynamicSchema());
         properties.actionOnTable.setValue(ActionOnTable.Drop_and_create_table);
         properties.tableName.setValue(tblDrop);
@@ -271,9 +274,29 @@ public class TAzureStorageOuputTableTestIT extends AzureStorageTableBaseTestIT {
         // table shouldn't exist
         writer.open("test-uid");
         writer.close();
+    }
+
+    @Test
+    public void testDropAndCreateTable() throws IOException, StorageException, URISyntaxException {
+
+        String tblDrop = tbl_test + "Drop";
+        // create the table first
+        properties.schema.schema.setValue(getDynamicSchema());
+        properties.actionOnTable.setValue(ActionOnTable.Create_table);
+        properties.tableName.setValue(tblDrop);
+        Writer<?> writer = createWriter(properties);
+        // table shouldn't exist
+        writer.open("test-uid");
+        writer.close();
         assertTrue(tableClient.getTableReference(tblDrop).exists());
-        // redo op for testing
-        writer.open("test-drop");
+
+        properties.schema.schema.setValue(getDynamicSchema());
+        properties.actionOnTable.setValue(ActionOnTable.Drop_and_create_table);
+        properties.tableName.setValue(tblDrop);
+        writer = createWriter(properties);
+        // table shouldn't exist
+        writer.open("test-uid");
+        writer.close();
         assertTrue(tableClient.getTableReference(tblDrop).exists());
     }
 
@@ -383,6 +406,45 @@ public class TAzureStorageOuputTableTestIT extends AzureStorageTableBaseTestIT {
         reader.close();
         // we should have read 9 +2 rows...
         assertEquals(11, counted);
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Test
+    public void testInsertOrReplaceNullValue() throws Throwable {
+        currentTable = tbl_test + "InsertOrReplaceNullValue";
+        insertTestValues(currentTable);
+        //
+        properties.schema.schema.setValue(getSimpleTestSchema());
+        properties.actionOnData.setValue(ActionOnData.Insert_Or_Replace);
+        properties.schemaListener.afterSchema();
+        Writer<?> writer = createWriter(properties);
+        writer.open("test-uid");
+        IndexedRecord entity;
+        for (String p : partitions) {
+            for (String r : rows) {
+                entity = new GenericData.Record(getSimpleTestSchema());
+                assertEquals(3, entity.getSchema().getFields().size());
+                entity.put(0, p);
+                entity.put(1, r);
+                entity.put(2, null);
+                writer.write(entity);
+            }
+        }
+
+        writer.close();
+        // check results
+        BoundedReader reader = createReader(currentTable, filter, false);
+        int counted = 0;
+        assertTrue(reader.start());
+        do {
+            counted++;
+            IndexedRecord current = (IndexedRecord) reader.getCurrent();
+            assertNull(current.getSchema().getField("StringValue"));
+            // Column with null values are not writed to azure
+            assertEquals(3, current.getSchema().getFields().size());
+        } while (reader.advance());
+        reader.close();
+        assertEquals(9, counted);
     }
 
     @SuppressWarnings("rawtypes")

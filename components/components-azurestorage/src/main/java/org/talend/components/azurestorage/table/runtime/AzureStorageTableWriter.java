@@ -66,7 +66,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
 
     private IndexedRecord inputRecord;
 
-    private IndexedRecordConverter<IndexedRecord, IndexedRecord> factory;
+    private IndexedRecordConverter<IndexedRecord, IndexedRecord> converter;
 
     private Result result;
 
@@ -103,7 +103,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
     private Boolean useNameMappings = Boolean.FALSE;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageTableWriter.class);
-    
+
     private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(AzureStorageTableWriter.class);
 
@@ -209,24 +209,27 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
         if (writeSchema == null) {
             writeSchema = ((IndexedRecord) object).getSchema();
         }
-        inputRecord = getFactory(object).convertToAvro((IndexedRecord) object);
+        inputRecord = getConverter(object).convertToAvro((IndexedRecord) object);
         DynamicTableEntity entity = new DynamicTableEntity();
         HashMap<String, EntityProperty> entityProps = new HashMap<>();
         for (Field f : writeSchema.getFields()) {
-            String sName = f.name(); // schema name
-            String mName = sName; // mapped name
-            if (useNameMappings) {
-                if (nameMappings.containsKey(sName)) {
-                    mName = nameMappings.get(sName);
-                }
+            if (inputRecord.get(f.pos()) == null) {
+                continue; // record value may be null, No need to set the property in azure in this case
             }
+
+            String sName = f.name(); // schema name
+            String mName = getMappedNameIfNecessary(sName); // mapped name
+
             Schema fSchema = f.schema();
-            if (fSchema.getType() == Type.UNION)
-                for (Schema s : f.schema().getTypes())
+            if (fSchema.getType() == Type.UNION) {
+                for (Schema s : f.schema().getTypes()) {
                     if (s.getType() != Type.NULL) {
                         fSchema = s;
                         break;
                     }
+                }
+            }
+
             if (sName.equals(AzureStorageTableProperties.TABLE_PARTITION_KEY)
                     || mName.equals(AzureStorageTableProperties.TABLE_PARTITION_KEY)) {
                 entity.setPartitionKey((String) inputRecord.get(f.pos()));
@@ -251,18 +254,24 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
                     String clazz = fSchema.getProp(SchemaConstants.JAVA_CLASS_FLAG);
                     if (clazz != null && clazz.equals(Date.class.getCanonicalName())) {
                         Date dt = null;
-                        try {
-                            dt = new SimpleDateFormat(fSchema.getProp(SchemaConstants.TALEND_COLUMN_PATTERN))
-                                    .parse(inputRecord.get(f.pos()).toString());
-                            entityProps.put(mName, new EntityProperty(dt));
-                        } catch (ParseException e) {
-                            LOGGER.error(i18nMessages.getMessage("error.ParseError",e));
-                            if (properties.dieOnError.getValue()) {
-                                throw new ComponentException(e);
+                        String pattern = fSchema.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
+                        if (pattern != null && !pattern.isEmpty()) {
+                            try {
+                                dt = new SimpleDateFormat(pattern).parse(inputRecord.get(f.pos()).toString());
+                            } catch (ParseException e) {
+                                LOGGER.error(i18nMessages.getMessage("error.ParseError", e));
+                                if (properties.dieOnError.getValue()) {
+                                    throw new ComponentException(e);
+                                }
                             }
+                        } else {
+                            dt = (Date) inputRecord.get(f.pos());
                         }
-                    } else
+
+                        entityProps.put(mName, new EntityProperty(dt));
+                    } else {
                         entityProps.put(mName, new EntityProperty((Long) inputRecord.get(f.pos())));
+                    }
                 }
                 //
                 else if (fSchema.getType().equals(Type.STRING)) {
@@ -284,10 +293,23 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
         }
     }
 
+    /**
+     * this method return the mapped name is useNameMappings is true else it return the original name
+     */
+    private String getMappedNameIfNecessary(String sName) {
+        if (useNameMappings) {
+            if (nameMappings.containsKey(sName)) {
+                return nameMappings.get(sName);
+            }
+        }
+
+        return sName;
+    }
+
     @Override
     public Result close() throws IOException {
         if (batchOperationsCount > 0) {
-            LOGGER.debug(i18nMessages.getMessage("debug.ExecutingBrtch",batchOperationsCount));
+            LOGGER.debug(i18nMessages.getMessage("debug.ExecutingBrtch", batchOperationsCount));
             processBatch();
         }
         table = null;
@@ -310,12 +332,12 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
         return Collections.unmodifiableList(rejectedWrites);
     }
 
-    private IndexedRecordConverter<IndexedRecord, IndexedRecord> getFactory(Object datum) {
-        if (factory == null) {
-            factory = new GenericIndexedRecordConverter();
-            factory.setSchema(writeSchema);
+    private IndexedRecordConverter<IndexedRecord, IndexedRecord> getConverter(Object datum) {
+        if (converter == null) {
+            converter = new GenericIndexedRecordConverter();
+            converter.setSchema(writeSchema);
         }
-        return factory;
+        return converter;
     }
 
     private TableOperation getTableOperation(DynamicTableEntity entity) {
@@ -352,7 +374,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
             table.execute(ope);
             handleSuccess(inputRecord, 1);
         } catch (StorageException e) {
-            LOGGER.error(i18nMessages.getMessage("error.ProcessSingleOperation",actionData,e.getLocalizedMessage()));
+            LOGGER.error(i18nMessages.getMessage("error.ProcessSingleOperation", actionData, e.getLocalizedMessage()));
 
             if (properties.dieOnError.getValue()) {
                 throw new ComponentException(e);
@@ -387,7 +409,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
             handleSuccess(null, batchOperationsCount);
 
         } catch (StorageException e) {
-            LOGGER.error(i18nMessages.getMessage("error.ProcessBatch",actionData,e.getLocalizedMessage()));
+            LOGGER.error(i18nMessages.getMessage("error.ProcessBatch", actionData, e.getLocalizedMessage()));
 
             handleReject(null, e, batchOperationsCount);
 
