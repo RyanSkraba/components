@@ -28,6 +28,8 @@ public class SnowflakeSourceOrSinkTest {
 
     private static final String TALEND_EXPECTED_DATE_PATTERN = "yyyy-MM-dd";
 
+    private static final String TALEND_EXPECTED_TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
+
     private final SnowflakeSourceOrSink snowflakeSourceOrSink = new SnowflakeSourceOrSink();
 
     @Mock
@@ -83,7 +85,7 @@ public class SnowflakeSourceOrSinkTest {
 
         LOGGER.debug("expected schema: " + expectedSchema);
 
-        Schema schemaWithAnotherDatePattern = SchemaBuilder.builder().record("ExpectedSchema").fields()
+        Schema schemaWithAnotherDatePattern = SchemaBuilder.builder().record("Schema").fields()
                 .name("logicalDate")
                 .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy/MM/dd").type(AvroUtils._logicalDate())
                 .noDefault().endRecord();
@@ -136,5 +138,79 @@ public class SnowflakeSourceOrSinkTest {
 
         Assert.assertNotEquals(expectedSchema.getField("logicalDate").getProp(SchemaConstants.TALEND_COLUMN_PATTERN),
                 schemaWithAnotherDatePattern.getField("logicalDate").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+    }
+
+    /**
+     * Checks {@link SnowflakeSourceOrSink#getSchema(RuntimeContainer, Connection, String)} adds default timestamp-pattern
+     * to the logical type timestamp
+     */
+    @Test
+    public void testGetSchemaDefaultTimestampPattern() throws Exception {
+        Schema schemaToEdit = SchemaBuilder.builder().record("SchemaToEdit").fields()
+                .name("Timestamp").type(AvroUtils._logicalTimestamp()).noDefault()
+                .endRecord();
+
+        LOGGER.debug("schema to add default timestamp pattern: " + schemaToEdit);
+
+        Schema expectedSchema = SchemaBuilder.builder().record("ExpectedSchema").fields()
+                .name("Timestamp")
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, TALEND_EXPECTED_TIMESTAMP_PATTERN).type(AvroUtils._logicalTimestamp())
+                .noDefault().endRecord();
+
+        LOGGER.debug("expected schema: " + expectedSchema);
+
+        Schema schemaWithAnotherTimestampPattern = SchemaBuilder.builder().record("Schema").fields()
+                .name("Timestamp")
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy/MM/dd'T'HH/mm/ss").type(AvroUtils._logicalTimestamp())
+                .noDefault().endRecord();
+
+        LOGGER.debug("schema with another timestamp pattern: " + schemaWithAnotherTimestampPattern);
+
+        Connection connectionMock = Mockito.mock(Connection.class);
+
+        Mockito.when(runtimeContainerMock
+                .getComponentData(Matchers.anyString(), Matchers.anyString()))
+                .thenReturn((SnowflakeConnectionProperties) snowflakeSourceOrSink.properties);
+
+        DatabaseMetaData databaseMetaDataMock = Mockito.mock(DatabaseMetaData.class);
+        ResultSet resultSetMock = Mockito.mock(ResultSet.class);
+
+        Mockito.when(connectionMock.getMetaData()).thenReturn(databaseMetaDataMock);
+
+        final SnowflakeAvroRegistry snowflakeAvroRegistryMock = Mockito.mock(SnowflakeAvroRegistry.class);
+
+        class SnowflakeSourceOrSinkChild extends SnowflakeSourceOrSink {
+            @Override
+            public SnowflakeAvroRegistry getSnowflakeAvroRegistry() {
+                return snowflakeAvroRegistryMock;
+            }
+        }
+
+        SnowflakeSourceOrSink sfSourceOrSink = new SnowflakeSourceOrSinkChild();
+        SnowflakeConnectionProperties properties = new SnowflakeConnectionProperties("test");
+        properties.referencedComponent.componentInstanceId.setValue("referencedComponentId");
+        properties.db.setValue("database");
+        sfSourceOrSink.initialize(runtimeContainerMock, properties);
+
+        Mockito.when(databaseMetaDataMock.getColumns(sfSourceOrSink.getCatalog(sfSourceOrSink
+                        .getEffectiveConnectionProperties(runtimeContainerMock)),
+                sfSourceOrSink.getDbSchema(sfSourceOrSink.getEffectiveConnectionProperties(runtimeContainerMock)),
+                "tableName", null)).thenReturn(resultSetMock);
+        Mockito.when(databaseMetaDataMock.getPrimaryKeys(sfSourceOrSink.getCatalog(sfSourceOrSink
+                        .getEffectiveConnectionProperties(runtimeContainerMock)),
+                sfSourceOrSink.getDbSchema(sfSourceOrSink.getEffectiveConnectionProperties(runtimeContainerMock)),
+                "tableName")).thenReturn(resultSetMock);
+
+        Mockito.when(snowflakeAvroRegistryMock.inferSchema(resultSetMock)).thenReturn(schemaToEdit);
+
+        Schema resultSchema = sfSourceOrSink.getSchema(runtimeContainerMock, connectionMock, "tableName");
+
+        LOGGER.debug("result schema: " + resultSchema);
+
+        Assert.assertEquals(expectedSchema.getField("Timestamp").getProp(SchemaConstants.TALEND_COLUMN_PATTERN),
+                resultSchema.getField("Timestamp").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+
+        Assert.assertNotEquals(expectedSchema.getField("Timestamp").getProp(SchemaConstants.TALEND_COLUMN_PATTERN),
+                schemaWithAnotherTimestampPattern.getField("Timestamp").getProp(SchemaConstants.TALEND_COLUMN_PATTERN));
     }
 }

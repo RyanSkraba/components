@@ -49,12 +49,6 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String INCORRECRT_SNOWFLAKE_ACCOUNT = " Incorrect Snowflake Account was specified..";
-
-    private static final String JDBC_DRIVER = "com.snowflake.client.jdbc.SnowflakeDriver";
-
-    private static final String TALEND_DEFAULT_DATE_PATTERN = "yyyy-MM-dd";
-
     private transient static final Logger LOG = LoggerFactory.getLogger(SnowflakeSourceOrSink.class);
 
     protected SnowflakeProvideConnectionProperties properties;
@@ -75,7 +69,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
             connect(container);
         } catch (IllegalArgumentException e) {
             ValidationResult vr = new ValidationResult();
-            vr.setMessage(e.getMessage().concat(INCORRECRT_SNOWFLAKE_ACCOUNT));
+            vr.setMessage(e.getMessage().concat(SnowflakeConstants.INCORRECRT_SNOWFLAKE_ACCOUNT_MESSAGE));
             vr.setStatus(ValidationResult.Result.ERROR);
             return vr;
         } catch (Exception ex) {
@@ -83,7 +77,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
         }
         ValidationResult vr = new ValidationResult();
         vr.setStatus(Result.OK);
-        vr.setMessage("Connection Successful");
+        vr.setMessage(SnowflakeConstants.CONNECTION_SUCCESSFUL_MESSAGE);
         return vr;
     }
 
@@ -106,7 +100,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
         }
         ValidationResult vr = new ValidationResult();
         vr.setStatus(Result.OK);
-        vr.setMessage("Connection Successful");
+        vr.setMessage(SnowflakeConstants.CONNECTION_SUCCESSFUL_MESSAGE);
         return vr;
     }
 
@@ -161,7 +155,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
         }
 
         try {
-            Driver driver = (Driver) Class.forName(JDBC_DRIVER).newInstance();
+            Driver driver = (Driver) Class.forName(SnowflakeConstants.SNOWFLAKE_DRIVER).newInstance();
             DriverManager.registerDriver(new DriverWrapper(driver));
 
             conn = DriverManager.getConnection(connProps.getConnectionUrl(), connProps.getJdbcProperties());
@@ -263,7 +257,9 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
 
             for (Field f : tableSchema.getFields()) {
                 if (LogicalTypes.fromSchemaIgnoreInvalid(AvroUtils.unwrapIfNullable(f.schema())) == LogicalTypes.date()) {
-                    f.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, TALEND_DEFAULT_DATE_PATTERN);
+                    f.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, SnowflakeConstants.TALEND_DEFAULT_DATE_PATTERN);
+                } else if (LogicalTypes.fromSchemaIgnoreInvalid(AvroUtils.unwrapIfNullable(f.schema())) == LogicalTypes.timestampMillis()) {
+                    f.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, SnowflakeConstants.TALEND_DAFEULT_TIMESTAMP_PATTERN);
                 }
                 if (pkColumns.contains(f.name())) {
                     f.schema().addProp(SchemaConstants.TALEND_COLUMN_IS_KEY, "true");
