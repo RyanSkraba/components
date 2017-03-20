@@ -66,6 +66,7 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
             schema = AvroUtils._int();
             LogicalTypes.date().addToSchema(schema);
             field = wrap(nullable, schema, name);
+            field.schema().addProp(SchemaConstants.TALEND_COLUMN_PATTERN, SnowflakeConstants.TALEND_DEFAULT_DATE_PATTERN);
             break;
         case java.sql.Types.TIME:
             schema = AvroUtils._int();
@@ -76,6 +77,7 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
             schema = AvroUtils._long();
             LogicalTypes.timestampMillis().addToSchema(schema);
             field = wrap(nullable, schema, name);
+            field.schema().addProp(SchemaConstants.TALEND_COLUMN_PATTERN, SnowflakeConstants.TALEND_DAFEULT_TIMESTAMP_PATTERN);
             break;
         case java.sql.Types.BOOLEAN:
             schema = AvroUtils._boolean();

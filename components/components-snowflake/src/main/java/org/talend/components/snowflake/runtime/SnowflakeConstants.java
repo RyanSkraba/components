@@ -13,4 +13,8 @@ public final class SnowflakeConstants {
     public static final String CONNECTION_SUCCESSFUL_MESSAGE = "Connection Successful";
 
     public static final String SNOWFLAKE_DRIVER = "com.snowflake.client.jdbc.SnowflakeDriver";
+
+    private SnowflakeConstants() {
+        throw new AssertionError();
+    }
 }

@@ -256,11 +256,6 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
             }
 
             for (Field f : tableSchema.getFields()) {
-                if (LogicalTypes.fromSchemaIgnoreInvalid(AvroUtils.unwrapIfNullable(f.schema())) == LogicalTypes.date()) {
-                    f.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, SnowflakeConstants.TALEND_DEFAULT_DATE_PATTERN);
-                } else if (LogicalTypes.fromSchemaIgnoreInvalid(AvroUtils.unwrapIfNullable(f.schema())) == LogicalTypes.timestampMillis()) {
-                    f.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, SnowflakeConstants.TALEND_DAFEULT_TIMESTAMP_PATTERN);
-                }
                 if (pkColumns.contains(f.name())) {
                     f.schema().addProp(SchemaConstants.TALEND_COLUMN_IS_KEY, "true");
                 }
