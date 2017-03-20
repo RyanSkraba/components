@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.avro.Schema;
+import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.runners.spark.SparkContextOptions;
 import org.apache.beam.runners.spark.SparkRunner;
 import org.apache.beam.sdk.Pipeline;
@@ -35,6 +36,7 @@ import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
+import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
@@ -45,9 +47,11 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
+import org.talend.components.adapter.beam.io.rowgenerator.RowGeneratorIO;
 import org.talend.components.bigquery.BigQueryDatastoreProperties;
 import org.talend.components.bigquery.input.BigQueryInputProperties;
 import org.talend.components.bigquery.output.BigQueryOutputProperties;
+import org.talend.daikon.avro.SampleSchemas;
 
 import com.google.api.services.bigquery.model.TableRow;
 import com.google.cloud.bigquery.BigQuery;
@@ -59,8 +63,12 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
     final static String uuid = UUID.randomUUID().toString().replace("-", "_");
 
     final static String datasetName = "bqcomponentio" + uuid;
+
     @Rule
     public final TestPipeline pipeline = TestPipeline.create();
+
+    private final static JavaSparkContext jsc = new JavaSparkContext("local[2]", BigQueryBeamRuntimeTestIT.class.getName());
+
     BigQueryDatastoreProperties datastore;
 
     @BeforeClass
@@ -87,9 +95,33 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
         testAllTypesInputOutput(pipeline);
     }
 
-    //TODO extract this to utils
+    @Test
+    public void testAllTypesInputOutput_Spark() throws UnsupportedEncodingException {
+        testAllTypesInputOutput(createSparkRunnerPipeline());
+    }
+
+    @Test
+    public void testPrimitivesRequiredInputOutput_Local() {
+        testInputOutput(pipeline, "testPrimitiveRequiredLocal", SampleSchemas.recordPrimitivesRequired());
+    }
+
+    @Test
+    public void testPrimitivesNullableInputOutput_Local() {
+        testInputOutput(pipeline, "testPrimitiveNullableLocal", SampleSchemas.recordPrimitivesNullable());
+    }
+
+    @Test
+    public void testCompositesRequired_Local() {
+        testInputOutput(pipeline, "testCompositesRequiredLocal", SampleSchemas.recordCompositesRequired());
+    }
+
+    @Test
+    public void testCompositesRequired_Spark() {
+        testInputOutput(pipeline, "testCompositesRequiredSpark", SampleSchemas.recordCompositesRequired());
+    }
+
+    // TODO extract this to utils
     private Pipeline createSparkRunnerPipeline() {
-        JavaSparkContext jsc = new JavaSparkContext("local[2]", this.getClass().getName());
         PipelineOptions o = PipelineOptionsFactory.create();
         SparkContextOptions options = o.as(SparkContextOptions.class);
         options.setProvidedSparkContext(jsc);
@@ -97,11 +129,6 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
         options.setRunner(SparkRunner.class);
 
         return Pipeline.create(options);
-    }
-
-    @Test
-    public void testAllTypesInputOutput_Spark() throws UnsupportedEncodingException {
-        testAllTypesInputOutput(createSparkRunnerPipeline());
     }
 
     private void testAllTypesInputOutput(Pipeline pipeline) throws UnsupportedEncodingException {
@@ -183,4 +210,33 @@ public class BigQueryBeamRuntimeTestIT implements Serializable {
         pipeline.run().waitUntilFinish();
     }
 
+    private void testInputOutput(Pipeline pipeline, String tableName, Schema schema) {
+        // Write 10 rows of generated records to BigQuery.
+        {
+            BigQueryOutputProperties outputProperties = createOutput(createDatasetFromTable(datastore, datasetName, tableName));
+            outputProperties.tableOperation.setValue(BigQueryOutputProperties.TableOperation.DROP_IF_EXISTS_AND_CREATE);
+            outputProperties.getDatasetProperties().main.schema.setValue(schema);
+            BigQueryOutputRuntime outputRuntime = new BigQueryOutputRuntime();
+            outputRuntime.initialize(null, outputProperties);
+
+            // Generate 10 rows.
+            PCollection<IndexedRecord> pc1 = pipeline.apply(RowGeneratorIO.read().withSchema(schema).withRows(10).withSeed(0L));
+
+            pc1.apply(outputRuntime);
+            pipeline.run().waitUntilFinish();
+        }
+
+        // Read the 10 rows back from BigQuery.
+        {
+            BigQueryInputProperties inputProperties = createInput(createDatasetFromTable(datastore, datasetName, tableName));
+            BigQueryInputRuntime inputRuntime = new BigQueryInputRuntime();
+            inputRuntime.initialize(null, inputProperties);
+            PCollection<IndexedRecord> pc2 = pipeline.apply(inputRuntime);
+            // TODO: This only tests that 10 records were read back, we should probably check the values.
+            // TODO: To be completed when RowGeneratorIO is more stable.
+            // PAssert.that(pc2).containsInAnyOrder(...);
+            PAssert.thatSingleton(pc2.apply("Count", Count.<IndexedRecord> globally())).isEqualTo(10L);
+            pipeline.run().waitUntilFinish();
+        }
+    }
 }

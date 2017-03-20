@@ -157,40 +157,38 @@ public class BigQueryAvroRegistry extends AvroRegistry {
         }
 
         SchemaBuilder.FieldAssembler<org.apache.avro.Schema> fieldAssembler = SchemaBuilder.record("BigQuerySchema").fields();
-
         for (Field bqField : bqFields) {
             String name = bqField.getName();
-            Field.Type type = bqField.getType();
-            Field.Mode mode = bqField.getMode();
-            // All other primitive types
-            org.apache.avro.Schema fieldSchema = inferSchemaDataTypeTryList(bqField);
-            if (Field.Mode.NULLABLE == mode) {
-                fieldSchema = AvroUtils.wrapAsNullable(fieldSchema);
-            }
+            org.apache.avro.Schema fieldSchema = inferSchemaField(bqField);
             fieldAssembler = fieldAssembler.name(name).type(fieldSchema).noDefault();
         }
         return fieldAssembler.endRecord();
     }
 
-    private org.apache.avro.Schema inferSchemaDataTypeTryList(Field field) {
+    private org.apache.avro.Schema inferSchemaField(Field field) {
         String name = field.getName();
         Field.Type sqlType = field.getType();
         Field.Mode mode = field.getMode();
-        if (Field.Mode.REPEATED == mode) {
-            // Array type
+
+        // Get the "basic" type of the field.
+        org.apache.avro.Schema fieldSchema = inferSchemaFieldWithoutMode(field);
+
+        // BigQuery fields are NULLABLE by default.
+        if (Field.Mode.NULLABLE == mode || mode == null) {
+            fieldSchema = AvroUtils.wrapAsNullable(fieldSchema);
+        } else if (Field.Mode.REPEATED == mode) {
+            // Determine if the field is an array.
             // https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#array-type
-            org.apache.avro.Schema itemSchema = inferSchemaDataType(field);
-            org.apache.avro.Schema arraySchema = SchemaBuilder.array().items(itemSchema);
-            return arraySchema;
-        } // not array
-        return inferSchemaDataType(field);
+            fieldSchema = SchemaBuilder.array().items(fieldSchema);
+        }
+        return fieldSchema;
     }
 
     /**
      * All BigQuery types except Record/Struct and Arrays, no matter legacy or not, as {@link LegacySQLTypeName} is a
      * wrapper for {@link StandardSQLTypeName}
      */
-    private org.apache.avro.Schema inferSchemaDataType(Field field) {
+    private org.apache.avro.Schema inferSchemaFieldWithoutMode(Field field) {
         Field.Type sqlType = field.getType();
         switch (sqlType.getValue()) {
         case RECORD:
@@ -199,7 +197,7 @@ public class BigQueryAvroRegistry extends AvroRegistry {
             // https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#struct-type
             SchemaBuilder.FieldAssembler<org.apache.avro.Schema> itemFieldAssembler = SchemaBuilder.record(name).fields();
             for (Field itemField : sqlType.getFields()) {
-                itemFieldAssembler.name(itemField.getName()).type(inferSchemaDataTypeTryList(itemField)).noDefault();
+                itemFieldAssembler.name(itemField.getName()).type(inferSchemaField(itemField)).noDefault();
             }
             org.apache.avro.Schema recordSchema = itemFieldAssembler.endRecord();
             return recordSchema;
