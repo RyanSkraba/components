@@ -1,7 +1,7 @@
 package org.talend.components.snowflake.runtime;
 
 /**
- * Constants used in Snowflake component
+ * Constants used in {@link org.talend.components.snowflake.runtime} package
  */
 public final class SnowflakeConstants {
     public static final String TALEND_DEFAULT_DATE_PATTERN = "yyyy-MM-dd";
