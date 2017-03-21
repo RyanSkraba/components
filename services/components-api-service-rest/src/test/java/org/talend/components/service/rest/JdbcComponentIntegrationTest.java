@@ -36,6 +36,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -55,7 +56,6 @@ import org.talend.daikon.properties.test.PropertiesTestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
 
@@ -102,6 +102,7 @@ public class JdbcComponentIntegrationTest {
     }
 
     @Test
+    @Ignore
     public void testGetDataBinary() throws java.io.IOException {
         // given
         PropertiesDto propertiesDto = new PropertiesDto();
@@ -131,6 +132,7 @@ public class JdbcComponentIntegrationTest {
     }
 
     @Test
+    @Ignore
     public void testGetData() throws java.io.IOException {
         // given
         PropertiesDto propertiesDto = new PropertiesDto();
@@ -192,6 +194,7 @@ public class JdbcComponentIntegrationTest {
     }
 
     @Test
+    @Ignore
     public void testGetSchema() throws java.io.IOException {
         // given
         PropertiesDto propertiesDto = new PropertiesDto();
@@ -212,6 +215,7 @@ public class JdbcComponentIntegrationTest {
     }
 
     @Test
+    @Ignore
     public void testGetSchema_wrongSql() throws java.io.IOException {
         // given
 
@@ -250,6 +254,7 @@ public class JdbcComponentIntegrationTest {
     }
 
     @Test
+    @Ignore
     public void validateDataStoreConnection() throws java.io.IOException {
         // given
         PropertiesDto properties = new PropertiesDto();
