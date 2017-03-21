@@ -38,7 +38,8 @@ public class WindowRuntime extends PTransform<PCollection<IndexedRecord>, PColle
         PCollection<IndexedRecord> windowed_items;
 
         if (properties.windowLength.getValue() < 1) {
-            throw new TalendRuntimeException(CommonErrorCodes.UNEXPECTED_ARGUMENT);
+            TalendRuntimeException.build(CommonErrorCodes.UNEXPECTED_ARGUMENT).setAndThrow(properties.windowLength.getName(),
+                    String.valueOf(properties.windowLength.getValue()));
         }
 
         // Session Window

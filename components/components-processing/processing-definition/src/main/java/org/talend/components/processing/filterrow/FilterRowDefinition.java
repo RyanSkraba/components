@@ -62,7 +62,7 @@ public class FilterRowDefinition extends AbstractComponentDefinition {
         assertEngineCompatibility(engine);
         if (ConnectorTopology.INCOMING_AND_OUTGOING.equals(connectorTopology)) {
             try {
-                return new JarRuntimeInfo(new URL("mvn:org.talend.components/components-runtime"),
+                return new JarRuntimeInfo(new URL("mvn:org.talend.components/processing-runtime"),
                         DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-runtime"),
                         "org.talend.components.processing.runtime.filterrow.FilterRowRuntime");
             } catch (MalformedURLException e) {

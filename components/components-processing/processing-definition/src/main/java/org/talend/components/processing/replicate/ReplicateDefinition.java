@@ -56,7 +56,7 @@ public class ReplicateDefinition extends AbstractComponentDefinition {
         assertEngineCompatibility(engine);
         assertConnectorTopologyCompatibility(connectorTopology);
         try {
-            return new JarRuntimeInfo(new URL("mvn:org.talend.components/components-processing"),
+            return new JarRuntimeInfo(new URL("mvn:org.talend.components/processing-runtime"),
                     DependenciesReader.computeDependenciesFilePath(ProcessingFamilyDefinition.MAVEN_GROUP_ID,
                             ProcessingFamilyDefinition.MAVEN_ARTIFACT_ID),
                     "org.talend.components.processing.runtime.replicate.ReplicateRuntime");
