@@ -13,6 +13,7 @@
 package org.talend.components.processing.filterrow;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.avro.Schema;
@@ -139,7 +140,7 @@ public class FilterRowProperties extends FixedConnectorsComponentProperties {
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
-        HashSet<PropertyPathConnector> connectors = new HashSet<PropertyPathConnector>();
+        HashSet<PropertyPathConnector> connectors = new LinkedHashSet<PropertyPathConnector>();
         if (isOutputConnection) {
             // output schemas
             connectors.add(FLOW_CONNECTOR);
