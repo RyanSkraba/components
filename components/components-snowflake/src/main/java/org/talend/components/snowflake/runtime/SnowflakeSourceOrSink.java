@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.slf4j.Logger;
@@ -39,6 +40,7 @@ import org.talend.components.snowflake.SnowflakeConnectionProperties;
 import org.talend.components.snowflake.SnowflakeProvideConnectionProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
@@ -46,10 +48,6 @@ import org.talend.daikon.properties.ValidationResult.Result;
 public class SnowflakeSourceOrSink implements SourceOrSink {
 
     private static final long serialVersionUID = 1L;
-
-    private static final String INCORRECRT_SNOWFLAKE_ACCOUNT = " Incorrect Snowflake Account was specified..";
-
-    private static final String JDBC_DRIVER = "com.snowflake.client.jdbc.SnowflakeDriver";
 
     private transient static final Logger LOG = LoggerFactory.getLogger(SnowflakeSourceOrSink.class);
 
@@ -71,7 +69,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
             connect(container);
         } catch (IllegalArgumentException e) {
             ValidationResult vr = new ValidationResult();
-            vr.setMessage(e.getMessage().concat(INCORRECRT_SNOWFLAKE_ACCOUNT));
+            vr.setMessage(e.getMessage().concat(SnowflakeConstants.INCORRECRT_SNOWFLAKE_ACCOUNT_MESSAGE));
             vr.setStatus(ValidationResult.Result.ERROR);
             return vr;
         } catch (Exception ex) {
@@ -79,7 +77,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
         }
         ValidationResult vr = new ValidationResult();
         vr.setStatus(Result.OK);
-        vr.setMessage("Connection Successful");
+        vr.setMessage(SnowflakeConstants.CONNECTION_SUCCESSFUL_MESSAGE);
         return vr;
     }
 
@@ -102,7 +100,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
         }
         ValidationResult vr = new ValidationResult();
         vr.setStatus(Result.OK);
-        vr.setMessage("Connection Successful");
+        vr.setMessage(SnowflakeConstants.CONNECTION_SUCCESSFUL_MESSAGE);
         return vr;
     }
 
@@ -157,7 +155,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
         }
 
         try {
-            Driver driver = (Driver) Class.forName(JDBC_DRIVER).newInstance();
+            Driver driver = (Driver) Class.forName(SnowflakeConstants.SNOWFLAKE_DRIVER).newInstance();
             DriverManager.registerDriver(new DriverWrapper(driver));
 
             conn = DriverManager.getConnection(connProps.getConnectionUrl(), connProps.getJdbcProperties());
@@ -231,6 +229,10 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
         return getSchema(container, connect(container), schemaName);
     }
 
+    protected SnowflakeAvroRegistry getSnowflakeAvroRegistry() {
+        return SnowflakeAvroRegistry.get();
+    }
+
     protected Schema getSchema(RuntimeContainer container, Connection connection, String tableName) throws IOException {
         Schema tableSchema = null;
 
@@ -239,7 +241,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
             DatabaseMetaData metaData = connection.getMetaData();
 
             ResultSet resultSet = metaData.getColumns(getCatalog(connProps), getDbSchema(connProps), tableName, null);
-            tableSchema = SnowflakeAvroRegistry.get().inferSchema(resultSet);
+            tableSchema = getSnowflakeAvroRegistry().inferSchema(resultSet);
             // FIXME - I18N for this message
             if (tableSchema == null)
                 throw new IOException("Table: " + tableName + " not found");
