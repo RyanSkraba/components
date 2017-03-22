@@ -246,7 +246,7 @@ public class MarketoConstants {
     /////////////////////////////////////////////////////////////////////////
     public static Schema getSOAPSchemaForGetLeadOrGetMultipleLeads() {
         return SchemaBuilder.builder().record("getLeadOrGetMultipleLeads").fields() //
-                .name("Id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().longType().noDefault() //
+                .name("Id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
                 .name("Email").type().nullable().stringType().noDefault() //
                 .name("ForeignSysPersonId").type().nullable().stringType().noDefault() //
                 .name("ForeignSysType").type().nullable().stringType().noDefault() //
@@ -255,7 +255,7 @@ public class MarketoConstants {
 
     public static Schema getSOAPSchemaForGetLeadChanges() {
         return SchemaBuilder.builder().record("getLeadChanges").fields() //
-                .name("Id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().longType().noDefault() //
+                .name("Id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
                 .name("ActivityDateTime")//
                 .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'")//
                 .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
@@ -270,7 +270,7 @@ public class MarketoConstants {
 
     public static Schema getSOAPSchemaForGetLeadActivity() {
         return SchemaBuilder.builder().record("getLeadActivity").fields() //
-                .name("Id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().longType().noDefault() //
+                .name("Id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
                 .name("ActivityDateTime")//
                 .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'")
                 .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //

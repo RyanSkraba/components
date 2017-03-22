@@ -29,7 +29,6 @@ import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
-import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.marketo.MarketoComponentProperties;
@@ -304,18 +303,11 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
     }
 
     @Override
-    public Schema getSchema(Connector connector, boolean isOutputConnection) {
-        if (isOutputConnection)
-            return schemaFlow.schema.getValue();
-        return schemaInput.schema.getValue();
-    }
-
-    @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
         if (isOutputConnection)
-            return Collections.singleton(FLOW_CONNECTOR);
-        else
             return Collections.singleton(MAIN_CONNECTOR);
+        else
+            return Collections.emptySet();
     }
 
     @Override
@@ -377,7 +369,7 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
         mainForm.addColumn(leadKeyTypeREST);
         mainForm.addColumn(leadKeyTypeSOAP);
         mainForm.addColumn(leadKeyValue);
-        mainForm.addColumn(widget(leadKeyValues).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
+        mainForm.addColumn(leadKeyValues);
         //
         mainForm.addRow(listParam);
         mainForm.addColumn(listParamValue);
@@ -558,7 +550,6 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
                 mcn.add("");
             mappingInput.marketoColumnName.setValue(mcn);
         }
-        leadKeyValues.setPossibleValues(fld);
     }
 
     public void updateSchemaRelated() {
@@ -603,10 +594,6 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
         }
         schemaInput.schema.setValue(s);
         updateMappings();
-    }
-
-    public void beforeLeadKeyValues() {
-        leadKeyValues.setPossibleValues(getSchemaFields());
     }
 
     public void afterInputOperation() {

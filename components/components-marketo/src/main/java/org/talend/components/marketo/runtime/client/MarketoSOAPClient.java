@@ -749,7 +749,6 @@ public class MarketoSOAPClient extends MarketoClient {
             lk.setKeyType(LeadKeyRef.valueOf(parameters.getLeadKeyType()));
             lk.setKeyValue(lkv);
             leadKeys.getLeadKeies().add(lk);
-            LOG.warn("[listOperation] Adding leadID {} for {}.", lkv, operationType);
         }
         paramsListOperation.setListMemberList(leadKeys);
 

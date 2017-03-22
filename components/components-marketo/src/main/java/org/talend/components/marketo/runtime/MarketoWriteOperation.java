@@ -53,7 +53,6 @@ public class MarketoWriteOperation implements WriteOperation<Result> {
             return new MarketoOutputWriter(this, adaptor);
         if (sink.properties instanceof TMarketoInputProperties)
             return new MarketoInputWriter(this, adaptor);
-        LOG.warn("[createWriter] undefined properties : {}.", sink.properties);
         return null;
     }
 

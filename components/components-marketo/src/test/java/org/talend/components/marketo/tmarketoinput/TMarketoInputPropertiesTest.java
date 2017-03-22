@@ -387,13 +387,12 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
     @Test
     public void testGetAllSchemaPropertiesConnectors() {
         assertEquals(Collections.singleton(props.MAIN_CONNECTOR), props.getAllSchemaPropertiesConnectors(true));
-        assertEquals(Collections.singleton(props.MAIN_CONNECTOR), props.getAllSchemaPropertiesConnectors(false));
     }
 
     @Test
     public void testGetSchema() {
         props.afterInputOperation();
-        assertEquals(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads(), props.getSchema(null, false));
+        assertEquals(MarketoConstants.getRESTSchemaForGetLeadOrGetMultipleLeads(), props.getSchema(props.MAIN_CONNECTOR, false));
         assertEquals(6, props.getSchemaFields().size());
     }
 
@@ -771,5 +770,4 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         assertEquals(LeadKeyTypeSOAP.SFDCLEADOWNERID, LeadKeyTypeSOAP.valueOf("SFDCLEADOWNERID"));
         assertEquals(LeadKeyTypeSOAP.SFDCOPPTYID, LeadKeyTypeSOAP.valueOf("SFDCOPPTYID"));
     }
-
 }
