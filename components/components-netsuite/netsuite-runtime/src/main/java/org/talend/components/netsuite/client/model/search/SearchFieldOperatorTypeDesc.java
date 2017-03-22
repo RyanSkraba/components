@@ -87,7 +87,7 @@ public class SearchFieldOperatorTypeDesc<T> {
         } else {
             if (!opName.getDataType().equals(operatorType.getDataType())) {
                 throw new IllegalArgumentException(
-                        "Invalid operator data type: " + "'" + opName.getDataType() + "' != '" + opName.getDataType() + "'");
+                        "Invalid operator data type: " + "'" + opName.getDataType() + "' != '" + operatorType.getDataType() + "'");
             }
             return mapFromString(opName.getName());
         }
