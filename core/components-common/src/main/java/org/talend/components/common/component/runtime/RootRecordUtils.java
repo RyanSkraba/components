@@ -63,6 +63,23 @@ public final class RootRecordUtils {
         IndexedRecord rootRecord = new GenericData.Record(rootSchema);
         return rootRecord;
     }
+    
+    /**
+     * Creates and returns root record
+     * For performance purposes, it is recommended to create Root schema only once and then use it to create Root record instances
+     * Sets <code>dataRecord</code> on position 0, and <code>outOfBandRecord</code> on position 1
+     * 
+     * @param rootSchema Root schema, see {@link RootSchemaUtils}
+     * @param dataRecord main data record
+     * @param outOfBandRecord out of band (additional) data record
+     * @return root record
+     */
+    public static IndexedRecord createRootRecord(Schema rootSchema, IndexedRecord dataRecord, IndexedRecord outOfBandRecord) {
+    	IndexedRecord rootRecord = createRootRecord(rootSchema);
+    	rootRecord.put(0, dataRecord);
+    	rootRecord.put(1, outOfBandRecord);
+    	return rootRecord;
+    }
 
     /**
      * Checks whether input {@link IndexedRecord} is Root record

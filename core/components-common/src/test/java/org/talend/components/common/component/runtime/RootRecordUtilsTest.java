@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.common.component.runtime;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -138,6 +139,32 @@ public class RootRecordUtilsTest {
                 .name("name").type().stringType().noDefault().endRecord(); //
 
         RootRecordUtils.createRootRecord(notRoot);
+    }
+    
+    /**
+     * Checks {@link RootRecordUtils#createRootRecord(Schema, IndexedRecord, IndexedRecord))} returns Root record, which schema is Root schema
+     * and it contains data and outOfBand children records
+     */
+    @Test
+    public void testCreateRootRecordWithChildren() {
+        Schema mainSchema = SchemaBuilder.record("Main").fields() //
+                .name("name").type().stringType().noDefault().endRecord(); //
+
+        Schema outOfBandSchema = SchemaBuilder.record("OutOfBand").fields() //
+                .name("id").type().intType().noDefault().endRecord(); //
+        
+        Schema rootSchema = SchemaBuilder.record("Root").fields() //
+                .name("Main").type(mainSchema).noDefault() // 
+                .name("OutOfBand").type(outOfBandSchema).noDefault() // 
+                .endRecord(); //
+        
+        IndexedRecord dataRecord = new GenericData.Record(mainSchema);
+        IndexedRecord outOfBandRecord = new GenericData.Record(outOfBandSchema);
+        IndexedRecord rootRecord = RootRecordUtils.createRootRecord(rootSchema, dataRecord, outOfBandRecord);
+        
+        assertEquals(rootSchema, rootRecord.getSchema());
+        assertEquals(dataRecord, rootRecord.get(0));
+        assertEquals(outOfBandRecord, rootRecord.get(1));
     }
 
     /**
