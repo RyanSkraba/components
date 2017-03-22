@@ -111,11 +111,11 @@ public abstract class AzureStorageTableBaseTestIT extends AzureStorageBaseTestIT
     public Schema getSystemSchema() {
         return SchemaBuilder.record("Main").fields()
                 //
-                .name("RowKey").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")
-                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")// $NON-NLS-3$
+                .name("PartitionKey").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")// $NON-NLS-3$
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "true").type(AvroUtils._string()).noDefault()
                 //
-                .name("PartitionKey").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")// $NON-NLS-3$
+                .name("RowKey").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")
+                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")// $NON-NLS-3$
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "true").type(AvroUtils._string()).noDefault()
                 //
                 .name("Timestamp").prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd hh:mm:ss")// $NON-NLS-3$

@@ -15,7 +15,11 @@ package org.talend.components.azurestorage.table.runtime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.*;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.COMPARISON_EQUAL;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.COMPARISON_GREATER_THAN;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.FIELD_TYPE_DATE;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.FIELD_TYPE_STRING;
+import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.PREDICATE_AND;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -134,7 +138,7 @@ public class TAzureStorageInputTableTestIT extends AzureStorageTableBaseTestIT {
         reader.close();
     }
 
-    @SuppressWarnings({"rawtypes"})
+    @SuppressWarnings({ "rawtypes" })
     @Test
     public void testFilterReader() throws Throwable {
         Date startTest = new Date();
@@ -144,7 +148,6 @@ public class TAzureStorageInputTableTestIT extends AzureStorageTableBaseTestIT {
         createSampleDataset(ctable);
 
         properties.tableName.setValue(ctable);
-        // String f = String.format("datetime\'%s:00Z\'", sdf);
         properties.useFilterExpression.setValue(true);
         List<String> cols = Arrays.asList("PartitionKey", "Timestamp");
         List<String> ops = Arrays.asList(pk_test1, sdf);
@@ -156,7 +159,7 @@ public class TAzureStorageInputTableTestIT extends AzureStorageTableBaseTestIT {
         properties.filterExpression.operand.setValue(ops);
         properties.filterExpression.predicate.setValue(preds);
         properties.filterExpression.fieldType.setValue(types);
-        // properties.combinedFilter.setValue(f);
+
         properties.schema.schema.setValue(getDynamicSchema());
         BoundedReader reader = createBoundedReader(properties);
         assertTrue(reader.start());
@@ -184,6 +187,7 @@ public class TAzureStorageInputTableTestIT extends AzureStorageTableBaseTestIT {
         while (reader.advance()) {
             IndexedRecord current = (IndexedRecord) reader.getCurrent();
             assertNotNull(current);
+            assertEquals(getSystemSchema(), current.getSchema());
             assertEquals(3, current.getSchema().getFields().size());
         }
         reader.close();
