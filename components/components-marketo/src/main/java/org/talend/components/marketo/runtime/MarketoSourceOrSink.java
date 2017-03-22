@@ -72,7 +72,8 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
             vr.setStatus(ValidationResult.Result.ERROR);
             return vr;
         }
-        return ValidationResult.OK;
+        // bug/TDI-38439_MarketoWizardConnection
+        return validateConnection(conn);
     }
 
     public static List<NamedThing> getSchemaNames(RuntimeContainer container, TMarketoConnectionProperties connection)
@@ -137,9 +138,10 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
             MarketoSourceOrSink sos = new MarketoSourceOrSink();
             sos.initialize(null, (ComponentProperties) properties);
             sos.getClientService(null);
+            vr.setMessage(messages.getMessage("success.validation.connection"));
         } catch (IOException e) {
             vr.setStatus(Result.ERROR);
-            vr.setMessage(e.getLocalizedMessage());
+            vr.setMessage(messages.getMessage("error.validation.connection.testconnection", e.getLocalizedMessage()));
         }
         return vr;
     }
@@ -147,7 +149,7 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
     public TMarketoConnectionProperties connect(RuntimeContainer container) {
         TMarketoConnectionProperties connProps = getConnectionProperties();
         if (connProps == null)
-            throw new IllegalArgumentException("Connection is null");
+            throw new IllegalArgumentException(messages.getMessage("error.validation.connection.null"));
         String refComponentId = connProps.getReferencedComponentId();
         TMarketoConnectionProperties shared;
         if (refComponentId != null) {// Using another component's connection
@@ -170,8 +172,8 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
 
     public MarketoClientService getClientService(RuntimeContainer container) throws IOException {
         if (client == null) {
-            TMarketoConnectionProperties conn = connect(container);
             try {
+                TMarketoConnectionProperties conn = connect(container);
                 if (conn.apiMode.getValue().equals(APIMode.SOAP)) {
                     client = new MarketoSOAPClient(conn);
                 } else {

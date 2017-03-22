@@ -312,7 +312,6 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
-        LOG.warn("[getAllSchemaPropertiesConnectors] {}", isOutputConnection);
         if (isOutputConnection)
             return Collections.singleton(FLOW_CONNECTOR);
         else

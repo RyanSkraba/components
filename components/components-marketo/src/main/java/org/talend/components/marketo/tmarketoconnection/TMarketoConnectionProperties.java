@@ -26,6 +26,8 @@ import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.marketo.MarketoProvideConnectionProperties;
 import org.talend.components.marketo.runtime.MarketoSource;
 import org.talend.components.marketo.runtime.MarketoSourceOrSink;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
@@ -73,6 +75,8 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
     private static final long serialVersionUID = 145738798798151L;
 
     private transient static final Logger LOG = LoggerFactory.getLogger(TMarketoConnectionProperties.class);
+
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(MarketoSourceOrSink.class);
 
     public TMarketoConnectionProperties(String name) {
         super(name);
@@ -163,10 +167,9 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
         refreshLayout(getForm(Form.REFERENCE));
     }
 
-    public ValidationResult validateTestConnection() throws Exception {
+    public ValidationResult validateTestConnection() {
         ValidationResult vr = MarketoSource.validateConnection(this);
         if (vr.getStatus() == ValidationResult.Result.OK) {
-            vr.setMessage("Connection successful");
             getForm(FORM_WIZARD).setAllowForward(true);
             getForm(FORM_WIZARD).setAllowFinish(true);
         } else {
@@ -175,7 +178,7 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
         return vr;
     }
 
-    public ValidationResult afterFormFinishWizard(Repository<Properties> repo) throws Exception {
+    public ValidationResult afterFormFinishWizard(Repository<Properties> repo) {
 
         ValidationResult vr = MarketoSourceOrSink.validateConnection(this);
         if (vr.getStatus() != ValidationResult.Result.OK) {
