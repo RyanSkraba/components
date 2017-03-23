@@ -12,7 +12,15 @@
 // ============================================================================
 package org.talend.components.snowflake.test;
 
-import org.junit.Ignore;
+import static org.ops4j.pax.exam.CoreOptions.composite;
+import static org.ops4j.pax.exam.CoreOptions.linkBundle;
+import static org.ops4j.pax.exam.CoreOptions.options;
+import static org.ops4j.pax.exam.CoreOptions.propagateSystemProperties;
+
+import java.util.Arrays;
+
+import javax.inject.Inject;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -29,11 +37,6 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.snowflake.tsnowflakeconnection.TSnowflakeConnectionDefinition;
 import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputDefinition;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputDefinition;
-
-import javax.inject.Inject;
-import java.util.Arrays;
-
-import static org.ops4j.pax.exam.CoreOptions.*;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
@@ -57,7 +60,6 @@ public class OsgiSnowflakeTestIT extends SnowflakeTestIT {
                 linkBundle("org.talend.components-components-snowflake-bundle"), //
                 propagateSystemProperties("snowflake.account", "snowflake.password", "snowflake.warehouse", "snowflake.schema",
                         "snowflake.db", "snowflake.user"));
-        //vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"));
     }
 
     @Override
@@ -72,7 +74,7 @@ public class OsgiSnowflakeTestIT extends SnowflakeTestIT {
         assertComponentIsRegistered(TSnowflakeConnectionDefinition.COMPONENT_NAME);
     }
 
-    //@Test
+    // @Test
     public void showbundleContext() throws InvalidSyntaxException {
         System.out.println(" CLASS IS LOCATED :" + this.getClass().getResource(""));
         System.out.println(" ALL BUNDLES" + Arrays.toString(bc.getBundles()));
