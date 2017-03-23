@@ -42,8 +42,8 @@ public abstract class AbstractNetSuiteTestBase {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected static List<TestFixture> classScopedTestFixtures = new ArrayList<>();
-    protected List<TestFixture> testFixtures = new ArrayList<>();
+    protected static TestFixtures classScopedTestFixtures = new TestFixtures();
+    protected TestFixtures testFixtures = new TestFixtures();
 
     protected static Random rnd = new Random(System.currentTimeMillis());
     protected static DatatypeFactory datatypeFactory;
@@ -57,33 +57,19 @@ public abstract class AbstractNetSuiteTestBase {
     }
 
     public void setUp() throws Exception {
-        for (TestFixture testFixture : testFixtures) {
-            testFixture.setUp();
-        }
+        testFixtures.setUp();
     }
 
     public void tearDown() throws Exception {
-        List<TestFixture> reversed = new ArrayList<>(testFixtures);
-        Collections.reverse(reversed);
-        for (TestFixture testFixture : reversed) {
-            testFixture.tearDown();
-        }
-        testFixtures.clear();
+        testFixtures.tearDown();
     }
 
     public static void setUpClassScopedTestFixtures() throws Exception {
-        for (TestFixture testFixture : classScopedTestFixtures) {
-            testFixture.setUp();
-        }
+        classScopedTestFixtures.setUp();
     }
 
     public static void tearDownClassScopedTestFixtures() throws Exception {
-        List<TestFixture> reversed = new ArrayList<>(classScopedTestFixtures);
-        Collections.reverse(reversed);
-        for (TestFixture testFixture : reversed) {
-            testFixture.tearDown();
-        }
-        classScopedTestFixtures.clear();
+        classScopedTestFixtures.tearDown();
     }
 
     protected Schema getDynamicSchema() {
@@ -208,4 +194,40 @@ public abstract class AbstractNetSuiteTestBase {
             return nsObject;
         }
     }
+
+    public static class TestFixtures implements TestFixture {
+        protected final Logger logger = LoggerFactory.getLogger(getClass());
+
+        protected List<TestFixture> testFixtures = new ArrayList<>();
+
+        public void add(TestFixture testFixture) {
+            testFixtures.add(testFixture);
+        }
+
+        public void clear() {
+            testFixtures.clear();
+        }
+
+        @Override
+        public void setUp() throws Exception {
+            for (TestFixture testFixture : testFixtures) {
+                testFixture.setUp();
+            }
+        }
+
+        @Override
+        public void tearDown() throws Exception {
+            List<TestFixture> reversed = new ArrayList<>(testFixtures);
+            Collections.reverse(reversed);
+            for (TestFixture testFixture : reversed) {
+                try {
+                    testFixture.tearDown();
+                } catch (Exception | Error e) {
+                    logger.error("Failed to tearDown test fixture: {}", testFixture, e);
+                }
+            }
+            clear();
+        }
+    }
+
 }

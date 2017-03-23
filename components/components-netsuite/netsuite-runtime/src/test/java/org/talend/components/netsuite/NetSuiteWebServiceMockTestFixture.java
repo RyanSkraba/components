@@ -31,6 +31,8 @@ import javax.xml.ws.Endpoint;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.cxf.headers.Header;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.netsuite.client.NetSuiteClientFactory;
 import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NetSuiteCredentials;
@@ -38,6 +40,7 @@ import org.talend.components.netsuite.client.model.CustomFieldDesc;
 import org.talend.components.netsuite.client.model.FieldDesc;
 import org.talend.components.netsuite.client.model.TypeDesc;
 import org.talend.components.netsuite.client.model.beans.Beans;
+import org.talend.components.netsuite.test.FreePortFinder;
 import org.talend.components.netsuite.test.TestFixture;
 import org.talend.components.netsuite.util.Mapper;
 
@@ -46,6 +49,8 @@ import org.talend.components.netsuite.util.Mapper;
  */
 public class NetSuiteWebServiceMockTestFixture<PortT, AdapterT extends NetSuitePortTypeMockAdapter<PortT>>
         implements TestFixture {
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private NetSuiteClientFactory<PortT> clientFactory;
     private NetSuiteServiceFactory<?> serviceFactory;
@@ -78,7 +83,10 @@ public class NetSuiteWebServiceMockTestFixture<PortT, AdapterT extends NetSuiteP
     public void setUp() throws Exception {
         System.setProperty("com.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize", "true");
 
-        URL endpointAddress = new URL("http://localhost:8088/services/" + portName);
+        int portNumber = FreePortFinder.findFreePort(8080, FreePortFinder.MAX_PORT_NUMBER);
+        URL endpointAddress = new URL("http://localhost:" + portNumber + "/services/" + portName);
+
+        logger.info("Endpoint address: {}", endpointAddress);
 
         portMockAdapter = portAdapterClass.newInstance();
         portMockAdapter.setEndpointAddress(endpointAddress);
@@ -89,6 +97,8 @@ public class NetSuiteWebServiceMockTestFixture<PortT, AdapterT extends NetSuiteP
         assertEquals("http://schemas.xmlsoap.org/wsdl/soap/http", endpoint.getBinding().getBindingID());
 
         URL wsdlLocation = new URL(endpointAddress.toString().concat("?wsdl"));
+//        assertNotNull(wsdlLocation.getContent());
+
         service = serviceFactory.createService(wsdlLocation);
 
         credentials = new NetSuiteCredentials(

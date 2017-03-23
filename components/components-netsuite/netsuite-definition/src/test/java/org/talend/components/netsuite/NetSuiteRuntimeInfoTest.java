@@ -46,6 +46,8 @@ public class NetSuiteRuntimeInfoTest {
         assertNotNull(runtimeInfo);
         assertThat(runtimeInfo, instanceOf(JarRuntimeInfo.class));
         JarRuntimeInfo jarRuntimeInfo = (JarRuntimeInfo) runtimeInfo;
+        assertNotNull(jarRuntimeInfo.getJarUrl());
+        assertNotNull(jarRuntimeInfo.getDepTxtPath());
         assertEquals(jarRuntimeInfo.getRuntimeClassName(),
                 "org.talend.components.netsuite.v" + apiVersion + ".NetSuiteRuntimeImpl");
     }

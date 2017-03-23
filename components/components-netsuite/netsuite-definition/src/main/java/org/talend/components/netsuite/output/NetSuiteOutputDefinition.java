@@ -53,9 +53,11 @@ public class NetSuiteOutputDefinition extends NetSuiteComponentDefinition {
         return EnumSet.of(ConnectorTopology.INCOMING);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public Class<? extends ComponentProperties>[] getNestedCompatibleComponentPropertiesClass() {
         return concatPropertiesClasses(super.getNestedCompatibleComponentPropertiesClass(),
-                new Class[] { NetSuiteModuleProperties.class });
+                new Class[] { NetSuiteOutputModuleProperties.class });
     }
 
     @Override
