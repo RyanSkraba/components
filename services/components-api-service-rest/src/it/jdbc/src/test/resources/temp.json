@@ -1,0 +1,49 @@
+{
+  "@type": "org.talend.components.fullexample.datastore.FullExampleDatastoreProperties",
+  "tag": {
+    "@type": "org.talend.daikon.properties.property.StringProperty",
+    "possibleValues2": null,
+    "flags": null,
+    "taggedValues": {
+      "@type": "java.util.HashMap"
+    },
+    "storedValue": null,
+    "size": -1,
+    "occurMinTimes": 0,
+    "occurMaxTimes": 0,
+    "precision": 0,
+    "pattern": null,
+    "nullable": false,
+    "possibleValues": null,
+    "children": {
+      "@type": "java.util.ArrayList"
+    },
+    "currentType": "java.lang.String",
+    "name": "tag",
+    "displayName": null,
+    "title": null
+  },
+  "tagId": {
+    "flags": null,
+    "taggedValues": {
+      "@type": "java.util.HashMap"
+    },
+    "storedValue": null,
+    "size": -1,
+    "occurMinTimes": 0,
+    "occurMaxTimes": 0,
+    "precision": 0,
+    "pattern": null,
+    "nullable": false,
+    "possibleValues": null,
+    "children": {
+      "@type": "java.util.ArrayList"
+    },
+    "currentType": "java.lang.Integer",
+    "name": "tagId",
+    "displayName": null,
+    "title": null
+  },
+  "name": null,
+  "validationResult": null
+}
