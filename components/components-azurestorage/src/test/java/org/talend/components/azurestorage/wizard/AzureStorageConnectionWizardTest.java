@@ -147,7 +147,7 @@ public class AzureStorageConnectionWizardTest extends AzureStorageGenericBase {
         assertEquals("Name", nameProp.getDisplayName());
         connProps = (TAzureStorageConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(),
                 connFormWizard, "testConnection", connProps);
-        assertTrue(connFormWizard.isAllowForward());
+        assertFalse(connFormWizard.isAllowForward());
 
         Form modForm = forms.get(1);
     }

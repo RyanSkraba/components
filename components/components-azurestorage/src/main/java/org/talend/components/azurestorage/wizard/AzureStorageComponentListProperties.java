@@ -26,9 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.azurestorage.AzureStorageProvideConnectionProperties;
 import org.talend.components.azurestorage.blob.AzureStorageContainerProperties;
-import org.talend.components.azurestorage.blob.runtime.AzureStorageSourceOrSink;
 import org.talend.components.azurestorage.queue.AzureStorageQueueProperties;
-import org.talend.components.azurestorage.queue.runtime.AzureStorageQueueSourceOrSink;
 import org.talend.components.azurestorage.table.AzureStorageTableProperties;
 import org.talend.components.azurestorage.table.runtime.AzureStorageTableSourceOrSink;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
@@ -57,17 +55,11 @@ public class AzureStorageComponentListProperties extends ComponentPropertiesImpl
 
     private String repositoryLocation;
 
-    private List<NamedThing> containerNames;
-
     public Property<List<NamedThing>> selectedContainerNames = newProperty(new TypeLiteral<List<NamedThing>>() {
     }, "selectedContainerNames"); //$NON-NLS-1$
 
-    private List<NamedThing> tableNames;
-
     public Property<List<NamedThing>> selectedTableNames = newProperty(new TypeLiteral<List<NamedThing>>() {
     }, "selectedTableNames"); //$NON-NLS-1$
-
-    private List<NamedThing> queueNames;
 
     public Property<List<NamedThing>> selectedQueueNames = newProperty(new TypeLiteral<List<NamedThing>>() {
     }, "selectedQueueNames"); //$NON-NLS-1$
@@ -110,25 +102,22 @@ public class AzureStorageComponentListProperties extends ComponentPropertiesImpl
         refreshLayout(tableForm);
     }
 
-    public void beforeFormPresentContainer() throws Exception {
-        containerNames = AzureStorageSourceOrSink.getSchemaNames(null, connection);
-        selectedContainerNames.setPossibleValues(containerNames);
+    public void beforeFormPresentContainer(){
+        selectedContainerNames.setPossibleValues(connection.BlobSchema);
         getForm(FORM_CONTAINER).setAllowBack(true);
         getForm(FORM_CONTAINER).setAllowForward(true);
         getForm(FORM_CONTAINER).setAllowFinish(true);
     }
 
-    public void beforeFormPresentQueue() throws Exception {
-        queueNames = AzureStorageQueueSourceOrSink.getSchemaNames(null, connection);
-        selectedQueueNames.setPossibleValues(queueNames);
+    public void beforeFormPresentQueue(){
+        selectedQueueNames.setPossibleValues(connection.QueueSchema);
         getForm(FORM_QUEUE).setAllowBack(true);
         getForm(FORM_QUEUE).setAllowForward(true);
         getForm(FORM_QUEUE).setAllowFinish(true);
     }
 
-    public void beforeFormPresentTable() throws Exception {
-        tableNames = AzureStorageTableSourceOrSink.getSchemaNames(null, connection);
-        selectedTableNames.setPossibleValues(tableNames);
+    public void beforeFormPresentTable(){
+        selectedTableNames.setPossibleValues(connection.TableSchema);
         getForm(FORM_TABLE).setAllowBack(true);
         getForm(FORM_TABLE).setAllowFinish(true);
     }
