@@ -40,8 +40,15 @@ public class SslProperties extends PropertiesImpl {
     // If verify client hostname with the hostname in the cert. for debugging, usually set false
     public Property<Boolean> verifyHost = PropertyFactory.newBoolean("verifyHost", true);
 
+    private FormType formType;
+
     public SslProperties(String name) {
+        this(name, FormType.ALL);
+    }
+
+    public SslProperties(String name, FormType formType) {
         super(name);
+        this.formType = formType;
     }
 
     @Override
@@ -52,11 +59,13 @@ public class SslProperties extends PropertiesImpl {
         main.addRow(trustStoreType);
         main.addRow(trustStorePath);
         main.addRow(Widget.widget(trustStorePassword).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
-        main.addRow(needClientAuth);
-        main.addRow(keyStoreType);
-        main.addRow(keyStorePath);
-        main.addRow(Widget.widget(keyStorePassword).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
-        main.addRow(verifyHost);
+        if (formType == FormType.ALL) {
+            main.addRow(needClientAuth);
+            main.addRow(keyStoreType);
+            main.addRow(keyStorePath);
+            main.addRow(Widget.widget(keyStorePassword).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
+            main.addRow(verifyHost);
+        }
     }
 
     public void afterUseSsl() {
@@ -75,15 +84,23 @@ public class SslProperties extends PropertiesImpl {
             form.getWidget(trustStoreType).setVisible(useSsl);
             form.getWidget(trustStorePath).setVisible(useSsl);
             form.getWidget(trustStorePassword).setVisible(useSsl);
-            form.getWidget(needClientAuth).setVisible(useSsl);
-            form.getWidget(verifyHost).setVisible(useSsl);
 
-            boolean needClient = useSsl.getValue() && needClientAuth.getValue();
-            form.getWidget(keyStoreType).setVisible(needClient);
-            form.getWidget(keyStorePath).setVisible(needClient);
-            form.getWidget(keyStorePassword).setVisible(needClient);
+            if (formType == FormType.ALL) {
+                form.getWidget(needClientAuth).setVisible(useSsl);
+                form.getWidget(verifyHost).setVisible(useSsl);
+
+                boolean needClient = useSsl.getValue() && needClientAuth.getValue();
+                form.getWidget(keyStoreType).setVisible(needClient);
+                form.getWidget(keyStorePath).setVisible(needClient);
+                form.getWidget(keyStorePassword).setVisible(needClient);
+            }
 
         }
+    }
+
+    public enum FormType {
+        ALL,
+        TRUST_ONLY
     }
 
     public enum StoreType {
