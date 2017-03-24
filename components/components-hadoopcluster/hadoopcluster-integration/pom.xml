@@ -37,30 +37,30 @@
         </dependency>
 
     </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.20-PAXEXAM-PATCH</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <argLine>-Xms512m -Xmx1024m</argLine>
-                    <systemPropertyVariables>
-                        <hadoop.cm58.url>${hadoop.cm58.url}</hadoop.cm58.url>
-                        <hadoop.cm58.user>${hadoop.cm58.user}</hadoop.cm58.user>
-                        <hadoop.cm58.pass>${hadoop.cm58.pass}</hadoop.cm58.pass>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <!--<build>-->
+        <!--<plugins>-->
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-failsafe-plugin</artifactId>-->
+                <!--<version>2.20-PAXEXAM-PATCH</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<goals>-->
+                            <!--<goal>integration-test</goal>-->
+                            <!--<goal>verify</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+                <!--<configuration>-->
+                    <!--<argLine>-Xms512m -Xmx1024m</argLine>-->
+                    <!--<systemPropertyVariables>-->
+                        <!--<hadoop.cm58.url>${hadoop.cm58.url}</hadoop.cm58.url>-->
+                        <!--<hadoop.cm58.user>${hadoop.cm58.user}</hadoop.cm58.user>-->
+                        <!--<hadoop.cm58.pass>${hadoop.cm58.pass}</hadoop.cm58.pass>-->
+                    <!--</systemPropertyVariables>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
+        <!--</plugins>-->
+    <!--</build>-->
 
 </project>
