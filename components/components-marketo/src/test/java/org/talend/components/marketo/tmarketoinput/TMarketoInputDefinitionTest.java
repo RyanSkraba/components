@@ -33,7 +33,7 @@ public class TMarketoInputDefinitionTest {
 
     @Test
     public final void testTMarketoInputDefinition() {
-        assertEquals("tMarketoInputDEV", def.getName());
+        assertEquals("tMarketoInput", def.getName());
     }
 
     @Test

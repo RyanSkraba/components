@@ -25,7 +25,7 @@ import org.talend.daikon.runtime.RuntimeInfo;
 
 public class TMarketoInputDefinition extends MarketoComponentDefinition {
 
-    public static final String COMPONENT_NAME = "tMarketoInputDEV";
+    public static final String COMPONENT_NAME = "tMarketoInput";
 
     private transient static final Logger LOG = LoggerFactory.getLogger(TMarketoInputDefinition.class);
 
