@@ -19,7 +19,6 @@
     <modules>
         <module>hadoopcluster-definition</module>
         <module>hadoopcluster-runtime</module>
-        <module>hadoopcluster-integration</module>
     </modules>
 
 </project>
