@@ -132,7 +132,7 @@ public class SnowflakeWritersTestIT extends SnowflakeRuntimeIT {
                 tableProps.tableName.getName(), tableProps);
         LOGGER.info(String.valueOf(tableProps.getValidationResult()));
         assertEquals(ValidationResult.Result.ERROR, tableProps.getValidationResult().getStatus());
-        assertThat(tableProps.getValidationResult().getMessage(), containsString("Missing user name"));
+        assertThat(tableProps.getValidationResult().getMessage(), containsString("Missing account"));
     }
 
     @Test

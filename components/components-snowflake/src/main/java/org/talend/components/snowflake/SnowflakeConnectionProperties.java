@@ -218,33 +218,36 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl imple
     }
 
     public String getConnectionUrl() {
-        String queryString = "";
+        StringBuilder stringBuilder = new StringBuilder();
         String account = this.account.getStringValue();
+
+        if (account == null || account.isEmpty()) {
+            throw new IllegalArgumentException(" Missing account");
+        }
 
         String warehouse = this.warehouse.getStringValue();
         String db = this.db.getStringValue();
         String schema = this.schemaName.getStringValue();
-
         String role = this.role.getStringValue();
         String tracing = this.tracing.getStringValue();
 
-        if (null != warehouse && !"".equals(warehouse)) {
-            queryString = queryString + "warehouse=" + warehouse;
-        }
-        if (null != db && !"".equals(db)) {
-            queryString = queryString + "&db=" + db;
-        }
-        if (null != schema && !"".equals(schema)) {
-            queryString = queryString + "&schema=" + schema;
-        }
+        appendProperty("warehouse", warehouse, stringBuilder);
+        appendProperty("db", db, stringBuilder);
+        appendProperty("schema", schema, stringBuilder);
+        appendProperty("role", role, stringBuilder);
+        appendProperty("tracing", tracing, stringBuilder);
 
-        if (null != role && !"".equals(role)) {
-            queryString = queryString + "&role=" + role;
+        return new StringBuilder().append("jdbc:snowflake://").append(account)
+                .append(".snowflakecomputing.com").append("/?").append(stringBuilder).toString();
+    }
+
+    private void appendProperty(String propertyName, String propertyValue, StringBuilder builder) {
+        if (propertyValue != null && !propertyValue.isEmpty()) {
+            if (builder.length() > 0) {
+                builder.append("&");
+            }
+            builder.append(propertyName).append("=").append(propertyValue);
         }
-        if (null != tracing && !"".equals(tracing)) {
-            queryString = queryString + "&tracing=" + tracing;
-        }
-        return "jdbc:snowflake://" + account + ".snowflakecomputing.com" + "/?" + queryString;
     }
 
 }
