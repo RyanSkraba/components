@@ -12,25 +12,17 @@
 // ============================================================================
 package org.talend.components.azurestorage.table.helpers;
 
-import static org.hamcrest.Matchers.contains;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.COMPARISON_EQUAL;
-import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.COMPARISON_GREATER_THAN;
-import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.COMPARISON_GREATER_THAN_OR_EQUAL;
-import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.COMPARISON_LESS_THAN;
-import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.COMPARISON_LESS_THAN_OR_EQUAL;
-import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.COMPARISON_NOT_EQUAL;
-import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.FIELD_TYPE_BINARY;
-import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.FIELD_TYPE_BOOLEAN;
-import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.FIELD_TYPE_DATE;
-import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.FIELD_TYPE_GUID;
-import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.FIELD_TYPE_INT64;
-import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.FIELD_TYPE_NUMERIC;
-import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.FIELD_TYPE_STRING;
-import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.PREDICATE_AND;
-import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.PREDICATE_NOT;
-import static org.talend.components.azurestorage.table.helpers.FilterExpressionTable.PREDICATE_OR;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.talend.components.azurestorage.table.helpers.SupportedFieldType.BINARY;
+import static org.talend.components.azurestorage.table.helpers.SupportedFieldType.BOOLEAN;
+import static org.talend.components.azurestorage.table.helpers.SupportedFieldType.DATE;
+import static org.talend.components.azurestorage.table.helpers.SupportedFieldType.GUID;
+import static org.talend.components.azurestorage.table.helpers.SupportedFieldType.INT64;
+import static org.talend.components.azurestorage.table.helpers.SupportedFieldType.NUMERIC;
+import static org.talend.components.azurestorage.table.helpers.SupportedFieldType.STRING;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +30,6 @@ import java.util.List;
 
 import org.junit.Test;
 import org.talend.components.azurestorage.table.AzureStorageTableProperties;
-import org.talend.daikon.properties.ValidationResult;
 
 import com.microsoft.azure.storage.table.EdmType;
 import com.microsoft.azure.storage.table.TableQuery.Operators;
@@ -79,17 +70,16 @@ public class FilterExpressionTableTest {
     @Test
     public void testGetPossibleValues() {
         fet.setupProperties();
-        assertThat((List<String>) fet.function.getPossibleValues(), contains(COMPARISON_EQUAL, COMPARISON_NOT_EQUAL,
-                COMPARISON_GREATER_THAN, COMPARISON_GREATER_THAN_OR_EQUAL, COMPARISON_LESS_THAN, COMPARISON_LESS_THAN_OR_EQUAL));
-        assertThat((List<String>) fet.predicate.getPossibleValues(), contains(PREDICATE_AND, PREDICATE_OR, PREDICATE_NOT));
+        assertArrayEquals(fet.function.getPossibleValues().toArray(), Comparison.possibleValues().toArray());
+        assertArrayEquals(fet.predicate.getPossibleValues().toArray(), Predicate.possibleValues().toArray());
         fet.function.setStoredValue(Arrays.asList("GREATER THAN", "EQUAL", "LESS THAN"));
-        assertEquals(Arrays.asList(COMPARISON_GREATER_THAN, COMPARISON_EQUAL, COMPARISON_LESS_THAN).toString(),
+        assertEquals(
+                Arrays.asList(Comparison.GREATER_THAN.toString(), Comparison.EQUAL.toString(), Comparison.LESS_THAN.toString())
+                        .toString(),
                 fet.function.getValue().toString());
 
-        assertEquals(Arrays.asList(COMPARISON_GREATER_THAN, COMPARISON_EQUAL, COMPARISON_LESS_THAN), fet.function.getValue());
-
-        assertEquals(Arrays.asList(FIELD_TYPE_STRING, FIELD_TYPE_NUMERIC, FIELD_TYPE_DATE, FIELD_TYPE_INT64, FIELD_TYPE_BOOLEAN,
-                FIELD_TYPE_BINARY, FIELD_TYPE_GUID), fet.fieldType.getPossibleValues());
+        assertEquals(Arrays.asList(STRING.toString(), NUMERIC.toString(), DATE.toString(), INT64.toString(), BINARY.toString(),
+                GUID.toString(), BOOLEAN.toString()), fet.fieldType.getPossibleValues());
     }
 
     @Test
@@ -98,51 +88,51 @@ public class FilterExpressionTableTest {
         clearLists();
         //
         columns.add(AzureStorageTableProperties.TABLE_PARTITION_KEY);
-        functions.add(COMPARISON_EQUAL);
+        functions.add(Comparison.EQUAL.toString());
         values.add("12345");
-        predicates.add(PREDICATE_NOT);
-        fieldTypes.add(FIELD_TYPE_STRING);
+        predicates.add(Predicate.NOT.toString());
+        fieldTypes.add(STRING.toString());
         setTableVals();
-        query = fet.getCombinedFilterConditions();
+        query = fet.generateCombinedFilterConditions();
         assertEquals(query, "PartitionKey eq '12345'");
         //
         columns.add(AzureStorageTableProperties.TABLE_ROW_KEY);
-        functions.add(COMPARISON_GREATER_THAN);
+        functions.add(Comparison.GREATER_THAN.toString());
         values.add("AVID12345");
-        predicates.add(PREDICATE_AND);
-        fieldTypes.add(FIELD_TYPE_STRING);
+        predicates.add(Predicate.AND.toString());
+        fieldTypes.add(STRING.toString());
         setTableVals();
-        query = fet.getCombinedFilterConditions();
+        query = fet.generateCombinedFilterConditions();
         assertEquals(query, "(PartitionKey eq '12345') and (RowKey gt 'AVID12345')");
         //
         columns.add(AzureStorageTableProperties.TABLE_TIMESTAMP);
-        functions.add(COMPARISON_GREATER_THAN_OR_EQUAL);
+        functions.add(Comparison.GREATER_THAN_OR_EQUAL.toString());
         values.add("2016-01-01 00:00:00");
-        predicates.add(PREDICATE_OR);
-        fieldTypes.add(FIELD_TYPE_DATE);
+        predicates.add(Predicate.OR.toString());
+        fieldTypes.add(DATE.toString());
         setTableVals();
-        query = fet.getCombinedFilterConditions();
+        query = fet.generateCombinedFilterConditions();
         assertEquals(query,
                 "((PartitionKey eq '12345') and (RowKey gt 'AVID12345')) or (Timestamp ge datetime'2016-01-01 00:00:00')");
         //
         columns.add("AnUnknownProperty");
-        functions.add(COMPARISON_LESS_THAN);
+        functions.add(Comparison.LESS_THAN.toString());
         values.add("WEB345");
-        predicates.add(PREDICATE_OR);
-        fieldTypes.add(FIELD_TYPE_STRING);
+        predicates.add(Predicate.OR.toString());
+        fieldTypes.add(STRING.toString());
         setTableVals();
-        query = fet.getCombinedFilterConditions();
+        query = fet.generateCombinedFilterConditions();
         assertEquals(query,
                 "(((PartitionKey eq '12345') and (RowKey gt 'AVID12345')) or (Timestamp ge datetime'2016-01-01 00:00:00')) or (AnUnknownProperty lt 'WEB345')");
 
         // Boolean
         columns.add("ABooleanProperty");
-        functions.add(COMPARISON_EQUAL);
+        functions.add(Comparison.EQUAL.toString());
         values.add("true");
-        predicates.add(PREDICATE_AND);
-        fieldTypes.add(FIELD_TYPE_BOOLEAN);
+        predicates.add(Predicate.AND.toString());
+        fieldTypes.add(BOOLEAN.toString());
         setTableVals();
-        query = fet.getCombinedFilterConditions();
+        query = fet.generateCombinedFilterConditions();
         assertEquals(
                 "((((PartitionKey eq '12345') and (RowKey gt 'AVID12345')) or (Timestamp ge datetime'2016-01-01 00:00:00')) or (AnUnknownProperty lt 'WEB345')) and (ABooleanProperty eq true)",
                 query);
@@ -153,56 +143,61 @@ public class FilterExpressionTableTest {
     public void testValidateFilterExpession() {
         clearLists();
         // empty
-        assertEquals(ValidationResult.OK, fet.validateFilterExpession());
+        assertTrue(fet.generateCombinedFilterConditions().isEmpty());
         // ok
         columns.add(AzureStorageTableProperties.TABLE_PARTITION_KEY);
-        functions.add(COMPARISON_EQUAL);
+        functions.add(Comparison.EQUAL.toString());
         values.add("12345");
-        predicates.add(PREDICATE_NOT);
+        predicates.add(Predicate.NOT.toString());
+        fieldTypes.add(SupportedFieldType.STRING.toString());
         setTableVals();
-        assertEquals(ValidationResult.OK, fet.validateFilterExpession());
+        assertFalse(fet.generateCombinedFilterConditions().isEmpty());
         // missing value
         columns.add(AzureStorageTableProperties.TABLE_ROW_KEY);
-        functions.add(COMPARISON_GREATER_THAN);
+        functions.add(Comparison.GREATER_THAN.toString());
         values.add("");
-        predicates.add(PREDICATE_AND);
+        predicates.add(Predicate.AND.toString());
+        fieldTypes.add(SupportedFieldType.INT64.toString());
         setTableVals();
-        assertEquals(ValidationResult.Result.ERROR, fet.validateFilterExpession().getStatus());
+        assertTrue(fet.generateCombinedFilterConditions().isEmpty());
         // missing column
         columns.add("");
-        functions.add(COMPARISON_GREATER_THAN);
+        functions.add(Comparison.GREATER_THAN.toString());
         values.add("123456");
-        predicates.add(PREDICATE_AND);
+        fieldTypes.add(SupportedFieldType.INT64.toString());
+        predicates.add(Predicate.AND.toString());
         setTableVals();
-        assertEquals(ValidationResult.Result.ERROR, fet.validateFilterExpession().getStatus());
+        assertTrue(fet.generateCombinedFilterConditions().isEmpty());
     }
 
     @Test
     public void testGetFieldType() {
-        assertEquals(EdmType.STRING, fet.getType(FIELD_TYPE_STRING));
-        assertEquals(EdmType.INT64, fet.getType(FIELD_TYPE_INT64));
-        assertEquals(EdmType.INT32, fet.getType(FIELD_TYPE_NUMERIC));
-        assertEquals(EdmType.BINARY, fet.getType(FIELD_TYPE_BINARY));
-        assertEquals(EdmType.GUID, fet.getType(FIELD_TYPE_GUID));
-        assertEquals(EdmType.DATE_TIME, fet.getType(FIELD_TYPE_DATE));
-        assertEquals(EdmType.BOOLEAN, fet.getType(FIELD_TYPE_BOOLEAN));
+        assertEquals(EdmType.STRING, SupportedFieldType.getEdmType(STRING.toString()));
+        assertEquals(EdmType.INT64, SupportedFieldType.getEdmType(INT64.toString()));
+        assertEquals(EdmType.INT32, SupportedFieldType.getEdmType(NUMERIC.toString()));
+        assertEquals(EdmType.BINARY, SupportedFieldType.getEdmType(BINARY.toString()));
+        assertEquals(EdmType.GUID, SupportedFieldType.getEdmType(GUID.toString()));
+        assertEquals(EdmType.DATE_TIME, SupportedFieldType.getEdmType(DATE.toString()));
+        assertEquals(EdmType.BOOLEAN, SupportedFieldType.getEdmType(BOOLEAN.toString()));
     }
 
     @Test
     public void testGetComparison() {
-        assertEquals(QueryComparisons.EQUAL, fet.getComparison(COMPARISON_EQUAL));
-        assertEquals(QueryComparisons.NOT_EQUAL, fet.getComparison(COMPARISON_NOT_EQUAL));
-        assertEquals(QueryComparisons.GREATER_THAN, fet.getComparison(COMPARISON_GREATER_THAN));
-        assertEquals(QueryComparisons.GREATER_THAN_OR_EQUAL, fet.getComparison(COMPARISON_GREATER_THAN_OR_EQUAL));
-        assertEquals(QueryComparisons.LESS_THAN, fet.getComparison(COMPARISON_LESS_THAN));
-        assertEquals(QueryComparisons.LESS_THAN_OR_EQUAL, fet.getComparison(COMPARISON_LESS_THAN_OR_EQUAL));
+        assertEquals(QueryComparisons.EQUAL, Comparison.getQueryComparisons(Comparison.EQUAL.toString()));
+        assertEquals(QueryComparisons.NOT_EQUAL, Comparison.getQueryComparisons(Comparison.NOT_EQUAL.toString()));
+        assertEquals(QueryComparisons.GREATER_THAN, Comparison.getQueryComparisons(Comparison.GREATER_THAN.toString()));
+        assertEquals(QueryComparisons.GREATER_THAN_OR_EQUAL,
+                Comparison.getQueryComparisons(Comparison.GREATER_THAN_OR_EQUAL.toString()));
+        assertEquals(QueryComparisons.LESS_THAN, Comparison.getQueryComparisons(Comparison.LESS_THAN.toString()));
+        assertEquals(QueryComparisons.LESS_THAN_OR_EQUAL,
+                Comparison.getQueryComparisons(Comparison.LESS_THAN_OR_EQUAL.toString()));
     }
 
     @Test
     public void testGetOperator() {
-        assertEquals(Operators.AND, fet.getOperator(PREDICATE_AND));
-        assertEquals(Operators.OR, fet.getOperator(PREDICATE_OR));
-        assertEquals(Operators.NOT, fet.getOperator(PREDICATE_NOT));
+        assertEquals(Operators.AND, Predicate.getOperator(Predicate.AND.toString()));
+        assertEquals(Operators.OR, Predicate.getOperator(Predicate.OR.toString()));
+        assertEquals(Operators.NOT, Predicate.getOperator(Predicate.NOT.toString()));
     }
 
 }

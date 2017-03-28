@@ -99,7 +99,7 @@ public class AzureStorageTableReader extends AbstractBoundedReader<IndexedRecord
         String tableName = properties.tableName.getValue();
         String filter = "";
         if (properties.useFilterExpression.getValue()) {
-            filter = properties.filterExpression.getCombinedFilterConditions();
+            filter = properties.filterExpression.generateCombinedFilterConditions();
             LOGGER.debug(i18nMessages.getMessage("debug.FilterApplied", filter));
         }
         try {
