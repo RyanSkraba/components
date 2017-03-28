@@ -416,7 +416,7 @@ public abstract class NsObjectTransducer {
             xts.setMinute(dateTime.getMinuteOfHour());
             xts.setSecond(dateTime.getSecondOfMinute());
             xts.setMillisecond(dateTime.getMillisOfSecond());
-            xts.setTimezone(dateTime.getZone().toTimeZone().getRawOffset() / 60000);
+            xts.setTimezone(dateTime.getZone().toTimeZone().getOffset(dateTime.getMillis()) / 60000);
 
             return xts;
         }

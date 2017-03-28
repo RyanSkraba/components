@@ -73,7 +73,7 @@ public class ValueConverterTest extends NetSuiteMockTestBase {
 
         Schema s = NetSuiteDatasetRuntimeImpl.inferSchemaForType(typeDesc.getTypeName(), typeDesc.getFields());
 
-        DateTimeZone tz1 = DateTimeZone.forID("EET");
+        DateTimeZone tz1 = DateTimeZone.getDefault();
 
         MutableDateTime dateTime1 = new MutableDateTime(tz1);
         dateTime1.setDate(System.currentTimeMillis());
@@ -87,7 +87,7 @@ public class ValueConverterTest extends NetSuiteMockTestBase {
         xmlCalendar1.setMinute(dateTime1.getMinuteOfHour());
         xmlCalendar1.setSecond(dateTime1.getSecondOfMinute());
         xmlCalendar1.setMillisecond(dateTime1.getMillisOfSecond());
-        xmlCalendar1.setTimezone(tz1.toTimeZone().getRawOffset() / 60000);
+        xmlCalendar1.setTimezone(tz1.toTimeZone().getOffset(dateTime1.getMillis()) / 60000);
 
         FieldDesc fieldInfo = typeDesc.getField("TranDate");
         Schema.Field f = s.getField(fieldInfo.getName());

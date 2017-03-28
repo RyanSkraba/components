@@ -22,6 +22,7 @@ import java.util.Arrays;
 import javax.xml.datatype.DatatypeFactory;
 
 import org.joda.time.Instant;
+import org.joda.time.MutableDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
@@ -164,8 +165,10 @@ public class SearchQueryTest {
     public void testSearchDateField() throws Exception {
         DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("HH:mm:ss");
 
-        String currentDateFormatted = dateFormatter.print(Instant.now().getMillis());
+        Instant now = Instant.now();
+        String currentDateFormatted = dateFormatter.print(now.getMillis());
 
         SearchQuery s1 = clientService.newSearch();
         s1.target("Check");
@@ -194,11 +197,18 @@ public class SearchQueryTest {
         assertNotNull(customFieldList.getCustomField());
         assertEquals(1, customFieldList.getCustomField().size());
 
+        MutableDateTime controlDateTime = new MutableDateTime();
+        controlDateTime.setHourOfDay(14);
+        controlDateTime.setMinuteOfHour(0);
+        controlDateTime.setSecondOfMinute(0);
+        controlDateTime.setMillisOfSecond(0);
+        String controlTimeFormatted = timeFormatter.print(controlDateTime);
+
         SearchDateCustomField customField1 = (SearchDateCustomField) customFieldList.getCustomField().get(0);
         assertEquals(SearchDateFieldOperator.ON_OR_AFTER, customField1.getOperator());
         assertNotNull(customField1.getSearchValue());
         assertNull(customField1.getSearchValue2());
-        assertEquals(currentDateFormatted + " 14:00:00",
+        assertEquals(currentDateFormatted + " " + controlTimeFormatted,
                 dateTimeFormatter.print(calendarValueConverter.convertInput(customField1.getSearchValue())));
     }
 
