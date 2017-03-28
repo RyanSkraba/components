@@ -95,6 +95,12 @@
             <version>${project.version}</version>
             <classifier>lib</classifier>
             <scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+			</exclusions>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>

@@ -1,38 +1,40 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.talend.components</groupId>
-        <artifactId>components-parent</artifactId>
-        <version>0.18.0-SNAPSHOT</version>
-        <relativePath>../../../components-parent/pom.xml</relativePath>
-    </parent>
+	<parent>
+		<groupId>org.talend.components</groupId>
+		<artifactId>components-parent</artifactId>
+		<version>0.18.0-SNAPSHOT</version>
+		<relativePath>../../../components-parent/pom.xml</relativePath>
+	</parent>
 
-    <artifactId>components-salesforce-integration</artifactId>
+	<artifactId>components-salesforce-integration</artifactId>
 
-    <name>Components - Salesforce Integration Tests</name>
-    <packaging>jar</packaging>
+	<name>Components - Salesforce Integration Tests</name>
+	<packaging>jar</packaging>
 
-    <properties>
-        <!-- skip the deployment for integration tests, not necessary -->
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
+	<properties>
+		<!-- skip the deployment for integration tests, not necessary -->
+		<maven.deploy.skip>true</maven.deploy.skip>
+	</properties>
 
-    <dependencies>
-        <!-- should only depend on definition dependency, but now the test case need a big refactor if miss the runtime dependency, so add runtime now, after refactor the tests, we will remove the runtime dependency -->
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-salesforce-definition</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+	<dependencies>
+		<!-- should only depend on definition dependency, but now the test case 
+			need a big refactor if miss the runtime dependency, so add runtime now, after 
+			refactor the tests, we will remove the runtime dependency -->
 		<dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-salesforce-runtime</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-salesforce-definition</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-salesforce-runtime</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
-        <!-- Tests -->
+		<!-- Tests -->
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-osgitest</artifactId>
@@ -40,12 +42,12 @@
 			<scope>test</scope>
 		</dependency>
 
-        <dependency>
-            <groupId>org.ops4j.pax.url</groupId>
-            <artifactId>pax-url-aether</artifactId>
-            <version>2.4.7</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.ops4j.pax.url</groupId>
+			<artifactId>pax-url-aether</artifactId>
+			<version>2.4.7</version>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.talend.components</groupId>
@@ -87,6 +89,12 @@
 			<version>${project.version}</version>
 			<classifier>lib</classifier>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
@@ -109,7 +117,7 @@
 			<classifier>bundle</classifier>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.servicemix.bundles</groupId>
 			<artifactId>org.apache.servicemix.bundles.commons-collections</artifactId>
@@ -117,7 +125,7 @@
 			<scope>test</scope>
 		</dependency>
 
-    </dependencies>
+	</dependencies>
 
 	<build>
 		<plugins>
@@ -147,7 +155,8 @@
 									<classifier>bundle</classifier>
 									<version>${project.version}</version>
 								</artifact>
-								<!-- no need at final, but need to refactor the test before removing it -->
+								<!-- no need at final, but need to refactor the test before removing 
+									it -->
 								<artifact>
 									<groupId>${project.groupId}</groupId>
 									<artifactId>components-salesforce-runtime</artifactId>

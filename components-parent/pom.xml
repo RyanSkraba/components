@@ -18,7 +18,7 @@
 		<hamcrest.version>1.3</hamcrest.version>
 		<org.json.version>20131018</org.json.version>
 		<commons-beanutils.version>1.8.0</commons-beanutils.version>
-		<log4j.rootLogger>DEBUG, stdout</log4j.rootLogger>
+		<log4j.rootLogger>INFO, stdout</log4j.rootLogger>
 		<log4j.appender.stdout>org.apache.log4j.ConsoleAppender</log4j.appender.stdout>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -29,9 +29,9 @@
 	<scm>
 		<connection>scm:git:https://github.com/Talend/components.git</connection>
 	</scm>
-	
+
 	<modules>
-	   <module>components-p2update-assembly</module>
+		<module>components-p2update-assembly</module>
 	</modules>
 
 	<distributionManagement>
@@ -50,6 +50,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.daikon</groupId>
@@ -62,6 +68,12 @@
 			<artifactId>daikon-spring-utils</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.25</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
@@ -71,6 +83,13 @@
 				<artifactId>spring-boot-starter-test</artifactId>
 				<version>${spring.boot.version}</version>
 				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>ch.qos.logback</groupId>
+						<artifactId>logback-classic</artifactId>
+					</exclusion>
+				</exclusions>
+
 			</dependency>
 			<dependency>
 				<groupId>biz.aQute.bnd</groupId>
@@ -146,11 +165,11 @@
 			<name>snapshots</name>
 			<url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
 		</repository>
-		<!--<repository>-->
-			<!--<id>talend_beam</id>-->
-			<!--<name>Talend Patched Beam Repository</name>-->
-			<!--<url>http://maven.nanthrax.net/</url>-->
-		<!--</repository>-->
+		<!--<repository> -->
+		<!--<id>talend_beam</id> -->
+		<!--<name>Talend Patched Beam Repository</name> -->
+		<!--<url>http://maven.nanthrax.net/</url> -->
+		<!--</repository> -->
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -258,7 +277,7 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
-					<!-- Workaround maven not being able to set a property conditionally
+					<!-- Workaround maven not being able to set a property conditionally 
 						based on the current version being SNAPSHOT or not -->
 					<execution>
 						<id>compute-docker-version</id>
@@ -269,7 +288,8 @@
 						<configuration>
 							<exportAntProperties>true</exportAntProperties>
 							<tasks>
-								<echo message="computing docker version for ${project.build.finalName}-bundle.jar" />
+								<echo
+									message="computing docker version for ${project.build.finalName}-bundle.jar" />
 								<condition property="docker.version"
 									value="${project.version}-${maven.build.timestamp}" else="${project.version}">
 									<contains string="${project.version}" substring="SNAPSHOT" />
@@ -425,7 +445,7 @@
 							<dependency>
 								<groupId>org.talend.components</groupId>
 								<artifactId>components-p2update-assembly</artifactId>
-                                <version>0.18.0-SNAPSHOT</version>								
+								<version>0.18.0-SNAPSHOT</version>
 							</dependency>
 						</dependencies>
 						<executions>
