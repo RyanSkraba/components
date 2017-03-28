@@ -39,10 +39,8 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.azurestorage.table.AzureStorageTableProperties;
 import org.talend.components.azurestorage.table.tazurestorageoutputtable.TAzureStorageOutputTableProperties;
 import org.talend.components.azurestorage.table.tazurestorageoutputtable.TAzureStorageOutputTableProperties.ActionOnTable;
-import org.talend.components.common.runtime.GenericIndexedRecordConverter;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
-import org.talend.daikon.avro.converter.IndexedRecordConverter;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
@@ -66,8 +64,6 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
 
     private IndexedRecord inputRecord;
 
-    private IndexedRecordConverter<IndexedRecord, IndexedRecord> converter;
-
     private Result result;
 
     private AzureStorageTableSink sink;
@@ -81,8 +77,6 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
     private String tableName;
 
     private TAzureStorageOutputTableProperties.ActionOnData actionData;
-
-    private TAzureStorageOutputTableProperties.ActionOnTable actionTable;
 
     private Boolean processOperationInBatch;
 
@@ -114,7 +108,6 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
         properties = sink.getProperties();
         tableName = properties.tableName.getValue();
         actionData = properties.actionOnData.getValue();
-        actionTable = properties.actionOnTable.getValue();
         processOperationInBatch = properties.processOperationInBatch.getValue();
         nameMappings = properties.nameMapping.getNameMappings();
         if (nameMappings != null)
@@ -205,11 +198,12 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
             return;
         }
         result.totalCount++;
+        inputRecord = (IndexedRecord) object;
         // This for dynamic which would get schema from the first record
         if (writeSchema == null) {
             writeSchema = ((IndexedRecord) object).getSchema();
         }
-        inputRecord = getConverter(object).convertToAvro((IndexedRecord) object);
+
         DynamicTableEntity entity = new DynamicTableEntity();
         HashMap<String, EntityProperty> entityProps = new HashMap<>();
         for (Field f : writeSchema.getFields()) {
@@ -330,14 +324,6 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
     @Override
     public Iterable<IndexedRecord> getRejectedWrites() {
         return Collections.unmodifiableList(rejectedWrites);
-    }
-
-    private IndexedRecordConverter<IndexedRecord, IndexedRecord> getConverter(Object datum) {
-        if (converter == null) {
-            converter = new GenericIndexedRecordConverter();
-            converter.setSchema(writeSchema);
-        }
-        return converter;
     }
 
     private TableOperation getTableOperation(DynamicTableEntity entity) {
