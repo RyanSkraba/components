@@ -100,4 +100,8 @@ public class TMarketoOutputPropertiesTest {
         assertEquals(MarketoConstants.getSOAPOuputSchemaForSyncLead(), props.schemaInput.schema.getValue());
     }
 
+    @Test
+    public void testDefaultShema() throws Exception {
+        assertEquals(MarketoConstants.getRESTOutputSchemaForSyncLead(), props.schemaInput.schema.getValue());
+    }
 }
