@@ -16,9 +16,12 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.azurestorage.blob.AzureStorageBlobDefinition;
+import org.talend.components.azurestorage.blob.runtime.AzureStorageDeleteRuntime;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 public class TAzureStorageDeleteDefinition extends AzureStorageBlobDefinition {
 
@@ -31,7 +34,7 @@ public class TAzureStorageDeleteDefinition extends AzureStorageBlobDefinition {
     @SuppressWarnings("rawtypes")
     @Override
     public Property[] getReturnProperties() {
-        return new Property[]{RETURN_ERROR_MESSAGE_PROP,RETURN_CONTAINER_PROP};
+        return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_CONTAINER_PROP };
     }
 
     @Override
@@ -39,15 +42,23 @@ public class TAzureStorageDeleteDefinition extends AzureStorageBlobDefinition {
         return TAzureStorageDeleteProperties.class;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public Class getPropertiesClass() {
         return TAzureStorageDeleteProperties.class;
     }
 
     @Override
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
+            ConnectorTopology connectorTopology) {
+        assertConnectorTopologyCompatibility(connectorTopology);
+        assertEngineCompatibility(engine);
+        return getCommonRuntimeInfo(this.getClass().getClassLoader(), AzureStorageDeleteRuntime.class);
+    }
+
+    @Override
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
-        return EnumSet.of(ConnectorTopology.OUTGOING);
+        return EnumSet.of(ConnectorTopology.NONE);
     }
 
 }

@@ -40,7 +40,7 @@ public class AzureStorageTableSourceTest {
      */
     @Test
     public final void testValidate() {
-        assertEquals(ValidationResult.Result.OK, source.validate(null).getStatus());
+        assertEquals(ValidationResult.Result.ERROR, source.validate(null).getStatus());
     }
 
     /**

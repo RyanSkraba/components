@@ -16,8 +16,11 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.azurestorage.blob.AzureStorageContainerDefinition;
+import org.talend.components.azurestorage.blob.runtime.AzureStorageContainerDeleteRuntime;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 public class TAzureStorageContainerDeleteDefinition extends AzureStorageContainerDefinition {
 
@@ -38,9 +41,18 @@ public class TAzureStorageContainerDeleteDefinition extends AzureStorageContaine
         return TAzureStorageContainerDeleteProperties.class;
     }
 
+
+    @Override
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
+            ConnectorTopology connectorTopology) {
+        assertConnectorTopologyCompatibility(connectorTopology);
+        assertEngineCompatibility(engine);
+        return getCommonRuntimeInfo(this.getClass().getClassLoader(), AzureStorageContainerDeleteRuntime.class);
+    }
+
     @Override
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
-        return EnumSet.of(ConnectorTopology.OUTGOING);
+        return EnumSet.of(ConnectorTopology.NONE);
     }
 
 }

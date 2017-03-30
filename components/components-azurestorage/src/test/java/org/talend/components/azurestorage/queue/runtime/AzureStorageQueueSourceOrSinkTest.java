@@ -30,7 +30,6 @@ public class AzureStorageQueueSourceOrSinkTest {
         sos = new AzureStorageQueueSourceOrSink();
         props = new TAzureStorageQueueListProperties("tests");
         props.setupProperties();
-        sos.initialize(null, props);
     }
 
     /**
@@ -39,7 +38,7 @@ public class AzureStorageQueueSourceOrSinkTest {
      */
     @Test
     public final void testValidate() {
-        assertEquals(ValidationResult.Result.ERROR, sos.validate(null).getStatus());
+        assertEquals(ValidationResult.Result.ERROR, sos.initialize(null, props).getStatus());
     }
 
     /**

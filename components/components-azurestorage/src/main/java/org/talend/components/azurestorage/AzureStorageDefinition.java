@@ -14,6 +14,7 @@ package org.talend.components.azurestorage;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.runtime.DependenciesReader;
+import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.properties.ComponentProperties;
@@ -70,7 +71,7 @@ public abstract class AzureStorageDefinition extends AbstractComponentDefinition
      * @param clazz {@link SourceOrSink} clazz
      * @return {@link RuntimeInfo} runtime info
      */
-    public static RuntimeInfo getCommonRuntimeInfo(ClassLoader classLoader, Class<? extends SourceOrSink> clazz) {
+    public static RuntimeInfo getCommonRuntimeInfo(ClassLoader classLoader, Class<? extends RuntimableRuntime<?>> clazz) {
         return new SimpleRuntimeInfo(classLoader,
                 DependenciesReader.computeDependenciesFilePath(MAVEN_GROUP_ID, MAVEN_ARTIFACT_ID), clazz.getCanonicalName());
     }

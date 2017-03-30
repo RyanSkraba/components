@@ -35,10 +35,11 @@ public class AzureStorageTableSource extends AzureStorageTableSourceOrSink imple
 
     @Override
     public ValidationResult validate(RuntimeContainer container) {
-        ValidationResult vr = super.validate(container);
-        if (vr == ValidationResult.OK) {
-            // TODO check combinedFilter...
+        ValidationResult validationResult = super.validate(container);
+        if (validationResult.getStatus() == ValidationResult.Result.ERROR) {
+            return validationResult;
         }
+
         return ValidationResult.OK;
     }
 

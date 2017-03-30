@@ -28,8 +28,7 @@ import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.azurestorage.blob.AzureStorageContainerProperties;
-import org.talend.components.azurestorage.blob.runtime.AzureStorageSource;
-import org.talend.components.azurestorage.blob.tazurestoragecontainercreate.TAzureStorageContainerCreateProperties;
+import org.talend.components.azurestorage.blob.runtime.AzureStorageContainerRuntime;
 import org.talend.components.azurestorage.blob.tazurestoragecontainerlist.TAzureStorageContainerListProperties;
 import org.talend.components.azurestorage.blob.tazurestoragelist.TAzureStorageListProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionDefinition;
@@ -62,44 +61,10 @@ public class AzureStorageComponentsTest {// extends AzureStorageGenericBase {
      */
     public ValidationResult getContainerValidation(String container, AzureStorageContainerProperties properties) {
         properties.container.setValue(container);
-        AzureStorageSource sos = new AzureStorageSource();
-        sos.initialize(runtime, properties);
-        return sos.validate(runtime);
+        AzureStorageContainerRuntime sos = new AzureStorageContainerRuntime();
+        return sos.initialize(runtime, properties);
     }
 
-    @Test
-    public void testContainerValidation() {
-        String errAcct = "ERROR The account name or key cannot be empty.";
-        // String
-        String containerOK = "a-good-container-name";
-        String containerEmpty = "";
-        String containerUpper = "AnUpperCasedContainer";
-        String containerTooLong = "a-very-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-container-name";
-        String containerInvalid = "**( ^%";
-        //
-        AzureStorageContainerProperties properties = new TAzureStorageContainerCreateProperties("tests");
-        // checks account name and key
-        assertEquals(errAcct, getContainerValidation(containerOK, properties).toString());
-        //
-        properties.connection.accountName.setValue("myFakeAccountName");
-        assertEquals(errAcct, getContainerValidation(containerOK, properties).toString());
-        //
-        properties.connection.accountName.setValue("");
-        properties.connection.accountKey.setValue("myFakeAccountKey");
-        assertEquals(errAcct, getContainerValidation(containerOK, properties).toString());
-        //
-        // now checks container's name
-        properties.connection.accountName.setValue("myFakeAccountName");
-        properties.connection.accountKey.setValue("myFakeAccountKey");
-        assertEquals(ValidationResult.OK, getContainerValidation(containerOK, properties));
-        assertEquals("ERROR The container name cannot be empty.", getContainerValidation(containerEmpty, properties).toString());
-        assertEquals("ERROR The container name must be in lowercase.",
-                getContainerValidation(containerUpper, properties).toString());
-        assertEquals("ERROR The container name length must be between 3 and 63 characters.",
-                getContainerValidation(containerTooLong, properties).toString());
-        assertEquals("ERROR The container name must contain only alphanumeric chars and dash(-).",
-                getContainerValidation(containerInvalid, properties).toString());
-    }
 
     @Test
     public void testBlobListSchema() {

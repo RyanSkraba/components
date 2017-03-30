@@ -54,30 +54,32 @@ public class AzureStorageTableSourceOrSink extends AzureStorageSourceOrSink impl
     private final Pattern tableCheckNamePattern = Pattern.compile("^[A-Za-z][A-Za-z0-9]{2,62}$");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageTableSourceOrSink.class);
-    
+
     private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(AzureStorageTableSourceOrSink.class);
 
     @Override
     public ValidationResult validate(RuntimeContainer container) {
         ValidationResult vr = super.validate(container);
-        if (vr == ValidationResult.OK) {
-            AzureStorageTableProperties p = (AzureStorageTableProperties) properties;
-            String tn = p.tableName.getValue();
-            if (tn.isEmpty()) {
-                vr = new ValidationResult();
-                vr.setStatus(ValidationResult.Result.ERROR);
-                vr.setMessage(i18nMessages.getMessage("message.VacantName"));
-                return vr;
-            }
-            if (!tableCheckNamePattern.matcher(tn).matches()) {
-                vr = new ValidationResult();
-                vr.setStatus(ValidationResult.Result.ERROR);
-                vr.setMessage(i18nMessages.getMessage("message.IncorrectName"));
-                return vr;
-            }
-        } else
+        if (vr.getStatus() == ValidationResult.Result.ERROR) {
             return vr;
+        }
+
+        AzureStorageTableProperties p = (AzureStorageTableProperties) properties;
+        String tn = p.tableName.getValue();
+        if (tn.isEmpty()) {
+            vr = new ValidationResult();
+            vr.setStatus(ValidationResult.Result.ERROR);
+            vr.setMessage(i18nMessages.getMessage("message.VacantName"));
+            return vr;
+        }
+        if (!tableCheckNamePattern.matcher(tn).matches()) {
+            vr = new ValidationResult();
+            vr.setStatus(ValidationResult.Result.ERROR);
+            vr.setMessage(i18nMessages.getMessage("message.IncorrectName"));
+            return vr;
+        }
+
         return ValidationResult.OK;
     }
 

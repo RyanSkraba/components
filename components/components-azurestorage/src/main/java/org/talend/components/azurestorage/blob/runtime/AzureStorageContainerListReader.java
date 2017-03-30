@@ -42,6 +42,10 @@ public class AzureStorageContainerListReader extends AzureStorageReader<IndexedR
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageContainerListReader.class);
 
+    private Boolean startable = null; // this is initialized in the start method
+
+    Boolean advanceable = null; // this is initialized in the advance method
+
     public AzureStorageContainerListReader(RuntimeContainer container, BoundedSource source,
             TAzureStorageContainerListProperties properties) {
         super(container, source);
@@ -50,7 +54,7 @@ public class AzureStorageContainerListReader extends AzureStorageReader<IndexedR
 
     @Override
     public boolean start() throws IOException {
-        Boolean startable = false;
+        startable = false;
         try {
             CloudBlobClient clientService = ((AzureStorageSource) getCurrentSource()).getServiceClient(runtime);
             containers = clientService.listContainers().iterator();
@@ -72,7 +76,7 @@ public class AzureStorageContainerListReader extends AzureStorageReader<IndexedR
 
     @Override
     public boolean advance() throws IOException {
-        Boolean advanceable = containers.hasNext();
+        advanceable = containers.hasNext();
         if (advanceable) {
             dataCount++;
             currentRecord = new GenericData.Record(properties.schema.schema.getValue());
@@ -83,6 +87,10 @@ public class AzureStorageContainerListReader extends AzureStorageReader<IndexedR
 
     @Override
     public IndexedRecord getCurrent() throws NoSuchElementException {
+        if (startable == null || (advanceable != null && !advanceable)) {
+            throw new NoSuchElementException();
+        }
+
         return currentRecord;
     }
 

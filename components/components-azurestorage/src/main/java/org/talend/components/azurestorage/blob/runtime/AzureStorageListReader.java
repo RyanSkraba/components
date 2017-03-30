@@ -18,7 +18,6 @@ import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
@@ -66,8 +65,8 @@ public class AzureStorageListReader extends AzureStorageReader<IndexedRecord> {
         // build a list with remote blobs to fetch
         List<RemoteBlob> remoteBlobs = ((AzureStorageSource) getCurrentSource()).getRemoteBlobs();
         try {
-            CloudBlobContainer container = ((AzureStorageSource) getCurrentSource()).getStorageContainerReference(runtime,
-                    mycontainer);
+            CloudBlobContainer container = ((AzureStorageSource) getCurrentSource())
+                    .getAzureStorageBlobContainerReference(runtime, mycontainer);
             blobs = new ArrayList<>();
             for (RemoteBlob rmtb : remoteBlobs) {
                 for (ListBlobItem blob : container.listBlobs(rmtb.prefix, rmtb.include)) {
@@ -76,8 +75,8 @@ public class AzureStorageListReader extends AzureStorageReader<IndexedRecord> {
                     }
                 }
             }
-            blobSize = blobs.size();
-            startable = (blobSize > 0);
+
+            startable = !blobs.isEmpty();
         } catch (StorageException | InvalidKeyException | URISyntaxException e) {
             LOGGER.error(e.getLocalizedMessage());
             if (properties.dieOnError.getValue())
@@ -88,6 +87,7 @@ public class AzureStorageListReader extends AzureStorageReader<IndexedRecord> {
             blobIndex = 0;
             currentRecord = new GenericData.Record(properties.schema.schema.getValue());
             currentRecord.put(0, blobs.get(blobIndex).getName());
+            currentBlob = blobs.get(blobIndex);
         }
         return startable;
     }
@@ -99,13 +99,14 @@ public class AzureStorageListReader extends AzureStorageReader<IndexedRecord> {
             dataCount++;
             currentRecord = new GenericData.Record(properties.schema.schema.getValue());
             currentRecord.put(0, blobs.get(blobIndex).getName());
+            currentBlob = blobs.get(blobIndex);
             return true;
         }
         return false;
     }
 
     @Override
-    public IndexedRecord getCurrent() throws NoSuchElementException {
+    public IndexedRecord getCurrent() {
         if (runtime != null)
             runtime.setComponentData(runtime.getCurrentComponentId(), AzureStorageBlobDefinition.RETURN_CURRENT_BLOB,
                     currentRecord.get(0));

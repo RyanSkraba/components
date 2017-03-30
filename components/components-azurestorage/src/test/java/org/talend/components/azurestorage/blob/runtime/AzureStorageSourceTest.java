@@ -23,14 +23,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.azurestorage.blob.AzureStorageBlobProperties;
-import org.talend.components.azurestorage.blob.tazurestoragecontainercreate.TAzureStorageContainerCreateProperties;
-import org.talend.components.azurestorage.blob.tazurestoragecontainerdelete.TAzureStorageContainerDeleteProperties;
-import org.talend.components.azurestorage.blob.tazurestoragecontainerexist.TAzureStorageContainerExistProperties;
 import org.talend.components.azurestorage.blob.tazurestoragecontainerlist.TAzureStorageContainerListProperties;
-import org.talend.components.azurestorage.blob.tazurestoragedelete.TAzureStorageDeleteProperties;
 import org.talend.components.azurestorage.blob.tazurestorageget.TAzureStorageGetProperties;
 import org.talend.components.azurestorage.blob.tazurestoragelist.TAzureStorageListProperties;
-import org.talend.components.azurestorage.blob.tazurestorageput.TAzureStoragePutProperties;
 
 public class AzureStorageSourceTest {
 
@@ -59,36 +54,12 @@ public class AzureStorageSourceTest {
      */
     @Test
     public final void testCreateReader() {
-        source.initialize(null, new TAzureStorageContainerCreateProperties("test"));
-        assertTrue(source.createReader(null) instanceof AzureStorageContainerCreateReader);
-
-        source.initialize(null, new TAzureStorageContainerDeleteProperties("test"));
-        assertTrue(source.createReader(null) instanceof AzureStorageContainerDeleteReader);
-
-        source.initialize(null, new TAzureStorageContainerExistProperties("test"));
-        assertTrue(source.createReader(null) instanceof AzureStorageContainerExistReader);
 
         source.initialize(null, new TAzureStorageContainerListProperties("test"));
         assertTrue(source.createReader(null) instanceof AzureStorageContainerListReader);
 
-        source.initialize(null, new TAzureStorageContainerExistProperties("test"));
-        assertTrue(source.createReader(null) instanceof AzureStorageContainerExistReader);
-
         source.initialize(null, new TAzureStorageListProperties("test"));
         assertTrue(source.createReader(null) instanceof AzureStorageListReader);
-
-        source.initialize(null, new TAzureStorageDeleteProperties("test"));
-        assertTrue(source.createReader(null) instanceof AzureStorageDeleteReader);
-
-        source.initialize(null, new TAzureStorageGetProperties("test"));
-        assertTrue(source.createReader(null) instanceof AzureStorageGetReader);
-
-        source.initialize(null, new TAzureStoragePutProperties("test"));
-        assertTrue(source.createReader(null) instanceof AzureStoragePutReader);
-
-        // source.initialize(null, new AzureStorageTableProperties("test"));
-        // assertNull(source.createReader(null));
-
     }
 
     /**
@@ -105,24 +76,6 @@ public class AzureStorageSourceTest {
 
         source.initialize(null, props);
         assertNotNull(source.getRemoteBlobs());
-
-    }
-
-    /**
-     * Test method for {@link org.talend.components.azurestorage.blob.runtime.AzureStorageSource#getRemoteBlobsGet()}.
-     */
-    @Test
-    public final void testGetRemoteBlobsGet() {
-        TAzureStorageGetProperties props = new TAzureStorageGetProperties("test");
-        props.setupProperties();
-        List<String> prefixes = Arrays.asList("test1", "test2");
-        List<Boolean> includes = Arrays.asList(true, false);
-        props.remoteBlobsGet.prefix.setValue(prefixes);
-        props.remoteBlobsGet.include.setValue(includes);
-        props.remoteBlobsGet.create.setValue(includes);
-
-        source.initialize(null, props);
-        assertNotNull(source.getRemoteBlobsGet());
 
     }
 

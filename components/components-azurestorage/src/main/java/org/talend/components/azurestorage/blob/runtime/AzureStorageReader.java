@@ -18,7 +18,6 @@ import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.azurestorage.AzureStorageDefinition;
 import org.talend.components.azurestorage.AzureStorageProvideConnectionProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 
@@ -38,7 +37,7 @@ public abstract class AzureStorageReader<T> extends AbstractBoundedReader<T> imp
     @Override
     public TAzureStorageConnectionProperties getConnectionProperties() {
         if (connection == null) {
-            connection = ((AzureStorageSourceOrSink) getCurrentSource()).validateConnection(runtime);
+            connection = ((AzureStorageSourceOrSink) getCurrentSource()).getConnectionProperties();
         }
         return connection;
     }

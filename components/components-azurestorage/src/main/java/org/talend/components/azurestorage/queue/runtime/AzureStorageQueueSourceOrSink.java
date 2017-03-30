@@ -46,12 +46,17 @@ public class AzureStorageQueueSourceOrSink extends AzureStorageSourceOrSink impl
     protected RuntimeContainer runtime;
 
     private final Pattern queueCheckNamePattern = Pattern.compile("^[a-z][a-z0-9]{2,61}[a-z]$");
-    
+
     private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(AzureStorageQueueSourceOrSink.class);
 
     @Override
     public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
+        ValidationResult validationResult = super.initialize(container, properties);
+        if (validationResult.getStatus() == ValidationResult.Result.ERROR) {
+            return validationResult;
+        }
+
         this.runtime = container;
         this.properties = (AzureStorageProvideConnectionProperties) properties;
         return ValidationResult.OK;

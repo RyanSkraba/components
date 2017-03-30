@@ -16,9 +16,12 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.azurestorage.blob.AzureStorageBlobDefinition;
+import org.talend.components.azurestorage.blob.runtime.AzureStoragePutRuntime;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 public class TAzureStoragePutDefinition extends AzureStorageBlobDefinition {
 
@@ -40,15 +43,25 @@ public class TAzureStoragePutDefinition extends AzureStorageBlobDefinition {
         return TAzureStoragePutProperties.class;
     }
 
-    @Override
-    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
-        return EnumSet.of(ConnectorTopology.OUTGOING);
-    }
+
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public Class getPropertiesClass() {
         return TAzureStoragePutProperties.class;
+    }
+
+    @Override
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
+            ConnectorTopology connectorTopology) {
+        assertConnectorTopologyCompatibility(connectorTopology);
+        assertEngineCompatibility(engine);
+        return getCommonRuntimeInfo(this.getClass().getClassLoader(), AzureStoragePutRuntime.class);
+    }
+
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return EnumSet.of(ConnectorTopology.NONE);
     }
 
 }

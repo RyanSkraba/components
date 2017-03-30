@@ -14,62 +14,56 @@ package org.talend.components.azurestorage.table.helpers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.daikon.properties.ValidationResult;
 
 public class NameMappingTableTest {
 
-    List<String> schemaCols = new ArrayList<>();
+    NameMappingTable nmt;
 
-    List<String> entityCols = new ArrayList<>();
-
-    Map<String, String> result = new HashMap<>();
-
-    NameMappingTable nmt = new NameMappingTable("test");
-
-    public void clearList() {
-        schemaCols.clear();
-        entityCols.clear();
-    }
-
-    public void setTableValues() {
+    @Before
+    public void init() {
+        List<String> schemaCols = new ArrayList<>();
+        List<String> entityCols = new ArrayList<>();
+        nmt = new NameMappingTable("test");
         nmt.schemaColumnName.setValue(schemaCols);
         nmt.entityPropertyName.setValue(entityCols);
+
     }
 
     @Test
-    public void testValidation() {
-        clearList();
-        setTableValues();
+    public void testValidateNameMappingsEmptyTable() {
         // empty table is ok
         assertEquals(ValidationResult.OK, nmt.validateNameMappings());
-        schemaCols.add("system");
-        entityCols.add("SytstemStatus");
-        setTableValues();
-        assertEquals(ValidationResult.OK, nmt.validateNameMappings());
-        schemaCols.add("notentitymapping");
-        entityCols.add("");
-        setTableValues();
+    }
+
+    @Test
+    public void testValidateNameMappingsInvalide() {
+        nmt.schemaColumnName.getValue().add("notentitymapping");
+        nmt.entityPropertyName.getValue().add("");
         assertEquals(ValidationResult.Result.ERROR, nmt.validateNameMappings().getStatus());
     }
 
     @Test
-    public void testNameMappings() {
-        clearList();
-        setTableValues();
-        assertNull(nmt.getNameMappings());
-        schemaCols.add("system");
-        entityCols.add("SytstemStatus");
-        setTableValues();
-        result = nmt.getNameMappings();
+    public void testValidateNameMappingsValide() {
+        nmt.schemaColumnName.getValue().add("system");
+        nmt.entityPropertyName.getValue().add("SytstemStatus");
+        assertEquals(ValidationResult.OK, nmt.validateNameMappings());
+    }
+
+    @Ignore
+    public void testGetNameMappings() {
+        nmt.schemaColumnName.getValue().add("system");
+        nmt.entityPropertyName.getValue().add("SytstemStatus");
+        Map<String, String> result = nmt.getNameMappings();
         assertNotNull(result);
         assertEquals(1, result.values().size());
         assertTrue(result.containsKey("system"));

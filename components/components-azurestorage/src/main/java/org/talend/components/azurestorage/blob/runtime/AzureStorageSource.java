@@ -12,31 +12,20 @@
 // ============================================================================
 package org.talend.components.azurestorage.blob.runtime;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.azurestorage.AzureStorageProperties;
 import org.talend.components.azurestorage.blob.AzureStorageBlobProperties;
-import org.talend.components.azurestorage.blob.AzureStorageContainerProperties;
 import org.talend.components.azurestorage.blob.helpers.RemoteBlob;
 import org.talend.components.azurestorage.blob.helpers.RemoteBlobGet;
-import org.talend.components.azurestorage.blob.tazurestoragecontainercreate.TAzureStorageContainerCreateProperties;
-import org.talend.components.azurestorage.blob.tazurestoragecontainerdelete.TAzureStorageContainerDeleteProperties;
-import org.talend.components.azurestorage.blob.tazurestoragecontainerexist.TAzureStorageContainerExistProperties;
 import org.talend.components.azurestorage.blob.tazurestoragecontainerlist.TAzureStorageContainerListProperties;
-import org.talend.components.azurestorage.blob.tazurestoragedelete.TAzureStorageDeleteProperties;
 import org.talend.components.azurestorage.blob.tazurestorageget.TAzureStorageGetProperties;
 import org.talend.components.azurestorage.blob.tazurestoragelist.TAzureStorageListProperties;
-import org.talend.components.azurestorage.blob.tazurestorageput.TAzureStoragePutProperties;
-import org.talend.daikon.i18n.GlobalI18N;
-import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 
 /**
@@ -55,13 +44,15 @@ import org.talend.daikon.properties.ValidationResult;
 public class AzureStorageSource extends AzureStorageSourceOrSink implements BoundedSource {
 
     private static final long serialVersionUID = 8358040916857157407L;
-    
-    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
-            .getI18nMessages(AzureStorageSource.class);
 
     @Override
-    public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
-        this.properties = (AzureStorageProperties) properties;
+    public ValidationResult initialize(RuntimeContainer runtimeContainer, ComponentProperties properties) {
+
+        ValidationResult validationResult = super.initialize(runtimeContainer, properties);
+        if (validationResult.getStatus() == ValidationResult.Result.ERROR) {
+            return validationResult;
+        }
+
         return ValidationResult.OK;
     }
 
@@ -71,20 +62,6 @@ public class AzureStorageSource extends AzureStorageSourceOrSink implements Boun
         //
         // Container operations
         //
-        if (properties instanceof TAzureStorageContainerCreateProperties) {
-            TAzureStorageContainerCreateProperties props = (TAzureStorageContainerCreateProperties) properties;
-            return new AzureStorageContainerCreateReader(container, this, props);
-        }
-        //
-        if (properties instanceof TAzureStorageContainerDeleteProperties) {
-            TAzureStorageContainerDeleteProperties props = (TAzureStorageContainerDeleteProperties) properties;
-            return new AzureStorageContainerDeleteReader(container, this, props);
-        }
-        //
-        if (properties instanceof TAzureStorageContainerExistProperties) {
-            TAzureStorageContainerExistProperties props = (TAzureStorageContainerExistProperties) properties;
-            return new AzureStorageContainerExistReader(container, this, props);
-        }
         if (properties instanceof TAzureStorageContainerListProperties) {
             TAzureStorageContainerListProperties props = (TAzureStorageContainerListProperties) properties;
             return new AzureStorageContainerListReader(container, this, props);
@@ -94,121 +71,8 @@ public class AzureStorageSource extends AzureStorageSourceOrSink implements Boun
             TAzureStorageListProperties props = (TAzureStorageListProperties) properties;
             return new AzureStorageListReader(container, this, props);
         }
-        //
-        // CloudBlob operations
-        //
-        if (properties instanceof TAzureStorageDeleteProperties) {
-            TAzureStorageDeleteProperties props = (TAzureStorageDeleteProperties) properties;
-            return new AzureStorageDeleteReader(container, this, props);
-        }
-        //
-        if (properties instanceof TAzureStorageGetProperties) {
-            TAzureStorageGetProperties props = (TAzureStorageGetProperties) properties;
-            return new AzureStorageGetReader(container, this, props);
-        }
-        //
-        if (properties instanceof TAzureStoragePutProperties) {
-            TAzureStoragePutProperties props = (TAzureStoragePutProperties) properties;
-            return new AzureStoragePutReader(container, this, props);
-        }
 
         return null;
-    }
-
-    @Override
-    public ValidationResult validate(RuntimeContainer container) {
-        // checks that account name and key are not empty
-        ValidationResult superRes = super.validate(container);
-        if (superRes != ValidationResult.OK)
-            return superRes;
-        // No validation for listing containers
-        if (this.properties instanceof TAzureStorageContainerListProperties) {
-            return ValidationResult.OK;
-        }
-        // Checks that container name follows MS naming rules
-        if (this.properties instanceof AzureStorageContainerProperties) {
-            String cnt = ((AzureStorageContainerProperties) this.properties).container.getValue();
-            // not empty
-            if (StringUtils.isEmpty(cnt)) {
-                ValidationResult vr = new ValidationResult();
-                vr.setMessage(messages.getMessage("error.ContainerEmpty")); //$NON-NLS-1$
-                vr.setStatus(ValidationResult.Result.ERROR);
-                return vr;
-            }
-            // valid characters 0-9 a-z and -
-            if (!StringUtils.isAlphanumeric(cnt.replaceAll("-", ""))) {
-                ValidationResult vr = new ValidationResult();
-                vr.setMessage(messages.getMessage("error.IncorrectName")); //$NON-NLS-1$
-                vr.setStatus(ValidationResult.Result.ERROR);
-                return vr;
-            }
-            // all lowercase
-            if (!StringUtils.isAllLowerCase(cnt.replaceAll("(-|\\d)", ""))) {
-                ValidationResult vr = new ValidationResult();
-                vr.setMessage(messages.getMessage("error.UppercaseName")); //$NON-NLS-1$
-                vr.setStatus(ValidationResult.Result.ERROR);
-                return vr;
-            }
-            // length range : 3-63
-            int cntl = cnt.length();
-            if ((cntl < 3) || (cntl > 63)) {
-                ValidationResult vr = new ValidationResult();
-                vr.setMessage(messages.getMessage("error.LengthError")); //$NON-NLS-1$
-                vr.setStatus(ValidationResult.Result.ERROR);
-                return vr;
-            }
-        }
-        // Operations on CloudBlob(s)
-        if (this.properties instanceof AzureStorageBlobProperties) {
-            // Put operation has different properties
-            if (this.properties instanceof TAzureStoragePutProperties) {
-                TAzureStoragePutProperties p = (TAzureStoragePutProperties) this.properties;
-                String folder = p.localFolder.getValue();
-                // checks local folder
-                if (!new File(folder).exists()) {
-                    ValidationResult vr = new ValidationResult();
-                    vr.setMessage(messages.getMessage("error.EmptyLocalFolder")); //$NON-NLS-1$
-                    vr.setStatus(ValidationResult.Result.ERROR);
-                    return vr;
-                }
-                // checks file list if set.
-                if (p.useFileList.getValue() && p.files.fileMask.getValue().size() == 0) {
-                    ValidationResult vr = new ValidationResult();
-                    vr.setMessage(messages.getMessage("error.EmptyFileList")); //$NON-NLS-1$
-                    vr.setStatus(ValidationResult.Result.ERROR);
-                    return vr;
-                }
-                // everything is OK.
-                return ValidationResult.OK;
-            }
-            // Get operation needs some additional properties
-            if (this.properties instanceof TAzureStorageGetProperties) {
-                //
-                if (((TAzureStorageGetProperties) this.properties).remoteBlobsGet.prefix.getValue().size() == 0) {
-                    ValidationResult vr = new ValidationResult();
-                    vr.setMessage(messages.getMessage("error.EmptyBlobs")); //$NON-NLS-1$
-                    vr.setStatus(ValidationResult.Result.ERROR);
-                    return vr;
-                }
-                String folder = ((TAzureStorageGetProperties) this.properties).localFolder.getValue();
-                if (!new File(folder).exists()) {
-                    ValidationResult vr = new ValidationResult();
-                    vr.setMessage(messages.getMessage("error.NonentityLocal")); //$NON-NLS-1$
-                    vr.setStatus(ValidationResult.Result.ERROR);
-                    return vr;
-                }
-                // everything is OK.
-                return ValidationResult.OK;
-            }
-            // We need at least one blob filter
-            if (((AzureStorageBlobProperties) this.properties).remoteBlobs.prefix.getValue().size() == 0) {
-                ValidationResult vr = new ValidationResult();
-                vr.setMessage(messages.getMessage("error.EmptyBlobs")); //$NON-NLS-1$
-                vr.setStatus(ValidationResult.Result.ERROR);
-                return vr;
-            }
-        }
-        return ValidationResult.OK;
     }
 
     public List<RemoteBlob> getRemoteBlobs() {

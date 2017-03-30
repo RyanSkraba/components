@@ -59,4 +59,5 @@ public class TAzureStorageContainerListDefinition extends AzureStorageContainerD
     public boolean isSchemaAutoPropagate() {
         return true;
     }
+
 }

@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -32,9 +33,8 @@ import org.talend.daikon.i18n.I18nMessages;
 public class AzureStorageUtils {
 
     private transient static final Logger LOG = LoggerFactory.getLogger(AzureStorageUtils.class);
-    
-    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
-            .getI18nMessages(AzureStorageUtils.class);
+
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider().getI18nMessages(AzureStorageUtils.class);
 
     class LocalFileFilter implements FileFilter {
 
@@ -136,5 +136,20 @@ public class AzureStorageUtils {
             }
         }
         return fileMap;
+    }
+
+
+    public static String getStudioNameFromProperty(final String inputString) {
+        // FIXME : move this method to tcomp
+        StringBuilder outputString = new StringBuilder();
+        if (inputString == null || inputString.isEmpty()) {
+            return inputString;
+        }
+
+        for (int i = 0; i < inputString.length(); i++) {
+            Character c = inputString.charAt(i);
+            outputString.append(Character.isUpperCase(c) && i > 0 ? "_" + c : c); //$NON-NLS-1$
+        }
+        return outputString.toString().toUpperCase(Locale.ENGLISH);
     }
 }

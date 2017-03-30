@@ -17,6 +17,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -53,7 +54,7 @@ public class AzureStorageContainerListReaderTest {
         fail("Should have failed...");
     }
 
-    @Test
+    @Test(expected = NoSuchElementException.class)
     public final void testGetCurrent() {
         assertNull(reader.getCurrent());
     }
