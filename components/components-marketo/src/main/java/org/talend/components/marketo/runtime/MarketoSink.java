@@ -27,8 +27,9 @@ public class MarketoSink extends MarketoSourceOrSink implements Sink {
     @Override
     public ValidationResult validate(RuntimeContainer container) {
         ValidationResult vr = super.validate(container);
-        if (vr.getStatus().equals(Result.ERROR))
+        if (vr.getStatus().equals(Result.ERROR)) {
             return vr;
+        }
         // output
         if (properties instanceof TMarketoOutputProperties) {
             switch (((TMarketoOutputProperties) properties).outputOperation.getValue()) {
@@ -69,10 +70,11 @@ public class MarketoSink extends MarketoSourceOrSink implements Sink {
             }
             // lead selector must be LeadKeySelector
             LeadSelector selector;
-            if (((TMarketoInputProperties) properties).connection.apiMode.equals(APIMode.SOAP))
+            if (((TMarketoInputProperties) properties).connection.apiMode.equals(APIMode.SOAP)) {
                 selector = ((TMarketoInputProperties) properties).leadSelectorSOAP.getValue();
-            else
+            } else {
                 selector = ((TMarketoInputProperties) properties).leadSelectorREST.getValue();
+            }
             if (!selector.equals(LeadSelector.LeadKeySelector)) {
                 vr.setStatus(Result.ERROR);
                 vr.setMessage(messages.getMessage("error.validation.sink.leadkeyselector.only"));

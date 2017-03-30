@@ -83,11 +83,13 @@ public class MarketoException extends Exception {
     public String toString() {
         final StringBuffer sb = new StringBuffer("MarketoException{");
         sb.append("api='").append(apiMode).append('\'');
-        if (!StringUtils.isEmpty(code))
+        if (!StringUtils.isEmpty(code)) {
             sb.append(", code='").append(code).append('\'');
+        }
         sb.append(", message='").append(getMessage()).append('\'');
-        if (getCause() != null)
+        if (getCause() != null) {
             sb.append(", cause='").append(getCause()).append('\'');
+        }
         sb.append('}');
         return sb.toString();
     }

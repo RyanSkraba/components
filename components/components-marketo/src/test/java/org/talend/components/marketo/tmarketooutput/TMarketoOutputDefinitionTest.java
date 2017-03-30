@@ -14,17 +14,15 @@ package org.talend.components.marketo.tmarketooutput;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import java.util.Arrays;
+import java.util.HashSet;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 
-import java.util.Arrays;
-import java.util.HashSet;
-
-/**
- * Created by undx on 24/01/2017.
- */
 public class TMarketoOutputDefinitionTest {
 
     TMarketoOutputDefinition def;

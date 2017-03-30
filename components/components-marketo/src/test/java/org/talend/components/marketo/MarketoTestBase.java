@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.marketo;
 
+import javax.inject.Inject;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ErrorCollector;
@@ -22,11 +24,6 @@ import org.talend.components.api.service.common.DefinitionRegistry;
 import org.talend.components.api.test.AbstractComponentTest2;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
 
-import javax.inject.Inject;
-
-/**
- * Created by undx on 24/01/2017.
- */
 public class MarketoTestBase extends AbstractComponentTest2 {
 
     @Rule

@@ -12,15 +12,20 @@
 // ============================================================================
 package org.talend.components.marketo.helpers;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
 import org.junit.Before;
 import org.junit.Test;
+import org.talend.daikon.avro.SchemaConstants;
 
 public class MarketoColumnMappingsTableTest {
 
@@ -86,4 +91,65 @@ public class MarketoColumnMappingsTableTest {
         assertEquals(Arrays.asList("LeadId", "EMAIL", "CAMPAIGN"),
                 Arrays.asList(mappings.getNameMappingsForMarketo().values().toArray()));
     }
+
+    public Schema getTestSchema() {
+        return SchemaBuilder.record("test").fields()//
+                .name("ID").type().stringType().noDefault()//
+                .name("EMAIL").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "EMAIL")//
+                .type().stringType().noDefault()//
+                .name("CAMPAIGN").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "Campaign")//
+                .type().stringType().noDefault()//
+                .name("LastScoring_Adoption").prop(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "LastScoring-Adoption")//
+                .type().stringType().noDefault()//
+                //
+                .endRecord();
+    }
+
+    @Test
+    public void testGetMarketoColumnsFullMappings() throws Exception {
+        List<String> schema = new ArrayList<String>(Arrays.asList("ID", "EMAIL", "CAMPAIGN", "LastScoring_Adoption"));
+        List<String> mkto = new ArrayList<String>(Arrays.asList("LeadId", "Email", "Campaign", "LastScoring-Adoption"));
+        mappings.columnName.setValue(schema);
+        mappings.marketoColumnName.setValue(mkto);
+
+        assertThat(schema, containsInAnyOrder(mappings.getNameMappingsForMarketo().keySet().toArray()));
+        assertEquals(mkto, mappings.getMarketoColumns(getTestSchema()));
+    }
+
+    @Test
+    public void testGetMarketoColumnsSemiMappings() throws Exception {
+        List<String> schema = new ArrayList<String>(Arrays.asList("ID", "EMAIL", "CAMPAIGN", "LastScoring_Adoption"));
+        List<String> mkto = new ArrayList<String>(Arrays.asList("LeadId", "", "Campaign", ""));
+        mappings.columnName.setValue(schema);
+        mappings.marketoColumnName.setValue(mkto);
+
+        assertThat(schema, containsInAnyOrder(mappings.getNameMappingsForMarketo().keySet().toArray()));
+        assertEquals(Arrays.asList("LeadId", "EMAIL", "Campaign", "LastScoring-Adoption"),
+                mappings.getMarketoColumns(getTestSchema()));
+    }
+
+    @Test
+    public void testGetMarketoColumnsSemiMappingsWithNull() throws Exception {
+        List<String> schema = new ArrayList<String>(Arrays.asList("ID", "EMAIL", "CAMPAIGN", "LastScoring_Adoption"));
+        List<String> mkto = new ArrayList<String>(Arrays.asList("LeadId", null, "", ""));
+        mappings.columnName.setValue(schema);
+        mappings.marketoColumnName.setValue(mkto);
+
+        assertThat(schema, containsInAnyOrder(mappings.getNameMappingsForMarketo().keySet().toArray()));
+        assertEquals(Arrays.asList("LeadId", "EMAIL", "Campaign", "LastScoring-Adoption"),
+                mappings.getMarketoColumns(getTestSchema()));
+    }
+
+    @Test
+    public void testGetMarketoColumnsNoMappingsWithNull() throws Exception {
+        List<String> schema = new ArrayList<String>(Arrays.asList("ID", "EMAIL", "CAMPAIGN", "LastScoring_Adoption"));
+        List<String> mkto = new ArrayList<String>(Arrays.asList("", null, "", ""));
+        mappings.columnName.setValue(schema);
+        mappings.marketoColumnName.setValue(mkto);
+
+        assertThat(schema, containsInAnyOrder(mappings.getNameMappingsForMarketo().keySet().toArray()));
+        assertEquals(Arrays.asList("ID", "EMAIL", "Campaign", "LastScoring-Adoption"),
+                mappings.getMarketoColumns(getTestSchema()));
+    }
+
 }

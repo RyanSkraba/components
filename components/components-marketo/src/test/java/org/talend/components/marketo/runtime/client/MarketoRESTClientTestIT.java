@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.IncludeExcludeFieldsSOAP.ChangeDataValue;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.CustomObject;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLead;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLeadActivity;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLeadChanges;
@@ -35,9 +36,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
+import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Before;
@@ -53,13 +56,16 @@ import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
 import org.talend.components.marketo.runtime.client.type.MarketoSyncResult;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
+import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.IncludeExcludeFieldsREST;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.IncludeExcludeFieldsSOAP;
+import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadKeyTypeREST;
 import org.talend.components.marketo.tmarketolistoperation.TMarketoListOperationProperties;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OperationType;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OutputOperation;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.RESTLookupFields;
+import org.talend.daikon.avro.SchemaConstants;
 
 public class MarketoRESTClientTestIT extends MarketoClientTestIT {
 
@@ -713,6 +719,81 @@ public class MarketoRESTClientTestIT extends MarketoClientTestIT {
             assertNotNull(r.getId());
             assertEquals("skipped", r.getStatus());
             LOG.debug("r = {}.", r);
+        }
+    }
+    /*
+     * 
+     * Dynamic fields
+     * 
+     */
+
+    @Test
+    public void testGetLeadDynamic() throws Exception {
+        iprops.inputOperation.setValue(getLead);
+        iprops.leadKeyTypeREST.setValue(LeadKeyTypeREST.id);
+        iprops.batchSize.setValue(1);
+        iprops.afterInputOperation();
+        iprops.leadKeyValue.setValue(createdLeads.get(0).toString());
+        iprops.schemaInput.schema.setValue(
+                SchemaBuilder.builder().record("test").prop(SchemaConstants.INCLUDE_ALL_FIELDS, "true").fields().endRecord());
+        MarketoSource source = new MarketoSource();
+        source.initialize(null, iprops);
+        MarketoRESTClient client = (MarketoRESTClient) source.getClientService(null);
+        Schema design = this.iprops.schemaInput.schema.getValue();
+        // preserve mappings to re-apply them after
+        Map<String, String> mappings = iprops.mappingInput.getNameMappingsForMarketo();
+        Schema runtimeSchema = source.getDynamicSchema("", design);
+        List<String> columnNames = new ArrayList<>();
+        List<String> mktoNames = new ArrayList<>();
+        for (Field f : runtimeSchema.getFields()) {
+            columnNames.add(f.name());
+            if (mappings.get(f.name()) != null) {
+                mktoNames.add(mappings.get(f.name()));
+            } else {
+                mktoNames.add("");
+            }
+        }
+        iprops.mappingInput.columnName.setValue(columnNames);
+        iprops.mappingInput.marketoColumnName.setValue(mktoNames);
+        iprops.schemaInput.schema.setValue(runtimeSchema);
+
+        MarketoRecordResult result = client.getLead(iprops, null);
+        IndexedRecord r = result.getRecords().get(0);
+        assertNotNull(r);
+        LOG.debug("r = {}.", r);
+        assertEquals("Retail-Dev", r.get(runtimeSchema.getField("company").pos()));
+        assertEquals(COMMON_LINKEDIN_ID.toString(), r.get(runtimeSchema.getField("linkedInId").pos()));
+        assertEquals(COMMON_SFDC_ACCOUNT_ID, r.get(runtimeSchema.getField("sfdcAccountId").pos()));
+    }
+
+    @Test
+    public void testGetCustomObjectDynamic() throws Exception {
+        String coName = "smartphone_c";
+        String brand = "Samsung";
+        String models = "Galaxy S7,XCover";
+        iprops.inputOperation.setValue(CustomObject);
+        iprops.customObjectAction.setValue(CustomObjectAction.get);
+        iprops.batchSize.setValue(1);
+        iprops.afterCustomObjectAction();
+        iprops.customObjectName.setValue(coName);
+        iprops.customObjectFilterType.setValue("model");
+        iprops.customObjectFilterValues.setValue(models);
+        iprops.schemaInput.schema.setValue(
+                SchemaBuilder.builder().record("test").prop(SchemaConstants.INCLUDE_ALL_FIELDS, "true").fields().endRecord());
+        MarketoSource source = new MarketoSource();
+        source.initialize(null, iprops);
+        Schema runtimeSchema = source.getDynamicSchema(coName, iprops.schemaInput.schema.getValue());
+        LOG.debug("runtimeSchema = {}.", runtimeSchema);
+        iprops.schemaInput.schema.setValue(runtimeSchema);
+        MarketoRESTClient client = (MarketoRESTClient) source.getClientService(null);
+        MarketoRecordResult result = client.getCustomObjects(iprops, null);
+        assertTrue(result.isSuccess());
+        for (IndexedRecord r : result.getRecords()) {
+            LOG.debug("r = {}.", r);
+            assertNotNull(r);
+            assertEquals(brand, r.get(runtimeSchema.getField("brand").pos()));
+            assertTrue(models.contains(r.get(runtimeSchema.getField("model").pos()).toString()));
+            assertNotNull(r.get(runtimeSchema.getField("customerId").pos()));
         }
     }
 

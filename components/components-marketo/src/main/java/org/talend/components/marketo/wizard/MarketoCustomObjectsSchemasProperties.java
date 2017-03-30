@@ -71,6 +71,10 @@ public class MarketoCustomObjectsSchemasProperties extends ComponentPropertiesIm
         return this;
     }
 
+    public String getRepositoryLocation() {
+        return repositoryLocation;
+    }
+
     @Override
     public void setupProperties() {
         super.setupProperties();

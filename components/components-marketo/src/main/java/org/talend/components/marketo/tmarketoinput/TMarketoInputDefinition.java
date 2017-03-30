@@ -15,8 +15,6 @@ package org.talend.components.marketo.tmarketoinput;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
@@ -26,8 +24,6 @@ import org.talend.daikon.runtime.RuntimeInfo;
 public class TMarketoInputDefinition extends MarketoComponentDefinition {
 
     public static final String COMPONENT_NAME = "tMarketoInput";
-
-    private transient static final Logger LOG = LoggerFactory.getLogger(TMarketoInputDefinition.class);
 
     public TMarketoInputDefinition() {
         super(COMPONENT_NAME);

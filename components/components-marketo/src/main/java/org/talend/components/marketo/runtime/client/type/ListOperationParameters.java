@@ -58,14 +58,15 @@ public class ListOperationParameters {
     }
 
     public String[] getLeadKeyValues() {
-        return leadKeyValue.toArray(new String[]{});
+        return leadKeyValue.toArray(new String[] {});
     }
 
     public void setLeadKeyValue(String[] leadKeyValue) {
-        if (leadKeyValue == null)
+        if (leadKeyValue == null) {
             this.leadKeyValue = null;
-        else
+        } else {
             this.leadKeyValue = new ArrayList<>(Arrays.asList(leadKeyValue));
+        }
     }
 
     public String getListKeyType() {
@@ -109,14 +110,15 @@ public class ListOperationParameters {
     }
 
     public Integer[] getLeadIdsValues() {
-        return leadIds.toArray(new Integer[]{});
+        return leadIds.toArray(new Integer[] {});
     }
 
     public void setLeadIds(Integer[] leadIds) {
-        if (leadIds == null)
+        if (leadIds == null) {
             this.leadIds = null;
-        else
+        } else {
             this.leadIds = new ArrayList<>(Arrays.asList(leadIds));
+        }
     }
 
     public String getOperation() {

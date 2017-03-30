@@ -112,10 +112,12 @@ public class MarketoListOperationWriter extends MarketoWriter {
         // multipleOperations is valid for AddTo and RemoveFrom List
         // while the List doesn't change we accumulate the Lead keys...
         if (isSameListForListOperation(inputRecord) || !listOpeParms.isValid()) {
-            if (!listOpeParms.isValid()) // initial listOperation...
+            // initial listOperation...
+            if (!listOpeParms.isValid()) {
                 listOpeParms = buildListOperationParameters(inputRecord);
-            else
+            } else {
                 addLeadKeyToListOperationParameters(inputRecord);
+            }
             return;
         } else {
             // first process previous list

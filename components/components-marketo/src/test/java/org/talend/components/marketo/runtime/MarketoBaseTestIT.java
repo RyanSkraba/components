@@ -142,8 +142,9 @@ public class MarketoBaseTestIT {
     public static void createDatasets(int numberOfLeads) throws Exception {
         LOG.info("Creating test leads");
         TMarketoOutputProperties p = initClient();
-        if (numberOfLeads < 5)
+        if (numberOfLeads < 5) {
             numberOfLeads = 5;
+        }
         // create leads for tests
         // test attributes
         List<Field> fields = new ArrayList<>();

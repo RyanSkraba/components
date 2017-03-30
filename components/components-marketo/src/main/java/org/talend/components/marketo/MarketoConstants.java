@@ -23,7 +23,6 @@ import org.talend.daikon.avro.SchemaConstants;
 
 /**
  * Common shared schemas and constants
- * 
  */
 public class MarketoConstants {
 
@@ -62,6 +61,10 @@ public class MarketoConstants {
     public static final String FIELD_DEDUPE_FIELDS = "dedupeFields";
 
     public static final String DATETIME_PATTERN_PARAM = "yyyy-MM-dd HH:mm:ss Z";
+
+    public static final String DATETIME_PATTERN_REST = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+
+    public static final String DATETIME_PATTERN_SOAP = "yyyy-MM-dd'T'HH:mm:ss'.000Z'";
 
     /**
      * List Operations
@@ -123,7 +126,6 @@ public class MarketoConstants {
      * At","dataType":"datetime","updateable":false},{"name":"acquiredAt","displayName":"Acquired
      * at","dataType":"date","updateable":true},{"name":"brand","displayName":"Brand","dataType":"string","length":255,"updateable":true},{"name":"customerId","displayName":"Customer
      * Id","dataType":"integer","updateable":true},{"name":"model","displayName":"Model","dataType":"string","length":255,"updateable":true}]}],"success":true}
-     *
      */
     public static Schema getCustomObjectDescribeSchema() {
         return record("CustomObject").fields()//
@@ -131,11 +133,11 @@ public class MarketoConstants {
                 .name("displayName").type().nullable().stringType().noDefault()//
                 .name("description").type().nullable().stringType().noDefault()//
                 .name(FIELD_CREATED_AT)//
-                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'Z'")//
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_REST)//
                 .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
                 .type(AvroUtils._date()).noDefault()//
                 .name(FIELD_UPDATED_AT)//
-                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'Z'")//
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_REST)//
                 .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
                 .type(AvroUtils._date()).noDefault()//
                 .name("idField").type().nullable().stringType().noDefault()//
@@ -152,11 +154,11 @@ public class MarketoConstants {
                 .name(FIELD_MARKETO_GUID).prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().stringType().noDefault()//
                 .name(FIELD_SEQ).type().intType().noDefault()//
                 .name(FIELD_CREATED_AT) //
-                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'Z'")//
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_REST)//
                 .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
                 .type(AvroUtils._date()).noDefault()//
                 .name(FIELD_UPDATED_AT) //
-                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'Z'")//
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_REST)//
                 .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
                 .type(AvroUtils._date()).noDefault()//
                 // .name(FIELD_DEDUPE_FIELDS).type().nullable().stringType().noDefault()//
@@ -202,11 +204,11 @@ public class MarketoConstants {
                 .name("firstName").type().nullable().stringType().noDefault() //
                 .name("lastName").type().nullable().stringType().noDefault() //
                 .name(FIELD_CREATED_AT)//
-                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'Z'")//
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_REST)//
                 .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
                 .type(AvroUtils._date()).noDefault()//
                 .name(FIELD_UPDATED_AT)//
-                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'Z'")//
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_REST)//
                 .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
                 .type(AvroUtils._date()).noDefault()//
                 .endRecord();
@@ -217,7 +219,7 @@ public class MarketoConstants {
                 .name("id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
                 .name("leadId").type().nullable().intType().noDefault() //
                 .name("activityDate")//
-                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'Z'")//
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_REST)//
                 .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
                 .type(AvroUtils._date()).noDefault()//
                 .name("activityTypeId").type().nullable().intType().noDefault() //
@@ -231,7 +233,7 @@ public class MarketoConstants {
                 .name("id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
                 .name("leadId").type().nullable().intType().noDefault() //
                 .name("activityDate")//
-                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'Z'")//
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_REST)//
                 .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
                 .type(AvroUtils._date()).noDefault()//
                 .name("activityTypeId").type().nullable().intType().noDefault() //
@@ -257,7 +259,7 @@ public class MarketoConstants {
         return SchemaBuilder.builder().record("getLeadChanges").fields() //
                 .name("Id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
                 .name("ActivityDateTime")//
-                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'")//
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_SOAP)//
                 .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//
                 .type(AvroUtils._date()).noDefault()//
@@ -272,7 +274,7 @@ public class MarketoConstants {
         return SchemaBuilder.builder().record("getLeadActivity").fields() //
                 .name("Id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
                 .name("ActivityDateTime")//
-                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'")
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_SOAP)
                 .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//
                 .type(AvroUtils._date()).noDefault()//
@@ -284,24 +286,6 @@ public class MarketoConstants {
                 .name("PersonName").type().nullable().stringType().noDefault() //
                 .name("OrgName").type().nullable().stringType().noDefault() //
                 .name("ForeignSysOrgId").type().nullable().stringType().noDefault() //
-                .endRecord();
-    }
-
-    /**
-     * Other stuff
-     */
-    public static Schema getSampleSchema() {
-        return SchemaBuilder.builder().record("getLeadActivity").fields() //
-                .name("ActivityDateTime")//
-                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'")//
-                .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName())//
-                .type().nullable().longType().noDefault()//
-                //
-                .name("ActivityDateTime2")//
-                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'")//
-                .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
-                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")//
-                .type(AvroUtils._date()).noDefault()//
                 .endRecord();
     }
 

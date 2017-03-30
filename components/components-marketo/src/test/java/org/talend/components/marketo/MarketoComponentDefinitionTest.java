@@ -14,10 +14,14 @@ package org.talend.components.marketo;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.ExecutionEngine;
+import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputDefinition;
 
 public class MarketoComponentDefinitionTest {
@@ -47,6 +51,7 @@ public class MarketoComponentDefinitionTest {
     public void testGetFamilies() {
         assertThat(def.getFamilies(), arrayContainingInAnyOrder("Business/Marketo", "Cloud/Marketo"));
     }
+
     @Test
     public void testIsSchemaAutoPropagate() throws Exception {
         assertTrue(def.isSchemaAutoPropagate());
@@ -55,5 +60,10 @@ public class MarketoComponentDefinitionTest {
     @Test
     public void testIsStartable() throws Exception {
         assertTrue(def.isStartable());
+    }
+
+    @Test
+    public void testGetNestedCompatibleComponentPropertiesClass() throws Exception {
+        assertEquals(TMarketoConnectionProperties.class, def.getNestedCompatibleComponentPropertiesClass()[0]);
     }
 }

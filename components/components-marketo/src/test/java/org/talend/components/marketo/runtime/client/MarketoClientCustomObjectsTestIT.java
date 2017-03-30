@@ -177,7 +177,7 @@ public class MarketoClientCustomObjectsTestIT extends MarketoBaseTestIT {
         MarketoSource source = new MarketoSource();
         source.initialize(null, irProps);
         MarketoClientServiceExtended client = (MarketoClientServiceExtended) source.getClientService(null);
-        irProps.customObjectNames.setValue("smartphone_c,roadShow_c");
+        irProps.customObjectNames.setValue("smartphone_c,roadShow_c,car_c");
         MarketoRecordResult result = client.listCustomObjects(irProps);
         assertNotNull(result.getRecords());
         assertEquals(2, result.getRecords().size());
@@ -233,10 +233,6 @@ public class MarketoClientCustomObjectsTestIT extends MarketoBaseTestIT {
         source.initialize(null, irProps);
         MarketoRESTClient client = (MarketoRESTClient) source.getClientService(null);
         irProps.customObjectName.setValue(TEST_CO_NAME_SMARTPHONE);
-        // irProps.customObjectFilterType.setValue(FIELD_CO_SMARTPHONE_BRAND); // cannot search by brand, must be a
-        // dedupe
-        // field.
-        // irProps.customObjectFilterValues.setValue(TEST_SMARTPHONE_BRAND_SAMSUNG);
         irProps.batchSize.setValue(500);
         irProps.schemaInput.schema.setValue(MarketoConstants.getCustomObjectRecordSchema());
         MarketoRecordResult result = client.getCustomObjects(irProps, null);

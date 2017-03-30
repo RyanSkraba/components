@@ -43,8 +43,9 @@ public class MarketoInputWriter extends MarketoWriter {
 
     @Override
     public void write(Object object) throws IOException {
-        if (object == null)
+        if (object == null) {
             return;
+        }
 
         if (null == factory) {
             factory = (IndexedRecordConverter<Object, ? extends IndexedRecord>) GenericAvroRegistry.get()

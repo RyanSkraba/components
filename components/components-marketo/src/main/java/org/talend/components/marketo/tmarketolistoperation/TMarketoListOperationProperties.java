@@ -104,12 +104,14 @@ public class TMarketoListOperationProperties extends MarketoComponentProperties 
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
-        if (connection.apiMode.getValue().equals(APIMode.SOAP))
+        if (connection.apiMode.getValue().equals(APIMode.SOAP)) {
             schemaInput.schema.setValue(MarketoConstants.getListOperationSOAPSchema());
-        else
+        } else {
             schemaInput.schema.setValue(MarketoConstants.getListOperationRESTSchema());
-        if (listOperation.getValue().equals(ListOperation.isMemberOf))
+        }
+        if (listOperation.getValue().equals(ListOperation.isMemberOf)) {
             multipleOperation.setValue(false);
+        }
 
         if (form.getName().equals(Form.MAIN)) {
             switch (listOperation.getValue()) {

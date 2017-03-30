@@ -12,8 +12,10 @@
 // ============================================================================
 package org.talend.components.marketo.runtime.client.rest.type;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
@@ -206,12 +208,14 @@ public class CustomObject {
 
     @Override
     public String toString() {
+        SimpleDateFormat sdf = new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_REST);
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
         final StringBuffer sb = new StringBuffer("CustomObject{");
         sb.append("name='").append(name).append('\'');
         sb.append(", displayName='").append(displayName).append('\'');
         sb.append(", description='").append(description).append('\'');
-        sb.append(", createdAt=").append(createdAt);
-        sb.append(", updatedAt=").append(updatedAt);
+        sb.append(", createdAt=").append(createdAt == null ? "null" : sdf.format(createdAt));
+        sb.append(", updatedAt=").append(updatedAt == null ? "null" : sdf.format(updatedAt));
         sb.append(", idField='").append(idField).append('\'');
         sb.append(", dedupeFields=").append(dedupeFields == null ? "null" : Arrays.asList(dedupeFields).toString());
         sb.append(", searchableFields=").append(searchableFields == null ? "null" : Arrays.deepToString(searchableFields));

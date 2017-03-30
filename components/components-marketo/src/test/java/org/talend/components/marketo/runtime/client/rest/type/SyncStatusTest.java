@@ -17,6 +17,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +53,18 @@ public class SyncStatusTest {
         assertNull(s.getErrorMessage());
         s.setErrorMessage("err");
         assertEquals("err", s.getErrorMessage());
+        s.setSeq(666);
+        assertEquals("666", s.getSeq().toString());
+        s.setMarketoGUID("GUID-123456");
+        assertEquals("GUID-123456", s.getMarketoGUID());
+        assertEquals("", s.getAvailableReason());
+        Map<String, String> reason1 = new HashMap<>();
+        s.setReasons(new ArrayList<Map<String, String>>());
+        assertEquals("", s.getAvailableReason());
+        reason1.put("code", "R1");
+        reason1.put("message", "M1");
+        s.setReasons(Arrays.asList(reason1));
+        assertEquals("[R1] M1.", s.getAvailableReason());
     }
 
     @Test

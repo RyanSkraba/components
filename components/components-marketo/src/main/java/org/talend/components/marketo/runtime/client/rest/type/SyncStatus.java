@@ -74,11 +74,10 @@ public class SyncStatus {
     }
 
     public String getAvailableReason() {
-        if (reasons == null)
+        if (reasons == null || reasons.isEmpty()) {
             return "";
+        }
         Map<String, String> m = reasons.get(0);
-        if (m == null)
-            return "";
         String c = m.get("code");
         String msg = m.get("message");
         return String.format("[%s] %s.", c, msg);

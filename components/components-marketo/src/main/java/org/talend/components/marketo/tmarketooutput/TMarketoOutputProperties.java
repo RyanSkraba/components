@@ -38,9 +38,6 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
-/**
- * Created by undx on 23/01/2017.
- */
 public class TMarketoOutputProperties extends MarketoComponentProperties {
 
     public enum OutputOperation {
@@ -285,8 +282,9 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
         // protect mappings...
         if (fld.size() != mappingInput.size()) {
             List<String> mcn = new ArrayList<>();
-            for (String t : fld)
+            for (String t : fld) {
                 mcn.add("");
+            }
             mappingInput.marketoColumnName.setValue(mcn);
         }
     }

@@ -12,15 +12,12 @@
 // ============================================================================
 package org.talend.components.marketo.runtime;
 
+import java.io.IOException;
+
 import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.SourceOrSink;
-import org.talend.components.api.properties.ComponentProperties;
 
-/**
- * Created by undx on 25/01/2017.
- */
 public interface MarketoSourceOrSinkSchemaProvider extends SourceOrSink {
 
-    Schema getSchemaForParams(ComponentProperties params);
-
+    Schema getSchemaForCustomObject(String customObjectName) throws IOException;
 }

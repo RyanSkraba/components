@@ -34,9 +34,6 @@ import org.talend.components.marketo.tmarketolistoperation.TMarketoListOperation
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
 
-/**
- * Created by undx on 24/01/2017.
- */
 public class TMarketoListOperationPropertiesTest extends MarketoTestBase {
 
     TMarketoListOperationProperties props;

@@ -20,15 +20,23 @@ import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
-public class MarketoSourceOrSinkTestIT {
+public class MarketoSourceOrSinkTestIT extends MarketoBaseTestIT {
 
     MarketoSourceOrSink sos;
+
+    TMarketoInputProperties props;
 
     private transient static final Logger LOG = LoggerFactory.getLogger(MarketoSourceOrSinkTestIT.class);
 
     @Before
     public void setUp() throws Exception {
         sos = new MarketoSourceOrSink();
+        props = new TMarketoInputProperties("test");
+        props.connection.setupProperties();
+        props.setupProperties();
+        props.connection.endpoint.setValue(MarketoBaseTestIT.ENDPOINT_REST);
+        props.connection.clientAccessId.setValue(MarketoBaseTestIT.USERID_REST);
+        props.connection.secretKey.setValue(MarketoBaseTestIT.SECRETKEY_REST);
     }
 
     @Test(expected = IllegalArgumentException.class)

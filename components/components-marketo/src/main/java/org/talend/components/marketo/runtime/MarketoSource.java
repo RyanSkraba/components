@@ -17,6 +17,7 @@ import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
@@ -61,11 +62,21 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
     @Override
     public ValidationResult validate(RuntimeContainer container) {
         ValidationResult vr = super.validate(container);
-        if (vr.getStatus().equals(Result.ERROR))
+        if (vr.getStatus().equals(Result.ERROR)) {
             return vr;
+        }
         if (properties instanceof TMarketoInputProperties) {
             TMarketoInputProperties p = (TMarketoInputProperties) properties;
             boolean useSOAP = properties.getConnectionProperties().apiMode.getValue().equals(APIMode.SOAP);
+            // Validate dynamic schema if needed
+            Boolean isDynamic = AvroUtils.isIncludeAllFields(p.schemaInput.schema.getValue());
+            if (useSOAP) { // no dynamic schema for SOAP !
+                if (isDynamic) {
+                    vr.setStatus(Result.ERROR);
+                    vr.setMessage(messages.getMessage("error.validation.soap.dynamicschema"));
+                    return vr;
+                }
+            }
             ////////////
             // Leads
             ////////////
@@ -80,10 +91,11 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
             // getMultipleLeads
             if (p.inputOperation.getValue().equals(InputOperation.getMultipleLeads)) {
                 LeadSelector sel;
-                if (useSOAP)
+                if (useSOAP) {
                     sel = p.leadSelectorSOAP.getValue();
-                else
+                } else {
                     sel = p.leadSelectorREST.getValue();
+                }
                 switch (sel) {
                 case LeadKeySelector:
                     if (p.leadKeyValues.getValue().isEmpty()) {
@@ -111,6 +123,11 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
             }
             // getLeadActivity
             if (p.inputOperation.getValue().equals(InputOperation.getLeadActivity)) {
+                if (isDynamic) {
+                    vr.setStatus(Result.ERROR);
+                    vr.setMessage(messages.getMessage("error.validation.operation.dynamicschema"));
+                    return vr;
+                }
                 if (useSOAP) {
                     if (p.leadKeyValue.getValue().isEmpty()) {
                         vr.setStatus(Result.ERROR);
@@ -127,6 +144,11 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
             }
             // getLeadChanges
             if (p.inputOperation.getValue().equals(InputOperation.getLeadChanges)) {
+                if (isDynamic) {
+                    vr.setStatus(Result.ERROR);
+                    vr.setMessage(messages.getMessage("error.validation.operation.dynamicschema"));
+                    return vr;
+                }
                 if (useSOAP) {
                     if (p.oldestCreateDate.getValue().isEmpty() || p.latestCreateDate.getValue().isEmpty()
                             || isInvalidDate(p.oldestCreateDate.getValue()) || isInvalidDate(p.latestCreateDate.getValue())) {
@@ -166,8 +188,20 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
                     }
                 }
                 // list no checking...
+                if (p.customObjectAction.getValue().equals(CustomObjectAction.list)) {
+                    if (isDynamic) {
+                        vr.setStatus(Result.ERROR);
+                        vr.setMessage(messages.getMessage("error.validation.operation.dynamicschema"));
+                        return vr;
+                    }
+                }
                 // describe
                 if (p.customObjectAction.getValue().equals(CustomObjectAction.describe)) {
+                    if (isDynamic) {
+                        vr.setStatus(Result.ERROR);
+                        vr.setMessage(messages.getMessage("error.validation.operation.dynamicschema"));
+                        return vr;
+                    }
                     if (p.customObjectName.getValue().isEmpty()) {
                         vr.setStatus(Result.ERROR);
                         vr.setMessage(messages.getMessage("error.validation.customobject.customobjectname"));

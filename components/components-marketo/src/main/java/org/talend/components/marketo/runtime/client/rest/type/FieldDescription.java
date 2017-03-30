@@ -19,6 +19,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.marketo.MarketoConstants;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 
@@ -66,6 +67,14 @@ public class FieldDescription {
 
         public String getName() {
             return name;
+        }
+
+        public ApiFieldName() {
+        }
+
+        public ApiFieldName(String name, Boolean readOnly) {
+            this.name = name;
+            this.readOnly = readOnly;
         }
 
         public void setName(String name) {
@@ -139,8 +148,9 @@ public class FieldDescription {
     }
 
     public String getName() {
-        if (name != null)
+        if (name != null) {
             return name;
+        }
         return rest.getName();
     }
 
@@ -202,18 +212,22 @@ public class FieldDescription {
             LOG.warn("Non managed type : {}. for {}. Defaulting to String.", getDataType(), this);
         }
         Field f = new Field(fname, fs, getDisplayName(), (Object) null);
-        if (getLength() != null)
-            f.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, getLength());
-        if (fs.equals(AvroUtils._date()))
-            f.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd HH:mm:ss");
-        if (updateable != null && !updateable)
+        f.addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, getName());
+        if (getLength() != null) {
+            f.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, getLength().toString());
+        }
+        if (fs.equals(AvroUtils._date())) {
+            f.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, MarketoConstants.DATETIME_PATTERN_REST);
+            f.addProp(SchemaConstants.JAVA_CLASS_FLAG, "java.util.Date");
+        }
+        if (updateable != null && !updateable) {
             f.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
-
+        }
         //
-        if (getId() != null)
-            f.addProp("mktoId", getId());
+        if (getId() != null) {
+            f.addProp("mktoId", getId().toString());
+        }
         f.addProp("mktoType", getDataType());
-
         return f;
     }
 
@@ -227,11 +241,15 @@ public class FieldDescription {
     public static Schema getSchemaForThisFields(String schemaName, FieldDescription[] fields, String[] keys) {
         Schema schema = Schema.createRecord(schemaName, "", "", false);
         List<Field> fieldList = new ArrayList<>();
+        if (fields == null) {
+            return null;
+        }
         for (FieldDescription field : fields) {
             Field f = field.toAvroField();
             for (String key : keys) {
-                if (field.getName().equals(key))
+                if (field.getName().equals(key)) {
                     f.addProp(SchemaConstants.TALEND_COLUMN_IS_KEY, "true");
+                }
             }
             fieldList.add(f);
         }

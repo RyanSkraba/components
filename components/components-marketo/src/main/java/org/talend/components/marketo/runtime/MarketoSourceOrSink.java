@@ -3,9 +3,12 @@ package org.talend.components.marketo.runtime;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.SourceOrSink;
@@ -40,7 +43,7 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
 
     protected static final String KEY_CONNECTION_PROPERTIES = "connection";
 
-    private transient static final Logger LOG = LoggerFactory.getLogger(MarketoSourceOrSink.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MarketoSourceOrSink.class);
 
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(MarketoSourceOrSink.class);
 
@@ -96,8 +99,9 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
         for (IndexedRecord co : r.getRecords()) {
             String name = co.get(0).toString();// name cannot be null
             Object displayName = co.get(1);
-            if (displayName == null)
+            if (displayName == null) {
                 displayName = name;
+            }
             customObjects.add(new SimpleNamedThing(name, displayName.toString()));
         }
         //
@@ -121,15 +125,82 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
         ip.customObjectName.setValue(schemaName);
         Schema describeSchema = MarketoConstants.getCustomObjectDescribeSchema();
         MarketoRecordResult r = client.describeCustomObject(ip);
-        if (!r.isSuccess())
+        if (!r.isSuccess()) {
             return null;
+        }
         List<IndexedRecord> records = r.getRecords();
-        if (records == null || records.isEmpty())
+        if (records == null || records.isEmpty()) {
             return null;
+        }
         IndexedRecord record = records.get(0);
 
         return FieldDescription.getSchemaFromJson(schemaName, record.get(describeSchema.getField("fields").pos()).toString(),
                 record.get(describeSchema.getField("dedupeFields").pos()).toString());
+    }
+
+    @Override
+    public Schema getSchemaForCustomObject(String customObjectName) throws IOException {
+        if (StringUtils.isEmpty(customObjectName)) {
+            return null;
+        }
+        return getEndpointSchema(null, customObjectName);
+    }
+
+    /**
+     * Retrieve schema for Leads or CustomObjects.
+     *
+     * @param the ObjectName to get schema. If blank, assumes it's for Lead fields. Otherwise ObjectName should be the
+     * CustomObject API's name.
+     * 
+     * @return the schema for the given CustomObject or all Lead fields.
+     * 
+     */
+    public Schema getDynamicSchema(String objectName, Schema design) throws IOException {
+        List<Field> designFields = new ArrayList<>();
+        List<String> existingFieldNames = new ArrayList<>();
+        for (Field f : design.getFields()) {
+            existingFieldNames.add(f.name());
+            Field nf = new Field(f.name(), f.schema(), f.doc(), f.defaultVal());
+            nf.getObjectProps().putAll(f.getObjectProps());
+            for (Map.Entry<String, Object> entry : f.getObjectProps().entrySet()) {
+                nf.addProp(entry.getKey(), entry.getValue());
+            }
+            designFields.add(nf);
+        }
+        List<Field> objectFields;
+        List<Field> resultFields = new ArrayList<>();
+        resultFields.addAll(designFields);
+        // will fetch fields...
+        MarketoRESTClient client = (MarketoRESTClient) getClientService(null);
+        if (StringUtils.isEmpty(objectName)) {
+            objectFields = client.getAllLeadFields();
+        } else {
+            objectFields = getSchemaFieldsList(getEndpointSchema(null, objectName));
+        }
+        for (Field f : objectFields) {
+            // test if field isn't already in the schema
+            if (!existingFieldNames.contains(f.name())) {
+                resultFields.add(f);
+            }
+        }
+        Schema resultSchema = Schema.createRecord(design.getName(), design.getDoc(), design.getNamespace(), design.isError());
+        resultSchema.getObjectProps().putAll(design.getObjectProps());
+        resultSchema.setFields(resultFields);
+
+        return resultSchema;
+    }
+
+    public static List<Field> getSchemaFieldsList(Schema schema) {
+        List<Field> result = new ArrayList<>();
+        for (Field f : schema.getFields()) {
+            Field nf = new Field(f.name(), f.schema(), f.doc(), f.defaultVal());
+            nf.getObjectProps().putAll(f.getObjectProps());
+            for (Map.Entry<String, Object> entry : f.getObjectProps().entrySet()) {
+                nf.addProp(entry.getKey(), entry.getValue());
+            }
+            result.add(nf);
+        }
+        return result;
     }
 
     public static ValidationResult validateConnection(MarketoProvideConnectionProperties properties) {
@@ -148,15 +219,17 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
 
     public TMarketoConnectionProperties connect(RuntimeContainer container) {
         TMarketoConnectionProperties connProps = getConnectionProperties();
-        if (connProps == null)
+        if (connProps == null) {
             throw new IllegalArgumentException(messages.getMessage("error.validation.connection.null"));
+        }
         String refComponentId = connProps.getReferencedComponentId();
         TMarketoConnectionProperties shared;
         if (refComponentId != null) {// Using another component's connection
             if (container != null) { // In a runtime container
                 shared = (TMarketoConnectionProperties) container.getComponentData(refComponentId, KEY_CONNECTION_PROPERTIES);
-                if (shared != null)
+                if (shared != null) {
                     return shared;
+                }
             }
             connProps = connProps.getReferencedConnectionProperties(); // Design time
         }
@@ -186,11 +259,6 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkSch
             LOG.debug("ClientService : {}", client);
         }
         return client;
-    }
-
-    @Override
-    public Schema getSchemaForParams(ComponentProperties params) {
-        return null;
     }
 
 }

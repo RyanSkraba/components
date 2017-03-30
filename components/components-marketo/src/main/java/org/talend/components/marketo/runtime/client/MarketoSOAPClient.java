@@ -836,20 +836,24 @@ public class MarketoSOAPClient extends MarketoClient {
             String col = mappings.get(f.name());
             if (col.equals(FIELD_ID)) {
                 final Integer id = (Integer) record.get(f.pos());
-                if (id != null)
+                if (id != null) {
                     lead.setId(objectFactory.createLeadRecordId(id));
+                }
             } else if (col.equals(FIELD_EMAIL)) {
                 final String email = (String) record.get(f.pos());
-                if (email != null)
+                if (email != null) {
                     lead.setEmail(objectFactory.createLeadRecordEmail(email));
+                }
             } else if (col.equals(FIELD_FOREIGN_SYS_PERSON_ID)) {
                 final String fspid = (String) record.get(f.pos());
-                if (fspid != null)
+                if (fspid != null) {
                     lead.setForeignSysPersonId(objectFactory.createLeadRecordForeignSysPersonId(fspid));
+                }
             } else if (col.equals(FIELD_FOREIGN_SYS_TYPE)) {
                 final String fst = (String) record.get(f.pos());
-                if (fst != null)
+                if (fst != null) {
                     lead.setForeignSysType(objectFactory.createLeadRecordForeignSysType(ForeignSysType.valueOf(fst)));
+                }
             } else {
                 Attribute attr = new Attribute();
                 attr.setAttrName(col);
