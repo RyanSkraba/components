@@ -9,60 +9,84 @@
             <defaultValue>org.talend.components</defaultValue>
         </requiredProperty>
         <requiredProperty key="artifactId">
-            <defaultValue>file-input</defaultValue>
+            <defaultValue>components-file</defaultValue>
         </requiredProperty>
         <requiredProperty key="version">
             <defaultValue>0.1.0-SNAPSHOT</defaultValue>
         </requiredProperty>
         <requiredProperty key="package">
-            <defaultValue>org.talend.components.fileinput</defaultValue>
+            <defaultValue>org.talend.components.file</defaultValue>
         </requiredProperty>
         <requiredProperty key="componentName">
             <defaultValue>FileInput</defaultValue>
         </requiredProperty>
-<!--
-        <requiredProperty key="if you want to change one the properties set above say N to the following question.">
-            <defaultValue>_</defaultValue>
+        <requiredProperty key="componentPackage">
+            <defaultValue>tfileinput</defaultValue>
         </requiredProperty>
-        -->
-
     </requiredProperties>
-    <fileSets>
-        <fileSet filtered="true" packaged="true" encoding="UTF-8">
-            <directory>src/main/java</directory>
-            <includes>
-                <include>**/*.java</include>
-            </includes>
-        </fileSet>
-        <fileSet filtered="true" encoding="UTF-8" packaged="true" >
-            <directory>src/main/resources</directory>
-            <includes>
-                <include>**/*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet encoding="UTF-8" packaged="true" >
-            <directory>src/main/resources</directory>
-            <includes>
-                <include>**/*.png</include>
-            </includes>
-        </fileSet>
-        <fileSet encoding="UTF-8" packaged="true" >
-            <directory>src/main/resources</directory>
-            <includes>
-                <include>**/*.svg</include>
-            </includes>
-        </fileSet>
-        <fileSet filtered="true" packaged="true" encoding="UTF-8">
-            <directory>src/test/java</directory>
-            <includes>
-                <include>**/*.java</include>
-            </includes>
-        </fileSet>
-        <fileSet filtered="true" encoding="UTF-8">
-            <directory>src/test/resources</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-        </fileSet>
-    </fileSets>
+    <modules>
+        <module id="${rootArtifactId}-definition" dir="__rootArtifactId__-definition" name="${rootArtifactId}-definition">
+            <fileSets>
+                <fileSet filtered="true" packaged="true" encoding="UTF-8">
+                    <directory>src/main/java</directory>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                </fileSet>
+                <fileSet filtered="true" packaged="true" encoding="UTF-8">
+                    <directory>src/main/resources</directory>
+                    <includes>
+                        <include>**/*.properties</include>
+                    </includes>
+                </fileSet>
+                <fileSet encoding="UTF-8" packaged="true">
+                    <directory>src/main/resources</directory>
+                    <includes>
+                        <include>**/*.svg</include>
+                        <include>**/*.png</include>
+                    </includes>
+                </fileSet>
+                <fileSet filtered="true" packaged="true" encoding="UTF-8">
+                    <directory>src/test/java</directory>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                </fileSet>
+                <fileSet filtered="true" encoding="UTF-8">
+                    <directory>src/test/resources</directory>
+                    <includes>
+                        <include>**/*.*</include>
+                    </includes>
+                </fileSet>
+            </fileSets>
+        </module>
+        <module id="${rootArtifactId}-runtime" dir="__rootArtifactId__-runtime" name="${rootArtifactId}-runtime">
+            <fileSets>
+                <fileSet filtered="true" packaged="true" encoding="UTF-8">
+                    <directory>src/main/java</directory>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                </fileSet>
+				<fileSet filtered="true" packaged="true" encoding="UTF-8">
+                    <directory>src/main/resources</directory>
+                    <includes>
+                        <include>**/*.properties</include>
+                    </includes>
+                </fileSet>
+                <fileSet filtered="true" packaged="true" encoding="UTF-8">
+                    <directory>src/test/java</directory>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                </fileSet>
+                <fileSet filtered="true" encoding="UTF-8">
+                    <directory>src/test/resources</directory>
+                    <includes>
+                        <include>**/*.*</include>
+                    </includes>
+                </fileSet>
+            </fileSets>        
+        </module>        
+    </modules>
 </archetype-descriptor>

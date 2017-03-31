@@ -15,8 +15,10 @@ package ${package};
 import javax.inject.Inject;
 
 import org.junit.Test;
-import org.talend.components.api.service.ComponentService;
+import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.test.AbstractComponentTest2;
+import ${package}.${componentPackage}.${componentName}Definition;
+import org.talend.daikon.definition.Definition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
 
 public class ${componentName}TestBase extends AbstractComponentTest2 {
@@ -31,6 +33,7 @@ public class ${componentName}TestBase extends AbstractComponentTest2 {
     
     @Test
     public void testComponentHasBeenRegistered(){
-        assertComponentIsRegistered("${componentName}");
+        assertComponentIsRegistered(ComponentDefinition.class, "${componentName}", ${componentName}Definition.class);
+        assertComponentIsRegistered(Definition.class, "${componentName}", ${componentName}Definition.class);
     }
 }

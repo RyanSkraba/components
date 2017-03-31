@@ -1,1 +1,1 @@
-clean verify clean
+clean install clean
