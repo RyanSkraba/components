@@ -15,6 +15,7 @@ package org.talend.components.netsuite.output;
 
 import java.util.Map;
 
+import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
@@ -56,5 +57,9 @@ public class NetSuiteWriteOperation implements WriteOperation<Result> {
 
     public NetSuiteOutputProperties getProperties() {
         return properties;
+    }
+
+    public Schema getSchema() {
+        return properties.module.main.schema.getValue();
     }
 }

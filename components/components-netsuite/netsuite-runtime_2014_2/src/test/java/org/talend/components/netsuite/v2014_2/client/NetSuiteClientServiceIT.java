@@ -81,14 +81,15 @@ public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
         NetSuiteClientService<?> connection = webServiceTestFixture.getClientService();
         connection.login();
 
-        Collection<NamedThing> searches = connection.getSearchableTypes();
+        Collection<NamedThing> searches = connection.getMetaDataSource().getSearchableTypes();
 
         for (NamedThing search : searches) {
             assertNotNull(search);
             assertNotNull(search.getName());
             assertNotNull(search.getDisplayName());
 
-            SearchRecordTypeDesc searchRecordInfo = connection.getSearchRecordType(search.getName());
+            SearchRecordTypeDesc searchRecordInfo = connection.getMetaDataSource()
+                    .getSearchRecordType(search.getName());
             assertNotNull("Search record def found: " + search.getName(), searchRecordInfo);
         }
     }

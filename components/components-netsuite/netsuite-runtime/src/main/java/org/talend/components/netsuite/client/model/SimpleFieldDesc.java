@@ -29,10 +29,6 @@ public class SimpleFieldDesc extends FieldDesc {
         this.nullable = nullable;
     }
 
-    public String getInternalName() {
-        return propertyName != null ? propertyName : super.getInternalName();
-    }
-
     public String getPropertyName() {
         return propertyName;
     }
@@ -49,7 +45,6 @@ public class SimpleFieldDesc extends FieldDesc {
         sb.append(", key=").append(key);
         sb.append(", nullable=").append(nullable);
         sb.append(", length=").append(length);
-        sb.append(", internalName='").append(getInternalName()).append('\'');
         sb.append(", propertyName='").append(propertyName).append('\'');
         sb.append('}');
         return sb.toString();

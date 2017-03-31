@@ -73,7 +73,7 @@ public class NsObjectInputTransducerTest extends NetSuiteMockTestBase {
         NetSuiteClientService<?> connection = webServiceMockTestFixture.getClientService();
         connection.login();
 
-        TypeDesc typeDesc = connection.getTypeInfo("Opportunity");
+        TypeDesc typeDesc = connection.getMetaDataSource().getTypeInfo("Opportunity");
 
         final List<Opportunity> recordList = makeNsObjects(new RecordComposer<>(Opportunity.class,
                 Collections.<String, CustomFieldSpec<RecordType, CustomizationFieldType>>emptyMap()), 10);
@@ -96,7 +96,7 @@ public class NsObjectInputTransducerTest extends NetSuiteMockTestBase {
         Collection<String> typeNames = Arrays.asList(RefType.RECORD_REF.getTypeName());
 
         for (String typeName : typeNames) {
-            TypeDesc typeDesc = connection.getTypeInfo(typeName);
+            TypeDesc typeDesc = connection.getMetaDataSource().getTypeInfo(typeName);
 
             final List<?> nsObjects = makeNsObjects(new SimpleObjectComposer<>(typeDesc.getTypeClass()), 10);
 
@@ -116,13 +116,13 @@ public class NsObjectInputTransducerTest extends NetSuiteMockTestBase {
         NetSuiteClientService<?> connection = webServiceMockTestFixture.getClientService();
         connection.login();
 
-        TypeDesc basicTypeDesc = connection.getTypeInfo("Opportunity");
+        TypeDesc basicTypeDesc = connection.getMetaDataSource().getTypeInfo("Opportunity");
 
         final List<Opportunity> recordList = makeNsObjects(new RecordComposer<>(Opportunity.class,
                 Collections.<String, CustomFieldSpec<RecordType, CustomizationFieldType>>emptyMap()), 10);
         mockSearchRequestResults(recordList, 100);
 
-        TypeDesc typeDesc = connection.getTypeInfo(basicTypeDesc.getTypeName());
+        TypeDesc typeDesc = connection.getMetaDataSource().getTypeInfo(basicTypeDesc.getTypeName());
 
         Schema schema = getDynamicSchema();
 

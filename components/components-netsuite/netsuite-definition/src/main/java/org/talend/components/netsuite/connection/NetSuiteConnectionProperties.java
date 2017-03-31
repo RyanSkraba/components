@@ -15,6 +15,7 @@ package org.talend.components.netsuite.connection;
 
 import static org.talend.components.netsuite.NetSuiteComponentDefinition.withRuntime;
 import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
@@ -65,6 +66,8 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
 
     public final Property<String> applicationId = newString("applicationId");
 
+    public final Property<Boolean> customizationEnabled = newBoolean("customizationEnabled");
+
     public final PresentationItem testConnection = new PresentationItem(
             "testConnection", "Test connection");
 
@@ -86,6 +89,7 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
         role.setValue(3);
         account.setValue("");
         applicationId.setValue("");
+        customizationEnabled.setValue(true);
     }
 
     @Override
@@ -100,6 +104,9 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
         mainForm.addRow(role);
         mainForm.addRow(account);
         mainForm.addRow(applicationId);
+
+        Form advForm = new Form(this, Form.ADVANCED);
+        advForm.addRow(customizationEnabled);
 
         // A form for a reference to a connection
         Form refForm = Form.create(this, Form.REFERENCE);
@@ -137,6 +144,8 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
             form.getWidget(role.getName()).setHidden(refConnectionUsed);
             form.getWidget(account.getName()).setHidden(refConnectionUsed);
             form.getWidget(applicationId.getName()).setHidden(refConnectionUsed);
+        } else if (form.getName().equals(Form.ADVANCED)) {
+            form.getWidget(customizationEnabled.getName()).setHidden(refConnectionUsed);
         }
     }
 

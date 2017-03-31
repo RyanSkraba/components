@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.talend.components.netsuite.NetSuiteWebServiceMockTestFixture.assertIndexedRecord;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +41,7 @@ import org.talend.components.netsuite.v2016_2.NetSuiteMockTestBase;
 import org.talend.components.netsuite.v2016_2.NetSuiteRuntimeImpl;
 import org.talend.components.netsuite.v2016_2.NetSuiteSourceImpl;
 
+import com.google.common.collect.Lists;
 import com.netsuite.webservices.v2016_2.lists.accounting.Account;
 
 /**
@@ -78,6 +80,20 @@ public class NetSuiteSearchInputReaderTest extends NetSuiteMockTestBase {
     public void testBasic() throws Exception {
         properties.module.moduleName.setValue("Account");
 
+        properties.module.searchQuery.field.setValue(Lists.newArrayList(
+                "type", "generalRateType")
+        );
+        properties.module.searchQuery.operator.setValue(Lists.newArrayList(
+                "List.anyOf", "List.anyOf")
+        );
+        properties.module.searchQuery.value1.setValue(Lists.newArrayList(
+                (Object) Arrays.asList("bank","otherAsset"),
+                (Object) Arrays.asList("current","historical"))
+        );
+        properties.module.searchQuery.value2.setValue(Lists.newArrayList(
+                null, null)
+        );
+
         NetSuiteRuntime netSuiteRuntime = new NetSuiteRuntimeImpl();
         NetSuiteDatasetRuntime dataSetRuntime = netSuiteRuntime.getDatasetRuntime(properties.getConnectionProperties());
 
@@ -91,7 +107,7 @@ public class NetSuiteSearchInputReaderTest extends NetSuiteMockTestBase {
         mockSearchRequestResults(recordList, 100);
 
         NetSuiteClientService<?> clientService = source.getClientService();
-        TypeDesc typeDesc = clientService.getTypeInfo(Account.class);
+        TypeDesc typeDesc = clientService.getMetaDataSource().getTypeInfo(Account.class);
 
         NetSuiteSearchInputReader reader = (NetSuiteSearchInputReader) source.createReader(
                 mockTestFixture.getRuntimeContainer());

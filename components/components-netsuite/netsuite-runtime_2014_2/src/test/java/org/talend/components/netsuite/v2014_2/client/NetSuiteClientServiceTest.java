@@ -120,7 +120,8 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
 
         for (String searchRecordType : searchRecordTypeNameSet) {
             try {
-                SearchRecordTypeDesc searchRecordInfo = clientService.getSearchRecordType(searchRecordType);
+                SearchRecordTypeDesc searchRecordInfo = clientService.getMetaDataSource()
+                        .getSearchRecordType(searchRecordType);
                 assertNotNull("Search record def found: " + searchRecordType, searchRecordInfo);
             } catch (Exception e) {
                 throw new AssertionError("Search record type: " + searchRecordType, e);
@@ -137,7 +138,7 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
         recordTypeNameSet.add("TimeEntry");
 
         for (String recordType : recordTypeNameSet) {
-            RecordTypeInfo recordTypeInfo = clientService.getRecordType(recordType);
+            RecordTypeInfo recordTypeInfo = clientService.getMetaDataSource().getRecordType(recordType);
             assertNotNull("Record type def found: " + recordType, recordTypeInfo);
         }
     }

@@ -62,6 +62,7 @@ public abstract class AbstractNetSuiteComponentMockTestFixture<PortT> implements
         connectionProperties.role.setValue(3);
         connectionProperties.account.setValue("test");
         connectionProperties.applicationId.setValue("00000000-0000-0000-0000-000000000000");
+        connectionProperties.customizationEnabled.setValue(true);
     }
 
     @Override

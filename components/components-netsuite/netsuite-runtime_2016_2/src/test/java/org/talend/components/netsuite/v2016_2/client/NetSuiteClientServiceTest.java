@@ -49,7 +49,6 @@ import org.talend.components.netsuite.client.model.search.SearchFieldOperatorTyp
 import org.talend.components.netsuite.test.AssertMatcher;
 import org.talend.components.netsuite.test.MessageContextHolder;
 import org.talend.components.netsuite.v2016_2.NetSuiteMockTestBase;
-import org.talend.daikon.properties.property.Property;
 
 import com.netsuite.webservices.v2016_2.platform.NetSuitePortType;
 import com.netsuite.webservices.v2016_2.platform.core.types.RecordType;
@@ -75,7 +74,7 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
     }
 
     /**
-     * TODO Verify headers (applicationInfo etc.)
+     *
      */
     @Test
     public void testConnectAndLogin() throws Exception {
@@ -128,7 +127,8 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
 
         for (String searchRecordType : searchRecordTypeNameSet) {
             try {
-                SearchRecordTypeDesc searchRecordInfo = clientService.getSearchRecordType(searchRecordType);
+                SearchRecordTypeDesc searchRecordInfo = clientService.getMetaDataSource()
+                        .getSearchRecordType(searchRecordType);
                 assertNotNull("Search record def found: " + searchRecordType, searchRecordInfo);
             } catch (Exception e) {
                 throw new AssertionError("Search record type: " + searchRecordType, e);
@@ -147,7 +147,7 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
         recordTypeNameSet.add("TimeEntry");
 
         for (String recordType : recordTypeNameSet) {
-            RecordTypeInfo recordTypeInfo = clientService.getRecordType(recordType);
+            RecordTypeInfo recordTypeInfo = clientService.getMetaDataSource().getRecordType(recordType);
             assertNotNull("Record type def found: " + recordType, recordTypeInfo);
         }
 
@@ -161,25 +161,9 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
         });
         for (SearchFieldOperatorName operatorName : searchFieldOperatorNameList) {
             assertNotNull(operatorName.getDataType());
-
-            String i18nEntry = Property.I18N_PROPERTY_POSSIBLE_VALUE_PREFIX;
-            if (SearchFieldOperatorType.BOOLEAN.dataTypeEquals(operatorName.getDataType())) {
-                i18nEntry += operatorName.getQualifiedName() + ".displayName=" +
-                        operatorName.getDataType() +
-                        " (true | false)";
-            } else {
-                if (SearchFieldOperatorType.DATE.dataTypeEquals(operatorName.getDataType())) {
-                    i18nEntry += operatorName.getQualifiedName() + ".displayName=" +
-                            operatorName.getDataType() + " - " + operatorName.getName() +
-                            " (yyyy-MM-dd HH:mm:ss)";
-                } else {
-                    i18nEntry += operatorName.getQualifiedName() + ".displayName=" +
-                            operatorName.getDataType() + " - " + operatorName.getName();
-                }
-
+            if (!SearchFieldOperatorType.BOOLEAN.dataTypeEquals(operatorName.getDataType())) {
                 assertNotNull(operatorName.getName());
             }
-            System.out.println(i18nEntry);
         }
     }
 

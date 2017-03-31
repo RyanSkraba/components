@@ -13,13 +13,8 @@
 
 package org.talend.components.netsuite.client.model.search;
 
-import static org.talend.components.netsuite.client.model.beans.Beans.setProperty;
 import static org.talend.components.netsuite.client.model.beans.Beans.setSimpleProperty;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 
 import javax.xml.datatype.DatatypeConfigurationException;

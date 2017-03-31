@@ -20,7 +20,9 @@ import org.talend.daikon.exception.error.ErrorCode;
 import org.talend.daikon.exception.json.JsonErrorCode;
 
 /**
+ * Thrown when NetSuite related error occurs.
  *
+ * @see org.talend.components.netsuite.NetSuiteErrorCode
  */
 public class NetSuiteException extends TalendRuntimeException {
 
@@ -32,6 +34,14 @@ public class NetSuiteException extends TalendRuntimeException {
     public NetSuiteException(String message, Throwable cause) {
         super(CommonErrorCodes.UNEXPECTED_EXCEPTION, cause,
                 ExceptionContext.build().put(ExceptionContext.KEY_MESSAGE, message));
+    }
+
+    public NetSuiteException(ErrorCode code, String message) {
+        super(code, ExceptionContext.build().put(ExceptionContext.KEY_MESSAGE, message));
+    }
+
+    public NetSuiteException(ErrorCode code, String message, Throwable cause) {
+        super(code, cause, ExceptionContext.build().put(ExceptionContext.KEY_MESSAGE, message));
     }
 
     public NetSuiteException(ErrorCode code, Throwable cause, ExceptionContext context) {

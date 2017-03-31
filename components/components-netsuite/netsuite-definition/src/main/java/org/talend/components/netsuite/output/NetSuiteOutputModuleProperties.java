@@ -56,6 +56,9 @@ public class NetSuiteOutputModuleProperties extends NetSuiteModuleProperties {
         mainForm.addRow(main.getForm(Form.REFERENCE));
         mainForm.addRow(action);
 
+        Form advForm = Form.create(this, Form.ADVANCED);
+        advForm.addRow(connection.getForm(Form.ADVANCED));
+
         Form refForm = Form.create(this, Form.REFERENCE);
         refForm.addRow(widget(moduleName)
                 .setWidgetType(Widget.NAME_SELECTION_REFERENCE_WIDGET_TYPE)

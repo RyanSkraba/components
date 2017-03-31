@@ -87,7 +87,7 @@ public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
         NetSuiteClientService<?> connection = webServiceTestFixture.getClientService();
         connection.login();
 
-        Collection<RecordTypeInfo> recordTypes = connection.getRecordTypes();
+        Collection<RecordTypeInfo> recordTypes = connection.getMetaDataSource().getRecordTypes();
         RecordTypeInfo recordType = getCustomRecordType(recordTypes, "customrecord_campaign_revenue");
 
         SearchQuery searchQuery = connection.newSearch();
@@ -106,14 +106,15 @@ public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
         NetSuiteClientService<?> connection = webServiceTestFixture.getClientService();
         connection.login();
 
-        Collection<NamedThing> searches = connection.getSearchableTypes();
+        Collection<NamedThing> searches = connection.getMetaDataSource().getSearchableTypes();
 
         for (NamedThing search : searches) {
             assertNotNull(search);
             assertNotNull(search.getName());
             assertNotNull(search.getDisplayName());
 
-            SearchRecordTypeDesc searchRecordInfo = connection.getSearchRecordType(search.getName());
+            SearchRecordTypeDesc searchRecordInfo = connection.getMetaDataSource()
+                    .getSearchRecordType(search.getName());
             assertNotNull("Search record def found: " + search.getName(), searchRecordInfo);
         }
     }
@@ -125,7 +126,7 @@ public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        Collection<RecordTypeInfo> recordTypes = connection.getRecordTypes();
+        Collection<RecordTypeInfo> recordTypes = connection.getMetaDataSource().getRecordTypes();
         stopWatch.stop();
 
         for (RecordTypeInfo recordType : recordTypes) {
@@ -141,9 +142,10 @@ public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        RecordTypeInfo recordType = connection.getRecordType("customrecord_campaign_revenue");
+        RecordTypeInfo recordType = connection.getMetaDataSource()
+                .getRecordType("customrecord_campaign_revenue");
 
-        TypeDesc typeDesc = connection.getTypeInfo(recordType.getName());
+        TypeDesc typeDesc = connection.getMetaDataSource().getTypeInfo(recordType.getName());
         logger.debug("Record type desc: {}", typeDesc.getTypeName());
 
         stopWatch.stop();
@@ -157,7 +159,7 @@ public class NetSuiteClientServiceIT extends AbstractNetSuiteTestBase {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         for (RecordTypeDesc recordType : Arrays.asList(RecordTypeEnum.OPPORTUNITY, RecordTypeEnum.CALENDAR_EVENT)) {
-            TypeDesc typeDesc = connection.getTypeInfo(recordType.getTypeName());
+            TypeDesc typeDesc = connection.getMetaDataSource().getTypeInfo(recordType.getTypeName());
             logger.debug("Record type desc: {}", typeDesc.getTypeName());
         }
         stopWatch.stop();

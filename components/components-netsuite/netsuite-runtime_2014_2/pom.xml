@@ -18,8 +18,6 @@
     </properties>
 
     <dependencies>
-
-
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>netsuite-definition</artifactId>
@@ -131,6 +129,13 @@
                     <excludes>
                         <exclude>com/netsuite/webservices/**/*</exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <excludePackageNames>com.netsuite.webservices.*</excludePackageNames>
                 </configuration>
             </plugin>
 

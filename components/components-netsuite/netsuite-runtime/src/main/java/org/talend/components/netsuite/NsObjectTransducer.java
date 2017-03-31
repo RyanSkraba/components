@@ -18,7 +18,9 @@ import static org.talend.components.netsuite.client.model.beans.Beans.getPropert
 import static org.talend.components.netsuite.client.model.beans.Beans.getSimpleProperty;
 import static org.talend.components.netsuite.client.model.beans.Beans.setSimpleProperty;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -33,24 +35,48 @@ import org.apache.avro.Schema;
 import org.joda.time.DateTimeZone;
 import org.joda.time.MutableDateTime;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.components.netsuite.client.MetaDataSource;
 import org.talend.components.netsuite.client.NetSuiteClientService;
+import org.talend.components.netsuite.client.NetSuiteException;
+import org.talend.components.netsuite.client.NsRef;
+import org.talend.components.netsuite.client.model.BasicMetaData;
 import org.talend.components.netsuite.client.model.CustomFieldDesc;
 import org.talend.components.netsuite.client.model.FieldDesc;
+import org.talend.components.netsuite.client.model.SimpleFieldDesc;
 import org.talend.components.netsuite.client.model.TypeDesc;
 import org.talend.components.netsuite.client.model.beans.BeanInfo;
 import org.talend.components.netsuite.client.model.beans.Beans;
 import org.talend.components.netsuite.client.model.beans.EnumAccessor;
 import org.talend.components.netsuite.client.model.customfield.CustomFieldRefType;
 import org.talend.daikon.di.DiSchemaConstants;
+import org.talend.daikon.exception.ExceptionContext;
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.DatabindContext;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.cfg.MapperConfig;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
+import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
+import com.fasterxml.jackson.databind.type.SimpleType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 /**
  *
  */
 public abstract class NsObjectTransducer {
+    public static final String JSON_NS_TYPE_PROPERTY_NAME = "nsType";
 
     protected NetSuiteClientService<?> clientService;
+    protected MetaDataSource metaDataSource;
 
     protected final DatatypeFactory datatypeFactory;
+
+    protected final ObjectMapper objectMapper;
 
     protected Map<Class<?>, ValueConverter<?, ?>> valueConverterCache = new HashMap<>();
 
@@ -62,6 +88,24 @@ public abstract class NsObjectTransducer {
         } catch (DatatypeConfigurationException e) {
             throw new ComponentException(e);
         }
+
+        objectMapper = new ObjectMapper();
+
+        objectMapper.setDefaultTyping(new NsTypeResolverBuilder(clientService.getBasicMetaData()));
+
+        // Register JAXB annotation module to perform mapping of data model objects to/from JSON.
+        JaxbAnnotationModule jaxbAnnotationModule = new JaxbAnnotationModule();
+        objectMapper.registerModule(jaxbAnnotationModule);
+
+        setMetaDataSource(clientService.getMetaDataSource());
+    }
+
+    public MetaDataSource getMetaDataSource() {
+        return metaDataSource;
+    }
+
+    public void setMetaDataSource(MetaDataSource metaDataSource) {
+        this.metaDataSource = metaDataSource;
     }
 
     public NetSuiteClientService<?> getClientService() {
@@ -70,6 +114,10 @@ public abstract class NsObjectTransducer {
 
     public DatatypeFactory getDatatypeFactory() {
         return datatypeFactory;
+    }
+
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
     }
 
     protected Schema getDynamicSchema(TypeDesc typeDesc, Schema designSchema, String targetSchemaName) {
@@ -81,7 +129,7 @@ public abstract class NsObjectTransducer {
         if (dynamicPosProp != null) {
             Set<String> designFieldNames = new HashSet<>(designSchema.getFields().size());
             for (Schema.Field field : designSchema.getFields()) {
-                String fieldName = field.name();
+                String fieldName = NetSuiteDatasetRuntimeImpl.getNsFieldName(field);
                 designFieldNames.add(fieldName);
             }
 
@@ -108,7 +156,8 @@ public abstract class NsObjectTransducer {
                     }
 
                     // Add fields of design schema
-                    Schema.Field avroField = new Schema.Field(field.name(), field.schema(), null, field.defaultVal());
+                    Schema.Field avroField = new Schema.Field(
+                            field.name(), field.schema(), null, field.defaultVal());
                     Map<String, Object> fieldProps = field.getObjectProps();
                     for (String propName : fieldProps.keySet()) {
                         Object propValue = fieldProps.get(propName);
@@ -149,31 +198,30 @@ public abstract class NsObjectTransducer {
 
     protected Schema.Field createSchemaField(FieldDesc fieldDesc) {
         Schema avroFieldType = NetSuiteDatasetRuntimeImpl.inferSchemaForField(fieldDesc);
-        Schema.Field avroField = new Schema.Field(fieldDesc.getName(), avroFieldType, null, null);
+        Schema.Field avroField = new Schema.Field(fieldDesc.getName(), avroFieldType, null, (Object) null);
         return avroField;
     }
 
     protected Map<String, Object> getMapView(Object nsObject, Schema schema, TypeDesc typeDesc) {
-        BeanInfo beanInfo = Beans.getBeanInfo(typeDesc.getTypeClass());
-
         Map<String, Object> valueMap = new HashMap<>();
 
+        BeanInfo beanInfo = Beans.getBeanInfo(typeDesc.getTypeClass());
         Map<String, FieldDesc> fieldMap = typeDesc.getFieldMap();
 
         Map<String, CustomFieldDesc> customFieldMap = new HashMap<>();
         for (Schema.Field field : schema.getFields()) {
-            String fieldName = field.name();
-            FieldDesc fieldDesc = fieldMap.get(fieldName);
+            String nsFieldName = NetSuiteDatasetRuntimeImpl.getNsFieldName(field);
+            FieldDesc fieldDesc = fieldMap.get(nsFieldName);
 
             if (fieldDesc == null) {
                 continue;
             }
 
             if (fieldDesc instanceof CustomFieldDesc) {
-                customFieldMap.put(fieldName, (CustomFieldDesc) fieldDesc);
+                customFieldMap.put(nsFieldName, (CustomFieldDesc) fieldDesc);
             } else {
-                Object value = getSimpleProperty(nsObject, fieldDesc.getInternalName());
-                valueMap.put(fieldName, value);
+                Object value = getSimpleProperty(nsObject, fieldDesc.getName());
+                valueMap.put(nsFieldName, value);
             }
         }
 
@@ -211,72 +259,103 @@ public abstract class NsObjectTransducer {
         }
     }
 
-    protected Object writeField(Object nsObject, FieldDesc fieldDesc, Object value) {
-        ValueConverter valueConverter = getValueConverter(fieldDesc);
+    protected void writeField(Object nsObject, FieldDesc fieldDesc, Map<String, Object> customFieldMap,
+            boolean replace, Collection<String> nullFieldNames, Object value) {
         if (fieldDesc instanceof CustomFieldDesc) {
-            CustomFieldDesc customFieldInfo = fieldDesc.asCustom();
-            Object targetValue = valueConverter.convertOutput(value);
+            writeCustomField(nsObject, fieldDesc.asCustom(), customFieldMap, replace, nullFieldNames, value);
+        } else {
+            writeSimpleField(nsObject, fieldDesc.asSimple(), replace, nullFieldNames, value);
+        }
+    }
 
-            if (targetValue != null) {
-                CustomFieldRefType customFieldRefType = customFieldInfo.getCustomFieldType();
+    protected void writeCustomField(Object nsObject, CustomFieldDesc fieldDesc, Map<String, Object> customFieldMap,
+            boolean replace, Collection<String> nullFieldNames, Object value) {
 
-                Object customFieldListWrapper = getSimpleProperty(nsObject, "customFieldList");
-                if (customFieldListWrapper == null) {
-                    customFieldListWrapper = clientService.getBasicMetaData()
-                            .createInstance("CustomFieldList");
-                    setSimpleProperty(nsObject, "customFieldList", customFieldListWrapper);
-                }
-                List<Object> customFieldList = (List<Object>) getSimpleProperty(
-                        customFieldListWrapper, "customField");
+        NsRef ref = fieldDesc.getRef();
+        CustomFieldRefType customFieldRefType = fieldDesc.getCustomFieldType();
 
-                Object customField = clientService.getBasicMetaData()
-                        .createInstance(customFieldRefType.getTypeName());
-                setSimpleProperty(customField, "scriptId", customFieldInfo.getRef().getScriptId());
-                setSimpleProperty(customField, "internalId", customFieldInfo.getRef().getInternalId());
+        Object customFieldListWrapper = getSimpleProperty(nsObject, "customFieldList");
+        if (customFieldListWrapper == null) {
+            customFieldListWrapper = clientService.getBasicMetaData().createInstance("CustomFieldList");
+            setSimpleProperty(nsObject, "customFieldList", customFieldListWrapper);
+        }
+        List<Object> customFieldList = (List<Object>) getSimpleProperty(customFieldListWrapper, "customField");
 
-                setSimpleProperty(customField, "value", targetValue);
+        Object customField = customFieldMap.get(ref.getScriptId());
+        ValueConverter valueConverter = getValueConverter(fieldDesc);
+
+        Object targetValue = valueConverter.convertOutput(value);
+
+        if (targetValue == null) {
+            if (replace && customField != null && customFieldList != null) {
+                customFieldList.remove(customField);
+                nullFieldNames.add(fieldDesc.getName());
+            }
+        } else {
+            if (customField == null) {
+                customField = clientService.getBasicMetaData().createInstance(customFieldRefType.getTypeName());
+
+                setSimpleProperty(customField, "scriptId", ref.getScriptId());
+                setSimpleProperty(customField, "internalId", ref.getInternalId());
 
                 customFieldList.add(customField);
-
-                return targetValue;
+                customFieldMap.put(ref.getScriptId(), customField);
             }
 
-        } else {
-            Object targetValue = valueConverter.convertOutput(value);
-
-            if (targetValue != null) {
-                setSimpleProperty(nsObject, fieldDesc.getInternalName(), targetValue);
-                return targetValue;
-            }
+            setSimpleProperty(customField, "value", targetValue);
         }
+    }
 
-        return null;
+    protected void writeSimpleField(Object nsObject, SimpleFieldDesc fieldDesc,
+            boolean replace, Collection<String> nullFieldNames, Object value) {
+
+        ValueConverter valueConverter = getValueConverter(fieldDesc);
+
+        Object targetValue = valueConverter.convertOutput(value);
+
+        if (targetValue == null) {
+            if (replace) {
+                setSimpleProperty(nsObject, fieldDesc.getPropertyName(), null);
+                nullFieldNames.add(fieldDesc.getName());
+            }
+        } else {
+            setSimpleProperty(nsObject, fieldDesc.getPropertyName(), targetValue);
+        }
+    }
+
+    protected Class<?> getCustomFieldValueConverterTargetClass(CustomFieldRefType customFieldRefType) {
+        Class<?> valueClass;
+        switch (customFieldRefType) {
+        case BOOLEAN:
+            valueClass = Boolean.class;
+            break;
+        case STRING:
+            valueClass = String.class;
+            break;
+        case LONG:
+            valueClass = Long.class;
+            break;
+        case DOUBLE:
+            valueClass = Double.class;
+            break;
+        case DATE:
+            valueClass = XMLGregorianCalendar.class;
+            break;
+        case SELECT:
+        case MULTI_SELECT:
+        default:
+            valueClass = null;
+            break;
+        }
+        return valueClass;
     }
 
     public ValueConverter<?, ?> getValueConverter(FieldDesc fieldDesc) {
         Class<?> valueClass = null;
-
         if (fieldDesc instanceof CustomFieldDesc) {
-            CustomFieldDesc customFieldInfo = (CustomFieldDesc) fieldDesc;
-            CustomFieldRefType customFieldRefType = customFieldInfo.getCustomFieldType();
-
-            switch (customFieldRefType) {
-            case BOOLEAN:
-                valueClass = Boolean.TYPE;
-                break;
-            case STRING:
-                valueClass = String.class;
-                break;
-            case LONG:
-                valueClass = Long.class;
-                break;
-            case DOUBLE:
-                valueClass = Double.class;
-                break;
-            case DATE:
-                valueClass = XMLGregorianCalendar.class;
-                break;
-            }
+            CustomFieldDesc customFieldDesc = (CustomFieldDesc) fieldDesc;
+            CustomFieldRefType customFieldRefType = customFieldDesc.getCustomFieldType();
+            valueClass = getCustomFieldValueConverterTargetClass(customFieldRefType);
         } else {
             valueClass = fieldDesc.getValueType();
         }
@@ -291,7 +370,7 @@ public abstract class NsObjectTransducer {
         return converter;
     }
 
-    protected ValueConverter<?, ?> getValueConverter(Class<?> valueClass) {
+    public ValueConverter<?, ?> getValueConverter(Class<?> valueClass) {
         ValueConverter<?, ?> converter = valueConverterCache.get(valueClass);
         if (converter == null) {
             converter = createValueConverter(valueClass);
@@ -314,6 +393,8 @@ public abstract class NsObjectTransducer {
         } else if (valueClass.isEnum()) {
             Class<Enum> enumClass = (Class<Enum>) valueClass;
             return new EnumValueConverter<>(enumClass, getEnumAccessor(enumClass));
+        } else if (!valueClass.isPrimitive()) {
+            return new JsonValueConverter<>(objectMapper, valueClass);
         }
         return null;
     }
@@ -449,5 +530,113 @@ public abstract class NsObjectTransducer {
         }
     }
 
-}
+    public static class JsonValueConverter<T> implements ValueConverter<T, String> {
+        protected Class<T> clazz;
+        protected ObjectReader objectReader;
+        protected ObjectWriter objectWriter;
 
+        public JsonValueConverter(ObjectMapper objectMapper, Class<T> clazz) {
+            this.clazz = clazz;
+
+            objectWriter = objectMapper.writer().forType(clazz);
+            objectReader = objectMapper.reader().forType(clazz);
+        }
+
+        @Override
+        public String convertInput(T value) {
+            if (value == null) {
+                return null;
+            }
+            try {
+                return objectWriter.writeValueAsString(value);
+            } catch (IOException e) {
+                throw new NetSuiteException(new NetSuiteErrorCode("JSON_PROCESSING"), e,
+                        ExceptionContext.build().put(ExceptionContext.KEY_MESSAGE, e.getMessage()));
+            }
+        }
+
+        @Override
+        public T convertOutput(String value) {
+            if (value == null) {
+                return null;
+            }
+            try {
+                return objectReader.readValue(value);
+            } catch (IOException e) {
+                throw new NetSuiteException(new NetSuiteErrorCode("JSON_PROCESSING"), e,
+                        ExceptionContext.build().put(ExceptionContext.KEY_MESSAGE, e.getMessage()));
+            }
+        }
+    }
+
+    protected static class NsTypeResolverBuilder extends ObjectMapper.DefaultTypeResolverBuilder {
+        protected BasicMetaData basicMetaData;
+
+        protected NsTypeResolverBuilder(BasicMetaData basicMetaData) {
+            super(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE);
+
+            this.basicMetaData = basicMetaData;
+
+            init(JsonTypeInfo.Id.NAME, null);
+            inclusion(JsonTypeInfo.As.PROPERTY);
+            typeProperty(JSON_NS_TYPE_PROPERTY_NAME);
+        }
+
+        @Override
+        public boolean useForType(JavaType t) {
+            if (t.isCollectionLikeType()) {
+                return false;
+            }
+            if (t.getRawClass() == XMLGregorianCalendar.class) {
+                return false;
+            }
+            return super.useForType(t);
+        }
+
+        @Override
+        protected TypeIdResolver idResolver(MapperConfig<?> config, JavaType baseType,
+                Collection<NamedType> subtypes, boolean forSer, boolean forDeser) {
+
+            if (_idType == null) {
+                throw new IllegalStateException("Can not build, 'init()' not yet called");
+            }
+
+            return new NsTypeIdResolver(baseType, config.getTypeFactory(), basicMetaData);
+        }
+    }
+
+    protected static class NsTypeIdResolver extends TypeIdResolverBase {
+        protected BasicMetaData basicMetaData;
+
+        protected NsTypeIdResolver(JavaType baseType, TypeFactory typeFactory, BasicMetaData basicMetaData) {
+            super(baseType, typeFactory);
+
+            this.basicMetaData = basicMetaData;
+        }
+
+        @Override
+        public JavaType typeFromId(DatabindContext context, String id) {
+            Class<?> clazz = basicMetaData.getTypeClass(id);
+            if (clazz == null) {
+                return null;
+            }
+            JavaType javaType = SimpleType.construct(clazz);
+            return javaType;
+        }
+
+        @Override
+        public String idFromValue(Object value) {
+            return value.getClass().getSimpleName();
+        }
+
+        @Override
+        public String idFromValueAndType(Object value, Class<?> suggestedType) {
+            return suggestedType.getSimpleName();
+        }
+
+        @Override
+        public JsonTypeInfo.Id getMechanism() {
+            return JsonTypeInfo.Id.NAME;
+        }
+    }
+}

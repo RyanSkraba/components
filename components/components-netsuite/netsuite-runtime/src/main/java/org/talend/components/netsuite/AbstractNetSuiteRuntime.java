@@ -13,10 +13,10 @@
 
 package org.talend.components.netsuite;
 
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.netsuite.client.NetSuiteClientFactory;
 import org.talend.components.netsuite.client.NetSuiteException;
 import org.talend.components.netsuite.connection.NetSuiteConnectionProperties;
+import org.talend.components.netsuite.util.ComponentExceptions;
 import org.talend.daikon.properties.ValidationResult;
 
 /**
@@ -46,12 +46,8 @@ public abstract class AbstractNetSuiteRuntime implements NetSuiteRuntime {
 
     @Override
     public NetSuiteDatasetRuntime getDatasetRuntime(NetSuiteConnectionProperties properties) {
-        try {
-            NetSuiteEndpoint endpoint = getEndpoint(context, properties);
-            return new NetSuiteDatasetRuntimeImpl(endpoint.getClientService());
-        } catch (NetSuiteException e) {
-            throw new ComponentException(e);
-        }
+        NetSuiteEndpoint endpoint = getEndpoint(context, properties);
+        return new NetSuiteDatasetRuntimeImpl(endpoint.getClientService().getMetaDataSource());
     }
 
     @Override
@@ -61,10 +57,7 @@ public abstract class AbstractNetSuiteRuntime implements NetSuiteRuntime {
             endpoint.connect();
             return ValidationResult.OK;
         } catch (NetSuiteException e) {
-            ValidationResult result = new ValidationResult();
-            result.setStatus(ValidationResult.Result.ERROR);
-            result.setMessage(e.getMessage());
-            return result;
+            return ComponentExceptions.exceptionToValidationResult(e);
         }
     }
 

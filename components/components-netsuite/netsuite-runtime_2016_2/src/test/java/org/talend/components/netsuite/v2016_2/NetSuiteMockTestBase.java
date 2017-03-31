@@ -47,6 +47,8 @@ import com.netsuite.webservices.v2016_2.platform.messages.GetCustomizationIdRequ
 import com.netsuite.webservices.v2016_2.platform.messages.GetCustomizationIdResponse;
 import com.netsuite.webservices.v2016_2.platform.messages.GetListRequest;
 import com.netsuite.webservices.v2016_2.platform.messages.GetListResponse;
+import com.netsuite.webservices.v2016_2.platform.messages.GetRequest;
+import com.netsuite.webservices.v2016_2.platform.messages.GetResponse;
 import com.netsuite.webservices.v2016_2.platform.messages.ReadResponse;
 import com.netsuite.webservices.v2016_2.platform.messages.ReadResponseList;
 import com.netsuite.webservices.v2016_2.platform.messages.SearchMoreWithIdRequest;
@@ -73,6 +75,21 @@ public abstract class NetSuiteMockTestBase extends AbstractNetSuiteTestBase {
         mockTestFixture = new NetSuiteComponentMockTestFixture(webServiceMockTestFixture);
         mockTestFixture.setReinstall(true);
         testFixtures.add(mockTestFixture);
+    }
+
+    protected <T extends Record> void mockGetRequestResults(final T record) throws Exception {
+        final NetSuitePortType port = webServiceMockTestFixture.getPortMock();
+
+        when(port.get(any(GetRequest.class))).then(new Answer<GetResponse>() {
+            @Override public GetResponse answer(InvocationOnMock invocationOnMock) throws Throwable {
+                GetResponse response = new GetResponse();
+                ReadResponse readResponse = new ReadResponse();
+                readResponse.setStatus(createSuccessStatus());
+                readResponse.setRecord(record);
+                response.setReadResponse(readResponse);
+                return response;
+            }
+        });
     }
 
     protected <T extends Record> void mockSearchRequestResults(List<T> recordList, int pageSize) throws Exception {

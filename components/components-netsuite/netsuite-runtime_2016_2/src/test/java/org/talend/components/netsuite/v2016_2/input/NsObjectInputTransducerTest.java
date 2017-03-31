@@ -80,7 +80,7 @@ public class NsObjectInputTransducerTest extends NetSuiteMockTestBase {
         NetSuiteClientService<?> connection = webServiceMockTestFixture.getClientService();
         connection.login();
 
-        TypeDesc typeDesc = connection.getTypeInfo("Opportunity");
+        TypeDesc typeDesc = connection.getMetaDataSource().getTypeInfo("Opportunity");
 
         final Map<String, CustomFieldSpec<RecordType, CustomizationFieldType>> customFieldSpecs =
                 createCustomFieldSpecs();
@@ -110,7 +110,7 @@ public class NsObjectInputTransducerTest extends NetSuiteMockTestBase {
         );
 
         for (String typeName : typeNames) {
-            TypeDesc typeDesc = connection.getTypeInfo(typeName);
+            TypeDesc typeDesc = connection.getMetaDataSource().getTypeInfo(typeName);
 
             final List<?> nsObjects = makeNsObjects(new SimpleObjectComposer<>(typeDesc.getTypeClass()), 10);
 
@@ -130,7 +130,7 @@ public class NsObjectInputTransducerTest extends NetSuiteMockTestBase {
         NetSuiteClientService<?> connection = webServiceMockTestFixture.getClientService();
         connection.login();
 
-        TypeDesc basicTypeDesc = connection.getTypeInfo("Opportunity");
+        TypeDesc basicTypeDesc = connection.getMetaDataSource().getTypeInfo("Opportunity");
 
         final Map<String, CustomFieldSpec<RecordType, CustomizationFieldType>> customFieldSpecs =
                 createCustomFieldSpecs();
@@ -140,7 +140,7 @@ public class NsObjectInputTransducerTest extends NetSuiteMockTestBase {
                 new RecordComposer<>(Opportunity.class, customFieldSpecs), 10);
         mockSearchRequestResults(recordList, 100);
 
-        TypeDesc typeDesc = connection.getTypeInfo(basicTypeDesc.getTypeName());
+        TypeDesc typeDesc = connection.getMetaDataSource().getTypeInfo(basicTypeDesc.getTypeName());
 
         Schema schema = getDynamicSchema();
 
@@ -163,27 +163,27 @@ public class NsObjectInputTransducerTest extends NetSuiteMockTestBase {
         NetSuiteClientService<?> connection = webServiceMockTestFixture.getClientService();
         connection.login();
 
-        TypeDesc basicTypeDesc = connection.getTypeInfo("Check");
+        TypeDesc basicTypeDesc = connection.getMetaDataSource().getTypeInfo("Check");
 
         final List<Check> recordList = makeNsObjects(
                 new SimpleObjectComposer<>(Check.class), 10);
         mockSearchRequestResults(recordList, 100);
 
-        TypeDesc typeDesc = connection.getTypeInfo(basicTypeDesc.getTypeName());
+        TypeDesc typeDesc = connection.getMetaDataSource().getTypeInfo(basicTypeDesc.getTypeName());
 
         Schema designSchema = SchemaBuilder.record(typeDesc.getTypeName())
                 .fields()
                 // Field 1
                 .name("InternalId")
-                .type(NetSuiteDatasetRuntimeImpl.inferSchemaForField(typeDesc.getField("InternalId")))
+                .type(NetSuiteDatasetRuntimeImpl.inferSchemaForField(typeDesc.getField("internalId")))
                 .noDefault()
                 // Field 2
                 .name("TranId")
-                .type(NetSuiteDatasetRuntimeImpl.inferSchemaForField(typeDesc.getField("TranId")))
+                .type(NetSuiteDatasetRuntimeImpl.inferSchemaForField(typeDesc.getField("tranId")))
                 .noDefault()
                 // Field 3
                 .name("LastModifiedDate")
-                .type(NetSuiteDatasetRuntimeImpl.inferSchemaForField(typeDesc.getField("LastModifiedDate")))
+                .type(NetSuiteDatasetRuntimeImpl.inferSchemaForField(typeDesc.getField("lastModifiedDate")))
                 .noDefault()
                 //
                 .endRecord();
@@ -211,27 +211,27 @@ public class NsObjectInputTransducerTest extends NetSuiteMockTestBase {
         NetSuiteClientService<?> connection = webServiceMockTestFixture.getClientService();
         connection.login();
 
-        TypeDesc basicTypeDesc = connection.getTypeInfo("Check");
+        TypeDesc basicTypeDesc = connection.getMetaDataSource().getTypeInfo("Check");
 
         final List<Check> recordList = makeNsObjects(
                 new SimpleObjectComposer<>(Check.class), 10);
         mockSearchRequestResults(recordList, 100);
 
-        TypeDesc typeDesc = connection.getTypeInfo(basicTypeDesc.getTypeName());
+        TypeDesc typeDesc = connection.getMetaDataSource().getTypeInfo(basicTypeDesc.getTypeName());
 
         Schema designSchema = SchemaBuilder.record(typeDesc.getTypeName())
                 .fields()
                 // Field 1
                 .name("InternalId")
-                .type(NetSuiteDatasetRuntimeImpl.inferSchemaForField(typeDesc.getField("InternalId")))
+                .type(NetSuiteDatasetRuntimeImpl.inferSchemaForField(typeDesc.getField("internalId")))
                 .noDefault()
                 // Field 2
                 .name("TranId")
-                .type(NetSuiteDatasetRuntimeImpl.inferSchemaForField(typeDesc.getField("TranId")))
+                .type(NetSuiteDatasetRuntimeImpl.inferSchemaForField(typeDesc.getField("tranId")))
                 .noDefault()
                 // Field 3
                 .name("LastModifiedDate")
-                .type(NetSuiteDatasetRuntimeImpl.inferSchemaForField(typeDesc.getField("LastModifiedDate")))
+                .type(NetSuiteDatasetRuntimeImpl.inferSchemaForField(typeDesc.getField("lastModifiedDate")))
                 .noDefault()
                 //
                 .endRecord();

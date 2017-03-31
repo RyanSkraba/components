@@ -35,6 +35,11 @@ public class SearchQueryProperties extends ComponentPropertiesImpl {
     private static final TypeLiteral<List<String>> LIST_STRING_TYPE = new TypeLiteral<List<String>>() {};
 
     /**
+     *
+     */
+    private static final TypeLiteral<List<Object>> LIST_OBJECT_TYPE = new TypeLiteral<List<Object>>() {};
+
+    /**
      * Named constructor to be used is these properties are nested in other properties. Do not subclass this method for
      * initialization, use {@link #init()} instead.
      *
@@ -48,9 +53,9 @@ public class SearchQueryProperties extends ComponentPropertiesImpl {
 
     public final Property<List<String>> operator = newProperty(LIST_STRING_TYPE, "operator");
 
-    public final Property<List<String>> value1 = newProperty(LIST_STRING_TYPE, "value1");
+    public final Property<List<Object>> value1 = newProperty(LIST_OBJECT_TYPE, "value1");
 
-    public final Property<List<String>> value2 = newProperty(LIST_STRING_TYPE, "value2");
+    public final Property<List<Object>> value2 = newProperty(LIST_OBJECT_TYPE, "value2");
 
     @Override
     public void setupLayout() {

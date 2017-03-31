@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.talend.components.netsuite.client.MetaDataSource;
 import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NetSuiteException;
 import org.talend.components.netsuite.client.NsRef;
@@ -44,6 +45,7 @@ import org.talend.components.netsuite.client.model.search.SearchFieldType;
 public class SearchQuery<SearchT, RecT> {
 
     protected NetSuiteClientService<?> clientService;
+    protected MetaDataSource metaDataSource;
 
     protected String recordTypeName;
     protected RecordTypeInfo recordTypeInfo;
@@ -57,15 +59,16 @@ public class SearchQuery<SearchT, RecT> {
 
     protected List<Object> customFieldList = new ArrayList<>();
 
-    public SearchQuery(NetSuiteClientService<?> clientService) throws NetSuiteException {
+    public SearchQuery(NetSuiteClientService<?> clientService, MetaDataSource metaDataSource) throws NetSuiteException {
         this.clientService = clientService;
+        this.metaDataSource = metaDataSource != null ? metaDataSource : clientService.getMetaDataSource();
     }
 
     public SearchQuery target(final String recordTypeName) throws NetSuiteException {
         this.recordTypeName = recordTypeName;
 
-        recordTypeInfo = clientService.getRecordType(recordTypeName);
-        searchRecordTypeDesc = clientService.getSearchRecordType(recordTypeName);
+        recordTypeInfo = metaDataSource.getRecordType(recordTypeName);
+        searchRecordTypeDesc = metaDataSource.getSearchRecordType(recordTypeName);
 
         // search not found or not supported
         if (searchRecordTypeDesc == null) {
@@ -185,7 +188,7 @@ public class SearchQuery<SearchT, RecT> {
             String searchOperator = condition.getOperatorName();
             List<String> searchValue = condition.getValues();
 
-            SearchFieldAdapter<?> fieldAdapter = clientService.getBasicMetaData().getSearchFieldAdapter(fieldType);
+            SearchFieldAdapter<?> fieldAdapter = metaDataSource.getBasicMetaData().getSearchFieldAdapter(fieldType);
             Object searchField = fieldAdapter.populate(searchFieldName, searchOperator, searchValue);
 
             return searchField;
@@ -199,7 +202,7 @@ public class SearchQuery<SearchT, RecT> {
 
         BasicRecordType basicRecordType = BasicRecordType.getByType(searchRecordTypeDesc.getType());
         if (BasicRecordType.TRANSACTION == basicRecordType) {
-            SearchFieldAdapter<?> fieldAdapter = clientService.getBasicMetaData()
+            SearchFieldAdapter<?> fieldAdapter = metaDataSource.getBasicMetaData()
                     .getSearchFieldAdapter(SearchFieldType.SELECT);
             Object searchTypeField = fieldAdapter.populate(
                     "List.anyOf", Arrays.asList(recordTypeInfo.getRecordType().getType()));
@@ -209,7 +212,7 @@ public class SearchQuery<SearchT, RecT> {
             CustomRecordTypeInfo customRecordTypeInfo = (CustomRecordTypeInfo) recordTypeInfo;
             NsRef customizationRef = customRecordTypeInfo.getRef();
 
-            Object recType = clientService.getBasicMetaData().createInstance(RefType.CUSTOMIZATION_REF.getTypeName());
+            Object recType = metaDataSource.getBasicMetaData().createInstance(RefType.CUSTOMIZATION_REF.getTypeName());
             setProperty(recType, "scriptId", customizationRef.getScriptId());
             setProperty(recType, "internalId", customizationRef.getInternalId());
 
@@ -218,7 +221,7 @@ public class SearchQuery<SearchT, RecT> {
 
 
         if (!customFieldList.isEmpty()) {
-            Object customFieldListWrapper = clientService.getBasicMetaData()
+            Object customFieldListWrapper = metaDataSource.getBasicMetaData()
                     .createInstance("SearchCustomFieldList");
             List<Object> customFields = (List<Object>) getProperty(customFieldListWrapper, "customField");
             for (Object customField : customFieldList) {

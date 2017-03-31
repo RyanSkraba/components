@@ -52,7 +52,7 @@ public class NetSuiteSearchInputReaderIT extends AbstractNetSuiteTestBase {
     private final NetSuiteClientFactory<NetSuitePortType> clientFactory = new NetSuiteClientFactoryImpl() {
         @Override public NetSuiteClientService<NetSuitePortType> createClient() throws NetSuiteException {
             NetSuiteClientService<NetSuitePortType> service = super.createClient();
-            service.setCustomizationEnabled(webServiceTestFixture.getClientService().isCustomizationEnabled());
+            service.getMetaDataSource().setCustomizationEnabled(webServiceTestFixture.getClientService().getMetaDataSource().isCustomizationEnabled());
             return service;
         }
     };
@@ -93,8 +93,8 @@ public class NetSuiteSearchInputReaderIT extends AbstractNetSuiteTestBase {
         properties.module.afterModuleName();
         properties.module.searchQuery.field.setValue(Arrays.asList("Type"));
         properties.module.searchQuery.operator.setValue(Arrays.asList("List.anyOf"));
-        properties.module.searchQuery.value1.setValue(Arrays.asList("Bank"));
-        properties.module.searchQuery.value2.setValue(Arrays.asList((String) null));
+        properties.module.searchQuery.value1.setValue(Arrays.<Object>asList("Bank"));
+        properties.module.searchQuery.value2.setValue(Arrays.<Object>asList((String) null));
 
         NetSuiteSource source = new NetSuiteSourceImpl();
         source.initialize(container, properties);

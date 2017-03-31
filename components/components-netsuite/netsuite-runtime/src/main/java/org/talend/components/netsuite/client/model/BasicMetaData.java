@@ -191,7 +191,7 @@ public abstract class BasicMetaData {
         customFieldAdapterMap.put(adapter.getType(), adapter);
     }
 
-    protected Class<?> getTypeClass(String typeName) {
+    public Class<?> getTypeClass(String typeName) {
         Class<?> clazz = typeMap.get(typeName);
         if (clazz != null) {
             return clazz;
@@ -215,7 +215,7 @@ public abstract class BasicMetaData {
         List<FieldDesc> fields = new ArrayList<>(propertyInfos.size());
 
         for (PropertyInfo propertyInfo : propertyInfos) {
-            String fieldName = toInitialUpper(propertyInfo.getName());
+            String fieldName = propertyInfo.getName();
 
             Class fieldValueType = propertyInfo.getReadType();
             if ((propertyInfo.getName().equals("class") && fieldValueType == Class.class)) {

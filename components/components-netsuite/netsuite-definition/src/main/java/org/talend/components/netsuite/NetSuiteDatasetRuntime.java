@@ -37,5 +37,4 @@ public interface NetSuiteDatasetRuntime {
     Schema getSchemaForDelete(String typeName);
 
     List<String> getSearchFieldOperators();
-
 }

@@ -50,7 +50,6 @@ public class CustomFieldDesc extends FieldDesc {
         sb.append(", key=").append(key);
         sb.append(", nullable=").append(nullable);
         sb.append(", length=").append(length);
-        sb.append(", internalName='").append(getInternalName()).append('\'');
         sb.append(", ref=").append(ref);
         sb.append(", customFieldType=").append(customFieldType);
         sb.append('}');

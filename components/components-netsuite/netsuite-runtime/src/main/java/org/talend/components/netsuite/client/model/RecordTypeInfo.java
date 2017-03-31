@@ -13,6 +13,8 @@
 
 package org.talend.components.netsuite.client.model;
 
+import org.talend.components.netsuite.client.NsRef;
+
 /**
  *
  */
@@ -40,6 +42,19 @@ public class RecordTypeInfo {
 
     public RecordTypeDesc getRecordType() {
         return recordType;
+    }
+
+    public RefType getRefType() {
+        return RefType.RECORD_REF;
+    }
+
+    public NsRef createRef(String internalId, String externalId) {
+        NsRef ref = new NsRef();
+        ref.setRefType(getRefType());
+        ref.setType(getRecordType().getType());
+        ref.setInternalId(internalId);
+        ref.setExternalId(externalId);
+        return ref;
     }
 
     @Override

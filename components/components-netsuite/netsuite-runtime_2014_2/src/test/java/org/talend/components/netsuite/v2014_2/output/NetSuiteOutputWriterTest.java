@@ -97,8 +97,10 @@ public class NetSuiteOutputWriterTest extends NetSuiteMockTestBase {
     public void testUpdate() throws Exception {
         final NetSuitePortType port = webServiceMockTestFixture.getPortMock();
 
-        final TypeDesc typeDesc = webServiceMockTestFixture.getClientService().getTypeInfo(
-                RecordTypeEnum.OPPORTUNITY.getTypeName());
+        final TypeDesc typeDesc = webServiceMockTestFixture.getClientService().getMetaDataSource()
+                .getTypeInfo(RecordTypeEnum.OPPORTUNITY.getTypeName());
+
+        mockGetRequestResults(null);
 
         final List<Opportunity> updatedRecordList = new ArrayList<>();
         when(port.update(any(UpdateRequest.class))).then(new Answer<UpdateResponse>() {
@@ -162,9 +164,10 @@ public class NetSuiteOutputWriterTest extends NetSuiteMockTestBase {
     public void testDelete() throws Exception {
         final NetSuitePortType port = webServiceMockTestFixture.getPortMock();
 
-        final TypeDesc typeDesc = webServiceMockTestFixture.getClientService().getTypeInfo(
-                RecordTypeEnum.OPPORTUNITY.getTypeName());
-        final TypeDesc refTypeDesc = webServiceMockTestFixture.getClientService().getTypeInfo(RefType.RECORD_REF.getTypeName());
+        final TypeDesc typeDesc = webServiceMockTestFixture.getClientService().getMetaDataSource()
+                .getTypeInfo(RecordTypeEnum.OPPORTUNITY.getTypeName());
+        final TypeDesc refTypeDesc = webServiceMockTestFixture.getClientService().getMetaDataSource()
+                .getTypeInfo(RefType.RECORD_REF.getTypeName());
 
         properties.module.moduleName.setValue(typeDesc.getTypeName());
         properties.module.action.setValue(OutputAction.DELETE);

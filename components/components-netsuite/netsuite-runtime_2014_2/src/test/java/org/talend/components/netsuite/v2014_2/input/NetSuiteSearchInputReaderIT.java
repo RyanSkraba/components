@@ -80,8 +80,8 @@ public class NetSuiteSearchInputReaderIT extends AbstractNetSuiteTestBase {
         properties.module.afterModuleName();
         properties.module.searchQuery.field.setValue(Arrays.asList("Type"));
         properties.module.searchQuery.operator.setValue(Arrays.asList("List.anyOf"));
-        properties.module.searchQuery.value1.setValue(Arrays.asList("Bank"));
-        properties.module.searchQuery.value2.setValue(Arrays.asList((String) null));
+        properties.module.searchQuery.value1.setValue(Arrays.<Object>asList("Bank"));
+        properties.module.searchQuery.value2.setValue(Arrays.<Object>asList((String) null));
 
         NetSuiteSource source = new NetSuiteSourceImpl();
         source.initialize(container, properties);

@@ -14,7 +14,8 @@
 package org.talend.components.netsuite.input;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -26,12 +27,14 @@ import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.netsuite.NetSuiteSource;
+import org.talend.components.netsuite.SchemaCustomMetaDataSource;
+import org.talend.components.netsuite.client.MetaDataSource;
 import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NetSuiteException;
+import org.talend.components.netsuite.client.ResultSet;
 import org.talend.components.netsuite.client.model.RecordTypeInfo;
 import org.talend.components.netsuite.client.search.SearchCondition;
 import org.talend.components.netsuite.client.search.SearchQuery;
-import org.talend.components.netsuite.client.ResultSet;
 
 /**
  *
@@ -39,10 +42,11 @@ import org.talend.components.netsuite.client.ResultSet;
 public class NetSuiteSearchInputReader extends AbstractBoundedReader<IndexedRecord> {
 
     private transient NetSuiteClientService<?> clientService;
+    private transient MetaDataSource metaDataSource;
 
     private transient NsObjectInputTransducer transducer;
 
-    private transient Schema searchSchema;
+    private transient Schema schema;
 
     private NetSuiteInputProperties properties;
 
@@ -66,8 +70,19 @@ public class NetSuiteSearchInputReader extends AbstractBoundedReader<IndexedReco
     @Override
     public boolean start() throws IOException {
         try {
+            schema = properties.module.main.schema.getValue();
+
             clientService = ((NetSuiteSource) getCurrentSource()).getClientService();
+
+            MetaDataSource originalMetaDataSource = clientService.getMetaDataSource();
+            metaDataSource = clientService.createDefaultMetaDataSource();
+            metaDataSource.setCustomizationEnabled(originalMetaDataSource.isCustomizationEnabled());
+            SchemaCustomMetaDataSource schemaCustomMetaDataSource = new SchemaCustomMetaDataSource(
+                    clientService.getBasicMetaData(), originalMetaDataSource.getCustomMetaDataSource(), schema);
+            metaDataSource.setCustomMetaDataSource(schemaCustomMetaDataSource);
+
             resultSet = search();
+
             return advance();
         } catch (NetSuiteException e) {
             throw new IOException(e);
@@ -107,11 +122,21 @@ public class NetSuiteSearchInputReader extends AbstractBoundedReader<IndexedReco
     }
 
     protected ResultSet<?> search() throws NetSuiteException {
-        searchSchema = properties.module.main.schema.getValue();
+        SearchQuery search = buildSearchQuery();
 
+        RecordTypeInfo recordTypeInfo = search.getRecordTypeInfo();
+
+        transducer = new NsObjectInputTransducer(clientService, schema, recordTypeInfo.getName());
+        transducer.setMetaDataSource(metaDataSource);
+
+        ResultSet<?> resultSet = search.search();
+        return resultSet;
+    }
+
+    protected SearchQuery buildSearchQuery() {
         String target = properties.module.moduleName.getStringValue();
 
-        SearchQuery search = clientService.newSearch();
+        SearchQuery search = clientService.newSearch(metaDataSource);
         search.target(target);
 
         List<String> fieldNames = properties.module.searchQuery.field.getValue();
@@ -119,21 +144,48 @@ public class NetSuiteSearchInputReader extends AbstractBoundedReader<IndexedReco
             for (int i = 0; i < fieldNames.size(); i++) {
                 String fieldName = fieldNames.get(i);
                 String operator = properties.module.searchQuery.operator.getValue().get(i);
-                String value1 = properties.module.searchQuery.value1.getValue().get(i);
-                String value2 = properties.module.searchQuery.value2.getValue().get(i);
-                List<String> values = null;
-                if (StringUtils.isNotEmpty(value1)) {
-                    values = StringUtils.isNotEmpty(value2) ? Arrays.asList(value1, value2) : Arrays.asList(value1);
-                }
-                search.condition(new SearchCondition(fieldName, operator, values));
+                Object value1 = properties.module.searchQuery.value1.getValue().get(i);
+                Object value2 = properties.module.searchQuery.value2.getValue().get(i);
+                search.condition(buildSearchCondition(fieldName, operator, value1, value2));
             }
         }
 
-        RecordTypeInfo recordTypeInfo = search.getRecordTypeInfo();
-        transducer = new NsObjectInputTransducer(clientService, searchSchema, recordTypeInfo.getName());
+        return search;
+    }
 
-        ResultSet<?> resultSet = search.search();
-        return resultSet;
+    protected SearchCondition buildSearchCondition(String fieldName, String operator, Object value1, Object value2) {
+        List<String> values = buildSearchConditionValueList(value1, value2);
+        return new SearchCondition(fieldName, operator, values);
+    }
+
+    protected List<String> buildSearchConditionValueList(Object value1, Object value2) {
+        if (value1 == null) {
+            return null;
+        }
+
+        List<String> valueList;
+        if (value1 instanceof Collection) {
+            Collection<?> elements = (Collection<?>) value1;
+            valueList = new ArrayList<>(elements.size());
+            for (Object elemValue : elements) {
+                if (elemValue != null) {
+                    valueList.add(elemValue.toString());
+                }
+            }
+        } else {
+            valueList = new ArrayList<>(2);
+            String sValue1 = value1 != null ? value1.toString() : null;
+            if (StringUtils.isNotEmpty(sValue1)) {
+                valueList.add(sValue1);
+
+                String sValue2 = value2 != null ? value2.toString() : null;
+                if (StringUtils.isNotEmpty(sValue2)) {
+                    valueList.add(sValue2);
+                }
+            }
+        }
+
+        return valueList;
     }
 
     protected IndexedRecord transduceRecord(Object record) throws IOException {

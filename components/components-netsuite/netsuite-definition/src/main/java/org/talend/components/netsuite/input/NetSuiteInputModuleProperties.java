@@ -54,6 +54,9 @@ public class NetSuiteInputModuleProperties extends NetSuiteModuleProperties {
         mainForm.addRow(widget(searchQuery)
                 .setWidgetType(Widget.TABLE_WIDGET_TYPE));
 
+        Form advForm = Form.create(this, Form.ADVANCED);
+        advForm.addRow(connection.getForm(Form.ADVANCED));
+
         Form refForm = Form.create(this, Form.REFERENCE);
         refForm.addRow(widget(moduleName)
                 .setWidgetType(Widget.NAME_SELECTION_REFERENCE_WIDGET_TYPE)
@@ -109,8 +112,8 @@ public class NetSuiteInputModuleProperties extends NetSuiteModuleProperties {
         searchQuery.operator.setPossibleValues(getSearchFieldOperators());
         searchQuery.operator.setValue(new ArrayList<String>());
 
-        searchQuery.value1.setValue(new ArrayList<String>());
-        searchQuery.value2.setValue(new ArrayList<String>());
+        searchQuery.value1.setValue(new ArrayList<>());
+        searchQuery.value2.setValue(new ArrayList<>());
 
         searchQuery.refreshLayout(searchQuery.getForm(Form.MAIN));
     }

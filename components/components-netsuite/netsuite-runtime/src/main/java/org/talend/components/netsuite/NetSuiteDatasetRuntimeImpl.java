@@ -13,20 +13,31 @@
 
 package org.talend.components.netsuite;
 
+import static org.talend.components.netsuite.client.model.beans.Beans.toInitialLower;
+import static org.talend.components.netsuite.client.model.beans.Beans.toInitialUpper;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.apache.avro.JsonProperties;
 import org.apache.avro.Schema;
+import org.apache.commons.lang3.StringUtils;
 import org.talend.components.api.exception.ComponentException;
-import org.talend.components.netsuite.client.NetSuiteClientService;
+import org.talend.components.netsuite.client.MetaDataSource;
 import org.talend.components.netsuite.client.NetSuiteException;
+import org.talend.components.netsuite.client.NsRef;
+import org.talend.components.netsuite.client.model.BasicMetaData;
 import org.talend.components.netsuite.client.model.CustomFieldDesc;
+import org.talend.components.netsuite.client.model.CustomRecordTypeInfo;
 import org.talend.components.netsuite.client.model.FieldDesc;
+import org.talend.components.netsuite.client.model.RecordTypeDesc;
 import org.talend.components.netsuite.client.model.RecordTypeInfo;
 import org.talend.components.netsuite.client.model.RefType;
 import org.talend.components.netsuite.client.model.SearchRecordTypeDesc;
@@ -39,21 +50,22 @@ import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
+import org.talend.daikon.di.DiSchemaConstants;
 
 /**
  *
  */
 public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
-    private NetSuiteClientService<?> clientService;
+    private MetaDataSource metaDataSource;
 
-    public NetSuiteDatasetRuntimeImpl(NetSuiteClientService<?> clientService) throws NetSuiteException {
-        this.clientService = clientService;
+    public NetSuiteDatasetRuntimeImpl(MetaDataSource metaDataSource) throws NetSuiteException {
+        this.metaDataSource = metaDataSource;
     }
 
     @Override
     public List<NamedThing> getRecordTypes() {
         try {
-            Collection<RecordTypeInfo> recordTypeList = clientService.getRecordTypes();
+            Collection<RecordTypeInfo> recordTypeList = metaDataSource.getRecordTypes();
 
             List<NamedThing> recordTypes = new ArrayList<>(recordTypeList.size());
             for (RecordTypeInfo recordTypeInfo : recordTypeList) {
@@ -75,17 +87,24 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
     @Override
     public Schema getSchema(String typeName) {
         try {
-            TypeDesc typeDesc = clientService.getTypeInfo(typeName);
+            final RecordTypeInfo recordTypeInfo = metaDataSource.getRecordType(typeName);
+            final TypeDesc typeDesc = metaDataSource.getTypeInfo(typeName);
 
             List<FieldDesc> fieldDescList = new ArrayList<>(typeDesc.getFields());
-            // Sort by name alphabetically
             Collections.sort(fieldDescList, new Comparator<FieldDesc>() {
                 @Override public int compare(FieldDesc o1, FieldDesc o2) {
-                    return o1.getName().compareTo(o2.getName());
+                    int result = Boolean.compare(o1.isKey(), o2.isKey());
+                    if (result != 0) {
+                        return result * -1;
+                    }
+                    result = o1.getName().compareTo(o2.getName());
+                    return result;
                 }
             });
 
-            Schema schema = inferSchemaForType(typeDesc.getTypeName(), typeDesc.getFields());
+            Schema schema = inferSchemaForType(typeDesc.getTypeName(), fieldDescList);
+            augmentSchemaWithCustomMetaData(schema, recordTypeInfo, fieldDescList);
+
             return schema;
         } catch (NetSuiteException e) {
             throw new ComponentException(e);
@@ -95,7 +114,7 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
     @Override
     public List<NamedThing> getSearchableTypes() {
         try {
-            List<NamedThing> searchableTypes = new ArrayList<>(clientService.getSearchableTypes());
+            List<NamedThing> searchableTypes = new ArrayList<>(metaDataSource.getSearchableTypes());
             // Sort by display name alphabetically
             Collections.sort(searchableTypes, new Comparator<NamedThing>() {
                 @Override public int compare(NamedThing o1, NamedThing o2) {
@@ -111,8 +130,8 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
     @Override
     public SearchInfo getSearchInfo(String typeName) {
         try {
-            final SearchRecordTypeDesc searchInfo = clientService.getSearchRecordType(typeName);
-            final TypeDesc searchRecordInfo = clientService.getBasicMetaData()
+            final SearchRecordTypeDesc searchInfo = metaDataSource.getSearchRecordType(typeName);
+            final TypeDesc searchRecordInfo = metaDataSource.getBasicMetaData()
                     .getTypeInfo(searchInfo.getSearchBasicClass());
 
             List<FieldDesc> fieldDescList = searchRecordInfo.getFields();
@@ -139,8 +158,13 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
     @Override
     public Schema getSchemaForUpdate(String typeName) {
         try {
-            final TypeDesc typeDesc = clientService.getTypeInfo(typeName);
-            return NetSuiteDatasetRuntimeImpl.inferSchemaForType(typeDesc.getTypeName(), typeDesc.getFields());
+            final RecordTypeInfo recordTypeInfo = metaDataSource.getRecordType(typeName);
+            final TypeDesc typeDesc = metaDataSource.getTypeInfo(typeName);
+
+            Schema schema = NetSuiteDatasetRuntimeImpl.inferSchemaForType(typeDesc.getTypeName(), typeDesc.getFields());
+            augmentSchemaWithCustomMetaData(schema, recordTypeInfo, typeDesc.getFields());
+
+            return schema;
         } catch (NetSuiteException e) {
             throw new ComponentException(e);
         }
@@ -149,8 +173,14 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
     @Override
     public Schema getSchemaForDelete(String typeName) {
         try {
-            final TypeDesc typeDesc = clientService.getTypeInfo(RefType.RECORD_REF.getTypeName());
-            return NetSuiteDatasetRuntimeImpl.inferSchemaForType(typeDesc.getTypeName(), typeDesc.getFields());
+            final RecordTypeInfo referencedRecordTypeInfo = metaDataSource.getRecordType(typeName);
+            final RefType refType = referencedRecordTypeInfo.getRefType();
+            final TypeDesc typeDesc = metaDataSource.getTypeInfo(refType.getTypeName());
+
+            Schema schema = NetSuiteDatasetRuntimeImpl.inferSchemaForType(typeDesc.getTypeName(), typeDesc.getFields());
+            augmentSchemaWithCustomMetaData(schema, referencedRecordTypeInfo, null);
+
+            return schema;
         } catch (NetSuiteException e) {
             throw new ComponentException(e);
         }
@@ -159,7 +189,7 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
     @Override
     public List<String> getSearchFieldOperators() {
         List<SearchFieldOperatorName> operatorList =
-                new ArrayList<>(clientService.getBasicMetaData().getSearchOperatorNames());
+                new ArrayList<>(metaDataSource.getBasicMetaData().getSearchOperatorNames());
         List<String> operatorNames = new ArrayList<>(operatorList.size());
         for (SearchFieldOperatorName operatorName : operatorList) {
             operatorNames.add(operatorName.getQualifiedName());
@@ -180,12 +210,16 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
         List<Schema.Field> fields = new ArrayList<>();
 
         for (FieldDesc fieldDesc : fieldDescList) {
+            final String fieldName = fieldDesc.getName();
+            final String avroFieldName = toInitialUpper(fieldName);
 
-            Schema.Field avroField = new Schema.Field(fieldDesc.getName(),
+            Schema.Field avroField = new Schema.Field(avroFieldName,
                     inferSchemaForField(fieldDesc), null, (Object) null);
 
             // Add some Talend6 custom properties to the schema.
             Schema avroFieldSchema = AvroUtils.unwrapIfNullable(avroField.schema());
+
+            avroField.addProp(DiSchemaConstants.TALEND6_COLUMN_ORIGINAL_DB_COLUMN_NAME, fieldDesc.getName());
 
             if (AvroUtils.isSameType(avroFieldSchema, AvroUtils._string())) {
                 if (fieldDesc.getLength() != 0) {
@@ -197,11 +231,15 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
                 CustomFieldDesc customFieldInfo = (CustomFieldDesc) fieldDesc;
                 CustomFieldRefType customFieldRefType = customFieldInfo.getCustomFieldType();
 
+                avroField.addProp(DiSchemaConstants.TALEND6_COLUMN_SOURCE_TYPE, customFieldRefType.getTypeName());
+
                 if (customFieldRefType == CustomFieldRefType.DATE) {
                     avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'");
                 }
             } else {
                 Class<?> fieldType = fieldDesc.getValueType();
+
+                avroField.addProp(DiSchemaConstants.TALEND6_COLUMN_SOURCE_TYPE, fieldType.getSimpleName());
 
                 if (fieldType == XMLGregorianCalendar.class) {
                     avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'");
@@ -278,6 +316,236 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
         base = fieldDesc.isNullable() ? AvroUtils.wrapAsNullable(base) : base;
 
         return base;
+    }
+
+    /**
+     * Augment a given <code>Schema</code> with customization related meta data.
+     *
+     * @param schema schema to be augmented
+     * @param recordTypeInfo information about record type to be used for augmentation
+     * @param fieldDescList list of field descriptors to be used for augmentation
+     */
+    protected void augmentSchemaWithCustomMetaData(final Schema schema,
+            final RecordTypeInfo recordTypeInfo, final Collection<FieldDesc> fieldDescList) {
+
+        if (recordTypeInfo == null) {
+            // Not a record, do nothing
+            return;
+        }
+
+        // Add custom record type meta data to a key field
+        if (recordTypeInfo instanceof CustomRecordTypeInfo) {
+            CustomRecordTypeInfo customRecordTypeInfo = (CustomRecordTypeInfo) recordTypeInfo;
+            Schema.Field keyField = getNsFieldByName(schema, "internalId");
+            if (keyField != null) {
+                writeCustomRecord(metaDataSource.getBasicMetaData(), keyField, customRecordTypeInfo);
+            }
+        }
+
+        // Add custom field meta data to fields
+        if (fieldDescList != null && !fieldDescList.isEmpty()) {
+            Map<String, CustomFieldDesc> customFieldDescMap = getCustomFieldDescMap(fieldDescList);
+            if (!customFieldDescMap.isEmpty()) {
+                for (Schema.Field field : schema.getFields()) {
+                    String nsFieldName = getNsFieldName(field);
+                    CustomFieldDesc customFieldDesc = customFieldDescMap.get(nsFieldName);
+                    if (customFieldDesc != null) {
+                        writeCustomField(field, customFieldDesc);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Write custom record meta data to a given <code>JsonProperties</code>.
+     *
+     * @see NetSuiteSchemaConstants
+     *
+     * @param basicMetaData basic meta data
+     * @param properties properties object which to write meta data to
+     * @param recordTypeInfo information about record type to be used
+     */
+    public static void writeCustomRecord(BasicMetaData basicMetaData, JsonProperties properties, CustomRecordTypeInfo recordTypeInfo) {
+        NsRef ref = recordTypeInfo.getRef();
+        RecordTypeDesc recordTypeDesc = recordTypeInfo.getRecordType();
+
+        properties.addProp(NetSuiteSchemaConstants.NS_CUSTOM_RECORD, "true");
+        properties.addProp(NetSuiteSchemaConstants.NS_CUSTOM_RECORD_SCRIPT_ID, ref.getScriptId());
+        properties.addProp(NetSuiteSchemaConstants.NS_CUSTOM_RECORD_INTERNAL_ID, ref.getInternalId());
+        properties.addProp(NetSuiteSchemaConstants.NS_CUSTOM_RECORD_CUSTOMIZATION_TYPE, ref.getType());
+        properties.addProp(NetSuiteSchemaConstants.NS_CUSTOM_RECORD_TYPE, recordTypeDesc.getType());
+    }
+
+    /**
+     * Read custom record meta data from a given <code>JsonProperties</code>.
+     *
+     * @see NetSuiteSchemaConstants
+     *
+     * @param basicMetaData basic meta data
+     * @param properties properties object which to read meta data from
+     * @return custom record type info or <code>null</code> if meta data was not found
+     */
+    public static CustomRecordTypeInfo readCustomRecord(BasicMetaData basicMetaData, JsonProperties properties) {
+        String scriptId = properties.getProp(NetSuiteSchemaConstants.NS_CUSTOM_RECORD_SCRIPT_ID);
+        if (StringUtils.isEmpty(scriptId)) {
+            return null;
+        }
+        String internalId = properties.getProp(NetSuiteSchemaConstants.NS_CUSTOM_RECORD_INTERNAL_ID);
+        String customizationType = properties.getProp(NetSuiteSchemaConstants.NS_CUSTOM_RECORD_CUSTOMIZATION_TYPE);
+        String recordType = properties.getProp(NetSuiteSchemaConstants.NS_CUSTOM_RECORD_TYPE);
+
+        NsRef ref = new NsRef();
+        ref.setRefType(RefType.CUSTOMIZATION_REF);
+        ref.setScriptId(scriptId);
+        ref.setInternalId(internalId);
+        ref.setType(customizationType);
+
+        RecordTypeDesc recordTypeDesc = basicMetaData.getRecordType(recordType);
+        CustomRecordTypeInfo recordTypeInfo = new CustomRecordTypeInfo(scriptId, recordTypeDesc, ref);
+
+        return recordTypeInfo;
+    }
+
+    /**
+     * Write custom field meta data to a given <code>JsonProperties</code>.
+     *
+     * @see NetSuiteSchemaConstants
+     *
+     * @param properties properties object which to write meta data to
+     * @param fieldDesc information about custom field to be used
+     */
+    public static void writeCustomField(JsonProperties properties, CustomFieldDesc fieldDesc) {
+        NsRef ref = fieldDesc.getRef();
+        CustomFieldRefType customFieldRefType = fieldDesc.getCustomFieldType();
+
+        properties.addProp(NetSuiteSchemaConstants.NS_CUSTOM_FIELD, "true");
+        properties.addProp(NetSuiteSchemaConstants.NS_CUSTOM_FIELD_SCRIPT_ID, ref.getScriptId());
+        properties.addProp(NetSuiteSchemaConstants.NS_CUSTOM_FIELD_INTERNAL_ID, ref.getInternalId());
+        properties.addProp(NetSuiteSchemaConstants.NS_CUSTOM_FIELD_CUSTOMIZATION_TYPE, ref.getType());
+        properties.addProp(NetSuiteSchemaConstants.NS_CUSTOM_FIELD_TYPE, customFieldRefType.name());
+    }
+
+    /**
+     * Read custom field meta data from a given <code>JsonProperties</code>.
+     *
+     * @see NetSuiteSchemaConstants
+     *
+     * @param properties properties object which to read meta data from
+     * @return custom field info or <code>null</code> if meta data was not found
+     */
+    public static CustomFieldDesc readCustomField(JsonProperties properties) {
+        String scriptId = properties.getProp(NetSuiteSchemaConstants.NS_CUSTOM_FIELD_SCRIPT_ID);
+        if (StringUtils.isEmpty(scriptId)) {
+            return null;
+        }
+        String internalId = properties.getProp(NetSuiteSchemaConstants.NS_CUSTOM_FIELD_INTERNAL_ID);
+        String customizationType = properties.getProp(NetSuiteSchemaConstants.NS_CUSTOM_FIELD_CUSTOMIZATION_TYPE);
+        String type = properties.getProp(NetSuiteSchemaConstants.NS_CUSTOM_FIELD_TYPE);
+
+        NsRef ref = new NsRef();
+        ref.setRefType(RefType.CUSTOMIZATION_REF);
+        ref.setScriptId(scriptId);
+        ref.setInternalId(internalId);
+        ref.setType(customizationType);
+
+        CustomFieldRefType customFieldRefType = CustomFieldRefType.valueOf(type);
+
+        CustomFieldDesc fieldDesc = new CustomFieldDesc();
+        fieldDesc.setCustomFieldType(customFieldRefType);
+        fieldDesc.setRef(ref);
+        fieldDesc.setName(scriptId);
+        fieldDesc.setValueType(getCustomFieldValueClass(customFieldRefType));
+        fieldDesc.setNullable(true);
+
+        return fieldDesc;
+    }
+
+    /**
+     * Build and return map of custom field descriptors.
+     *
+     * @param fieldDescList list of custom field descriptors
+     * @return map of custom field descriptors by names
+     */
+    public static Map<String, CustomFieldDesc> getCustomFieldDescMap(Collection<FieldDesc> fieldDescList) {
+        Map<String, CustomFieldDesc> customFieldDescMap = new HashMap<>();
+        for (FieldDesc fieldDesc : fieldDescList) {
+            if (fieldDesc instanceof CustomFieldDesc) {
+                CustomFieldDesc customFieldDesc = fieldDesc.asCustom();
+                customFieldDescMap.put(customFieldDesc.getName(), customFieldDesc);
+            }
+        }
+        return customFieldDescMap;
+    }
+
+    /**
+     * Return type of value hold by a custom field.
+     *
+     * @param fieldDesc custom field descriptor
+     * @return type of value
+     */
+    public static Class<?> getCustomFieldValueClass(CustomFieldDesc fieldDesc) {
+        return getCustomFieldValueClass(fieldDesc.getCustomFieldType());
+    }
+
+    /**
+     * Return type of value hold by a custom field with given <code>CustomFieldRefType</code>.
+     *
+     * @param customFieldRefType type of field
+     * @return type of value
+     */
+    public static Class<?> getCustomFieldValueClass(CustomFieldRefType customFieldRefType) {
+        Class<?> valueClass = null;
+        switch (customFieldRefType) {
+        case BOOLEAN:
+            valueClass = Boolean.class;
+            break;
+        case STRING:
+            valueClass = String.class;
+            break;
+        case LONG:
+            valueClass = Long.class;
+            break;
+        case DOUBLE:
+            valueClass = Double.class;
+            break;
+        case DATE:
+            valueClass = XMLGregorianCalendar.class;
+            break;
+        case SELECT:
+        case MULTI_SELECT:
+            valueClass = String.class;
+            break;
+        }
+        return valueClass;
+    }
+
+    /**
+     * Return internal (NetSuite specific) name for a given <code>schema field</code>.
+     *
+     * @param field schema field
+     * @return name
+     */
+    public static String getNsFieldName(Schema.Field field) {
+        String name = field.getProp(DiSchemaConstants.TALEND6_COLUMN_ORIGINAL_DB_COLUMN_NAME);
+        return name != null ? toInitialLower(name) : toInitialLower(field.name());
+    }
+
+    /**
+     * Find and return <code>schema field</code> by it's name.
+     *
+     * @param schema schema
+     * @param fieldName name of field to be found
+     * @return schema field or <code>null</code> if field was not found
+     */
+    public static Schema.Field getNsFieldByName(Schema schema, String fieldName) {
+        for (Schema.Field field : schema.getFields()) {
+            String nsFieldName = getNsFieldName(field);
+            if (fieldName.equals(nsFieldName)) {
+                return field;
+            }
+        }
+        return null;
     }
 
 }

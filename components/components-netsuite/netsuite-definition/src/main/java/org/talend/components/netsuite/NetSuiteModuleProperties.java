@@ -16,9 +16,11 @@ package org.talend.components.netsuite;
 import static org.talend.components.netsuite.NetSuiteComponentDefinition.withDatasetRuntime;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.avro.Schema;
+import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.netsuite.connection.NetSuiteConnectionProperties;
@@ -37,14 +39,14 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
 
     public final StringProperty moduleName = newString("moduleName"); //$NON-NLS-1$
 
-    public final SchemaProperties main;
+    public final NsSchemaProperties main;
 
     public NetSuiteModuleProperties(String name, NetSuiteConnectionProperties connectionProperties) {
         super(name);
 
         connection = connectionProperties;
 
-        main = new SchemaProperties("main");
+        main = new NsSchemaProperties("main");
     }
 
     @Override
@@ -118,4 +120,25 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
         main.schema.setValue(schema);
     }
 
+    public static class NsSchemaProperties extends SchemaProperties {
+        private transient List<ISchemaListener> schemaListeners = new ArrayList<>();
+
+        public NsSchemaProperties(String name) {
+            super(name);
+        }
+
+        public void removeSchemaListener(ISchemaListener schemaListener) {
+            schemaListeners.remove(schemaListener);
+        }
+
+        public void addSchemaListener(ISchemaListener schemaListener) {
+            schemaListeners.add(schemaListener);
+        }
+
+        public void afterSchema() {
+            for (ISchemaListener schemaListener : schemaListeners) {
+                schemaListener.afterSchema();
+            }
+        }
+    }
 }

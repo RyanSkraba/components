@@ -13,8 +13,6 @@
 
 package org.talend.components.netsuite.client.model;
 
-import static org.talend.components.netsuite.client.model.beans.Beans.toInitialLower;
-
 /**
  *
  */
@@ -34,10 +32,6 @@ public abstract class FieldDesc {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getInternalName() {
-        return toInitialLower(name);
     }
 
     public boolean isKey() {

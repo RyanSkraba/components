@@ -57,7 +57,7 @@ public class NsObjectInputTransducerIT extends AbstractNetSuiteTestBase {
         NetSuiteClientService<?> connection = webServiceTestFixture.getClientService();
         connection.login();
 
-        TypeDesc typeDesc = connection.getTypeInfo("Opportunity");
+        TypeDesc typeDesc = connection.getMetaDataSource().getTypeInfo("Opportunity");
         Schema schema = NetSuiteDatasetRuntimeImpl.inferSchemaForType(typeDesc.getTypeName(), typeDesc.getFields());
 
         NsObjectInputTransducer transducer = new NsObjectInputTransducer(connection, schema, typeDesc.getTypeName());
@@ -91,7 +91,7 @@ public class NsObjectInputTransducerIT extends AbstractNetSuiteTestBase {
                 .target(basicTypeDesc.getTypeName())
                 .search();
 
-        TypeDesc typeDesc = connection.getTypeInfo(basicTypeDesc.getTypeName());
+        TypeDesc typeDesc = connection.getMetaDataSource().getTypeInfo(basicTypeDesc.getTypeName());
 
         int count = 0;
         while (count++ < connection.getSearchPageSize() && rs.next()) {

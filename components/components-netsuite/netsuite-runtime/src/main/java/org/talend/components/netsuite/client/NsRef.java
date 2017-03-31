@@ -13,7 +13,12 @@
 
 package org.talend.components.netsuite.client;
 
+import org.talend.components.netsuite.client.model.BasicMetaData;
 import org.talend.components.netsuite.client.model.RefType;
+import org.talend.components.netsuite.client.model.beans.BeanInfo;
+import org.talend.components.netsuite.client.model.beans.Beans;
+
+import static org.talend.components.netsuite.client.model.beans.Beans.setSimpleProperty;
 
 /**
  *
@@ -72,6 +77,17 @@ public class NsRef {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Object toNativeRef(BasicMetaData basicMetaData) {
+        Object ref = basicMetaData.createInstance(refType.getTypeName());
+        BeanInfo beanInfo = Beans.getBeanInfo(ref.getClass());
+        setSimpleProperty(ref, "type", Beans.getEnumAccessor((Class<Enum>) beanInfo.getProperty("type").getWriteType()).getEnumValue(type));
+        setSimpleProperty(ref, "internalId", internalId);
+        if (refType == RefType.CUSTOMIZATION_REF) {
+            setSimpleProperty(ref, "scriptId", scriptId);
+        }
+        return ref;
     }
 
     @Override

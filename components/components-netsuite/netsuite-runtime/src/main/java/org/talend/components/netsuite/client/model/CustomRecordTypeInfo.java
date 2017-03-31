@@ -38,6 +38,16 @@ public class CustomRecordTypeInfo extends RecordTypeInfo {
         this.ref = ref;
     }
 
+    public RefType getRefType() {
+        return RefType.CUSTOMIZATION_REF;
+    }
+
+    public NsRef createRef(String internalId, String externalId, String scriptId) {
+        NsRef ref = createRef(internalId, externalId);
+        ref.setScriptId(scriptId);
+        return ref;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("CustomRecordTypeInfo{");

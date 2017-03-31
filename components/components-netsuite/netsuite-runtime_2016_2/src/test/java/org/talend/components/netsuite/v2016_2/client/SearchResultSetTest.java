@@ -69,9 +69,9 @@ public class SearchResultSetTest {
         when(conn.search(eq(nsSearchRecord1))).thenReturn(nsSearchResult1);
 
         NetSuiteClientService<?> clientService = new NetSuiteClientServiceImpl();
-        RecordTypeInfo recordTypeInfo = clientService.getRecordType("Account");
-        SearchRecordTypeDesc searchRecordTypeDesc = clientService.getSearchRecordType(
-                recordTypeInfo.getRecordType().getSearchRecordType());
+        RecordTypeInfo recordTypeInfo = clientService.getMetaDataSource().getRecordType("Account");
+        SearchRecordTypeDesc searchRecordTypeDesc = clientService.getMetaDataSource()
+                .getSearchRecordType(recordTypeInfo.getRecordType().getSearchRecordType());
 
         SearchResultSet<Record> resultSet = new SearchResultSet<>(conn,
                 recordTypeInfo.getRecordType(), searchRecordTypeDesc, nsSearchResult1);
@@ -127,9 +127,9 @@ public class SearchResultSetTest {
         when(conn.searchMoreWithId(eq("abc123"), eq(2))).thenReturn(nsSearchResult2);
 
         NetSuiteClientService<?> clientService = new NetSuiteClientServiceImpl();
-        RecordTypeInfo recordTypeInfo = clientService.getRecordType("Account");
-        SearchRecordTypeDesc searchRecordTypeDesc = clientService.getSearchRecordType(
-                recordTypeInfo.getRecordType().getSearchRecordType());
+        RecordTypeInfo recordTypeInfo = clientService.getMetaDataSource().getRecordType("Account");
+        SearchRecordTypeDesc searchRecordTypeDesc = clientService.getMetaDataSource()
+                .getSearchRecordType(recordTypeInfo.getRecordType().getSearchRecordType());
 
         SearchResultSet<Record> resultSet = new SearchResultSet<>(conn,
                 recordTypeInfo.getRecordType(), searchRecordTypeDesc, nsSearchResult1);
@@ -192,9 +192,9 @@ public class SearchResultSetTest {
         when(conn.searchMoreWithId(eq("abc123"), eq(2))).thenReturn(nsSearchResult2);
 
         NetSuiteClientService<?> clientService = new NetSuiteClientServiceImpl();
-        RecordTypeInfo recordTypeInfo = clientService.getRecordType("InventoryItem");
-        SearchRecordTypeDesc searchRecordTypeDesc = clientService.getSearchRecordType(
-                recordTypeInfo.getRecordType().getSearchRecordType());
+        RecordTypeInfo recordTypeInfo = clientService.getMetaDataSource().getRecordType("InventoryItem");
+        SearchRecordTypeDesc searchRecordTypeDesc = clientService.getMetaDataSource()
+                .getSearchRecordType(recordTypeInfo.getRecordType().getSearchRecordType());
 
         SearchResultSet<Record> resultSet = new SearchResultSet<>(conn,
                 recordTypeInfo.getRecordType(), searchRecordTypeDesc, nsSearchResult1);
