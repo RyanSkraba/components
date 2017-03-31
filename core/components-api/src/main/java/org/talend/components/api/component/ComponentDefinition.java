@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.api.component;
 
+import java.util.List;
 import java.util.Set;
 
 import org.talend.components.api.component.runtime.ExecutionEngine;
@@ -161,5 +162,12 @@ public interface ComponentDefinition extends Definition<ComponentProperties> {
      * @return all the type this component provides.
      */
     Set<ConnectorTopology> getSupportedConnectorTopologies();
+
+    /**
+     * This method return which products the component supports.
+     *
+     * @return all supported product types.
+     */
+    List<String> getSupportedProducts();
 
 }
