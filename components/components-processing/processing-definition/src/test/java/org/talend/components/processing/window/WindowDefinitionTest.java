@@ -36,6 +36,15 @@ public class WindowDefinitionTest {
     }
 
     /**
+     * Check {@link WindowDefinition#getIconKey()} returns "window"
+     */
+    @Test
+    public void testGetIconKey() {
+        String componentName = definition.getIconKey();
+        assertEquals(componentName, "window");
+    }
+
+    /**
      * Check {@link WindowDefinition#getFamilies()} returns string array,
      * which contains "Processing"
      */

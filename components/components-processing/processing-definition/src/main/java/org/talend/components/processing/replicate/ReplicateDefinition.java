@@ -51,6 +51,11 @@ public class ReplicateDefinition extends AbstractComponentDefinition {
     }
 
     @Override
+    public String getIconKey() {
+        return "replicate";
+    }
+
+    @Override
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);

@@ -51,6 +51,11 @@ public class WindowDefinition extends AbstractComponentDefinition {
     }
 
     @Override
+    public String getIconKey() {
+        return "window";
+    }
+
+    @Override
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);

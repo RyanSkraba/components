@@ -50,6 +50,11 @@ public class JDBCInputDefinition extends AbstractComponentDefinition {
     }
 
     @Override
+    public String getIconKey() {
+        return "db-input";
+    }
+
+    @Override
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);

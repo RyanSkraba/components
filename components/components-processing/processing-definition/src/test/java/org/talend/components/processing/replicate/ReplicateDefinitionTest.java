@@ -53,6 +53,15 @@ public class ReplicateDefinitionTest {
     }
 
     /**
+     * Check {@link ReplicateDefinition#getIconKey()} returns "replicate"
+     */
+    @Test
+    public void testGetIconKey() {
+        String componentName = definition.getIconKey();
+        assertEquals(componentName, "replicate");
+    }
+
+    /**
      * Check {@link ReplicateDefinition#getPropertyClass()} returns class, which
      * canonical name is
      * "org.talend.components.processing.replicate.ReplicateProperties"
