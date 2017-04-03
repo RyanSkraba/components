@@ -1,81 +1,42 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.talend.components</groupId>
-        <artifactId>components-adapter-beam-parent</artifactId>
+        <artifactId>components-parent</artifactId>
         <version>0.18.0-SNAPSHOT</version>
-        <relativePath>../../../core/components-adapter-beam-parent/pom.xml</relativePath>
+        <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>kafka-runtime</artifactId>
+    <artifactId>kafka-integration</artifactId>
 
-    <name>Components - Kafka Runtime</name>
+    <name>Components - Kafka Integration Tests</name>
     <packaging>jar</packaging>
 
+    <properties>
+        <!-- skip the deployment for integration tests, not necessary -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-adapter-beam</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+        <!-- Depend only on definitions. -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>kafka-definition</artifactId>
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.beam</groupId>
-            <artifactId>beam-runners-direct-java</artifactId>
-        </dependency>
-
-        <!-- use Kafka client 0.9 to support Kafka 0.9 and above -->
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-clients</artifactId>
-            <version>0.9.0.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.beam</groupId>
-            <artifactId>beam-sdks-java-io-kafka</artifactId>
-            <version>${beam.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-expression</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- KafkaIO using spring-expression 4.3.5, but TCOMP spring environment using spring
-        4.3.3 -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-expression</artifactId>
-            <version>4.3.3.RELEASE</version>
-        </dependency>
-
-        <!-- For dependency resolution. -->
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-api</artifactId>
-            <version>${project.version}</version>
-            <classifier>tests</classifier>
-            <scope>test</scope>
-        </dependency>
+        <!-- Tests -->
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-aether</artifactId>
             <version>2.4.7</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -153,4 +114,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

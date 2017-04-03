@@ -108,6 +108,9 @@ public class KafkaDatasetRuntime implements IKafkaDatasetRuntime {
         inputProperties.useMaxReadTime.setValue(true);
         inputProperties.maxReadTime.setValue(1000l);
         inputProperties.autoOffsetReset.setValue(KafkaInputProperties.OffsetType.EARLIEST);
+        // TODO: BEAM-1847: Enable both stopping conditions when they can be set, and remove Sample transform from job.
+        // inputProperties.useMaxNumRecords.setValue(true);
+        // inputProperties.maxNumRecords.setValue(Long.valueOf(limit));
         inputRuntime.initialize(null, inputProperties);
 
         // Create a pipeline using the input component to get records.
@@ -118,7 +121,7 @@ public class KafkaDatasetRuntime implements IKafkaDatasetRuntime {
             // Collect a sample of the input records.
             p.apply(inputRuntime) //
                     .apply(Sample.<IndexedRecord> any(limit)).apply(collector);
-            p.run();
+            p.run().waitUntilFinish();
         }
     }
 }

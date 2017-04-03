@@ -12,10 +12,15 @@
 // ============================================================================
 package org.talend.components.kafka.datastore;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.talend.components.api.component.runtime.DependenciesReader;
-import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
+import org.talend.components.api.component.runtime.JarRuntimeInfo;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.datastore.DatastoreDefinition;
+import org.talend.components.kafka.KafkaFamilyDefinition;
 import org.talend.components.kafka.dataset.KafkaDatasetDefinition;
 import org.talend.components.kafka.dataset.KafkaDatasetProperties;
 import org.talend.components.kafka.input.KafkaInputDefinition;
@@ -25,6 +30,8 @@ import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 public class KafkaDatastoreDefinition extends I18nDefinition implements DatastoreDefinition<KafkaDatastoreProperties> {
+
+    public static final String RUNTIME = "org.talend.components.kafka.runtime.KafkaDatastoreRuntime";
 
     public static final String NAME = "KafkaDatastore";
 
@@ -39,9 +46,13 @@ public class KafkaDatastoreDefinition extends I18nDefinition implements Datastor
 
     @Override
     public RuntimeInfo getRuntimeInfo(KafkaDatastoreProperties properties) {
-        return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
-                DependenciesReader.computeDependenciesFilePath("org.talend.components", "kafka-runtime"),
-                "org.talend.components.kafka.runtime.KafkaDatastoreRuntime");
+        try {
+            return new JarRuntimeInfo(new URL(KafkaFamilyDefinition.MAVEN_DEFAULT_RUNTIME_URI),
+                    DependenciesReader.computeDependenciesFilePath(KafkaFamilyDefinition.MAVEN_GROUP_ID,
+                            KafkaFamilyDefinition.MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID), RUNTIME);
+        } catch (MalformedURLException e) {
+            throw new ComponentException(e);
+        }
     }
 
     @Override

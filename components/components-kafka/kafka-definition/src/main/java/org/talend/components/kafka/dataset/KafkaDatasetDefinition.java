@@ -12,14 +12,21 @@
 // ============================================================================
 package org.talend.components.kafka.dataset;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.talend.components.api.component.runtime.DependenciesReader;
-import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
+import org.talend.components.api.component.runtime.JarRuntimeInfo;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.dataset.DatasetDefinition;
+import org.talend.components.kafka.KafkaFamilyDefinition;
 import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.definition.I18nDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 public class KafkaDatasetDefinition extends I18nDefinition implements DatasetDefinition<KafkaDatasetProperties> {
+
+    public static final String RUNTIME = "org.talend.components.kafka.runtime.KafkaDatasetRuntime";
 
     public static final String NAME = "KafkaDataset";
 
@@ -34,9 +41,13 @@ public class KafkaDatasetDefinition extends I18nDefinition implements DatasetDef
 
     @Override
     public RuntimeInfo getRuntimeInfo(KafkaDatasetProperties properties) {
-        return new SimpleRuntimeInfo(this.getClass().getClassLoader(),
-                DependenciesReader.computeDependenciesFilePath("org.talend.components", "kafka-runtime"),
-                "org.talend.components.kafka.runtime.KafkaDatasetRuntime");
+        try {
+            return new JarRuntimeInfo(new URL(KafkaFamilyDefinition.MAVEN_DEFAULT_RUNTIME_URI),
+                    DependenciesReader.computeDependenciesFilePath(KafkaFamilyDefinition.MAVEN_GROUP_ID,
+                            KafkaFamilyDefinition.MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID), RUNTIME);
+        } catch (MalformedURLException e) {
+            throw new ComponentException(e);
+        }
     }
 
     @Deprecated

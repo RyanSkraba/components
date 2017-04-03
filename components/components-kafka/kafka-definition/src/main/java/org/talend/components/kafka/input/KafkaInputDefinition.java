@@ -12,20 +12,26 @@
 // ============================================================================
 package org.talend.components.kafka.input;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.EnumSet;
 import java.util.Set;
 
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.ExecutionEngine;
-import org.talend.components.api.component.runtime.SimpleRuntimeInfo;
+import org.talend.components.api.component.runtime.JarRuntimeInfo;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.kafka.KafkaFamilyDefinition;
 import org.talend.components.kafka.KafkaIOBasedDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 public class KafkaInputDefinition extends KafkaIOBasedDefinition {
 
     public static String NAME = "KafkaInput";
+
+    public static String RUNTIME = "org.talend.components.kafka.runtime.KafkaInputPTransformRuntime";
 
     public KafkaInputDefinition() {
         super(NAME);
@@ -44,8 +50,14 @@ public class KafkaInputDefinition extends KafkaIOBasedDefinition {
     @Override
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
-        return new SimpleRuntimeInfo(this.getClass().getClassLoader(), DependenciesReader.computeDependenciesFilePath(
-                "org.talend.components", "kafka-runtime"), "org.talend.components.kafka.runtime.KafkaInputPTransformRuntime");
+        assertConnectorTopologyCompatibility(connectorTopology);
+        try {
+            return new JarRuntimeInfo(new URL(KafkaFamilyDefinition.MAVEN_DEFAULT_RUNTIME_URI),
+                    DependenciesReader.computeDependenciesFilePath(KafkaFamilyDefinition.MAVEN_GROUP_ID,
+                            KafkaFamilyDefinition.MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID), RUNTIME);
+        } catch (MalformedURLException e) {
+            throw new ComponentException(e);
+        }
     }
 
 }

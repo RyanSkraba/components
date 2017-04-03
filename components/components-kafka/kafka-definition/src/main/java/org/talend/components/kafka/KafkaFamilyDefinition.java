@@ -33,6 +33,12 @@ public class KafkaFamilyDefinition extends AbstractComponentFamilyDefinition imp
 
     public static final String NAME = "Kafka";
 
+    public static final String MAVEN_GROUP_ID = "org.talend.components";
+
+    public static final String MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID = "kafka-runtime";
+
+    public static final String MAVEN_DEFAULT_RUNTIME_URI = "mvn:" + MAVEN_GROUP_ID + "/" + MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID;
+
     public KafkaFamilyDefinition() {
         super(NAME, new KafkaDatastoreDefinition(), new KafkaDatasetDefinition(), new KafkaInputDefinition(),
                 new KafkaOutputDefinition());

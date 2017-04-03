@@ -28,6 +28,11 @@ public abstract class KafkaIOBasedDefinition extends AbstractComponentDefinition
     }
 
     @Override
+    public String[] getFamilies() {
+        return new String[] { KafkaFamilyDefinition.NAME };
+    }
+
+    @Override
     public Property[] getReturnProperties() {
         return new Property[0];
     }
