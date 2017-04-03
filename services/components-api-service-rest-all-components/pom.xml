@@ -30,11 +30,6 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>20.0</version>
-		</dependency>
 		<!-- list of embedded components -->
 		<dependency>
 			<!-- because common-oauth depends on jetty 9.2 (for java 7 compliance)
@@ -240,6 +235,16 @@
 		</dependency>
 	</dependencies>
 
+	<dependencyManagement>
+		<dependencies>
+			<!-- Lock guava to the Beam dependency -->
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>20.0</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<repositories>
 		<repository>

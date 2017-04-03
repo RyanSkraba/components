@@ -33,12 +33,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- BigQuery runtime need guava 20.0 -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>20.0</version>
-        </dependency>
 
         <!-- Tests -->
         <dependency>
@@ -48,6 +42,17 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Lock guava to the Beam dependency -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>20.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
