@@ -26,12 +26,6 @@
             <groupId>org.talend.components</groupId>
             <artifactId>bigquery-definition</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- Tests -->
