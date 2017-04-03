@@ -22,9 +22,9 @@ import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Sample;
 import org.talend.components.adapter.beam.transform.DirectConsumerCollector;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.common.SchemaProperties;
 import org.talend.components.kafka.dataset.KafkaDatasetProperties;
 import org.talend.components.kafka.input.KafkaInputProperties;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.java8.Consumer;
 import org.talend.daikon.properties.ValidationResult;
 
@@ -61,6 +61,7 @@ public class KafkaDatasetRuntime implements IKafkaDatasetRuntime {
         case CSV: {
             // Simple schema container.
             final Schema[] s = new Schema[1];
+            s[0] = AvroUtils.createEmptySchema();
             // Try to get one record and determine its schema in a callback.
             getSample(1, new Consumer<IndexedRecord>() {
 
@@ -77,7 +78,7 @@ public class KafkaDatasetRuntime implements IKafkaDatasetRuntime {
                 // nothing to do, keep original
             } else { // use {@link KafkaDatasetProperties#avroSchema} generate schema
                 String avroSchemaStr = dataset.avroSchema.getValue();
-                if(avroSchemaStr != null && !"".equals(avroSchemaStr)) {
+                if (avroSchemaStr != null && !"".equals(avroSchemaStr)) {
                     return new Schema.Parser().parse(avroSchemaStr);
                 }
             }
@@ -106,8 +107,7 @@ public class KafkaDatasetRuntime implements IKafkaDatasetRuntime {
         inputProperties.setDatasetProperties(dataset);
         inputProperties.useMaxReadTime.setValue(true);
         inputProperties.maxReadTime.setValue(1000l);
-        inputProperties.useMaxNumRecords.setValue(true);
-        inputProperties.maxNumRecords.setValue(Long.valueOf(limit));
+        inputProperties.autoOffsetReset.setValue(KafkaInputProperties.OffsetType.EARLIEST);
         inputRuntime.initialize(null, inputProperties);
 
         // Create a pipeline using the input component to get records.

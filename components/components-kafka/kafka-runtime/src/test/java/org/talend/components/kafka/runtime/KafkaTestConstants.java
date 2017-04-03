@@ -12,6 +12,9 @@
 // ============================================================================
 package org.talend.components.kafka.runtime;
 
+import org.talend.components.kafka.dataset.KafkaDatasetProperties;
+import org.talend.components.kafka.datastore.KafkaDatastoreProperties;
+
 public class KafkaTestConstants {
 
     public static final String TOPIC_IN = "test_in";
@@ -22,14 +25,33 @@ public class KafkaTestConstants {
 
     public static final String TOPIC_AVRO_OUT = "test_avro_out";
 
-    public static final String TOPIC_AVRO_CUSTOM_IN = "test_avro_custom_in";
-
-    public static final String TOPIC_AVRO_CUSTOM_OUT = "test_avro_custom_out";
-
     public static final String BOOTSTRAP_HOST;
 
     static {
         String systemPropertyHost = System.getProperty("kafka.bootstrap");
         BOOTSTRAP_HOST = systemPropertyHost != null ? systemPropertyHost : "localhost:9092";
+    }
+
+    public static KafkaDatastoreProperties createDatastore() {
+        KafkaDatastoreProperties datastore = new KafkaDatastoreProperties("datastore");
+        datastore.init();
+        datastore.brokers.setValue(KafkaTestConstants.BOOTSTRAP_HOST);
+        return datastore;
+    }
+
+    public static KafkaDatasetProperties createDataset(KafkaDatastoreProperties datastore) {
+        KafkaDatasetProperties dataset = new KafkaDatasetProperties("dataset");
+        dataset.init();
+        dataset.setDatastoreProperties(datastore);
+        return dataset;
+    }
+
+    public static KafkaDatasetProperties createDatasetCSV(KafkaDatastoreProperties datastore, String topic,
+            String filedDelimited) {
+        KafkaDatasetProperties dataset = createDataset(datastore);
+        dataset.topic.setValue(topic);
+        dataset.valueFormat.setValue(KafkaDatasetProperties.ValueFormat.CSV);
+        dataset.fieldDelimiter.setValue(filedDelimited);
+        return dataset;
     }
 }
