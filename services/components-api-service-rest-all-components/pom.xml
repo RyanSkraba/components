@@ -26,6 +26,7 @@
 		<beam.version>0.6.0-tlnd</beam.version>
 		<!-- Used for Docker images name -->
 		<git_branch>local</git_branch>
+		<docker_tag_suffix>${maven.build.timestamp}</docker_tag_suffix>
 		<talend_docker_registry>registry.datapwn.com</talend_docker_registry>
 	</properties>
 
@@ -440,7 +441,7 @@
 											<build>
 												<from>java:8-jre-alpine</from>
 												<tags>
-													<tag>${docker.version}</tag>
+													<tag>${project.version}-${docker_tag_suffix}</tag>
 												</tags>
 												<ports>
 													<port>8989</port>

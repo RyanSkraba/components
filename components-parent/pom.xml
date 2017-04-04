@@ -284,27 +284,6 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
-					<!-- Workaround maven not being able to set a property conditionally 
-						based on the current version being SNAPSHOT or not -->
-					<execution>
-						<id>compute-docker-version</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<exportAntProperties>true</exportAntProperties>
-							<tasks>
-								<echo
-									message="computing docker version for ${project.build.finalName}-bundle.jar" />
-								<condition property="docker.version"
-									value="${project.version}-${maven.build.timestamp}" else="${project.version}">
-									<contains string="${project.version}" substring="SNAPSHOT" />
-								</condition>
-								<echo message="the docker version is ${docker.version}" />
-							</tasks>
-						</configuration>
-					</execution>
 				</executions>
 			</plugin>
 			<plugin>
