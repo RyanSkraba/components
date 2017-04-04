@@ -28,7 +28,6 @@ import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentReferenceProperties;
-import org.talend.components.api.properties.ComponentReferencePropertiesEnclosing;
 import org.talend.components.api.testcomponent.nestedprop.NestedComponentProperties;
 import org.talend.components.api.testcomponent.nestedprop.inherited.InheritedComponentProperties;
 import org.talend.daikon.properties.PresentationItem;
@@ -40,7 +39,9 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.service.Repository;
 
-public class TestComponentProperties extends ComponentPropertiesImpl implements ComponentReferencePropertiesEnclosing {
+public class TestComponentProperties extends ComponentPropertiesImpl {
+
+    private static final long serialVersionUID = 5751002825822282055L;
 
     public static final String USER_ID_PROP_NAME = "userId"; //$NON-NLS-1$
 
@@ -82,7 +83,7 @@ public class TestComponentProperties extends ComponentPropertiesImpl implements 
 
     public InheritedComponentProperties nestedProp3 = new InheritedComponentProperties("nestedProp3");
 
-    public ComponentReferenceProperties referencedComponent = new ComponentReferenceProperties("referencedComponent",
+    public ComponentReferenceProperties<TestComponentProperties> referencedComponent = new ComponentReferenceProperties<>("referencedComponent",
             TestComponentDefinition.COMPONENT_NAME);
 
     public static final String TESTCOMPONENT = "TestComponent";
@@ -92,14 +93,14 @@ public class TestComponentProperties extends ComponentPropertiesImpl implements 
     }
 
     public ValidationResult beforeNameList() {
-        List values = new ArrayList<>();
+        List<String> values = new ArrayList<>();
         Collections.addAll(values, new String[] { "name1", "name2", "name3" });
         nameList.setPossibleValues(values);
         return ValidationResult.OK;
     }
 
     public void beforeNameListRef() {
-        List values = new ArrayList<>();
+        List<String> values = new ArrayList<>();
         Collections.addAll(values, new String[] { "namer1", "namer2", "namer3" });
         nameListRef.setPossibleValues(values);
     }
@@ -110,12 +111,6 @@ public class TestComponentProperties extends ComponentPropertiesImpl implements 
 
     public ValidationResult afterInteger() {
         return new ValidationResult().setStatus(Result.WARNING);
-    }
-
-    @Override
-    public void afterReferencedComponent() {
-        refreshLayout(getForm(Form.MAIN));
-        refreshLayout(getForm(Form.REFERENCE));
     }
 
     @Override

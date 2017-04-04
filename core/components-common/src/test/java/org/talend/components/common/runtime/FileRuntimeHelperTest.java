@@ -12,7 +12,6 @@
 // ============================================================================
 package org.talend.components.common.runtime;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -28,8 +27,8 @@ public class FileRuntimeHelperTest {
     private transient static final Logger LOG = LoggerFactory.getLogger(FileRuntimeHelperTest.class);
 
     @Test
-    public void testCompareFile() throws IOException {
-        String resources = getClass().getResource("/compare").getPath();
+    public void testCompareFile() throws Exception {
+        String resources = getClass().getResource("/compare").toURI().getPath();
         LOG.info("Resources folder: " + resources);
         // Text content and Binary both same
         String srcFile = resources + "/source.csv";
@@ -52,7 +51,7 @@ public class FileRuntimeHelperTest {
 
     @Test
     public void testFileUncompress() throws Throwable {
-        String resources = getClass().getResource("/zip").getPath();
+        String resources = getClass().getResource("/zip").toURI().getPath();
         LOG.info("Resources folder: " + resources);
         String zipFile = resources + "/test_uncompress.zip";
         ZipInputStream zipInputStream = FileRuntimeHelper.getZipInputStream(zipFile);

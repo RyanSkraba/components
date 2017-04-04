@@ -41,9 +41,6 @@ public class ComponentReferenceProperties<P extends Properties> extends Referenc
         COMPONENT_INSTANCE
     }
 
-    //
-    // Properties
-    //
     public Property<ReferenceType> referenceType = newEnum("referenceType", ReferenceType.class);
 
     public Property<String> componentInstanceId = newString("componentInstanceId"); //$NON-NLS-1$
