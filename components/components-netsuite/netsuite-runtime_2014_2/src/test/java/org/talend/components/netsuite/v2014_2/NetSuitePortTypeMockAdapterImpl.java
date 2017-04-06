@@ -534,4 +534,9 @@ public class NetSuitePortTypeMockAdapterImpl implements NetSuitePortTypeMockAdap
         return status;
     }
 
+    public static Status createNotFoundStatus() {
+        Status status = new Status();
+        status.setIsSuccess(false);
+        return status;
+    }
 }

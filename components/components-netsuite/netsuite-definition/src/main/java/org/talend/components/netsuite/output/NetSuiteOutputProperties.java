@@ -22,8 +22,11 @@ import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.netsuite.NetSuiteProvideConnectionProperties;
 import org.talend.components.netsuite.connection.NetSuiteConnectionProperties;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 
 /**
  *
@@ -31,9 +34,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class NetSuiteOutputProperties extends FixedConnectorsComponentProperties
         implements NetSuiteProvideConnectionProperties {
 
+    public static final int DEFAULT_BATCH_SIZE = 100;
+
     public final NetSuiteConnectionProperties connection;
 
     public final NetSuiteOutputModuleProperties module;
+
+    public final Property<Integer> batchSize = newInteger("batchSize");
 
     protected transient PropertyPathConnector MAIN_CONNECTOR =
             new PropertyPathConnector(Connector.MAIN_NAME, "module.main");
@@ -47,6 +54,13 @@ public class NetSuiteOutputProperties extends FixedConnectorsComponentProperties
     }
 
     @Override
+    public void setupProperties() {
+        super.setupProperties();
+
+        batchSize.setValue(NetSuiteOutputProperties.DEFAULT_BATCH_SIZE);
+    }
+
+    @Override
     public void setupLayout() {
         super.setupLayout();
 
@@ -56,6 +70,7 @@ public class NetSuiteOutputProperties extends FixedConnectorsComponentProperties
 
         Form advForm = Form.create(this, Form.ADVANCED);
         advForm.addRow(module.getForm(Form.ADVANCED));
+        advForm.addRow(batchSize);
     }
 
     @Override

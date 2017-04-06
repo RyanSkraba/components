@@ -29,13 +29,14 @@ import org.joda.time.MutableDateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.netsuite.NetSuiteDatasetRuntimeImpl;
-import org.talend.components.netsuite.NsObjectTransducer;
 import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NetSuiteException;
 import org.talend.components.netsuite.client.model.FieldDesc;
 import org.talend.components.netsuite.client.model.TypeDesc;
 import org.talend.components.netsuite.input.NsObjectInputTransducer;
+import org.talend.components.netsuite.json.NsTypeResolverBuilder;
 import org.talend.components.netsuite.v2016_2.client.NetSuiteClientServiceImpl;
+import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.exception.ExceptionContext;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -74,16 +75,16 @@ public class ValueConverterTest extends NetSuiteMockTestBase {
         NsObjectInputTransducer transducer = new NsObjectInputTransducer(clientService, schema, typeDesc.getTypeName());
 
         FieldDesc fieldDesc = typeDesc.getField("isInactive");
-        NsObjectTransducer.ValueConverter<Boolean, Boolean> converter1 =
-                (NsObjectTransducer.ValueConverter<Boolean, Boolean>) transducer.getValueConverter(fieldDesc);
-        assertEquals(Boolean.TRUE, converter1.convertInput(Boolean.TRUE));
-        assertEquals(Boolean.FALSE, converter1.convertOutput(Boolean.FALSE));
+        AvroConverter<Boolean, Boolean> converter1 =
+                (AvroConverter<Boolean, Boolean>) transducer.getValueConverter(fieldDesc);
+        assertEquals(Boolean.TRUE, converter1.convertToAvro(Boolean.TRUE));
+        assertEquals(Boolean.FALSE, converter1.convertToDatum(Boolean.FALSE));
 
         fieldDesc = typeDesc.getField("openingBalance");
-        NsObjectTransducer.ValueConverter<Double, Double> converter2 =
-                (NsObjectTransducer.ValueConverter<Double, Double>) transducer.getValueConverter(fieldDesc);
-        assertEquals(Double.valueOf(12345.6789), converter2.convertInput(Double.valueOf(12345.6789)));
-        assertEquals(Double.valueOf(98765.4321), converter2.convertOutput(Double.valueOf(98765.4321)));
+        AvroConverter<Double, Double> converter2 =
+                (AvroConverter<Double, Double>) transducer.getValueConverter(fieldDesc);
+        assertEquals(Double.valueOf(12345.6789), converter2.convertToAvro(Double.valueOf(12345.6789)));
+        assertEquals(Double.valueOf(98765.4321), converter2.convertToDatum(Double.valueOf(98765.4321)));
     }
 
     @Test
@@ -91,21 +92,21 @@ public class ValueConverterTest extends NetSuiteMockTestBase {
         NsObjectInputTransducer transducer = new NsObjectInputTransducer(clientService, schema, typeDesc.getTypeName());
 
         FieldDesc fieldDesc = typeDesc.getField("acctType");
-        NsObjectTransducer.ValueConverter<Enum<AccountType>, String> converter1 =
-                (NsObjectTransducer.ValueConverter<Enum<AccountType>, String>) transducer.getValueConverter(fieldDesc);
+        AvroConverter<Enum<AccountType>, String> converter1 =
+                (AvroConverter<Enum<AccountType>, String>) transducer.getValueConverter(fieldDesc);
         assertEquals(AccountType.ACCOUNTS_PAYABLE.value(),
-                converter1.convertInput(AccountType.ACCOUNTS_PAYABLE));
+                converter1.convertToAvro(AccountType.ACCOUNTS_PAYABLE));
         assertEquals(AccountType.ACCOUNTS_PAYABLE,
-                converter1.convertOutput(AccountType.ACCOUNTS_PAYABLE.value()));
+                converter1.convertToDatum(AccountType.ACCOUNTS_PAYABLE.value()));
 
         fieldDesc = typeDesc.getField("generalRate");
         assertNotNull(fieldDesc);
-        NsObjectTransducer.ValueConverter<Enum<ConsolidatedRate>, String> converter2 =
-                (NsObjectTransducer.ValueConverter<Enum<ConsolidatedRate>, String>) transducer.getValueConverter(fieldDesc);
+        AvroConverter<Enum<ConsolidatedRate>, String> converter2 =
+                (AvroConverter<Enum<ConsolidatedRate>, String>) transducer.getValueConverter(fieldDesc);
         assertEquals(ConsolidatedRate.HISTORICAL.value(),
-                converter2.convertInput(ConsolidatedRate.HISTORICAL));
+                converter2.convertToAvro(ConsolidatedRate.HISTORICAL));
         assertEquals(ConsolidatedRate.HISTORICAL,
-                converter2.convertOutput(ConsolidatedRate.HISTORICAL.value()));
+                converter2.convertToDatum(ConsolidatedRate.HISTORICAL.value()));
     }
 
     @Test
@@ -130,12 +131,12 @@ public class ValueConverterTest extends NetSuiteMockTestBase {
 
         NsObjectInputTransducer transducer = new NsObjectInputTransducer(clientService, schema, typeDesc.getTypeName());
 
-        NsObjectTransducer.ValueConverter<XMLGregorianCalendar, Long> converter1 =
-                (NsObjectTransducer.ValueConverter<XMLGregorianCalendar, Long>) transducer.getValueConverter(fieldInfo);
+        AvroConverter<XMLGregorianCalendar, Long> converter1 =
+                (AvroConverter<XMLGregorianCalendar, Long>) transducer.getValueConverter(fieldInfo);
         assertEquals(controlValue1,
-                converter1.convertInput(xmlCalendar1));
+                converter1.convertToAvro(xmlCalendar1));
         assertEquals(xmlCalendar1,
-                converter1.convertOutput(controlValue1));
+                converter1.convertToDatum(controlValue1));
     }
 
     @Test
@@ -174,13 +175,13 @@ public class ValueConverterTest extends NetSuiteMockTestBase {
 
         account1.setCustomFieldList(customFieldList);
 
-        NsObjectTransducer.ValueConverter<Account, String> converter1 =
-                (NsObjectTransducer.ValueConverter<Account, String>) transducer.getValueConverter(account1.getClass());
+        AvroConverter<Account, String> converter1 =
+                (AvroConverter<Account, String>) transducer.getValueConverter(account1.getClass());
 
-        String testJson1 = converter1.convertInput(account1);
+        String testJson1 = converter1.convertToAvro(account1);
         assertNotNull(testJson1);
 
-        Account testAccount1 = converter1.convertOutput(testJson1);
+        Account testAccount1 = converter1.convertToDatum(testJson1);
         assertNotNull(testAccount1);
     }
 
@@ -202,10 +203,10 @@ public class ValueConverterTest extends NetSuiteMockTestBase {
         String recordRefJson1 = objectMapper.writer().writeValueAsString(recordRef1);
 
         FieldDesc fieldDesc = typeDesc.getField("department");
-        NsObjectTransducer.ValueConverter<RecordRef, String> converter1 =
-                (NsObjectTransducer.ValueConverter<RecordRef, String>) transducer.getValueConverter(fieldDesc);
+        AvroConverter<RecordRef, String> converter1 =
+                (AvroConverter<RecordRef, String>) transducer.getValueConverter(fieldDesc);
 
-        String testRecordRefJson1 = converter1.convertInput(recordRef1);
+        String testRecordRefJson1 = converter1.convertToAvro(recordRef1);
         assertNotNull(testRecordRefJson1);
         JsonNode testRecordRefNode1 = objectMapper.reader().readTree(testRecordRefJson1);
         assertTrue(testRecordRefNode1.has("name"));
@@ -217,7 +218,7 @@ public class ValueConverterTest extends NetSuiteMockTestBase {
         assertEquals(recordRef1.getExternalId(), testRecordRefNode1.get("externalId").asText(null));
         assertNull(testRecordRefNode1.get("type").asText(null));
 
-        RecordRef testRecordRef1 = converter1.convertOutput(recordRefJson1);
+        RecordRef testRecordRef1 = converter1.convertToDatum(recordRefJson1);
         assertNotNull(testRecordRef1);
         assertEquals(recordRef1.getName(), testRecordRef1.getName());
         assertEquals(recordRef1.getInternalId(), testRecordRef1.getInternalId());
@@ -244,31 +245,31 @@ public class ValueConverterTest extends NetSuiteMockTestBase {
         customFieldList.getCustomField().add(customFieldRef2);
 
         FieldDesc fieldDesc = typeDesc.getField("customFieldList");
-        NsObjectTransducer.ValueConverter<CustomFieldList, String> converter1 =
-                (NsObjectTransducer.ValueConverter<CustomFieldList, String>) transducer.getValueConverter(fieldDesc);
+        AvroConverter<CustomFieldList, String> converter1 =
+                (AvroConverter<CustomFieldList, String>) transducer.getValueConverter(fieldDesc);
 
-        String testJson1 = converter1.convertInput(customFieldList);
+        String testJson1 = converter1.convertToAvro(customFieldList);
         assertNotNull(testJson1);
 
         ObjectNode node1 = JsonNodeFactory.instance.objectNode();
         ArrayNode list1 = JsonNodeFactory.instance.arrayNode();
         node1.set("customField", list1);
         ObjectNode customFieldNode1 = JsonNodeFactory.instance.objectNode();
-        customFieldNode1.set(NsObjectTransducer.JSON_NS_TYPE_PROPERTY_NAME,
+        customFieldNode1.set(NsTypeResolverBuilder.TYPE_PROPERTY_NAME,
                 JsonNodeFactory.instance.textNode("BooleanCustomFieldRef"));
         customFieldNode1.set("internalId", JsonNodeFactory.instance.textNode("100001"));
         customFieldNode1.set("scriptId", JsonNodeFactory.instance.textNode("custentity_field1"));
         customFieldNode1.set("value", JsonNodeFactory.instance.booleanNode(true));
         list1.add(customFieldNode1);
         ObjectNode customFieldNode2 = JsonNodeFactory.instance.objectNode();
-        customFieldNode2.set(NsObjectTransducer.JSON_NS_TYPE_PROPERTY_NAME,
+        customFieldNode2.set(NsTypeResolverBuilder.TYPE_PROPERTY_NAME,
                 JsonNodeFactory.instance.textNode("StringCustomFieldRef"));
         customFieldNode2.set("internalId", JsonNodeFactory.instance.textNode("100002"));
         customFieldNode2.set("scriptId", JsonNodeFactory.instance.textNode("custentity_field2"));
         customFieldNode2.set("value", JsonNodeFactory.instance.textNode("test123"));
         list1.add(customFieldNode2);
 
-        CustomFieldList testCustomFieldList = converter1.convertOutput(node1.toString());
+        CustomFieldList testCustomFieldList = converter1.convertToDatum(node1.toString());
         assertNotNull(testCustomFieldList);
         assertEquals(2, testCustomFieldList.getCustomField().size());
     }
@@ -278,10 +279,10 @@ public class ValueConverterTest extends NetSuiteMockTestBase {
         NsObjectInputTransducer transducer = new NsObjectInputTransducer(clientService, schema, typeDesc.getTypeName());
 
         FieldDesc fieldDesc = typeDesc.getField("department");
-        NsObjectTransducer.ValueConverter<RecordRef, String> converter1 =
-                (NsObjectTransducer.ValueConverter<RecordRef, String>) transducer.getValueConverter(fieldDesc);
+        AvroConverter<RecordRef, String> converter1 =
+                (AvroConverter<RecordRef, String>) transducer.getValueConverter(fieldDesc);
         try {
-            converter1.convertOutput("{name:'R&D',internalId:'12345',externalId:null,type:null}");
+            converter1.convertToDatum("{name:'R&D',internalId:'12345',externalId:null,type:null}");
             fail("NetSuiteException expected");
         } catch (Exception e) {
             assertThat(e, instanceOf(NetSuiteException.class));

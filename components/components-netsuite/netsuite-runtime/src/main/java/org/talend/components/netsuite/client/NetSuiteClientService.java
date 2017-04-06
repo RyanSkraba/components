@@ -191,6 +191,9 @@ public abstract class NetSuiteClientService<PortT> {
     public abstract <RecT, RefT> NsReadResponse<RecT> get(final RefT ref)
             throws NetSuiteException;
 
+    public abstract <RecT, RefT> List<NsReadResponse<RecT>> getList(final List<RefT> refs)
+            throws NetSuiteException;
+
     public abstract <RecT, RefT> NsWriteResponse<RefT> add(final RecT record)
             throws NetSuiteException;
 

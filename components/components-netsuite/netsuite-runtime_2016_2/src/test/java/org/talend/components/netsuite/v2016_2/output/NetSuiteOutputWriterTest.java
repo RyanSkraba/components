@@ -14,6 +14,7 @@
 package org.talend.components.netsuite.v2016_2.output;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
@@ -54,11 +55,12 @@ import org.talend.components.netsuite.v2016_2.client.model.RecordTypeEnum;
 import com.netsuite.webservices.v2016_2.platform.NetSuitePortType;
 import com.netsuite.webservices.v2016_2.platform.core.RecordRef;
 import com.netsuite.webservices.v2016_2.platform.core.types.RecordType;
-import com.netsuite.webservices.v2016_2.platform.messages.DeleteRequest;
-import com.netsuite.webservices.v2016_2.platform.messages.DeleteResponse;
-import com.netsuite.webservices.v2016_2.platform.messages.UpdateRequest;
-import com.netsuite.webservices.v2016_2.platform.messages.UpdateResponse;
+import com.netsuite.webservices.v2016_2.platform.messages.DeleteListRequest;
+import com.netsuite.webservices.v2016_2.platform.messages.DeleteListResponse;
+import com.netsuite.webservices.v2016_2.platform.messages.UpdateListRequest;
+import com.netsuite.webservices.v2016_2.platform.messages.UpdateListResponse;
 import com.netsuite.webservices.v2016_2.platform.messages.WriteResponse;
+import com.netsuite.webservices.v2016_2.platform.messages.WriteResponseList;
 import com.netsuite.webservices.v2016_2.transactions.sales.Opportunity;
 
 /**
@@ -100,27 +102,35 @@ public class NetSuiteOutputWriterTest extends NetSuiteMockTestBase {
         final TypeDesc typeDesc = webServiceMockTestFixture.getClientService().getMetaDataSource()
                 .getTypeInfo(RecordTypeEnum.OPPORTUNITY.getTypeName());
 
-        mockGetRequestResults(null);
+        mockGetListRequestResults(null);
 
         final List<Opportunity> updatedRecordList = new ArrayList<>();
-        when(port.update(any(UpdateRequest.class))).then(new Answer<UpdateResponse>() {
-            @Override public UpdateResponse answer(InvocationOnMock invocationOnMock) throws Throwable {
-                UpdateRequest request = (UpdateRequest) invocationOnMock.getArguments()[0];
-                Opportunity record = (Opportunity) request.getRecord();
-                assertNotNull(record);
-                assertNotNull(record.getInternalId());
+        when(port.updateList(any(UpdateListRequest.class))).then(new Answer<UpdateListResponse>() {
+            @Override public UpdateListResponse answer(InvocationOnMock invocationOnMock) throws Throwable {
+                UpdateListRequest request = (UpdateListRequest) invocationOnMock.getArguments()[0];
+                assertFalse(request.getRecord().isEmpty());
 
-                RecordRef recordRef = new RecordRef();
-                recordRef.setInternalId(record.getInternalId());
-                recordRef.setType(RecordType.OPPORTUNITY);
+                UpdateListResponse response = new UpdateListResponse();
+                WriteResponseList writeResponseList = new WriteResponseList();
+                writeResponseList.setStatus(createSuccessStatus());
+                for (int i = 0; i < request.getRecord().size(); i++) {
+                    Opportunity record = (Opportunity) request.getRecord().get(i);
+                    assertNotNull(record);
+                    assertNotNull(record.getInternalId());
 
-                updatedRecordList.add(record);
+                    RecordRef recordRef = new RecordRef();
+                    recordRef.setInternalId(record.getInternalId());
+                    recordRef.setType(RecordType.OPPORTUNITY);
 
-                UpdateResponse response = new UpdateResponse();
-                WriteResponse writeResponse = new WriteResponse();
-                writeResponse.setStatus(createSuccessStatus());
-                writeResponse.setBaseRef(recordRef);
-                response.setWriteResponse(writeResponse);
+                    updatedRecordList.add(record);
+
+                    WriteResponse writeResponse = new WriteResponse();
+                    writeResponse.setStatus(createSuccessStatus());
+                    writeResponse.setBaseRef(recordRef);
+
+                    writeResponseList.getWriteResponse().add(writeResponse);
+                }
+                response.setWriteResponseList(writeResponseList);
                 return response;
             }
         });
@@ -146,7 +156,7 @@ public class NetSuiteOutputWriterTest extends NetSuiteMockTestBase {
         writer.open(UUID.randomUUID().toString());
 
         List<IndexedRecord> indexedRecordList = makeIndexedRecords(clientService, schema,
-                new SimpleObjectComposer<>(typeDesc.getTypeClass()), 100);
+                new SimpleObjectComposer<>(typeDesc.getTypeClass()), 150);
 
         for (IndexedRecord record : indexedRecordList) {
             writer.write(record);
@@ -156,7 +166,7 @@ public class NetSuiteOutputWriterTest extends NetSuiteMockTestBase {
         assertNotNull(writerResult);
         assertEquals(indexedRecordList.size(), writerResult.totalCount);
 
-        verify(port, times(indexedRecordList.size())).update(any(UpdateRequest.class));
+        verify(port, times(2)).updateList(any(UpdateListRequest.class));
         assertEquals(indexedRecordList.size(), updatedRecordList.size());
     }
 
@@ -172,24 +182,27 @@ public class NetSuiteOutputWriterTest extends NetSuiteMockTestBase {
         properties.module.moduleName.setValue(typeDesc.getTypeName());
         properties.module.action.setValue(OutputAction.DELETE);
 
-        mockGetRequestResults(null);
-
         final List<RecordRef> deletedRecordRefList = new ArrayList<>();
-        when(port.delete(any(DeleteRequest.class))).then(new Answer<DeleteResponse>() {
-            @Override public DeleteResponse answer(InvocationOnMock invocationOnMock) throws Throwable {
-                DeleteRequest request = (DeleteRequest) invocationOnMock.getArguments()[0];
-                RecordRef recordRef = (RecordRef) request.getBaseRef();
-                assertNotNull(recordRef);
-                assertNotNull(recordRef.getInternalId());
-                assertNotNull(recordRef.getType());
+        when(port.deleteList(any(DeleteListRequest.class))).then(new Answer<DeleteListResponse>() {
+            @Override public DeleteListResponse answer(InvocationOnMock invocationOnMock) throws Throwable {
+                DeleteListRequest request = (DeleteListRequest) invocationOnMock.getArguments()[0];
+                DeleteListResponse response = new DeleteListResponse();
+                WriteResponseList writeResponseList = new WriteResponseList();
+                for (int i = 0; i < request.getBaseRef().size(); i++) {
+                    RecordRef recordRef = (RecordRef) request.getBaseRef().get(i);
+                    assertNotNull(recordRef);
+                    assertNotNull(recordRef.getInternalId());
+                    assertNotNull(recordRef.getType());
 
-                deletedRecordRefList.add(recordRef);
+                    deletedRecordRefList.add(recordRef);
 
-                DeleteResponse response = new DeleteResponse();
-                WriteResponse writeResponse = new WriteResponse();
-                writeResponse.setStatus(createSuccessStatus());
-                writeResponse.setBaseRef(recordRef);
-                response.setWriteResponse(writeResponse);
+                    WriteResponse writeResponse = new WriteResponse();
+                    writeResponse.setStatus(createSuccessStatus());
+                    writeResponse.setBaseRef(recordRef);
+
+                    writeResponseList.getWriteResponse().add(writeResponse);
+                }
+                response.setWriteResponseList(writeResponseList);
                 return response;
             }
         });
@@ -212,7 +225,7 @@ public class NetSuiteOutputWriterTest extends NetSuiteMockTestBase {
         writer.open(UUID.randomUUID().toString());
 
         List<IndexedRecord> indexedRecordList = makeIndexedRecords(clientService, schema,
-                new RecordRefComposer<>(refTypeDesc.getTypeClass()), 100);
+                new RecordRefComposer<>(refTypeDesc.getTypeClass()), 150);
 
         for (IndexedRecord record : indexedRecordList) {
             writer.write(record);
@@ -222,7 +235,7 @@ public class NetSuiteOutputWriterTest extends NetSuiteMockTestBase {
         assertNotNull(writerResult);
         assertEquals(indexedRecordList.size(), writerResult.totalCount);
 
-        verify(port, times(indexedRecordList.size())).delete(any(DeleteRequest.class));
+        verify(port, times(2)).deleteList(any(DeleteListRequest.class));
         assertEquals(indexedRecordList.size(), deletedRecordRefList.size());
     }
 }

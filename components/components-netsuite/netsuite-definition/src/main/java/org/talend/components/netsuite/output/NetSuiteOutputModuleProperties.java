@@ -15,6 +15,7 @@ package org.talend.components.netsuite.output;
 
 import static org.talend.components.netsuite.util.ComponentExceptions.exceptionToValidationResult;
 import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 
 import java.util.List;
@@ -34,6 +35,8 @@ public class NetSuiteOutputModuleProperties extends NetSuiteModuleProperties {
 
     public final Property<OutputAction> action = newEnum("action", OutputAction.class);
 
+    public final Property<Boolean> useNativeUpsert = newBoolean("useNativeUpsert");
+
     public NetSuiteOutputModuleProperties(String name, NetSuiteConnectionProperties connectionProperties) {
         super(name, connectionProperties);
     }
@@ -43,6 +46,7 @@ public class NetSuiteOutputModuleProperties extends NetSuiteModuleProperties {
         super.setupProperties();
 
         action.setValue(OutputAction.ADD);
+        useNativeUpsert.setValue(Boolean.FALSE);
     }
 
     @Override
@@ -58,6 +62,7 @@ public class NetSuiteOutputModuleProperties extends NetSuiteModuleProperties {
 
         Form advForm = Form.create(this, Form.ADVANCED);
         advForm.addRow(connection.getForm(Form.ADVANCED));
+        advForm.addRow(useNativeUpsert);
 
         Form refForm = Form.create(this, Form.REFERENCE);
         refForm.addRow(widget(moduleName)
@@ -65,6 +70,15 @@ public class NetSuiteOutputModuleProperties extends NetSuiteModuleProperties {
                 .setLongRunning(true));
         refForm.addRow(main.getForm(Form.REFERENCE));
         refForm.addRow(action);
+    }
+
+    @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+
+        if (form.getName().equals(Form.ADVANCED)) {
+            form.getWidget(useNativeUpsert.getName()).setHidden(action.getValue() != OutputAction.UPSERT);
+        }
     }
 
     public ValidationResult beforeModuleName() throws Exception {

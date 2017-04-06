@@ -69,6 +69,8 @@ public class NetSuiteOutputPropertiesTest extends NetSuitePropertiesTestBase {
         properties.setupProperties();
 
         assertEquals(OutputAction.ADD, properties.module.action.getValue());
+        assertEquals(Boolean.FALSE, properties.module.useNativeUpsert.getValue());
+        assertEquals((Integer) NetSuiteOutputProperties.DEFAULT_BATCH_SIZE, properties.batchSize.getValue());
 
         assertNotNull(properties.getConnectionProperties());
     }

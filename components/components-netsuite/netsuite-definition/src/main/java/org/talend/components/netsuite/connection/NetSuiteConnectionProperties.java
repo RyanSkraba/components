@@ -27,6 +27,7 @@ import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.netsuite.NetSuiteComponentDefinition;
 import org.talend.components.netsuite.NetSuiteProvideConnectionProperties;
 import org.talend.components.netsuite.NetSuiteRuntime;
+import org.talend.components.netsuite.NetSuiteVersion;
 import org.talend.daikon.java8.Function;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.ValidationResult;
@@ -170,6 +171,10 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
     public void afterReferencedComponent() {
         refreshLayout(getForm(Form.MAIN));
         refreshLayout(getForm(Form.REFERENCE));
+    }
+
+    public NetSuiteVersion getApiVersion() {
+        return NetSuiteVersion.detectVersion(endpoint.getStringValue());
     }
 
     public ValidationResult validateTestConnection() throws Exception {

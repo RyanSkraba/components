@@ -21,6 +21,10 @@ import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.netsuite.NetSuiteSink;
+import org.talend.components.netsuite.SchemaCustomMetaDataSource;
+import org.talend.components.netsuite.client.MetaDataSource;
+import org.talend.components.netsuite.client.NetSuiteClientService;
+import org.talend.components.netsuite.client.NetSuiteException;
 
 /**
  *
@@ -47,7 +51,47 @@ public class NetSuiteWriteOperation implements WriteOperation<Result> {
 
     @Override
     public Writer<Result> createWriter(RuntimeContainer adaptor) {
-        return new NetSuiteOutputWriter(this);
+        NetSuiteClientService clientService = sink.getClientService();
+
+        OutputAction action = properties.module.action.getValue();
+
+        Schema schema = properties.module.main.schema.getValue();
+
+        MetaDataSource originalMetaDataSource = clientService.getMetaDataSource();
+        MetaDataSource metaDataSource = clientService.createDefaultMetaDataSource();
+        metaDataSource.setCustomizationEnabled(originalMetaDataSource.isCustomizationEnabled());
+        SchemaCustomMetaDataSource schemaCustomMetaDataSource = new SchemaCustomMetaDataSource(
+                clientService.getBasicMetaData(), originalMetaDataSource.getCustomMetaDataSource(), schema);
+        metaDataSource.setCustomMetaDataSource(schemaCustomMetaDataSource);
+
+        NetSuiteOutputWriter<?, ?> writer;
+        switch (action) {
+        case ADD:
+            writer = new NetSuiteAddWriter<>(this, metaDataSource);
+            break;
+        case UPDATE:
+            writer = new NetSuiteUpsertWriter<>(this, metaDataSource);
+            break;
+        case UPSERT:
+            writer = new NetSuiteUpsertWriter<>(this, metaDataSource);
+            Boolean useNativeUpsert = properties.module.useNativeUpsert.getValue();
+            if (useNativeUpsert != null) {
+                ((NetSuiteUpsertWriter) writer).setUseNativeUpsert(useNativeUpsert);
+            }
+            break;
+        case DELETE:
+            writer = new NetSuiteDeleteWriter<>(this, metaDataSource);
+            break;
+        default:
+            throw new NetSuiteException("Output operation not implemented: " + action);
+        }
+
+        Integer batchSize = properties.batchSize.getValue();
+        if (batchSize != null) {
+            writer.setBatchSize(batchSize);
+        }
+
+        return writer;
     }
 
     @Override
@@ -57,9 +101,5 @@ public class NetSuiteWriteOperation implements WriteOperation<Result> {
 
     public NetSuiteOutputProperties getProperties() {
         return properties;
-    }
-
-    public Schema getSchema() {
-        return properties.module.main.schema.getValue();
     }
 }

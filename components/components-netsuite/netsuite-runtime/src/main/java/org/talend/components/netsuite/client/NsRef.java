@@ -13,12 +13,15 @@
 
 package org.talend.components.netsuite.client;
 
+import static org.talend.components.netsuite.client.model.beans.Beans.getSimpleProperty;
+import static org.talend.components.netsuite.client.model.beans.Beans.setSimpleProperty;
+
+import java.util.Objects;
+
 import org.talend.components.netsuite.client.model.BasicMetaData;
 import org.talend.components.netsuite.client.model.RefType;
 import org.talend.components.netsuite.client.model.beans.BeanInfo;
 import org.talend.components.netsuite.client.model.beans.Beans;
-
-import static org.talend.components.netsuite.client.model.beans.Beans.setSimpleProperty;
 
 /**
  *
@@ -82,12 +85,46 @@ public class NsRef {
     public Object toNativeRef(BasicMetaData basicMetaData) {
         Object ref = basicMetaData.createInstance(refType.getTypeName());
         BeanInfo beanInfo = Beans.getBeanInfo(ref.getClass());
-        setSimpleProperty(ref, "type", Beans.getEnumAccessor((Class<Enum>) beanInfo.getProperty("type").getWriteType()).getEnumValue(type));
+        setSimpleProperty(ref, "type", Beans.getEnumAccessor(
+                (Class<Enum>) beanInfo.getProperty("type").getWriteType()).getEnumValue(type));
         setSimpleProperty(ref, "internalId", internalId);
         if (refType == RefType.CUSTOMIZATION_REF) {
             setSimpleProperty(ref, "scriptId", scriptId);
         }
         return ref;
+    }
+
+    public static NsRef fromNativeRef(Object ref) {
+        String typeName = ref.getClass().getSimpleName();
+        RefType refType = RefType.getByTypeName(typeName);
+        NsRef nsRef = new NsRef();
+        nsRef.setRefType(refType);
+        BeanInfo beanInfo = Beans.getBeanInfo(ref.getClass());
+        nsRef.setInternalId((String) getSimpleProperty(ref, "internalId"));
+        nsRef.setExternalId((String) getSimpleProperty(ref, "externalId"));
+        if (refType == RefType.RECORD_REF) {
+            nsRef.setType(Beans.getEnumAccessor((Class<Enum>) beanInfo.getProperty("type").getReadType())
+                    .getStringValue((Enum) getSimpleProperty(ref, "type")));
+        } else if (refType == RefType.CUSTOMIZATION_REF) {
+            nsRef.setScriptId((String) getSimpleProperty(ref, "scriptId"));
+        }
+        return nsRef;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        NsRef ref = (NsRef) o;
+        return refType == ref.refType && Objects.equals(internalId, ref.internalId) &&
+                Objects.equals(externalId, ref.externalId) && Objects.equals(scriptId, ref.scriptId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(refType, internalId, externalId, scriptId);
     }
 
     @Override

@@ -13,8 +13,6 @@
 
 package org.talend.components.netsuite;
 
-import java.net.URL;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;

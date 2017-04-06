@@ -30,7 +30,6 @@ import org.talend.components.netsuite.NetSuiteDatasetRuntimeImpl;
 import org.talend.components.netsuite.NsObjectTransducer;
 import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NetSuiteException;
-import org.talend.components.netsuite.client.NsReadResponse;
 import org.talend.components.netsuite.client.NsRef;
 import org.talend.components.netsuite.client.model.CustomRecordTypeInfo;
 import org.talend.components.netsuite.client.model.FieldDesc;
@@ -47,7 +46,6 @@ import org.talend.components.netsuite.client.model.beans.Beans;
 public class NsObjectOutputTransducer extends NsObjectTransducer {
     protected String typeName;
     protected boolean reference;
-    protected RecordSource recordSource;
 
     protected TypeDesc typeDesc;
     protected RecordTypeInfo recordTypeInfo;
@@ -66,14 +64,6 @@ public class NsObjectOutputTransducer extends NsObjectTransducer {
         this.reference = reference;
     }
 
-    public RecordSource getRecordSource() {
-        return recordSource;
-    }
-
-    public void setRecordSource(RecordSource recordSource) {
-        this.recordSource = recordSource;
-    }
-
     protected void prepare() {
         if (typeDesc != null) {
             return;
@@ -84,10 +74,6 @@ public class NsObjectOutputTransducer extends NsObjectTransducer {
             typeDesc = metaDataSource.getTypeInfo(recordTypeInfo.getRefType().getTypeName());
         } else {
             typeDesc = metaDataSource.getTypeInfo(typeName);
-
-            if (recordSource == null) {
-                recordSource = new DefaultRecordSource(clientService);
-            }
         }
     }
 
@@ -105,12 +91,10 @@ public class NsObjectOutputTransducer extends NsObjectTransducer {
 
         Schema.Field internalIdField = NetSuiteDatasetRuntimeImpl.getNsFieldByName(schema, "internalId");
         String internalId = internalIdField != null ? (String) indexedRecord.get(internalIdField.pos()) : null;
-        if (internalId == null) {
-            return null;
-        }
 
         Schema.Field externalIdField = NetSuiteDatasetRuntimeImpl.getNsFieldByName(schema, "externalId");
         String externalId = externalIdField != null ? (String) indexedRecord.get(externalIdField.pos()) : null;
+
         if (internalId == null && externalId == null) {
             return null;
         }
@@ -135,15 +119,7 @@ public class NsObjectOutputTransducer extends NsObjectTransducer {
         Schema schema = indexedRecord.getSchema();
 
         try {
-            NsRef ref = getRef(schema, indexedRecord);
-
-            Object nsObject = null;
-            if (!reference && ref != null) {
-                nsObject = recordSource.get(ref);
-            }
-            if (nsObject == null) {
-                nsObject = clientService.getBasicMetaData().createInstance(typeDesc.getTypeName());
-            }
+            Object nsObject = clientService.getBasicMetaData().createInstance(typeDesc.getTypeName());
 
             Set<String> nullFieldNames = new HashSet<>();
 
@@ -172,7 +148,7 @@ public class NsObjectOutputTransducer extends NsObjectTransducer {
 
                 Object value = indexedRecord.get(field.pos());
 
-                writeField(nsObject, fieldDesc, customFieldMap, false, nullFieldNames, value);
+                writeField(nsObject, fieldDesc, customFieldMap, nullFieldNames, value);
             }
 
             if (!nullFieldNames.isEmpty() && beanInfo.getProperty("nullFieldList") != null) {
@@ -197,27 +173,4 @@ public class NsObjectOutputTransducer extends NsObjectTransducer {
         }
     }
 
-    public interface RecordSource {
-
-        Object get(NsRef ref) throws NetSuiteException;
-    }
-
-    public static class DefaultRecordSource implements RecordSource {
-        private NetSuiteClientService clientService;
-
-        public DefaultRecordSource(NetSuiteClientService clientService) {
-            this.clientService = clientService;
-        }
-
-        @Override
-        public Object get(NsRef nsRef) throws NetSuiteException {
-            Object ref = nsRef.toNativeRef(clientService.getBasicMetaData());
-            NsReadResponse<?> readResponse = clientService.get(ref);
-            if (readResponse.getStatus().isSuccess()) {
-                return readResponse.getRecord();
-            }
-            NetSuiteClientService.checkError(readResponse.getStatus());
-            return null;
-        }
-    }
 }

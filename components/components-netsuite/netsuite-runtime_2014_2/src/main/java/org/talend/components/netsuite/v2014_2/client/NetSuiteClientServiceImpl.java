@@ -67,6 +67,7 @@ import com.netsuite.webservices.v2014_2.platform.messages.DeleteListRequest;
 import com.netsuite.webservices.v2014_2.platform.messages.DeleteRequest;
 import com.netsuite.webservices.v2014_2.platform.messages.GetDataCenterUrlsRequest;
 import com.netsuite.webservices.v2014_2.platform.messages.GetDataCenterUrlsResponse;
+import com.netsuite.webservices.v2014_2.platform.messages.GetListRequest;
 import com.netsuite.webservices.v2014_2.platform.messages.GetRequest;
 import com.netsuite.webservices.v2014_2.platform.messages.LoginRequest;
 import com.netsuite.webservices.v2014_2.platform.messages.LoginResponse;
@@ -169,6 +170,24 @@ public class NetSuiteClientServiceImpl extends NetSuiteClientService<NetSuitePor
 
                 ReadResponse response = port.get(request).getReadResponse();
                 return toNsReadResponse(response);
+            }
+        });
+    }
+
+    @Override
+    public <RecT, RefT> List<NsReadResponse<RecT>> getList(final List<RefT> refs) throws NetSuiteException {
+        if (refs == null) {
+            return Collections.emptyList();
+        }
+        return execute(new PortOperation<List<NsReadResponse<RecT>>, NetSuitePortType>() {
+            @Override public List<NsReadResponse<RecT>> execute(NetSuitePortType port) throws Exception {
+                GetListRequest request = new GetListRequest();
+                for (RefT ref : refs) {
+                    request.getBaseRef().add((BaseRef) ref);
+                }
+
+                ReadResponseList response = port.getList(request).getReadResponseList();
+                return toNsReadResponseList(response);
             }
         });
     }

@@ -18,7 +18,6 @@ import static org.talend.components.netsuite.client.model.beans.Beans.getPropert
 import static org.talend.components.netsuite.client.model.beans.Beans.getSimpleProperty;
 import static org.talend.components.netsuite.client.model.beans.Beans.setSimpleProperty;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,53 +31,43 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.avro.Schema;
-import org.joda.time.DateTimeZone;
-import org.joda.time.MutableDateTime;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.components.netsuite.avro.converter.EnumToStringConverter;
+import org.talend.components.netsuite.avro.converter.ObjectToJsonConverter;
+import org.talend.components.netsuite.avro.converter.NullConverter;
+import org.talend.components.netsuite.avro.converter.XMLGregorianCalendarToLongConverter;
 import org.talend.components.netsuite.client.MetaDataSource;
 import org.talend.components.netsuite.client.NetSuiteClientService;
-import org.talend.components.netsuite.client.NetSuiteException;
 import org.talend.components.netsuite.client.NsRef;
-import org.talend.components.netsuite.client.model.BasicMetaData;
 import org.talend.components.netsuite.client.model.CustomFieldDesc;
 import org.talend.components.netsuite.client.model.FieldDesc;
 import org.talend.components.netsuite.client.model.SimpleFieldDesc;
 import org.talend.components.netsuite.client.model.TypeDesc;
 import org.talend.components.netsuite.client.model.beans.BeanInfo;
 import org.talend.components.netsuite.client.model.beans.Beans;
-import org.talend.components.netsuite.client.model.beans.EnumAccessor;
 import org.talend.components.netsuite.client.model.customfield.CustomFieldRefType;
+import org.talend.components.netsuite.json.NsTypeResolverBuilder;
+import org.talend.daikon.avro.AvroRegistry;
+import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.di.DiSchemaConstants;
-import org.talend.daikon.exception.ExceptionContext;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.DatabindContext;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.cfg.MapperConfig;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
-import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
-import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
-import com.fasterxml.jackson.databind.type.SimpleType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 /**
  *
  */
 public abstract class NsObjectTransducer {
-    public static final String JSON_NS_TYPE_PROPERTY_NAME = "nsType";
 
     protected NetSuiteClientService<?> clientService;
+
     protected MetaDataSource metaDataSource;
 
     protected final DatatypeFactory datatypeFactory;
 
     protected final ObjectMapper objectMapper;
 
-    protected Map<Class<?>, ValueConverter<?, ?>> valueConverterCache = new HashMap<>();
+    protected Map<Class<?>, AvroConverter<?, ?>> valueConverterCache = new HashMap<>();
 
     public NsObjectTransducer(NetSuiteClientService<?> clientService) {
         this.clientService = clientService;
@@ -243,22 +232,53 @@ public abstract class NsObjectTransducer {
         return valueMap;
     }
 
+    /**
+     * Read a value from a field.
+     *
+     * @param valueMap map containing raw values by names
+     * @param fieldDesc field descriptor
+     * @return value of a field or <code>null</code>
+     */
     protected Object readField(Map<String, Object> valueMap, FieldDesc fieldDesc) {
         String fieldName = fieldDesc.getName();
-        ValueConverter valueConverter = getValueConverter(fieldDesc);
+        AvroConverter valueConverter = getValueConverter(fieldDesc);
         if (fieldDesc instanceof CustomFieldDesc) {
             Object customField = valueMap.get(fieldName);
             if (customField != null) {
                 Object value = getSimpleProperty(customField, "value");
-                return valueConverter.convertInput(value);
+                return valueConverter.convertToAvro(value);
             }
             return null;
         } else {
             Object value = valueMap.get(fieldName);
-            return valueConverter.convertInput(value);
+            return valueConverter.convertToAvro(value);
         }
     }
 
+    /**
+     * Write a value to a field.
+     *
+     * @param nsObject target NetSuite data model object which to write field value to
+     * @param fieldDesc field descriptor
+     * @param customFieldMap map of native custom field objects by names
+     * @param nullFieldNames collection to register null'ed fields
+     * @param value value to be written, can be <code>null</code>
+     */
+    protected void writeField(Object nsObject, FieldDesc fieldDesc, Map<String, Object> customFieldMap,
+            Collection<String> nullFieldNames, Object value) {
+        writeField(nsObject, fieldDesc, customFieldMap, true, nullFieldNames, value);
+    }
+
+    /**
+     * Write a value to a field.
+     *
+     * @param nsObject target NetSuite data model object which to write field value to
+     * @param fieldDesc field descriptor
+     * @param customFieldMap map of native custom field objects by names
+     * @param replace specifies whether to forcibly replace a field's value
+     * @param nullFieldNames collection to register null'ed fields
+     * @param value value to be written, can be <code>null</code>
+     */
     protected void writeField(Object nsObject, FieldDesc fieldDesc, Map<String, Object> customFieldMap,
             boolean replace, Collection<String> nullFieldNames, Object value) {
         if (fieldDesc instanceof CustomFieldDesc) {
@@ -268,6 +288,16 @@ public abstract class NsObjectTransducer {
         }
     }
 
+    /**
+     * Write a custom field which is not defined by NetSuite standard data model.
+     *
+     * @param nsObject target NetSuite data model object which to write field value to
+     * @param fieldDesc field descriptor
+     * @param customFieldMap map of native custom field objects by names
+     * @param replace specifies whether to forcibly replace a field's value
+     * @param nullFieldNames collection to register null'ed fields
+     * @param value value to be written, can be <code>null</code>
+     */
     protected void writeCustomField(Object nsObject, CustomFieldDesc fieldDesc, Map<String, Object> customFieldMap,
             boolean replace, Collection<String> nullFieldNames, Object value) {
 
@@ -282,9 +312,9 @@ public abstract class NsObjectTransducer {
         List<Object> customFieldList = (List<Object>) getSimpleProperty(customFieldListWrapper, "customField");
 
         Object customField = customFieldMap.get(ref.getScriptId());
-        ValueConverter valueConverter = getValueConverter(fieldDesc);
+        AvroConverter valueConverter = getValueConverter(fieldDesc);
 
-        Object targetValue = valueConverter.convertOutput(value);
+        Object targetValue = valueConverter.convertToDatum(value);
 
         if (targetValue == null) {
             if (replace && customField != null && customFieldList != null) {
@@ -306,12 +336,21 @@ public abstract class NsObjectTransducer {
         }
     }
 
+    /**
+     * Write a value to a simple field which is defined by NetSuite standard data model.
+     *
+     * @param nsObject target NetSuite data model object which to write field value to
+     * @param fieldDesc field descriptor
+     * @param replace specifies whether to forcibly replace a field's value
+     * @param nullFieldNames collection to register null'ed fields
+     * @param value value to be written, can be <code>null</code>
+     */
     protected void writeSimpleField(Object nsObject, SimpleFieldDesc fieldDesc,
             boolean replace, Collection<String> nullFieldNames, Object value) {
 
-        ValueConverter valueConverter = getValueConverter(fieldDesc);
+        AvroConverter valueConverter = getValueConverter(fieldDesc);
 
-        Object targetValue = valueConverter.convertOutput(value);
+        Object targetValue = valueConverter.convertToDatum(value);
 
         if (targetValue == null) {
             if (replace) {
@@ -350,7 +389,7 @@ public abstract class NsObjectTransducer {
         return valueClass;
     }
 
-    public ValueConverter<?, ?> getValueConverter(FieldDesc fieldDesc) {
+    public AvroConverter<?, ?> getValueConverter(FieldDesc fieldDesc) {
         Class<?> valueClass = null;
         if (fieldDesc instanceof CustomFieldDesc) {
             CustomFieldDesc customFieldDesc = (CustomFieldDesc) fieldDesc;
@@ -360,18 +399,18 @@ public abstract class NsObjectTransducer {
             valueClass = fieldDesc.getValueType();
         }
 
-        ValueConverter<?, ?> converter = null;
+        AvroConverter<?, ?> converter = null;
         if (valueClass != null) {
             converter = getValueConverter(valueClass);
         }
         if (converter == null) {
-            converter = NullValueConverter.INSTANCE;
+            converter = new NullConverter(valueClass, null);
         }
         return converter;
     }
 
-    public ValueConverter<?, ?> getValueConverter(Class<?> valueClass) {
-        ValueConverter<?, ?> converter = valueConverterCache.get(valueClass);
+    public AvroConverter<?, ?> getValueConverter(Class<?> valueClass) {
+        AvroConverter<?, ?> converter = valueConverterCache.get(valueClass);
         if (converter == null) {
             converter = createValueConverter(valueClass);
             if (converter != null) {
@@ -381,262 +420,22 @@ public abstract class NsObjectTransducer {
         return converter;
     }
 
-    protected ValueConverter<?, ?> createValueConverter(Class<?> valueClass) {
+    protected AvroConverter<?, ?> createValueConverter(Class<?> valueClass) {
         if (valueClass == Boolean.TYPE || valueClass == Boolean.class ||
                 valueClass == Integer.TYPE || valueClass == Integer.class ||
                 valueClass == Long.TYPE || valueClass == Long.class ||
                 valueClass == Double.TYPE || valueClass == Double.class ||
                 valueClass == String.class) {
-            return IdentityValueConverter.INSTANCE;
+            return new AvroRegistry.Unconverted<>(valueClass, null);
         } else if (valueClass == XMLGregorianCalendar.class) {
-            return new XMLGregorianCalendarValueConverter(datatypeFactory);
+            return new XMLGregorianCalendarToLongConverter(datatypeFactory);
         } else if (valueClass.isEnum()) {
             Class<Enum> enumClass = (Class<Enum>) valueClass;
-            return new EnumValueConverter<>(enumClass, getEnumAccessor(enumClass));
+            return new EnumToStringConverter<>(enumClass, getEnumAccessor(enumClass));
         } else if (!valueClass.isPrimitive()) {
-            return new JsonValueConverter<>(objectMapper, valueClass);
+            return new ObjectToJsonConverter<>(valueClass, objectMapper);
         }
         return null;
     }
 
-    public interface ValueConverter<T, U> {
-
-        U convertInput(T value);
-
-        T convertOutput(U value);
-    }
-
-    public static class NullValueConverter<T> implements ValueConverter<T, T> {
-
-        public static final NullValueConverter INSTANCE = new NullValueConverter();
-
-        @Override
-        public T convertInput(T value) {
-            return null;
-        }
-
-        @Override
-        public T convertOutput(T value) {
-            return null;
-        }
-    }
-
-    public static class IdentityValueConverter<T> implements ValueConverter<T, T> {
-
-        public static final IdentityValueConverter INSTANCE = new IdentityValueConverter();
-
-        @Override
-        public T convertInput(T value) {
-            return value;
-        }
-
-        @Override
-        public T convertOutput(T value) {
-            return value;
-        }
-    }
-
-    public static class EnumValueConverter<T extends Enum<T>> implements ValueConverter<T, String> {
-
-        private final Class<T> clazz;
-        private final EnumAccessor enumAccessor;
-
-        public EnumValueConverter(Class<T> clazz, EnumAccessor enumAccessor) {
-            this.clazz = clazz;
-            this.enumAccessor = enumAccessor;
-        }
-
-        @Override
-        public T convertOutput(String value) {
-            if (value == null) {
-                return null;
-            }
-            try {
-                return (T) enumAccessor.getEnumValue(value);
-            } catch (IllegalArgumentException ex) {
-                // Fallback to .valueOf(String)
-                return Enum.valueOf(clazz, value);
-            }
-        }
-
-        @Override
-        public String convertInput(Enum enumValue) {
-            if (enumValue == null) {
-                return null;
-            }
-            try {
-                return enumAccessor.getStringValue(enumValue);
-            } catch (IllegalArgumentException ex) {
-                // Fallback to .name()
-                return enumValue.name();
-            }
-        }
-    }
-
-    public static class XMLGregorianCalendarValueConverter implements ValueConverter<XMLGregorianCalendar, Long> {
-        private DatatypeFactory datatypeFactory;
-
-        public XMLGregorianCalendarValueConverter(DatatypeFactory datatypeFactory) {
-            this.datatypeFactory = datatypeFactory;
-        }
-
-        @Override
-        public XMLGregorianCalendar convertOutput(Long timestamp) {
-            if (timestamp == null) {
-                return null;
-            }
-
-            MutableDateTime dateTime = new MutableDateTime();
-            dateTime.setMillis(timestamp);
-
-            XMLGregorianCalendar xts = datatypeFactory.newXMLGregorianCalendar();
-            xts.setYear(dateTime.getYear());
-            xts.setMonth(dateTime.getMonthOfYear());
-            xts.setDay(dateTime.getDayOfMonth());
-            xts.setHour(dateTime.getHourOfDay());
-            xts.setMinute(dateTime.getMinuteOfHour());
-            xts.setSecond(dateTime.getSecondOfMinute());
-            xts.setMillisecond(dateTime.getMillisOfSecond());
-            xts.setTimezone(dateTime.getZone().toTimeZone().getOffset(dateTime.getMillis()) / 60000);
-
-            return xts;
-        }
-
-        @Override
-        public Long convertInput(XMLGregorianCalendar xts) {
-            if (xts == null) {
-                return null;
-            }
-
-            MutableDateTime dateTime = new MutableDateTime();
-            try {
-                dateTime.setYear(xts.getYear());
-                dateTime.setMonthOfYear(xts.getMonth());
-                dateTime.setDayOfMonth(xts.getDay());
-                dateTime.setHourOfDay(xts.getHour());
-                dateTime.setMinuteOfHour(xts.getMinute());
-                dateTime.setSecondOfMinute(xts.getSecond());
-                dateTime.setMillisOfSecond(xts.getMillisecond());
-
-                DateTimeZone tz = DateTimeZone.forOffsetMillis(xts.getTimezone() * 60000);
-                if (tz != null) {
-                    dateTime.setZoneRetainFields(tz);
-                }
-
-                return dateTime.getMillis();
-            } catch (IllegalArgumentException e) {
-                throw new ComponentException(e);
-            }
-        }
-    }
-
-    public static class JsonValueConverter<T> implements ValueConverter<T, String> {
-        protected Class<T> clazz;
-        protected ObjectReader objectReader;
-        protected ObjectWriter objectWriter;
-
-        public JsonValueConverter(ObjectMapper objectMapper, Class<T> clazz) {
-            this.clazz = clazz;
-
-            objectWriter = objectMapper.writer().forType(clazz);
-            objectReader = objectMapper.reader().forType(clazz);
-        }
-
-        @Override
-        public String convertInput(T value) {
-            if (value == null) {
-                return null;
-            }
-            try {
-                return objectWriter.writeValueAsString(value);
-            } catch (IOException e) {
-                throw new NetSuiteException(new NetSuiteErrorCode("JSON_PROCESSING"), e,
-                        ExceptionContext.build().put(ExceptionContext.KEY_MESSAGE, e.getMessage()));
-            }
-        }
-
-        @Override
-        public T convertOutput(String value) {
-            if (value == null) {
-                return null;
-            }
-            try {
-                return objectReader.readValue(value);
-            } catch (IOException e) {
-                throw new NetSuiteException(new NetSuiteErrorCode("JSON_PROCESSING"), e,
-                        ExceptionContext.build().put(ExceptionContext.KEY_MESSAGE, e.getMessage()));
-            }
-        }
-    }
-
-    protected static class NsTypeResolverBuilder extends ObjectMapper.DefaultTypeResolverBuilder {
-        protected BasicMetaData basicMetaData;
-
-        protected NsTypeResolverBuilder(BasicMetaData basicMetaData) {
-            super(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE);
-
-            this.basicMetaData = basicMetaData;
-
-            init(JsonTypeInfo.Id.NAME, null);
-            inclusion(JsonTypeInfo.As.PROPERTY);
-            typeProperty(JSON_NS_TYPE_PROPERTY_NAME);
-        }
-
-        @Override
-        public boolean useForType(JavaType t) {
-            if (t.isCollectionLikeType()) {
-                return false;
-            }
-            if (t.getRawClass() == XMLGregorianCalendar.class) {
-                return false;
-            }
-            return super.useForType(t);
-        }
-
-        @Override
-        protected TypeIdResolver idResolver(MapperConfig<?> config, JavaType baseType,
-                Collection<NamedType> subtypes, boolean forSer, boolean forDeser) {
-
-            if (_idType == null) {
-                throw new IllegalStateException("Can not build, 'init()' not yet called");
-            }
-
-            return new NsTypeIdResolver(baseType, config.getTypeFactory(), basicMetaData);
-        }
-    }
-
-    protected static class NsTypeIdResolver extends TypeIdResolverBase {
-        protected BasicMetaData basicMetaData;
-
-        protected NsTypeIdResolver(JavaType baseType, TypeFactory typeFactory, BasicMetaData basicMetaData) {
-            super(baseType, typeFactory);
-
-            this.basicMetaData = basicMetaData;
-        }
-
-        @Override
-        public JavaType typeFromId(DatabindContext context, String id) {
-            Class<?> clazz = basicMetaData.getTypeClass(id);
-            if (clazz == null) {
-                return null;
-            }
-            JavaType javaType = SimpleType.construct(clazz);
-            return javaType;
-        }
-
-        @Override
-        public String idFromValue(Object value) {
-            return value.getClass().getSimpleName();
-        }
-
-        @Override
-        public String idFromValueAndType(Object value, Class<?> suggestedType) {
-            return suggestedType.getSimpleName();
-        }
-
-        @Override
-        public JsonTypeInfo.Id getMechanism() {
-            return JsonTypeInfo.Id.NAME;
-        }
-    }
 }

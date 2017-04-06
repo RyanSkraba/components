@@ -35,6 +35,7 @@ public class NetSuiteConnectionPropertiesTest {
         assertNotNull(properties.role.getValue());
         assertNotNull(properties.account.getValue());
         assertNotNull(properties.applicationId.getValue());
+        assertNotNull(properties.customizationEnabled.getValue());
     }
 
     @Test
@@ -49,6 +50,9 @@ public class NetSuiteConnectionPropertiesTest {
         assertNotNull(mainForm.getWidget("role"));
         assertNotNull(mainForm.getWidget("account"));
         assertNotNull(mainForm.getWidget("applicationId"));
+
+        Form advForm = properties.getForm(Form.ADVANCED);
+        assertNotNull(advForm.getWidget("customizationEnabled"));
 
         Form refForm = properties.getForm(Form.REFERENCE);
         assertNotNull(refForm);

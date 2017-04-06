@@ -17,6 +17,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static org.talend.components.netsuite.client.model.beans.Beans.getProperty;
 import static org.talend.components.netsuite.v2014_2.MockTestHelper.makeRecordPages;
+import static org.talend.components.netsuite.v2014_2.NetSuitePortTypeMockAdapterImpl.createNotFoundStatus;
 import static org.talend.components.netsuite.v2014_2.NetSuitePortTypeMockAdapterImpl.createSuccessStatus;
 
 import java.util.HashMap;
@@ -87,6 +88,32 @@ public abstract class NetSuiteMockTestBase extends AbstractNetSuiteTestBase {
                 readResponse.setStatus(createSuccessStatus());
                 readResponse.setRecord(record);
                 response.setReadResponse(readResponse);
+                return response;
+            }
+        });
+    }
+
+    protected <T extends Record> void mockGetListRequestResults(final List<T> records) throws Exception {
+        final NetSuitePortType port = webServiceMockTestFixture.getPortMock();
+
+        when(port.getList(any(GetListRequest.class))).then(new Answer<GetListResponse>() {
+            @Override public GetListResponse answer(InvocationOnMock invocationOnMock) throws Throwable {
+                GetListRequest request = (GetListRequest) invocationOnMock.getArguments()[0];
+                GetListResponse response = new GetListResponse();
+                ReadResponseList readResponseList = new ReadResponseList();
+                int count = request.getBaseRef().size();
+                for (int i = 0; i < count; i++) {
+                    ReadResponse readResponse = new ReadResponse();
+                    T record = records != null ? records.get(i) : null;
+                    if (record != null) {
+                        readResponse.setStatus(createSuccessStatus());
+                    } else {
+                        readResponse.setStatus(createNotFoundStatus());
+                    }
+                    readResponse.setRecord(record);
+                    readResponseList.getReadResponse().add(readResponse);
+                }
+                response.setReadResponseList(readResponseList);
                 return response;
             }
         });

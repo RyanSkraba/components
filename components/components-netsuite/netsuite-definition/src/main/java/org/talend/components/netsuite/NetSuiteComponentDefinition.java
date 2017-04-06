@@ -13,7 +13,6 @@
 
 package org.talend.components.netsuite;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -100,11 +99,21 @@ public abstract class NetSuiteComponentDefinition extends AbstractComponentDefin
         NetSuiteConnectionProperties connectionProperties = properties.getConnectionProperties();
 
         String endpointUrl = connectionProperties.endpoint.getStringValue();
-        String apiVersion = detectApiVersion(endpointUrl);
 
-        String artifactId = MAVEN_ARTIFACT_ID.replace("${version}", apiVersion);
-        String className = runtimeClassName.replace("${version}", apiVersion);
+        try {
+            NetSuiteVersion version = NetSuiteVersion.detectVersion(endpointUrl);
+            return getRuntimeInfo(version, runtimeClassName);
+        } catch (IllegalArgumentException e) {
+            throw new ComponentException(new ValidationResult()
+                    .setStatus(ValidationResult.Result.ERROR)
+                    .setMessage(e.getMessage()));
+        }
+    }
 
+    public static RuntimeInfo getRuntimeInfo(final NetSuiteVersion version, final String runtimeClassName) {
+        String versionString = version.getMajorAsString("_");
+        String artifactId = MAVEN_ARTIFACT_ID.replace("${version}", versionString);
+        String className = runtimeClassName.replace("${version}", versionString);
         return new JarRuntimeInfo("mvn:" + MAVEN_GROUP_ID + "/" + artifactId,
                 DependenciesReader.computeDependenciesFilePath(MAVEN_GROUP_ID, artifactId),
                 className);
@@ -119,19 +128,6 @@ public abstract class NetSuiteComponentDefinition extends AbstractComponentDefin
             throw new IllegalArgumentException("Runtime invoker can't be null");
         }
         NetSuiteComponentDefinition.runtimeInvoker = runtimeInvoker;
-    }
-
-    public static String detectApiVersion(String nsEndpointUrl) {
-        URI uri = URI.create(nsEndpointUrl);
-        if (uri.getPath().endsWith("NetSuitePort_2016_2")) {
-            return "2016_2";
-        }
-        if (uri.getPath().endsWith("NetSuitePort_2014_2")) {
-            return "2014_2";
-        }
-        throw new ComponentException(new ValidationResult()
-                .setStatus(ValidationResult.Result.ERROR)
-                .setMessage("Failed to detect NetSuite API version: " + nsEndpointUrl));
     }
 
     public static class DesignTimeContext implements NetSuiteRuntime.Context {
