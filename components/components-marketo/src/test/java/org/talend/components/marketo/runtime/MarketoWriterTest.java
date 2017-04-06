@@ -13,7 +13,8 @@
 package org.talend.components.marketo.runtime;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -21,54 +22,57 @@ import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.talend.components.marketo.tmarketolistoperation.TMarketoListOperationProperties;
+import org.talend.components.api.component.runtime.Result;
+import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
 
-public class MarketoOutputWriterTest {
+public class MarketoWriterTest {
 
-    MarketoOutputWriter w;
+    MarketoSink sink;
+
+    MarketoWriteOperation wop;
+
+    MarketoOutputWriter writer;
 
     @Before
     public void setUp() throws Exception {
-        MarketoSink sink = new MarketoSink();
-        TMarketoListOperationProperties p = new TMarketoListOperationProperties("test");
-        p.connection.setupProperties();
-        p.setupProperties();
-        sink.initialize(null, p);
-
-        w = new MarketoOutputWriter(new MarketoWriteOperation(sink), null);
+        sink = new MarketoSink();
+        TMarketoOutputProperties pout = new TMarketoOutputProperties("test");
+        pout.setupProperties();
+        pout.connection.setupProperties();
+        sink.initialize(null, pout);
+        wop = (MarketoWriteOperation) sink.createWriteOperation();
+        writer = (MarketoOutputWriter) wop.createWriter(null);
     }
 
     @Test(expected = IOException.class)
     public void testOpen() throws Exception {
-        w.open("test");
-        fail("Should be here");
-    }
-
-    @Test
-    public void testWrite() throws Exception {
-        w.write(null);
-        assertEquals(0, w.result.totalCount);
+        writer.open("testUID");
+        fail("Shouldn't be here");
     }
 
     @Test
     public void testGetWriteOperation() throws Exception {
-        assertTrue(w.getWriteOperation() instanceof MarketoWriteOperation);
+        assertEquals(wop, writer.getWriteOperation());
     }
 
     @Test
     public void testClose() throws Exception {
-        w.close();
-        assertEquals(0, w.result.totalCount);
+        Result r = writer.close();
+        assertNotNull(r);
+        assertEquals(0, r.getTotalCount());
+        assertEquals(0, r.getSuccessCount());
+        assertEquals(0, r.getRejectCount());
+        assertNull(r.getuId());
     }
 
     @Test
     public void testGetSuccessfulWrites() throws Exception {
-        assertEquals(Collections.emptyList(), w.getSuccessfulWrites());
+        assertEquals(Collections.emptyList(), writer.getSuccessfulWrites());
     }
 
     @Test
     public void testGetRejectedWrites() throws Exception {
-        assertEquals(Collections.emptyList(), w.getRejectedWrites());
+        assertEquals(Collections.emptyList(), writer.getRejectedWrites());
     }
 
 }

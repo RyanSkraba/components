@@ -53,7 +53,8 @@ public class MarketoResultTest {
         assertEquals("", result.getStreamPosition());
         assertEquals("", result.getRequestId());
         assertFalse(result.isSuccess());
-        assertNull(result.getErrors());
+        assertNotNull(result.getErrors());
+        assertEquals(0, result.getErrors().size());
 
         result.setRecordCount(100);
         result.setRemainCount(100);

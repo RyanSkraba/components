@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.marketo.runtime.client.type;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class MarketoBaseResult<T> {
@@ -27,6 +28,7 @@ public abstract class MarketoBaseResult<T> {
     int recordCount;
 
     int remainCount;
+
     public MarketoBaseResult(String streamPosition, int recordCount, int remainCount, List<?> records) {
         this.streamPosition = streamPosition;
         this.recordCount = recordCount;
@@ -54,6 +56,10 @@ public abstract class MarketoBaseResult<T> {
     }
 
     public List<MarketoError> getErrors() {
+        // ensure that errors is never null
+        if (errors == null) {
+            return new ArrayList<>();
+        }
         return errors;
     }
 

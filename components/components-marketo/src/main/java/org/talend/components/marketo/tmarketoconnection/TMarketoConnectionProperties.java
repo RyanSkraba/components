@@ -19,15 +19,11 @@ import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 import java.util.EnumSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.marketo.MarketoProvideConnectionProperties;
 import org.talend.components.marketo.runtime.MarketoSource;
 import org.talend.components.marketo.runtime.MarketoSourceOrSink;
-import org.talend.daikon.i18n.GlobalI18N;
-import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
@@ -49,8 +45,6 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
 
     public Property<String> name = newString("name").setRequired();
 
-    private String repositoryLocation;
-
     //
     public PresentationItem testConnection = new PresentationItem("testConnection", "Test connection");
 
@@ -71,12 +65,10 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
     public ComponentReferenceProperties<TMarketoConnectionProperties> referencedComponent = new ComponentReferenceProperties<>(
             "referencedComponent", TMarketoConnectionDefinition.COMPONENT_NAME);
 
+    private String repositoryLocation;
+
     //
     private static final long serialVersionUID = 145738798798151L;
-
-    private transient static final Logger LOG = LoggerFactory.getLogger(TMarketoConnectionProperties.class);
-
-    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(MarketoSourceOrSink.class);
 
     public TMarketoConnectionProperties(String name) {
         super(name);
@@ -184,7 +176,7 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
         if (vr.getStatus() != ValidationResult.Result.OK) {
             return vr;
         }
-        String repoLoc = repo.storeProperties(this, this.name.getValue(), repositoryLocation, null);
+        repo.storeProperties(this, this.name.getValue(), repositoryLocation, null);
         return ValidationResult.OK;
     }
 
@@ -194,7 +186,7 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
     }
 
     public String getReferencedComponentId() {
-        return referencedComponent.componentInstanceId.getStringValue();
+        return referencedComponent.componentInstanceId.getValue();
     }
 
     public TMarketoConnectionProperties getReferencedConnectionProperties() {

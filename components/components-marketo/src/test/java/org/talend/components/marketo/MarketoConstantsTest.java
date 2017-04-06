@@ -199,4 +199,38 @@ public class MarketoConstantsTest {
         assertEquals("INT", ref.getField("primaryAttributeValueId").schema().getTypes().get(0).getType().toString());
         assertEquals("STRING", ref.getField("primaryAttributeValue").schema().getTypes().get(0).getType().toString());
     }
+
+    @Test
+    public void testGetBulkImportLeadSchema() throws Exception {
+        Schema ref = MarketoConstants.getBulkImportLeadSchema();
+        assertEquals("true", ref.getProp(SchemaConstants.TALEND_IS_LOCKED));
+        assertEquals("INT", ref.getField("batchId").schema().getTypes().get(0).getType().toString());
+        assertEquals("true", ref.getField("batchId").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
+        assertEquals("STRING", ref.getField("importId").schema().getTypes().get(0).getType().toString());
+        assertEquals("STRING", ref.getField("message").schema().getTypes().get(0).getType().toString());
+        assertEquals("INT", ref.getField("numOfLeadsProcessed").schema().getTypes().get(0).getType().toString());
+        assertEquals("INT", ref.getField("numOfRowsFailed").schema().getTypes().get(0).getType().toString());
+        assertEquals("INT", ref.getField("numOfRowsWithWarning").schema().getTypes().get(0).getType().toString());
+        assertEquals("STRING", ref.getField("status").schema().getTypes().get(0).getType().toString());
+        assertEquals("STRING", ref.getField("failuresLogFile").schema().getTypes().get(0).getType().toString());
+        assertEquals("STRING", ref.getField("warningsLogFile").schema().getTypes().get(0).getType().toString());
+    }
+
+    @Test
+    public void testGetBulkImportCustomObjectSchema() throws Exception {
+        Schema ref = MarketoConstants.getBulkImportCustomObjectSchema();
+        assertEquals("true", ref.getProp(SchemaConstants.TALEND_IS_LOCKED));
+        assertEquals("INT", ref.getField("batchId").schema().getTypes().get(0).getType().toString());
+        assertEquals("true", ref.getField("batchId").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
+        assertEquals("STRING", ref.getField("importTime").schema().getTypes().get(0).getType().toString());
+        assertEquals("STRING", ref.getField("message").schema().getTypes().get(0).getType().toString());
+        assertEquals("INT", ref.getField("numOfObjectsProcessed").schema().getTypes().get(0).getType().toString());
+        assertEquals("INT", ref.getField("numOfRowsFailed").schema().getTypes().get(0).getType().toString());
+        assertEquals("INT", ref.getField("numOfRowsWithWarning").schema().getTypes().get(0).getType().toString());
+        assertEquals("STRING", ref.getField("objectApiName").schema().getTypes().get(0).getType().toString());
+        assertEquals("STRING", ref.getField("operation").schema().getTypes().get(0).getType().toString());
+        assertEquals("STRING", ref.getField("status").schema().getTypes().get(0).getType().toString());
+        assertEquals("STRING", ref.getField("failuresLogFile").schema().getTypes().get(0).getType().toString());
+        assertEquals("STRING", ref.getField("warningsLogFile").schema().getTypes().get(0).getType().toString());
+    }
 }

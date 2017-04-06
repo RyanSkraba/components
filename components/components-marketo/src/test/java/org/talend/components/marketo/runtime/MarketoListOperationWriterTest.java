@@ -16,8 +16,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.talend.components.marketo.tmarketolistoperation.TMarketoListOperationProperties;
 
 public class MarketoListOperationWriterTest {
 
@@ -25,11 +28,16 @@ public class MarketoListOperationWriterTest {
 
     @Before
     public void setUp() throws Exception {
-        w = new MarketoListOperationWriter(new MarketoWriteOperation(new MarketoSink()), null);
+        MarketoSink sink = new MarketoSink();
+        TMarketoListOperationProperties p = new TMarketoListOperationProperties("test");
+        p.connection.setupProperties();
+        p.setupProperties();
+        sink.initialize(null, p);
+        w = new MarketoListOperationWriter(new MarketoWriteOperation(sink), null);
         assertNotNull(w);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IOException.class)
     public void testOpen() throws Exception {
         w.open("test");
         fail("Should be here");

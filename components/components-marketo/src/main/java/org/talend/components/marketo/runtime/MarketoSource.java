@@ -1,17 +1,23 @@
 package org.talend.components.marketo.runtime;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.marketo.MarketoConstants;
+import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties;
+import org.talend.components.marketo.tmarketobulkexec.TMarketoBulkExecProperties.BulkImportTo;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
@@ -53,9 +59,9 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
     public boolean isInvalidDate(String datetime) {
         try {
             Date dt = new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_PARAM).parse(datetime);
-            return true;
-        } catch (ParseException e) {
             return false;
+        } catch (ParseException e) {
+            return true;
         }
     }
 
@@ -210,12 +216,61 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
                 }
             }
         }
+        // BulkExec
+        if (properties instanceof TMarketoBulkExecProperties) {
+            TMarketoBulkExecProperties p = (TMarketoBulkExecProperties) properties;
+            if (p.connection.apiMode.getValue().equals(APIMode.SOAP)) {
+                vr.setStatus(Result.ERROR);
+                vr.setMessage(messages.getMessage("error.validation.soap.bulkexec"));
+                return vr;
+            }
+            if (StringUtils.isEmpty(p.bulkFilePath.getValue())) {
+                vr.setStatus(Result.ERROR);
+                vr.setMessage(messages.getMessage("error.validation.sink.bulk.bulkfilepath"));
+                return vr;
+            }
+            Path tmpPath = Paths.get(p.bulkFilePath.getValue());
+            if (!Files.exists(tmpPath)) {
+                vr.setStatus(Result.ERROR);
+                vr.setMessage(messages.getMessage("error.validation.sink.bulk.bulkfilepath.notexists"));
+                return vr;
+            }
+            if (StringUtils.isEmpty(p.logDownloadPath.getValue())) {
+                vr.setStatus(Result.ERROR);
+                vr.setMessage(messages.getMessage("error.validation.sink.bulk.logdownloadpath"));
+                return vr;
+            }
+            tmpPath = Paths.get(p.logDownloadPath.getValue());
+            if (!Files.isDirectory(tmpPath)) {
+                vr.setStatus(Result.ERROR);
+                vr.setMessage(messages.getMessage("error.validation.sink.bulk.logdownloadpath"));
+                return vr;
+            }
+            if (p.bulkImportTo.getValue().equals(BulkImportTo.Leads)) {
+                if (StringUtils.isEmpty(p.lookupField.getValue().name())) {
+                    vr.setStatus(Result.ERROR);
+                    vr.setMessage(messages.getMessage("error.validation.bulk.lookupfield"));
+                    return vr;
+                }
+            } else {
+                if (StringUtils.isEmpty(p.customObjectName.getValue())) {
+                    vr.setStatus(Result.ERROR);
+                    vr.setMessage(messages.getMessage("error.validation.customobject.customobjectname"));
+                    return vr;
+                }
+            }
+        }
         return vr;
     }
 
     @Override
     public BoundedReader createReader(RuntimeContainer adaptor) {
-        return new MarketoInputReader(adaptor, this, (TMarketoInputProperties) properties);
+        if (properties instanceof TMarketoInputProperties) {
+            return new MarketoInputReader(adaptor, this, (TMarketoInputProperties) properties);
+        }
+        if (properties instanceof TMarketoBulkExecProperties) {
+            return new MarketoBulkExecReader(adaptor, this, (TMarketoBulkExecProperties) properties);
+        }
+        return null;
     }
-
 }

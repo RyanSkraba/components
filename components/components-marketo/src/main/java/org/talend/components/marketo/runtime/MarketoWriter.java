@@ -73,7 +73,7 @@ public abstract class MarketoWriter implements WriterWithFeedback<Result, Indexe
 
     @Override
     public void open(String uId) throws IOException {
-        client = sink.getClientService(null);
+        client = sink.getClientService(runtime);
         api = client.getApi();
         use_soap_api = API_SOAP.equals(api);
     }

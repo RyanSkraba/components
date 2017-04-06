@@ -21,13 +21,17 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.Result;
+import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
+import org.talend.components.marketo.tmarketolistoperation.TMarketoListOperationProperties;
+import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
 
-public class MarketoListOperationWriteOperationTest {
+public class MarketoWriteOperationTest {
 
-    MarketoListOperationWriteOperation wop;
+    MarketoWriteOperation wop;
+
     @Before
     public void setUp() throws Exception {
-        wop = new MarketoListOperationWriteOperation(new MarketoSink());
+        wop = new MarketoWriteOperation(new MarketoSink());
         wop.initialize(null);
     }
 
@@ -40,7 +44,19 @@ public class MarketoListOperationWriteOperationTest {
 
     @Test
     public void testCreateWriter() throws Exception {
-        assertTrue(wop.createWriter(null) instanceof MarketoListOperationWriter);
+        MarketoSink sink = new MarketoSink();
+        TMarketoListOperationProperties plist = new TMarketoListOperationProperties("test");
+        TMarketoOutputProperties pout = new TMarketoOutputProperties("test");
+        TMarketoInputProperties pin = new TMarketoInputProperties("test");
+        sink.initialize(null, plist);
+        wop = new MarketoWriteOperation(sink);
+        assertEquals(MarketoListOperationWriter.class, wop.createWriter(null).getClass());
+        sink.initialize(null, pout);
+        wop = new MarketoWriteOperation(sink);
+        assertEquals(MarketoOutputWriter.class, wop.createWriter(null).getClass());
+        sink.initialize(null, pin);
+        wop = new MarketoWriteOperation(sink);
+        assertEquals(MarketoInputWriter.class, wop.createWriter(null).getClass());
     }
 
     @Test

@@ -35,7 +35,7 @@ public class MarketoFamilyDefinitionTest extends MarketoTestBase {
     public final void testMarketoFamilyDefinition() {
         assertNotNull(getDefinitionRegistry());
         assertEquals("Marketo", new MarketoFamilyDefinition().getName());
-        assertEquals(6, testComponentRegistry.getDefinitions().size());
+        assertEquals(7, testComponentRegistry.getDefinitions().size());
     }
 
     @Test
