@@ -13,6 +13,8 @@
 package org.talend.components.marketo.tmarketooutput;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,6 +29,7 @@ import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProper
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OperationType;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OutputOperation;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.RESTLookupFields;
+import org.talend.daikon.properties.presentation.Form;
 
 public class TMarketoOutputPropertiesTest {
 
@@ -100,5 +103,29 @@ public class TMarketoOutputPropertiesTest {
     @Test
     public void testDefaultShema() throws Exception {
         assertEquals(MarketoConstants.getRESTOutputSchemaForSyncLead(), props.schemaInput.schema.getValue());
+    }
+
+    @Test
+    public void testTDI38543() throws Exception {
+        props.outputOperation.setValue(OutputOperation.syncMultipleLeads);
+        props.afterOutputOperation();
+        assertFalse(props.deDupeEnabled.getValue());
+        assertTrue(props.getForm(Form.MAIN).getWidget(props.operationType.getName()).isVisible());
+        assertTrue(props.getForm(Form.MAIN).getWidget(props.lookupField.getName()).isVisible());
+        props.deDupeEnabled.setValue(true);
+        props.afterOutputOperation();
+        assertTrue(props.deDupeEnabled.getValue());
+        assertFalse(props.getForm(Form.MAIN).getWidget(props.operationType.getName()).isVisible());
+        assertFalse(props.getForm(Form.MAIN).getWidget(props.lookupField.getName()).isVisible());
+        props.connection.apiMode.setValue(APIMode.SOAP);
+        props.afterApiMode();
+        assertTrue(props.deDupeEnabled.getValue());
+        assertFalse(props.getForm(Form.MAIN).getWidget(props.operationType.getName()).isVisible());
+        assertFalse(props.getForm(Form.MAIN).getWidget(props.lookupField.getName()).isVisible());
+        props.deDupeEnabled.setValue(false);
+        props.afterDeDupeEnabled();
+        assertFalse(props.deDupeEnabled.getValue());
+        assertFalse(props.getForm(Form.MAIN).getWidget(props.operationType.getName()).isVisible());
+        assertFalse(props.getForm(Form.MAIN).getWidget(props.lookupField.getName()).isVisible());
     }
 }

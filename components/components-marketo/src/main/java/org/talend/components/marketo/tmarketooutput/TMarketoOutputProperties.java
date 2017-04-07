@@ -208,9 +208,9 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
                 switch (outputOperation.getValue()) {
                 case syncLead:
                 case syncMultipleLeads:
-                    form.getWidget(operationType.getName()).setVisible(true);
-                    form.getWidget(lookupField.getName()).setVisible(true);
                     form.getWidget(deDupeEnabled.getName()).setVisible(true);
+                    form.getWidget(operationType.getName()).setHidden(deDupeEnabled.getValue());
+                    form.getWidget(lookupField.getName()).setHidden(deDupeEnabled.getValue());
                     break;
                 case syncCustomObjects:
                     form.getWidget(customObjectName.getName()).setVisible(true);
@@ -268,6 +268,10 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
             }
         }
         updateSchemaRelated();
+        refreshLayout(getForm(Form.MAIN));
+    }
+
+    public void afterDeDupeEnabled() {
         refreshLayout(getForm(Form.MAIN));
     }
 
