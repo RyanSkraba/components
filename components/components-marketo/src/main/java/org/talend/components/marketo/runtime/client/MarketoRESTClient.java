@@ -25,11 +25,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.text.DateFormat;
@@ -223,20 +222,24 @@ public class MarketoRESTClient extends MarketoClient implements MarketoClientSer
         retryInterval = connection.attemptsIntervalTime.getValue();
         try {
             if (endpoint == null) {
-                throw new MarketoException(REST, "The endpoint is null!");
+                throw new MarketoException(REST, messages.getMessage("error.rest.endpoint.null"));
             }
-            URI basicURI = new URI(endpoint);
-            if (basicURI.getPath() != null) {
-                basicPath = basicURI.toString();
+            URL url = new URL(endpoint);
+            if (url.getPath() != null) {
+                basicPath = url.toString();
+                // check if endpoint is valid
+                if (!basicPath.equals(String.format("%s://%s/rest", url.getProtocol(), url.getHost()))) {
+                    throw new MarketoException(REST, messages.getMessage("error.rest.endpoint.invalid"));
+                }
                 bulkPath = basicPath.replaceAll("rest$", "bulk");
             }
+            // check credentials
             getToken();
-        } catch (URISyntaxException e) {
+            // dummy call to finally check the connection
+            getPageToken("2017-01-01 00:00:00");
+        } catch (MalformedURLException e) {
             LOG.error(e.toString());
             throw new MarketoException(REST, e.getMessage());
-        } catch (MarketoException e) {
-            LOG.error(e.toString());
-            throw e;
         }
     }
 

@@ -52,4 +52,26 @@ public class MarketoSourceTest {
         assertEquals(ValidationResult.Result.ERROR, source.validate(null).getStatus());
     }
 
+    @Test
+    public void testTDI38561() throws Exception {
+        TMarketoInputProperties props = new TMarketoInputProperties("test");
+        props.connection.setupProperties();
+        props.setupProperties();
+        props.connection.endpoint.setValue("htp:ttoot.com");
+        props.connection.clientAccessId.setValue("user");
+        props.connection.secretKey.setValue("secret");
+        source.initialize(null, props);
+        assertEquals(ValidationResult.Result.ERROR, source.validate(null).getStatus());
+        props.connection.endpoint.setValue("https://ttoot.com");
+        source.initialize(null, props);
+        assertEquals(ValidationResult.Result.ERROR, source.validate(null).getStatus());
+        props.connection.endpoint.setValue("https://ttoot.com/rustinpeace/rest");
+        source.initialize(null, props);
+        assertEquals(ValidationResult.Result.ERROR, source.validate(null).getStatus());
+        props.connection.endpoint.setValue("https://ttoot.com/rest");
+        source.initialize(null, props);
+        ValidationResult vr = source.validate(null);
+        assertEquals(ValidationResult.Result.ERROR, vr.getStatus());
+        assertTrue(vr.getMessage().contains("refused"));
+    }
 }
