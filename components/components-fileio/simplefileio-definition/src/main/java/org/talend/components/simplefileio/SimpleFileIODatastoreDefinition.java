@@ -56,7 +56,7 @@ public class SimpleFileIODatastoreDefinition extends I18nDefinition implements
 
     @Override
     public String getIconKey() {
-        return "file-o";
+        return "file-hdfs-o";
     }
 
     @Override

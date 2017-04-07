@@ -46,7 +46,7 @@ public class SimpleFileIOOutputDefinition extends AbstractComponentDefinition {
 
     @Override
     public String getIconKey() {
-        return "file-o";
+        return "file-hdfs-o";
     }
 
     @Override

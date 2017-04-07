@@ -52,7 +52,7 @@ public class SimpleFileIODatasetDefinition extends I18nDefinition implements Dat
 
     @Override
     public String getIconKey() {
-        return "file-o";
+        return "file-hdfs-o";
     }
 
     @Override
