@@ -39,7 +39,7 @@ import org.talend.daikon.serialize.migration.SerializeSetVersion;
 public class SalesforceConnectionProperties extends ComponentPropertiesImpl
         implements SalesforceProvideConnectionProperties, SerializeSetVersion {
 
-    public static final String DEFAULT_API_VERSION = "37.0";
+    public static final String DEFAULT_API_VERSION = "39.0";
 
     public static final String URL = "https://www.salesforce.com/services/Soap/u/" + DEFAULT_API_VERSION;
 

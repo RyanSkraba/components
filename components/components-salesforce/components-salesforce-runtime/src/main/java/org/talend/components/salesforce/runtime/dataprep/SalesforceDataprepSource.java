@@ -31,6 +31,7 @@ import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.common.SalesforceRuntimeSourceOrSink;
 import org.talend.components.salesforce.dataprep.SalesforceInputProperties;
 import org.talend.components.salesforce.dataset.SalesforceDatasetProperties;
@@ -57,9 +58,7 @@ public final class SalesforceDataprepSource
     private static final Logger LOG = LoggerFactory.getLogger(SalesforceDataprepSource.class);
 
     private static final String CONFIG_FILE_lOCATION_KEY = "org.talend.component.salesforce.config.file";
-    
-    private static final String DEFAULT_ENDPOINT = "https://www.salesforce.com/services/Soap/u/37.0";
-    
+
     private static final int DEFAULT_TIMEOUT = 60000;
 
     private SalesforceInputProperties properties;
@@ -68,7 +67,7 @@ public final class SalesforceDataprepSource
 
     private SalesforceDatastoreProperties datastore;
 
-    private String endpoint = DEFAULT_ENDPOINT;
+    private String endpoint = SalesforceConnectionProperties.URL;
 
     private int timeout = DEFAULT_TIMEOUT;
 
@@ -81,21 +80,21 @@ public final class SalesforceDataprepSource
         String config_file = System.getProperty(CONFIG_FILE_lOCATION_KEY);
         try (InputStream is = config_file != null ? (new FileInputStream(config_file))
                 : this.getClass().getClassLoader().getResourceAsStream("salesforce.properties")) {
-            if(is == null) {
+            if (is == null) {
                 LOG.warn("not found the property file, will use the default value for endpoint and timeout");
                 return ValidationResult.OK;
             }
-            
+
             Properties props = new Properties();
             props.load(is);
 
             String endpoint = props.getProperty("endpoint");
-            if(endpoint != null && !endpoint.isEmpty()) {
-               this.endpoint = endpoint;
+            if (endpoint != null && !endpoint.isEmpty()) {
+                this.endpoint = endpoint;
             }
-            
+
             String timeout = props.getProperty("timeout");
-            if(timeout != null && !timeout.isEmpty()) {
+            if (timeout != null && !timeout.isEmpty()) {
                 this.timeout = Integer.parseInt(timeout);
             }
         } catch (IOException e) {
@@ -285,8 +284,8 @@ public final class SalesforceDataprepSource
         return connection;
     }
 
-	public String guessQuery(Schema schema, String entityName) {
-		//not necessary for dataprep
-		return null;
-	}
+    public String guessQuery(Schema schema, String entityName) {
+        // not necessary for dataprep
+        return null;
+    }
 }
