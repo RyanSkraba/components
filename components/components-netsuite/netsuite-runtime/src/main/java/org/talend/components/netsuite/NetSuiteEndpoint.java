@@ -44,16 +44,16 @@ public class NetSuiteEndpoint {
 
         NetSuiteConnectionProperties connProps = properties.getConnectionProperties();
 
-        if (StringUtils.isEmpty(connProps.endpoint.getValue())) {
+        if (StringUtils.isEmpty(connProps.endpoint.getStringValue())) {
             throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"), "Invalid endpoint URL");
         }
-        if (StringUtils.isEmpty(connProps.email.getValue())) {
+        if (StringUtils.isEmpty(connProps.email.getStringValue())) {
             throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"), "Invalid email");
         }
-        if (StringUtils.isEmpty(connProps.password.getValue())) {
+        if (StringUtils.isEmpty(connProps.password.getStringValue())) {
             throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"), "Invalid password");
         }
-        if (StringUtils.isEmpty(connProps.account.getValue())) {
+        if (StringUtils.isEmpty(connProps.account.getStringValue())) {
             throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"), "Invalid account");
         }
 
