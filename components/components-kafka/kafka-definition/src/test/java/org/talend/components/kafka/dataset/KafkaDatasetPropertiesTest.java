@@ -53,8 +53,8 @@ public class KafkaDatasetPropertiesTest {
         assertTrue(main.getWidget(dataset.topic).isVisible());
         assertTrue(main.getWidget(dataset.main).isVisible());
         assertTrue(main.getWidget(dataset.valueFormat).isVisible());
-        assertTrue(main.getWidget(dataset.fieldDelimiter).isHidden());
-        assertTrue(main.getWidget(dataset.isHierarchy).isVisible());
+        assertTrue(main.getWidget(dataset.fieldDelimiter).isVisible());
+        assertTrue(main.getWidget(dataset.isHierarchy).isHidden());
         assertTrue(main.getWidget(dataset.avroSchema).isHidden());
 
         dataset.valueFormat.setValue(KafkaDatasetProperties.ValueFormat.CSV);
@@ -84,7 +84,7 @@ public class KafkaDatasetPropertiesTest {
         Schema schema = dataset.main.schema.getValue();
         List<Schema.Field> fields = schema.getFields();
         assertEquals(0, fields.size());
-        assertEquals(KafkaDatasetProperties.ValueFormat.AVRO, dataset.valueFormat.getValue());
+        assertEquals(KafkaDatasetProperties.ValueFormat.CSV, dataset.valueFormat.getValue());
         assertEquals(";", dataset.fieldDelimiter.getValue());
         assertFalse(dataset.isHierarchy.getValue());
         assertNull(dataset.avroSchema.getValue());

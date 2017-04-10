@@ -73,7 +73,7 @@ public class KafkaDatasetProperties extends PropertiesImpl implements DatasetPro
     @Override
     public void setupProperties() {
         super.setupProperties();
-        valueFormat.setValue(ValueFormat.AVRO);
+        valueFormat.setValue(ValueFormat.CSV);
     }
 
     public void afterValueFormat() {
