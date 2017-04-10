@@ -13,11 +13,6 @@
 
 package org.talend.components.elasticsearch.output;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.EnumSet;
-import java.util.Set;
-
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.DependenciesReader;
@@ -26,9 +21,13 @@ import org.talend.components.api.component.runtime.JarRuntimeInfo;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.elasticsearch.ElasticsearchComponentFamilyDefinition;
-import org.talend.components.elasticsearch.input.ElasticsearchInputProperties;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.EnumSet;
+import java.util.Set;
 
 public class ElasticsearchOutputDefinition extends AbstractComponentDefinition {
 
@@ -50,7 +49,7 @@ public class ElasticsearchOutputDefinition extends AbstractComponentDefinition {
         assertEngineCompatibility(engine);
         assertConnectorTopologyCompatibility(connectorTopology);
         try {
-            switch (((ElasticsearchInputProperties) properties).getDatasetProperties().getDatastoreProperties().version
+            switch (((ElasticsearchOutputProperties) properties).getDatasetProperties().getDatastoreProperties().version
                     .getValue()) {
             case V_2_4:
             default:
