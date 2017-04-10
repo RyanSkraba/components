@@ -39,11 +39,12 @@ import org.talend.components.salesforce.SalesforceProvideConnectionProperties;
 import org.talend.components.salesforce.common.SalesforceRuntimeSourceOrSink;
 import org.talend.components.salesforce.connection.oauth.SalesforceOAuthConnection;
 import org.talend.components.salesforce.runtime.common.ConnectionHolder;
-import org.talend.components.salesforce.runtime.common.SalesforceRuntimeCommon;
 import org.talend.components.salesforce.runtime.common.SalesforceConstant;
+import org.talend.components.salesforce.runtime.common.SalesforceRuntimeCommon;
 import org.talend.components.salesforce.schema.SalesforceSchemaHelper;
 import org.talend.components.salesforce.soql.FieldDescription;
 import org.talend.components.salesforce.soql.SoqlQuery;
+import org.talend.components.salesforce.soql.SoqlQueryBuilder;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.avro.AvroUtils;
@@ -63,8 +64,6 @@ import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 import com.sforce.ws.SessionRenewer;
 
-import org.talend.components.salesforce.soql.SoqlQueryBuilder;
-
 public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, SalesforceSchemaHelper<Schema> {
 
     private transient static final Logger LOG = LoggerFactory.getLogger(SalesforceSourceOrSink.class);
@@ -72,8 +71,6 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
     protected SalesforceProvideConnectionProperties properties;
 
     private transient static final Schema DEFAULT_GUESS_SCHEMA_TYPE = AvroUtils._string();
-
-    protected static final String API_VERSION = "34.0";
 
     protected static final String KEY_CONNECTION = "Connection";
 
@@ -140,7 +137,11 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
          * it's '/async/versionNumber'
          */
         String soapEndpoint = config.getServiceEndpoint();
-        String restEndpoint = soapEndpoint.substring(0, soapEndpoint.indexOf("Soap/")) + "async/" + API_VERSION;
+        // Service endpoint should be like this:
+        // https://ap1.salesforce.com/services/Soap/u/37.0/00D90000000eSq3
+        String apiVersion = soapEndpoint.substring(soapEndpoint.lastIndexOf("/services/Soap/u/") + 17);
+        apiVersion = apiVersion.substring(0, apiVersion.indexOf("/"));
+        String restEndpoint = soapEndpoint.substring(0, soapEndpoint.indexOf("Soap/")) + "async/" + apiVersion;
         bulkConfig.setRestEndpoint(restEndpoint);
         // This should only be false when doing debugging.
         bulkConfig.setCompression(connProps.needCompression.getValue());
@@ -155,7 +156,7 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
 
     /**
      * Create a connection with specified connector configuration
-     * 
+     *
      * @param config connector configuration with endpoint/userId/password
      * @param openNewSession whether need to create new session
      * @return PartnerConnection object with correct session id
@@ -170,7 +171,8 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
             String endpoint = connProps.endpoint.getStringValue();
             endpoint = StringUtils.strip(endpoint, "\"");
             if (SalesforceConnectionProperties.LoginType.OAuth.equals(connProps.loginType.getValue())) {
-                SalesforceOAuthConnection oauthConnection = new SalesforceOAuthConnection(connProps.oauth, endpoint, API_VERSION);
+                SalesforceOAuthConnection oauthConnection = new SalesforceOAuthConnection(connProps.oauth, endpoint,
+                        connProps.apiVersion.getValue());
                 oauthConnection.login(config);
             } else {
                 config.setAuthEndpoint(endpoint);
@@ -399,7 +401,7 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
 
     /**
      * Get the session properties instance
-     * 
+     *
      * @return session properties
      * @throws ConnectionException connection disable during get user information
      */
@@ -428,7 +430,7 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
 
     /**
      * Save session to target file
-     * 
+     *
      * @param connection which you want to saved information
      * @throws IOException error during create or write session file
      * @throws ConnectionException connection disable during get user information
@@ -505,13 +507,13 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
         return (Schema) fieldAssembler.endRecord();
     }
 
-	/**
+    /**
      * Gets SOQL query
      *
      * @param schema which fields used for SOQL query building
      * @param entityName is the module name
      */
-	@Override
+    @Override
     public String guessQuery(Schema schema, String entityName) {
         return new SoqlQueryBuilder(schema, entityName).buildSoqlQuery();
     }

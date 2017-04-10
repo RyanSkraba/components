@@ -33,10 +33,15 @@ import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
+import org.talend.daikon.serialize.PostDeserializeSetup;
+import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
-public class SalesforceConnectionProperties extends ComponentPropertiesImpl implements SalesforceProvideConnectionProperties {
+public class SalesforceConnectionProperties extends ComponentPropertiesImpl
+        implements SalesforceProvideConnectionProperties, SerializeSetVersion {
 
-    public static final String URL = "https://www.salesforce.com/services/Soap/u/37.0";
+    public static final String DEFAULT_API_VERSION = "37.0";
+
+    public static final String URL = "https://www.salesforce.com/services/Soap/u/" + DEFAULT_API_VERSION;
 
     public static final String OAUTH_URL = "https://login.salesforce.com/services/oauth2";
 
@@ -88,6 +93,8 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl impl
 
     public OauthProperties oauth = new OauthProperties(OAUTH);
 
+    public Property<String> apiVersion = newString("apiVersion");
+
     private static final String USERPASSWORD = "userPassword";
 
     public SalesforceUserPasswordProperties userPassword = new SalesforceUserPasswordProperties(USERPASSWORD);
@@ -107,6 +114,7 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl impl
 
         loginType.setValue(LoginType.Basic);
         endpoint.setValue(URL);
+        apiVersion.setValue(DEFAULT_API_VERSION);
         timeout.setValue(60000);
         httpChunked.setValue(true);
     }
@@ -130,6 +138,7 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl impl
 
         Form advancedForm = Form.create(this, Form.ADVANCED);
         advancedForm.addRow(endpoint);
+        advancedForm.addColumn(apiVersion);
         advancedForm.addRow(bulkConnection);
         advancedForm.addRow(reuseSession);
         advancedForm.addRow(widget(sessionDirectory).setWidgetType(Widget.DIRECTORY_WIDGET_TYPE));
@@ -170,8 +179,8 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl impl
 
     public ValidationResult validateTestConnection() throws Exception {
         ClassLoader classLoader = SalesforceDefinition.class.getClassLoader();
-        RuntimeInfo runtimeInfo = SalesforceDefinition.getCommonRuntimeInfo(
-                "org.talend.components.salesforce.runtime.SalesforceSourceOrSink");
+        RuntimeInfo runtimeInfo = SalesforceDefinition
+                .getCommonRuntimeInfo("org.talend.components.salesforce.runtime.SalesforceSourceOrSink");
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(runtimeInfo,
                 classLoader)) {
             SalesforceRuntimeSourceOrSink ss = (SalesforceRuntimeSourceOrSink) sandboxedInstance.getInstance();
@@ -236,6 +245,7 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl impl
                 boolean isBasicLogin = LoginType.Basic.equals(loginType.getValue());
                 form.getWidget(reuseSession.getName()).setVisible(isBasicLogin && !bulkMode);
                 form.getWidget(sessionDirectory.getName()).setVisible(isBasicLogin && !bulkMode && reuseSession.getValue());
+                form.getWidget(apiVersion.getName()).setHidden(isBasicLogin);
 
                 Form proxyForm = form.getChildForm(proxy.getName());
                 if (proxyForm != null) {
@@ -263,6 +273,23 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl impl
             return refProps;
         }
         return null;
+    }
+
+    @Override
+    public int getVersionNumber() {
+        return 1;
+    }
+
+    @Override
+    public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
+        boolean migrated = super.postDeserialize(version, setup, persistent);
+        if (version < this.getVersionNumber()) {
+            if (apiVersion.getValue() == null) {
+                apiVersion.setValue("\"34.0\"");
+                migrated = true;
+            }
+        }
+        return migrated;
     }
 
 }
