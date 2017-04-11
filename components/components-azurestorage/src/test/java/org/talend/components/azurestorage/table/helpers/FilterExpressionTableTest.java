@@ -16,11 +16,9 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.talend.components.azurestorage.table.helpers.SupportedFieldType.BINARY;
 import static org.talend.components.azurestorage.table.helpers.SupportedFieldType.BOOLEAN;
 import static org.talend.components.azurestorage.table.helpers.SupportedFieldType.DATE;
 import static org.talend.components.azurestorage.table.helpers.SupportedFieldType.GUID;
-import static org.talend.components.azurestorage.table.helpers.SupportedFieldType.INT64;
 import static org.talend.components.azurestorage.table.helpers.SupportedFieldType.NUMERIC;
 import static org.talend.components.azurestorage.table.helpers.SupportedFieldType.STRING;
 
@@ -78,8 +76,8 @@ public class FilterExpressionTableTest {
                         .toString(),
                 fet.function.getValue().toString());
 
-        assertEquals(Arrays.asList(STRING.toString(), NUMERIC.toString(), DATE.toString(), INT64.toString(), BINARY.toString(),
-                GUID.toString(), BOOLEAN.toString()), fet.fieldType.getPossibleValues());
+        assertEquals(Arrays.asList(STRING.toString(), NUMERIC.toString(), DATE.toString(), GUID.toString(), BOOLEAN.toString()),
+                fet.fieldType.getPossibleValues());
     }
 
     @Test
@@ -152,30 +150,12 @@ public class FilterExpressionTableTest {
         fieldTypes.add(SupportedFieldType.STRING.toString());
         setTableVals();
         assertFalse(fet.generateCombinedFilterConditions().isEmpty());
-        // missing value
-        columns.add(AzureStorageTableProperties.TABLE_ROW_KEY);
-        functions.add(Comparison.GREATER_THAN.toString());
-        values.add("");
-        predicates.add(Predicate.AND.toString());
-        fieldTypes.add(SupportedFieldType.INT64.toString());
-        setTableVals();
-        assertTrue(fet.generateCombinedFilterConditions().isEmpty());
-        // missing column
-        columns.add("");
-        functions.add(Comparison.GREATER_THAN.toString());
-        values.add("123456");
-        fieldTypes.add(SupportedFieldType.INT64.toString());
-        predicates.add(Predicate.AND.toString());
-        setTableVals();
-        assertTrue(fet.generateCombinedFilterConditions().isEmpty());
     }
 
     @Test
     public void testGetFieldType() {
         assertEquals(EdmType.STRING, SupportedFieldType.getEdmType(STRING.toString()));
-        assertEquals(EdmType.INT64, SupportedFieldType.getEdmType(INT64.toString()));
         assertEquals(EdmType.INT32, SupportedFieldType.getEdmType(NUMERIC.toString()));
-        assertEquals(EdmType.BINARY, SupportedFieldType.getEdmType(BINARY.toString()));
         assertEquals(EdmType.GUID, SupportedFieldType.getEdmType(GUID.toString()));
         assertEquals(EdmType.DATE_TIME, SupportedFieldType.getEdmType(DATE.toString()));
         assertEquals(EdmType.BOOLEAN, SupportedFieldType.getEdmType(BOOLEAN.toString()));

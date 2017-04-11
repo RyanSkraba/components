@@ -27,10 +27,6 @@ public enum SupportedFieldType {
 
     DATE("DATE", EdmType.DATE_TIME),
 
-    INT64("INT64", EdmType.INT64),
-
-    BINARY("BINARY", EdmType.BINARY),
-
     GUID("GUID", EdmType.GUID),
 
     BOOLEAN("BOOLEAN", EdmType.BOOLEAN);
