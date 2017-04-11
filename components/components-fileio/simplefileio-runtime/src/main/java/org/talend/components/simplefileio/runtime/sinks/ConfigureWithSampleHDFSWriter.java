@@ -56,11 +56,12 @@ public class ConfigureWithSampleHDFSWriter<K, V> extends ConfigurableHDFSFileSin
 
     @Override
     public String close() throws Exception {
+        // If data was written, then close the task normally.
         if (opened) {
             return super.close();
         }
-        // result is prefix of the output file name
-        return String.format("part-r-%d", uId.hashCode());
+        // If no data was written, then return null to indicate that this writer did not produce any output.
+        return null;
     }
 
     protected KV<K, V> getSample() {

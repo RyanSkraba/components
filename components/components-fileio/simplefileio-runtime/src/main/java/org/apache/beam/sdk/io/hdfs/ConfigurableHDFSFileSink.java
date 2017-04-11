@@ -159,8 +159,13 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
             Job job = ((ConfigurableHDFSFileSink<K, V>) getSink()).jobInstance();
             FileSystem fs = FileSystem.get(job.getConfiguration());
 
+            // Get expected output shards.  Nulls indicate that the task was launched, but didn't 
+            // process any records.
+            Set<String> expected = Sets.newHashSet(writerResults);
+            expected.remove(null);
+
             // If there are 0 output shards, just create output folder.
-            if (!writerResults.iterator().hasNext()) {
+            if (!expected.iterator().hasNext()) {
                 fs.mkdirs(new Path(path));
                 return;
             }
@@ -180,8 +185,6 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
                 }
             });
 
-            // get expected output shards
-            Set<String> expected = Sets.newHashSet(writerResults);
             checkState(
                     expected.size() == Lists.newArrayList(writerResults).size(),
                     "Data loss due to writer results hash collision");
