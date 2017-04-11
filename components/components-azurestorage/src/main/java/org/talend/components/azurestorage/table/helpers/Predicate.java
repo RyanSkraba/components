@@ -21,8 +21,7 @@ import com.microsoft.azure.storage.table.TableQuery.Operators;
 
 public enum Predicate {
     AND("AND", Operators.AND),
-    OR("OR", Operators.OR),
-    NOT("NOT", Operators.NOT);
+    OR("OR", Operators.OR);
 
     private String displayName;
 
