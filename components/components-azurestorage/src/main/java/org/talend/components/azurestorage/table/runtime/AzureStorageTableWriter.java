@@ -197,6 +197,10 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
         if (object == null) {
             return;
         }
+        // initialize feedback collections for the write operation
+        successfulWrites = new ArrayList<>();
+        rejectedWrites = new ArrayList<>();
+
         result.totalCount++;
         inputRecord = (IndexedRecord) object;
         // This for dynamic which would get schema from the first record
