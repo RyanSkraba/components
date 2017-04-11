@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.marketo.tmarketobulkexec;
 
+import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
@@ -29,6 +30,7 @@ import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
 public class TMarketoBulkExecProperties extends MarketoComponentProperties {
@@ -48,7 +50,7 @@ public class TMarketoBulkExecProperties extends MarketoComponentProperties {
 
     public Property<RESTLookupFields> lookupField = newEnum("lookupField", RESTLookupFields.class).setRequired();
 
-    public Property<String> listId = newString("listId");
+    public Property<Integer> listId = newInteger("listId");
 
     public Property<String> partitionName = newString("partitionName");
 
@@ -82,6 +84,9 @@ public class TMarketoBulkExecProperties extends MarketoComponentProperties {
     public void setupProperties() {
         super.setupProperties();
 
+        getConnectionProperties().apiMode.setPossibleValues(APIMode.REST);
+        getConnectionProperties().apiMode.setValue(APIMode.REST);
+
         schemaInput.schema.setValue(MarketoConstants.getBulkImportLeadSchema());
 
         bulkImportTo.setPossibleValues(BulkImportTo.values());
@@ -100,13 +105,14 @@ public class TMarketoBulkExecProperties extends MarketoComponentProperties {
 
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(bulkImportTo);
+        mainForm.addColumn(bulkFileFormat);
         mainForm.addRow(lookupField);
         mainForm.addColumn(listId);
         mainForm.addColumn(partitionName);
         mainForm.addRow(customObjectName);
-        mainForm.addRow(bulkFilePath);
+        mainForm.addRow(widget(bulkFilePath).setWidgetType(Widget.FILE_WIDGET_TYPE));
         mainForm.addRow(pollWaitTime);
-        mainForm.addRow(logDownloadPath);
+        mainForm.addRow(widget(logDownloadPath).setWidgetType(Widget.DIRECTORY_WIDGET_TYPE));
         mainForm.addRow(dieOnError);
     }
 

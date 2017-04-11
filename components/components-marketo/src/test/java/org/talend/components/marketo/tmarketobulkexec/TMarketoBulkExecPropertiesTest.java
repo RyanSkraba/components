@@ -14,6 +14,7 @@ package org.talend.components.marketo.tmarketobulkexec;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
@@ -40,7 +41,6 @@ public class TMarketoBulkExecPropertiesTest {
         props.connection.setupLayout();
         props.schemaInput.setupLayout();
         props.setupLayout();
-        props.listId.setValue("");
         props.partitionName.setValue("");
         props.customObjectName.setValue("");
         props.bulkFilePath.setValue("");
@@ -59,7 +59,7 @@ public class TMarketoBulkExecPropertiesTest {
     public void testSetupProperties() throws Exception {
         assertEquals(BulkImportTo.Leads, props.bulkImportTo.getValue());
         assertEquals("", props.bulkFilePath.getValue());
-        assertEquals("", props.listId.getValue());
+        assertNull(props.listId.getValue());
         assertEquals("", props.partitionName.getValue());
         assertEquals(BulkFileFormat.csv, props.bulkFileFormat.getValue());
     }

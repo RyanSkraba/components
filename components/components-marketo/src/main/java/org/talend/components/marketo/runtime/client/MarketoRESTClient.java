@@ -1740,7 +1740,7 @@ public class MarketoRESTClient extends MarketoClient implements MarketoClientSer
         Integer pollWaitTime = parameters.pollWaitTime.getValue();
         String logDownloadPath = parameters.logDownloadPath.getValue();
         String lookupField;
-        String listId;
+        Integer listId;
         String partitionName;
         String customObjectName;
         current_uri = new StringBuilder(bulkPath);
@@ -1752,7 +1752,7 @@ public class MarketoRESTClient extends MarketoClient implements MarketoClientSer
             current_uri.append(API_PATH_BULK_LEADS)//
                     .append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true))//
                     .append(fmtParams(FIELD_LOOKUP_FIELD, lookupField));
-            if (!StringUtils.isEmpty(listId)) {
+            if (listId != null) {
                 current_uri.append(fmtParams(FIELD_LIST_ID, listId));
             }
             if (!StringUtils.isEmpty(partitionName)) {
@@ -1774,15 +1774,16 @@ public class MarketoRESTClient extends MarketoClient implements MarketoClientSer
             mkto.setSuccess(rs.isSuccess());
             if (!mkto.isSuccess()) {
                 mkto.setRecordCount(0);
-                mkto.setErrors(Arrays
-                        .asList(new MarketoError(REST, messages.getMessage("bulkimport.error.import", rs.getErrors().get(0)))));
+                mkto.setErrors(Arrays.asList(new MarketoError(REST, rs.getErrors().get(0).getCode(),
+                        messages.getMessage("bulkimport.error.import", rs.getErrors().get(0).getMessage()))));
                 return mkto;
             }
             BulkImport bulkResult = rs.getResult().get(0);
             if (bulkResult.getStatus().equals(BULK_STATUS_FAILED)) { // request Failed
-                LOG.error("[bulkImportCustomObjects] Failed: {}.", bulkResult.getMessage());
+                String err = messages.getMessage("bulkimport.status.failed", bulkResult.getMessage());
+                LOG.error("{}.", err);
                 mkto.setSuccess(false);
-                mkto.setErrors(Arrays.asList(new MarketoError(REST, "", "Failed : " + bulkResult.getMessage())));
+                mkto.setErrors(Arrays.asList(new MarketoError(REST, err)));
             } else if (bulkResult.getStatus().equals(BULK_STATUS_COMPLETE)) { // already Complete
                 bulkResult = getStatusesForBatch(bulkResult, logDownloadPath);
             } else { // Importing, Queued
