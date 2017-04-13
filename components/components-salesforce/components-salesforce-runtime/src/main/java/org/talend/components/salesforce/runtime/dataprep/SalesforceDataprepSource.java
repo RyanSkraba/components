@@ -55,6 +55,8 @@ import com.sforce.ws.SessionRenewer;
 public final class SalesforceDataprepSource
         implements BoundedSource, SalesforceRuntimeSourceOrSink, SalesforceSchemaHelper<Schema> {
 
+    private static final long serialVersionUID = 1930140572051028338L;
+
     private static final Logger LOG = LoggerFactory.getLogger(SalesforceDataprepSource.class);
 
     private static final String CONFIG_FILE_lOCATION_KEY = "org.talend.component.salesforce.config.file";
@@ -69,6 +71,8 @@ public final class SalesforceDataprepSource
 
     private String endpoint = SalesforceConnectionProperties.URL;
 
+    private ConnectionHolder connectionHolder;
+
     private int timeout = DEFAULT_TIMEOUT;
 
     @Override
@@ -78,8 +82,7 @@ public final class SalesforceDataprepSource
         datastore = dataset.getDatastoreProperties();
 
         String config_file = System.getProperty(CONFIG_FILE_lOCATION_KEY);
-        try (InputStream is = config_file != null ? (new FileInputStream(config_file))
-                : this.getClass().getClassLoader().getResourceAsStream("salesforce.properties")) {
+        try (InputStream is = config_file != null ? (new FileInputStream(config_file)) : null) {
             if (is == null) {
                 LOG.warn("not found the property file, will use the default value for endpoint and timeout");
                 return ValidationResult.OK;
@@ -101,6 +104,16 @@ public final class SalesforceDataprepSource
             LOG.warn("not found the property file, will use the default value for endpoint and timeout", e);
         }
 
+        return ValidationResult.OK;
+    }
+
+    @Override
+    public ValidationResult validate(RuntimeContainer container) {
+        try {
+            connectionHolder = connect(container);
+        } catch (IOException ex) {
+            return SalesforceRuntimeCommon.exceptionToValidationResult(ex);
+        }
         return ValidationResult.OK;
     }
 
@@ -129,29 +142,18 @@ public final class SalesforceDataprepSource
 
     @Override
     public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
-        return SalesforceRuntimeCommon.getSchemaNames(connect(container).connection);
+        return SalesforceRuntimeCommon.getSchemaNames(connectionHolder.connection);
     }
 
     @Override
     public Schema getEndpointSchema(RuntimeContainer container, String schemaName) throws IOException {
         try {
             DescribeSObjectResult[] describeSObjectResults = new DescribeSObjectResult[0];
-            describeSObjectResults = connect(container).connection.describeSObjects(new String[] { schemaName });
+            describeSObjectResults = connectionHolder.connection.describeSObjects(new String[] { schemaName });
             return SalesforceAvroRegistryString.get().inferSchema(describeSObjectResults[0]);
         } catch (ConnectionException e) {
             throw new IOException(e);
         }
-    }
-
-    @Override
-    public ValidationResult validate(RuntimeContainer container) {
-        ValidationResult vr = new ValidationResult();
-        try {
-            connect(container);
-        } catch (IOException ex) {
-            return SalesforceRuntimeCommon.exceptionToValidationResult(ex);
-        }
-        return vr;
     }
 
     ConnectionHolder connect(RuntimeContainer container) throws IOException {
@@ -170,7 +172,6 @@ public final class SalesforceDataprepSource
 
         // Notes on how to test this
         // http://thysmichels.com/2014/02/15/salesforce-wsc-partner-connection-session-renew-when-session-timeout/
-
         config.setSessionRenewer(new SessionRenewer() {
 
             @Override
@@ -190,8 +191,7 @@ public final class SalesforceDataprepSource
         });
 
         config.setConnectionTimeout(timeout);
-
-        config.setCompression(false);
+        config.setCompression(true);// This should only be false when doing debugging.
         config.setUseChunkedPost(true);
         config.setValidateSchema(false);
 
@@ -224,8 +224,7 @@ public final class SalesforceDataprepSource
         String api_version = "34.0";
         String restEndpoint = soapEndpoint.substring(0, soapEndpoint.indexOf("Soap/")) + "async/" + api_version;
         bulkConfig.setRestEndpoint(restEndpoint);
-        // This should only be false when doing debugging.
-        bulkConfig.setCompression(false);
+        bulkConfig.setCompression(true);// This should only be false when doing debugging.
         bulkConfig.setTraceMessage(false);
         bulkConfig.setValidateSchema(false);
         try {
@@ -246,7 +245,7 @@ public final class SalesforceDataprepSource
         DescribeSObjectResult describeSObjectResult = null;
 
         try {
-            describeSObjectResult = connect(null).connection.describeSObject(drivingEntityName);
+            describeSObjectResult = connectionHolder.connection.describeSObject(drivingEntityName);
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -287,5 +286,9 @@ public final class SalesforceDataprepSource
     public String guessQuery(Schema schema, String entityName) {
         // not necessary for dataprep
         return null;
+    }
+
+    public ConnectionHolder getConnectionHolder() {
+        return connectionHolder;
     }
 }

@@ -41,12 +41,13 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
         properties = props;
         this.container = container;
     }
-    
+
     @Override
     public boolean start() throws IOException {
         try {
             if (bulkRuntime == null) {
-                bulkRuntime = new SalesforceBulkRuntime(((SalesforceSource) getCurrentSource()).connect(container).bulkConnection);
+                bulkRuntime = new SalesforceBulkRuntime(
+                        ((SalesforceSource) getCurrentSource()).connect(container).bulkConnection);
             }
             executeSalesforceBulkQuery();
             bulkResultSet = bulkRuntime.getQueryResultSet(bulkRuntime.nextResultId());
@@ -97,7 +98,7 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
         String queryText = getQueryString(properties);
         bulkRuntime = new SalesforceBulkRuntime(((SalesforceSource) getCurrentSource()).connect(container).bulkConnection);
         try {
-            bulkRuntime.doBulkQuery(getModuleName(), queryText, 30);
+            bulkRuntime.doBulkQuery(getModuleName(), queryText);
         } catch (AsyncApiException | InterruptedException | ConnectionException e) {
             throw new IOException(e);
         }
@@ -111,7 +112,7 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
             throw new ComponentException(e);
         }
     }
-    
+
     private String getModuleName() {
         TSalesforceInputProperties inProperties = (TSalesforceInputProperties) properties;
         if (inProperties.manualQuery.getValue()) {

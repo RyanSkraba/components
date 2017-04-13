@@ -39,6 +39,7 @@ public class SalesforceInputTestIT {
 
             SalesforceDataprepSource source = new SalesforceDataprepSource();
             source.initialize(null, properties);
+            source.validate(null);
             reader = source.createReader(null);
 
             reader.start();
@@ -74,6 +75,7 @@ public class SalesforceInputTestIT {
 
         SalesforceDataprepSource source = new SalesforceDataprepSource();
         source.initialize(null, properties);
+        source.validate(null);
         Reader reader = source.createReader(null);
 
         try {
@@ -103,6 +105,7 @@ public class SalesforceInputTestIT {
 
             SalesforceDataprepSource source = new SalesforceDataprepSource();
             source.initialize(null, properties);
+            source.validate(null);
             reader = source.createReader(null);
 
             reader.start();
@@ -139,6 +142,7 @@ public class SalesforceInputTestIT {
 
         SalesforceDataprepSource source = new SalesforceDataprepSource();
         source.initialize(null, properties);
+        source.validate(null);
         Reader reader = source.createReader(null);
 
         try {

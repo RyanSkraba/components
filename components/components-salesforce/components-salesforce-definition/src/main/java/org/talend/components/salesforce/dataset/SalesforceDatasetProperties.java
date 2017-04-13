@@ -77,6 +77,7 @@ public class SalesforceDatasetProperties extends PropertiesImpl implements Datas
                 properties.setDatasetProperties(this);
 
                 runtime.initialize(null, properties);
+                runtime.validate(null);
                 List<NamedThing> moduleNames = runtime.getSchemaNames(null);
                 moduleName.setPossibleNamedThingValues(moduleNames);
             }

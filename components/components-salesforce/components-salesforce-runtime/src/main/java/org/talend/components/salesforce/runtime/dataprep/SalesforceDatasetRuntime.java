@@ -57,6 +57,7 @@ public class SalesforceDatasetRuntime implements DatasetRuntime<SalesforceDatase
         properties.setDatasetProperties(dataset);
 
         sds.initialize(container, properties);
+        sds.validate(container);
 
         try {
             // TODO the UI will be a radio, need to adjust here

@@ -29,6 +29,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.salesforce.SalesforceBulkProperties.Concurrency;
 import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
@@ -57,6 +59,8 @@ import com.sforce.ws.ConnectionException;
  */
 
 public class SalesforceBulkRuntime {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceBulkRuntime.class.getName());
 
     private final String FILE_ENCODING = "UTF-8";
 
@@ -414,7 +418,7 @@ public class SalesforceBulkRuntime {
         return batchInfoList.size();
     }
 
-    public void doBulkQuery(String moduleName, String queryStatement, int secToWait)
+    public void doBulkQuery(String moduleName, String queryStatement)
             throws AsyncApiException, InterruptedException, ConnectionException {
         job = new JobInfo();
         job.setObject(moduleName);
@@ -424,35 +428,51 @@ public class SalesforceBulkRuntime {
         }
         job.setContentType(ContentType.CSV);
         job = createJob(job);
+        if (job.getId() == null) { // job creation failed
+            throw new ComponentException(new DefaultErrorCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "failedBatch"),
+                    ExceptionContext.build().put("failedBatch", job));
+        }
 
-        job = getJobStatus(job.getId());
-        batchInfoList = new ArrayList<BatchInfo>();
-        BatchInfo info = null;
         ByteArrayInputStream bout = new ByteArrayInputStream(queryStatement.getBytes());
-        info = createBatchFromStream(job, bout);
-
+        BatchInfo info = createBatchFromStream(job, bout);
+        int secToWait = 1;
+        int tryCount = 0;
         while (true) {
-            Thread.sleep(secToWait * 1000); // default is 30 sec
+            LOGGER.debug("Awaiting " + secToWait + " seconds for results ...\n" + info);
+            Thread.sleep(secToWait * 1000);
             info = getBatchInfo(job.getId(), info.getId());
-
             if (info.getState() == BatchStateEnum.Completed) {
-                QueryResultList list = getQueryResultList(job.getId(), info.getId());
-                queryResultIDs = new HashSet<String>(Arrays.asList(list.getResult())).iterator();
                 break;
             } else if (info.getState() == BatchStateEnum.Failed) {
                 throw new ComponentException(new DefaultErrorCode(HttpServletResponse.SC_BAD_REQUEST, "failedBatch"),
                         ExceptionContext.build().put("failedBatch", info));
-            } else {
-                System.out.println("-------------- waiting ----------" + info);
+            }
+            tryCount++;
+            if (tryCount % 3 == 0) {// after 3 attempt to get the result we multiply the time to wait by 2
+                secToWait = secToWait * 3;
+            }
+            // There is also a 2-minute limit on the time to process the query.
+            // If the query takes more than 2 minutes to process, a QUERY_TIMEOUT error is returned.
+            // https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/asynch_api_concepts_limits.htm
+            int processingTime = (int) ((System.currentTimeMillis() - job.getCreatedDate().getTimeInMillis()) / 1000);
+            if (processingTime > 120) {
+                throw new ComponentException(new DefaultErrorCode(HttpServletResponse.SC_REQUEST_TIMEOUT, "failedBatch"),
+                        ExceptionContext.build().put("failedBatch", info));
             }
         }
-        batchInfoList.add(info);
+
         closeJob();
+        QueryResultList list = getQueryResultList(job.getId(), info.getId());
+        queryResultIDs = new HashSet<String>(Arrays.asList(list.getResult())).iterator();
+        batchInfoList = new ArrayList<BatchInfo>();
+        batchInfoList.add(info);
+
     }
 
     public BulkResultSet getQueryResultSet(String resultId) throws AsyncApiException, IOException, ConnectionException {
-        baseFileReader = new com.csvreader.CsvReader(new BufferedReader(new InputStreamReader(
-                getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId), FILE_ENCODING)), ',');
+        baseFileReader = new com.csvreader.CsvReader(new BufferedReader(
+                new InputStreamReader(getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId), FILE_ENCODING)),
+                ',');
 
         if (baseFileReader.readRecord()) {
             baseFileHeader = Arrays.asList(baseFileReader.getValues());

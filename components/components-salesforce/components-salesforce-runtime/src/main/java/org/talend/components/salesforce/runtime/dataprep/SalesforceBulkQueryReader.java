@@ -18,8 +18,6 @@ import java.util.NoSuchElementException;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
@@ -30,6 +28,7 @@ import org.talend.components.salesforce.dataset.SalesforceDatasetProperties.Sour
 import org.talend.components.salesforce.runtime.BulkResult;
 import org.talend.components.salesforce.runtime.BulkResultSet;
 import org.talend.components.salesforce.runtime.SalesforceBulkRuntime;
+import org.talend.components.salesforce.runtime.common.ConnectionHolder;
 import org.talend.components.salesforce.soql.SoqlQuery;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
@@ -38,8 +37,6 @@ import com.sforce.async.AsyncApiException;
 import com.sforce.ws.ConnectionException;
 
 public final class SalesforceBulkQueryReader extends AbstractBoundedReader<IndexedRecord> {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SalesforceBulkQueryReader.class);
 
     private SalesforceBulkRuntime bulkRuntime;
 
@@ -71,8 +68,8 @@ public final class SalesforceBulkQueryReader extends AbstractBoundedReader<Index
     public boolean start() throws IOException {
         try {
             if (bulkRuntime == null) {
-                bulkRuntime = new SalesforceBulkRuntime(
-                        ((SalesforceDataprepSource) getCurrentSource()).connect(container).bulkConnection);
+                ConnectionHolder connectionHolder = ((SalesforceDataprepSource) getCurrentSource()).getConnectionHolder();
+                bulkRuntime = new SalesforceBulkRuntime(connectionHolder.bulkConnection);
             }
             executeSalesforceBulkQuery();
             bulkResultSet = bulkRuntime.getQueryResultSet(bulkRuntime.nextResultId());
@@ -121,10 +118,8 @@ public final class SalesforceBulkQueryReader extends AbstractBoundedReader<Index
 
     protected void executeSalesforceBulkQuery() throws IOException, ConnectionException {
         String queryText = getQueryString();
-        bulkRuntime = new SalesforceBulkRuntime(
-                ((SalesforceDataprepSource) getCurrentSource()).connect(container).bulkConnection);
         try {
-            bulkRuntime.doBulkQuery(getModuleName(), queryText, 30);
+            bulkRuntime.doBulkQuery(getModuleName(), queryText);
         } catch (AsyncApiException | InterruptedException | ConnectionException e) {
             throw new IOException(e);
         }
@@ -152,7 +147,7 @@ public final class SalesforceBulkQueryReader extends AbstractBoundedReader<Index
     }
 
     private String getQueryString() throws IOException {
-        if(dataset.sourceType.getValue() == SourceType.MODULE_SELECTION) {
+        if (dataset.sourceType.getValue() == SourceType.MODULE_SELECTION) {
             StringBuilder sb = new StringBuilder();
             sb.append("select ");
             int count = 0;
@@ -171,7 +166,7 @@ public final class SalesforceBulkQueryReader extends AbstractBoundedReader<Index
     }
 
     private String getModuleName() {
-        if(dataset.sourceType.getValue() == SourceType.MODULE_SELECTION) {
+        if (dataset.sourceType.getValue() == SourceType.MODULE_SELECTION) {
             return dataset.moduleName.getValue();
         } else {
             String query = dataset.query.getValue();
