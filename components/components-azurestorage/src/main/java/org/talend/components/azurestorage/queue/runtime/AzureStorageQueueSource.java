@@ -17,12 +17,9 @@ import java.util.List;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.azurestorage.queue.tazurestoragequeuecreate.TAzureStorageQueueCreateProperties;
-import org.talend.components.azurestorage.queue.tazurestoragequeuedelete.TAzureStorageQueueDeleteProperties;
 import org.talend.components.azurestorage.queue.tazurestoragequeueinput.TAzureStorageQueueInputProperties;
 import org.talend.components.azurestorage.queue.tazurestoragequeueinputloop.TAzureStorageQueueInputLoopProperties;
 import org.talend.components.azurestorage.queue.tazurestoragequeuelist.TAzureStorageQueueListProperties;
-import org.talend.components.azurestorage.queue.tazurestoragequeuepurge.TAzureStorageQueuePurgeProperties;
 
 public class AzureStorageQueueSource extends AzureStorageQueueSourceOrSink implements BoundedSource {
 
@@ -31,17 +28,9 @@ public class AzureStorageQueueSource extends AzureStorageQueueSourceOrSink imple
     @SuppressWarnings("rawtypes")
     @Override
     public BoundedReader createReader(RuntimeContainer container) {
-        if (properties instanceof TAzureStorageQueueCreateProperties) {
-            return new AzureStorageQueueCreateReader(container, this, (TAzureStorageQueueCreateProperties) properties);
-        }
-        if (properties instanceof TAzureStorageQueueDeleteProperties) {
-            return new AzureStorageQueueDeleteReader(container, this, (TAzureStorageQueueDeleteProperties) properties);
-        }
+        
         if (properties instanceof TAzureStorageQueueListProperties) {
             return new AzureStorageQueueListReader(container, this, (TAzureStorageQueueListProperties) properties);
-        }
-        if (properties instanceof TAzureStorageQueuePurgeProperties) {
-            return new AzureStorageQueuePurgeReader(container, this, (TAzureStorageQueuePurgeProperties) properties);
         }
         if (properties instanceof TAzureStorageQueueInputLoopProperties) {
             return new AzureStorageQueueInputLoopReader(container, this, (TAzureStorageQueueInputLoopProperties) properties);

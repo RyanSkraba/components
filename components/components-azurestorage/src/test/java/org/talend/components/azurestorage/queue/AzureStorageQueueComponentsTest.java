@@ -34,6 +34,8 @@ import org.talend.components.azurestorage.queue.tazurestoragequeuelist.TAzureSto
 import org.talend.components.azurestorage.queue.tazurestoragequeueoutput.TAzureStorageQueueOutputDefinition;
 import org.talend.components.azurestorage.queue.tazurestoragequeueoutput.TAzureStorageQueueOutputProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
@@ -42,6 +44,9 @@ public class AzureStorageQueueComponentsTest {
     private AzureStorageQueueProperties props;
 
     private AzureStorageQueueDefinition def;
+    
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(AzureStorageQueueSourceOrSink.class);
 
     @Before
     public void setup() {
@@ -83,13 +88,13 @@ public class AzureStorageQueueComponentsTest {
 
     @Test
     public void testQueueNameValidation() {
-        ValidationResult vrEmpty = new ValidationResult().setStatus(Result.ERROR).setMessage("Queue name cannot be empty.");
+        ValidationResult vrEmpty = new ValidationResult().setStatus(Result.ERROR).setMessage(i18nMessages.getMessage("error.NameEmpty"));
         ValidationResult vrSize = new ValidationResult().setStatus(Result.ERROR)
-                .setMessage("Queue name doesn't follow AzureStorage specification length : 3..63 characters long.");
+                .setMessage(i18nMessages.getMessage("error.LengthError"));
         ValidationResult vrDash = new ValidationResult().setStatus(Result.ERROR)
-                .setMessage("Queue name doesn't follow AzureStorage specification : You can't have 2 following dashes.");
+                .setMessage(i18nMessages.getMessage("error.TwoDashError"));
         ValidationResult vrName = new ValidationResult().setStatus(Result.ERROR)
-                .setMessage("Queue name doesn't follow AzureStorage specification.");
+                .setMessage(i18nMessages.getMessage("error.QueueNameError"));
         //
         TAzureStorageQueueCreateProperties properties = new TAzureStorageQueueCreateProperties("test");
         properties.connection.accountName.setValue("dummy");

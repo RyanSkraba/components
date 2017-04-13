@@ -19,13 +19,10 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.talend.components.azurestorage.queue.tazurestoragequeuecreate.TAzureStorageQueueCreateProperties;
-import org.talend.components.azurestorage.queue.tazurestoragequeuedelete.TAzureStorageQueueDeleteProperties;
 import org.talend.components.azurestorage.queue.tazurestoragequeueinput.TAzureStorageQueueInputProperties;
 import org.talend.components.azurestorage.queue.tazurestoragequeueinputloop.TAzureStorageQueueInputLoopProperties;
 import org.talend.components.azurestorage.queue.tazurestoragequeuelist.TAzureStorageQueueListProperties;
 import org.talend.components.azurestorage.queue.tazurestoragequeueoutput.TAzureStorageQueueOutputProperties;
-import org.talend.components.azurestorage.queue.tazurestoragequeuepurge.TAzureStorageQueuePurgeProperties;
 
 public class AzureStorageQueueSourceTest {
 
@@ -48,17 +45,8 @@ public class AzureStorageQueueSourceTest {
         // if (properties instanceof TAzureStorageQueueInputProperties) {
         // return new AzureStorageQueueInputReader(container, this, (TAzureStorageQueueInputProperties) properties);
         // return null;
-        source.initialize(null, new TAzureStorageQueueCreateProperties("test"));
-        assertTrue(source.createReader(null) instanceof AzureStorageQueueCreateReader);
-
-        source.initialize(null, new TAzureStorageQueueDeleteProperties("test"));
-        assertTrue(source.createReader(null) instanceof AzureStorageQueueDeleteReader);
-
         source.initialize(null, new TAzureStorageQueueListProperties("test"));
         assertTrue(source.createReader(null) instanceof AzureStorageQueueListReader);
-
-        source.initialize(null, new TAzureStorageQueuePurgeProperties("test"));
-        assertTrue(source.createReader(null) instanceof AzureStorageQueuePurgeReader);
 
         source.initialize(null, new TAzureStorageQueueInputProperties("test"));
         assertTrue(source.createReader(null) instanceof AzureStorageQueueInputReader);

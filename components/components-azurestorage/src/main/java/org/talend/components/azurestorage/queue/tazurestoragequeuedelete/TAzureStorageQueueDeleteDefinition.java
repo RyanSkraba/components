@@ -12,9 +12,16 @@
 // ============================================================================
 package org.talend.components.azurestorage.queue.tazurestoragequeuedelete;
 
+import java.util.EnumSet;
+import java.util.Set;
+
+import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.azurestorage.queue.AzureStorageQueueDefinition;
+import org.talend.components.azurestorage.queue.runtime.AzureStorageQueueDeleteRuntime;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.runtime.RuntimeInfo;
 
 public class TAzureStorageQueueDeleteDefinition extends AzureStorageQueueDefinition {
 
@@ -33,6 +40,20 @@ public class TAzureStorageQueueDeleteDefinition extends AzureStorageQueueDefinit
     @Override
     public Property[] getReturnProperties() {
         return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_QUEUE_NAME_PROP };
+    }
+
+    @Override
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
+            ConnectorTopology connectorTopology) {
+
+        assertConnectorTopologyCompatibility(connectorTopology);
+        assertEngineCompatibility(engine);
+        return getCommonRuntimeInfo(this.getClass().getClassLoader(), AzureStorageQueueDeleteRuntime.class);
+    }
+
+    @Override
+    public Set<ConnectorTopology> getSupportedConnectorTopologies() {
+        return EnumSet.of(ConnectorTopology.NONE);
     }
 
 }
