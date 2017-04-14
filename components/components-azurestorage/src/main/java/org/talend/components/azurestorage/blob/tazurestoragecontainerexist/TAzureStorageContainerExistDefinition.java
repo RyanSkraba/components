@@ -30,7 +30,7 @@ public class TAzureStorageContainerExistDefinition extends AzureStorageContainer
 
     public static final String RETURN_CONTAINER_EXIST = "containerExist"; //$NON-NLS-1$
 
-    public static final Property<String> RETURN_CONTAINER_EXIST_PROP = PropertyFactory.newString(RETURN_CONTAINER_EXIST);
+    public static final Property<Boolean> RETURN_CONTAINER_EXIST_PROP = PropertyFactory.newBoolean(RETURN_CONTAINER_EXIST);
 
     public TAzureStorageContainerExistDefinition() {
         super(COMPONENT_NAME);
