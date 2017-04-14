@@ -131,8 +131,8 @@ public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
                 include = remoteBlobsGet.include.getValue().get(idx);
             }
 
-            if (remoteBlobsGet.include.getValue().get(idx) != null) {
-                create = remoteBlobsGet.include.getValue().get(idx);
+            if (remoteBlobsGet.create.getValue().get(idx) != null) {
+                create = remoteBlobsGet.create.getValue().get(idx);
             }
 
             remoteBlobs.add(new RemoteBlobGet(prefix, include, create));
