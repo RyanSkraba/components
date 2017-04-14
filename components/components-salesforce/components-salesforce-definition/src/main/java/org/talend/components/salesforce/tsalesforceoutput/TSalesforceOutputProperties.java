@@ -33,6 +33,8 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
 
     public static final String FIELD_SALESFORCE_ID = "salesforce_id";
 
+    public static final String FIELD_STATUS = "salesforce_upsert_status";
+
     public static final String FIELD_ERROR_CODE = "errorCode";
 
     public static final String FIELD_ERROR_FIELDS = "errorFields";
@@ -74,21 +76,28 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
             }
         });
     }
-    
+
     private void updateOutputSchemas() {
         Schema inputSchema = module.main.schema.getValue();
-        
+
         Schema.Field field = null;
-        
-        if (!extendInsert.getValue() && retrieveInsertId.getValue() && OutputAction.INSERT.equals(outputAction.getValue())) {
+
+        if (!extendInsert.getValue() && retrieveInsertId.getValue()
+                && (OutputAction.INSERT.equals(outputAction.getValue()) || OutputAction.UPSERT.equals(outputAction.getValue()))) {
             final List<Schema.Field> additionalMainFields = new ArrayList<Schema.Field>();
-            
+
             field = new Schema.Field(FIELD_SALESFORCE_ID, Schema.create(Schema.Type.STRING), null, (Object) null);
             field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
             field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
             field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
             additionalMainFields.add(field);
-            
+            if (OutputAction.UPSERT.equals(outputAction.getValue())) {
+                field = new Schema.Field(FIELD_STATUS, Schema.create(Schema.Type.STRING), null, (Object) null);
+                field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
+                field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
+                field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
+                additionalMainFields.add(field);
+            }
             Schema mainOutputSchema = newSchema(inputSchema, "output", additionalMainFields);
             schemaFlow.schema.setValue(mainOutputSchema);
         } else {
@@ -102,21 +111,21 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
         field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
         field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
         additionalRejectFields.add(field);
-        
+
         field = new Schema.Field(FIELD_ERROR_FIELDS, Schema.create(Schema.Type.STRING), null, (Object) null);
         field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
         field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
         field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
         additionalRejectFields.add(field);
-        
+
         field = new Schema.Field(FIELD_ERROR_MESSAGE, Schema.create(Schema.Type.STRING), null, (Object) null);
         field.addProp(SchemaConstants.TALEND_IS_LOCKED, "false");
         field.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
         field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255");
         additionalRejectFields.add(field);
-        
+
         Schema rejectSchema = newSchema(inputSchema, "rejectOutput", additionalRejectFields);
-        
+
         schemaReject.schema.setValue(rejectSchema);
     }
 
@@ -128,7 +137,7 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
         for (Schema.Field se : metadataSchema.getFields()) {
             Schema.Field field = new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal(), se.order());
             field.getObjectProps().putAll(se.getObjectProps());
-            for (Map.Entry<String,Object> entry : se.getObjectProps().entrySet()) {
+            for (Map.Entry<String, Object> entry : se.getObjectProps().entrySet()) {
                 field.addProp(entry.getKey(), entry.getValue());
             }
             copyFieldList.add(field);
@@ -137,7 +146,7 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
         copyFieldList.addAll(moreFields);
 
         newSchema.setFields(copyFieldList);
-        for (Map.Entry<String,Object> entry : metadataSchema.getObjectProps().entrySet()) {
+        for (Map.Entry<String, Object> entry : metadataSchema.getObjectProps().entrySet()) {
             newSchema.addProp(entry.getKey(), entry.getValue());
         }
 
@@ -167,6 +176,11 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
         updateOutputSchemas();
     }
 
+    public void afterOutputAction() {
+        super.afterOutputAction();
+        updateOutputSchemas();
+    }
+
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
@@ -177,7 +191,8 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
             form.getChildForm(connection.getName()).getWidget(connection.httpTraceMessage.getName()).setHidden(true);
             form.getWidget("commitLevel").setHidden(!extendInsert.getValue());
             form.getWidget("retrieveInsertId")
-                    .setHidden(extendInsert.getValue() || !OutputAction.INSERT.equals(outputAction.getValue()));
+                    .setHidden(extendInsert.getValue() || !(OutputAction.INSERT.equals(outputAction.getValue())
+                            || OutputAction.UPSERT.equals(outputAction.getValue())));
             form.getWidget("ignoreNull").setHidden(!(OutputAction.UPDATE.equals(outputAction.getValue())
                     || OutputAction.UPSERT.equals(outputAction.getValue())));
         }

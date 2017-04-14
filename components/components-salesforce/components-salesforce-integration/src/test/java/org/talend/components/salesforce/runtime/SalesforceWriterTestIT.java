@@ -118,6 +118,13 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
             .name("Id").type().stringType().noDefault() //
             .endRecord();
 
+    public static Schema SCHEMA_CONTACT = SchemaBuilder.builder().record("Schema").fields() //
+            .name("Email").type().stringType().noDefault() //
+            .name("FirstName").type().stringType().noDefault() //
+            .name("LastName").type().stringType().noDefault() //
+            .name("Id").type().stringType().noDefault() //
+            .endRecord();
+
     public Writer<Result> createSalesforceOutputWriter(TSalesforceOutputProperties props) {
         SalesforceSink salesforceSink = new SalesforceSink();
         salesforceSink.initialize(adaptor, props);
@@ -141,9 +148,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
         // Get the list of records that match the prefix to delete.
         {
-            ComponentDefinition sfDef = new TSalesforceInputDefinition();
-
-            TSalesforceInputProperties sfProps = (TSalesforceInputProperties) sfDef.createRuntimeProperties();
+            TSalesforceInputProperties sfProps = getSalesforceInputProperties();
             SalesforceTestBase.setupProps(sfProps.connection, false);
             sfProps.module.setValue("moduleName", "Account");
             sfProps.module.main.schema.setValue(SCHEMA_UPDATE_ACCOUNT);
@@ -333,8 +338,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
         assertEquals(1, ((SalesforceWriter) batchWriter).getSuccessfulWrites().size());
 
-        ComponentDefinition sfInputDef = new TSalesforceInputDefinition();
-        TSalesforceInputProperties sfInputProps = (TSalesforceInputProperties) sfInputDef.createRuntimeProperties();
+        TSalesforceInputProperties sfInputProps = getSalesforceInputProperties();
         sfInputProps.copyValuesFrom(sfTestLookupProps);
         // "LookupModuleExternalId" is not the column of module. So "CUSTOM_LOOKUP_MODULE_SCHEMA" for query
         sfInputProps.module.main.schema.setValue(CUSTOM_LOOKUP_MODULE_SCHEMA);
@@ -696,8 +700,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         File file = new File(logFilePath);
         assertFalse(file.exists());
         // Prepare the input properties for check record in server side
-        ComponentDefinition sfInputDef = new TSalesforceInputDefinition();
-        TSalesforceInputProperties inputProperties = (TSalesforceInputProperties) sfInputDef.createRuntimeProperties();
+        TSalesforceInputProperties inputProperties = getSalesforceInputProperties();
         List<IndexedRecord> inputRecords = null;
 
         // Component framework objects.
@@ -1024,8 +1027,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
         assertEquals(2, ((SalesforceWriter) batchWriter).getSuccessfulWrites().size());
 
-        ComponentDefinition sfInputDef = new TSalesforceInputDefinition();
-        TSalesforceInputProperties sfInputProps = (TSalesforceInputProperties) sfInputDef.createRuntimeProperties();
+        TSalesforceInputProperties sfInputProps = getSalesforceInputProperties();
         sfInputProps.copyValuesFrom(sfProps);
         sfInputProps.condition.setValue("Subject = '" + random + "' ORDER BY DurationInMinutes ASC");
 
@@ -1050,6 +1052,114 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         } finally {
             deleteRows(inpuRecords, sfInputProps);
         }
+    }
+
+    /**
+     * Test tSalesforceOutput add additional information for upsert
+     */
+    @Test
+    public void testUpsertAdditionalInfo() throws Throwable {
+        // 1.Prepare output component configuration
+        ComponentDefinition sfDef = new TSalesforceOutputDefinition();
+        TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
+        SalesforceTestBase.setupProps(sfProps.connection, false);
+        sfProps.module.setValue("moduleName", "Contact");
+        sfProps.module.main.schema.setValue(SCHEMA_CONTACT);
+        sfProps.outputAction.setValue(OutputAction.UPSERT);
+        sfProps.ceaseForError.setValue(false);
+        sfProps.extendInsert.setValue(false);
+        sfProps.retrieveInsertId.setValue(true);
+        sfProps.upsertKeyColumn.setValue("Email");
+        sfProps.module.schemaListener.afterSchema();
+
+        // 2.Prepare the data
+        List records = new ArrayList<IndexedRecord>();
+        String random = String.valueOf(createNewRandom());
+        IndexedRecord r1 = new GenericData.Record(SCHEMA_CONTACT);
+        r1.put(0, "aaa"+random+"@talend.com");
+        r1.put(1, "F_" + random);
+        r1.put(2, "L_" + random);
+        IndexedRecord r2 = new GenericData.Record(SCHEMA_CONTACT);
+        r2.put(0, "bbb"+random+"@talend.com");
+        IndexedRecord r3 = new GenericData.Record(SCHEMA_CONTACT);
+        r3.put(0, "ccc"+random+"@talend.com");
+        r3.put(1, "F_" + random);
+        r3.put(2, "L_" + random);
+        IndexedRecord r4 = new GenericData.Record(SCHEMA_CONTACT);
+        r4.put(0, "aaa"+random+"@talend.com");
+        r4.put(1, "F_update_" + random);
+        r4.put(2, "L_update_" + random);
+
+        // 3. Write data
+        SalesforceSink salesforceSink = new SalesforceSink();
+        salesforceSink.initialize(adaptor, sfProps);
+        salesforceSink.validate(adaptor);
+        SalesforceWriter writer = salesforceSink.createWriteOperation().createWriter(adaptor);
+
+        List<IndexedRecord> successRecords = new ArrayList<>();
+        List<IndexedRecord> rejectRecords = new ArrayList<>();
+        writer.open("foo");
+        try {
+            // writing and collect the result
+            // insert
+            writer.write(r1);
+            successRecords.addAll(writer.getSuccessfulWrites());
+            rejectRecords.addAll(writer.getRejectedWrites());
+            // reject
+            writer.write(r2);
+            successRecords.addAll(writer.getSuccessfulWrites());
+            rejectRecords.addAll(writer.getRejectedWrites());
+            // insert
+            writer.write(r3);
+            successRecords.addAll(writer.getSuccessfulWrites());
+            rejectRecords.addAll(writer.getRejectedWrites());
+            // update
+            writer.write(r4);
+            successRecords.addAll(writer.getSuccessfulWrites());
+            rejectRecords.addAll(writer.getRejectedWrites());
+        } finally {
+            writer.close();
+        }
+
+        // 4.Check the write return IndexRecords whether include expect information
+        assertEquals(3, successRecords.size());
+        assertEquals(1, rejectRecords.size());
+        IndexedRecord record_1 = successRecords.get(0);
+        IndexedRecord record_2 = successRecords.get(1);
+        IndexedRecord record_3 = successRecords.get(2);
+        Schema recordSchema = record_1.getSchema();
+        assertEquals(6, recordSchema.getFields().size());
+        assertEquals(4, recordSchema.getField(TSalesforceOutputProperties.FIELD_SALESFORCE_ID).pos());
+        assertEquals(5, recordSchema.getField(TSalesforceOutputProperties.FIELD_STATUS).pos());
+
+        assertEquals("aaa"+random+"@talend.com", record_1.get(0));
+        assertNotNull(record_1.get(4));
+        assertEquals("created", record_1.get(5));
+
+        assertEquals("ccc"+random+"@talend.com", record_2.get(0));
+        assertNotNull(record_2.get(4));
+        assertEquals("created", record_2.get(5));
+
+        assertEquals("aaa"+random+"@talend.com", record_3.get(0));
+        assertEquals(record_3.get(4), record_1.get(4));
+        assertEquals("updated", record_3.get(5));
+
+        // 5.Check the result in salesforce
+        TSalesforceInputProperties sfInputProps = getSalesforceInputProperties();
+        sfInputProps.copyValuesFrom(sfProps);
+        sfInputProps.condition.setValue("FirstName like '%" + random + "'");
+        List<IndexedRecord> inpuRecords = readRows(sfInputProps);
+        assertEquals(2, inpuRecords.size());
+        IndexedRecord inputRecords_1 = inpuRecords.get(0);
+        IndexedRecord inputRecords_2 = inpuRecords.get(1);
+        assertThat(Arrays.asList("aaa"+random+"@talend.com", "ccc"+random+"@talend.com"),
+                containsInAnyOrder(inputRecords_1.get(0), inputRecords_2.get(0)));
+        assertThat(Arrays.asList("F_" + random, "F_update_" + random),
+                containsInAnyOrder(inputRecords_1.get(1), inputRecords_2.get(1)));
+        assertThat(Arrays.asList("L_" + random, "L_update_" + random),
+                containsInAnyOrder(inputRecords_1.get(2), inputRecords_2.get(2)));
+        // 6.Delete test data
+        deleteRows(inpuRecords, sfInputProps);
     }
 
     @Test
@@ -1100,8 +1210,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         assertEquals(2, ((SalesforceWriter) batchWriter).getSuccessfulWrites().size());
         LOGGER.debug("2 attachments uploaded successfully!");
 
-        ComponentDefinition sfInputDef = new TSalesforceInputDefinition();
-        TSalesforceInputProperties sfInputProps = (TSalesforceInputProperties) sfInputDef.createRuntimeProperties();
+        TSalesforceInputProperties sfInputProps = getSalesforceInputProperties();
         sfInputProps.copyValuesFrom(sfProps);
         sfInputProps.condition.setValue("Name = 'attachment_1_" + random + ".txt' or Name = 'attachment_2_" + random + ".txt'");
 
@@ -1141,8 +1250,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
     }
 
     public String getFirstCreatedAccountRecordId() throws Exception {
-        ComponentDefinition sfInputDef = new TSalesforceInputDefinition();
-        TSalesforceInputProperties sfInputProps = (TSalesforceInputProperties) sfInputDef.createRuntimeProperties();
+        TSalesforceInputProperties sfInputProps = getSalesforceInputProperties();
         SalesforceTestBase.setupProps(sfInputProps.connection, false);
         sfInputProps.module.setValue("moduleName", "Account");
         sfInputProps.module.main.schema.setValue(SCHEMA_UPDATE_ACCOUNT);
@@ -1159,6 +1267,11 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
             LOGGER.error("Module Account have no records!");
         }
         return firstId;
+    }
+
+    protected static TSalesforceInputProperties getSalesforceInputProperties() {
+        ComponentDefinition sfInputDef = new TSalesforceInputDefinition();
+        return (TSalesforceInputProperties) sfInputDef.createRuntimeProperties();
     }
 
 }

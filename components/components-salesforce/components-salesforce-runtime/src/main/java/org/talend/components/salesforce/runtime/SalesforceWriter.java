@@ -327,7 +327,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
                     for (int i = 0; i < saveResults.length; i++) {
                         ++batch_idx;
                         if (saveResults[i].getSuccess()) {
-                            handleSuccess(insertItems.get(i), saveResults[i].getId());
+                            handleSuccess(insertItems.get(i), saveResults[i].getId(), null);
                         } else {
                             handleReject(insertItems.get(i), saveResults[i].getErrors(), changedItemKeys, batch_idx);
                         }
@@ -371,7 +371,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
                     for (int i = 0; i < saveResults.length; i++) {
                         ++batch_idx;
                         if (saveResults[i].getSuccess()) {
-                            handleSuccess(updateItems.get(i), saveResults[i].getId());
+                            handleSuccess(updateItems.get(i), saveResults[i].getId(), null);
                         } else {
                             handleReject(updateItems.get(i), saveResults[i].getErrors(), changedItemKeys, batch_idx);
                         }
@@ -418,7 +418,11 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
                     for (int i = 0; i < upsertResults.length; i++) {
                         ++batch_idx;
                         if (upsertResults[i].getSuccess()) {
-                            handleSuccess(upsertItems.get(i), upsertResults[i].getId());
+                            if (upsertResults[i].getCreated()) {
+                                handleSuccess(upsertItems.get(i), upsertResults[i].getId(), "created");
+                            } else {
+                                handleSuccess(upsertItems.get(i), upsertResults[i].getId(), "updated");
+                            }
                         } else {
                             handleReject(upsertItems.get(0), upsertResults[i].getErrors(), changedItemKeys, batch_idx);
                         }
@@ -434,7 +438,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
 
     }
 
-    private void handleSuccess(IndexedRecord input, String id) {
+    private void handleSuccess(IndexedRecord input, String id, String status) {
         successCount++;
         Schema outSchema = sprops.schemaFlow.schema.getValue();
         if (outSchema == null || outSchema.getFields().size() == 0)
@@ -446,10 +450,13 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
             for (Schema.Field outField : successful.getSchema().getFields()) {
                 Object outValue = null;
                 Schema.Field inField = input.getSchema().getField(outField.name());
-                if (inField != null)
+                if (inField != null) {
                     outValue = input.get(inField.pos());
-                else if (TSalesforceOutputProperties.FIELD_SALESFORCE_ID.equals(outField.name()))
+                } else if (TSalesforceOutputProperties.FIELD_SALESFORCE_ID.equals(outField.name())) {
                     outValue = id;
+                } else if (TSalesforceOutputProperties.FIELD_STATUS.equals(outField.name())) {
+                    outValue = status;
+                }
                 successful.put(outField.pos(), outValue);
             }
             successfulWrites.add(successful);
@@ -554,7 +561,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
                     for (int i = 0; i < dr.length; i++) {
                         ++batch_idx;
                         if (dr[i].getSuccess()) {
-                            handleSuccess(deleteItems.get(i), dr[i].getId());
+                            handleSuccess(deleteItems.get(i), dr[i].getId(), null);
                         } else {
                             handleReject(deleteItems.get(i), dr[i].getErrors(), changedItemKeys, batch_idx);
                         }
