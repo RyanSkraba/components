@@ -17,6 +17,8 @@
     <modules>
         <module>components-jdbc-definition</module>
         <module>components-jdbc-runtime</module>
+        <module>components-jdbc-runtime-beam</module>
+        <module>components-jdbc-integration</module>
     </modules>
 
 </project>

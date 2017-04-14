@@ -11,7 +11,7 @@
 //
 // ============================================================================
 
-package org.talend.components.jdbc.runtime.beam;
+package org.talend.components.jdbc.runtime;
 
 import static org.junit.Assert.assertEquals;
 

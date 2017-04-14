@@ -35,9 +35,13 @@ public class JdbcRuntimeInfo extends JarRuntimeInfo {
      */
     public JdbcRuntimeInfo(RuntimeSettingProvider props, String runtimeClassName) {
         // add the version to fix the issue, not good, could we avoid it?
-        super("mvn:org.talend.components/components-jdbc-runtime",
-                DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-jdbc-runtime"),
-                runtimeClassName);
+        super(JDBCFamilyDefinition.MAVEN_RUNTIME_URI, DependenciesReader.computeDependenciesFilePath(
+                JDBCFamilyDefinition.MAVEN_GROUP_ID, JDBCFamilyDefinition.MAVEN_RUNTIME_ARTIFACT_ID), runtimeClassName);
+        this.props = props;
+    }
+
+    public JdbcRuntimeInfo(RuntimeSettingProvider props, String jarUrlString, String depTxtPath, String runtimeClassName) {
+        super(jarUrlString, depTxtPath, runtimeClassName);
         this.props = props;
     }
 

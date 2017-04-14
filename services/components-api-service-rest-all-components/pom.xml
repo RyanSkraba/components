@@ -126,6 +126,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
+			<artifactId>components-jdbc-runtime-beam</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
 			<artifactId>components-salesforce-runtime</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -308,6 +314,7 @@
 								<extraArtifact>org.talend.components:elasticsearch-runtime_2_4:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:simplefileio-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:components-jdbc-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:components-jdbc-runtime-beam:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:processing-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:bigquery-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.components:pubsub-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>

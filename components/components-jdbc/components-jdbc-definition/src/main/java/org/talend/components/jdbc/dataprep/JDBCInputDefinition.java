@@ -17,8 +17,10 @@ import java.util.Set;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.jdbc.JDBCFamilyDefinition;
 import org.talend.components.jdbc.JdbcRuntimeInfo;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -29,7 +31,7 @@ import org.talend.daikon.runtime.RuntimeInfo;
  */
 public class JDBCInputDefinition extends AbstractComponentDefinition {
 
-    public static final String BEAM_RUNTIME = "org.talend.components.jdbc.runtime.beam.JDBCInputPTransformRuntime";
+    public static final String BEAM_RUNTIME = "org.talend.components.jdbc.runtime.JDBCInputPTransformRuntime";
 
     public static final String DI_RUNTIME = "org.talend.components.jdbc.runtime.JDBCSource";
 
@@ -61,14 +63,17 @@ public class JDBCInputDefinition extends AbstractComponentDefinition {
         String runtimeClass = "";
         switch (engine) {
         case BEAM:
-            runtimeClass = BEAM_RUNTIME;
-            break;
+            return new JdbcRuntimeInfo((JDBCInputProperties) properties, JDBCFamilyDefinition.MAVEN_RUNTIME_BEAM_URI,
+                    DependenciesReader.computeDependenciesFilePath(JDBCFamilyDefinition.MAVEN_GROUP_ID,
+                            JDBCFamilyDefinition.MAVEN_RUNTIME_BEAM_ARTIFACT_ID),
+                    BEAM_RUNTIME);
         case DI:
         default:
-            runtimeClass = DI_RUNTIME;
-            break;
+            return new JdbcRuntimeInfo((JDBCInputProperties) properties, JDBCFamilyDefinition.MAVEN_RUNTIME_URI,
+                    DependenciesReader.computeDependenciesFilePath(JDBCFamilyDefinition.MAVEN_GROUP_ID,
+                            JDBCFamilyDefinition.MAVEN_RUNTIME_ARTIFACT_ID),
+                    DI_RUNTIME);
         }
-        return new JdbcRuntimeInfo((JDBCInputProperties) properties, runtimeClass);
     }
 
     @SuppressWarnings("rawtypes")

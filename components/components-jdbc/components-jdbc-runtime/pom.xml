@@ -9,24 +9,6 @@
         <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
 
-    <!-- TODO: when separating beam and di runtimes, this should be taken from components-adapter-beam-parent. -->
-    <properties>
-        <beam.version>0.6.0-tlnd</beam.version>
-    </properties>
-    <repositories>
-        <repository>
-            <id>apache.snapshots</id>
-            <name>Apache Development Snapshot Repository</name>
-            <url>https://repository.apache.org/content/repositories/snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <name>Components - JDBC - Runtime</name>
     <artifactId>components-jdbc-runtime</artifactId>
     <packaging>bundle</packaging>
@@ -37,7 +19,7 @@
             <artifactId>components-jdbc-definition</artifactId>
 			<version>${project.version}</version>
         </dependency>
-        
+
     	<dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
@@ -67,24 +49,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-adapter-beam</artifactId>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.apache.beam</groupId>
-            <artifactId>beam-runners-direct-java</artifactId>
-            <version>${beam.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.beam</groupId>
-            <artifactId>beam-sdks-java-io-jdbc</artifactId>
-            <version>${beam.version}</version>
-        </dependency>
-        
         <dependency>
             <groupId>org.talend.daikon</groupId>
             <artifactId>daikon-spring-utils</artifactId>

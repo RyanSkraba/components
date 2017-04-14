@@ -18,8 +18,10 @@ import java.util.Set;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
+import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.jdbc.JDBCFamilyDefinition;
 import org.talend.components.jdbc.JdbcRuntimeInfo;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -28,7 +30,7 @@ public class JDBCOutputDefinition extends AbstractComponentDefinition {
 
     public final static String NAME = "JdbcOutput";
 
-    public final static String BEAM_RUNTIME = "org.talend.components.jdbc.runtime.beam.JDBCOutputPTransformRuntime";
+    public final static String BEAM_RUNTIME = "org.talend.components.jdbc.runtime.JDBCOutputPTransformRuntime";
 
     public JDBCOutputDefinition() {
         super(NAME, ExecutionEngine.BEAM);
@@ -43,7 +45,10 @@ public class JDBCOutputDefinition extends AbstractComponentDefinition {
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
-        return new JdbcRuntimeInfo((JDBCOutputProperties) properties, BEAM_RUNTIME);
+        return new JdbcRuntimeInfo((JDBCOutputProperties) properties, JDBCFamilyDefinition.MAVEN_RUNTIME_BEAM_URI,
+                DependenciesReader.computeDependenciesFilePath(JDBCFamilyDefinition.MAVEN_GROUP_ID,
+                        JDBCFamilyDefinition.MAVEN_RUNTIME_BEAM_ARTIFACT_ID),
+                BEAM_RUNTIME);
     }
 
     @Override

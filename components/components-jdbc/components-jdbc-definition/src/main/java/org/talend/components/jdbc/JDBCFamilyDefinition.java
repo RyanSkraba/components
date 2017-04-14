@@ -42,6 +42,18 @@ public class JDBCFamilyDefinition extends AbstractComponentFamilyDefinition impl
 
     public static final String NAME = "Jdbc";
 
+    public static final String MAVEN_GROUP_ID = "org.talend.components";
+
+    public static final String MAVEN_RUNTIME_ARTIFACT_ID = "components-jdbc-runtime";
+
+    public static final String MAVEN_RUNTIME_BEAM_ARTIFACT_ID = "components-jdbc-runtime-beam";
+
+    public static final String MAVEN_RUNTIME_URI = "mvn:" + MAVEN_GROUP_ID + "/" +
+            MAVEN_RUNTIME_ARTIFACT_ID;
+
+    public static final String MAVEN_RUNTIME_BEAM_URI = "mvn:" + MAVEN_GROUP_ID + "/" +
+            MAVEN_RUNTIME_BEAM_ARTIFACT_ID;
+
     public JDBCFamilyDefinition() {
         super(
                 NAME,

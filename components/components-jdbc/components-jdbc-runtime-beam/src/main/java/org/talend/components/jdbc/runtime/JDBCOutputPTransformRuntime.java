@@ -11,11 +11,8 @@
 //
 // ============================================================================
 
-package org.talend.components.jdbc.runtime.beam;
+package org.talend.components.jdbc.runtime;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.sql.PreparedStatement;
 import java.util.List;
 
@@ -28,13 +25,9 @@ import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PDone;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.jdbc.dataprep.JDBCInputProperties;
-import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
-import org.talend.components.jdbc.datastore.JDBCDatastoreProperties;
 import org.talend.components.jdbc.datastream.JDBCOutputProperties;
 import org.talend.components.jdbc.runtime.setting.JDBCSQLBuilder;
 import org.talend.components.jdbc.runtime.type.JDBCMapping;
-import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
 
 public class JDBCOutputPTransformRuntime extends PTransform<PCollection<IndexedRecord>, PDone>
