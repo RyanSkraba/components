@@ -88,6 +88,7 @@ public class AzureStorageListReader extends AzureStorageReader<IndexedRecord> {
             currentRecord = new GenericData.Record(properties.schema.schema.getValue());
             currentRecord.put(0, blobs.get(blobIndex).getName());
             currentBlob = blobs.get(blobIndex);
+            blobSize = blobs.size();
         }
         return startable;
     }
