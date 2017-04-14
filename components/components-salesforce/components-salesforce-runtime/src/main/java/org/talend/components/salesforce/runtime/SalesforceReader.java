@@ -21,6 +21,7 @@ import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
+import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.avro.AvroUtils;
@@ -79,14 +80,6 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
         if (querySchema == null) {
             querySchema = properties.module.main.schema.getValue();
             if (AvroUtils.isIncludeAllFields(querySchema)) {
-                if(properties instanceof TSalesforceInputProperties) {
-                    TSalesforceInputProperties inProperties = (TSalesforceInputProperties) properties;
-                    if(inProperties.manualQuery.getValue()) {
-                        querySchema = ((SalesforceSource) getCurrentSource()).guessSchema(inProperties.query.getValue());
-                        return querySchema;
-                    }
-                }
-                
                 String moduleName = null;
                 if (properties instanceof SalesforceConnectionModuleProperties) {
                     moduleName = properties.module.moduleName.getStringValue();
@@ -96,7 +89,7 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
         }
         return querySchema;
     }
-    
+
     protected String getQueryString(SalesforceConnectionModuleProperties properties) throws IOException {
         String condition = null;
         if (properties instanceof TSalesforceInputProperties) {
@@ -124,7 +117,7 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
         }
         return sb.toString();
     }
-    
+
     @Override
     public void close() throws IOException {
     }

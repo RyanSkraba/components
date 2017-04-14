@@ -15,6 +15,7 @@ package org.talend.components.salesforce.runtime;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
+import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.salesforce.soql.SoqlQuery;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
+import org.talend.daikon.avro.AvroUtils;
 
 import com.sforce.async.AsyncApiException;
 import com.sforce.ws.ConnectionException;
@@ -122,5 +124,20 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
         } else {
             return properties.module.moduleName.getValue();
         }
+    }
+
+    @Override
+    protected Schema getSchema() throws IOException {
+        if (querySchema == null && AvroUtils.isIncludeAllFields(properties.module.main.schema.getValue())) {
+            // This for bulk manual query dynamic to generate schema based on soql
+            if (properties instanceof TSalesforceInputProperties) {
+                TSalesforceInputProperties inProperties = (TSalesforceInputProperties) properties;
+                if (inProperties.manualQuery.getValue()) {
+                    querySchema = ((SalesforceSource) getCurrentSource()).guessSchema(inProperties.query.getValue());
+                    return querySchema;
+                }
+            }
+        }
+        return super.getSchema();
     }
 }

@@ -41,6 +41,7 @@ import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinit
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.SchemaConstants;
 
 public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
@@ -223,6 +224,39 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
             // 4. Delete test data
             deleteRows(outputRows, props);
         }
+
+    }
+
+    /**
+     * This for basic connection manual query with dynamic
+     */
+    @Test
+    public void testManualQueryDynamic() throws Throwable {
+        testManualQueryDynamic(false);
+    }
+
+    /**
+     * This for basic connection manual query with dynamic
+     */
+    @Ignore("Should be activated after TDI-38263")
+    @Test
+    public void testBulkManualQueryDynamic() throws Throwable {
+        testManualQueryDynamic(true);
+    }
+
+    public void testManualQueryDynamic(boolean isBulkQuery) throws Throwable {
+        TSalesforceInputProperties props = createTSalesforceInputProperties(true, false);
+        props.manualQuery.setValue(true);
+        props.query.setValue("select Id,IsDeleted,Name,Phone,CreatedDate from Account limit 1");
+        if (isBulkQuery) {
+            props.queryMode.setValue(TSalesforceInputProperties.QueryMode.Bulk);
+        }
+        List<IndexedRecord> outputRows = readRows(props);
+        assertEquals(1, outputRows.size());
+        IndexedRecord record = outputRows.get(0);
+        assertNotNull(record.getSchema());
+        Schema.Field field = record.getSchema().getField("CreatedDate");
+        assertEquals("yyyy-MM-dd'T'HH:mm:ss'.000Z'", field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
     }
 
     /*
