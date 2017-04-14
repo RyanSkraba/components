@@ -14,6 +14,7 @@ package org.talend.components.marketo.tmarketooutput;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -21,6 +22,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.avro.Schema;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
@@ -127,5 +129,42 @@ public class TMarketoOutputPropertiesTest {
         assertFalse(props.deDupeEnabled.getValue());
         assertFalse(props.getForm(Form.MAIN).getWidget(props.operationType.getName()).isVisible());
         assertFalse(props.getForm(Form.MAIN).getWidget(props.lookupField.getName()).isVisible());
+    }
+
+    @Test
+    public void testDeleteLeads() throws Exception {
+        props.outputOperation.setValue(OutputOperation.deleteLeads);
+        props.afterOutputOperation();
+        assertFalse(props.getForm(Form.MAIN).getWidget(props.mappingInput.getName()).isVisible());
+        assertFalse(props.getForm(Form.MAIN).getWidget(props.operationType.getName()).isVisible());
+        assertFalse(props.getForm(Form.MAIN).getWidget(props.lookupField.getName()).isVisible());
+        assertFalse(props.getForm(Form.MAIN).getWidget(props.deDupeEnabled.getName()).isVisible());
+        assertFalse(props.getForm(Form.MAIN).getWidget(props.customObjectDedupeBy.getName()).isVisible());
+        assertFalse(props.getForm(Form.MAIN).getWidget(props.customObjectDeleteBy.getName()).isVisible());
+        assertFalse(props.getForm(Form.MAIN).getWidget(props.customObjectName.getName()).isVisible());
+        assertFalse(props.getForm(Form.MAIN).getWidget(props.customObjectSyncAction.getName()).isVisible());
+        //
+        assertTrue(props.getForm(Form.MAIN).getWidget(props.deleteLeadsInBatch.getName()).isVisible());
+        assertFalse(props.getForm(Form.MAIN).getWidget(props.batchSize.getName()).isVisible());
+        //
+        props.deleteLeadsInBatch.setValue(true);
+        props.afterDeleteLeadsInBatch();
+        assertTrue(props.getForm(Form.MAIN).getWidget(props.deleteLeadsInBatch.getName()).isVisible());
+        assertTrue(props.getForm(Form.MAIN).getWidget(props.batchSize.getName()).isVisible());
+    }
+
+    @Test
+    public void testDeleteLeadsSchemas() throws Exception {
+        props.outputOperation.setValue(OutputOperation.deleteLeads);
+        props.afterOutputOperation();
+        assertEquals(MarketoConstants.getDeleteLeadsSchema(), props.schemaInput.schema.getValue());
+        Schema flow = props.schemaFlow.schema.getValue();
+        assertNotNull(flow.getField("Status"));
+        props.deleteLeadsInBatch.setValue(true);
+        props.afterDeleteLeadsInBatch();
+        assertEquals(MarketoConstants.getDeleteLeadsSchema(), props.schemaInput.schema.getValue());
+        assertEquals(MarketoConstants.getEmptySchema(), props.schemaFlow.schema.getValue());
+        // assertEquals(MarketoConstants.getDeleteLeadsSchema().getFields(),
+        // props.schemaFlow.schema.getValue().getFields());
     }
 }

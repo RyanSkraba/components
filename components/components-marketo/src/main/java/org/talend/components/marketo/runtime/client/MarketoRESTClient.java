@@ -1119,14 +1119,19 @@ public class MarketoRESTClient extends MarketoClient implements MarketoClientSer
         return fields;
     }
 
-    public MarketoSyncResult deleteLeads(Integer[] leadIds) {
+    public MarketoSyncResult deleteLeads(List<IndexedRecord> leadIds) {
+        List<Integer> leads = new ArrayList<>();
+        for (IndexedRecord r : leadIds) {
+            leads.add((Integer) r.get(0));
+        }
+        return deleteLeads(leads.toArray(new Integer[leads.size()]));
+    }
 
+    public MarketoSyncResult deleteLeads(Integer[] leadIds) {
         current_uri = new StringBuilder(basicPath)//
                 .append(API_PATH_LEADS_DELETE)//
                 .append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true))//
-                // .append(fmtParams(FIELD_ID, csvString(leadIds)))//
                 .append(fmtParams(QUERY_METHOD, QUERY_METHOD_POST));
-
         JsonArray json = new JsonArray();
         for (Integer leadId : leadIds) {
             JsonObject leadKey = new JsonObject();

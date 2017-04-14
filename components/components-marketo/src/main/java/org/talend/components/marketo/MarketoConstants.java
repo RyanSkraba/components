@@ -66,6 +66,10 @@ public class MarketoConstants {
 
     public static final String DATETIME_PATTERN_SOAP = "yyyy-MM-dd'T'HH:mm:ss'.000Z'";
 
+    public static Schema getEmptySchema() {
+        return SchemaBuilder.builder().record("empty").fields().endRecord();
+    }
+
     /**
      * List Operations
      */
@@ -240,6 +244,12 @@ public class MarketoConstants {
                 .name("activityTypeValue").type().nullable().stringType().noDefault() //
                 .name("primaryAttributeValueId").type().nullable().intType().noDefault() //
                 .name("primaryAttributeValue").type().nullable().stringType().noDefault() //
+                .endRecord();
+    }
+
+    public static Schema getDeleteLeadsSchema() {
+        return SchemaBuilder.builder().record("deleteLeads").fields() //
+                .name("leadId").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
                 .endRecord();
     }
 

@@ -720,6 +720,32 @@ public class MarketoRESTClientTestIT extends MarketoClientTestIT {
             assertEquals("skipped", r.getStatus());
             LOG.debug("r = {}.", r);
         }
+        // writer
+        outProperties.outputOperation.setValue(OutputOperation.deleteLeads);
+        outProperties.afterOutputOperation();
+        List<IndexedRecord> leads = new ArrayList<>();
+        Schema s = outProperties.schemaInput.schema.getValue();
+        IndexedRecord record;
+        for (int i = 0; i < 10; i++) {
+            record = new GenericData.Record(s);
+            record.put(0, createdLeads.get(i));
+            leads.add(record);
+        }
+        // Non existing lead
+        record = new GenericData.Record(s);
+        record.put(0, 123);
+        leads.add(record);
+        MarketoSyncResult rs = client.deleteLeads(leads);
+        for (SyncStatus sync : rs.getRecords()) {
+            assertNotNull(sync);
+            LOG.debug("sync = {}.", sync);
+            if (sync.getId().equals(123)) {
+                assertEquals("skipped", sync.getStatus());
+                assertEquals("[1004] Lead not found.", sync.getAvailableReason());
+            } else {
+                assertEquals("deleted", sync.getStatus());
+            }
+        }
     }
     /*
      * 

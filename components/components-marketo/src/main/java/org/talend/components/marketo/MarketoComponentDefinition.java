@@ -12,8 +12,6 @@
 // ============================================================================
 package org.talend.components.marketo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.ExecutionEngine;
@@ -47,8 +45,6 @@ public abstract class MarketoComponentDefinition extends AbstractComponentDefini
     public static final String RETURN_NB_CALL = "numberCall";
 
     public static final Property<Integer> RETURN_NB_CALL_PROP = PropertyFactory.newInteger(RETURN_NB_CALL);
-
-    private transient static final Logger LOG = LoggerFactory.getLogger(MarketoComponentDefinition.class);
 
     public MarketoComponentDefinition(String componentName) {
         super(componentName, ExecutionEngine.DI);

@@ -39,6 +39,12 @@ public class MarketoResult extends Result {
     }
 
     @Override
+    public void add(Result result) {
+        super.add(result);
+        apiCalls += ((MarketoResult) result).getApiCalls();
+    }
+
+    @Override
     public String toString() {
         return super.toString() + " API calls: " + apiCalls;
     }

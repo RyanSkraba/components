@@ -15,6 +15,8 @@ package org.talend.components.marketo.runtime.client.type;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 public abstract class MarketoBaseResult<T> {
 
     String requestId = "";
@@ -61,6 +63,19 @@ public abstract class MarketoBaseResult<T> {
             return new ArrayList<>();
         }
         return errors;
+    }
+
+    public String getErrorsString() {
+        StringBuilder errs = new StringBuilder("");
+        for (MarketoError err : getErrors()) {
+            errs.append("{ ");
+            if (!StringUtils.isEmpty(err.getCode())) {
+                errs.append("[").append(err.getCode()).append("] ");
+            }
+            errs.append(err.getMessage());
+            errs.append("}");
+        }
+        return errs.toString();
     }
 
     public void setErrors(List<MarketoError> errors) {

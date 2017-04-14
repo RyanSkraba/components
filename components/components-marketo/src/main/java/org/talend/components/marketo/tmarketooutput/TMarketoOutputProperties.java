@@ -32,6 +32,8 @@ import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.helpers.MarketoColumnMappingsTable;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.daikon.avro.SchemaConstants;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.presentation.Form;
@@ -43,6 +45,7 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
     public enum OutputOperation {
         syncLead, // This operation requests an insert or update operation for a lead record.
         syncMultipleLeads, // This operation requests an insert or update operation for lead records in batch.
+        deleteLeads, // REST only
         syncCustomObjects, // REST only
         deleteCustomObjects // REST only
     }
@@ -107,6 +110,11 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
 
     public Property<CustomObjectDeleteBy> customObjectDeleteBy = newEnum("customObjectDeleteBy", CustomObjectDeleteBy.class);
 
+    public Property<Boolean> deleteLeadsInBatch = newBoolean("deleteLeadsInBatch");
+
+    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(TMarketoOutputProperties.class);
+
     public TMarketoOutputProperties(String name) {
         super(name);
     }
@@ -136,6 +144,7 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
         lookupField.setValue(RESTLookupFields.email);
 
         deDupeEnabled.setValue(false);
+        deleteLeadsInBatch.setValue(false);
 
         schemaInput.schema.setValue(MarketoConstants.getRESTOutputSchemaForSyncLead());
 
@@ -174,6 +183,7 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
         mainForm.addRow(lookupField);
         mainForm.addRow(widget(mappingInput).setWidgetType(Widget.TABLE_WIDGET_TYPE));
         mainForm.addRow(deDupeEnabled);
+        mainForm.addRow(deleteLeadsInBatch);
         mainForm.addRow(batchSize);
         mainForm.addRow(dieOnError);
     }
@@ -191,6 +201,7 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
             form.getWidget(lookupField.getName()).setVisible(false);
             form.getWidget(deDupeEnabled.getName()).setVisible(false);
             form.getWidget(batchSize.getName()).setVisible(false);
+            form.getWidget(deleteLeadsInBatch.getName()).setVisible(false);
             //
             form.getWidget(customObjectSyncAction.getName()).setVisible(false);
             form.getWidget(customObjectName.getName()).setVisible(false);
@@ -212,6 +223,10 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
                     form.getWidget(operationType.getName()).setHidden(deDupeEnabled.getValue());
                     form.getWidget(lookupField.getName()).setHidden(deDupeEnabled.getValue());
                     break;
+                case deleteLeads:
+                    form.getWidget(deleteLeadsInBatch.getName()).setVisible(true);
+                    form.getWidget(batchSize.getName()).setVisible(deleteLeadsInBatch.getValue());
+                    break;
                 case syncCustomObjects:
                     form.getWidget(customObjectName.getName()).setVisible(true);
                     form.getWidget(customObjectSyncAction.getName()).setVisible(true);
@@ -232,11 +247,12 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
             case syncLead:
             case syncMultipleLeads:
                 return ValidationResult.OK;
+            case deleteLeads:
             case syncCustomObjects:
             case deleteCustomObjects:
                 ValidationResult vr = new ValidationResult();
                 vr.setStatus(Result.ERROR);
-                vr.setMessage("CustomObjects not managed in SOAP API!");
+                vr.setMessage(messages.getMessage("validation.error.operation.soap"));
                 return vr;
             }
         }
@@ -261,6 +277,9 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
             case syncMultipleLeads:
                 schemaInput.schema.setValue(MarketoConstants.getRESTOutputSchemaForSyncLead());
                 break;
+            case deleteLeads:
+                schemaInput.schema.setValue(MarketoConstants.getDeleteLeadsSchema());
+                break;
             case syncCustomObjects:
             case deleteCustomObjects:
                 schemaInput.schema.setValue(MarketoConstants.getCustomObjectSyncSchema());
@@ -272,6 +291,16 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
     }
 
     public void afterDeDupeEnabled() {
+        refreshLayout(getForm(Form.MAIN));
+    }
+
+    public void afterDeleteLeadsInBatch() {
+        updateOutputSchemas();
+        refreshLayout(getForm(Form.MAIN));
+    }
+
+    public void afterBatchSize() {
+        updateOutputSchemas();
         refreshLayout(getForm(Form.MAIN));
     }
 
@@ -296,11 +325,19 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
     protected void updateOutputSchemas() {
         Schema inputSchema = schemaInput.schema.getValue();
         inputSchema.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
+        // batch processing workaround - studio can't handle feedbacks correctly on close call.
+        // so we set an empty schema for now.
+        // seems that it may be resolved : https://jira.talendforge.org/browse/TDI-38603
+        if ((outputOperation.getValue().equals(OutputOperation.deleteLeads) && deleteLeadsInBatch.getValue())
+                || (outputOperation.getValue().equals(OutputOperation.syncMultipleLeads) && batchSize.getValue() > 1)) {
+            schemaFlow.schema.setValue(MarketoConstants.getEmptySchema());
+            schemaReject.schema.setValue(MarketoConstants.getEmptySchema());
+            return;
+        }
         //
         boolean isCustomObject = (outputOperation.getValue().equals(OutputOperation.syncCustomObjects)
                 || outputOperation.getValue().equals(OutputOperation.deleteCustomObjects));
         //
-
         final List<Field> flowFields = new ArrayList<Field>();
         final List<Field> rejectFields = new ArrayList<Field>();
         Field f;

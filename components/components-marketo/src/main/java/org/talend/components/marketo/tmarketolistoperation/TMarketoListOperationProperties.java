@@ -71,23 +71,21 @@ public class TMarketoListOperationProperties extends MarketoComponentProperties 
     public void setupProperties() {
         super.setupProperties();
 
+        listOperation.setPossibleValues(ListOperation.values());
+        listOperation.setValue(ListOperation.addTo);
+        multipleOperation.setValue(false);
         schemaInput.schema.setValue(MarketoConstants.getListOperationRESTSchema());
         updateOutputSchemas();
         setSchemaListener(new ISchemaListener() {
 
             @Override
             public void afterSchema() {
-                LOG.debug("afterSchema");
                 schemaFlow.schema.setValue(null);
                 schemaReject.schema.setValue(null);
                 updateOutputSchemas();
                 refreshLayout(getForm(Form.MAIN));
             }
         });
-
-        listOperation.setPossibleValues(ListOperation.values());
-        listOperation.setValue(ListOperation.addTo);
-        multipleOperation.setValue(false);
     }
 
     @Override
@@ -106,13 +104,11 @@ public class TMarketoListOperationProperties extends MarketoComponentProperties 
 
         if (connection.apiMode.getValue().equals(APIMode.SOAP)) {
             schemaInput.schema.setValue(MarketoConstants.getListOperationSOAPSchema());
+            updateOutputSchemas();
         } else {
             schemaInput.schema.setValue(MarketoConstants.getListOperationRESTSchema());
+            updateOutputSchemas();
         }
-        if (listOperation.getValue().equals(ListOperation.isMemberOf)) {
-            multipleOperation.setValue(false);
-        }
-
         if (form.getName().equals(Form.MAIN)) {
             switch (listOperation.getValue()) {
             case addTo:
@@ -130,6 +126,12 @@ public class TMarketoListOperationProperties extends MarketoComponentProperties 
     }
 
     public void afterListOperation() {
+        updateOutputSchemas();
+        refreshLayout(getForm(Form.MAIN));
+    }
+
+    public void afterMultipleOperation() {
+        updateOutputSchemas();
         refreshLayout(getForm(Form.MAIN));
     }
 
@@ -146,7 +148,16 @@ public class TMarketoListOperationProperties extends MarketoComponentProperties 
     public void updateOutputSchemas() {
         Schema inputSchema = schemaInput.schema.getValue();
         inputSchema.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
-
+        // batch processing
+        if ((listOperation.getValue().equals(ListOperation.addTo) || listOperation.getValue().equals(ListOperation.removeFrom))
+                && multipleOperation.getValue()) {
+            // schemaFlow.schema.setValue(MarketoConstants.getEmptySchema());
+            // schemaReject.schema.setValue(MarketoConstants.getEmptySchema());
+            schemaFlow.schema.setValue(inputSchema);
+            schemaReject.schema.setValue(inputSchema);
+            return;
+        }
+        //
         final List<Field> flowFields = new ArrayList<Field>();
         final List<Field> rejectFields = new ArrayList<Field>();
         Field f;
@@ -175,7 +186,6 @@ public class TMarketoListOperationProperties extends MarketoComponentProperties 
             f.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
             rejectFields.add(f);
         }
-
         Schema flowSchema = newSchema(inputSchema, "schemaFlow", flowFields);
         Schema rejectSchema = newSchema(inputSchema, "schemaReject", rejectFields);
         schemaFlow.schema.setValue(flowSchema);

@@ -21,28 +21,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
-import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericData.Record;
 import org.apache.avro.generic.IndexedRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.common.runtime.GenericAvroRegistry;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.runtime.client.MarketoRESTClient;
 import org.talend.components.marketo.runtime.client.rest.type.SyncStatus;
-import org.talend.components.marketo.runtime.client.type.MarketoError;
 import org.talend.components.marketo.runtime.client.type.MarketoSyncResult;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
-import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OperationType;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.OutputOperation;
-import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
 public class MarketoOutputWriter extends MarketoWriter {
 
@@ -50,27 +42,15 @@ public class MarketoOutputWriter extends MarketoWriter {
 
     public static final String FIELD_ID_SOAP = "Id";
 
-    public static final String FIELD_EMAIL_REST = "email";
-
-    public static final String FIELD_EMAIL_SOAP = "Email";
-
     TMarketoOutputProperties properties;
 
     private OutputOperation operation;
 
-    private OperationType operationType;
-
-    private String lookupField;
-
-    private Map<String, String> mappings;
-
-    private Boolean deDupeEnabled = Boolean.FALSE;
+    private Boolean dieOnError;
 
     private int batchSize = 1;
 
     private List<IndexedRecord> recordsToProcess = new ArrayList<>();
-
-    private transient static final Logger LOG = LoggerFactory.getLogger(MarketoOutputWriter.class);
 
     public MarketoOutputWriter(WriteOperation writeOperation, RuntimeContainer runtime) {
         super(writeOperation, runtime);
@@ -86,31 +66,31 @@ public class MarketoOutputWriter extends MarketoWriter {
         rejectSchema = properties.schemaReject.schema.getValue();
         //
         operation = properties.outputOperation.getValue();
-        operationType = properties.operationType.getValue();// REST only
-        lookupField = properties.lookupField.getValue().name(); // REST only
-        mappings = properties.mappingInput.getNameMappingsForMarketo(); // SOAP only
-        deDupeEnabled = properties.deDupeEnabled.getValue(); // syncMultipleLeads only
-        batchSize = properties.batchSize.getValue(); // syncMultipleLeads only
+        dieOnError = properties.dieOnError.getValue();
+        if (operation.equals(OutputOperation.syncMultipleLeads) || operation.equals(OutputOperation.deleteLeads)) {
+            batchSize = properties.batchSize.getValue();
+        }
+        if (operation.equals(OutputOperation.deleteLeads) && !properties.deleteLeadsInBatch.getValue()) {
+            batchSize = 1;
+        }
     }
 
     @Override
     public void write(Object object) throws IOException {
-        LOG.debug("[write] object = {}.", object);
         if (object == null) {
             return;
         }
-        if (null == factory) {
-            factory = (IndexedRecordConverter<Object, ? extends IndexedRecord>) GenericAvroRegistry.get()
-                    .createIndexedRecordConverter(object.getClass());
-        }
-        inputRecord = factory.convertToAvro(object);
+        //
+        successfulWrites.clear();
+        rejectedWrites.clear();
+        //
+        inputRecord = (IndexedRecord) object;
         result.totalCount++;
         // This for dynamic which would get schema from the first record
         if (inputSchema == null) {
-            inputSchema = ((IndexedRecord) object).getSchema();
+            inputSchema = inputRecord.getSchema();
         }
         //
-        MarketoSyncResult syncResult = null;
         switch (operation) {
         case syncLead:
             processResult(client.syncLead(properties, inputRecord));
@@ -122,7 +102,13 @@ public class MarketoOutputWriter extends MarketoWriter {
                 recordsToProcess.clear();
             }
             break;
-        // TODO see if we manage the list...
+        case deleteLeads:
+            recordsToProcess.add(inputRecord);
+            if (recordsToProcess.size() >= batchSize) {
+                processResult(((MarketoRESTClient) client).deleteLeads(recordsToProcess));
+                recordsToProcess.clear();
+            }
+            break;
         case syncCustomObjects:
             processResult(((MarketoRESTClient) client).syncCustomObjects(properties, Arrays.asList(inputRecord)));
             break;
@@ -134,57 +120,52 @@ public class MarketoOutputWriter extends MarketoWriter {
 
     @Override
     public Result close() throws IOException {
-        if (recordsToProcess.size() > 0) {
-            processResult(client.syncMultipleLeads(properties, recordsToProcess));
+        if (!recordsToProcess.isEmpty()) {
+            if (operation.equals(OutputOperation.syncMultipleLeads)) {
+                processResult(client.syncMultipleLeads(properties, recordsToProcess));
+            }
+            if (operation.equals(OutputOperation.deleteLeads)) {
+                processResult(((MarketoRESTClient) client).deleteLeads(recordsToProcess));
+            }
             recordsToProcess.clear();
         }
         return super.close();
     }
 
-    public void processResult(MarketoSyncResult mktoResult) {
+    public void processResult(MarketoSyncResult mktoResult) throws IOException {
         result.apiCalls++;
-        LOG.debug("[processResult] = {}.", mktoResult);
-        if (mktoResult.isSuccess()) {
-            for (SyncStatus r : mktoResult.getRecords()) {
-                handleSuccess(fillSuccessRecord(r));
-            }
-        } else {
-            for (MarketoError e : mktoResult.getErrors()) {
-                handleReject(inputRecord, e);
+        if (!mktoResult.isSuccess()) {
+            throw new IOException(mktoResult.getErrorsString());
+        }
+        for (SyncStatus status : mktoResult.getRecords()) {
+            if (Arrays.asList("created", "updated", "deleted").contains(status.getStatus().toLowerCase())) {
+                handleSuccess(fillRecord(status, flowSchema));
+            } else {
+                if (dieOnError) {
+                    throw new IOException(status.getAvailableReason());
+                }
+                handleReject(fillRecord(status, rejectSchema));
             }
         }
     }
 
     private void handleSuccess(IndexedRecord record) {
-        LOG.debug("[handleSuccess] record={}.", record);
-        successfulWrites.clear();
         if (record != null) {
             result.successCount++;
             successfulWrites.add(record);
         }
     }
 
-    private void handleReject(IndexedRecord record, MarketoError error) {
-        LOG.debug("[handleReject] record={}. Error: {}.", record, error);
-        rejectedWrites.clear();
-        IndexedRecord reject = new GenericData.Record(rejectSchema);
-        reject.put(rejectSchema.getField(FIELD_ERROR_MSG).pos(), error.getMessage());
-        for (Schema.Field outField : reject.getSchema().getFields()) {
-            Object outValue;
-            Schema.Field inField = record.getSchema().getField(outField.name());
-            if (inField != null) {
-                outValue = record.get(inField.pos());
-                reject.put(outField.pos(), outValue);
-            }
+    private void handleReject(IndexedRecord record) {
+        if (record != null) {
+            result.rejectCount++;
+            rejectedWrites.add(record);
         }
-        LOG.debug("reject = {}.", reject);
-        result.rejectCount++;
-        rejectedWrites.add(reject);
     }
 
-    public IndexedRecord fillSuccessRecord(SyncStatus status) {
-        IndexedRecord record = new Record(flowSchema);
-        for (Field f : flowSchema.getFields()) {
+    public IndexedRecord fillRecord(SyncStatus status, Schema schema) {
+        IndexedRecord record = new Record(schema);
+        for (Field f : schema.getFields()) {
             if (f.name().equals(FIELD_ID_SOAP)) {
                 record.put(f.pos(), status.getId());
             } else if (f.name().equals(FIELD_ID_REST)) {
@@ -196,7 +177,7 @@ public class MarketoOutputWriter extends MarketoWriter {
             } else if (f.name().equals(FIELD_STATUS)) {
                 record.put(f.pos(), status.getStatus());
             } else if (f.name().equals(FIELD_ERROR_MSG)) {
-                record.put(f.pos(), status.getReasons());
+                record.put(f.pos(), status.getAvailableReason());
                 // manage CO fields
             } else if (f.name().equals(MarketoConstants.FIELD_MARKETO_GUID)) {
                 record.put(f.pos(), status.getMarketoGUID());
@@ -205,11 +186,9 @@ public class MarketoOutputWriter extends MarketoWriter {
             } else if (f.name().equals(MarketoConstants.FIELD_REASON)) {
                 record.put(f.pos(), status.getAvailableReason());
             } else {
-                LOG.debug("f = {}.", f);
-                record.put(flowSchema.getField(f.name()).pos(), inputRecord.get(inputSchema.getField(f.name()).pos()));
+                record.put(schema.getField(f.name()).pos(), inputRecord.get(inputSchema.getField(f.name()).pos()));
             }
         }
-
         return record;
     }
 }

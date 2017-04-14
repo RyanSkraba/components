@@ -21,6 +21,7 @@ import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.marketo.MarketoComponentDefinition;
+import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 public class TMarketoListOperationDefinition extends MarketoComponentDefinition {
@@ -48,5 +49,16 @@ public class TMarketoListOperationDefinition extends MarketoComponentDefinition 
         assertEngineCompatibility(engine);
         // assertConnectorTopologyCompatibility(connectorTopology);
         return getCommonRuntimeInfo(this.getClass().getClassLoader(), RUNTIME_SINK_CLASS);
+    }
+
+    @Override
+    public boolean isConditionalInputs() {
+        return true;
+    }
+
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_NB_CALL_PROP, RETURN_TOTAL_RECORD_COUNT_PROP,
+                RETURN_SUCCESS_RECORD_COUNT_PROP, RETURN_REJECT_RECORD_COUNT_PROP };
     }
 }
