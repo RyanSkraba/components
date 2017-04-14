@@ -13,7 +13,12 @@
 package org.talend.components.marketo.tmarketoinput;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_PARAM;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.CustomObject;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLead;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLeadActivity;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLeadChanges;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getMultipleLeads;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
@@ -321,7 +326,7 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
         super.setupProperties();
         //
         inputOperation.setPossibleValues((Object[]) InputOperation.values());
-        inputOperation.setValue(InputOperation.getLead);
+        inputOperation.setValue(getLead);
         leadSelectorSOAP.setPossibleValues((Object[]) LeadSelector.values());
         leadSelectorSOAP.setValue(LeadSelector.LeadKeySelector);
         leadSelectorREST.setPossibleValues(LeadSelector.LeadKeySelector, LeadSelector.StaticListSelector);
@@ -343,7 +348,11 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
         excludeTypes.type.setPossibleValues((Object[]) IncludeExcludeFieldsREST.values());
         fieldList.setValue("");
         leadKeysSegmentSize.setValue(50);
-        sinceDateTime.setValue("yyyy-MM-dd HH:mm:ss Z");
+        sinceDateTime.setValue(DATETIME_PATTERN_PARAM);
+        oldestCreateDate.setValue(DATETIME_PATTERN_PARAM);
+        latestCreateDate.setValue(DATETIME_PATTERN_PARAM);
+        oldestUpdateDate.setValue(DATETIME_PATTERN_PARAM);
+        latestUpdateDate.setValue(DATETIME_PATTERN_PARAM);
         //
         // Custom Objects
         //
@@ -437,15 +446,14 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
             // enable widgets according params
             //
             if (useSOAP) {
-                inputOperation.setPossibleValues(InputOperation.getLead, InputOperation.getMultipleLeads,
-                        InputOperation.getLeadActivity, InputOperation.getLeadChanges);
+                inputOperation.setPossibleValues(getLead, getMultipleLeads, getLeadActivity, getLeadChanges);
             } else {
                 inputOperation.setPossibleValues(InputOperation.values());
             }
             //
             form.getWidget(mappingInput.getName()).setVisible(true);
             // getLead
-            if (inputOperation.getValue().equals(InputOperation.getLead)) {
+            if (inputOperation.getValue().equals(getLead)) {
                 form.getWidget(leadKeyValue.getName()).setVisible(true);
                 if (useSOAP) {
                     form.getWidget(leadKeyTypeSOAP.getName()).setVisible(true);
@@ -454,7 +462,7 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
                 }
             }
             // getMultipleLeads
-            if (inputOperation.getValue().equals(InputOperation.getMultipleLeads)) {
+            if (inputOperation.getValue().equals(getMultipleLeads)) {
                 if (useSOAP) {
                     form.getWidget(leadSelectorSOAP.getName()).setVisible(true);
                     switch (leadSelectorSOAP.getValue()) {
@@ -465,10 +473,12 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
                     case StaticListSelector:
                         form.getWidget(listParam.getName()).setVisible(true);
                         form.getWidget(listParamValue.getName()).setVisible(true);
+                        form.getWidget(batchSize.getName()).setVisible(true);
                         break;
                     case LastUpdateAtSelector:
                         form.getWidget(oldestUpdateDate.getName()).setVisible(true);
                         form.getWidget(latestUpdateDate.getName()).setVisible(true);
+                        form.getWidget(batchSize.getName()).setVisible(true);
                         break;
                     }
                 } else {
@@ -481,12 +491,13 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
                     case StaticListSelector:
                         form.getWidget(listParam.getName()).setVisible(true);
                         form.getWidget(listParamValue.getName()).setVisible(true);
+                        form.getWidget(batchSize.getName()).setVisible(true);
                         break;
                     }
                 }
             }
             // getLeadActivity
-            if (inputOperation.getValue().equals(InputOperation.getLeadActivity)) {
+            if (inputOperation.getValue().equals(getLeadActivity)) {
                 if (useSOAP) {
                     form.getWidget(leadKeyTypeSOAP.getName()).setVisible(true);
                     form.getWidget(leadKeyValue.getName()).setVisible(true);
@@ -500,7 +511,7 @@ public class TMarketoInputProperties extends MarketoComponentProperties {
                 form.getWidget(batchSize.getName()).setVisible(true);
             }
             // getLeadChanges
-            if (inputOperation.getValue().equals(InputOperation.getLeadChanges)) {
+            if (inputOperation.getValue().equals(getLeadChanges)) {
                 if (useSOAP) {
                     form.getWidget(setIncludeTypes.getName()).setVisible(true);
                     form.getWidget(includeTypes.getName()).setVisible(setIncludeTypes.getValue());

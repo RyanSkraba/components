@@ -160,7 +160,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         assertFalse(f.getWidget(tl_sinceDateTime).isVisible());
         assertFalse(f.getWidget(tl_oldestCreateDate).isVisible());
         assertFalse(f.getWidget(tl_latestCreateDate).isVisible());
-        assertFalse(f.getWidget(tl_batchSize).isVisible());
+        assertTrue(f.getWidget(tl_batchSize).isVisible());
         // REST API Mode - getLeadActivity
         props.inputOperation.setValue(getLeadActivity);
         props.refreshLayout(props.getForm(Form.MAIN));
@@ -300,7 +300,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         assertFalse(f.getWidget(tl_sinceDateTime).isVisible());
         assertFalse(f.getWidget(tl_oldestCreateDate).isVisible());
         assertFalse(f.getWidget(tl_latestCreateDate).isVisible());
-        assertFalse(f.getWidget(tl_batchSize).isVisible());
+        assertTrue(f.getWidget(tl_batchSize).isVisible());
         // SOAP API Mode - getMultipleLeads - LastUpdate
         props.inputOperation.setValue(getMultipleLeads);
         props.leadSelectorSOAP.setValue(LeadSelector.LastUpdateAtSelector);
@@ -328,7 +328,7 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         assertFalse(f.getWidget(tl_sinceDateTime).isVisible());
         assertFalse(f.getWidget(tl_oldestCreateDate).isVisible());
         assertFalse(f.getWidget(tl_latestCreateDate).isVisible());
-        assertFalse(f.getWidget(tl_batchSize).isVisible());
+        assertTrue(f.getWidget(tl_batchSize).isVisible());
 
         // SOAP API Mode - getLeadActivity
         props.inputOperation.setValue(getLeadActivity);
