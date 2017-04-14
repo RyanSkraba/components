@@ -86,21 +86,16 @@ public class TAzureStorageQueueInputProperties extends AzureStorageQueueProperti
 
     public void afterPeekMessages() {
         refreshLayout(getForm(Form.MAIN));
+        if (peekMessages.getValue()) {
+            deleteMessages.setValue(false);
+        }
     }
 
     public void afterDeleteMessages() {
         refreshLayout(getForm(Form.MAIN));
-    }
-
-    @Override
-    public void refreshLayout(Form form) {
-        super.refreshLayout(form);
-
-        if (peekMessages.getValue()) {
-            deleteMessages.setValue(false);
-        }
         if (deleteMessages.getValue()) {
             peekMessages.setValue(false);
         }
     }
+
 }
