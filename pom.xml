@@ -8,6 +8,10 @@
     <artifactId>components</artifactId>
     <packaging>pom</packaging>
 
+	<scm>
+		<connection>scm:git:https://github.com/Talend/components.git</connection>
+	</scm>
+	
     <name>Component Aggregator</name>
     <modules>
         <module>components-parent</module>
@@ -32,6 +36,17 @@
                 <artifactId>versions-maven-plugin</artifactId>
                 <version>2.2</version>
             </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5.3</version>
+				<configuration>
+					<preparationGoals>clean install</preparationGoals>
+					<pushChanges>false</pushChanges>
+					<scmCommentPrefix>release:</scmCommentPrefix>
+					<tagNameFormat>@{project.artifactId}-@{project.version}</tagNameFormat>
+				</configuration>
+			</plugin>
         </plugins>
     </build>
 </project>

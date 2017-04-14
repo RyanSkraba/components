@@ -18,13 +18,11 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-osgi</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
             <exclusions>
             	<exclusion>

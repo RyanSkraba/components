@@ -35,7 +35,7 @@
     	<dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-jdbc-definition</artifactId>
-            <version>${project.version}</version>
+			<version>${project.version}</version>
         </dependency>
         
     	<dependency>
@@ -70,7 +70,6 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-adapter-beam</artifactId>
-            <version>${project.version}</version>
         </dependency>
         
         <dependency>
@@ -113,32 +112,27 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>${project.version}</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
-            <version>${project.version}</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>

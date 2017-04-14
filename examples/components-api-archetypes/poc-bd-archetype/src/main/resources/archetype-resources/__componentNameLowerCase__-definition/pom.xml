@@ -6,18 +6,18 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.18.0-SNAPSHOT</version>
+        <version>${version}</version>
     </parent>
 
-    <artifactId>${componentNameLowerCase}-definition</artifactId>
+    <artifactId>\${componentNameLowerCase}-definition</artifactId>
 
-    <name>Components - ${componentNameClass} Definition</name>
+    <name>Components - \${componentNameClass} Definition</name>
     <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <tcomp.version>0.18.0-SNAPSHOT</tcomp.version>
+        <tcomp.version>${version}</tcomp.version>
     </properties>
 
     <dependencies>
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>${tcomp.version}</version>
+            <version>\${tcomp.version}</version>
         </dependency>
 
         <!-- Annotation processing -->
@@ -42,27 +42,27 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
-            <version>${tcomp.version}</version>
+            <version>\${tcomp.version}</version>
         </dependency>
 
         <!-- Jar containing Test utils methods -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>${tcomp.version}</version>
+            <version>\${tcomp.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>${tcomp.version}</version>
+            <version>\${tcomp.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>${tcomp.version}</version>
+            <version>\${tcomp.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -89,7 +89,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-osgitest</artifactId>
-            <version>${tcomp.version}</version>
+            <version>\${tcomp.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -111,17 +111,17 @@
                         <configuration>
                             <name>%groupId%-%artifactId%%dashClassifier%.link</name>
                             <value>%url%</value>
-                            <separator>${line.separator}</separator>
-                            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                            <separator>\${line.separator}</separator>
+                            <outputDirectory>\${project.build.testOutputDirectory}</outputDirectory>
                             <dependencySet>
                                 <scope>test</scope>
                             </dependencySet>
                             <artifacts>
                                 <artifact>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>${project.artifactId}</artifactId>
+                                    <groupId>\${project.groupId}</groupId>
+                                    <artifactId>\${project.artifactId}</artifactId>
                                     <classifier>bundle</classifier>
-                                    <version>${project.version}</version>
+                                    <version>\${project.version}</version>
                                 </artifact>
                             </artifacts>
                         </configuration>
@@ -141,10 +141,10 @@
                         </goals>
                         <configuration>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.${componentNameLowerCase}.lib</Bundle-SymbolicName>
-                                <Bundle-Name>${project.name} lib</Bundle-Name>
+                                <Bundle-SymbolicName>org.talend.components.\${componentNameLowerCase}.lib</Bundle-SymbolicName>
+                                <Bundle-Name>\${project.name} lib</Bundle-Name>
                                 <Include-Resource>
-                                    {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
+                                    {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/\${project.groupId}/\${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/\${project.groupId}/\${project.artifactId}/dependencies.txt
                                 </Include-Resource>
                                 <Service-Component>*</Service-Component>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
@@ -160,12 +160,12 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.${componentNameLowerCase}</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>org.talend.components.\${componentNameLowerCase}</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
                                 <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*|auto-service
                                 </Embed-Dependency>
                                 <Include-Resource>
-                                    {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
+                                    {maven-resources},META-INF/maven/\${project.groupId}/\${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/\${project.groupId}/\${project.artifactId}/dependencies.txt
                                 </Include-Resource>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                             </instructions>

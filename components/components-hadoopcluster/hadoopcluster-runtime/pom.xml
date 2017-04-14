@@ -16,19 +16,6 @@
 
     <repositories>
         <repository>
-            <id>talend_nexus</id>
-            <name>snapshots</name>
-            <url>
-                https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/
-            </url>
-        </repository>
-        <repository>
-            <id>releases</id>
-            <url>
-                https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/
-            </url>
-        </repository>
-        <repository>
             <id>cdh.repo</id>
             <url>https://repository.cloudera.com/artifactory/cloudera-repos</url>
             <name>Cloudera Repository</name>
@@ -38,7 +25,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>hadoopcluster-definition</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

@@ -25,12 +25,10 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>${project.version}</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
@@ -49,9 +47,6 @@
             <version>2.4.7</version>
             <scope>test</scope>
         </dependency>
-
-
-        <!-- Test dependencies -->
     </dependencies>
     <repositories>
         <repository>

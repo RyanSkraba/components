@@ -22,7 +22,6 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>biz.aQute.bnd</groupId>
@@ -31,7 +30,6 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -64,27 +62,23 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
-            <version>${project.version}</version>
             <classifier>bundle</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>${project.version}</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -92,7 +86,6 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
-            <version>${project.version}</version>
             <classifier>lib</classifier>
             <scope>test</scope>
             <exclusions>
@@ -105,7 +98,6 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
-            <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -117,14 +109,12 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- dep for OSGI tests -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-osgitest</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
 

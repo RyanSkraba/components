@@ -5,36 +5,36 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.18.0-SNAPSHOT</version>
+        <version>${version}</version>
     </parent>
 
-    <artifactId>${componentNameLowerCase}-runtime${runtimeVersionConverted}</artifactId>
+    <artifactId>\${componentNameLowerCase}-runtime\${runtimeVersionConverted}</artifactId>
     <packaging>jar</packaging>
 
-    <name>Components - ${componentName} Runtime ${runtimeVersion}</name>
+    <name>Components - \${componentName} Runtime \${runtimeVersion}</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <beam.version>0.6.0-tlnd</beam.version>
-        <tcomp.version>0.18.0-SNAPSHOT</tcomp.version>
+        <tcomp.version>${version}</tcomp.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.talend.components</groupId>
-            <artifactId>${componentNameLowerCase}-definition</artifactId>
-            <version>${tcomp.version}</version>
+            <artifactId>\${componentNameLowerCase}-definition</artifactId>
+            <version>\${tcomp.version}</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-adapter-beam</artifactId>
-            <version>${tcomp.version}</version>
+            <version>\${tcomp.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.beam</groupId>
             <artifactId>beam-runners-direct-java</artifactId>
-            <version>${beam.version}</version>
+            <version>\${beam.version}</version>
         </dependency>
         <!-- Tests -->
         <dependency>
@@ -52,7 +52,7 @@
         <dependency>
             <groupId>org.apache.beam</groupId>
             <artifactId>beam-runners-direct-java</artifactId>
-            <version>${beam.version}</version>
+            <version>\${beam.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

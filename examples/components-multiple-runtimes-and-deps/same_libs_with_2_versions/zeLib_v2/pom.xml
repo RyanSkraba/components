@@ -4,10 +4,15 @@
 	<artifactId>zeLibV2</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
 	<name>zeLib V2</name>
+	
+	<properties>
+		<talend_snapshots_deployment>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
+	</properties>
+	
 	<distributionManagement>
 		<snapshotRepository>
 			<id>talend_nexus_deployment</id>
-			<url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
+			<url>${talend_snapshots_deployment}</url>
 		</snapshotRepository>
 		<repository>
 			<id>talend_nexus_deployment</id>

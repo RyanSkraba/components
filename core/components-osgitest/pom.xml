@@ -20,41 +20,35 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-osgi</artifactId>
-			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-osgi</artifactId>
-			<version>${project.version}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-common</artifactId>
-			<version>${project.version}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>${project.version}</version>
 			<classifier>bundle</classifier>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>${project.version}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.daikon</groupId>
 			<artifactId>daikon</artifactId>
-			<version>${daikon.version}</version>
 			<classifier>bundle</classifier>
 			<scope>test</scope>
 		</dependency>

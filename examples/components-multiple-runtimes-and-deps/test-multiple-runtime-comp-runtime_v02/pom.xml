@@ -17,7 +17,7 @@
         <repository>
             <id>talend_nexus</id>
             <name>snapshots</name>
-            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</url>
+            <url>${talend_snapshots_deployment}</url>
         </repository>
         <repository>
             <id>releases</id>
@@ -44,7 +44,6 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>biz.aQute.bnd</groupId>
@@ -55,20 +54,17 @@
         <dependency>
           <groupId>org.talend.components</groupId>
           <artifactId>components-common</artifactId>
-          <version>${project.version}</version>
         </dependency>
         
         <!-- Jar containing Test utils methods -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

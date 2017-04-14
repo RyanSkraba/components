@@ -20,7 +20,6 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-adapter-beam</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>

@@ -33,12 +33,11 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-adapter-beam</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>simplefileio-definition</artifactId>
-            <version>${project.version}</version>
+			<version>${project.version}</version>
         </dependency>
 
         <!-- includes avro -->
@@ -125,7 +124,6 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>${project.version}</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>

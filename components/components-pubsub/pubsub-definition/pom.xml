@@ -18,7 +18,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <tcomp.version>0.18.0-SNAPSHOT</tcomp.version>
     </properties>
 
     <dependencies>
@@ -26,7 +25,6 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>${tcomp.version}</version>
         </dependency>
         <dependency>
             <groupId>biz.aQute.bnd</groupId>
@@ -43,27 +41,23 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
-            <version>${tcomp.version}</version>
         </dependency>
 
         <!-- Jar containing Test utils methods -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>${tcomp.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>${tcomp.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>${tcomp.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -90,7 +84,6 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-osgitest</artifactId>
-            <version>${tcomp.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

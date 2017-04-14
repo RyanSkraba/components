@@ -37,7 +37,6 @@
 				and it's not compatible with spring-boot 1.4.1, the jetty needs to be excluded. -->
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-common-oauth</artifactId>
-			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.eclipse.jetty</groupId>
@@ -200,7 +199,6 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-rest</artifactId>
-			<version>${project.version}</version>
 			<classifier>lib</classifier>
 			<exclusions>
 				<exclusion>
@@ -223,14 +221,12 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-rest</artifactId>
-			<version>${project.version}</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api</artifactId>
-			<version>${project.version}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
@@ -264,8 +260,6 @@
 			</snapshots>
 		</repository>
 	</repositories>
-
-
 
 	<build>
 		<plugins>
