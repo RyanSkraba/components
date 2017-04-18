@@ -23,7 +23,7 @@ import org.talend.daikon.java8.Supplier;
 
 /**
  * Provides a way to iterate over a reader data until limit is reached, closes it when necessary. The data is consumed
- * via a Consumer, which performs required action on data
+ * via a Supplier, which performs required action on data
  */
 public class WriterDataSupplier<R, I> {
 
@@ -44,10 +44,10 @@ public class WriterDataSupplier<R, I> {
     }
 
     /**
-     * start writing data that are gotten from the supplier. This takes care of creating the initializing the
+     * Start writing data obtained from the supplier. This takes care of creating the initializing the
      * WriterOperation, creating a single writer, then starting and closing the writer and finally finalizing the
      * WriterOperation.<br>
-     * the writer will get initialized with a random string id.<br>
+     * The writer in initialized with a random string id.<br>
      * This will throw a {@link TalendRuntimeException} with {@link ComponentsErrorCode#IO_EXCEPTION} code in case of
      * writer error.
      */
