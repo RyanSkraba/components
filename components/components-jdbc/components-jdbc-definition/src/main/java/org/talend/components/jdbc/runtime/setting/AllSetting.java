@@ -83,6 +83,8 @@ public class AllSetting implements Serializable, JDBCAvroRegistryInfluencer {
 
     private String referencedComponentId;
 
+    private Boolean readOnly = false;
+
     private ComponentProperties referencedComponentProperties;
 
     public String getJdbcUrl() {
@@ -320,6 +322,14 @@ public class AllSetting implements Serializable, JDBCAvroRegistryInfluencer {
 
     public void setSchema(Schema schema) {
         this.schema = schema;
+    }
+
+    public void setReadOnly(Boolean readOnly) {
+        this.readOnly = readOnly;
+    }
+
+    public Boolean isReadOnly() {
+        return readOnly;
     }
 
 }

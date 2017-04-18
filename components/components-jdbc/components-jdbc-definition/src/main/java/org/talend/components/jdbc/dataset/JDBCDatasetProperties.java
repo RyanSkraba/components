@@ -52,12 +52,15 @@ public class JDBCDatasetProperties extends PropertiesImpl
 
     };
 
+    private transient AllSetting setting;
+
     public void afterSourceType() {
         refreshLayout(getForm(Form.MAIN));
     }
 
     public JDBCDatasetProperties(String name) {
         super(name);
+        setting = new AllSetting();
     }
 
     public void updateSchema() {
@@ -113,7 +116,6 @@ public class JDBCDatasetProperties extends PropertiesImpl
 
     @Override
     public AllSetting getRuntimeSetting() {
-        AllSetting setting = new AllSetting();
 
         JDBCDatastoreProperties datastoreProperties = this.getDatastoreProperties();
         setting.setDriverPaths(datastoreProperties.getCurrentDriverPaths());

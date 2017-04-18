@@ -27,8 +27,9 @@ import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
-import org.talend.components.jdbc.avro.JDBCAvroRegistryString;
+import org.talend.components.jdbc.JdbcComponentErrorsCode;
 import org.talend.components.jdbc.RuntimeSettingProvider;
+import org.talend.components.jdbc.avro.JDBCAvroRegistryString;
 import org.talend.components.jdbc.avro.ResultSetStringRecordConverter;
 import org.talend.components.jdbc.runtime.JDBCSource;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
@@ -62,7 +63,7 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
     private Result result;
 
     private boolean useExistedConnection;
-    
+
     /**
      * Current {@link IndexedRecord} read by this {@link Reader}
      * It is returned in {@link Reader#getCurrent()} method.
@@ -134,6 +135,8 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
             resultSet = statement.executeQuery(setting.getSql());
 
             return haveNext();
+        } catch (SQLException e) {
+            throw new ComponentException(JdbcComponentErrorsCode.SQL_ERROR, e);
         } catch (Exception e) {
             throw new ComponentException(e);
         }

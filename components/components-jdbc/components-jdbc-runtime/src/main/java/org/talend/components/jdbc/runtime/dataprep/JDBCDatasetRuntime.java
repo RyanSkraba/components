@@ -43,6 +43,13 @@ public class JDBCDatasetRuntime implements DatasetRuntime<JDBCDatasetProperties>
     @Override
     public ValidationResult initialize(RuntimeContainer container, JDBCDatasetProperties properties) {
         this.dataset = properties;
+        /*
+         * This data set have to be in a read-only mode for dataprep
+         * to deny queries that try to alter data or schemas
+         * this will allow only read statement to be executed with the JDBC connection
+         * this is also a hint to the driver to enable database optimizations
+         */
+        this.dataset.getRuntimeSetting().setReadOnly(true);
         this.container = container;
         return ValidationResult.OK;
     }

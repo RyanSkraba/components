@@ -28,12 +28,12 @@ import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.jdbc.avro.JDBCAvroRegistryString;
 import org.talend.components.common.dataset.DatasetProperties;
 import org.talend.components.common.datastore.DatastoreProperties;
 import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.JdbcComponentErrorsCode;
 import org.talend.components.jdbc.RuntimeSettingProvider;
+import org.talend.components.jdbc.avro.JDBCAvroRegistryString;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
@@ -153,6 +153,7 @@ public class JDBCSourceOrSink implements SourceOrSink {
 
         // connection component
         Connection conn = JdbcRuntimeUtils.createConnection(setting);
+        conn.setReadOnly(setting.isReadOnly());
 
         Boolean autoCommit = setting.getUseAutoCommit();
         if (autoCommit != null && autoCommit) {
