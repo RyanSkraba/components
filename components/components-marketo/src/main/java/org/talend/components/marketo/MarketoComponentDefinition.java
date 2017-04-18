@@ -63,11 +63,6 @@ public abstract class MarketoComponentDefinition extends AbstractComponentDefini
     }
 
     @Override
-    public boolean isSchemaAutoPropagate() {
-        return true;
-    }
-
-    @Override
     public String[] getFamilies() {
         return new String[] { "Business/Marketo", "Cloud/Marketo" };
     }

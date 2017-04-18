@@ -19,6 +19,8 @@ import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 import java.util.EnumSet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.marketo.MarketoProvideConnectionProperties;
@@ -65,9 +67,15 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
     public ComponentReferenceProperties<TMarketoConnectionProperties> referencedComponent = new ComponentReferenceProperties<>(
             "referencedComponent", TMarketoConnectionDefinition.COMPONENT_NAME);
 
+    public static final String DEFAULT_ENDPOINT_REST = "https://123-ABC-456.mktorest.com/rest";
+
+    public static final String DEFAULT_ENDPOINT_SOAP = "https://123-ABC-456.mktoapi.com/soap/mktows/2_9";
+
     private String repositoryLocation;
 
     //
+    private static final Logger LOG = LoggerFactory.getLogger(TMarketoConnectionProperties.class);
+
     private static final long serialVersionUID = 145738798798151L;
 
     public TMarketoConnectionProperties(String name) {
@@ -79,7 +87,7 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
     public void setupProperties() {
         super.setupProperties();
 
-        endpoint.setValue("");
+        endpoint.setValue(DEFAULT_ENDPOINT_REST);
         secretKey.setValue("");
         clientAccessId.setValue("");
 
@@ -134,6 +142,12 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
                 && refComponentIdValue.startsWith(TMarketoConnectionDefinition.COMPONENT_NAME);
 
         if (form.getName().equals(Form.MAIN) || form.getName().equals(FORM_WIZARD)) {
+            if (DEFAULT_ENDPOINT_REST.equals(endpoint.getValue()) && APIMode.SOAP.equals(apiMode.getValue())) {
+                endpoint.setValue(DEFAULT_ENDPOINT_SOAP);
+            }
+            if (DEFAULT_ENDPOINT_SOAP.equals(endpoint.getValue()) && APIMode.REST.equals(apiMode.getValue())) {
+                endpoint.setValue(DEFAULT_ENDPOINT_REST);
+            }
             form.getWidget(endpoint.getName()).setHidden(useOtherConnection);
             form.getWidget(clientAccessId.getName()).setHidden(useOtherConnection);
             form.getWidget(secretKey.getName()).setHidden(useOtherConnection);
@@ -182,11 +196,12 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
 
     @Override
     public TMarketoConnectionProperties getConnectionProperties() {
-        return this;
+        String refComponentId = getReferencedComponentId();
+        return refComponentId != null ? getReferencedConnectionProperties() : this;
     }
 
     public String getReferencedComponentId() {
-        return referencedComponent.componentInstanceId.getValue();
+        return referencedComponent.componentInstanceId.getStringValue();
     }
 
     public TMarketoConnectionProperties getReferencedConnectionProperties() {
@@ -194,6 +209,7 @@ public class TMarketoConnectionProperties extends ComponentPropertiesImpl implem
         if (refProps != null) {
             return refProps;
         }
+        LOG.error("Connection has a reference to `{}` but the referenced Object is null!", getReferencedComponentId());
         return null;
     }
 

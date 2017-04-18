@@ -37,8 +37,8 @@ public class MarketoWriterTest {
     public void setUp() throws Exception {
         sink = new MarketoSink();
         TMarketoOutputProperties pout = new TMarketoOutputProperties("test");
-        pout.setupProperties();
         pout.connection.setupProperties();
+        pout.setupProperties();
         sink.initialize(null, pout);
         wop = (MarketoWriteOperation) sink.createWriteOperation();
         writer = (MarketoOutputWriter) wop.createWriter(null);

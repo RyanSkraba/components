@@ -82,7 +82,7 @@ public class MarketoConstantsTest {
 
     @Test
     public void testSyncLeadOutputSchemaSOAP() throws Exception {
-        Schema ref = MarketoConstants.getSOAPOuputSchemaForSyncLead();
+        Schema ref = MarketoConstants.getSOAPOutputSchemaForSyncLead();
         assertEquals("INT", ref.getField("Id").schema().getTypes().get(0).getType().toString());
         assertEquals("true", ref.getField("Id").getProp(SchemaConstants.TALEND_COLUMN_IS_KEY));
         assertEquals("STRING", ref.getField("Email").schema().getTypes().get(0).getType().toString());

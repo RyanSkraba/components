@@ -666,8 +666,8 @@ public class MarketoRESTClientTestIT extends MarketoClientTestIT {
         outProperties.operationType.setValue(OperationType.createOrUpdate);
         outProperties.lookupField.setValue(RESTLookupFields.email);
         outProperties.deDupeEnabled.setValue(false);
-        outProperties.afterApiMode();
         outProperties.updateSchemaRelated();
+        outProperties.updateOutputSchemas();
         MarketoSource source = new MarketoSource();
         source.initialize(null, outProperties);
         MarketoClientService client = source.getClientService(null);
@@ -685,7 +685,7 @@ public class MarketoRESTClientTestIT extends MarketoClientTestIT {
         record.put(4, "My firstName");
         List<IndexedRecord> leads = Arrays.asList(record);
         outProperties.schemaInput.schema.setValue(s);
-        outProperties.updateMappings();
+        outProperties.beforeMappingInput();
         ///
         MarketoSyncResult result = client.syncLead(outProperties, record);
         LOG.debug("result = {}.", result);

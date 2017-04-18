@@ -145,7 +145,7 @@ public class TMarketoBulkExecProperties extends MarketoComponentProperties {
 
     public ValidationResult validateBulkImportTo() {
         ValidationResult vr = new ValidationResult().setStatus(Result.OK);
-        if (connection.apiMode.getValue().equals(APIMode.SOAP)) {
+        if (isApiSOAP()) {
             vr.setStatus(Result.ERROR);
             vr.setMessage(messages.getMessage("error.validation.soap.bulkexec"));
             return vr;

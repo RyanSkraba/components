@@ -679,7 +679,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
     public void testConvertToLeadRecord() throws Exception {
         MarketoSource source = new MarketoSource();
         outProperties.outputOperation.setValue(OutputOperation.syncLead);
-        outProperties.afterApiMode();
+        outProperties.updateSchemaRelated();
         MarketoSOAPClient client = new MarketoSOAPClient(outProperties.connection);
         IndexedRecord record = new GenericData.Record(outProperties.schemaInput.schema.getValue());
         record.put(0, 10);
@@ -703,7 +703,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         record.put(4, "My firstName");
         record.put(5, "My lastName");
         outProperties.schemaInput.schema.setValue(s);
-        outProperties.updateMappings();
+        outProperties.beforeMappingInput();
         lr = client.convertToLeadRecord(record, outProperties.mappingInput.getNameMappingsForMarketo());
         assertNotNull(lr);
         assertEquals(new Integer(10), lr.getId().getValue());
@@ -744,7 +744,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
     public void testSyncLead() throws Exception {
         MarketoSource source = new MarketoSource();
         outProperties.outputOperation.setValue(OutputOperation.syncLead);
-        outProperties.afterApiMode();
+        outProperties.updateSchemaRelated();
         source.initialize(null, listProperties);
         MarketoClientService client = source.getClientService(null);
         // test attributes
@@ -765,7 +765,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         record.put(5, "My lastName");
         record.put(6, "Conservative customer");
         outProperties.schemaInput.schema.setValue(s);
-        outProperties.updateMappings();
+        outProperties.beforeMappingInput();
         //
         MarketoSyncResult result = client.syncLead(outProperties, record);
         assertEquals("UPDATED", result.getRecords().get(0).getStatus());
@@ -775,7 +775,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
     public void testSyncMultipleLeads() throws Exception {
         MarketoSource source = new MarketoSource();
         outProperties.outputOperation.setValue(OutputOperation.syncLead);
-        outProperties.afterApiMode();
+        outProperties.updateSchemaRelated();
         source.initialize(null, listProperties);
         MarketoClientService client = source.getClientService(null);
         // test attributes
@@ -784,7 +784,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         fields.add(field);
         Schema s = outProperties.newSchema(outProperties.schemaInput.schema.getValue(), "leadAttribute", fields);
         outProperties.schemaInput.schema.setValue(s);
-        outProperties.updateMappings();
+        outProperties.beforeMappingInput();
         List<IndexedRecord> records = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             IndexedRecord record = new GenericData.Record(s);

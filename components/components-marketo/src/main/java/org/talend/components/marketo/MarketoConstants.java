@@ -60,7 +60,7 @@ public class MarketoConstants {
 
     public static final String FIELD_DEDUPE_FIELDS = "dedupeFields";
 
-    public static final String DATETIME_PATTERN_PARAM = "yyyy-MM-dd HH:mm:ss Z";
+    public static final String DATETIME_PATTERN_PARAM = "yyyy-MM-dd HH:mm:ss";
 
     public static final String DATETIME_PATTERN_REST = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
@@ -132,7 +132,7 @@ public class MarketoConstants {
      * Id","dataType":"integer","updateable":true},{"name":"model","displayName":"Model","dataType":"string","length":255,"updateable":true}]}],"success":true}
      */
     public static Schema getCustomObjectDescribeSchema() {
-        return record("CustomObject").fields()//
+        return record("CustomObjectREST").fields()//
                 .name("name").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().stringType().noDefault()//
                 .name("displayName").type().nullable().stringType().noDefault()//
                 .name("description").type().nullable().stringType().noDefault()//
@@ -154,7 +154,7 @@ public class MarketoConstants {
     }
 
     public static Schema getCustomObjectRecordSchema() {
-        return record("CustomObjectRecord").fields()//
+        return record("CustomObjectRecordREST").fields()//
                 .name(FIELD_MARKETO_GUID).prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().stringType().noDefault()//
                 .name(FIELD_SEQ).type().intType().noDefault()//
                 .name(FIELD_CREATED_AT) //
@@ -171,7 +171,7 @@ public class MarketoConstants {
     }
 
     public static Schema getCustomObjectSyncSchema() {
-        return record("CustomObjectRecord").fields()//
+        return record("CustomObjectSyncREST").fields()//
                 .name(FIELD_MARKETO_GUID).prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().stringType().noDefault()//
                 .endRecord();
     }
@@ -180,21 +180,57 @@ public class MarketoConstants {
      * Lead Schemas
      */
 
-    public static Schema getSOAPOuputSchemaForSyncLead() {
-        return SchemaBuilder.builder().record("syncLead").fields() //
+    public static Schema getSOAPOutputSchemaForSyncLead() {
+        return SchemaBuilder.builder().record("syncLeadSOAP").fields() //
                 .name("Id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
                 .name("Email").type().nullable().stringType().noDefault() //
                 .name("ForeignSysPersonId").type().nullable().stringType().noDefault() //
                 .name("ForeignSysType").type().nullable().stringType().noDefault() //
+                .name(FIELD_STATUS).prop(SchemaConstants.TALEND_FIELD_GENERATED, "true")
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().stringType().noDefault() //
+                .endRecord();
+    }
+
+    public static Schema getSOAPOutputSchemaForSyncMultipleLeads() {
+        return SchemaBuilder.builder().record("syncLeadSOAP").fields() //
+                .name("Id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
+                .name("Email").type().nullable().stringType().noDefault() //
+                .name("ForeignSysPersonId").type().nullable().stringType().noDefault() //
+                .name("ForeignSysType").type().nullable().stringType().noDefault() //
+                .name(FIELD_STATUS).prop(SchemaConstants.TALEND_FIELD_GENERATED, "true")
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().stringType().noDefault() //
+                .name(FIELD_ERROR_MSG).prop(SchemaConstants.TALEND_FIELD_GENERATED, "true")
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().stringType().noDefault() //
                 .endRecord();
     }
 
     public static Schema getRESTOutputSchemaForSyncLead() {
-        return SchemaBuilder.builder().record("syncLead").fields() //
+        return SchemaBuilder.builder().record("syncLeadREST").fields() //
                 .name("id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
                 .name("email").type().nullable().stringType().noDefault() //
                 .name("firstName").type().nullable().stringType().noDefault() //
                 .name("lastName").type().nullable().stringType().noDefault() //
+                .name(FIELD_STATUS).prop(SchemaConstants.TALEND_FIELD_GENERATED, "true")
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().stringType().noDefault() //
+                .endRecord();
+    }
+
+    public static Schema getRESTOutputSchemaForSyncMultipleLeads() {
+        return SchemaBuilder.builder().record("syncLeadREST").fields() //
+                .name("id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
+                .name("email").type().nullable().stringType().noDefault() //
+                .name("firstName").type().nullable().stringType().noDefault() //
+                .name("lastName").type().nullable().stringType().noDefault() //
+                .name(FIELD_STATUS).prop(SchemaConstants.TALEND_FIELD_GENERATED, "true")
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().stringType().noDefault() //
+                .name(FIELD_ERROR_MSG).prop(SchemaConstants.TALEND_FIELD_GENERATED, "true")
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().stringType().noDefault() //
                 .endRecord();
     }
 
@@ -202,7 +238,7 @@ public class MarketoConstants {
     // REST
     /////////////////////////////////////////////////////////////////////////
     public static Schema getRESTSchemaForGetLeadOrGetMultipleLeads() {
-        return SchemaBuilder.builder().record("getLeadOrGetMultipleLeads").fields() //
+        return SchemaBuilder.builder().record("getLeadOrGetMultipleLeadsREST").fields() //
                 .name("id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
                 .name("email").type().nullable().stringType().noDefault() //
                 .name("firstName").type().nullable().stringType().noDefault() //
@@ -219,7 +255,7 @@ public class MarketoConstants {
     }
 
     public static Schema getRESTSchemaForGetLeadChanges() {
-        return SchemaBuilder.builder().record("getLeadChanges").fields() //
+        return SchemaBuilder.builder().record("getLeadChangesREST").fields() //
                 .name("id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
                 .name("leadId").type().nullable().intType().noDefault() //
                 .name("activityDate")//
@@ -233,7 +269,7 @@ public class MarketoConstants {
     }
 
     public static Schema getRESTSchemaForGetLeadActivity() {
-        return SchemaBuilder.builder().record("getLeadActivity").fields() //
+        return SchemaBuilder.builder().record("getLeadActivityREST").fields() //
                 .name("id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
                 .name("leadId").type().nullable().intType().noDefault() //
                 .name("activityDate")//
@@ -257,7 +293,7 @@ public class MarketoConstants {
     // SOAP
     /////////////////////////////////////////////////////////////////////////
     public static Schema getSOAPSchemaForGetLeadOrGetMultipleLeads() {
-        return SchemaBuilder.builder().record("getLeadOrGetMultipleLeads").fields() //
+        return SchemaBuilder.builder().record("getLeadOrGetMultipleLeadsSOAP").fields() //
                 .name("Id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
                 .name("Email").type().nullable().stringType().noDefault() //
                 .name("ForeignSysPersonId").type().nullable().stringType().noDefault() //
@@ -266,7 +302,7 @@ public class MarketoConstants {
     }
 
     public static Schema getSOAPSchemaForGetLeadChanges() {
-        return SchemaBuilder.builder().record("getLeadChanges").fields() //
+        return SchemaBuilder.builder().record("getLeadChangesSOAP").fields() //
                 .name("Id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
                 .name("ActivityDateTime")//
                 .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_SOAP)//
@@ -281,7 +317,7 @@ public class MarketoConstants {
     }
 
     public static Schema getSOAPSchemaForGetLeadActivity() {
-        return SchemaBuilder.builder().record("getLeadActivity").fields() //
+        return SchemaBuilder.builder().record("getLeadActivitySOAP").fields() //
                 .name("Id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
                 .name("ActivityDateTime")//
                 .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_SOAP)

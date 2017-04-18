@@ -29,7 +29,6 @@ import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.components.marketo.MarketoConstants;
-import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
@@ -102,7 +101,7 @@ public class TMarketoListOperationProperties extends MarketoComponentProperties 
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
 
-        if (connection.apiMode.getValue().equals(APIMode.SOAP)) {
+        if (isApiSOAP()) {
             schemaInput.schema.setValue(MarketoConstants.getListOperationSOAPSchema());
             updateOutputSchemas();
         } else {
@@ -161,7 +160,7 @@ public class TMarketoListOperationProperties extends MarketoComponentProperties 
         final List<Field> flowFields = new ArrayList<Field>();
         final List<Field> rejectFields = new ArrayList<Field>();
         Field f;
-        if (connection.apiMode.getValue().equals(APIMode.SOAP)) {
+        if (isApiSOAP()) {
             f = new Field(FIELD_SUCCESS, Schema.create(Schema.Type.BOOLEAN), null, (Object) null);
             f.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
             f.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");

@@ -63,7 +63,7 @@ public class MarketoOutputWriterTestIT extends MarketoBaseTestIT {
         props.schemaInput.setupLayout();
         props.setupLayout();
         props.connection.apiMode.setValue(APIMode.SOAP);
-        props.schemaInput.schema.setValue(MarketoConstants.getSOAPOuputSchemaForSyncLead());
+        props.schemaInput.schema.setValue(MarketoConstants.getSOAPOutputSchemaForSyncLead());
         props.schemaListener.afterSchema();
 
         return props;
@@ -128,7 +128,7 @@ public class MarketoOutputWriterTestIT extends MarketoBaseTestIT {
         fields.add(field);
         Schema s = props.newSchema(props.schemaInput.schema.getValue(), "leadAttribute", fields);
         props.schemaInput.schema.setValue(s);
-        props.updateSchemaRelated();
+        props.updateOutputSchemas();
         //
         IndexedRecord record = new GenericData.Record(s);
         record.put(0, null);
@@ -156,7 +156,7 @@ public class MarketoOutputWriterTestIT extends MarketoBaseTestIT {
         fields.add(field);
         Schema s = props.newSchema(props.schemaInput.schema.getValue(), "leadAttribute", fields);
         props.schemaInput.schema.setValue(s);
-        props.updateSchemaRelated();
+        props.updateOutputSchemas();
         //
         IndexedRecord record = new GenericData.Record(s);
         record.put(0, null);

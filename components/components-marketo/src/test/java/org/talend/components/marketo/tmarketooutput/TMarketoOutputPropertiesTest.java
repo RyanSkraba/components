@@ -83,23 +83,38 @@ public class TMarketoOutputPropertiesTest {
         props.outputOperation.setValue(OutputOperation.syncLead);
         props.setupProperties();
         props.mappingInput.setupProperties();
-        props.afterApiMode();
+        props.updateSchemaRelated();
         props.schemaListener.afterSchema();
         assertEquals(MarketoConstants.getRESTOutputSchemaForSyncLead(), props.schemaInput.schema.getValue());
+        assertEquals(MarketoConstants.getRESTOutputSchemaForSyncLead().getFields(),
+                props.schemaFlow.schema.getValue().getFields());
+        assertEquals(MarketoConstants.getRESTOutputSchemaForSyncLead().getFields().size() + 1,
+                props.schemaReject.schema.getValue().getFields().size());
         props.outputOperation.setValue(OutputOperation.syncMultipleLeads);
-        props.updateSchemaRelated();
-        assertEquals(MarketoConstants.getRESTOutputSchemaForSyncLead(), props.schemaInput.schema.getValue());
+        props.batchSize.setValue(1);
+        props.afterOutputOperation();
+        assertEquals(MarketoConstants.getRESTOutputSchemaForSyncMultipleLeads(), props.schemaInput.schema.getValue());
+        assertEquals(MarketoConstants.getRESTOutputSchemaForSyncMultipleLeads().getFields(),
+                props.schemaFlow.schema.getValue().getFields());
+        assertEquals(MarketoConstants.getRESTOutputSchemaForSyncMultipleLeads().getFields(),
+                props.schemaReject.schema.getValue().getFields());
 
         props.connection.apiMode.setValue(APIMode.SOAP);
-        props.afterApiMode();
+        props.updateSchemaRelated();
         props.outputOperation.setValue(OutputOperation.syncLead);
         props.afterOutputOperation();
-        props.updateSchemaRelated();
-        assertEquals(MarketoConstants.getSOAPOuputSchemaForSyncLead(), props.schemaInput.schema.getValue());
+        assertEquals(MarketoConstants.getSOAPOutputSchemaForSyncLead(), props.schemaInput.schema.getValue());
+        assertEquals(MarketoConstants.getSOAPOutputSchemaForSyncLead().getFields(),
+                props.schemaFlow.schema.getValue().getFields());
+        assertEquals(MarketoConstants.getSOAPOutputSchemaForSyncLead().getFields().size() + 1,
+                props.schemaReject.schema.getValue().getFields().size());
         props.outputOperation.setValue(OutputOperation.syncMultipleLeads);
         props.afterOutputOperation();
-        props.updateSchemaRelated();
-        assertEquals(MarketoConstants.getSOAPOuputSchemaForSyncLead(), props.schemaInput.schema.getValue());
+        assertEquals(MarketoConstants.getSOAPOutputSchemaForSyncMultipleLeads(), props.schemaInput.schema.getValue());
+        assertEquals(MarketoConstants.getSOAPOutputSchemaForSyncMultipleLeads().getFields(),
+                props.schemaFlow.schema.getValue().getFields());
+        assertEquals(MarketoConstants.getSOAPOutputSchemaForSyncMultipleLeads().getFields(),
+                props.schemaReject.schema.getValue().getFields());
     }
 
     @Test
@@ -120,7 +135,7 @@ public class TMarketoOutputPropertiesTest {
         assertFalse(props.getForm(Form.MAIN).getWidget(props.operationType.getName()).isVisible());
         assertFalse(props.getForm(Form.MAIN).getWidget(props.lookupField.getName()).isVisible());
         props.connection.apiMode.setValue(APIMode.SOAP);
-        props.afterApiMode();
+        props.updateSchemaRelated();
         assertTrue(props.deDupeEnabled.getValue());
         assertFalse(props.getForm(Form.MAIN).getWidget(props.operationType.getName()).isVisible());
         assertFalse(props.getForm(Form.MAIN).getWidget(props.lookupField.getName()).isVisible());

@@ -12,7 +12,12 @@
 // ============================================================================
 package org.talend.components.marketo.tmarketoconnection;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.DEFAULT_ENDPOINT_REST;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +37,7 @@ public class TMarketoConnectionPropertiesTest {
     public final void testTMarketoConnectionProperties() {
         assertTrue(props.getName().equals("test"));
         props.setupProperties();
-        assertEquals("", props.endpoint.getValue());
+        assertEquals(DEFAULT_ENDPOINT_REST, props.endpoint.getValue());
         assertEquals("", props.secretKey.getValue());
         assertEquals("", props.clientAccessId.getValue());
     }

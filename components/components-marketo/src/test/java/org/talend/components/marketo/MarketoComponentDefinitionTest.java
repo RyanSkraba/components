@@ -54,7 +54,7 @@ public class MarketoComponentDefinitionTest {
 
     @Test
     public void testIsSchemaAutoPropagate() throws Exception {
-        assertTrue(def.isSchemaAutoPropagate());
+        assertFalse(def.isSchemaAutoPropagate());
     }
 
     @Test

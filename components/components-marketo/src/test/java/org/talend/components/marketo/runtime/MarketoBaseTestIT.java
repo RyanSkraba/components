@@ -130,7 +130,6 @@ public class MarketoBaseTestIT {
         p.operationType.setValue(OperationType.createOrUpdate);
         p.lookupField.setValue(RESTLookupFields.email);
         p.deDupeEnabled.setValue(false);
-        p.afterApiMode();
         p.updateSchemaRelated();
 
         MarketoSource source = new MarketoSource();
@@ -159,7 +158,7 @@ public class MarketoBaseTestIT {
 
         Schema s = p.newSchema(p.schemaInput.schema.getValue(), "leadAttribute", fields);
         p.schemaInput.schema.setValue(s);
-        p.updateSchemaRelated();
+        p.updateOutputSchemas();
         //
         List<IndexedRecord> leads = new ArrayList<>();
         //
