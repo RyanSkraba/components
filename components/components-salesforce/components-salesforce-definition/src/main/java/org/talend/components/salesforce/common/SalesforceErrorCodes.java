@@ -12,20 +12,22 @@
 // ============================================================================
 package org.talend.components.salesforce.common;
 
-import org.talend.daikon.exception.error.DefaultErrorCode;
-import org.talend.daikon.exception.error.ErrorCode;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
 
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import org.talend.daikon.exception.error.DefaultErrorCode;
+import org.talend.daikon.exception.error.ErrorCode;
 
 /**
  * Salesforce error code for a backend service application that also implents a REST API.
  */
 public enum SalesforceErrorCodes implements ErrorCode {
 
-    UNABLE_TO_RETRIEVE_MODULES(SC_INTERNAL_SERVER_ERROR);
+    UNABLE_TO_RETRIEVE_MODULES(SC_INTERNAL_SERVER_ERROR),
+
+    INVALID_SOQL(SC_BAD_REQUEST);
 
     private DefaultErrorCode errorCodeDelegate;
 
