@@ -26,8 +26,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.talend.components.api.component.runtime.WriteOperation;
+import org.talend.components.api.component.runtime.WriterDataSupplier;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.jdbc.common.DBTestUtils;
+import org.talend.components.jdbc.runtime.JDBCSink;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.runtime.writer.JDBCOutputWriter;
 import org.talend.components.jdbc.tjdbcinput.TJDBCInputDefinition;
@@ -35,6 +38,7 @@ import org.talend.components.jdbc.tjdbcinput.TJDBCInputProperties;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputDefinition;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties.DataAction;
+import org.talend.daikon.java8.Supplier;
 
 public class JDBCOutputTestIT {
 
@@ -55,6 +59,68 @@ public class JDBCOutputTestIT {
     @Before
     public void before() throws Exception {
         DBTestUtils.truncateTableAndLoadData(allSetting);
+    }
+
+    @Test
+    public void testInsertWithDataSupplier() throws Exception {
+        TJDBCOutputDefinition definition = new TJDBCOutputDefinition();
+        TJDBCOutputProperties properties = DBTestUtils.createCommonJDBCOutputProperties(allSetting, definition);
+
+        Schema schema = DBTestUtils.createTestSchema();
+        properties.main.schema.setValue(schema);
+        properties.updateOutputSchemas();
+
+        properties.tableSelection.tablename.setValue(DBTestUtils.getTablename());
+        properties.dataAction.setValue(DataAction.INSERT);
+        properties.dieOnError.setValue(true);
+
+        randomBatchAndCommit(properties);
+
+        JDBCSink sink = new JDBCSink();
+        sink.initialize(null, properties);
+
+        WriteOperation writerOperation = sink.createWriteOperation();
+
+        Supplier<IndexedRecord> indexRecordSupplier = createDataSupplier(properties.main.schema.getValue());
+        new WriterDataSupplier<>(writerOperation, indexRecordSupplier, null).writeData();
+        ;
+
+
+        TJDBCInputDefinition definition1 = new TJDBCInputDefinition();
+        TJDBCInputProperties properties1 = DBTestUtils.createCommonJDBCInputProperties(allSetting, definition1);
+        List<IndexedRecord> records = DBTestUtils.fetchDataByReaderFromTable(DBTestUtils.getTablename(), schema, definition1,
+                properties1);
+
+        assertThat(records, hasSize(5));
+        Assert.assertEquals("4", records.get(3).get(0));
+        Assert.assertEquals("xiaoming", records.get(3).get(1));
+        Assert.assertEquals("5", records.get(4).get(0));
+        Assert.assertEquals("xiaobai", records.get(4).get(1));
+    }
+
+    private Supplier<IndexedRecord> createDataSupplier(final Schema schema) {
+        return new Supplier<IndexedRecord>() {
+
+            int recordCount = 1;
+            @Override
+            public IndexedRecord get() {
+                switch (recordCount++) {
+                case 1:
+                    IndexedRecord r1 = new GenericData.Record(schema);
+                    r1.put(0, 4);
+                    r1.put(1, "xiaoming");
+                    return r1;
+                case 2:
+
+                    IndexedRecord r2 = new GenericData.Record(schema);
+                    r2.put(0, 5);
+                    r2.put(1, "xiaobai");
+                    return r2;
+                default:
+                    return null;
+                }
+            }
+        };
     }
 
     @Test

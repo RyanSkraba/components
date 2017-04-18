@@ -15,11 +15,11 @@ package org.talend.components.jdbc.runtime;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jdbc.ComponentConstants;
-import org.talend.components.jdbc.JDBCTemplate;
 
 /**
  * JDBC runtime execution object for output action
@@ -30,7 +30,7 @@ public class JDBCSink extends JDBCSourceOrSink implements Sink {
     private static final long serialVersionUID = 3228265006313531905L;
 
     @Override
-    public WriteOperation<?> createWriteOperation() {
+    public WriteOperation<Result> createWriteOperation() {
         return new JDBCOutputWriteOperation(this);
     }
 

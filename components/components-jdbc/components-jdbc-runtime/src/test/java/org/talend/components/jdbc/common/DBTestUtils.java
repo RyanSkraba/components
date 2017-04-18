@@ -12,11 +12,8 @@
 // ============================================================================
 package org.talend.components.jdbc.common;
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +23,7 @@ import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
@@ -64,8 +62,6 @@ import org.talend.components.jdbc.tjdbcrow.TJDBCRowProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
-
-import shaded.org.codehaus.plexus.util.StringInputStream;
 
 public class DBTestUtils {
 
@@ -303,6 +299,13 @@ public class DBTestUtils {
             truncateAllTypesTable(conn);
             loadAllTypesData(conn);
         }
+    }
+
+    public static int countItemsInTable(String tableName, Connection conn) throws SQLException {
+        PreparedStatement preparedStatement = conn.prepareStatement("select count(*) from " + tableName);
+        ResultSet rs = preparedStatement.executeQuery();
+        rs.next();
+        return rs.getInt(1);
     }
 
     public static Schema createTestSchema2() {

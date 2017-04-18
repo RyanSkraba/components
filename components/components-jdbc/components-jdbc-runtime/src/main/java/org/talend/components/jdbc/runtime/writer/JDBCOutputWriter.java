@@ -106,7 +106,9 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
         if ((dataAction == DataAction.INSERTORUPDATE) || (dataAction == DataAction.UPDATEORINSERT)) {
             useBatch = false;
         }
-        batchSize = setting.getBatchSize();
+        if (useBatch) {
+            batchSize = setting.getBatchSize();
+        }
 
         useExistedConnection = setting.getReferencedComponentId() != null;
         if (!useExistedConnection) {
@@ -118,6 +120,7 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
         result = new Result();
     }
 
+    @Override
     public void open(String uId) throws IOException {
         if (!setting.getClearDataInTable()) {
             return;
@@ -135,6 +138,7 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
 
     }
 
+    @Override
     public void write(Object datum) throws IOException {
         result.totalCount++;
 
