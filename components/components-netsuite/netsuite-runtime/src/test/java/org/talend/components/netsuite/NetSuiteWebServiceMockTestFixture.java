@@ -156,6 +156,10 @@ public class NetSuiteWebServiceMockTestFixture<PortT, AdapterT extends NetSuiteP
         clientService.setMessageLoggingEnabled(messageLoggingEnabled);
     }
 
+    public NetSuiteClientFactory<PortT> getClientFactory() {
+        return clientFactory;
+    }
+
     public NetSuiteCredentials getCredentials() {
         return credentials;
     }

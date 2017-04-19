@@ -26,6 +26,7 @@ import org.talend.daikon.properties.property.Property;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 
 /**
@@ -42,8 +43,13 @@ public class NetSuiteOutputProperties extends FixedConnectorsComponentProperties
 
     public final Property<Integer> batchSize = newInteger("batchSize");
 
-    protected transient PropertyPathConnector MAIN_CONNECTOR =
-            new PropertyPathConnector(Connector.MAIN_NAME, "module.main");
+    public final Property<Boolean> dieOnError = newBoolean("dieOnError");
+
+    protected transient final PropertyPathConnector mainConnector;
+
+    protected transient final PropertyPathConnector flowConnector;
+
+    protected transient final PropertyPathConnector rejectConnector;
 
     public NetSuiteOutputProperties(@JsonProperty("name") String name) {
         super(name);
@@ -51,6 +57,10 @@ public class NetSuiteOutputProperties extends FixedConnectorsComponentProperties
         connection = new NetSuiteConnectionProperties("connection");
 
         module = new NetSuiteOutputModuleProperties("module", connection);
+
+        mainConnector = new PropertyPathConnector(Connector.MAIN_NAME, "module.main");
+        flowConnector = new PropertyPathConnector(Connector.MAIN_NAME, "module.flowSchema");
+        rejectConnector = new PropertyPathConnector(Connector.REJECT_NAME, "module.rejectSchema");
     }
 
     @Override
@@ -58,6 +68,7 @@ public class NetSuiteOutputProperties extends FixedConnectorsComponentProperties
         super.setupProperties();
 
         batchSize.setValue(NetSuiteOutputProperties.DEFAULT_BATCH_SIZE);
+        dieOnError.setValue(Boolean.TRUE);
     }
 
     @Override
@@ -67,6 +78,7 @@ public class NetSuiteOutputProperties extends FixedConnectorsComponentProperties
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(connection.getForm(Form.REFERENCE));
         mainForm.addRow(module.getForm(Form.REFERENCE));
+        mainForm.addRow(dieOnError);
 
         Form advForm = Form.create(this, Form.ADVANCED);
         advForm.addRow(module.getForm(Form.ADVANCED));
@@ -75,14 +87,17 @@ public class NetSuiteOutputProperties extends FixedConnectorsComponentProperties
 
     @Override
     public NetSuiteConnectionProperties getConnectionProperties() {
-        return connection.getConnectionProperties();
+        return connection.getEffectiveConnectionProperties();
     }
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
         Set<PropertyPathConnector> connectors = new HashSet<>();
-        if (!isOutputConnection) {
-            connectors.add(MAIN_CONNECTOR);
+        if (isOutputConnection) {
+            connectors.add(flowConnector);
+            connectors.add(rejectConnector);
+        } else {
+            connectors.add(mainConnector);
         }
         return connectors;
     }

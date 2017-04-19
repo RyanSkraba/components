@@ -38,6 +38,7 @@ public class NetSuiteRuntimeInfoTest {
         NetSuiteConnectionProperties connProps = new NetSuiteConnectionProperties("test");
         connProps.setupProperties();
         connProps.endpoint.setValue("https://webservices.netsuite.com/services/NetSuitePort_" + apiVersion);
+        connProps.apiVersion.setValue(NetSuiteVersion.detectVersion(connProps.endpoint.getStringValue()).getMajorAsString("."));
 
         RuntimeInfo runtimeInfo = NetSuiteComponentDefinition.getRuntimeInfo(connProps,
                 NetSuiteComponentDefinition.RUNTIME_CLASS);

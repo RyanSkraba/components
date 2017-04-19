@@ -17,14 +17,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
+import org.talend.components.netsuite.NetSuiteDatasetRuntimeImpl;
 import org.talend.components.netsuite.client.MetaDataSource;
 import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NetSuiteException;
+import org.talend.components.netsuite.client.NsRef;
+import org.talend.components.netsuite.client.NsStatus;
 import org.talend.components.netsuite.client.NsWriteResponse;
+import org.talend.components.netsuite.client.model.RefType;
 import org.talend.components.netsuite.client.model.TypeDesc;
 
 /**
@@ -62,6 +68,12 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
 
     protected MetaDataSource metaDataSource;
 
+    protected Schema schema;
+
+    protected Schema flowSchema;
+
+    protected Schema rejectSchema;
+
     protected TypeDesc typeDesc;
 
     protected NsObjectOutputTransducer transducer;
@@ -89,11 +101,19 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
 
     @Override
     public Iterable<IndexedRecord> getSuccessfulWrites() {
+        // If successful write feedback is requested before submitting of current batch
+        // then write accumulated records to provide feedback to a caller.
+        // This is required due to bug in DI job which is not aware of bulk writes.
+        flush();
         return successfulWrites;
     }
 
     @Override
     public Iterable<IndexedRecord> getRejectedWrites() {
+        // If successful write feedback is requested before submitting of current batch
+        // then write accumulated records to provide feedback to a caller.
+        // This is required due to bug in DI job which is not aware of bulk writes.
+        flush();
         return rejectedWrites;
     }
 
@@ -104,6 +124,10 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
 
             String typeName = writeOperation.getProperties().module.moduleName.getValue();
             typeDesc = metaDataSource.getTypeInfo(typeName);
+
+            schema = writeOperation.getProperties().module.main.schema.getValue();
+            flowSchema = writeOperation.getProperties().module.flowSchema.schema.getValue();
+            rejectSchema = writeOperation.getProperties().module.rejectSchema.schema.getValue();
 
             initTransducer();
 
@@ -149,6 +173,8 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
             return;
         }
 
+        clearWriteFeedback();
+
         // Transduce IndexedRecords to NetSuite data model objects
 
         List<T> nsObjectList = new ArrayList<>(indexedRecordList.size());
@@ -170,15 +196,88 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
 
     private void processWriteResponse(NsWriteResponse<RefT> response, IndexedRecord indexedRecord) {
         if (response.getStatus().isSuccess()) {
-            successfulWrites.add(indexedRecord);
+            IndexedRecord targetRecord = createSuccessRecord(response, indexedRecord);
+            successfulWrites.add(targetRecord);
+            result.successCount++;
         } else {
             if (exceptionForErrors) {
                 NetSuiteClientService.checkError(response.getStatus());
             }
-            rejectedWrites.add(indexedRecord);
+            IndexedRecord targetRecord = createRejectRecord(response, indexedRecord);
+            rejectedWrites.add(targetRecord);
+            result.rejectCount++;
+        }
+        result.totalCount++;
+    }
+
+    private void clearWriteFeedback() {
+        successfulWrites.clear();
+        rejectedWrites.clear();
+    }
+
+    private IndexedRecord createSuccessRecord(NsWriteResponse<RefT> response, IndexedRecord record) {
+        NsRef ref = NsRef.fromNativeRef(response.getRef());
+
+        GenericData.Record targetRecord = new GenericData.Record(flowSchema);
+
+        for (Schema.Field field : schema.getFields()) {
+            Schema.Field targetField = flowSchema.getField(field.name());
+            if (targetField != null) {
+                Object value = record.get(field.pos());
+                targetRecord.put(targetField.name(), value);
+            }
         }
 
-        result.totalCount++;
+        Schema.Field internalIdField = NetSuiteDatasetRuntimeImpl.getNsFieldByName(flowSchema, "internalId");
+        if (internalIdField != null && targetRecord.get(internalIdField.pos()) == null) {
+            targetRecord.put(internalIdField.pos(), ref.getInternalId());
+        }
+        Schema.Field externalIdField = NetSuiteDatasetRuntimeImpl.getNsFieldByName(flowSchema, "externalId");
+        if (externalIdField != null && targetRecord.get(externalIdField.pos()) == null) {
+            targetRecord.put(externalIdField.pos(), ref.getExternalId());
+        }
+        if (ref.getRefType() == RefType.CUSTOMIZATION_REF) {
+            Schema.Field scriptIdField = NetSuiteDatasetRuntimeImpl.getNsFieldByName(flowSchema, "scriptId");
+            if (scriptIdField != null && targetRecord.get(scriptIdField.pos()) == null) {
+                targetRecord.put(scriptIdField.pos(), ref.getScriptId());
+            }
+        }
+
+        return targetRecord;
+    }
+
+    private IndexedRecord createRejectRecord(NsWriteResponse<RefT> response, IndexedRecord record) {
+        GenericData.Record targetRecord = new GenericData.Record(rejectSchema);
+
+        for (Schema.Field field : schema.getFields()) {
+            Schema.Field targetField = rejectSchema.getField(field.name());
+            if (targetField != null) {
+                Object value = record.get(field.pos());
+                targetRecord.put(targetField.name(), value);
+            }
+        }
+
+        String errorCode;
+        String errorMessage;
+        NsStatus status = response.getStatus();
+        if (!status.getDetails().isEmpty()) {
+            errorCode = status.getDetails().get(0).getCode();
+            errorMessage = status.getDetails().get(0).getMessage();
+        } else {
+            errorCode = "GENERAL_ERROR";
+            errorMessage = "Operation failed";
+        }
+
+        Schema.Field errorCodeField = NetSuiteDatasetRuntimeImpl.getNsFieldByName(rejectSchema, "errorCode");
+        if (errorCodeField != null) {
+            targetRecord.put(errorCodeField.pos(), errorCode);
+        }
+        Schema.Field errorMessageField = NetSuiteDatasetRuntimeImpl.getNsFieldByName(rejectSchema, "errorMessage");
+        if (errorMessageField != null) {
+            targetRecord.put(errorMessageField.pos(), errorMessage);
+        }
+
+        return targetRecord;
     }
 
     /**
@@ -191,13 +290,8 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
 
     @Override
     public Result close() throws IOException {
-
         // Write remaining objects
         flush();
-
-        result.successCount = successfulWrites.size();
-        result.rejectCount = rejectedWrites.size();
-
         return result;
     }
 

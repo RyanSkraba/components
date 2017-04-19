@@ -57,6 +57,7 @@ public abstract class AbstractNetSuiteComponentMockTestFixture<PortT> implements
         connectionProperties = new NetSuiteConnectionProperties("test");
         connectionProperties.init();
         connectionProperties.endpoint.setValue(webServiceMockTestFixture.getEndpointAddress().toString());
+        connectionProperties.apiVersion.setValue(webServiceMockTestFixture.getClientFactory().getApiVersion().getMajorAsString("."));
         connectionProperties.email.setValue("test@test.com");
         connectionProperties.password.setValue("123");
         connectionProperties.role.setValue(3);

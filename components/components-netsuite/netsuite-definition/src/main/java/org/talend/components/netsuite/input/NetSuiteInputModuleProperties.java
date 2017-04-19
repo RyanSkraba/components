@@ -82,7 +82,9 @@ public class NetSuiteInputModuleProperties extends NetSuiteModuleProperties {
         try {
             setupSchema();
             setupSearchSchema();
+
             refreshLayout(getForm(Form.MAIN));
+
             return ValidationResult.OK;
 
         } catch (Exception ex) {

@@ -37,6 +37,22 @@ public class NetSuiteVersionTest {
     }
 
     @Test
+    public void testParseVersionMajor() {
+        NetSuiteVersion version = NetSuiteVersion.parseVersion("2016.2");
+        assertEquals(2016, version.getMajorYear());
+        assertEquals(2, version.getMajorRelease());
+        assertEquals(-1, version.getMinor());
+    }
+
+    @Test
+    public void testParseVersionMajorAndPatch() {
+        NetSuiteVersion version = NetSuiteVersion.parseVersion("2016.2.1");
+        assertEquals(2016, version.getMajorYear());
+        assertEquals(2, version.getMajorRelease());
+        assertEquals(1, version.getMinor());
+    }
+
+    @Test
     public void testDetectVersionMajor() {
         NetSuiteVersion version = NetSuiteVersion.detectVersion(
                 "https://webservices.netsuite.com/services/NetSuitePort_2016_2");

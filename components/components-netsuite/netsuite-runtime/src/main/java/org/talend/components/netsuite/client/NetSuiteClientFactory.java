@@ -13,11 +13,15 @@
 
 package org.talend.components.netsuite.client;
 
+import org.talend.components.netsuite.NetSuiteVersion;
+
 /**
  *
  */
 public interface NetSuiteClientFactory<T> {
 
     NetSuiteClientService<T> createClient() throws NetSuiteException;
+
+    NetSuiteVersion getApiVersion();
 
 }

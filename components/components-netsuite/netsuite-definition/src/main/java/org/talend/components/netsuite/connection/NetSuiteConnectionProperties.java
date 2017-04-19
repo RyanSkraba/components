@@ -20,7 +20,10 @@ import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentReferenceProperties;
@@ -34,6 +37,7 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.serialize.PostDeserializeSetup;
 
 /**
  *
@@ -43,13 +47,22 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
 
     public static final String FORM_WIZARD = "Wizard";
 
+    public static final NetSuiteVersion DEFAULT_API_VERSION = new NetSuiteVersion(2016, 2);
+
     public static final String DEFAULT_ENDPOINT_URL =
-            "https://webservices.netsuite.com/services/NetSuitePort_2016_2";
+            "https://webservices.netsuite.com/services/NetSuitePort_" + DEFAULT_API_VERSION.getMajorAsString();
+
+    public static final List<String> API_VERSIONS = Collections.unmodifiableList(Arrays.asList(
+            "2016.2", "2014.2"
+    ));
 
     public final Property<String> name = newString("name")
             .setRequired();
 
     public final Property<String> endpoint = newString("endpoint")
+            .setRequired();
+
+    public final Property<String> apiVersion = newString("apiVersion")
             .setRequired();
 
     public final Property<String> email = newString("email")
@@ -86,6 +99,8 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
         super.setupProperties();
 
         endpoint.setValue(DEFAULT_ENDPOINT_URL);
+        apiVersion.setValue(DEFAULT_API_VERSION.getMajorAsString("."));
+        apiVersion.setPossibleValues(API_VERSIONS);
         email.setValue("youremail@yourcompany.com");
         role.setValue(3);
         account.setValue("");
@@ -99,6 +114,8 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
 
         Form mainForm = new Form(this, Form.MAIN);
         mainForm.addRow(endpoint);
+        mainForm.addColumn(widget(apiVersion)
+                .setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
         mainForm.addRow(email);
         mainForm.addRow(widget(password)
                 .setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
@@ -120,6 +137,8 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
         Form wizardForm = Form.create(this, FORM_WIZARD);
         wizardForm.addRow(name);
         wizardForm.addRow(endpoint);
+        wizardForm.addColumn(widget(apiVersion)
+                .setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
         wizardForm.addRow(email);
         wizardForm.addRow(widget(password)
                 .setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
@@ -140,11 +159,13 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
 
         if (form.getName().equals(Form.MAIN) || form.getName().equals(FORM_WIZARD)) {
             form.getWidget(endpoint.getName()).setHidden(refConnectionUsed);
+            form.getWidget(apiVersion.getName()).setHidden(refConnectionUsed);
             form.getWidget(email.getName()).setHidden(refConnectionUsed);
             form.getWidget(password.getName()).setHidden(refConnectionUsed);
             form.getWidget(role.getName()).setHidden(refConnectionUsed);
             form.getWidget(account.getName()).setHidden(refConnectionUsed);
             form.getWidget(applicationId.getName()).setHidden(refConnectionUsed);
+
         } else if (form.getName().equals(Form.ADVANCED)) {
             form.getWidget(customizationEnabled.getName()).setHidden(refConnectionUsed);
         }
@@ -152,6 +173,10 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
 
     @Override
     public NetSuiteConnectionProperties getConnectionProperties() {
+        return getEffectiveConnectionProperties();
+    }
+
+    public NetSuiteConnectionProperties getEffectiveConnectionProperties() {
         String refComponentId = getReferencedComponentId();
         return refComponentId != null ? getReferencedConnectionProperties() : this;
     }
@@ -174,7 +199,12 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
     }
 
     public NetSuiteVersion getApiVersion() {
-        return NetSuiteVersion.detectVersion(endpoint.getStringValue());
+        if (apiVersion.getValue() != null) {
+            String value = apiVersion.getStringValue();
+            return NetSuiteVersion.parseVersion(value);
+        }
+        String endpointUrl = endpoint.getStringValue();
+        return NetSuiteVersion.detectVersion(endpointUrl);
     }
 
     public ValidationResult validateTestConnection() throws Exception {
@@ -201,5 +231,32 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
             designTimeContext = new NetSuiteComponentDefinition.DesignTimeContext();
         }
         return designTimeContext;
+    }
+
+    @Override
+    public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
+        boolean migrated = super.postDeserialize(version, setup, persistent);
+        migrateApiVersion();
+        return migrated;
+    }
+
+    private void migrateApiVersion() {
+        if (apiVersion.getValue() == null) {
+            if (endpoint.getValue() != null) {
+                String endpointUrl = endpoint.getStringValue();
+                try {
+                    NetSuiteVersion nsVersion = NetSuiteVersion.detectVersion(endpointUrl);
+                    apiVersion.setValue(nsVersion.getMajorAsString("."));
+                } catch (IllegalArgumentException e) {
+                    // API version couldn't be detected, use default version
+                    apiVersion.setValue(DEFAULT_API_VERSION.getMajorAsString("."));
+                } catch (Exception e) {
+                    // do nothing
+                }
+            }
+        }
+        if (apiVersion.getPossibleValues().isEmpty()) {
+            apiVersion.setPossibleValues(API_VERSIONS);
+        }
     }
 }

@@ -24,7 +24,6 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.netsuite.connection.NetSuiteConnectionProperties;
 import org.talend.daikon.java8.Function;
-import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.runtime.RuntimeUtil;
@@ -98,15 +97,11 @@ public abstract class NetSuiteComponentDefinition extends AbstractComponentDefin
 
         NetSuiteConnectionProperties connectionProperties = properties.getConnectionProperties();
 
-        String endpointUrl = connectionProperties.endpoint.getStringValue();
-
         try {
-            NetSuiteVersion version = NetSuiteVersion.detectVersion(endpointUrl);
+            NetSuiteVersion version = connectionProperties.getApiVersion();
             return getRuntimeInfo(version, runtimeClassName);
         } catch (IllegalArgumentException e) {
-            throw new ComponentException(new ValidationResult()
-                    .setStatus(ValidationResult.Result.ERROR)
-                    .setMessage(e.getMessage()));
+            throw new ComponentException(e);
         }
     }
 

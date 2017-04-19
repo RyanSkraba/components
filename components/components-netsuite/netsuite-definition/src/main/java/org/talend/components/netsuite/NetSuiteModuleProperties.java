@@ -16,7 +16,6 @@ package org.talend.components.netsuite;
 import static org.talend.components.netsuite.NetSuiteComponentDefinition.withDatasetRuntime;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.avro.Schema;
@@ -39,19 +38,19 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
 
     public final StringProperty moduleName = newString("moduleName"); //$NON-NLS-1$
 
-    public final NsSchemaProperties main;
+    public final MainSchemaProperties main;
 
     public NetSuiteModuleProperties(String name, NetSuiteConnectionProperties connectionProperties) {
         super(name);
 
         connection = connectionProperties;
 
-        main = new NsSchemaProperties("main");
+        main = new MainSchemaProperties("main");
     }
 
     @Override
     public NetSuiteConnectionProperties getConnectionProperties() {
-        return connection.getConnectionProperties();
+        return connection.getEffectiveConnectionProperties();
     }
 
     public List<NamedThing> getRecordTypes() {
@@ -86,6 +85,12 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
         });
     }
 
+    /**
+     * Get schema for update <code>incoming</code> flow.
+     *
+     * @param typeName name of object's type
+     * @return schema
+     */
     public Schema getSchemaForUpdate(final String typeName) {
         return NetSuiteComponentDefinition.withDatasetRuntime(this, new Function<NetSuiteDatasetRuntime, Schema>() {
             @Override public Schema apply(NetSuiteDatasetRuntime dataSetRuntime) {
@@ -94,6 +99,12 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
         });
     }
 
+    /**
+     * Get schema for delete <code>incoming</code> flow.
+     *
+     * @param typeName name of object's type
+     * @return schema
+     */
     public Schema getSchemaForDelete(final String typeName) {
         return NetSuiteComponentDefinition.withDatasetRuntime(this, new Function<NetSuiteDatasetRuntime, Schema>() {
             @Override public Schema apply(NetSuiteDatasetRuntime dataSetRuntime) {
@@ -110,35 +121,26 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
         });
     }
 
-    protected void setupSchemaForUpdate() {
-        Schema schema = getSchemaForUpdate(moduleName.getStringValue());
-        main.schema.setValue(schema);
-    }
+    public static class MainSchemaProperties extends SchemaProperties {
+        protected transient ISchemaListener schemaListener;
 
-    protected void setupSchemaForDelete() {
-        Schema schema = getSchemaForDelete(moduleName.getStringValue());
-        main.schema.setValue(schema);
-    }
-
-    public static class NsSchemaProperties extends SchemaProperties {
-        private transient List<ISchemaListener> schemaListeners = new ArrayList<>();
-
-        public NsSchemaProperties(String name) {
+        public MainSchemaProperties(String name) {
             super(name);
         }
 
-        public void removeSchemaListener(ISchemaListener schemaListener) {
-            schemaListeners.remove(schemaListener);
+        public ISchemaListener getSchemaListener() {
+            return schemaListener;
         }
 
-        public void addSchemaListener(ISchemaListener schemaListener) {
-            schemaListeners.add(schemaListener);
+        public void setSchemaListener(ISchemaListener schemaListener) {
+            this.schemaListener = schemaListener;
         }
 
         public void afterSchema() {
-            for (ISchemaListener schemaListener : schemaListeners) {
+            if (schemaListener != null) {
                 schemaListener.afterSchema();
             }
         }
+
     }
 }

@@ -24,6 +24,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.talend.components.api.component.ComponentDefinition.RETURN_ERROR_MESSAGE_PROP;
+import static org.talend.components.api.component.ComponentDefinition.RETURN_REJECT_RECORD_COUNT_PROP;
+import static org.talend.components.api.component.ComponentDefinition.RETURN_SUCCESS_RECORD_COUNT_PROP;
 import static org.talend.components.api.component.ComponentDefinition.RETURN_TOTAL_RECORD_COUNT_PROP;
 
 import java.util.Arrays;
@@ -57,15 +59,17 @@ public class NetSuiteOutputDefinitionTest {
 
     @Test
     public void testGetReturnProperties() {
-        assertThat(definition.getReturnProperties().length, is(2));
+        assertThat(definition.getReturnProperties().length, is(4));
         assertThat(definition.getReturnProperties(), arrayContainingInAnyOrder(
-                (Property) RETURN_ERROR_MESSAGE_PROP, (Property) RETURN_TOTAL_RECORD_COUNT_PROP));
+                (Property) RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP,
+                RETURN_SUCCESS_RECORD_COUNT_PROP, RETURN_REJECT_RECORD_COUNT_PROP));
     }
 
     @Test
     public void testGetSupportedConnectorTopologies() {
-        assertThat(definition.getSupportedConnectorTopologies().size(), is(1));
-        assertThat(definition.getSupportedConnectorTopologies(), contains(ConnectorTopology.INCOMING));
+        assertThat(definition.getSupportedConnectorTopologies().size(), is(2));
+        assertThat(definition.getSupportedConnectorTopologies(), contains(
+                ConnectorTopology.INCOMING, ConnectorTopology.INCOMING_AND_OUTGOING));
     }
 
     @Test
@@ -78,11 +82,24 @@ public class NetSuiteOutputDefinitionTest {
     }
 
     @Test
-    public void testRuntimeInfo() {
+    public void testRuntimeInfoForIncoming() {
         NetSuiteOutputProperties properties = new NetSuiteOutputProperties("test");
         properties.initForRuntime();
 
         RuntimeInfo runtimeInfo = definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.INCOMING);
+        assertNotNull(runtimeInfo);
+        assertThat(runtimeInfo, instanceOf(JarRuntimeInfo.class));
+
+        JarRuntimeInfo jarRuntimeInfo = (JarRuntimeInfo) runtimeInfo;
+        assertThat(jarRuntimeInfo.getRuntimeClassName(), endsWith(".NetSuiteSinkImpl"));
+    }
+
+    @Test
+    public void testRuntimeInfoForIncomingAndOutgoing() {
+        NetSuiteOutputProperties properties = new NetSuiteOutputProperties("test");
+        properties.initForRuntime();
+
+        RuntimeInfo runtimeInfo = definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.INCOMING_AND_OUTGOING);
         assertNotNull(runtimeInfo);
         assertThat(runtimeInfo, instanceOf(JarRuntimeInfo.class));
 

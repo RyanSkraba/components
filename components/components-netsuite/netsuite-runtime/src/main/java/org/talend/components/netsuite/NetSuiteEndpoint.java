@@ -42,10 +42,13 @@ public class NetSuiteEndpoint {
     public static ConnectionConfig createConnectionConfig(
             NetSuiteConnectionProperties properties) throws NetSuiteException {
 
-        NetSuiteConnectionProperties connProps = properties.getConnectionProperties();
+        NetSuiteConnectionProperties connProps = properties.getEffectiveConnectionProperties();
 
         if (StringUtils.isEmpty(connProps.endpoint.getStringValue())) {
             throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"), "Invalid endpoint URL");
+        }
+        if (StringUtils.isEmpty(connProps.apiVersion.getStringValue())) {
+            throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"), "Invalid API version");
         }
         if (StringUtils.isEmpty(connProps.email.getStringValue())) {
             throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"), "Invalid email");
@@ -58,6 +61,29 @@ public class NetSuiteEndpoint {
         }
 
         String endpointUrl = connProps.endpoint.getStringValue();
+
+        NetSuiteVersion endpointApiVersion;
+        try {
+            endpointApiVersion = NetSuiteVersion.detectVersion(endpointUrl);
+        } catch (IllegalArgumentException e) {
+            throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"),
+                    "Invalid endpoint URL: API version could not be detected");
+        }
+        String apiVersionString = connProps.apiVersion.getStringValue();
+        NetSuiteVersion apiVersion;
+        try {
+            apiVersion = NetSuiteVersion.parseVersion(apiVersionString);
+        } catch (IllegalArgumentException e) {
+            throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"),
+                    "Invalid API version");
+        }
+
+        if (!endpointApiVersion.isSameMajor(apiVersion)) {
+            throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"),
+                    String.format("Invalid API version: endpoint URL is '%s' but specified version is '%s'",
+                            endpointUrl, apiVersionString));
+        }
+
         String email = connProps.email.getStringValue();
         String password = connProps.password.getStringValue();
         Integer roleId = connProps.role.getValue();
@@ -73,7 +99,8 @@ public class NetSuiteEndpoint {
         credentials.setApplicationId(applicationId);
 
         try {
-            ConnectionConfig connectionConfig = new ConnectionConfig(new URL(endpointUrl), credentials);
+            ConnectionConfig connectionConfig = new ConnectionConfig(
+                    new URL(endpointUrl), apiVersion.getMajor(), credentials);
             connectionConfig.setCustomizationEnabled(customizationEnabled);
             return connectionConfig;
         } catch (MalformedURLException e) {
@@ -116,14 +143,16 @@ public class NetSuiteEndpoint {
 
     public static class ConnectionConfig {
         private URL endpointUrl;
+        private NetSuiteVersion apiVersion;
         private NetSuiteCredentials credentials;
         private boolean customizationEnabled;
 
         public ConnectionConfig() {
         }
 
-        public ConnectionConfig(URL endpointUrl, NetSuiteCredentials credentials) {
+        public ConnectionConfig(URL endpointUrl, NetSuiteVersion apiVersion, NetSuiteCredentials credentials) {
             this.endpointUrl = endpointUrl;
+            this.apiVersion = apiVersion;
             this.credentials = credentials;
         }
 
@@ -133,6 +162,14 @@ public class NetSuiteEndpoint {
 
         public void setEndpointUrl(URL endpointUrl) {
             this.endpointUrl = endpointUrl;
+        }
+
+        public NetSuiteVersion getApiVersion() {
+            return apiVersion;
+        }
+
+        public void setApiVersion(NetSuiteVersion apiVersion) {
+            this.apiVersion = apiVersion;
         }
 
         public NetSuiteCredentials getCredentials() {
@@ -158,19 +195,20 @@ public class NetSuiteEndpoint {
             if (o == null || getClass() != o.getClass())
                 return false;
             ConnectionConfig that = (ConnectionConfig) o;
-            return customizationEnabled == that.customizationEnabled && Objects.equals(endpointUrl, that.endpointUrl) && Objects
-                    .equals(credentials, that.credentials);
+            return customizationEnabled == that.customizationEnabled && Objects.equals(endpointUrl, that.endpointUrl) &&
+                    Objects.equals(apiVersion, that.apiVersion) && Objects.equals(credentials, that.credentials);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(endpointUrl, credentials, customizationEnabled);
+            return Objects.hash(endpointUrl, apiVersion, credentials, customizationEnabled);
         }
 
         @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder("ConnectionConfig{");
             sb.append("endpointUrl=").append(endpointUrl);
+            sb.append("apiVersion=").append(apiVersion);
             sb.append(", credentials=").append(credentials);
             sb.append(", customizationEnabled=").append(customizationEnabled);
             sb.append('}');

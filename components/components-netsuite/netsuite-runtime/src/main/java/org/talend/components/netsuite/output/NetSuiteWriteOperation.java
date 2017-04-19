@@ -91,6 +91,11 @@ public class NetSuiteWriteOperation implements WriteOperation<Result> {
             writer.setBatchSize(batchSize);
         }
 
+        Boolean dieOnError = properties.dieOnError.getValue();
+        if (dieOnError != null) {
+            writer.setExceptionForErrors(dieOnError);
+        }
+
         return writer;
     }
 

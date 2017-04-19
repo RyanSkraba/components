@@ -28,13 +28,21 @@ public interface NetSuiteDatasetRuntime {
 
     List<NamedThing> getSearchableTypes();
 
-    Schema getSchema(String typeName);
-
     SearchInfo getSearchInfo(String typeName);
+
+    List<String> getSearchFieldOperators();
+
+    Schema getSchema(String typeName);
 
     Schema getSchemaForUpdate(String typeName);
 
     Schema getSchemaForDelete(String typeName);
 
-    List<String> getSearchFieldOperators();
+    Schema getSchemaForUpdateFlow(String typeName, Schema schema);
+
+    Schema getSchemaForDeleteFlow(String typeName, Schema schema);
+
+    Schema getSchemaForUpdateReject(String typeName, Schema schema);
+
+    Schema getSchemaForDeleteReject(String typeName, Schema schema);
 }

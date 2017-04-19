@@ -13,11 +13,15 @@
 
 package org.talend.components.netsuite.output;
 
+import java.util.Collection;
+import java.util.Set;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNotNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,6 +34,7 @@ import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.netsuite.NetSuiteDatasetRuntime;
 import org.talend.components.netsuite.NetSuitePropertiesTestBase;
 import org.talend.components.netsuite.NetSuiteRuntime;
+import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 
@@ -71,6 +76,7 @@ public class NetSuiteOutputPropertiesTest extends NetSuitePropertiesTestBase {
         assertEquals(OutputAction.ADD, properties.module.action.getValue());
         assertEquals(Boolean.FALSE, properties.module.useNativeUpsert.getValue());
         assertEquals((Integer) NetSuiteOutputProperties.DEFAULT_BATCH_SIZE, properties.batchSize.getValue());
+        assertEquals(Boolean.TRUE, properties.dieOnError.getValue());
 
         assertNotNull(properties.getConnectionProperties());
     }
@@ -80,10 +86,37 @@ public class NetSuiteOutputPropertiesTest extends NetSuitePropertiesTestBase {
         properties.setupProperties();
 
         assertEquals(1, properties.getAllSchemaPropertiesConnectors(false).size());
-        assertEquals(0, properties.getAllSchemaPropertiesConnectors(true).size());
-        PropertyPathConnector connector = properties.getAllSchemaPropertiesConnectors(false).iterator().next();
-        assertThat(connector.getName(), is(Connector.MAIN_NAME));
-        assertThat(connector.getPropertyPath(), is("module.main"));
+
+        Set<PropertyPathConnector> connectors = properties.getAllSchemaPropertiesConnectors(false);
+        PropertyPathConnector mainConnector = getByName(connectors, Connector.MAIN_NAME);
+        assertNotNull(mainConnector);
+        assertThat(mainConnector.getPropertyPath(), is("module.main"));
+    }
+
+    @Test
+    public void testGetAllSchemaPropertiesConnectorsForOutgoing() {
+        properties.setupProperties();
+
+        assertEquals(2, properties.getAllSchemaPropertiesConnectors(true).size());
+
+        Set<PropertyPathConnector> connectors = properties.getAllSchemaPropertiesConnectors(true);
+
+        PropertyPathConnector flowConnector = getByName(connectors, Connector.MAIN_NAME);
+        assertNotNull(flowConnector);
+        assertThat(flowConnector.getPropertyPath(), is("module.flowSchema"));
+
+        PropertyPathConnector rejectConnector = getByName(connectors, Connector.REJECT_NAME);
+        assertNotNull(rejectConnector);
+        assertThat(rejectConnector.getPropertyPath(), is("module.rejectSchema"));
+    }
+
+    private <T extends NamedThing> T getByName(Collection<T> objects, String name) {
+        for (T obj : objects) {
+            if (name.equals(obj.getName())) {
+                return obj;
+            }
+        }
+        return null;
     }
 
     @Test

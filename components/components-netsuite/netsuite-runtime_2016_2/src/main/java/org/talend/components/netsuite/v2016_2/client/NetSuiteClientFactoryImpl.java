@@ -13,6 +13,7 @@
 
 package org.talend.components.netsuite.v2016_2.client;
 
+import org.talend.components.netsuite.NetSuiteVersion;
 import org.talend.components.netsuite.client.NetSuiteClientFactory;
 import org.talend.components.netsuite.client.NetSuiteClientService;
 import org.talend.components.netsuite.client.NetSuiteException;
@@ -29,5 +30,10 @@ public class NetSuiteClientFactoryImpl implements NetSuiteClientFactory<NetSuite
     @Override
     public NetSuiteClientService<NetSuitePortType> createClient() throws NetSuiteException {
         return new NetSuiteClientServiceImpl();
+    }
+
+    @Override
+    public NetSuiteVersion getApiVersion() {
+        return new NetSuiteVersion(2016, 2);
     }
 }

@@ -13,6 +13,7 @@
 
 package org.talend.components.netsuite;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,6 +21,10 @@ import java.util.regex.Pattern;
  * Hold NetSuite API version numbers.
  */
 public class NetSuiteVersion {
+
+    private static final Pattern VERSION_PATTERN = Pattern.compile(
+            "((\\d+)\\.(\\d+))(\\.(\\d+))?"
+    );
 
     private static final Pattern ENDPOINT_URL_VERSION_PATTERN = Pattern.compile(
             ".+\\/NetSuitePort_((\\d+)_(\\d+))(_(\\d+))?"
@@ -56,6 +61,10 @@ public class NetSuiteVersion {
         return minor;
     }
 
+    public NetSuiteVersion getMajor() {
+        return new NetSuiteVersion(majorYear, majorRelease);
+    }
+
     public String getMajorAsString() {
         return getMajorAsString("_");
     }
@@ -73,6 +82,36 @@ public class NetSuiteVersion {
             return getMajorAsString(separator);
         }
         return String.format("%d%s%d%s%d", majorYear, separator, majorRelease, separator, minor);
+    }
+
+    public boolean isSameMajor(NetSuiteVersion thatVersion) {
+        return this.majorYear == thatVersion.majorYear && this.majorRelease == thatVersion.majorRelease;
+    }
+
+    /**
+     * Parse version.
+     *
+     * @param versionString version string
+     * @return version object
+     * @throws IllegalArgumentException if version couldn't be parsed
+     */
+    public static NetSuiteVersion parseVersion(String versionString) {
+        Matcher matcher = VERSION_PATTERN.matcher(versionString);
+        if (matcher.matches()) {
+            String sValue1 = matcher.group(2);
+            String sValue2 = matcher.group(3);
+            String sValue3 = matcher.group(5);
+            try {
+                int value1 = Integer.parseInt(sValue1);
+                int value2 = Integer.parseInt(sValue2);
+                int value3 = sValue3 != null ? Integer.parseInt(sValue3) : -1;
+                return new NetSuiteVersion(value1, value2, value3);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Failed to parse NetSuite API version: " + versionString);
+            }
+        } else {
+            throw new IllegalArgumentException("Failed to parse NetSuite API version: " + versionString);
+        }
     }
 
     /**
@@ -99,6 +138,21 @@ public class NetSuiteVersion {
         } else {
             throw new IllegalArgumentException("Failed to detect NetSuite API version: " + nsEndpointUrl);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        NetSuiteVersion version = (NetSuiteVersion) o;
+        return majorYear == version.majorYear && majorRelease == version.majorRelease && minor == version.minor;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(majorYear, majorRelease, minor);
     }
 
     @Override

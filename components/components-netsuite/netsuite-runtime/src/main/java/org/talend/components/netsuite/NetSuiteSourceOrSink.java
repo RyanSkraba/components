@@ -56,8 +56,10 @@ public abstract class NetSuiteSourceOrSink implements SourceOrSink {
     @Override
     public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {
         this.properties = (NetSuiteProvideConnectionProperties) properties;
-        this.endpoint = new NetSuiteEndpoint(clientFactory,
-                NetSuiteEndpoint.createConnectionConfig(getConnectionProperties()));
+        NetSuiteEndpoint.ConnectionConfig connectionConfig =
+                NetSuiteEndpoint.createConnectionConfig(getConnectionProperties());
+        assertApiVersion(connectionConfig.getApiVersion());
+        this.endpoint = new NetSuiteEndpoint(clientFactory, connectionConfig);
         return ValidationResult.OK;
     }
 
@@ -104,5 +106,12 @@ public abstract class NetSuiteSourceOrSink implements SourceOrSink {
 
     public NetSuiteClientService<?> getClientService() throws NetSuiteException {
         return endpoint.getClientService();
+    }
+
+    protected void assertApiVersion(final NetSuiteVersion apiVersion) {
+        if (!clientFactory.getApiVersion().isSameMajor(apiVersion)) {
+            throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"),
+                    "Invalid API version: " + apiVersion.getAsString("."));
+        }
     }
 }

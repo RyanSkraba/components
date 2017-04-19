@@ -161,7 +161,7 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
             final RecordTypeInfo recordTypeInfo = metaDataSource.getRecordType(typeName);
             final TypeDesc typeDesc = metaDataSource.getTypeInfo(typeName);
 
-            Schema schema = NetSuiteDatasetRuntimeImpl.inferSchemaForType(typeDesc.getTypeName(), typeDesc.getFields());
+            Schema schema = inferSchemaForType(typeDesc.getTypeName(), typeDesc.getFields());
             augmentSchemaWithCustomMetaData(schema, recordTypeInfo, typeDesc.getFields());
 
             return schema;
@@ -172,12 +172,16 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
 
     @Override
     public Schema getSchemaForDelete(String typeName) {
+        return getSchemaForRecordRef(typeName);
+    }
+
+    public Schema getSchemaForRecordRef(String typeName) {
         try {
             final RecordTypeInfo referencedRecordTypeInfo = metaDataSource.getRecordType(typeName);
             final RefType refType = referencedRecordTypeInfo.getRefType();
             final TypeDesc typeDesc = metaDataSource.getTypeInfo(refType.getTypeName());
 
-            Schema schema = NetSuiteDatasetRuntimeImpl.inferSchemaForType(typeDesc.getTypeName(), typeDesc.getFields());
+            Schema schema = inferSchemaForType(typeDesc.getTypeName(), typeDesc.getFields());
             augmentSchemaWithCustomMetaData(schema, referencedRecordTypeInfo, null);
 
             return schema;
@@ -197,6 +201,122 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
         // Sort by name alphabetically
         Collections.sort(operatorNames);
         return operatorNames;
+    }
+
+    @Override
+    public Schema getSchemaForUpdateFlow(String typeName, Schema schema) {
+        RecordTypeInfo recordTypeInfo = metaDataSource.getRecordType(typeName);
+        TypeDesc typeDesc = metaDataSource.getTypeInfo(typeName);
+
+        List<FieldDesc> fieldDescList = new ArrayList<>();
+        Schema.Field internalIdField = getNsFieldByName(schema, "internalId");
+        if (internalIdField == null) {
+            FieldDesc fieldDesc = typeDesc.getField("internalId");
+            fieldDescList.add(fieldDesc);
+        }
+        Schema.Field externalIdField = getNsFieldByName(schema, "externalId");
+        if (externalIdField == null) {
+            FieldDesc fieldDesc = typeDesc.getField("externalId");
+            fieldDescList.add(fieldDesc);
+        }
+        if (recordTypeInfo instanceof CustomRecordTypeInfo) {
+            Schema.Field scriptIdField = getNsFieldByName(schema, "scriptId");
+            if (scriptIdField == null) {
+                FieldDesc fieldDesc = typeDesc.getField("scriptId");
+                if (fieldDesc != null) {
+                    fieldDescList.add(fieldDesc);
+                }
+            }
+        }
+
+        List<Schema.Field> fields = new ArrayList<>();
+
+        Schema.Field f;
+
+        if (!fieldDescList.isEmpty()) {
+            Schema schemaToAdd = inferSchemaForType(typeName, fieldDescList);
+
+            for (Schema.Field sourceField : schemaToAdd.getFields()) {
+                f = copyField(sourceField);
+                f.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
+                f.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
+                fields.add(f);
+            }
+        }
+
+        return extendSchema(schema, typeName + "_FLOW", fields);
+    }
+
+    @Override
+    public Schema getSchemaForDeleteFlow(String typeName, Schema schema) {
+        RecordTypeInfo recordTypeInfo = metaDataSource.getRecordType(typeName);
+        TypeDesc typeDesc = metaDataSource.getTypeInfo(typeName);
+
+        List<FieldDesc> fieldDescList = new ArrayList<>();
+        Schema.Field internalIdField = getNsFieldByName(schema, "internalId");
+        if (internalIdField == null) {
+            FieldDesc fieldDesc = typeDesc.getField("internalId");
+            fieldDescList.add(fieldDesc);
+        }
+        Schema.Field externalIdField = getNsFieldByName(schema, "externalId");
+        if (externalIdField == null) {
+            FieldDesc fieldDesc = typeDesc.getField("externalId");
+            fieldDescList.add(fieldDesc);
+        }
+        if (recordTypeInfo instanceof CustomRecordTypeInfo) {
+            Schema.Field scriptIdField = getNsFieldByName(schema, "scriptId");
+            if (scriptIdField == null) {
+                FieldDesc fieldDesc = typeDesc.getField("scriptId");
+                if (fieldDesc != null) {
+                    fieldDescList.add(fieldDesc);
+                }
+            }
+        }
+
+        List<Schema.Field> fields = new ArrayList<>();
+
+        Schema.Field f;
+
+        if (!fieldDescList.isEmpty()) {
+            Schema schemaToAdd = inferSchemaForType(typeName, fieldDescList);
+
+            for (Schema.Field sourceField : schemaToAdd.getFields()) {
+                f = copyField(sourceField);
+                f.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
+                f.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
+                fields.add(f);
+            }
+        }
+
+        return extendSchema(schema, typeName + "_FLOW", fields);
+    }
+
+    @Override
+    public Schema getSchemaForUpdateReject(String typeName, Schema schema) {
+        return getSchemaForReject(schema, typeName + "_REJECT");
+    }
+
+    @Override
+    public Schema getSchemaForDeleteReject(String typeName, Schema schema) {
+        return getSchemaForReject(schema, typeName + "_REJECT");
+    }
+
+    public Schema getSchemaForReject(Schema schema, String newSchemaName) {
+        List<Schema.Field> fields = new ArrayList<>();
+
+        Schema.Field f;
+
+        f = new Schema.Field("errorCode", Schema.create(Schema.Type.STRING), null, (Object) null);
+        f.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
+        f.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
+        fields.add(f);
+
+        f = new Schema.Field("errorMessage", Schema.create(Schema.Type.STRING), null, (Object) null);
+        f.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
+        f.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
+        fields.add(f);
+
+        return extendSchema(schema, newSchemaName, fields);
     }
 
     /**
@@ -355,6 +475,38 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
                 }
             }
         }
+    }
+
+    public static Schema extendSchema(Schema sourceSchema, String newSchemaName, List<Schema.Field> fieldsToAdd) {
+        Schema newSchema = Schema.createRecord(newSchemaName,
+                sourceSchema.getDoc(), sourceSchema.getNamespace(),
+                sourceSchema.isError());
+
+        List<Schema.Field> copyFieldList = new ArrayList<>();
+        for (Schema.Field se : sourceSchema.getFields()) {
+            Schema.Field field = copyField(se);
+            copyFieldList.add(field);
+        }
+
+        copyFieldList.addAll(fieldsToAdd);
+
+        newSchema.setFields(copyFieldList);
+
+        for (Map.Entry<String, Object> entry : sourceSchema.getObjectProps().entrySet()) {
+            newSchema.addProp(entry.getKey(), entry.getValue());
+        }
+
+        return newSchema;
+    }
+
+    public static Schema.Field copyField(final Schema.Field sourceField) {
+        Schema.Field field = new Schema.Field(sourceField.name(), sourceField.schema(),
+                sourceField.doc(), sourceField.defaultVal(), sourceField.order());
+        field.getObjectProps().putAll(sourceField.getObjectProps());
+        for (Map.Entry<String, Object> entry : sourceField.getObjectProps().entrySet()) {
+            field.addProp(entry.getKey(), entry.getValue());
+        }
+        return field;
     }
 
     /**

@@ -31,7 +31,7 @@ public class NetSuiteInputDefinition extends NetSuiteComponentDefinition {
     public static final String COMPONENT_NAME = "tNetsuiteInput"; //$NON-NLS-1$
 
     public NetSuiteInputDefinition() {
-        super(COMPONENT_NAME, ExecutionEngine.DI, ExecutionEngine.BEAM);
+        super(COMPONENT_NAME, ExecutionEngine.DI);
     }
 
     @Override

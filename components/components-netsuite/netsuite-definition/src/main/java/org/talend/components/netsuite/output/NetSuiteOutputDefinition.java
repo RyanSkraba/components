@@ -21,6 +21,7 @@ import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.netsuite.NetSuiteModuleProperties;
 import org.talend.components.netsuite.NetSuiteComponentDefinition;
+import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
@@ -31,7 +32,7 @@ public class NetSuiteOutputDefinition extends NetSuiteComponentDefinition {
     public static final String COMPONENT_NAME = "tNetsuiteOutput"; //$NON-NLS-1$
 
     public NetSuiteOutputDefinition() {
-        super(COMPONENT_NAME, ExecutionEngine.DI, ExecutionEngine.BEAM);
+        super(COMPONENT_NAME, ExecutionEngine.DI);
     }
 
     @Override
@@ -50,7 +51,7 @@ public class NetSuiteOutputDefinition extends NetSuiteComponentDefinition {
 
     @Override
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
-        return EnumSet.of(ConnectorTopology.INCOMING);
+        return EnumSet.of(ConnectorTopology.INCOMING, ConnectorTopology.INCOMING_AND_OUTGOING);
     }
 
     @SuppressWarnings("unchecked")
@@ -63,6 +64,12 @@ public class NetSuiteOutputDefinition extends NetSuiteComponentDefinition {
     @Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return NetSuiteOutputProperties.class;
+    }
+
+    @Override
+    public Property[] getReturnProperties() {
+        return new Property[] { RETURN_ERROR_MESSAGE_PROP, RETURN_TOTAL_RECORD_COUNT_PROP,
+                RETURN_SUCCESS_RECORD_COUNT_PROP, RETURN_REJECT_RECORD_COUNT_PROP };
     }
 
 }
