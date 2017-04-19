@@ -128,6 +128,21 @@ public class SearchQueryTest {
     }
 
     @Test
+    public void testSearchOperatorWithoutValues() throws Exception {
+        SearchQuery s1 = clientService.newSearch();
+        s1.target("Account");
+        s1.condition(new SearchCondition("LegalName", "String.notEmpty", null));
+
+        SearchRecord sr1 = (SearchRecord) s1.toNativeQuery();
+        AccountSearch search = (AccountSearch) sr1;
+        AccountSearchBasic searchBasic = search.getBasic();
+
+        SearchStringField legalNameField = searchBasic.getLegalName();
+        assertEquals(SearchStringFieldOperator.NOT_EMPTY, legalNameField.getOperator());
+        assertNull(legalNameField.getSearchValue());
+    }
+
+    @Test
     public void testSearchForSpecialRecordTypes() throws Exception {
 
         SearchQuery s1 = clientService.newSearch();

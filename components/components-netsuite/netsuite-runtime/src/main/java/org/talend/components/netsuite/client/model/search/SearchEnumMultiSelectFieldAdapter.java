@@ -35,6 +35,7 @@ public class SearchEnumMultiSelectFieldAdapter<T> extends SearchFieldAdapter<T> 
 
         List<String> searchValue = (List<String>) getSimpleProperty(nsObject, "searchValue");
         searchValue.addAll(values);
+
         setSimpleProperty(nsObject, "operator",
                 metaData.getSearchFieldOperatorByName(fieldType.getFieldTypeName(), operatorName));
 

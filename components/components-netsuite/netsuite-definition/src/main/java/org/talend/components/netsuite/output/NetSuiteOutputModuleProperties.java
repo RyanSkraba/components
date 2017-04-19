@@ -21,7 +21,6 @@ import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 import java.util.List;
 
 import org.apache.avro.Schema;
-import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.netsuite.NetSuiteComponentDefinition;
 import org.talend.components.netsuite.NetSuiteDatasetRuntime;

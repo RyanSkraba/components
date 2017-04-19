@@ -248,6 +248,9 @@ public class SearchQuery<SearchT, RecT> {
     public SearchResultSet<RecT> search() throws NetSuiteException {
         Object searchRecord = toNativeQuery();
         NsSearchResult result = clientService.search(searchRecord);
+        if (!result.isSuccess()) {
+            NetSuiteClientService.checkError(result.getStatus());
+        }
         SearchResultSet<RecT> resultSet = new SearchResultSet<>(clientService,
                 recordTypeInfo.getRecordType(), searchRecordTypeDesc, result);
         return resultSet;

@@ -39,9 +39,10 @@ public class SearchDoubleFieldAdapter<T> extends SearchFieldAdapter<T> {
             if (values.size() > 1 && StringUtils.isNotEmpty(values.get(1))) {
                 setSimpleProperty(nsObject, "searchValue2", Double.valueOf(Double.parseDouble(values.get(1))));
             }
-            setSimpleProperty(nsObject, "operator",
-                    metaData.getSearchFieldOperatorByName(fieldType.getFieldTypeName(), operatorName));
         }
+
+        setSimpleProperty(nsObject, "operator",
+                metaData.getSearchFieldOperatorByName(fieldType.getFieldTypeName(), operatorName));
 
         return nsObject;
     }

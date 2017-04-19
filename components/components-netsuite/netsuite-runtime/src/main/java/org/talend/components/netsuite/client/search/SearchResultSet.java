@@ -105,10 +105,12 @@ public class SearchResultSet<R> extends ResultSet<R> {
     protected List<R> getMoreRecords() throws NetSuiteException {
         if (searchId != null) {
             int nextPageIndex = result.getPageIndex().intValue() + 1;
-            result = clientService.searchMoreWithId(searchId, nextPageIndex);
-            if (result.isSuccess()) {
-                return prepareRecordList();
+            NsSearchResult<R> nextPageResult = clientService.searchMoreWithId(searchId, nextPageIndex);
+            if (!nextPageResult.isSuccess()) {
+                NetSuiteClientService.checkError(nextPageResult.getStatus());
             }
+            result = nextPageResult;
+            return prepareRecordList();
         }
         return Collections.emptyList();
     }

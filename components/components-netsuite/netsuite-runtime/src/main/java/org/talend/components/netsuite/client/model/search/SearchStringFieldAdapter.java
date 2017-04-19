@@ -34,9 +34,10 @@ public class SearchStringFieldAdapter<T> extends SearchFieldAdapter<T> {
 
         if (values != null && values.size() != 0) {
             setSimpleProperty(nsObject, "searchValue", values.get(0));
-            setSimpleProperty(nsObject, "operator",
-                    metaData.getSearchFieldOperatorByName(fieldType.getFieldTypeName(), operatorName));
         }
+
+        setSimpleProperty(nsObject, "operator",
+                metaData.getSearchFieldOperatorByName(fieldType.getFieldTypeName(), operatorName));
 
         return nsObject;
     }
