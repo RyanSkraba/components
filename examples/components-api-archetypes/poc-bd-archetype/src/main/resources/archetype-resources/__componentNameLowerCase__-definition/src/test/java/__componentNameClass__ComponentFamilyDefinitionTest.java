@@ -44,7 +44,7 @@ public class ${componentNameClass}ComponentFamilyDefinitionTest{
     }
 
     /**
-     * Check {@link ${componentNameClass}ComponentFamilyDefinition#install(ComponentInstaller.ComponentFrameworkContext ctx)} which call once the method "registerComponentFamilyDefinition"
+     * Check {@link ${componentNameClass}ComponentFamilyDefinition#install()} which call once the method "registerComponentFamilyDefinition"
      */
     @Test
     public void testInstall(){
