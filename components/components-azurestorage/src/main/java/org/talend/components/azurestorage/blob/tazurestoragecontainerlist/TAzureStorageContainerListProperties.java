@@ -20,6 +20,8 @@ import org.talend.components.azurestorage.AzureStorageProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 /**
  * Class TAzureStorageContainerListProperties.
@@ -29,6 +31,8 @@ import org.talend.daikon.properties.presentation.Form;
 public class TAzureStorageContainerListProperties extends AzureStorageProperties {
 
     private static final long serialVersionUID = -5146548113930743503L;
+    
+    public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
 
     protected transient PropertyPathConnector MAIN_NAME = new PropertyPathConnector(Connector.MAIN_NAME, "schema");//$NON-NLS-1$
 

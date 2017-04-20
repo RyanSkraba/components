@@ -20,6 +20,8 @@ import org.talend.daikon.properties.property.PropertyFactory;
 public class TAzureStorageContainerCreateProperties extends AzureStorageContainerProperties {
 
     private static final long serialVersionUID = -1508935428835723716L;
+    
+    public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
 
     public enum AccessControl {
         Private,

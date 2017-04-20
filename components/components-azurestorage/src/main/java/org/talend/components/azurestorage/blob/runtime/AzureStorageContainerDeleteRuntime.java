@@ -22,6 +22,7 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.azurestorage.blob.AzureStorageContainerDefinition;
+import org.talend.components.azurestorage.blob.tazurestoragecontainerdelete.TAzureStorageContainerDeleteProperties;
 import org.talend.components.azurestorage.utils.AzureStorageUtils;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
@@ -46,6 +47,8 @@ public class AzureStorageContainerDeleteRuntime extends AzureStorageContainerRun
         if (validationResult.getStatus() == ValidationResult.Result.ERROR) {
             return validationResult;
         }
+        TAzureStorageContainerDeleteProperties componentProperties = (TAzureStorageContainerDeleteProperties) properties;
+        this.dieOnError = componentProperties.dieOnError.getValue();
 
         return ValidationResult.OK;
     }

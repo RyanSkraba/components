@@ -14,10 +14,14 @@ package org.talend.components.azurestorage.blob.tazurestoragecontainerdelete;
 
 import org.talend.components.azurestorage.blob.AzureStorageContainerProperties;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 public class TAzureStorageContainerDeleteProperties extends AzureStorageContainerProperties {
 
     private static final long serialVersionUID = -8409678756536686919L;
+    
+    public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
 
     public TAzureStorageContainerDeleteProperties(String name) {
         super(name);

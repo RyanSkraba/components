@@ -23,6 +23,7 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.azurestorage.blob.AzureStorageContainerDefinition;
 import org.talend.components.azurestorage.blob.tazurestoragecontainerexist.TAzureStorageContainerExistDefinition;
+import org.talend.components.azurestorage.blob.tazurestoragecontainerexist.TAzureStorageContainerExistProperties;
 import org.talend.components.azurestorage.utils.AzureStorageUtils;
 import org.talend.daikon.properties.ValidationResult;
 
@@ -42,6 +43,8 @@ public class AzureStorageContainerExistRuntime extends AzureStorageContainerRunt
         if (validationResult.getStatus() == ValidationResult.Result.ERROR) {
             return validationResult;
         }
+        TAzureStorageContainerExistProperties componentProperties = (TAzureStorageContainerExistProperties) properties;
+        this.dieOnError = componentProperties.dieOnError.getValue();
 
         return ValidationResult.OK;
     }

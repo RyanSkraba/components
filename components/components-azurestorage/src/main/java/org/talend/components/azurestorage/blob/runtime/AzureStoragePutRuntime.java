@@ -74,6 +74,7 @@ public class AzureStoragePutRuntime extends AzureStorageContainerRuntime
         remoteFolder = componentProperties.remoteFolder.getValue();
         useFileList = componentProperties.useFileList.getValue();
         files = componentProperties.files;
+        this.dieOnError = componentProperties.dieOnError.getValue();
 
         // checks local folder
         String errorMessage = "";

@@ -51,6 +51,7 @@ public class AzureStorageContainerCreateRuntime extends AzureStorageContainerRun
 
         TAzureStorageContainerCreateProperties componentProperties = (TAzureStorageContainerCreateProperties) properties;
         this.access = componentProperties.accessControl.getValue();
+        this.dieOnError = componentProperties.dieOnError.getValue();
 
         return ValidationResult.OK;
     }

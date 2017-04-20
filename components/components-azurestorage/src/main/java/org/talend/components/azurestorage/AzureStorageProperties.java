@@ -21,8 +21,6 @@ import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageC
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
 import org.talend.daikon.properties.presentation.Form;
-import org.talend.daikon.properties.property.Property;
-import org.talend.daikon.properties.property.PropertyFactory;
 
 public abstract class AzureStorageProperties extends FixedConnectorsComponentProperties
         implements AzureStorageProvideConnectionProperties {
@@ -32,8 +30,6 @@ public abstract class AzureStorageProperties extends FixedConnectorsComponentPro
     public TAzureStorageConnectionProperties connection = new TAzureStorageConnectionProperties("connection"); //$NON-NLS-1$
 
     public SchemaProperties schema = new SchemaProperties("schema"); //$NON-NLS-1$
-
-    public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
 
     public AzureStorageProperties(String name) {
         super(name);

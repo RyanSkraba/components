@@ -37,7 +37,6 @@ public class AzureStorageContainerRuntime extends AzureStorageRuntime {
         AzureStorageContainerProperties componentProperties = (AzureStorageContainerProperties) properties;
 
         this.containerName = componentProperties.container.getValue();
-        this.dieOnError = componentProperties.dieOnError.getValue();
 
         // validate
         ValidationResult validationResult = super.initialize(runtimeContainer, properties);

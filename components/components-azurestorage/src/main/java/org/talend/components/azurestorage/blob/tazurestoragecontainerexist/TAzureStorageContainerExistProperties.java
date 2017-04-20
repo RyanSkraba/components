@@ -14,10 +14,14 @@ package org.talend.components.azurestorage.blob.tazurestoragecontainerexist;
 
 import org.talend.components.azurestorage.blob.AzureStorageContainerProperties;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 public class TAzureStorageContainerExistProperties extends AzureStorageContainerProperties {
 
     private static final long serialVersionUID = -803847327028272736L;
+    
+    public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
 
     public TAzureStorageContainerExistProperties(String name) {
         super(name);

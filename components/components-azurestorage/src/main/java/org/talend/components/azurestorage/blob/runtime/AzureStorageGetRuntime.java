@@ -65,6 +65,7 @@ public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
         TAzureStorageGetProperties componentProperties = (TAzureStorageGetProperties) properties;
         localFolder = componentProperties.localFolder.getValue();
         remoteBlobsGet = componentProperties.remoteBlobsGet;
+        this.dieOnError = componentProperties.dieOnError.getValue();
 
         String errorMessage = "";
         if (remoteBlobsGet.prefix.getValue().isEmpty()) {

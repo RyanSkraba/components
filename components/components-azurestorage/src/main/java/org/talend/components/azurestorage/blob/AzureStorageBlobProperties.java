@@ -13,12 +13,16 @@
 package org.talend.components.azurestorage.blob;
 
 import org.talend.components.azurestorage.blob.helpers.RemoteBlobsTable;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 public abstract class AzureStorageBlobProperties extends AzureStorageContainerProperties {
 
     private static final long serialVersionUID = 8943576970325194236L;
 
     public RemoteBlobsTable remoteBlobs = new RemoteBlobsTable("remoteBlobs"); //$NON-NLS-1$
+    
+    public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
 
     public AzureStorageBlobProperties(String name) {
         super(name);
