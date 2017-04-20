@@ -51,7 +51,7 @@ import org.talend.daikon.properties.test.PropertiesTestUtils;
 /**
  * created by dmytro.chmyga on Mar 6, 2017
  */
-public class SnowflakeWritersTestIT extends SnowflakeRuntimeIT {
+public class SnowflakeWritersTestIT extends SnowflakeRuntimeIOTestIT {
 
     public Writer<Result> createSnowflakeOutputWriter(TSnowflakeOutputProperties props) {
         SnowflakeSink SnowflakeSink = new SnowflakeSink();

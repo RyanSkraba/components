@@ -17,10 +17,14 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
 public class SnowflakeSink extends SnowflakeSourceOrSink implements Sink {
+
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider().getI18nMessages(SnowflakeSink.class);
 
     /**
      * Default serial version UID.
@@ -38,8 +42,8 @@ public class SnowflakeSink extends SnowflakeSourceOrSink implements Sink {
         // also check that the properties is the right type
         if (validate.getStatus() != Result.ERROR) {
             if (!(properties instanceof TSnowflakeOutputProperties)) {
-                return new ValidationResult().setStatus(Result.ERROR)
-                        .setMessage("properties should be of type :" + TSnowflakeOutputProperties.class.getCanonicalName());
+                return new ValidationResult().setStatus(Result.ERROR).setMessage(i18nMessages
+                        .getMessage("debug.wrongPropertiesType", TSnowflakeOutputProperties.class.getCanonicalName()));
             } // else this is the right type
         } // else already an ERROR
         return validate;

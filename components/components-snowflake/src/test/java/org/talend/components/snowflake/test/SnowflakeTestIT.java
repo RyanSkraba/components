@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
+import javax.inject.Inject;
+
 import org.apache.avro.Schema;
 import org.junit.Before;
 import org.junit.Rule;
@@ -35,11 +37,15 @@ import org.talend.components.api.test.AbstractComponentTest;
 import org.talend.components.common.CommonTestUtils;
 import org.talend.components.snowflake.SnowflakeConnectionProperties;
 import org.talend.components.snowflake.SnowflakeFamilyDefinition;
+import org.talend.daikon.definition.service.DefinitionRegistryService;
 import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
 
 @SuppressWarnings("nls")
 public abstract class SnowflakeTestIT extends AbstractComponentTest {
+
+    @Inject
+    private DefinitionRegistryService definitionService;
 
     protected static Connection testConnection;
 
@@ -121,6 +127,16 @@ public abstract class SnowflakeTestIT extends AbstractComponentTest {
     @Test
     public void checkConnectorsSchema() {
         CommonTestUtils.checkAllSchemaPathAreSchemaTypes(getComponentService(), errorCollector);
+    }
+
+    @Override
+    @Test
+    public void testAlli18n() {
+        PropertiesTestUtils.assertAlli18nAreSetup(getDefinitionService(), errorCollector);
+    }
+
+    protected DefinitionRegistryService getDefinitionService() {
+        return definitionService;
     }
 
     static class RepoProps {

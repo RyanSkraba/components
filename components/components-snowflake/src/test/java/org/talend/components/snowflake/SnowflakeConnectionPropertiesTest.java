@@ -2,14 +2,19 @@ package org.talend.components.snowflake;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 /**
  * Unit-tests for {@link SnowflakeConnectionProperties} class
  */
 public class SnowflakeConnectionPropertiesTest {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SnowflakeConnectionPropertiesTest.class);
 
     private static final String NAME = "name";
@@ -27,6 +32,9 @@ public class SnowflakeConnectionPropertiesTest {
     private static final String ROLE = "role";
 
     private SnowflakeConnectionProperties snowflakeConnectionProperties;
+
+    @Rule
+    public ErrorCollector errorCollector = new ErrorCollector();
 
     @Before
     public void setUp() throws Exception {
@@ -49,11 +57,8 @@ public class SnowflakeConnectionPropertiesTest {
         StringBuilder builder = new StringBuilder();
 
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
-                .append("?").append("warehouse=").append(WAREHOUSE)
-                .append("&").append("db=").append(DB)
-                .append("&").append("schema=").append(SCHEMA)
-                .append("&").append("role=").append(ROLE)
-                .append("&").append("tracing=OFF")
+                .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("db=").append(DB).append("&")
+                .append("schema=").append(SCHEMA).append("&").append("role=").append(ROLE).append("&").append("tracing=OFF")
                 .toString();
 
         String resultUrl = snowflakeConnectionProperties.getConnectionUrl();
@@ -71,11 +76,8 @@ public class SnowflakeConnectionPropertiesTest {
     public void testGetConnectionUrlNullOrEmptyWarehouse() throws Exception {
         StringBuilder builder = new StringBuilder();
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
-                .append("?").append("db=").append(DB)
-                .append("&").append("schema=").append(SCHEMA)
-                .append("&").append("role=").append(ROLE)
-                .append("&").append("tracing=OFF")
-                .toString();
+                .append("?").append("db=").append(DB).append("&").append("schema=").append(SCHEMA).append("&").append("role=")
+                .append(ROLE).append("&").append("tracing=OFF").toString();
 
         snowflakeConnectionProperties.warehouse.setValue(null);
         String resultUrlNullWarehouse = snowflakeConnectionProperties.getConnectionUrl();
@@ -98,11 +100,8 @@ public class SnowflakeConnectionPropertiesTest {
     public void testGetConnectionUrlNullOrEmptyDb() throws Exception {
         StringBuilder builder = new StringBuilder();
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
-                .append("?").append("warehouse=").append(WAREHOUSE)
-                .append("&").append("schema=").append(SCHEMA)
-                .append("&").append("role=").append(ROLE)
-                .append("&").append("tracing=OFF")
-                .toString();
+                .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("schema=").append(SCHEMA).append("&")
+                .append("role=").append(ROLE).append("&").append("tracing=OFF").toString();
 
         snowflakeConnectionProperties.db.setValue(null);
         String resultUrlNullDb = snowflakeConnectionProperties.getConnectionUrl();
@@ -125,11 +124,8 @@ public class SnowflakeConnectionPropertiesTest {
     public void testGetConnectionUrlNullOrEmptySchema() throws Exception {
         StringBuilder builder = new StringBuilder();
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
-                .append("?").append("warehouse=").append(WAREHOUSE)
-                .append("&").append("db=").append(DB)
-                .append("&").append("role=").append(ROLE)
-                .append("&").append("tracing=OFF")
-                .toString();
+                .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("db=").append(DB).append("&")
+                .append("role=").append(ROLE).append("&").append("tracing=OFF").toString();
 
         snowflakeConnectionProperties.schemaName.setValue(null);
         String resultUrlNullSchema = snowflakeConnectionProperties.getConnectionUrl();
@@ -152,11 +148,8 @@ public class SnowflakeConnectionPropertiesTest {
     public void testGetConnectionUrlNullOrEmptyRole() throws Exception {
         StringBuilder builder = new StringBuilder();
         String expectedUrl = builder.append("jdbc:snowflake://").append(ACCOUNT).append(".").append("snowflakecomputing.com/")
-                .append("?").append("warehouse=").append(WAREHOUSE)
-                .append("&").append("db=").append(DB)
-                .append("&").append("schema=").append(SCHEMA)
-                .append("&").append("tracing=OFF")
-                .toString();
+                .append("?").append("warehouse=").append(WAREHOUSE).append("&").append("db=").append(DB).append("&")
+                .append("schema=").append(SCHEMA).append("&").append("tracing=OFF").toString();
 
         snowflakeConnectionProperties.role.setValue(null);
         String resultUrlNullSchema = snowflakeConnectionProperties.getConnectionUrl();
@@ -192,4 +185,14 @@ public class SnowflakeConnectionPropertiesTest {
 
         snowflakeConnectionProperties.getConnectionUrl();
     }
+
+    @Test
+    public void testI18NMessage() {
+        I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider().getI18nMessages(SnowflakeConnectionProperties.class);
+        String connectionSuccessMessage = i18nMessages.getMessage("messages.connectionSuccessful");
+
+        Assert.assertFalse(connectionSuccessMessage.equals("messages.connectionSuccessful"));
+
+    }
+
 }

@@ -14,9 +14,8 @@ package org.talend.components.snowflake;
 
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
-import static org.talend.daikon.properties.property.PropertyFactory.newString;
 import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
-
+import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 import java.util.Properties;
 
@@ -25,6 +24,8 @@ import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.snowflake.runtime.SnowflakeSourceOrSink;
 import org.talend.components.snowflake.tsnowflakeconnection.TSnowflakeConnectionDefinition;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
@@ -32,6 +33,9 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
 public class SnowflakeConnectionProperties extends ComponentPropertiesImpl implements SnowflakeProvideConnectionProperties {
+
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(SnowflakeConnectionProperties.class);
 
     private static final String USERPASSWORD = "userPassword";
 
@@ -170,7 +174,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl imple
     public ValidationResult validateTestConnection() throws Exception {
         ValidationResult vr = SnowflakeSourceOrSink.validateConnection(this);
         if (vr.getStatus() == ValidationResult.Result.OK) {
-            vr.setMessage("Connection successful");
+            vr.setMessage(i18nMessages.getMessage("messages.connectionSuccessful"));
             getForm(FORM_WIZARD).setAllowForward(true);
         } else {
             getForm(FORM_WIZARD).setAllowForward(false);
@@ -222,7 +226,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl imple
         String account = this.account.getStringValue();
 
         if (account == null || account.isEmpty()) {
-            throw new IllegalArgumentException(" Missing account");
+            throw new IllegalArgumentException(i18nMessages.getMessage("error.missingAccount"));
         }
 
         String warehouse = this.warehouse.getStringValue();
@@ -237,8 +241,8 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl imple
         appendProperty("role", role, stringBuilder);
         appendProperty("tracing", tracing, stringBuilder);
 
-        return new StringBuilder().append("jdbc:snowflake://").append(account)
-                .append(".snowflakecomputing.com").append("/?").append(stringBuilder).toString();
+        return new StringBuilder().append("jdbc:snowflake://").append(account).append(".snowflakecomputing.com").append("/?")
+                .append(stringBuilder).toString();
     }
 
     private void appendProperty(String propertyName, String propertyValue, StringBuilder builder) {

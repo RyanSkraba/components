@@ -1,5 +1,9 @@
 package org.talend.components.snowflake.runtime;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.junit.Assert;
@@ -9,10 +13,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputProperties;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 /**
  * Unit-tests for {@link SnowflakeReader} class
@@ -31,8 +33,7 @@ public class SnowflakeReaderTest {
 
     @Before
     public void setUp() throws Exception {
-        Schema schema = SchemaBuilder.builder().record("Schema").fields()
-                .name("field").type().stringType().noDefault()
+        Schema schema = SchemaBuilder.builder().record("Schema").fields().name("field").type().stringType().noDefault()
                 .endRecord();
 
         TSnowflakeInputProperties tSnowflakeInputProperties = new TSnowflakeInputProperties("test");
@@ -63,5 +64,13 @@ public class SnowflakeReaderTest {
         snowflakeReader.start();
 
         Assert.assertEquals(expectedRecords, snowflakeReader.getReturnValues().get("totalRecordCount"));
+    }
+
+    @Test
+    public void testI18NMessages() {
+        I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider().getI18nMessages(SnowflakeReader.class);
+        String errorDuringProcessQueryMessage = i18nMessages.getMessage("error.processQuery");
+
+        Assert.assertFalse(errorDuringProcessQueryMessage.equals("error.processQuery"));
     }
 }

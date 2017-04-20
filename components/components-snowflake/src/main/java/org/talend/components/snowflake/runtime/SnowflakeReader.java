@@ -31,8 +31,12 @@ import org.talend.components.common.avro.JDBCResultSetIndexedRecordConverter;
 import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
 import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputProperties;
 import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 public class SnowflakeReader<T> extends AbstractBoundedReader<IndexedRecord> {
+
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider().getI18nMessages(SnowflakeReader.class);
 
     private transient Connection connection;
 
@@ -114,7 +118,8 @@ public class SnowflakeReader<T> extends AbstractBoundedReader<IndexedRecord> {
             resultSet = statement.executeQuery(getQueryString());
             return haveNext();
         } catch (Exception e) {
-            throw new IOException("Error processing query: " + getQueryString(), e);
+            throw new IOException(i18nMessages.getMessage("error.processQuery", getQueryString()), e);
+
         }
     }
 

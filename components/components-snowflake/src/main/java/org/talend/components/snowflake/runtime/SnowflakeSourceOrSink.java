@@ -17,18 +17,17 @@ package org.talend.components.snowflake.runtime;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLException;
+import java.sql.DatabaseMetaData;
 import java.sql.Driver;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverPropertyInfo;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.slf4j.Logger;
@@ -40,12 +39,16 @@ import org.talend.components.snowflake.SnowflakeConnectionProperties;
 import org.talend.components.snowflake.SnowflakeProvideConnectionProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
-import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
 public class SnowflakeSourceOrSink implements SourceOrSink {
+
+    private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
+            .getI18nMessages(SnowflakeSourceOrSink.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -69,7 +72,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
             connect(container);
         } catch (IllegalArgumentException e) {
             ValidationResult vr = new ValidationResult();
-            vr.setMessage(e.getMessage().concat(SnowflakeConstants.INCORRECRT_SNOWFLAKE_ACCOUNT_MESSAGE));
+            vr.setMessage(e.getMessage().concat(SnowflakeConstants.INCORRECT_SNOWFLAKE_ACCOUNT_MESSAGE));
             vr.setStatus(ValidationResult.Result.ERROR);
             return vr;
         } catch (Exception ex) {
@@ -145,13 +148,13 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
                 } catch (SQLException ex) {
                     throw new IOException(ex);
                 }
-                throw new IOException("Referenced component: " + refComponentId + " not connected");
+                throw new IOException(i18nMessages.getMessage("error.refComponentNotConnected", refComponentId));
             }
             // Design time
             connProps = connProps.getReferencedConnectionProperties();
             // FIXME This should not happen - but does as of now
             if (connProps == null)
-                throw new IOException("Referenced component: " + refComponentId + " does not have properties set");
+                throw new IOException(i18nMessages.getMessage("error.refComponentWithoutProperties", refComponentId));
         }
 
         try {
@@ -211,8 +214,8 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
                 returnList.add(new SimpleNamedThing(tableName, tableName));
             }
         } catch (SQLException se) {
-            throw new IOException("Error when searching for tables in: " + getCatalog(connProps) + "." + getDbSchema(connProps)
-                    + ": " + se.getMessage(), se);
+            throw new IOException(i18nMessages.getMessage("error.searchingTable", getCatalog(connProps), getDbSchema(connProps),
+                    se.getMessage()), se);
         }
         return returnList;
     }
@@ -244,7 +247,7 @@ public class SnowflakeSourceOrSink implements SourceOrSink {
             tableSchema = getSnowflakeAvroRegistry().inferSchema(resultSet);
             // FIXME - I18N for this message
             if (tableSchema == null)
-                throw new IOException("Table: " + tableName + " not found");
+                throw new IOException(i18nMessages.getMessage("error.tableNotFound", tableName));
 
             // Update the schema with Primary Key details
             // FIXME - move this into the inferSchema stuff

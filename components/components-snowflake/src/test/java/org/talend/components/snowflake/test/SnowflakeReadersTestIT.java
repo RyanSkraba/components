@@ -48,7 +48,7 @@ import org.talend.daikon.properties.test.PropertiesTestUtils;
 /**
  * created by dmytro.chmyga on Mar 6, 2017
  */
-public class SnowflakeReadersTestIT extends SnowflakeRuntimeIT {
+public class SnowflakeReadersTestIT extends SnowflakeRuntimeIOTestIT {
 
     private static boolean setUp = false;
 

@@ -12,15 +12,15 @@
 // ============================================================================
 package org.talend.components.snowflake.runtime;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.component.runtime.BoundedSource;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.snowflake.tsnowflakeinput.TSnowflakeInputProperties;
 import org.talend.daikon.exception.TalendRuntimeException;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SnowflakeSource extends SnowflakeSourceOrSink implements BoundedSource {
 

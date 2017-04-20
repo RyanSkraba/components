@@ -1,5 +1,12 @@
 package org.talend.components.snowflake.runtime;
 
+import static org.junit.Assert.assertFalse;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.junit.Assert;
@@ -13,16 +20,14 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.snowflake.SnowflakeConnectionProperties;
 import org.talend.daikon.avro.SchemaConstants;
-
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
 
 /**
  * Unit-tests for {@link SnowflakeSourceOrSink} class
  */
 public class SnowflakeSourceOrSinkTest {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SnowflakeSourceOrSinkTest.class);
 
     private final SnowflakeSourceOrSink snowflakeSourceOrSink = new SnowflakeSourceOrSink();
@@ -48,33 +53,32 @@ public class SnowflakeSourceOrSinkTest {
     }
 
     /**
-     * Checks {@link SnowflakeSourceOrSink#connect(RuntimeContainer)} throws {@link IOException}
-     * when connection in closed
+     * Checks {@link SnowflakeSourceOrSink#connect(RuntimeContainer)} throws {@link IOException} when connection in
+     * closed
      */
     @Test(expected = IOException.class)
     public void testConnectClosedConnection() throws Exception {
         Connection connectionMock = Mockito.mock(Connection.class);
 
         Mockito.when(connectionMock.isClosed()).thenReturn(true);
-        Mockito.when(runtimeContainerMock.getComponentData(Matchers.anyString(), Matchers.anyString())).thenReturn(connectionMock);
+        Mockito.when(runtimeContainerMock.getComponentData(Matchers.anyString(), Matchers.anyString()))
+                .thenReturn(connectionMock);
 
         this.snowflakeSourceOrSink.connect(runtimeContainerMock);
     }
 
     /**
-     * Checks {@link SnowflakeSourceOrSink#getSchema(RuntimeContainer, Connection, String)} adds property key
-     * to the field
+     * Checks {@link SnowflakeSourceOrSink#getSchema(RuntimeContainer, Connection, String)} adds property key to the
+     * field
      */
     @Test
     public void testGetSchemaAddKeyProperty() throws Exception {
-        Schema schemaToEdit = SchemaBuilder.builder().record("Schema").fields()
-                .name("field").type().stringType().noDefault()
+        Schema schemaToEdit = SchemaBuilder.builder().record("Schema").fields().name("field").type().stringType().noDefault()
                 .endRecord();
 
         LOGGER.debug("schema to add key property: " + schemaToEdit);
 
-        Schema expectedSchema = SchemaBuilder.builder().record("Schema").fields()
-                .name("field").type().stringType().noDefault()
+        Schema expectedSchema = SchemaBuilder.builder().record("Schema").fields().name("field").type().stringType().noDefault()
                 .endRecord();
         expectedSchema.getField("field").schema().addProp(SchemaConstants.TALEND_COLUMN_IS_KEY, "true");
 
@@ -82,8 +86,7 @@ public class SnowflakeSourceOrSinkTest {
 
         Connection connectionMock = Mockito.mock(Connection.class);
 
-        Mockito.when(runtimeContainerMock
-                .getComponentData(Matchers.anyString(), Matchers.anyString()))
+        Mockito.when(runtimeContainerMock.getComponentData(Matchers.anyString(), Matchers.anyString()))
                 .thenReturn((SnowflakeConnectionProperties) snowflakeSourceOrSink.properties);
 
         DatabaseMetaData databaseMetaDataMock = Mockito.mock(DatabaseMetaData.class);
@@ -95,6 +98,7 @@ public class SnowflakeSourceOrSinkTest {
         final SnowflakeAvroRegistry snowflakeAvroRegistryMock = Mockito.mock(SnowflakeAvroRegistry.class);
 
         class SnowflakeSourceOrSinkChild extends SnowflakeSourceOrSink {
+
             @Override
             public SnowflakeAvroRegistry getSnowflakeAvroRegistry() {
                 return snowflakeAvroRegistryMock;
@@ -107,15 +111,15 @@ public class SnowflakeSourceOrSinkTest {
         properties.db.setValue("database");
         sfSourceOrSink.initialize(runtimeContainerMock, properties);
 
-        Mockito.when(databaseMetaDataMock.getColumns(sfSourceOrSink.getCatalog(sfSourceOrSink
-                        .getEffectiveConnectionProperties(runtimeContainerMock)),
-                sfSourceOrSink.getDbSchema(sfSourceOrSink.getEffectiveConnectionProperties(runtimeContainerMock)),
-                "tableName", null)).thenReturn(resultSetMock);
+        Mockito.when(databaseMetaDataMock.getColumns(
+                sfSourceOrSink.getCatalog(sfSourceOrSink.getEffectiveConnectionProperties(runtimeContainerMock)),
+                sfSourceOrSink.getDbSchema(sfSourceOrSink.getEffectiveConnectionProperties(runtimeContainerMock)), "tableName",
+                null)).thenReturn(resultSetMock);
 
-        Mockito.when(databaseMetaDataMock.getPrimaryKeys(sfSourceOrSink.getCatalog(sfSourceOrSink
-                        .getEffectiveConnectionProperties(runtimeContainerMock)),
-                sfSourceOrSink.getDbSchema(sfSourceOrSink.getEffectiveConnectionProperties(runtimeContainerMock)),
-                "tableName")).thenReturn(resultSetMockKeys);
+        Mockito.when(databaseMetaDataMock.getPrimaryKeys(
+                sfSourceOrSink.getCatalog(sfSourceOrSink.getEffectiveConnectionProperties(runtimeContainerMock)),
+                sfSourceOrSink.getDbSchema(sfSourceOrSink.getEffectiveConnectionProperties(runtimeContainerMock)), "tableName"))
+                .thenReturn(resultSetMockKeys);
 
         Mockito.when(resultSetMockKeys.next()).thenReturn(true).thenReturn(false);
         Mockito.when(resultSetMockKeys.getString("COLUMN_NAME")).thenReturn("field");
@@ -132,4 +136,17 @@ public class SnowflakeSourceOrSinkTest {
         Assert.assertEquals(expectedSchema, resultSchema);
     }
 
+    @Test
+    public void testI18NMessages() {
+        I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider().getI18nMessages(SnowflakeSourceOrSink.class);
+        String refComponentNotConnectedMessage = i18nMessages.getMessage("error.refComponentNotConnected");
+        String refComponentWithoutPropertiesMessage = i18nMessages.getMessage("error.refComponentWithoutProperties");
+        String errorDuringSearchingTable = i18nMessages.getMessage("error.searchingTable");
+        String tableNotFoundMessage = i18nMessages.getMessage("error.tableNotFound");
+
+        assertFalse(refComponentNotConnectedMessage.equals("error.refComponentNotConnected"));
+        assertFalse(refComponentWithoutPropertiesMessage.equals("error.refComponentWithoutProperties"));
+        assertFalse(errorDuringSearchingTable.equals("error.searchingTable"));
+        assertFalse(tableNotFoundMessage.equals("error.tableNotFound"));
+    }
 }
