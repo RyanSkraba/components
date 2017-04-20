@@ -37,8 +37,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -766,7 +768,7 @@ public class MarketoSOAPClient extends MarketoClient {
                     LOG.error(e.getMessage());
                 }
             }
-            mkto.setSuccess(true);
+            mkto.setSuccess(result.getResult().isSuccess());
             if (!result.getResult().getStatusList().isNil()) {
                 mkto.setRecordCount(result.getResult().getStatusList().getValue().getLeadStatuses().size());
                 List<LeadStatus> statuses = result.getResult().getStatusList().getValue().getLeadStatuses();
@@ -774,6 +776,18 @@ public class MarketoSOAPClient extends MarketoClient {
                 for (LeadStatus status : statuses) {
                     SyncStatus sts = new SyncStatus(Integer.parseInt(status.getLeadKey().getKeyValue()),
                             String.valueOf(status.isStatus()));
+                    if (!status.isStatus()) {
+                        Map<String, String> reason = new HashMap<>();
+                        reason.put("code", "20103");
+                        reason.put("message", "Lead Not Found");
+                        sts.setReasons(Collections.singletonList(reason));
+                        if (!mkto.isSuccess()) {
+                            List<MarketoError> errs = mkto.getErrors();
+                            errs.add(new MarketoError(SOAP, "20103",
+                                    String.format("Lead %s Not Found.", status.getLeadKey().getKeyValue())));
+                            mkto.setErrors(errs);
+                        }
+                    }
                     resultStatus.add(sts);
                 }
                 mkto.setRecords(resultStatus);

@@ -220,13 +220,7 @@ public class MarketoListOperationWriter extends MarketoWriter {
             throw new IOException(mktoResult.getErrorsString());
         }
         for (SyncStatus status : mktoResult.getRecords()) {
-            // no errors for isMemberOf operation just information
-            if (operation.equals(ListOperation.isMemberOf)) {
-                handleSuccess(fillRecord(status, flowSchema));
-                return;
-            }
-            // AddTo and RemoveFrom
-            if (Arrays.asList("true", "added", "removed").contains(status.getStatus().toLowerCase())) {
+            if (Arrays.asList("true", "added", "removed", "notmemberof", "memberof").contains(status.getStatus().toLowerCase())) {
                 handleSuccess(fillRecord(status, flowSchema));
             } else {
                 if (dieOnError) {
