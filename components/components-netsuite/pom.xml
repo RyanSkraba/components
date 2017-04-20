@@ -15,10 +15,10 @@
     </properties>
 
     <modules>
-        <module>netsuite-definition</module>
-        <module>netsuite-runtime</module>
-        <module>netsuite-runtime_2016_2</module>
-        <module>netsuite-runtime_2014_2</module>
+        <module>components-netsuite-definition</module>
+        <module>components-netsuite-runtime</module>
+        <module>components-netsuite-runtime_2016_2</module>
+        <module>components-netsuite-runtime_2014_2</module>
     </modules>
 
 </project>
