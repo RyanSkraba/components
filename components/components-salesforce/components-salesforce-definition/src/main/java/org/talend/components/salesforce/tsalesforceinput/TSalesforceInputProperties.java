@@ -29,6 +29,7 @@ import org.talend.components.common.ComponentConstants;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.common.SalesforceRuntimeSourceOrSink;
 import org.talend.components.salesforce.schema.SalesforceSchemaHelper;
+import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.PresentationItem;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
@@ -53,6 +54,8 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
     public Property<Boolean> manualQuery = newBoolean("manualQuery"); //$NON-NLS-1$
 
     public Property<String> query = newProperty("query"); //$NON-NLS-1$
+
+    public static final String DEFAULT_QUERY = "\"SELECT Id, Name, IsDeleted FROM Account\"";
 
     public transient PresentationItem guessSchema = new PresentationItem("guessSchema", "Guess schema");
 
@@ -81,7 +84,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         normalizeDelimiter.setValue(";");
         columnNameDelimiter.setValue("_");
         query.setTaggedValue(ComponentConstants.LINE_SEPARATOR_REPLACED_TO, " ");
-        query.setValue("\"SELECT Id, Name, IsDeleted FROM Account\"");
+        query.setValue(DEFAULT_QUERY);
     }
 
     @Override
@@ -107,25 +110,31 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
     public ValidationResult validateGuessSchema() {
         ValidationResult validationResult = new ValidationResult();
 
-        try (SandboxedInstance sandboxISalesforceSourceOrSink = RuntimeUtil.createRuntimeClass(
-                new JarRuntimeInfo("mvn:org.talend.components/components-salesforce-runtime",
-                        DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-salesforce-runtime"),
-                        "org.talend.components.salesforce.runtime.SalesforceSourceOrSink"),
-                connection.getClass().getClassLoader())) {
+        try (SandboxedInstance sandboxISalesforceSourceOrSink = RuntimeUtil
+                .createRuntimeClass(
+                        new JarRuntimeInfo("mvn:org.talend.components/components-salesforce-runtime",
+                                DependenciesReader.computeDependenciesFilePath("org.talend.components",
+                                        "components-salesforce-runtime"),
+                                "org.talend.components.salesforce.runtime.SalesforceSourceOrSink"),
+                        connection.getClass().getClassLoader())) {
 
-            SalesforceRuntimeSourceOrSink salesforceSourceOrSink = (SalesforceRuntimeSourceOrSink) sandboxISalesforceSourceOrSink.getInstance();
+            SalesforceRuntimeSourceOrSink salesforceSourceOrSink = (SalesforceRuntimeSourceOrSink) sandboxISalesforceSourceOrSink
+                    .getInstance();
             salesforceSourceOrSink.initialize(null, this);
 
-            Schema schema = ((SalesforceSchemaHelper<Schema>)salesforceSourceOrSink).guessSchema(query.getValue());
+            Schema schema = ((SalesforceSchemaHelper<Schema>) salesforceSourceOrSink).guessSchema(query.getValue());
 
             module.main.schema.setValue(schema);
             validationResult.setStatus(ValidationResult.Result.OK);
+        } catch (TalendRuntimeException tre) {
+            String errorMessage = getI18nMessage("errorMessage.validateGuessSchemaSoqlError");
+            validationResult.setStatus(ValidationResult.Result.ERROR).setMessage(errorMessage);
         } catch (RuntimeException e1) {
-            validationResult.setStatus(ValidationResult.Result.ERROR)
-					.setMessage("Could not call Salesforce API. Schema cannot be guessed.");
+            String errorMessage = getI18nMessage("errorMessage.validateGuessSchemaRuntimeError");
+            validationResult.setStatus(ValidationResult.Result.ERROR).setMessage(errorMessage);
         } catch (IOException e2) {
-            validationResult.setStatus(ValidationResult.Result.ERROR)
-                    .setMessage("Could not connect to Salesforce server. Schema cannot be guessed.");
+            String errorMessage = getI18nMessage("errorMessage.validateGuessSchemaConnectionError");
+            validationResult.setStatus(ValidationResult.Result.ERROR).setMessage(errorMessage);
         }
         return validationResult;
     }
@@ -133,20 +142,25 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
     public ValidationResult validateGuessQuery() {
         ValidationResult validationResult = new ValidationResult();
 
-        try (SandboxedInstance sandboxISalesforceSourceOrSink = RuntimeUtil.createRuntimeClass(
-                new JarRuntimeInfo("mvn:org.talend.components/components-salesforce-runtime",
-						DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-salesforce-runtime"),
-                        "org.talend.components.salesforce.runtime.SalesforceSourceOrSink"),
-                connection.getClass().getClassLoader())) {
+        try (SandboxedInstance sandboxISalesforceSourceOrSink = RuntimeUtil
+                .createRuntimeClass(
+                        new JarRuntimeInfo("mvn:org.talend.components/components-salesforce-runtime",
+                                DependenciesReader.computeDependenciesFilePath("org.talend.components",
+                                        "components-salesforce-runtime"),
+                                "org.talend.components.salesforce.runtime.SalesforceSourceOrSink"),
+                        connection.getClass().getClassLoader())) {
 
-            SalesforceRuntimeSourceOrSink salesforceSourceOrSink = (SalesforceRuntimeSourceOrSink) sandboxISalesforceSourceOrSink.getInstance();
+            SalesforceRuntimeSourceOrSink salesforceSourceOrSink = (SalesforceRuntimeSourceOrSink) sandboxISalesforceSourceOrSink
+                    .getInstance();
             salesforceSourceOrSink.initialize(null, this);
 
-            String soqlQuery = ((SalesforceSchemaHelper<Schema>)salesforceSourceOrSink).guessQuery(module.main.schema.getValue(), module.moduleName.getValue());
+            String soqlQuery = ((SalesforceSchemaHelper<Schema>) salesforceSourceOrSink).guessQuery(module.main.schema.getValue(),
+                    module.moduleName.getValue());
             query.setValue(soqlQuery);
 
             validationResult.setStatus(ValidationResult.Result.OK);
         }
+
         return validationResult;
     }
 
@@ -172,7 +186,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         super.refreshLayout(form);
         if (form.getName().equals(Form.MAIN)) {
             form.getWidget(includeDeleted.getName())
-                    .setHidden(!(queryMode.getValue() != null && queryMode.getValue().equals(QueryMode.Query)));
+                    .setHidden(!((queryMode.getValue() != null) && queryMode.getValue().equals(QueryMode.Query)));
 
             form.getWidget(query.getName()).setHidden(!manualQuery.getValue());
             form.getWidget(condition.getName()).setHidden(manualQuery.getValue());
@@ -184,7 +198,6 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
             form.getWidget(normalizeDelimiter.getName()).setHidden(isBulkQuery);
             form.getWidget(columnNameDelimiter.getName()).setHidden(isBulkQuery);
             form.getWidget(batchSize.getName()).setHidden(isBulkQuery);
-
             connection.bulkConnection.setValue(isBulkQuery);
             connection.afterBulkConnection();
             form.getChildForm(connection.getName()).getWidget(connection.bulkConnection.getName()).setHidden(true);
@@ -193,11 +206,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
-        if (isOutputConnection) {
-            return Collections.singleton(MAIN_CONNECTOR);
-        } else {
-            return Collections.EMPTY_SET;
-        }
+        return isOutputConnection ? Collections.singleton(MAIN_CONNECTOR) : Collections.<PropertyPathConnector> emptySet();
     }
 
 }
