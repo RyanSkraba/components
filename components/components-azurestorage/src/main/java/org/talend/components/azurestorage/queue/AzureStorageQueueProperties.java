@@ -38,8 +38,6 @@ public class AzureStorageQueueProperties extends FixedConnectorsComponentPropert
 
     public Property<String> queueName = PropertyFactory.newString("queueName");
 
-    public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
-
     /**
      * The maximum time to allow the message to be in the queue. A value of zero will set the time-to-live to the
      * service default value of seven days.
@@ -80,7 +78,6 @@ public class AzureStorageQueueProperties extends FixedConnectorsComponentPropert
         queueName.setValue("");
         timeToLiveInSeconds.setValue(0);
         initialVisibilityDelayInSeconds.setValue(0);
-        dieOnError.setValue(true);
     }
 
     @Override

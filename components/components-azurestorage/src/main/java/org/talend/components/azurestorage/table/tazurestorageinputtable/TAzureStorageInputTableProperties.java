@@ -42,6 +42,8 @@ public class TAzureStorageInputTableProperties extends AzureStorageTableProperti
     public FilterExpressionTable filterExpression = new FilterExpressionTable("filterExpression");
 
     public Property<String> producedFilter = newString("producedFilter");
+    
+    public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
 
     public TAzureStorageInputTableProperties(String name) {
         super(name);
@@ -67,6 +69,7 @@ public class TAzureStorageInputTableProperties extends AzureStorageTableProperti
     @Override
     public void setupProperties() {
         super.setupProperties();
+        dieOnError.setValue(true);
 
         // default Input schema
         Schema s = SchemaBuilder.record("Main").fields()

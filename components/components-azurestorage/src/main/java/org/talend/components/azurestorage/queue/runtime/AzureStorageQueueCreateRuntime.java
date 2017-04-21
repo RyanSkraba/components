@@ -10,9 +10,11 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.azurestorage.queue.AzureStorageQueueDefinition;
+import org.talend.components.azurestorage.queue.tazurestoragequeuecreate.TAzureStorageQueueCreateProperties;
 import org.talend.components.azurestorage.utils.AzureStorageUtils;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
+import org.talend.daikon.properties.ValidationResult;
 
 import com.microsoft.azure.storage.StorageErrorCodeStrings;
 import com.microsoft.azure.storage.StorageException;
@@ -27,6 +29,15 @@ public class AzureStorageQueueCreateRuntime extends AzureStorageQueueRuntime
     
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(AzureStorageQueueCreateRuntime.class);
+    
+    private boolean dieOnError;
+    
+    @Override
+    public ValidationResult initialize(RuntimeContainer runtimeContainer, ComponentProperties properties) {
+        this.dieOnError = ((TAzureStorageQueueCreateProperties) properties).dieOnError.getValue();
+        
+        return super.initialize(runtimeContainer, properties);
+    }
     
     @Override
     public void runAtDriver(RuntimeContainer container){

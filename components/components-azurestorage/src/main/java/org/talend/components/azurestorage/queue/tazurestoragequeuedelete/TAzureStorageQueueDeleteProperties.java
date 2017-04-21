@@ -18,10 +18,14 @@ import java.util.Set;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.azurestorage.queue.AzureStorageQueueProperties;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 public class TAzureStorageQueueDeleteProperties extends AzureStorageQueueProperties {
 
     private static final long serialVersionUID = -2555632279617814218L;
+    
+    public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
 
     public TAzureStorageQueueDeleteProperties(String name) {
         super(name);
@@ -33,6 +37,12 @@ public class TAzureStorageQueueDeleteProperties extends AzureStorageQueuePropert
         mainForm.addRow(connection.getForm(Form.REFERENCE));
         mainForm.addRow(queueName);
         mainForm.addRow(dieOnError);
+    }
+    
+    @Override
+    public void setupProperties() {
+        super.setupProperties();
+        dieOnError.setValue(true);
     }
     
 	@Override

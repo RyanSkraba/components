@@ -24,6 +24,8 @@ import org.talend.daikon.properties.property.PropertyFactory;
 public class TAzureStorageQueueInputProperties extends AzureStorageQueueProperties {
 
     private static final long serialVersionUID = 3741225803254131588L;
+    
+    public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
 
     /**
      * Just peek message. Don't change thevisibility (see visibilityTimeoutInSeconds) and don't increase dequeue count.
@@ -46,6 +48,7 @@ public class TAzureStorageQueueInputProperties extends AzureStorageQueueProperti
     @Override
     public void setupProperties() {
         super.setupProperties();
+        dieOnError.setValue(true);
 
         Schema s = SchemaBuilder.builder().record("Main").fields()//
                 .name(FIELD_MESSAGE_ID).prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")

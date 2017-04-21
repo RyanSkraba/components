@@ -18,10 +18,14 @@ import java.util.Set;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.azurestorage.queue.AzureStorageQueueProperties;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 public class TAzureStorageQueueCreateProperties extends AzureStorageQueueProperties {
 
     private static final long serialVersionUID = 5812021288325869860L;
+    
+    public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
 
     public TAzureStorageQueueCreateProperties(String name) {
         super(name);
@@ -36,6 +40,12 @@ public class TAzureStorageQueueCreateProperties extends AzureStorageQueuePropert
     }
     
 	@Override
+    public void setupProperties() {
+        super.setupProperties();
+        dieOnError.setValue(true);
+    }
+
+    @Override
 	public Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
 		return Collections.emptySet();
 	}

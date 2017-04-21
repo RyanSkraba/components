@@ -29,8 +29,6 @@ public class AzureStorageQueueRuntime extends AzureStorageRuntime {
 
     protected String QueueName;
 
-    protected boolean dieOnError;
-
     /**
      * getServiceClient.
      *
@@ -67,7 +65,7 @@ public class AzureStorageQueueRuntime extends AzureStorageRuntime {
         AzureStorageQueueProperties componentProperties = (AzureStorageQueueProperties) properties;
 
         this.QueueName = componentProperties.queueName.getValue();
-        this.dieOnError = componentProperties.dieOnError.getValue();
+        
 
         // validate
         ValidationResult validationResult = super.initialize(runtimeContainer, properties);

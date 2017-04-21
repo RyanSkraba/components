@@ -58,8 +58,6 @@ public class AzureStorageTableProperties extends FixedConnectorsComponentPropert
 
     public Property<String> tableName = PropertyFactory.newString("tableName").setRequired();
 
-    public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
-
     public NameMappingTable nameMapping = new NameMappingTable("nameMapping");
 
     protected transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
@@ -115,7 +113,6 @@ public class AzureStorageTableProperties extends FixedConnectorsComponentPropert
     public void setupProperties() {
         super.setupProperties();
 
-        dieOnError.setValue(true);
         tableName.setValue("");
     }
 

@@ -18,10 +18,14 @@ import java.util.Set;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.azurestorage.queue.AzureStorageQueueProperties;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 public class TAzureStorageQueuePurgeProperties extends AzureStorageQueueProperties {
 
     private static final long serialVersionUID = -1629227118426420176L;
+    
+    public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
 
     public TAzureStorageQueuePurgeProperties(String name) {
         super(name);

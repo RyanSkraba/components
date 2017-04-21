@@ -53,6 +53,8 @@ public class TAzureStorageOutputTableProperties extends AzureStorageTablePropert
     public Property<ActionOnTable> actionOnTable = PropertyFactory.newEnum("actionOnTable", ActionOnTable.class);
 
     public Property<Boolean> processOperationInBatch = PropertyFactory.newBoolean("processOperationInBatch");
+    
+    public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
 
     public TAzureStorageOutputTableProperties(String name) {
         super(name);
@@ -73,6 +75,7 @@ public class TAzureStorageOutputTableProperties extends AzureStorageTablePropert
     @Override
     public void setupProperties() {
         super.setupProperties();
+        dieOnError.setValue(true);
 
         actionOnData.setValue(ActionOnData.Insert);
         actionOnTable.setValue(ActionOnTable.Default);

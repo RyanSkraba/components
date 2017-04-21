@@ -25,10 +25,14 @@ import org.talend.components.common.SchemaProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 public class TAzureStorageQueueOutputProperties extends AzureStorageQueueProperties {
 
     private static final long serialVersionUID = 3427627996958495784L;
+    
+    public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
 
     public transient PropertyPathConnector FLOW_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "schemaFlow");
 
@@ -43,6 +47,7 @@ public class TAzureStorageQueueOutputProperties extends AzureStorageQueuePropert
     @Override
     public void setupProperties() {
         super.setupProperties();
+        dieOnError.setValue(true);
 
         Schema s = SchemaBuilder.builder().record("Main").fields()//
                 // .name(FIELD_MESSAGE_ID).prop(SchemaConstants.TALEND_COLUMN_IS_KEY,

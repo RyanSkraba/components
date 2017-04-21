@@ -18,10 +18,14 @@ import org.talend.components.azurestorage.queue.AzureStorageQueueProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 public class TAzureStorageQueueListProperties extends AzureStorageQueueProperties {
 
     private static final long serialVersionUID = 3395812871526057697L;
+    
+    public Property<Boolean> dieOnError = PropertyFactory.newBoolean("dieOnError");
 
     public TAzureStorageQueueListProperties(String name) {
         super(name);
@@ -30,6 +34,7 @@ public class TAzureStorageQueueListProperties extends AzureStorageQueuePropertie
     @Override
     public void setupProperties() {
         super.setupProperties();
+        dieOnError.setValue(true);
 
         Schema s = SchemaBuilder.record("QueueList").fields().name("QueueName").prop(SchemaConstants.TALEND_IS_LOCKED, "true")
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "63").type(AvroUtils._string()).noDefault().endRecord();
