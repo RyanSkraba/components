@@ -20,6 +20,7 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.xml.namespace.QName;
@@ -478,30 +479,34 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
         SoqlQuery query = SoqlQuery.getInstance();
         query.init(soqlQuery);
 
-        List<FieldDescription> fieldDescriptions = query.getFieldDescriptions();
-        String drivingEntityName = query.getDrivingEntityName();
-
         SchemaBuilder.FieldAssembler fieldAssembler = SchemaBuilder.record("GuessedSchema").fields();
-
         DescribeSObjectResult describeSObjectResult = null;
 
         try {
-            describeSObjectResult = connect(null).connection.describeSObject(drivingEntityName);
+            describeSObjectResult = connect(null).connection.describeSObject(query.getDrivingEntityName());
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage());
         }
 
         Schema entitySchema = SalesforceAvroRegistry.get().inferSchema(describeSObjectResult);
 
-        for (FieldDescription fieldDescription : fieldDescriptions) {
+        for (FieldDescription fieldDescription : query.getFieldDescriptions()) {
             Schema.Field schemaField = entitySchema.getField(fieldDescription.getSimpleName());
+
+            SchemaBuilder.FieldBuilder builder = fieldAssembler.name(fieldDescription.getFullName());
+
+            Map<String, Object> props = schemaField.getObjectProps();
+            for (Map.Entry<String, Object> entry : props.entrySet()) {
+                builder.prop(entry.getKey(), String.valueOf(entry.getValue()));
+            }
+
             Schema fieldType = null;
             if (schemaField != null) {
                 fieldType = schemaField.schema();
             } else {
                 fieldType = DEFAULT_GUESS_SCHEMA_TYPE;
             }
-            fieldAssembler.name(fieldDescription.getFullName()).type(fieldType).noDefault();
+            builder.type(fieldType).noDefault();
         }
 
         return (Schema) fieldAssembler.endRecord();
