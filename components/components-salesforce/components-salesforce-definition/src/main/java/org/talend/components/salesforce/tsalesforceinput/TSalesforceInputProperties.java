@@ -127,13 +127,13 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
             module.main.schema.setValue(schema);
             validationResult.setStatus(ValidationResult.Result.OK);
         } catch (TalendRuntimeException tre) {
-            String errorMessage = getI18nMessage("errorMessage.validateGuessSchemaSoqlError");
+            String errorMessage = getI18nMessage("errorMessage.validateGuessSchemaSoqlError", tre.getMessage());
             validationResult.setStatus(ValidationResult.Result.ERROR).setMessage(errorMessage);
         } catch (RuntimeException e1) {
-            String errorMessage = getI18nMessage("errorMessage.validateGuessSchemaRuntimeError");
+            String errorMessage = getI18nMessage("errorMessage.validateGuessSchemaRuntimeError", e1.getMessage());
             validationResult.setStatus(ValidationResult.Result.ERROR).setMessage(errorMessage);
         } catch (IOException e2) {
-            String errorMessage = getI18nMessage("errorMessage.validateGuessSchemaConnectionError");
+            String errorMessage = getI18nMessage("errorMessage.validateGuessSchemaConnectionError", e2.getMessage());
             validationResult.setStatus(ValidationResult.Result.ERROR).setMessage(errorMessage);
         }
         return validationResult;
@@ -159,6 +159,9 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
             query.setValue(soqlQuery);
 
             validationResult.setStatus(ValidationResult.Result.OK);
+        } catch (TalendRuntimeException tre) {
+            validationResult.setStatus(ValidationResult.Result.ERROR);
+            validationResult.setMessage(getI18nMessage("errorMessage.validateGuessQuerySoqlError", tre.getMessage()));
         }
 
         return validationResult;

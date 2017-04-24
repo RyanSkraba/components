@@ -27,6 +27,14 @@ import org.talend.daikon.properties.ValidationResult;
 
 public class TSalesforceInputPropertiesIT {
 
+    private static final String GUESS_SCHEMA_SOQL_ERROR_PROPERTY_KEY = "errorMessage.validateGuessSchemaSoqlError";
+
+    private static final String SALESFORCE_INVALID_CREDENTIALS_PROPERTY_KEY = "errorMessage.validateGuessSchemaConnectionError";
+
+    private static final String GUESS_QUERY_SOQL_ERROR_PROPERTY_KEY = "errorMessage.validateGuessQuerySoqlError";
+
+    private static final String EMPTY_STRING = "";
+
     private TSalesforceInputProperties properties;
 
     @Before
@@ -39,14 +47,15 @@ public class TSalesforceInputPropertiesIT {
         // Prepare properties for test with default values
         setupProperties();
         properties.setupLayout();
+        String expectedMessage = getExpectedMessage(GUESS_SCHEMA_SOQL_ERROR_PROPERTY_KEY);
 
         properties.query.setValue("Invalid SOQL query");
 
         ValidationResult validationResult = properties.validateGuessSchema();
 
         Assert.assertEquals(ValidationResult.Result.ERROR, validationResult.getStatus());
-        Assert.assertTrue(
-                properties.getI18nMessage("errorMessage.validateGuessSchemaSoqlError").equals(validationResult.getMessage()));
+        Assert.assertNotNull(validationResult.getMessage());
+        Assert.assertTrue(validationResult.getMessage().startsWith(expectedMessage));
     }
 
     @Test
@@ -54,13 +63,14 @@ public class TSalesforceInputPropertiesIT {
         // Prepare properties for test without credentials
         setupProperties();
         properties.setupLayout();
+        String expectedMessage = getExpectedMessage(SALESFORCE_INVALID_CREDENTIALS_PROPERTY_KEY);
 
         properties.query.setValue("SELECT Id, Name, BillingCity FROM Account");
         ValidationResult validationResult = properties.validateGuessSchema();
 
         Assert.assertEquals(ValidationResult.Result.ERROR, validationResult.getStatus());
-        Assert.assertTrue(properties.getI18nMessage("errorMessage.validateGuessSchemaConnectionError")
-                .equals(validationResult.getMessage()));
+        Assert.assertNotNull(validationResult.getMessage());
+        Assert.assertTrue(validationResult.getMessage().startsWith(expectedMessage));
     }
 
     @SuppressWarnings("unchecked")
@@ -96,10 +106,54 @@ public class TSalesforceInputPropertiesIT {
                 .equals(properties.query.getValue()));
     }
 
+    @Test
+    public void testInvalidSchemaField() {
+        setupProperties();
+        //Check if default value was set
+        Assert.assertTrue(TSalesforceInputProperties.DEFAULT_QUERY
+                .equals(properties.query.getValue()));
+        Schema schema = SchemaBuilder.builder().record("salesforceSchema").fields().requiredString("name")
+                .requiredString("name__c_records_").endRecord();
+        properties.module.main.schema.setValue(schema);
+
+        String expectedMessage = getExpectedMessage(GUESS_QUERY_SOQL_ERROR_PROPERTY_KEY);
+
+        ValidationResult validationResult = properties.validateGuessQuery();
+
+        Assert.assertEquals(ValidationResult.Result.ERROR, validationResult.getStatus());
+        Assert.assertNotNull(validationResult.getMessage());
+        Assert.assertTrue(validationResult.getMessage().startsWith(expectedMessage));
+    }
+
+    @Test
+    public void testInvalidSchemaChildTableName() {
+        setupProperties();
+        //Check if default value was set
+        Assert.assertTrue(TSalesforceInputProperties.DEFAULT_QUERY
+                .equals(properties.query.getValue()));
+        Schema schema = SchemaBuilder.builder().record("salesforceSchema").fields().requiredString("name")
+                .requiredString("_records_name__c").endRecord();
+        properties.module.main.schema.setValue(schema);
+
+        String expectedMessage = getExpectedMessage(GUESS_QUERY_SOQL_ERROR_PROPERTY_KEY);
+
+        ValidationResult validationResult = properties.validateGuessQuery();
+
+        Assert.assertEquals(ValidationResult.Result.ERROR, validationResult.getStatus());
+        Assert.assertNotNull(validationResult.getMessage());
+        Assert.assertTrue(validationResult.getMessage().startsWith(expectedMessage));
+    }
+
     private void setupProperties() {
         //Initializing all inner properties
         properties.setupProperties();
         properties.connection.init();
         properties.module.init();
+    }
+
+    private String getExpectedMessage(String key) {
+        String expectedMessage = properties.getI18nMessage(key, EMPTY_STRING);
+        Assert.assertNotEquals(key, expectedMessage);
+        return expectedMessage;
     }
 }
