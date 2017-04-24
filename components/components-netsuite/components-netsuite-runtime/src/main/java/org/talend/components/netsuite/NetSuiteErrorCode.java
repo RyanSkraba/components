@@ -30,6 +30,10 @@ public class NetSuiteErrorCode implements ErrorCode {
 
     public static final String GROUP_COMPONENT_NETSUITE = "NETSUITE";
 
+    public static final String INTERNAL_ERROR = "INTERNAL_ERROR";
+
+    public static final String CLIENT_ERROR = "CLIENT_ERROR";
+
     private String code;
     private int httpStatusCode;
     private final List<String> expectedContextEntries;

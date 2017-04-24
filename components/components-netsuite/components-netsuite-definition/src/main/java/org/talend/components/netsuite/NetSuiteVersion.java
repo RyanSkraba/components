@@ -107,10 +107,12 @@ public class NetSuiteVersion {
                 int value3 = sValue3 != null ? Integer.parseInt(sValue3) : -1;
                 return new NetSuiteVersion(value1, value2, value3);
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Failed to parse NetSuite API version: " + versionString);
+                throw new IllegalArgumentException(NetSuiteI18n.MESSAGES.getMessage(
+                        "error.failedToParseApiVersion", versionString));
             }
         } else {
-            throw new IllegalArgumentException("Failed to parse NetSuite API version: " + versionString);
+            throw new IllegalArgumentException(NetSuiteI18n.MESSAGES.getMessage(
+                    "error.failedToParseApiVersion", versionString));
         }
     }
 
@@ -133,10 +135,12 @@ public class NetSuiteVersion {
                 int value3 = sValue3 != null ? Integer.parseInt(sValue3) : -1;
                 return new NetSuiteVersion(value1, value2, value3);
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Failed to detect NetSuite API version: " + nsEndpointUrl);
+                throw new IllegalArgumentException(NetSuiteI18n.MESSAGES.getMessage(
+                        "error.failedToDetectApiVersion", nsEndpointUrl));
             }
         } else {
-            throw new IllegalArgumentException("Failed to detect NetSuite API version: " + nsEndpointUrl);
+            throw new IllegalArgumentException(NetSuiteI18n.MESSAGES.getMessage(
+                    "error.failedToDetectApiVersion", nsEndpointUrl));
         }
     }
 

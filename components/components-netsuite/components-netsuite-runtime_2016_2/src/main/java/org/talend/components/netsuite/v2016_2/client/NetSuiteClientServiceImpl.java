@@ -31,6 +31,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.cxf.feature.LoggingFeature;
 import org.talend.components.netsuite.NetSuiteErrorCode;
+import org.talend.components.netsuite.NetSuiteRuntimeI18n;
 import org.talend.components.netsuite.client.CustomMetaDataSource;
 import org.talend.components.netsuite.client.DefaultMetaDataSource;
 import org.talend.components.netsuite.client.MetaDataSource;
@@ -366,7 +367,8 @@ public class NetSuiteClientServiceImpl extends NetSuiteClientService<NetSuitePor
                 }
             };
         } else {
-            throw new NetSuiteException("SSO login not supported");
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.ssoLoginNotSupported"));
         }
 
         Status status = null;
@@ -378,7 +380,8 @@ public class NetSuiteClientServiceImpl extends NetSuiteClientService<NetSuitePor
                 status = sessionResponse.getStatus();
 
             } catch (InvalidCredentialsFault f) {
-                throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"), f.getFaultInfo().getMessage());
+                throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                        f.getFaultInfo().getMessage());
             } catch (UnexpectedErrorFault f) {
                 exceptionMessage = f.getFaultInfo().getMessage();
             } catch (Exception e) {
@@ -394,17 +397,7 @@ public class NetSuiteClientServiceImpl extends NetSuiteClientService<NetSuitePor
             }
         }
 
-        if (status == null || !status.getIsSuccess()) {
-            String message = "Login Failed:";
-            if (status != null && status.getStatusDetail() != null && status.getStatusDetail().size() > 0) {
-                message = message + " " + status.getStatusDetail().get(0).getCode();
-                message = message + " " + status.getStatusDetail().get(0).getMessage();
-            } else if (exceptionMessage != null) {
-                message = message + " " + exceptionMessage;
-            }
-
-            throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"), message);
-        }
+        checkLoginError(toNsStatus(status), exceptionMessage);
 
         remoteLoginHeaders(port);
     }
@@ -482,9 +475,9 @@ public class NetSuiteClientServiceImpl extends NetSuiteClientService<NetSuitePor
                 urls = response.getGetDataCenterUrlsResult().getDataCenterUrls();
             }
             if (urls == null) {
-                throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"),
-                        "Can't get a correct webservice domain! "
-                                + "Please check your configuration or try to run again.");
+                throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                        NetSuiteRuntimeI18n.MESSAGES.getMessage("error.couldNotGetWebServiceDomain",
+                                defaultEndpointUrl));
             }
 
             String wsDomain = urls.getWebservicesDomain();
@@ -497,8 +490,9 @@ public class NetSuiteClientServiceImpl extends NetSuiteClientService<NetSuitePor
         } catch (WebServiceException | MalformedURLException |
                 InsufficientPermissionFault | InvalidCredentialsFault | InvalidSessionFault |
                 UnexpectedErrorFault | ExceededRequestSizeFault e) {
-            throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"),
-                    "Failed to get NetSuite port due to error", e);
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.failedToInitClient",
+                            e.getLocalizedMessage()), e);
         }
     }
 
@@ -589,6 +583,9 @@ public class NetSuiteClientServiceImpl extends NetSuiteClientService<NetSuitePor
     }
 
     public static NsStatus toNsStatus(Status status) {
+        if (status == null) {
+            return null;
+        }
         NsStatus nsStatus = new NsStatus();
         nsStatus.setSuccess(status.getIsSuccess());
         for (StatusDetail detail : status.getStatusDetail()) {

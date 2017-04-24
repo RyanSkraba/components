@@ -34,6 +34,7 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.netsuite.NetSuiteErrorCode;
+import org.talend.components.netsuite.NetSuiteRuntimeI18n;
 import org.talend.components.netsuite.client.model.BasicMetaData;
 import org.talend.components.netsuite.client.search.SearchQuery;
 import org.talend.daikon.exception.ExceptionContext;
@@ -467,7 +468,8 @@ public abstract class NetSuiteClientService<PortT> {
             setHeader(port, searchPreferencesHeader);
 
         } catch (JAXBException e) {
-            throw new NetSuiteException("XML binding error", e);
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.INTERNAL_ERROR),
+                    "XML binding error", e);
         }
     }
 
@@ -482,7 +484,8 @@ public abstract class NetSuiteClientService<PortT> {
                     setHeader(port, appInfoHeader);
                 }
             } catch (JAXBException e) {
-                throw new NetSuiteException("XML binding error", e);
+                throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.INTERNAL_ERROR),
+                        "XML binding error", e);
             }
         }
     }
@@ -511,6 +514,20 @@ public abstract class NetSuiteClientService<PortT> {
     protected abstract <T> T createNativePassport(NetSuiteCredentials nsCredentials);
 
     protected abstract PortT getNetSuitePort(String defaultEndpointUrl, String account) throws NetSuiteException;
+
+    protected void checkLoginError(NsStatus status, String exceptionMessage) {
+        if (status == null || !status.isSuccess()) {
+            StringBuilder sb = new StringBuilder();
+            if (status != null && status.getDetails().size() > 0) {
+                NsStatus.Detail detail = status.getDetails().get(0);
+                sb.append(detail.getCode()).append(" ").append(detail.getMessage());
+            } else if (exceptionMessage != null) {
+                sb.append(exceptionMessage);
+            }
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.failedToLogin", sb));
+        }
+    }
 
     public interface PortOperation<R, PortT> {
         R execute(PortT port) throws Exception;

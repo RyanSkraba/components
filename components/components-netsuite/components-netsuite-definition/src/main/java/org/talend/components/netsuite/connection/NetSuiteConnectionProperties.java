@@ -214,7 +214,7 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
             }
         });
         if (vr.getStatus() == ValidationResult.Result.OK) {
-            vr.setMessage("Connection successful");
+            vr.setMessage(getI18nMessage("message.connectionSuccessful"));
             getForm(FORM_WIZARD).setAllowForward(true);
         } else {
             getForm(FORM_WIZARD).setAllowForward(false);

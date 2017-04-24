@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.netsuite.client.NetSuiteClientFactory;
 import org.talend.components.netsuite.client.NetSuiteClientService;
@@ -110,8 +109,10 @@ public abstract class NetSuiteSourceOrSink implements SourceOrSink {
 
     protected void assertApiVersion(final NetSuiteVersion apiVersion) {
         if (!clientFactory.getApiVersion().isSameMajor(apiVersion)) {
-            throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"),
-                    "Invalid API version: " + apiVersion.getAsString("."));
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.runtimeVersionMismatch",
+                            apiVersion.getAsString("."),
+                            clientFactory.getApiVersion().getMajorAsString(".")));
         }
     }
 }

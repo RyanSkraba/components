@@ -20,6 +20,8 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.netsuite.NetSuiteErrorCode;
+import org.talend.components.netsuite.NetSuiteRuntimeI18n;
 import org.talend.components.netsuite.NetSuiteSink;
 import org.talend.components.netsuite.SchemaCustomMetaDataSource;
 import org.talend.components.netsuite.client.MetaDataSource;
@@ -83,7 +85,8 @@ public class NetSuiteWriteOperation implements WriteOperation<Result> {
             writer = new NetSuiteDeleteWriter<>(this, metaDataSource);
             break;
         default:
-            throw new NetSuiteException("Output operation not implemented: " + action);
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.INTERNAL_ERROR),
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.outputOperationNotImplemented", action));
         }
 
         Integer batchSize = properties.batchSize.getValue();

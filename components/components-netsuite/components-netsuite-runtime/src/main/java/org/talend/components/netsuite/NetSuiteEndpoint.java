@@ -45,19 +45,28 @@ public class NetSuiteEndpoint {
         NetSuiteConnectionProperties connProps = properties.getEffectiveConnectionProperties();
 
         if (StringUtils.isEmpty(connProps.endpoint.getStringValue())) {
-            throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"), "Invalid endpoint URL");
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.endpointUrlRequired"));
         }
         if (StringUtils.isEmpty(connProps.apiVersion.getStringValue())) {
-            throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"), "Invalid API version");
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.apiVersionRequired"));
         }
         if (StringUtils.isEmpty(connProps.email.getStringValue())) {
-            throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"), "Invalid email");
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.emailRequired"));
         }
         if (StringUtils.isEmpty(connProps.password.getStringValue())) {
-            throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"), "Invalid password");
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.passwordRequired"));
         }
         if (StringUtils.isEmpty(connProps.account.getStringValue())) {
-            throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"), "Invalid account");
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.accountRequired"));
+        }
+        if (connProps.role.getValue() == null) {
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.roleRequired"));
         }
 
         String endpointUrl = connProps.endpoint.getStringValue();
@@ -66,22 +75,29 @@ public class NetSuiteEndpoint {
         try {
             endpointApiVersion = NetSuiteVersion.detectVersion(endpointUrl);
         } catch (IllegalArgumentException e) {
-            throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"),
-                    "Invalid endpoint URL: API version could not be detected");
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.couldNotDetectApiVersionFromEndpointUrl",
+                            endpointUrl));
         }
         String apiVersionString = connProps.apiVersion.getStringValue();
         NetSuiteVersion apiVersion;
         try {
             apiVersion = NetSuiteVersion.parseVersion(apiVersionString);
         } catch (IllegalArgumentException e) {
-            throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"),
-                    "Invalid API version");
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.invalidApiVersion", apiVersionString));
         }
 
         if (!endpointApiVersion.isSameMajor(apiVersion)) {
-            throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"),
-                    String.format("Invalid API version: endpoint URL is '%s' but specified version is '%s'",
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.endpointUrlApiVersionMismatch",
                             endpointUrl, apiVersionString));
+        }
+
+        if (apiVersion.getMajorYear() >= 2015
+                && StringUtils.isEmpty(connProps.applicationId.getStringValue())) {
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.applicationIdRequired"));
         }
 
         String email = connProps.email.getStringValue();
@@ -104,8 +120,8 @@ public class NetSuiteEndpoint {
             connectionConfig.setCustomizationEnabled(customizationEnabled);
             return connectionConfig;
         } catch (MalformedURLException e) {
-            throw new NetSuiteException(new NetSuiteErrorCode("CLIENT_ERROR"),
-                    "Invalid endpoint URL: " + endpointUrl);
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.invalidEndpointUrl", endpointUrl));
         }
     }
 

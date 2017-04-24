@@ -25,11 +25,9 @@ import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.netsuite.NetSuiteDatasetRuntimeImpl;
 import org.talend.components.netsuite.NsObjectTransducer;
 import org.talend.components.netsuite.client.NetSuiteClientService;
-import org.talend.components.netsuite.client.NetSuiteException;
 import org.talend.components.netsuite.client.NsRef;
 import org.talend.components.netsuite.client.model.CustomRecordTypeInfo;
 import org.talend.components.netsuite.client.model.FieldDesc;
@@ -118,59 +116,55 @@ public class NsObjectOutputTransducer extends NsObjectTransducer {
 
         Schema schema = indexedRecord.getSchema();
 
-        try {
-            Object nsObject = clientService.getBasicMetaData().createInstance(typeDesc.getTypeName());
+        Object nsObject = clientService.getBasicMetaData().createInstance(typeDesc.getTypeName());
 
-            Set<String> nullFieldNames = new HashSet<>();
+        Set<String> nullFieldNames = new HashSet<>();
 
-            Map<String, Object> customFieldMap = Collections.emptyMap();
+        Map<String, Object> customFieldMap = Collections.emptyMap();
 
-            if (!reference && beanInfo.getProperty("customFieldList") != null) {
-                customFieldMap = new HashMap<>();
+        if (!reference && beanInfo.getProperty("customFieldList") != null) {
+            customFieldMap = new HashMap<>();
 
-                Object customFieldListWrapper = getSimpleProperty(nsObject, "customFieldList");
-                if (customFieldListWrapper != null) {
-                    List<Object> customFieldList = (List<Object>) getSimpleProperty(customFieldListWrapper, "customField");
-                    for (Object customField : customFieldList) {
-                        String scriptId = (String) getSimpleProperty(customField, "scriptId");
-                        customFieldMap.put(scriptId, customField);
-                    }
+            Object customFieldListWrapper = getSimpleProperty(nsObject, "customFieldList");
+            if (customFieldListWrapper != null) {
+                List<Object> customFieldList = (List<Object>) getSimpleProperty(customFieldListWrapper, "customField");
+                for (Object customField : customFieldList) {
+                    String scriptId = (String) getSimpleProperty(customField, "scriptId");
+                    customFieldMap.put(scriptId, customField);
                 }
             }
-
-            for (Schema.Field field : schema.getFields()) {
-                String nsFieldName = NetSuiteDatasetRuntimeImpl.getNsFieldName(field);
-
-                FieldDesc fieldDesc = fieldMap.get(nsFieldName);
-                if (fieldDesc == null) {
-                    continue;
-                }
-
-                Object value = indexedRecord.get(field.pos());
-
-                writeField(nsObject, fieldDesc, customFieldMap, nullFieldNames, value);
-            }
-
-            if (!nullFieldNames.isEmpty() && beanInfo.getProperty("nullFieldList") != null) {
-                Object nullFieldListWrapper = clientService.getBasicMetaData()
-                        .createInstance("NullField");
-                setSimpleProperty(nsObject, "nullFieldList", nullFieldListWrapper);
-                List<String> nullFields = (List<String>) getSimpleProperty(nullFieldListWrapper, "name");
-                nullFields.addAll(nullFieldNames);
-            }
-
-            if (reference) {
-                if (recordTypeInfo.getRefType() == RefType.RECORD_REF) {
-                    FieldDesc recTypeFieldDesc = typeDesc.getField("type");
-                    RecordTypeDesc recordTypeDesc = recordTypeInfo.getRecordType();
-                    writeSimpleField(nsObject, recTypeFieldDesc.asSimple(), false, nullFieldNames, recordTypeDesc.getType());
-                }
-            }
-
-            return nsObject;
-        } catch (NetSuiteException e) {
-            throw new ComponentException(e);
         }
+
+        for (Schema.Field field : schema.getFields()) {
+            String nsFieldName = NetSuiteDatasetRuntimeImpl.getNsFieldName(field);
+
+            FieldDesc fieldDesc = fieldMap.get(nsFieldName);
+            if (fieldDesc == null) {
+                continue;
+            }
+
+            Object value = indexedRecord.get(field.pos());
+
+            writeField(nsObject, fieldDesc, customFieldMap, nullFieldNames, value);
+        }
+
+        if (!nullFieldNames.isEmpty() && beanInfo.getProperty("nullFieldList") != null) {
+            Object nullFieldListWrapper = clientService.getBasicMetaData()
+                    .createInstance("NullField");
+            setSimpleProperty(nsObject, "nullFieldList", nullFieldListWrapper);
+            List<String> nullFields = (List<String>) getSimpleProperty(nullFieldListWrapper, "name");
+            nullFields.addAll(nullFieldNames);
+        }
+
+        if (reference) {
+            if (recordTypeInfo.getRefType() == RefType.RECORD_REF) {
+                FieldDesc recTypeFieldDesc = typeDesc.getField("type");
+                RecordTypeDesc recordTypeDesc = recordTypeInfo.getRecordType();
+                writeSimpleField(nsObject, recTypeFieldDesc.asSimple(), false, nullFieldNames, recordTypeDesc.getType());
+            }
+        }
+
+        return nsObject;
     }
 
 }

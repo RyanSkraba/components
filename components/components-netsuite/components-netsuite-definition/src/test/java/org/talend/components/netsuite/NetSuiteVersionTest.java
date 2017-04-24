@@ -16,6 +16,7 @@ package org.talend.components.netsuite;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  *
@@ -68,5 +69,20 @@ public class NetSuiteVersionTest {
         assertEquals(2016, version.getMajorYear());
         assertEquals(2, version.getMajorRelease());
         assertEquals(1, version.getMinor());
+    }
+
+    @Test
+    public void testI18n() {
+        try {
+            NetSuiteVersion.detectVersion("https://webservices.netsuite.com/services/NetSuitePort_2016.2");
+        } catch (IllegalArgumentException e) {
+            assertNotEquals("error.failedToDetectApiVersion", e.getMessage());
+        }
+
+        try {
+            NetSuiteVersion.parseVersion("2016-2");
+        } catch (IllegalArgumentException e) {
+            assertNotEquals("error.failedToParseApiVersion", e.getMessage());
+        }
     }
 }

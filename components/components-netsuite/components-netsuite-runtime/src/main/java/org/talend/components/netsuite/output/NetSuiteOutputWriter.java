@@ -110,7 +110,7 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
 
     @Override
     public Iterable<IndexedRecord> getRejectedWrites() {
-        // If successful write feedback is requested before submitting of current batch
+        // If rejected write feedback is requested before submitting of current batch
         // then write accumulated records to provide feedback to a caller.
         // This is required due to bug in DI job which is not aware of bulk writes.
         flush();

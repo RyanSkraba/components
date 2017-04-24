@@ -31,8 +31,9 @@ public abstract class NetSuiteSink extends NetSuiteSourceOrSink implements Sink 
         if (properties instanceof NetSuiteOutputProperties) {
             return new NetSuiteWriteOperation(this, (NetSuiteOutputProperties) properties);
         }
-        throw new NetSuiteException("Invalid component properties type: " + properties);
-
+        throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                NetSuiteRuntimeI18n.MESSAGES.getMessage("error.invalidComponentPropertiesClass",
+                        NetSuiteOutputProperties.class, properties.getClass()));
     }
 
     @Override

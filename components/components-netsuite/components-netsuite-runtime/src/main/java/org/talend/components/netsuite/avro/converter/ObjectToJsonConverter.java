@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import org.apache.avro.Schema;
 import org.talend.components.netsuite.NetSuiteErrorCode;
+import org.talend.components.netsuite.NetSuiteRuntimeI18n;
 import org.talend.components.netsuite.client.NetSuiteException;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.AvroConverter;
@@ -62,8 +63,9 @@ public class ObjectToJsonConverter<T> implements AvroConverter<T, String> {
         try {
             return objectWriter.writeValueAsString(value);
         } catch (IOException e) {
-            throw new NetSuiteException(new NetSuiteErrorCode("JSON_PROCESSING"), e,
-                    ExceptionContext.build().put(ExceptionContext.KEY_MESSAGE, e.getMessage()));
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.INTERNAL_ERROR), e,
+                    ExceptionContext.build().put(ExceptionContext.KEY_MESSAGE,
+                            NetSuiteRuntimeI18n.MESSAGES.getMessage("error.failedToConvertValueToJson", e.getMessage())));
         }
     }
 
@@ -75,8 +77,9 @@ public class ObjectToJsonConverter<T> implements AvroConverter<T, String> {
         try {
             return objectReader.readValue(value);
         } catch (IOException e) {
-            throw new NetSuiteException(new NetSuiteErrorCode("JSON_PROCESSING"), e,
-                    ExceptionContext.build().put(ExceptionContext.KEY_MESSAGE, e.getMessage()));
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.INTERNAL_ERROR), e,
+                    ExceptionContext.build().put(ExceptionContext.KEY_MESSAGE,
+                            NetSuiteRuntimeI18n.MESSAGES.getMessage("error.failedToConvertValueFromJson", e.getMessage())));
         }
     }
 }

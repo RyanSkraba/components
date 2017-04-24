@@ -25,6 +25,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.talend.components.netsuite.NetSuiteErrorCode;
+import org.talend.components.netsuite.NetSuiteRuntimeI18n;
 import org.talend.components.netsuite.client.NetSuiteException;
 import org.talend.components.netsuite.client.model.BasicMetaData;
 
@@ -90,7 +92,9 @@ public class SearchDateFieldAdapter<T> extends SearchFieldAdapter<T> {
         try {
             dateTime = dateTimeFormatter.parseDateTime(valueToParse);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid date/time format: " + valueToParse);
+            throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                    NetSuiteRuntimeI18n.MESSAGES.getMessage("error.searchDateField.invalidDateTimeFormat",
+                            valueToParse));
         }
 
         XMLGregorianCalendar xts = datatypeFactory.newXMLGregorianCalendar();

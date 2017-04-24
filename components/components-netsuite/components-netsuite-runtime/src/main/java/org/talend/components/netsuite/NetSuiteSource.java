@@ -53,7 +53,9 @@ public abstract class NetSuiteSource extends NetSuiteSourceOrSink implements Bou
             NetSuiteInputProperties nsProperties = (NetSuiteInputProperties) properties;
             return new NetSuiteSearchInputReader(container, this, nsProperties);
         }
-        throw new NetSuiteException("Invalid component properties type: " + properties);
+        throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
+                NetSuiteRuntimeI18n.MESSAGES.getMessage("error.invalidComponentPropertiesClass",
+                        NetSuiteInputProperties.class, properties.getClass()));
     }
 
     @Override
