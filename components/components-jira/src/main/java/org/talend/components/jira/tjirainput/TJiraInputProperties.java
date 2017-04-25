@@ -22,7 +22,7 @@ import org.apache.avro.Schema.Field.Order;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.jira.JiraProperties;
 import org.talend.components.jira.Resource;
-import org.talend.daikon.avro.AvroRegistry;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
@@ -108,7 +108,7 @@ public class TJiraInputProperties extends JiraProperties {
             }
             }
         }
-        
+
         if (form.getName().equals(Form.ADVANCED)) {
 
             // refresh after resource changed
@@ -129,13 +129,10 @@ public class TJiraInputProperties extends JiraProperties {
      * Sets initial value of schema property
      */
     void setupSchema() {
-
-        // get Schema for String class
-        AvroRegistry registry = new AvroRegistry();
-        Schema stringSchema = registry.getConverter(String.class).getSchema();
+        Schema stringSchema = AvroUtils._string();
 
         // create Schema for JSON
-        Schema.Field jsonField = new Schema.Field("json", stringSchema, null, null, Order.ASCENDING);
+        Schema.Field jsonField = new Schema.Field("json", stringSchema, null, (Object) null, Order.ASCENDING);
         Schema initialSchema = Schema.createRecord("jira", null, null, false, Collections.singletonList(jsonField));
         initialSchema.addProp(TALEND_IS_LOCKED, "true");
 

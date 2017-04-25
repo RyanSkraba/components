@@ -30,7 +30,7 @@ import org.talend.components.jira.Action;
 import org.talend.components.jira.JiraProperties;
 import org.talend.components.jira.Mode;
 import org.talend.components.jira.Resource;
-import org.talend.daikon.avro.AvroRegistry;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
@@ -54,20 +54,18 @@ public class TJiraOutputProperties extends JiraProperties {
      * Initializes schema constants
      */
     static {
-        // get Schema for String class
-        AvroRegistry registry = new AvroRegistry();
-        Schema stringSchema = registry.getConverter(String.class).getSchema();
+        Schema stringSchema = AvroUtils._string();
 
-        Schema.Field deleteIdField = new Schema.Field("id", stringSchema, null, null, Order.ASCENDING);
+        Schema.Field deleteIdField = new Schema.Field("id", stringSchema, null, (Object) null, Order.ASCENDING);
         deleteSchema = Schema.createRecord("jira", null, null, false, Collections.singletonList(deleteIdField));
         deleteSchema.addProp(TALEND_IS_LOCKED, "true");
 
-        Schema.Field insertJsonField = new Schema.Field("json", stringSchema, null, null, Order.ASCENDING);
+        Schema.Field insertJsonField = new Schema.Field("json", stringSchema, null, (Object) null, Order.ASCENDING);
         insertSchema = Schema.createRecord("jira", null, null, false, Collections.singletonList(insertJsonField));
         insertSchema.addProp(TALEND_IS_LOCKED, "true");
 
-        Schema.Field updateIdField = new Schema.Field("id", stringSchema, null, null, Order.ASCENDING);
-        Schema.Field updateJsonField = new Schema.Field("json", stringSchema, null, null, Order.ASCENDING);
+        Schema.Field updateIdField = new Schema.Field("id", stringSchema, null, (Object) null, Order.ASCENDING);
+        Schema.Field updateJsonField = new Schema.Field("json", stringSchema, null, (Object) null, Order.ASCENDING);
         List<Schema.Field> fields = Arrays.asList(updateIdField, updateJsonField);
         updateSchema = Schema.createRecord("jira", null, null, false, fields);
         updateSchema.addProp(TALEND_IS_LOCKED, "true");
