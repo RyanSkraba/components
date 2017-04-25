@@ -13,18 +13,18 @@
 
 package org.talend.components.netsuite.output;
 
-import java.util.Collection;
-import java.util.Set;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNotNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+
+import java.util.Collection;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
@@ -214,5 +214,43 @@ public class NetSuiteOutputPropertiesTest extends NetSuitePropertiesTestBase {
 
         assertNotNull(validationResult3);
         assertEquals(ValidationResult.OK.getStatus(), validationResult3.getStatus());
+    }
+
+    @Test
+    public void testSelectActionWhenModuleNameNotSpecified() throws Exception {
+        properties.init();
+
+        // Select action
+
+        properties.module.action.setValue(OutputAction.UPDATE);
+
+        // After action select
+
+        ValidationResult validationResult1 = properties.module.afterAction();
+
+        verifyZeroInteractions(runtime);
+
+        assertNotNull(validationResult1);
+        assertEquals(ValidationResult.Result.ERROR, validationResult1.getStatus());
+        assertNotNull(validationResult1.getMessage());
+    }
+
+    @Test
+    public void testSyncOutputSchemaWhenModuleNameNotSpecified() throws Exception {
+        properties.init();
+
+        // Select action
+
+        properties.module.action.setValue(OutputAction.UPDATE);
+
+        // Sync output schema
+
+        ValidationResult validationResult1 = properties.module.validateSyncOutgoingSchema();
+
+        verifyZeroInteractions(runtime);
+
+        assertNotNull(validationResult1);
+        assertEquals(ValidationResult.Result.ERROR, validationResult1.getStatus());
+        assertNotNull(validationResult1.getMessage());
     }
 }

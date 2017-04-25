@@ -97,11 +97,15 @@ public class NetSuiteInputModuleProperties extends NetSuiteModuleProperties {
     }
 
     protected void setupSchema() {
+        assertModuleName();
+
         Schema schema = getSchema(moduleName.getStringValue());
         main.schema.setValue(schema);
     }
 
     protected void setupSearchSchema() {
+        assertModuleName();
+
         SearchInfo searchSchema = getSearchInfo(moduleName.getValue());
         List<String> fieldNames = new ArrayList<>(searchSchema.getFields().size());
         for (SearchFieldInfo field : searchSchema.getFields()) {

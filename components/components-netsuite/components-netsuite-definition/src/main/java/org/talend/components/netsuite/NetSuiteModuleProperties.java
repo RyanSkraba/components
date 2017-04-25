@@ -19,13 +19,16 @@ import static org.talend.daikon.properties.property.PropertyFactory.newString;
 import java.util.List;
 
 import org.apache.avro.Schema;
+import org.apache.commons.lang3.StringUtils;
 import org.talend.components.api.component.ISchemaListener;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.common.SchemaProperties;
 import org.talend.components.netsuite.connection.NetSuiteConnectionProperties;
 import org.talend.components.netsuite.schema.SearchInfo;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.java8.Function;
+import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.property.StringProperty;
 
 /**
@@ -119,6 +122,14 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
                 return dataSetRuntime.getSearchFieldOperators();
             }
         });
+    }
+
+    protected void assertModuleName() {
+        if (StringUtils.isEmpty(moduleName.getStringValue())) {
+            throw new ComponentException(new ValidationResult()
+                    .setStatus(ValidationResult.Result.ERROR)
+                    .setMessage(getI18nMessage("error.recordTypeNotSpecified")));
+        }
     }
 
     public static class MainSchemaProperties extends SchemaProperties {

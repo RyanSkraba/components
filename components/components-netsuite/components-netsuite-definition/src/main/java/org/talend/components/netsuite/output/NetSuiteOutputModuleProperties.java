@@ -249,12 +249,17 @@ public class NetSuiteOutputModuleProperties extends NetSuiteModuleProperties {
     }
 
     protected void setupSchemaForUpdate() {
+        assertModuleName();
+
         final String typeName = moduleName.getStringValue();
+
         Schema schema = getSchemaForUpdate(typeName);
         main.schema.setValue(schema);
     }
 
     protected void setupOutgoingSchemaForUpdate() {
+        assertModuleName();
+
         final String typeName = moduleName.getStringValue();
 
         Schema schema = main.schema.getValue();
@@ -266,12 +271,17 @@ public class NetSuiteOutputModuleProperties extends NetSuiteModuleProperties {
     }
 
     protected void setupSchemaForDelete() {
+        assertModuleName();
+
         final String typeName = moduleName.getStringValue();
+
         Schema schema = getSchemaForDelete(typeName);
         main.schema.setValue(schema);
     }
 
     protected void setupOutgoingSchemaForDelete() {
+        assertModuleName();
+
         final String typeName = moduleName.getStringValue();
 
         Schema schema = main.schema.getValue();
