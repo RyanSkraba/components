@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.SourceOrSink;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.snowflake.SnowflakeDefinition;
 import org.talend.components.snowflake.runtime.SnowflakeCloseSourceOrSink;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -67,7 +68,7 @@ public class TSnowflakeCloseDefinitionTest {
     }
 
     /**
-     * Check {@link TSnowflakeCloseDefinition#getRuntime()} returns instance of {@link SnowflakeCloseSourceOrSink}
+     * Check {@link TSnowflakeCloseDefinition#getRuntimeInfo(ExecutionEngine, ComponentProperties, ConnectorTopology)} returns instance of {@link SnowflakeCloseSourceOrSink}
      */
     @Test
     public void testGetRuntime() {
