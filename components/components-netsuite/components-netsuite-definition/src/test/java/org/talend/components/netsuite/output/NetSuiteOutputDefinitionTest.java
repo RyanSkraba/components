@@ -106,4 +106,14 @@ public class NetSuiteOutputDefinitionTest {
         JarRuntimeInfo jarRuntimeInfo = (JarRuntimeInfo) runtimeInfo;
         assertThat(jarRuntimeInfo.getRuntimeClassName(), endsWith(".NetSuiteSinkImpl"));
     }
+
+    @Test
+    public void testConditionalInputsFlag() {
+        assertTrue(definition.isConditionalInputs());
+    }
+
+    @Test
+    public void testRejectAfterCloseFlag() {
+        assertTrue(definition.isRejectAfterClose());
+    }
 }

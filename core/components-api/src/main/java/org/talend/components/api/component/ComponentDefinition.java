@@ -120,6 +120,16 @@ public interface ComponentDefinition extends Definition<ComponentProperties> {
 
     boolean isDataAutoPropagate();
 
+    /**
+     * Return flag specifying whether component's input/output data is conditional.
+     *
+     * <p>For example, an output component which has <i>success</i> and <i>reject</i> outgoing flows
+     * should return {@code true} to instruct a <code>runner</code> that output data should be checked
+     * before passing it to a next component.
+     *
+     * @return {@code true} if input/output is conditional and a client should check input/output record
+     *         before processing, {@code false} otherwise
+     */
     boolean isConditionalInputs();
 
     /**
