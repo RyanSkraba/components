@@ -125,42 +125,45 @@ public class AzureStorageComponentListProperties extends ComponentPropertiesImpl
     public ValidationResult afterFormFinishTable(Repository<Properties> repo) throws Exception {
         String repoLoc = repo.storeProperties(connection, connection.name.getValue(), repositoryLocation, null);
         String storeId;
-
-        for (NamedThing nl : selectedContainerNames.getValue()) {
-            String containerId = nl.getName();
-            storeId = nl.getName().replaceAll("-", "_").replaceAll(" ", "_");
-            AzureStorageContainerProperties containerProps = new AzureStorageContainerProperties(containerId);
-            containerProps.init();
-            containerProps.connection = connection;
-            containerProps.container.setValue(containerId);
-            containerProps.schema.schema.setValue(getContainerSchema());
-            repo.storeProperties(containerProps, storeId, repoLoc, "schema.schema");
+        if (selectedContainerNames.getValue() != null) {
+            for (NamedThing nl : selectedContainerNames.getValue()) {
+                String containerId = nl.getName();
+                storeId = nl.getName().replaceAll("-", "_").replaceAll(" ", "_");
+                AzureStorageContainerProperties containerProps = new AzureStorageContainerProperties(containerId);
+                containerProps.init();
+                containerProps.connection = connection;
+                containerProps.container.setValue(containerId);
+                containerProps.schema.schema.setValue(getContainerSchema());
+                repo.storeProperties(containerProps, storeId, repoLoc, "schema.schema");
+            }
         }
-
-        for (NamedThing nl : selectedQueueNames.getValue()) {
-            String queueId = nl.getName();
-            storeId = queueId.replaceAll("-", "_").replaceAll(" ", "_");
-            AzureStorageQueueProperties queueProps = new AzureStorageQueueProperties(queueId);
-            queueProps.init();
-            queueProps.connection = connection;
-            queueProps.queueName.setValue(queueId);
-            queueProps.schema.schema.setValue(getQueueSchema());
-            repo.storeProperties(queueProps, storeId, repoLoc, "schema.schema");
+        if (selectedQueueNames.getValue() != null) {
+            for (NamedThing nl : selectedQueueNames.getValue()) {
+                String queueId = nl.getName();
+                storeId = queueId.replaceAll("-", "_").replaceAll(" ", "_");
+                AzureStorageQueueProperties queueProps = new AzureStorageQueueProperties(queueId);
+                queueProps.init();
+                queueProps.connection = connection;
+                queueProps.queueName.setValue(queueId);
+                queueProps.schema.schema.setValue(getQueueSchema());
+                repo.storeProperties(queueProps, storeId, repoLoc, "schema.schema");
+            }
         }
-
-        for (NamedThing nl : selectedTableNames.getValue()) {
-            String tableId = nl.getName();
-            storeId = tableId.replaceAll("-", "_").replaceAll(" ", "_");
-            AzureStorageTableProperties tableProps = new AzureStorageTableProperties(tableId);
-            tableProps.init();
-            tableProps.connection = connection;
-            tableProps.tableName.setValue(tableId);
-            try {
-                Schema schema = AzureStorageTableSourceOrSink.getSchema(null, connection, tableId);
-                tableProps.schema.schema.setValue(schema);
-                repo.storeProperties(tableProps, storeId, repoLoc, "schema.schema");
-            } catch (IOException e) {
-                LOGGER.error(e.getLocalizedMessage());
+        if (selectedTableNames.getValue() != null) {
+            for (NamedThing nl : selectedTableNames.getValue()) {
+                String tableId = nl.getName();
+                storeId = tableId.replaceAll("-", "_").replaceAll(" ", "_");
+                AzureStorageTableProperties tableProps = new AzureStorageTableProperties(tableId);
+                tableProps.init();
+                tableProps.connection = connection;
+                tableProps.tableName.setValue(tableId);
+                try {
+                    Schema schema = AzureStorageTableSourceOrSink.getSchema(null, connection, tableId);
+                    tableProps.schema.schema.setValue(schema);
+                    repo.storeProperties(tableProps, storeId, repoLoc, "schema.schema");
+                } catch (IOException e) {
+                    LOGGER.error(e.getLocalizedMessage());
+                }
             }
         }
         return ValidationResult.OK;

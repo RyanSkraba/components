@@ -154,7 +154,7 @@ public class AzureStorageComponentListPropertiesTest extends AzureStorageConnect
      *
      * @see org.talend.components.azurestorage.wizard.AzureStorageComponentListProperties#afterFormFinishTable(Repository<Properties>)
      */
-    @Test(expected = Exception.class)
+    @Test
     public void afterFormFinishTable() throws Exception {
         ValidationResult result = properties.afterFormFinishTable(repo);
         assertNotNull("result cannot be null", result);
