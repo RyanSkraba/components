@@ -17,6 +17,9 @@ import org.apache.avro.SchemaBuilder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.daikon.properties.ValidationResult;
 
 /**
@@ -26,6 +29,7 @@ import org.talend.daikon.properties.ValidationResult;
  */
 
 public class TSalesforceInputPropertiesIT {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TSalesforceInputPropertiesIT.class);
 
     private static final String GUESS_SCHEMA_SOQL_ERROR_PROPERTY_KEY = "errorMessage.validateGuessSchemaSoqlError";
 
@@ -142,6 +146,76 @@ public class TSalesforceInputPropertiesIT {
         Assert.assertEquals(ValidationResult.Result.ERROR, validationResult.getStatus());
         Assert.assertNotNull(validationResult.getMessage());
         Assert.assertTrue(validationResult.getMessage().startsWith(expectedMessage));
+    }
+
+    /**
+     * Checks {@link TSalesforceInputProperties#guessQuery} returns correct soql-query
+     */
+    @Test
+    public void testValidateGuessQueryPositiveCase() throws Exception {
+        final String field1 = "Id";
+        final String field2 = "Name";
+        final String moduleName = "Module";
+
+        String expectedQuery = "\"SELECT Id, Name FROM Module\"";
+
+        Schema schema = SchemaBuilder.record("Result").fields()
+                .name(field1).type().stringType().noDefault()
+                .name(field2).type().stringType().noDefault()
+                .endRecord();
+
+        SalesforceModuleProperties salesforceModuleProperties = new SalesforceModuleProperties("properties");
+        salesforceModuleProperties.moduleName.setValue(moduleName);
+        salesforceModuleProperties.main.schema.setValue(schema);
+
+        properties.module = salesforceModuleProperties;
+
+        ValidationResult.Result resultStatus = properties.validateGuessQuery().status;
+        String expectedMessage = properties.validateGuessQuery().getMessage();
+
+        LOGGER.debug("validation result status: " + resultStatus);
+        Assert.assertEquals(ValidationResult.Result.OK, resultStatus);
+
+        String resultQuery = properties.query.getValue();
+        LOGGER.debug("result query: " + resultQuery);
+        Assert.assertNotNull(resultQuery);
+        Assert.assertEquals(expectedQuery, resultQuery);
+        Assert.assertNull(expectedMessage);
+    }
+
+    /**
+     * Checks {@link TSalesforceInputProperties#guessQuery} returns empty {@link java.lang.String}
+     * when schema does not include any fields
+     */
+    @Test
+    public void testValidateGuessQueryEmptySchema() throws Exception {
+        final String field1 = "Id";
+        final String field2 = "Name";
+        final String moduleName = "Module";
+
+        String expectedQuery = "";
+
+        Schema schema = SchemaBuilder.record("Result").fields()
+                .endRecord();
+
+        SalesforceModuleProperties salesforceModuleProperties = new SalesforceModuleProperties("properties");
+        salesforceModuleProperties.moduleName.setValue(moduleName);
+        salesforceModuleProperties.main.schema.setValue(schema);
+
+        properties.module = salesforceModuleProperties;
+
+        ValidationResult.Result resultStatus = properties.validateGuessQuery().status;
+        String expectedMessage = properties.validateGuessQuery().getMessage();
+
+        LOGGER.debug("validation result status: " + resultStatus);
+        Assert.assertEquals(ValidationResult.Result.ERROR, resultStatus);
+        Assert.assertNotNull(expectedMessage);
+        Assert.assertEquals(expectedMessage, "Schema does not contain any field. Query cannot be guessed.");
+
+        String resultQuery = properties.query.getValue();
+        LOGGER.debug("result query: " + resultQuery);
+        Assert.assertNotNull(resultQuery);
+        Assert.assertEquals(expectedQuery, resultQuery);
     }
 
     private void setupProperties() {

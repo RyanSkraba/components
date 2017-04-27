@@ -154,11 +154,19 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
                     .getInstance();
             salesforceSourceOrSink.initialize(null, this);
 
-            String soqlQuery = ((SalesforceSchemaHelper<Schema>) salesforceSourceOrSink).guessQuery(module.main.schema.getValue(),
-                    module.moduleName.getValue());
-            query.setValue(soqlQuery);
+            Schema schema = module.main.schema.getValue();
+            String moduleName = module.moduleName.getValue();
 
-            validationResult.setStatus(ValidationResult.Result.OK);
+            if (!schema.getFields().isEmpty()) {
+                String soqlQuery = ((SalesforceSchemaHelper<Schema>)salesforceSourceOrSink).guessQuery(schema, moduleName);
+                query.setValue(soqlQuery);
+
+                validationResult.setStatus(ValidationResult.Result.OK);
+            } else {
+                String errorMessage = getI18nMessage("errorMessage.validateGuessQueryError");
+                validationResult.setStatus(ValidationResult.Result.ERROR).setMessage(errorMessage);
+                query.setValue("");
+            }
         } catch (TalendRuntimeException tre) {
             validationResult.setStatus(ValidationResult.Result.ERROR);
             validationResult.setMessage(getI18nMessage("errorMessage.validateGuessQuerySoqlError", tre.getMessage()));
