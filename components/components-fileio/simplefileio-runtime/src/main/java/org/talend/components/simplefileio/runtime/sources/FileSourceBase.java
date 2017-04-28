@@ -27,6 +27,7 @@ import org.apache.beam.sdk.repackaged.com.google.common.collect.Lists;
 import org.apache.beam.sdk.values.KV;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.talend.components.simplefileio.runtime.ExtraHadoopConfiguration;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 
 /**
@@ -51,6 +52,11 @@ public abstract class FileSourceBase<K, V, SourceT extends FileSourceBase<K, V, 
     protected FileSourceBase(UgiDoAs doAs, String filepattern, Class<? extends FileInputFormat<?, ?>> formatClass,
             Class<K> keyClass, Class<V> valueClass, SerializableSplit serializableSplit) {
         super(doAs, filepattern, formatClass, keyClass, valueClass, serializableSplit);
+    }
+
+    protected FileSourceBase(UgiDoAs doAs, String filepattern, Class<? extends FileInputFormat<?, ?>> formatClass,
+            Class<K> keyClass, Class<V> valueClass, ExtraHadoopConfiguration extraConfig, SerializableSplit serializableSplit) {
+        super(doAs, filepattern, formatClass, keyClass, valueClass, extraConfig, serializableSplit);
     }
 
     /**

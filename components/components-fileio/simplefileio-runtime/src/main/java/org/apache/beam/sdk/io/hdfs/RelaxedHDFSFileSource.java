@@ -22,7 +22,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 /**
  * This class exists only to relax the package-private access to the subclass for extension.
  */
-public abstract class RelaxedHDFSFileSource<K, V> extends HDFSFileSource<K, V> {
+public abstract class RelaxedHDFSFileSource<K, V> extends ConfigurableHDFSFileSource<K, V> {
 
     protected RelaxedHDFSFileSource(String filepattern, Class<? extends FileInputFormat<?, ?>> formatClass, Class<K> keyClass,
             Class<V> valueClass, SerializableSplit serializableSplit) {

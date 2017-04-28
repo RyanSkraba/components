@@ -21,7 +21,9 @@ import org.apache.beam.sdk.io.BoundedSource;
 import org.apache.beam.sdk.io.hdfs.RelaxedHDFSFileSource;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.values.KV;
+import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.talend.components.simplefileio.runtime.ExtraHadoopConfiguration;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 
 /**
@@ -41,10 +43,30 @@ public abstract class UgiFileSourceBase<K, V, SourceT extends UgiFileSourceBase<
 
     protected final UgiDoAs doAs;
 
+    /** Additional information to configure the InputFormat */
+    protected final ExtraHadoopConfiguration extraConfig;
+
     protected UgiFileSourceBase(UgiDoAs doAs, String filepattern, Class<? extends FileInputFormat<?, ?>> formatClass,
             Class<K> keyClass, Class<V> valueClass, SerializableSplit serializableSplit) {
+        this(doAs, filepattern, formatClass, keyClass, valueClass, new ExtraHadoopConfiguration(), serializableSplit);
+    }
+
+    protected UgiFileSourceBase(UgiDoAs doAs, String filepattern, Class<? extends FileInputFormat<?, ?>> formatClass,
+            Class<K> keyClass, Class<V> valueClass, ExtraHadoopConfiguration extraConfig, SerializableSplit serializableSplit) {
         super(filepattern, formatClass, keyClass, valueClass, serializableSplit);
         this.doAs = doAs;
+        this.extraConfig = extraConfig;
+    }
+
+    public ExtraHadoopConfiguration getExtraHadoopConfiguration() {
+        return extraConfig;
+    }
+
+    @Override
+    protected Job jobInstance() throws IOException {
+        Job job = super.jobInstance();
+        extraConfig.addTo(job.getConfiguration());
+        return job;
     }
 
     /* Override with UGI if available. */
@@ -93,6 +115,7 @@ public abstract class UgiFileSourceBase<K, V, SourceT extends UgiFileSourceBase<
             super(source, source.filepattern, source.formatClass, source.serializableSplit == null ? null
                     : source.serializableSplit.getSplit());
             this.source = source;
+            source.extraConfig.addTo(job.getConfiguration());
         }
 
         @Override

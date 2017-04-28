@@ -102,11 +102,11 @@
 			<artifactId>pubsub-definition</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-api-full-example</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>org.talend.components</groupId>-->
+			<!--<artifactId>components-api-full-example</artifactId>-->
+			<!--<version>${project.version}</version>-->
+		<!--</dependency>-->
 		<!-- the runtime artifact are added as test so that the global maven build
 			builds them before -->
 		<!-- they are used to create the maven repo for runtime hence not real

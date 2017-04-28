@@ -23,6 +23,7 @@ import org.apache.beam.sdk.util.CoderUtils;
 import org.apache.beam.sdk.values.KV;
 import org.apache.hadoop.io.NullWritable;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
+import org.talend.components.simplefileio.runtime.ExtraHadoopConfiguration;
 import org.talend.components.simplefileio.runtime.coders.LazyAvroKeyWrapper;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 
@@ -35,19 +36,21 @@ public class AvroHdfsFileSource extends FileSourceBase<AvroKey, NullWritable, Av
 
     private final LazyAvroCoder<?> lac;
 
-    private AvroHdfsFileSource(UgiDoAs doAs, String filepattern, LazyAvroCoder<?> lac, SerializableSplit serializableSplit) {
-        super(doAs, filepattern, (Class) AvroKeyInputFormat.class, AvroKey.class, NullWritable.class, serializableSplit);
+    private AvroHdfsFileSource(UgiDoAs doAs, String filepattern, LazyAvroCoder<?> lac, ExtraHadoopConfiguration extraConfig,
+            SerializableSplit serializableSplit) {
+        super(doAs, filepattern, (Class) AvroKeyInputFormat.class, AvroKey.class, NullWritable.class, extraConfig,
+                serializableSplit);
         this.lac = lac;
         setDefaultCoder(LazyAvroKeyWrapper.of(lac), WritableCoder.of(NullWritable.class));
     }
 
     public static AvroHdfsFileSource of(UgiDoAs doAs, String filepattern, LazyAvroCoder<?> lac) {
-        return new AvroHdfsFileSource(doAs, filepattern, lac, null);
+        return new AvroHdfsFileSource(doAs, filepattern, lac, new ExtraHadoopConfiguration(), null);
     }
 
     @Override
     protected AvroHdfsFileSource createSourceForSplit(SerializableSplit serializableSplit) {
-        AvroHdfsFileSource source = new AvroHdfsFileSource(doAs, filepattern, lac, serializableSplit);
+        AvroHdfsFileSource source = new AvroHdfsFileSource(doAs, filepattern, lac, extraConfig, serializableSplit);
         source.setLimit(getLimit());
         return source;
     }

@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -16,6 +17,9 @@
 
     <properties>
         <hadoop.version>2.7.0</hadoop.version>
+        <!-- See below on information for hadoop-aws. -->
+        <hadoop.aws.artifactId>hadoop-aws-tlnd</hadoop.aws.artifactId>
+        <hadoop.aws.version>2.7.3.1-SNAPSHOT</hadoop.aws.version>
         <parquet.version>1.9.0</parquet.version>
         <spark.version>1.6.0</spark.version>
     </properties>
@@ -37,7 +41,35 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>simplefileio-definition</artifactId>
-			<version>${project.version}</version>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!--
+        For S3: We are currently using a patched version of Hadoop 2.7.3 hadoop-aws jar:
+
+        * In order to not collide with an existing hadoop-aws.jar on the cluster, the package names have been shaded
+          and the file system scheme has been changed to register s3t instead of s3a.
+
+        * Specific versions of Amazon SDK, jackson and joda-time have been included into the jar with shaded packages.
+         -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>${hadoop.aws.artifactId}</artifactId>
+            <version>${hadoop.aws.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-common</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.amazonaws</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- includes avro -->
@@ -150,4 +182,32 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.20-PAXEXAM-PATCH</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <argLine>-Xms512m -Xmx1024m</argLine>
+                    <systemPropertyVariables>
+                        <s3.accesskey>${s3.accesskey}</s3.accesskey>
+                        <s3.secretkey>${s3.secretkey}</s3.secretkey>
+                        <s3.region>${s3.region}</s3.region>
+                        <s3.bucket>${s3.bucket}</s3.bucket>
+                        <s3.ssekmskey>${s3.ssekmskey}</s3.ssekmskey>
+                        <s3.csekmskey>${s3.csekmskey}</s3.csekmskey>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -18,6 +18,7 @@ import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.coders.VoidCoder;
 import org.apache.parquet.avro.AvroParquetInputFormat;
 import org.talend.components.adapter.beam.coders.LazyAvroCoder;
+import org.talend.components.simplefileio.runtime.ExtraHadoopConfiguration;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 
 /**
@@ -30,19 +31,20 @@ public class ParquetHdfsFileSource extends FileSourceBase<Void, IndexedRecord, P
     private final LazyAvroCoder<IndexedRecord> lac;
 
     private ParquetHdfsFileSource(UgiDoAs doAs, String filepattern, LazyAvroCoder<IndexedRecord> lac,
-            SerializableSplit serializableSplit) {
-        super(doAs, filepattern, (Class) AvroParquetInputFormat.class, Void.class, IndexedRecord.class, serializableSplit);
+            ExtraHadoopConfiguration extraConfig, SerializableSplit serializableSplit) {
+        super(doAs, filepattern, (Class) AvroParquetInputFormat.class, Void.class, IndexedRecord.class, extraConfig,
+                serializableSplit);
         this.lac = lac;
         setDefaultCoder(VoidCoder.of(), (LazyAvroCoder) lac);
     }
 
     public static ParquetHdfsFileSource of(UgiDoAs doAs, String filepattern, LazyAvroCoder<IndexedRecord> lac) {
-        return new ParquetHdfsFileSource(doAs, filepattern, lac, null);
+        return new ParquetHdfsFileSource(doAs, filepattern, lac, new ExtraHadoopConfiguration(), null);
     }
 
     @Override
     protected ParquetHdfsFileSource createSourceForSplit(SerializableSplit serializableSplit) {
-        ParquetHdfsFileSource source = new ParquetHdfsFileSource(doAs, filepattern, lac, serializableSplit);
+        ParquetHdfsFileSource source = new ParquetHdfsFileSource(doAs, filepattern, lac, extraConfig, serializableSplit);
         source.setLimit(getLimit());
         return source;
     }

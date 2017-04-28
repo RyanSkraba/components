@@ -14,15 +14,14 @@ package org.talend.components.simplefileio.runtime.sinks;
 
 import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
-import java.util.Map;
 
 import org.apache.beam.sdk.io.hdfs.ConfigurableHDFSFileSink;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.values.KV;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.talend.components.simplefileio.runtime.ExtraHadoopConfiguration;
 import org.talend.components.simplefileio.runtime.ugi.UgiDoAs;
 
 /**
@@ -35,27 +34,33 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
 
     private final UgiDoAs doAs;
 
-    final boolean isLocalMode;
+    /** Additional information to configure the OutputFormat */
+    private final ExtraHadoopConfiguration extraConfig;
 
     public UgiFileSinkBase(UgiDoAs doAs, String path, Class<? extends FileOutputFormat<K, V>> formatClass) {
-        super(path, formatClass);
-        this.doAs = doAs;
-        this.isLocalMode = path.toLowerCase().startsWith("file:");
+        this(doAs, path, formatClass, new ExtraHadoopConfiguration());
     }
 
-    public UgiFileSinkBase(UgiDoAs doAs, String path, Class<? extends FileOutputFormat<K, V>> formatClass, Configuration conf) {
-        super(path, formatClass, conf);
+    public UgiFileSinkBase(UgiDoAs doAs, String path, Class<? extends FileOutputFormat<K, V>> formatClass,
+            ExtraHadoopConfiguration extraConfig) {
+        super(path, formatClass);
         this.doAs = doAs;
-        this.isLocalMode = path.toLowerCase().startsWith("file:");
+        this.extraConfig = extraConfig;
+        // Ensure that the local filesystem is used if the path starts with the file:// schema.
+        if (path.toLowerCase().startsWith("file:")) {
+            this.extraConfig.set(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY,
+                    CommonConfigurationKeysPublic.FS_DEFAULT_NAME_DEFAULT);
+        }
+    }
+
+    public ExtraHadoopConfiguration getExtraHadoopConfiguration() {
+        return extraConfig;
     }
 
     @Override
     protected Job jobInstance() throws IOException {
         Job job = super.jobInstance();
-        if (isLocalMode) {
-            job.getConfiguration().set(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY,
-                    CommonConfigurationKeysPublic.FS_DEFAULT_NAME_DEFAULT);
-        }
+        extraConfig.addTo(job.getConfiguration());
         return job;
     }
 
@@ -67,6 +72,7 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
      * @param sample A sample of the incoming data.
      */
     protected void configure(Job job, KV<K, V> sample) {
+        // The extra configuration has already been added to the job.
     }
 
     @Override
