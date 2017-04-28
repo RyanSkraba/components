@@ -43,7 +43,9 @@ public class NetSuiteInputDefinition extends NetSuiteComponentDefinition {
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
-        assertConnectorTopologyCompatibility(connectorTopology);
+        if (connectorTopology != ConnectorTopology.NONE) {
+            assertConnectorTopologyCompatibility(connectorTopology);
+        }
         NetSuiteInputProperties inputProperties = (NetSuiteInputProperties) properties;
         return getRuntimeInfo(inputProperties, NetSuiteComponentDefinition.SOURCE_CLASS);
     }

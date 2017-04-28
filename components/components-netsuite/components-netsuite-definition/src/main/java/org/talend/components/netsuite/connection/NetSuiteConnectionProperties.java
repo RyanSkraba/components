@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.netsuite.NetSuiteComponentDefinition;
@@ -44,6 +46,8 @@ import org.talend.daikon.serialize.PostDeserializeSetup;
  */
 public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
         implements NetSuiteProvideConnectionProperties {
+
+    private static final Logger LOG = LoggerFactory.getLogger(NetSuiteConnectionProperties.class);
 
     public static final String FORM_WIZARD = "Wizard";
 
@@ -178,7 +182,14 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
 
     public NetSuiteConnectionProperties getEffectiveConnectionProperties() {
         String refComponentId = getReferencedComponentId();
-        return refComponentId != null ? getReferencedConnectionProperties() : this;
+        if (refComponentId != null) {
+            NetSuiteConnectionProperties properties = getReferencedConnectionProperties();
+            if (properties == null) {
+                LOG.error("Connection has a reference to '{}' but the referenced object is null!", refComponentId);
+            }
+            return properties;
+        }
+        return this;
     }
 
     public String getReferencedComponentId() {

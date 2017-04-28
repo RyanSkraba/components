@@ -54,7 +54,9 @@ public class NetSuiteOutputDefinition extends NetSuiteComponentDefinition {
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
-        assertConnectorTopologyCompatibility(connectorTopology);
+        if (connectorTopology != ConnectorTopology.NONE) {
+            assertConnectorTopologyCompatibility(connectorTopology);
+        }
         NetSuiteOutputProperties outputProperties = (NetSuiteOutputProperties) properties;
         return getRuntimeInfo(outputProperties, NetSuiteComponentDefinition.SINK_CLASS);
     }
