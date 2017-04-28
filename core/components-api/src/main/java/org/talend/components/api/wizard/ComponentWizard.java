@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.daikon.i18n.TranslatableImpl;
+import org.talend.daikon.i18n.tag.TranslatableTaggedImpl;
 import org.talend.daikon.properties.presentation.Form;
 
 /**
@@ -25,7 +25,7 @@ import org.talend.daikon.properties.presentation.Form;
  * to the related ComponentPoperties. There are some ComponentProperties form lifecycle methods related to wizard see
  * {@link Properties}
  */
-public abstract class ComponentWizard extends TranslatableImpl {
+public abstract class ComponentWizard extends TranslatableTaggedImpl {
 
     private ComponentWizardDefinition definition;
 

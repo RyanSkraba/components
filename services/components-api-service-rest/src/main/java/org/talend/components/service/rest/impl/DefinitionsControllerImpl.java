@@ -33,6 +33,9 @@ import org.talend.components.service.rest.dto.DefinitionDTO;
 import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.definition.Definition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
+import org.talend.daikon.i18n.tag.HasTags;
+import org.talend.daikon.i18n.tag.Tag;
+import org.talend.daikon.i18n.tag.TagUtils;
 
 /**
  * Definition controller..
@@ -54,13 +57,27 @@ public class DefinitionsControllerImpl implements DefinitionsController {
      * @returnWrapped java.lang.Iterable<org.talend.components.service.rest.dto.DefinitionDTO>
      */
     @Override
-    public List<DefinitionDTO> listDefinitions(DefinitionType type) {
+    public List<DefinitionDTO> listDefinitions(DefinitionType type, String tag) {
         logger.debug("listing definitions for {} ", type);
 
         Iterable<? extends Definition> definitionsByType = //
                 definitionServiceDelegate.getDefinitionsMapByType(type.getTargetClass()).values();
 
-        return stream(definitionsByType.spliterator(), false)
+        Stream<? extends Definition> stream = stream(definitionsByType.spliterator(), false);
+
+        if (tag != null) {
+            stream = stream.filter(c -> HasTags.class.isAssignableFrom(c.getClass())) //
+                    .filter(c -> {
+                        for (Tag defTag : ((HasTags) c).getTags()) {
+                            if (TagUtils.hasTag(defTag, tag)) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    });
+        }
+
+        return stream
                 // this if...else is ugly, one should try to find a better solution
                 .map(c -> {
                     if (type == DefinitionType.COMPONENT) {

@@ -12,15 +12,24 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.runtime.DependenciesReader;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.JarRuntimeInfo;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.common.CommonTags;
+import org.talend.daikon.i18n.tag.TagImpl;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 public abstract class SalesforceDefinition extends AbstractComponentDefinition {
+
+    protected static final TagImpl SALESFORCE_CLOUD_TAG = new TagImpl("salesforce", CommonTags.CLOUD_TAG);
+
+    protected static final TagImpl SALESFORCE_BUSINESS_TAG = new TagImpl("salesforce", CommonTags.BUSINESS_TAG);
 
     public SalesforceDefinition(String componentName, ExecutionEngine engine1, ExecutionEngine... engines) {
         super(componentName, engine1, engines);
@@ -47,6 +56,10 @@ public abstract class SalesforceDefinition extends AbstractComponentDefinition {
         return new JarRuntimeInfo("mvn:org.talend.components/components-salesforce-runtime",
                 DependenciesReader.computeDependenciesFilePath("org.talend.components", "components-salesforce-runtime"),
                 clazzFullName);
+    }
+
+    public List<TagImpl> doGetTags() {
+        return Arrays.asList(SALESFORCE_CLOUD_TAG, SALESFORCE_BUSINESS_TAG);
     }
 
 }

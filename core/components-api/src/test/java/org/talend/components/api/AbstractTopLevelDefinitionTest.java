@@ -12,12 +12,19 @@
 // ============================================================================
 package org.talend.components.api;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+
+import java.util.Collection;
 
 import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.daikon.NamedThing;
+import org.talend.daikon.i18n.tag.TagImpl;
+import org.talend.daikon.i18n.tag.TagUtils;
 
 /**
  * created by pbailly on 5 Nov 2015 Detailled comment
@@ -72,6 +79,21 @@ public class AbstractTopLevelDefinitionTest {
         when(definition.getName()).thenReturn("foo");
         when(definition.getI18nPrefix()).thenReturn("definition.");
         return definition;
+    }
+
+    /**
+     * Test default tag in AbstractTopLevelDefinition. Definition name is added as a default tag, if method
+     * {@link AbstractTopLevelDefinition#doGetTags()} is not overriden.
+     */
+    @Test
+    public void testGetDefaultTag() {
+        AbstractTopLevelDefinition atld = new TestingAbstractTopLevelDefinition();
+        Collection<TagImpl> tags = atld.getTags();
+        assertEquals(1, tags.size());
+
+        TagImpl tag = tags.iterator().next();
+        assertTrue(TagUtils.hasTag(tag, "TestName"));
+        assertFalse(TagUtils.hasTag(tag, "SomeOtherTag"));
     }
 
 }

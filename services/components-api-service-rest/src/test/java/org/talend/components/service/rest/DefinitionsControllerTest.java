@@ -47,7 +47,9 @@ import org.talend.components.service.rest.mock.MockComponentDefinition;
 import org.talend.components.service.rest.mock.MockDatastoreDefinition;
 import org.talend.daikon.definition.Definition;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.response.Response;
 
@@ -196,6 +198,11 @@ public class DefinitionsControllerTest extends AbstractSpringIntegrationTests {
         assertEquals(14, actual.size());
     }
 
+    @Test
+    public void shouldFilterByTagSource() throws JsonParseException, JsonMappingException, IOException {
+        shouldFilterComponentsByTag("source", 3);
+    }
+
     public void shouldFilterComponentsByTypology(ConnectorTypology wantedTypology, int expectedResults) throws IOException {
         // given
         Map<String, ComponentDefinition> definitions = getComponentsDefinitions();
@@ -215,6 +222,23 @@ public class DefinitionsControllerTest extends AbstractSpringIntegrationTests {
                                                                                                                          // a
                                                                                                                          // source
                 .count());
+    }
+
+    public void shouldFilterComponentsByTag(String tag, int expectedResults)
+            throws JsonParseException, JsonMappingException, IOException {
+        Map<String, ComponentDefinition> definitions = getComponentsDefinitions();
+
+        BDDMockito.given(delegate.getDefinitionsMapByType(ComponentDefinition.class)) //
+                .willReturn(definitions);
+
+        // when
+        final Response response = when().get("/definitions/" + COMPONENT + "?tag=" + tag).andReturn();
+
+        // then
+        assertEquals(OK.value(), response.getStatusCode());
+        List<DefinitionDTO> actual = objectMapper.readValue(response.asInputStream(), new TypeReference<List<DefinitionDTO>>() {
+        });
+        assertEquals(expectedResults, actual.size());
     }
 
     public void shouldFilterComponentsByExecutionEngine(ExecutionEngine executionEngine, int expectedResults) throws IOException {
@@ -268,10 +292,10 @@ public class DefinitionsControllerTest extends AbstractSpringIntegrationTests {
         definitions.put("sink_3", new MockComponentDefinition("sink_3", ExecutionEngine.DI_SPARK_BATCH, OUTGOING));
         definitions.put("transformer_1", new MockComponentDefinition("transformer_1", "icon_key_transformer_1",
                 ExecutionEngine.DI_SPARK_STREAMING, INCOMING_AND_OUTGOING));
-        definitions.put("transformer_2", new MockComponentDefinition("transformer_2", ExecutionEngine.DI_SPARK_STREAMING,
-                INCOMING_AND_OUTGOING));
-        definitions.put("transformer_3", new MockComponentDefinition("transformer_3", ExecutionEngine.DI_SPARK_STREAMING,
-                INCOMING_AND_OUTGOING));
+        definitions.put("transformer_2",
+                new MockComponentDefinition("transformer_2", ExecutionEngine.DI_SPARK_STREAMING, INCOMING_AND_OUTGOING));
+        definitions.put("transformer_3",
+                new MockComponentDefinition("transformer_3", ExecutionEngine.DI_SPARK_STREAMING, INCOMING_AND_OUTGOING));
         definitions.put("config_1", new MockComponentDefinition("config_1", "icon_key_config_1", NONE));
         definitions.put("config_2", new MockComponentDefinition("config_2", NONE));
         definitions.put("config_3", new MockComponentDefinition("config_3", NONE));

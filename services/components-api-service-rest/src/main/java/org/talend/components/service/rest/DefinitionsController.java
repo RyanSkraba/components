@@ -1,4 +1,4 @@
-//==============================================================================
+// ==============================================================================
 //
 // Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
@@ -9,7 +9,7 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-//==============================================================================
+// ==============================================================================
 
 package org.talend.components.service.rest;
 
@@ -39,7 +39,8 @@ public interface DefinitionsController {
      * @returnWrapped java.lang.Iterable<org.talend.components.service.rest.dto.DefinitionDTO>
      */
     @RequestMapping(value = "/definitions/{type}", method = GET)
-    List<DefinitionDTO> listDefinitions(@PathVariable("type") DefinitionType type);
+    List<DefinitionDTO> listDefinitions(@PathVariable("type") DefinitionType type,
+            @RequestParam(value = "tag", required = false) String tag);
 
     /**
      * Return components that match the given typology and/or execution engine.
@@ -51,6 +52,6 @@ public interface DefinitionsController {
      */
     @RequestMapping(value = "/definitions/components", method = GET)
     List<DefinitionDTO> listComponentDefinitions(@RequestParam(value = "typology", required = false) ConnectorTypology typology,
-	    @RequestParam(value = "executionEngine", required = false) ExecutionEngine executionEngine);
+            @RequestParam(value = "executionEngine", required = false) ExecutionEngine executionEngine);
 
 }
