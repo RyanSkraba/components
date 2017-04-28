@@ -170,7 +170,7 @@ public class FileDelimitedWizardTestIT extends FileDelimitedTestBasic {
 
     @Test
     public void testWizardPreviewData() throws Throwable {
-        String resources = getClass().getResource("/runtime/input").getPath();
+        String resources = getClass().getResource("/runtime/input").toURI().getPath();
         FileDelimitedProperties props = (FileDelimitedProperties) new FileDelimitedProperties("wizard").init();
         props.rowSeparator.setValue("\n");
         Form wizardForm = props.getForm(FileDelimitedProperties.FORM_WIZARD);
@@ -202,7 +202,7 @@ public class FileDelimitedWizardTestIT extends FileDelimitedTestBasic {
         assertEquals(18, props.main.schema.getValue().getField("Column18").pos());
         assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
 
-        resources = getClass().getResource("/runtime/wizard").getPath();
+        resources = getClass().getResource("/runtime/wizard").toURI().getPath();
 
         // File is empty
         props.fileName.setValue(resources + "/wizard_file_empty.csv");

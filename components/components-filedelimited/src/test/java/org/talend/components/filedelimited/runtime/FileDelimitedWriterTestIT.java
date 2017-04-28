@@ -309,7 +309,7 @@ public class FileDelimitedWriterTestIT extends FileDelimitedTestBasic {
         return file.delete();
     }
 
-    public String getResourceFolder() {
-        return getClass().getResource(TEST_FOLDER).getPath();
+    public String getResourceFolder() throws Throwable {
+        return getClass().getResource(TEST_FOLDER).toURI().getPath();
     }
 }

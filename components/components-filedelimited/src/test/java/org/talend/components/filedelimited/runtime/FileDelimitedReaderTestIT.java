@@ -179,7 +179,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
 
     @Test
     public void testInputDecodeNumber() throws Throwable {
-        String resources = getClass().getResource("/runtime/input").getPath();
+        String resources = getClass().getResource("/runtime/input").toURI().getPath();
         String inputFile = resources + "/test_input_decode.csv";
         LOGGER.debug("Test file path: " + inputFile);
 
@@ -269,7 +269,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
 
     @Test
     public void testInputTransformNumberString() throws Throwable {
-        String resources = getClass().getResource("/runtime/input").getPath();
+        String resources = getClass().getResource("/runtime/input").toURI().getPath();
         String inputFile = resources + "/test_input_transform_number.csv";
         LOGGER.debug("Test file path: " + inputFile);
 
@@ -340,7 +340,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
     }
 
     protected void testInputTrim(boolean isCsvMode) throws Throwable {
-        String resources = getClass().getResource("/runtime/input").getPath();
+        String resources = getClass().getResource("/runtime/input").toURI().getPath();
         String inputFile = resources + "/test_input_trim.csv";
         LOGGER.debug("Test file path: " + inputFile);
 
@@ -400,7 +400,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
     // Test FileInputDelimited component read anc check date
     @Test(expected = RuntimeException.class)
     public void testInputCheckDate() throws Throwable {
-        String resources = getClass().getResource("/runtime/input").getPath();
+        String resources = getClass().getResource("/runtime/input").toURI().getPath();
         String inputFile = resources + "/test_input_check_date.csv";
         LOGGER.debug("Test file path: " + inputFile);
 
@@ -423,7 +423,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
     // Test FileInputDelimited component read with delimited mode and die on error
     @Test(expected = NumberFormatException.class)
     public void testInputDieOnErrorDelimitedMode() throws Throwable {
-        String resources = getClass().getResource("/runtime/input").getPath();
+        String resources = getClass().getResource("/runtime/input").toURI().getPath();
         String inputFile = resources + "/test_input_delimited_reject.csv";
         LOGGER.debug("Test file path: " + inputFile);
 
@@ -441,7 +441,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
     // Test FileInputDelimited component read with CSV mode and die on error
     @Test(expected = RuntimeException.class)
     public void testInputDieOnErrorCsvMode() throws Throwable {
-        String resources = getClass().getResource("/runtime/input").getPath();
+        String resources = getClass().getResource("/runtime/input").toURI().getPath();
         String inputFile = resources + "/test_input_csv_reject.csv";
         LOGGER.debug("Test file path: " + inputFile);
 
@@ -458,7 +458,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
     // Test FileInputDelimited component read with delimited mode and with reject
     @Test
     public void testInputRejectDelimitedMode() throws Throwable {
-        String resources = getClass().getResource("/runtime/input").getPath();
+        String resources = getClass().getResource("/runtime/input").toURI().getPath();
         String inputFile = resources + "/test_input_delimited_reject.csv";
         LOGGER.debug("Test file path: " + inputFile);
         testInputReject(createInputProperties(inputFile, false));
@@ -467,7 +467,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
     // Test FileInputDelimited component read with CSV mode and with reject
     @Test
     public void testInputRejectCsvMode() throws Throwable {
-        String resources = getClass().getResource("/runtime/input").getPath();
+        String resources = getClass().getResource("/runtime/input").toURI().getPath();
         String inputFile = resources + "/test_input_csv_reject.csv";
         LOGGER.debug("Test file path: " + inputFile);
         testInputReject(createInputProperties(inputFile, true));
@@ -488,7 +488,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
     // Test FileInputDelimited component nb line count
     @Test
     public void testInputNBLine() throws Throwable {
-        String resources = getClass().getResource("/runtime/input").getPath();
+        String resources = getClass().getResource("/runtime/input").toURI().getPath();
         // CSV mode
         String inputFile = resources + "/test_input_csv_reject.csv";
         TFileInputDelimitedProperties properties = createInputProperties(inputFile, true);
@@ -503,7 +503,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
     }
 
     public void testInputDelimited(boolean previewData, boolean sourceIsStream) throws Throwable {
-        String resources = getClass().getResource("/runtime/input").getPath();
+        String resources = getClass().getResource("/runtime/input").toURI().getPath();
         String inputFile = resources + "/test_input_delimited.csv";
         LOGGER.debug("Test file path: " + inputFile);
 
@@ -511,14 +511,14 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
     }
 
     protected void testInputCSV(boolean previewData, boolean sourceIsStream) throws Throwable {
-        String resources = getClass().getResource("/runtime/input").getPath();
+        String resources = getClass().getResource("/runtime/input").toURI().getPath();
         String inputFile = resources + "/test_input_csv.csv";
         LOGGER.debug("Test file path: " + inputFile);
         basicInputTest(inputFile, previewData, true, sourceIsStream);
     }
 
     protected void testInputCompressFile(boolean isCsvMode) throws Throwable {
-        String resources = getClass().getResource("/runtime/input").getPath();
+        String resources = getClass().getResource("/runtime/input").toURI().getPath();
         String inputFile = resources + "/test_input_compress_delimited.zip";
         if (isCsvMode) {
             inputFile = resources + "/test_input_compress_csv.zip";
@@ -574,7 +574,7 @@ public class FileDelimitedReaderTestIT extends FileDelimitedTestBasic {
     }
 
     protected void testInputDynamic(boolean isCsvMode) throws Throwable {
-        String resources = getClass().getResource("/runtime/input").getPath();
+        String resources = getClass().getResource("/runtime/input").toURI().getPath();
         String inputFile = resources + "/input_delimited_dynamic.csv";
         if (isCsvMode) {
             inputFile = resources + "/input_csv_dynamic.csv";

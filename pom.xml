@@ -41,7 +41,8 @@
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.5.3</version>
 				<configuration>
-					<preparationGoals>clean install</preparationGoals>
+					<!-- Only unit-tests are launched because for the moment release prepared on local machine. Should be replaced to clean install, when we setup Jenkins for release process -->
+					<preparationGoals>clean test</preparationGoals>
 					<pushChanges>false</pushChanges>
 					<scmCommentPrefix>release:</scmCommentPrefix>
 					<tagNameFormat>@{project.artifactId}-@{project.version}</tagNameFormat>
