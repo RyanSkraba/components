@@ -41,8 +41,12 @@ public class SimpleFileIOComponentFamilyDefinition extends AbstractComponentFami
     public static final String MAVEN_GROUP_ID = "org.talend.components";
 
     public static final String MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID = "simplefileio-runtime";
+    
+    public static final String MAVEN_DEFAULT_DI_RUNTIME_ARTIFACT_ID = "s3-runtime-di";
 
     public static final String MAVEN_DEFAULT_RUNTIME_URI = "mvn:" + MAVEN_GROUP_ID + "/" + MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID;
+    
+    public static final String MAVEN_DEFAULT_DI_RUNTIME_URI = "mvn:" + MAVEN_GROUP_ID + "/" + MAVEN_DEFAULT_DI_RUNTIME_ARTIFACT_ID;
 
     public SimpleFileIOComponentFamilyDefinition() {
         super(NAME,

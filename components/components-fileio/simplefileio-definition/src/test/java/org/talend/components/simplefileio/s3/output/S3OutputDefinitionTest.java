@@ -76,8 +76,18 @@ public class S3OutputDefinitionTest {
     }
 
     @Test(expected = TalendRuntimeException.class)
-    public void testFailRuntimeInfoDi() {
-        def.getRuntimeInfo(ExecutionEngine.DI, null, ConnectorTopology.INCOMING);
+    public void testFailRuntimeInfoOutgoingDi() {
+        def.getRuntimeInfo(ExecutionEngine.DI, null, ConnectorTopology.OUTGOING);
+    }
+
+    @Test(expected = TalendRuntimeException.class)
+    public void testFailRuntimeInfoIncomingAndOutgoingDi() {
+        def.getRuntimeInfo(ExecutionEngine.DI, null, ConnectorTopology.INCOMING_AND_OUTGOING);
+    }
+
+    @Test(expected = TalendRuntimeException.class)
+    public void testFailRuntimeInfoNoneDi() {
+        def.getRuntimeInfo(ExecutionEngine.DI, null, ConnectorTopology.NONE);
     }
 
     @Test(expected = TalendRuntimeException.class)

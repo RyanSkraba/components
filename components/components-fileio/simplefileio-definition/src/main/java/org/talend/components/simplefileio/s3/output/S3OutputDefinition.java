@@ -35,8 +35,10 @@ public class S3OutputDefinition extends AbstractComponentDefinition {
 
     public static final String RUNTIME = "org.talend.components.simplefileio.runtime.s3.S3OutputRuntime";
 
+    public static final String DI_RUNTIME = "org.talend.components.s3.runtime.S3Sink";
+
     public S3OutputDefinition() {
-        super(NAME, ExecutionEngine.BEAM);
+        super(NAME, ExecutionEngine.BEAM, ExecutionEngine.DI);
     }
 
     @Override
@@ -65,13 +67,24 @@ public class S3OutputDefinition extends AbstractComponentDefinition {
     }
 
     @Override
-    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties, ConnectorTopology connectorTopology) {
+    public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
+            ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
         assertConnectorTopologyCompatibility(connectorTopology);
         try {
-            return new JarRuntimeInfo(new URL(SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_URI),
-                    DependenciesReader.computeDependenciesFilePath(SimpleFileIOComponentFamilyDefinition.MAVEN_GROUP_ID,
-                            SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID), RUNTIME);
+            switch (engine) {
+            case DI:
+                return new JarRuntimeInfo(new URL(SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_DI_RUNTIME_URI),
+                        DependenciesReader.computeDependenciesFilePath(SimpleFileIOComponentFamilyDefinition.MAVEN_GROUP_ID,
+                                SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_DI_RUNTIME_ARTIFACT_ID),
+                        DI_RUNTIME);
+            case BEAM:
+            default:
+                return new JarRuntimeInfo(new URL(SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_URI),
+                        DependenciesReader.computeDependenciesFilePath(SimpleFileIOComponentFamilyDefinition.MAVEN_GROUP_ID,
+                                SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID),
+                        RUNTIME);
+            }
         } catch (MalformedURLException e) {
             throw new ComponentException(e);
         }
