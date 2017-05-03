@@ -21,7 +21,6 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<daikon.version>0.16.0-SNAPSHOT</daikon.version>
-		<components-api-full-example.version>0.18.0-SNAPSHOT</components-api-full-example.version>
 	</properties>
 
 	<dependencies>
