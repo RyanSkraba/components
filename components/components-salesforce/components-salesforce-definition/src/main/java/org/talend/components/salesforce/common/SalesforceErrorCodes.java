@@ -28,6 +28,8 @@ public enum SalesforceErrorCodes implements ErrorCode {
 
     UNABLE_TO_RETRIEVE_MODULES(SC_INTERNAL_SERVER_ERROR),
 
+    ERROR_IN_BULK_QUERY_PROCESSING(SC_BAD_REQUEST, ExceptionContext.KEY_MESSAGE),
+
     INVALID_SOQL(SC_BAD_REQUEST, ExceptionContext.KEY_MESSAGE);
 
     private DefaultErrorCode errorCodeDelegate;

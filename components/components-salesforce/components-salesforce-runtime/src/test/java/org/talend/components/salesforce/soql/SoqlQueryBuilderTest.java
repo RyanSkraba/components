@@ -179,4 +179,24 @@ public class SoqlQueryBuilderTest {
 
         Assert.assertEquals(expected, queryFromBuilder);
     }
+
+    /**
+     * Checks {@link SoqlQueryBuilder#buildSoqlQuery()} returns SOQL query according to schema and entity name with
+     * custom fields, and complex table name with relation parent to child
+     */
+    @Test
+    public void testBuildSoqlQueryWithComplexChildTableNameParentToChild() {
+        String expected = "\"SELECT Name, (SELECT custom.lastName, talend_account__c.Age FROM talend_contact__c.Persons), contact_title__c FROM talend_contact__c\"";
+
+        Schema schema = SchemaBuilder.record("Result").fields()
+                .requiredString("Name")
+                .requiredString("talend_contact__c_Persons_records_custom_lastName")
+                .requiredString("contact_title__c")
+                .requiredString("talend_contact__c_Persons_records_talend_account__c_Age")
+                .endRecord();
+
+        String queryFromBuilder = new SoqlQueryBuilder(schema, "talend_contact__c").buildSoqlQuery();
+
+        Assert.assertEquals(expected, queryFromBuilder);
+    }
 }

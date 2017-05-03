@@ -167,22 +167,17 @@ public class SoqlQueryBuilder {
                         .throwIt();
             }
             if (null == moduleName) {
-                moduleName = array[0];
+                moduleName = getSplittedValue(array[0]);
             }
-            if (PATTERN.matcher(columnName).matches()) {
-                //We need to catch this situation in Parent -> Child relation too.
-                sb.append(splitParentCustomField(columnName));
-            } else if (isCustomValues(columnName)) {
-                sb.append(columnName);
-            } else {
-                //e.g. Account_Name -> Account.Name
-                sb.append(columnName.replaceAll(UNDERSCORE, DOT));
-            }
-            sb.append(COMMA_AND_SPACE);
+            sb.append(getSplittedValue(columnName)).append(COMMA_AND_SPACE);
         }
         sb.delete(sb.length() - 2, sb.length());
         sb.append(FROM_CLAUSE).append(moduleName).append(RIGHT_PARENTHESIS);
         return sb;
+    }
+
+    private String getSplittedValue(String value) {
+        return PATTERN.matcher(value).matches() ? splitParentCustomField(value) : !isCustomValues(value) ? value.replaceAll(UNDERSCORE, DOT) : value;
     }
 
     /**
@@ -224,7 +219,7 @@ public class SoqlQueryBuilder {
      * @param fieldName - field name in {@link org.apache.avro.Schema}.
      * @return replaced input fieldName with "." instead of "_" where needed.
      */
-    private StringBuilder splitParentCustomField(String fieldName) {
+    private String splitParentCustomField(String fieldName) {
         StringBuilder sb = new StringBuilder(fieldName);
         Matcher matcher = PATTERN.matcher(fieldName);
         int lastPostition = 0;
@@ -238,7 +233,7 @@ public class SoqlQueryBuilder {
             String nonCustomRelationField = fieldName.substring(lastPostition).replaceAll(UNDERSCORE, DOT);
             sb.replace(lastPostition, sb.length(), nonCustomRelationField);
         }
-        return sb;
+        return sb.toString();
     }
 
 }

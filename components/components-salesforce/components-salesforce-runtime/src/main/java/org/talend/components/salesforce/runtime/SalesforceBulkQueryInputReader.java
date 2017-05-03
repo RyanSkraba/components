@@ -46,50 +46,62 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
 
     @Override
     public boolean start() throws IOException {
+        if (bulkRuntime == null) {
+            bulkRuntime = new SalesforceBulkRuntime(((SalesforceSource) getCurrentSource()).connect(container).bulkConnection);
+            if (((TSalesforceInputProperties) properties).pkChunking.getValue()) {
+                bulkRuntime.setChunkSize(((TSalesforceInputProperties) properties).chunkSize.getValue());
+            }
+        }
         try {
-            if (bulkRuntime == null) {
-                bulkRuntime = new SalesforceBulkRuntime(
-                        ((SalesforceSource) getCurrentSource()).connect(container).bulkConnection);
-            }
             executeSalesforceBulkQuery();
-            bulkResultSet = bulkRuntime.getQueryResultSet(bulkRuntime.nextResultId());
-            currentRecord = bulkResultSet.next();
-            boolean start = currentRecord != null;
-            if (start) {
-                dataCount++;
-            }
-            return start;
-        } catch (ConnectionException | AsyncApiException e) {
+        } catch (ConnectionException e) {
             // Wrap the exception in an IOException.
             throw new IOException(e);
         }
+
+        return retrieveNextResultSet();
     }
 
     @Override
     public boolean advance() throws IOException {
         currentRecord = bulkResultSet.next();
         if (currentRecord == null) {
-            String resultId = bulkRuntime.nextResultId();
-            if (resultId != null) {
-                try {
-                    // Get a new result set
-                    bulkResultSet = bulkRuntime.getQueryResultSet(resultId);
-                    currentRecord = bulkResultSet.next();
-                    boolean advance = currentRecord != null;
-                    if (advance) {
-                        // New result set available to retrieve
-                        dataCount++;
-                    }
-                    return advance;
-                } catch (AsyncApiException | ConnectionException e) {
-                    throw new IOException(e);
-                }
-            } else {
-                return false;
-            }
+            return retrieveNextResultSet();
         }
         dataCount++;
         return true;
+    }
+
+    private boolean retrieveNextResultSet() throws IOException {
+        while (bulkRuntime.hasNextResultId()) {
+            String resultId = bulkRuntime.nextResultId();
+            if (null != resultId) {
+                try {
+                    // Get a new result set
+                    bulkResultSet = bulkRuntime.getQueryResultSet(resultId);
+                } catch (AsyncApiException | ConnectionException e) {
+                    throw new IOException(e);
+                }
+
+                currentRecord = bulkResultSet.next();
+                // If currentRecord is null, we need to check if resultId set has more entries.
+                if (null != currentRecord) {
+                    // New result set available to retrieve
+                    dataCount++;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void close() throws IOException {
+        try {
+            bulkRuntime.closeJob();
+        } catch (AsyncApiException | ConnectionException e) {
+            throw new IOException(e);
+        }
     }
 
     public BulkResult getCurrentRecord() throws NoSuchElementException {
@@ -98,7 +110,6 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
 
     protected void executeSalesforceBulkQuery() throws IOException, ConnectionException {
         String queryText = getQueryString(properties);
-        bulkRuntime = new SalesforceBulkRuntime(((SalesforceSource) getCurrentSource()).connect(container).bulkConnection);
         try {
             bulkRuntime.doBulkQuery(getModuleName(), queryText);
         } catch (AsyncApiException | InterruptedException | ConnectionException e) {

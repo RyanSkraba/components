@@ -90,6 +90,8 @@ public class TSalesforceInputPropertiesTest {
         Assert.assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.normalizeDelimiter.getName()).isHidden());
         Assert.assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.columnNameDelimiter.getName()).isHidden());
         Assert.assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.batchSize.getName()).isHidden());
+        Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.pkChunking.getName()).isHidden());
+        Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.chunkSize.getName()).isHidden());
         Assert.assertTrue(properties.getForm(Form.ADVANCED).getChildForm(properties.connection.getName())
                 .getWidget(properties.connection.bulkConnection.getName()).isHidden());
 
@@ -102,10 +104,13 @@ public class TSalesforceInputPropertiesTest {
         Assert.assertTrue(properties.getForm(Form.MAIN).getWidget(properties.guessSchema.getName()).isHidden());
         Assert.assertTrue(properties.getForm(Form.MAIN).getWidget(properties.guessQuery.getName()).isHidden());
 
+        properties.pkChunking.setValue(true);
         properties.refreshLayout(properties.getForm(Form.ADVANCED));
         Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.normalizeDelimiter.getName()).isHidden());
         Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.columnNameDelimiter.getName()).isHidden());
         Assert.assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.batchSize.getName()).isHidden());
+        Assert.assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.pkChunking.getName()).isHidden());
+        Assert.assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.chunkSize.getName()).isHidden());
         Assert.assertTrue(properties.getForm(Form.ADVANCED).getChildForm(properties.connection.getName())
                 .getWidget(properties.connection.bulkConnection.getName()).isHidden());
     }

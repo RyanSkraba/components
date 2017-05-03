@@ -28,6 +28,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -95,10 +96,30 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         runInputTest(false, true);
     }
 
-    @Ignore("Bulk query doesn't support")
     @Test
     public void testInputBulkQueryDynamic() throws Throwable {
         runInputTest(true, true);
+    }
+
+    // Need to think about more flexible implementation of this IT.
+    @Ignore
+    @Test
+    public void testBulkApiWithPkChunking() throws Throwable {
+        int count = 200;
+        TSalesforceInputProperties properties = createTSalesforceInputProperties(false, true);
+        properties.pkChunking.setValue(true);
+        properties.chunkSize.setValue(100);
+        properties.manualQuery.setValue(false);
+        String random = createNewRandom();
+        List<IndexedRecord> outputRows = makeRows(random, count, true);
+        outputRows = writeRows(random, properties, outputRows);
+        try {
+            List<IndexedRecord> readRows = readRows(properties);
+            LOGGER.info("Read rows count - {}", readRows.size());
+            Assert.assertTrue(readRows.size() >= outputRows.size());
+        } finally {
+            deleteRows(outputRows, properties);
+        }
     }
 
     protected TSalesforceInputProperties createTSalesforceInputProperties(boolean emptySchema, boolean isBulkQury)
@@ -238,7 +259,6 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
     /**
      * This for basic connection manual query with dynamic
      */
-    @Ignore("Should be activated after TDI-38263")
     @Test
     public void testBulkManualQueryDynamic() throws Throwable {
         testManualQueryDynamic(true);
