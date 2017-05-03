@@ -46,7 +46,7 @@ public class AzureStorageConnectionWizard extends ComponentWizard {
     public void setupProperties(TAzureStorageConnectionProperties properties) {
         cProperties.setupProperties();
         cProperties.copyValuesFrom(properties);
-        qProperties.setConnection(properties);
+        qProperties.setConnection(cProperties);
     }
 
 }
