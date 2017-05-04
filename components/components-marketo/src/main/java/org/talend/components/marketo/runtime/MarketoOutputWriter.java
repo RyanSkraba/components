@@ -26,6 +26,8 @@ import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData.Record;
 import org.apache.avro.generic.IndexedRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
@@ -51,6 +53,8 @@ public class MarketoOutputWriter extends MarketoWriter {
     private int batchSize = 1;
 
     private List<IndexedRecord> recordsToProcess = new ArrayList<>();
+
+    private transient static final Logger LOG = LoggerFactory.getLogger(MarketoOutputWriter.class);
 
     public MarketoOutputWriter(WriteOperation writeOperation, RuntimeContainer runtime) {
         super(writeOperation, runtime);
@@ -135,7 +139,10 @@ public class MarketoOutputWriter extends MarketoWriter {
     public void processResult(MarketoSyncResult mktoResult) throws IOException {
         result.apiCalls++;
         if (!mktoResult.isSuccess()) {
-            throw new IOException(mktoResult.getErrorsString());
+            if (dieOnError) {
+                throw new IOException(mktoResult.getErrorsString());
+            }
+            LOG.error(mktoResult.getErrorsString());
         }
         for (SyncStatus status : mktoResult.getRecords()) {
             if (Arrays.asList("created", "updated", "deleted").contains(status.getStatus().toLowerCase())) {

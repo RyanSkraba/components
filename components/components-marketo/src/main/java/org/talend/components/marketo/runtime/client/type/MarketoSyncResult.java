@@ -32,6 +32,10 @@ public class MarketoSyncResult extends MarketoBaseResult<SyncStatus> {
 
     @Override
     public List<SyncStatus> getRecords() {
+        // ensure that records is never null
+        if (records == null) {
+            return new ArrayList<>();
+        }
         return records;
     }
 

@@ -14,6 +14,7 @@ package org.talend.components.marketo.runtime.client;
 
 import static com.marketo.mktows.ActivityType.fromValue;
 import static com.marketo.mktows.LeadKeyRef.valueOf;
+import static com.marketo.mktows.ListOperationType.ISMEMBEROFLIST;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
@@ -768,7 +769,7 @@ public class MarketoSOAPClient extends MarketoClient {
                     LOG.error(e.getMessage());
                 }
             }
-            mkto.setSuccess(result.getResult().isSuccess());
+            mkto.setSuccess(true);
             if (!result.getResult().getStatusList().isNil()) {
                 mkto.setRecordCount(result.getResult().getStatusList().getValue().getLeadStatuses().size());
                 List<LeadStatus> statuses = result.getResult().getStatusList().getValue().getLeadStatuses();
@@ -776,17 +777,11 @@ public class MarketoSOAPClient extends MarketoClient {
                 for (LeadStatus status : statuses) {
                     SyncStatus sts = new SyncStatus(Integer.parseInt(status.getLeadKey().getKeyValue()),
                             String.valueOf(status.isStatus()));
-                    if (!status.isStatus()) {
+                    if (!status.isStatus() && !ISMEMBEROFLIST.equals(operationType)) {
                         Map<String, String> reason = new HashMap<>();
                         reason.put("code", "20103");
                         reason.put("message", "Lead Not Found");
                         sts.setReasons(Collections.singletonList(reason));
-                        if (!mkto.isSuccess()) {
-                            List<MarketoError> errs = mkto.getErrors();
-                            errs.add(new MarketoError(SOAP, "20103",
-                                    String.format("Lead %s Not Found.", status.getLeadKey().getKeyValue())));
-                            mkto.setErrors(errs);
-                        }
                     }
                     resultStatus.add(sts);
                 }
@@ -815,7 +810,7 @@ public class MarketoSOAPClient extends MarketoClient {
 
     @Override
     public MarketoSyncResult isMemberOfList(ListOperationParameters parameters) {
-        return listOperation(ListOperationType.ISMEMBEROFLIST, parameters);
+        return listOperation(ISMEMBEROFLIST, parameters);
     }
 
     @Override
@@ -932,14 +927,13 @@ public class MarketoSOAPClient extends MarketoClient {
                 SyncStatus resultStatus = new SyncStatus(status.getLeadId(), status.getStatus().value());
                 mkto.setRecords(Arrays.asList(resultStatus));
             } else {
-                mkto.setErrors(Arrays.asList(new MarketoError(status.getError().getValue())));
+                mkto.setErrors(Arrays.asList(new MarketoError(SOAP, status.getError().getValue())));
             }
-        } catch (MarketoException e) {
+        } catch (Exception e) {
             LOG.error(e.toString());
             mkto.setSuccess(false);
-            mkto.setErrors(Arrays.asList(e.toMarketoError()));
+            mkto.setErrors(Arrays.asList(new MarketoError(SOAP, e.getMessage())));
         }
-
         return mkto;
     }
 
@@ -977,10 +971,10 @@ public class MarketoSOAPClient extends MarketoClient {
             }
             mkto.setSuccess(result.getResult().getSyncStatusList() != null);
             mkto.setRecords(records);
-        } catch (MarketoException e) {
+        } catch (Exception e) {
             LOG.error(e.toString());
             mkto.setSuccess(false);
-            mkto.setErrors(Arrays.asList(e.toMarketoError()));
+            mkto.setErrors(Arrays.asList(new MarketoError(SOAP, e.getMessage())));
         }
         return mkto;
     }

@@ -3,6 +3,8 @@ package org.talend.components.marketo.runtime.client.rest.type;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class SyncStatus {
 
     private Integer id;
@@ -75,6 +77,10 @@ public class SyncStatus {
 
     public String getAvailableReason() {
         if (reasons == null || reasons.isEmpty()) {
+            // sometimes when unrecoverable error happens, errorMessage will fit the reason
+            if (!StringUtils.isEmpty(errorMessage)) {
+                return errorMessage;
+            }
             return "";
         }
         Map<String, String> m = reasons.get(0);

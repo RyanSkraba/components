@@ -13,7 +13,7 @@
 package org.talend.components.marketo.runtime.client.type;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Collections;
 
@@ -27,12 +27,12 @@ public class MarketoSyncResultTest {
         assertEquals("STREAM", r.getStreamPosition());
         assertEquals(1, r.getRecordCount());
         assertEquals(2, r.getRemainCount());
-        assertNull(r.getRecords());
+        assertNotNull(r.getRecords());
         r = new MarketoSyncResult("STREAM", 10, 20, null);
         assertEquals("STREAM", r.getStreamPosition());
         assertEquals(10, r.getRecordCount());
         assertEquals(20, r.getRemainCount());
-        assertNull(r.getRecords());
+        assertNotNull(r.getRecords());
         r = new MarketoSyncResult();
         assertEquals("", r.getStreamPosition());
         assertEquals(0, r.getRecordCount());

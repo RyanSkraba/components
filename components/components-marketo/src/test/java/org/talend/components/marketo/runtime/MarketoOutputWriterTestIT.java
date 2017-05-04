@@ -14,14 +14,17 @@ package org.talend.components.marketo.runtime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode.REST;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
+import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.AfterClass;
@@ -140,6 +143,42 @@ public class MarketoOutputWriterTestIT extends MarketoBaseTestIT {
         record.put(6, "Conservative customer1");
         //
         testSyncLead(record);
+    }
+
+    @Test
+    public void testSyncLeadSOAPFail() throws Exception {
+        props = getSOAPProperties();
+        List<Field> fields = new ArrayList<>();
+        Field field = new Schema.Field("Id", Schema.create(Type.INT), null, (Object) null);
+        fields.add(field);
+        field = new Schema.Field("Email", Schema.create(Schema.Type.STRING), null, (Object) null);
+        fields.add(field);
+        Schema s = props.newSchema(MarketoConstants.getEmptySchema(), "leadAttribute", fields);
+        props.schemaInput.schema.setValue(s);
+        props.updateOutputSchemas();
+        props.beforeMappingInput();
+        IndexedRecord record = new GenericData.Record(s);
+        record.put(0, 12345);
+        record.put(1, "comp@talend.com");
+        props.outputOperation.setValue(OutputOperation.syncLead);
+        try {
+            writer = getWriter(props);
+            writer.open("testDieOnError");
+            writer.write(record);
+        } catch (IOException e) {
+            assertNotNull(e);
+            assertTrue(e.getMessage().contains("20103"));
+        }
+        props.dieOnError.setValue(false);
+        writer = getWriter(props);
+        writer.open("test");
+        writer.write(record);
+        MarketoResult result = (MarketoResult) writer.close();
+        assertEquals(1, result.getApiCalls());
+        assertEquals(0, result.getSuccessCount());
+        assertEquals(0, result.getRejectCount());
+        assertEquals(Collections.emptyList(), writer.getRejectedWrites());
+        assertEquals(Collections.emptyList(), writer.getSuccessfulWrites());
     }
 
     @Test

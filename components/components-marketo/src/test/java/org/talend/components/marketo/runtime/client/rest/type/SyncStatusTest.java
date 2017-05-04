@@ -57,9 +57,10 @@ public class SyncStatusTest {
         assertEquals("666", s.getSeq().toString());
         s.setMarketoGUID("GUID-123456");
         assertEquals("GUID-123456", s.getMarketoGUID());
-        assertEquals("", s.getAvailableReason());
+        assertEquals("err", s.getAvailableReason());
         Map<String, String> reason1 = new HashMap<>();
         s.setReasons(new ArrayList<Map<String, String>>());
+        s.setErrorMessage("");
         assertEquals("", s.getAvailableReason());
         reason1.put("code", "R1");
         reason1.put("message", "M1");
