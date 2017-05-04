@@ -19,7 +19,6 @@ import java.util.Set;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.properties.ComponentProperties;
-import org.talend.components.netsuite.NetSuiteModuleProperties;
 import org.talend.components.netsuite.NetSuiteComponentDefinition;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
@@ -37,11 +36,6 @@ public class NetSuiteOutputDefinition extends NetSuiteComponentDefinition {
 
     @Override
     public boolean isStartable() {
-        return true;
-    }
-
-    @Override
-    public boolean isRejectAfterClose() {
         return true;
     }
 

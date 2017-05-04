@@ -133,7 +133,8 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
     }
 
     public static class MainSchemaProperties extends SchemaProperties {
-        protected transient ISchemaListener schemaListener;
+
+        private transient ISchemaListener schemaListener;
 
         public MainSchemaProperties(String name) {
             super(name);
@@ -152,6 +153,5 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
                 schemaListener.afterSchema();
             }
         }
-
     }
 }

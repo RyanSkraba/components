@@ -35,7 +35,7 @@ public class NetSuiteInputProperties extends FixedConnectorsComponentProperties
 
     public final NetSuiteInputModuleProperties module;
 
-    protected transient PropertyPathConnector MAIN_CONNECTOR =
+    protected transient final PropertyPathConnector mainConnector =
             new PropertyPathConnector(Connector.MAIN_NAME, "module.main");
 
     public NetSuiteInputProperties(@JsonProperty("name") String name) {
@@ -66,7 +66,7 @@ public class NetSuiteInputProperties extends FixedConnectorsComponentProperties
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
         if (isOutputConnection) {
-            return Collections.singleton(MAIN_CONNECTOR);
+            return Collections.singleton(mainConnector);
         }
         return Collections.emptySet();
     }

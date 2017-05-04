@@ -13,6 +13,9 @@
 
 package org.talend.components.netsuite.output;
 
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
+import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,9 +28,6 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
-import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 
 /**
  *
@@ -101,4 +101,5 @@ public class NetSuiteOutputProperties extends FixedConnectorsComponentProperties
         }
         return connectors;
     }
+
 }

@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -114,6 +115,6 @@ public class NetSuiteOutputDefinitionTest {
 
     @Test
     public void testRejectAfterCloseFlag() {
-        assertTrue(definition.isRejectAfterClose());
+        assertFalse(definition.isRejectAfterClose());
     }
 }
