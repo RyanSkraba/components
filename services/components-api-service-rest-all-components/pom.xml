@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>org.talend.components</groupId>
 		<artifactId>components-parent</artifactId>
-		<version>0.18.0-SNAPSHOT</version>
+		<version>0.19.0-SNAPSHOT</version>
 		<relativePath>../../components-parent/pom.xml</relativePath>
 	</parent>
 
@@ -313,18 +312,18 @@
 						</goals>
 						<configuration>
 							<extraArtifacts>
-								<extraArtifact>org.talend.components:components-salesforce-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:components-jira:0.18.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:jms-runtime_1_1:0.18.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:kafka-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:elasticsearch-runtime_2_4:0.18.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:simplefileio-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:s3-runtime-di:0.18.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:components-jdbc-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:components-jdbc-runtime-beam:0.18.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:processing-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:bigquery-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:pubsub-runtime:0.18.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:components-salesforce-runtime:0.19.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:components-jira:0.19.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:jms-runtime_1_1:0.19.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:kafka-runtime:0.19.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:elasticsearch-runtime_2_4:0.19.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:simplefileio-runtime:0.19.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:s3-runtime-di:0.19.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:components-jdbc-runtime:0.19.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:components-jdbc-runtime-beam:0.19.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:processing-runtime:0.19.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:bigquery-runtime:0.19.0-SNAPSHOT:jar</extraArtifact>
+								<extraArtifact>org.talend.components:pubsub-runtime:0.19.0-SNAPSHOT:jar</extraArtifact>
 								<extraArtifact>org.talend.libraries:mysql-connector-java-5.1.30-bin:6.0.0:jar</extraArtifact>
 								<extraArtifact>org.apache.derby:derby:10.12.1.1:jar</extraArtifact>
 								<extraArtifact>org.apache.beam:beam-sdks-java-io-hdfs:${beam.version}:jar</extraArtifact>
