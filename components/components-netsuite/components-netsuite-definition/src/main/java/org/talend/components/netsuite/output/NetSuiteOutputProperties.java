@@ -86,6 +86,15 @@ public class NetSuiteOutputProperties extends FixedConnectorsComponentProperties
     }
 
     @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+
+        for (Form childForm : connection.getForms()) {
+            connection.refreshLayout(childForm);
+        }
+    }
+
+    @Override
     public NetSuiteConnectionProperties getConnectionProperties() {
         return connection.getEffectiveConnectionProperties();
     }

@@ -29,6 +29,7 @@ import org.talend.components.netsuite.schema.SearchInfo;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.java8.Function;
 import org.talend.daikon.properties.ValidationResult;
+import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.StringProperty;
 
 /**
@@ -49,6 +50,15 @@ public abstract class NetSuiteModuleProperties extends ComponentPropertiesImpl
         connection = connectionProperties;
 
         main = new MainSchemaProperties("main");
+    }
+
+    @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+
+        for (Form childForm : connection.getForms()) {
+            connection.refreshLayout(childForm);
+        }
     }
 
     @Override
