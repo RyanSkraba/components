@@ -1,5 +1,7 @@
-Components API Service REST
+Components API Service REST with all components
 ===
+This is a module that packages together the Web Service along with all the components packaged the maven-component-repo module.
+
 
 ###Run locally:
 
@@ -83,3 +85,9 @@ here is an example for oracle
     }
 ```    
  
+###How this service is built
+* This module unzips all the component maven repository build by the maven module service/components-maven-repo
+* it also unzip the list of components of the above maven repo in the configuration folder.
+* it adds the service artifact in the component maven repository to have a complete autonomous maven repository.
+* it adds the start scripts and configuration file from the maven module : service/components-api-service-rest-bare
+* and zips everything.

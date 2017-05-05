@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.talend.components</groupId>
@@ -31,7 +32,7 @@
 	<scm>
 		<connection>scm:git:https://github.com/Talend/components.git</connection>
 	  <tag>HEAD</tag>
-  </scm>
+	</scm>
 
 	<modules>
 		<module>components-p2update-assembly</module>
@@ -93,7 +94,11 @@
 						<artifactId>logback-classic</artifactId>
 					</exclusion>
 				</exclusions>
-
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>1.1.9</version>
 			</dependency>
 			<dependency>
 				<groupId>biz.aQute.bnd</groupId>
@@ -182,7 +187,7 @@
 				<artifactId>components-api</artifactId>
 				<version>${components.version}</version>
 				<classifier>bundle</classifier>
-			</dependency>			
+			</dependency>
 			<dependency>
 				<groupId>org.talend.components</groupId>
 				<artifactId>components-api-service-common</artifactId>
@@ -423,7 +428,6 @@
 						<!-- settings.xml and repo are used for pax tests on branch build that 
 							mirror the talend_nexus repo -->
 						<org.ops4j.pax.url.mvn.repositories>+https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot@snapshots@noreleases@id=talend_nexus,https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease@id=talrelease</org.ops4j.pax.url.mvn.repositories>
-						<org.ops4j.pax.url.mvn.settings>${project.basedir}/settings.xml</org.ops4j.pax.url.mvn.settings>
 					</systemProperties>
 				</configuration>
 				<executions>

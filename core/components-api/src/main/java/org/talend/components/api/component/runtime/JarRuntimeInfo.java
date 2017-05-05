@@ -12,18 +12,10 @@
 // ============================================================================
 package org.talend.components.api.component.runtime;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
 
-import org.talend.components.api.exception.ComponentException;
-import org.talend.components.api.exception.error.ComponentsApiErrorCode;
-import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.runtime.RuntimeUtil;
@@ -87,35 +79,7 @@ public class JarRuntimeInfo implements RuntimeInfo {
 
     @Override
     public List<URL> getMavenUrlDependencies() {
-        DependenciesReader dependenciesReader = new DependenciesReader(depTxtPath);
-        try {
-            // we assume that the url is a jar/zip file.
-            try (JarInputStream jarInputStream = new JarInputStream(jarUrl.openStream())) {
-                return extractDependencyFromStream(dependenciesReader, depTxtPath, jarInputStream);
-            }
-        } catch (IOException e) {
-            throw new ComponentException(ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED, e,
-                    ExceptionContext.withBuilder().put("path", depTxtPath).build());
-        }
-    }
-
-    protected static List<URL> extractDependencyFromStream(DependenciesReader dependenciesReader, String depTxtPath,
-            JarInputStream jarInputStream) throws IOException, MalformedURLException {
-        JarEntry nextJarEntry = jarInputStream.getNextJarEntry();
-        while (nextJarEntry != null) {
-            if (depTxtPath.equals(nextJarEntry.getName())) {// we got it so parse it.
-                Set<String> dependencies = dependenciesReader.parseDependencies(jarInputStream);
-                // convert the string to URL
-                List<URL> result = new ArrayList<>(dependencies.size());
-                for (String urlString : dependencies) {
-                    result.add(new URL(urlString));
-                }
-                return result;
-            }
-            nextJarEntry = jarInputStream.getNextJarEntry();
-        }
-        throw new ComponentException(ComponentsApiErrorCode.COMPUTE_DEPENDENCIES_FAILED,
-                ExceptionContext.withBuilder().put("path", depTxtPath).build());
+        return DependenciesReader.extractDepenencies(jarUrl, depTxtPath);
     }
 
     @Override

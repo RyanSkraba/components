@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.salesforce.tsalesforceinput;
 
+
 import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 import static org.talend.daikon.properties.property.PropertyFactory.newInteger;

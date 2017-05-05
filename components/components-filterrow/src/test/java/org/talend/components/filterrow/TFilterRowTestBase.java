@@ -15,20 +15,23 @@ package org.talend.components.filterrow;
 import javax.inject.Inject;
 
 import org.junit.Test;
-import org.talend.components.api.service.ComponentService;
-import org.talend.components.api.test.AbstractComponentTest;
+import org.talend.components.api.service.common.DefinitionRegistry;
+import org.talend.components.api.test.AbstractComponentTest2;
+import org.talend.daikon.definition.Definition;
+import org.talend.daikon.definition.service.DefinitionRegistryService;
 
-public class TFilterRowTestBase extends AbstractComponentTest {
+public class TFilterRowTestBase extends AbstractComponentTest2 {
 
     @Inject
-    private ComponentService componentService;
-
-    public ComponentService getComponentService() {
-        return componentService;
-    }
+    private DefinitionRegistry regService;
 
     @Test
     public void componentHasBeenRegistered() {
-        assertComponentIsRegistered("tFilterRow_POC");
+        assertComponentIsRegistered(Definition.class, TFilterRowDefinition.COMPONENT_NAME, TFilterRowDefinition.class);
+    }
+
+    @Override
+    public DefinitionRegistryService getDefinitionRegistry() {
+        return regService;
     }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -30,205 +31,39 @@
 	</properties>
 
 	<dependencies>
-		<!-- list of embedded components -->
-		<dependency>
-			<!-- because common-oauth depends on jetty 9.2 (for java 7 compliance)
-				and it's not compatible with spring-boot 1.4.1, the jetty needs to be excluded. -->
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-common-oauth</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.eclipse.jetty</groupId>
-					<artifactId>jetty-server</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-jdbc-definition</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>simplefileio-definition</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-salesforce-definition</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>localio-definition</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>jms-definition</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>kafka-definition</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>elasticsearch-definition</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-jira</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>processing-definition</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>bigquery-definition</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>pubsub-definition</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<!--<dependency>-->
-			<!--<groupId>org.talend.components</groupId>-->
-			<!--<artifactId>components-api-full-example</artifactId>-->
-			<!--<version>${project.version}</version>-->
-		<!--</dependency>-->
-		<!-- the runtime artifact are added as test so that the global maven build
-			builds them before -->
-		<!-- they are used to create the maven repo for runtime hence not real
-			dependencies for the REST service -->
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>jms-runtime_1_1</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-jdbc-runtime</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-jdbc-runtime-beam</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>components-salesforce-runtime</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>kafka-runtime</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>elasticsearch-runtime_2_4</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>simplefileio-runtime</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>s3-runtime-di</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>processing-runtime</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>bigquery-runtime</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.talend.components</groupId>
-			<artifactId>pubsub-runtime</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.beam</groupId>
-			<artifactId>beam-sdks-java-io-hdfs</artifactId>
-			<version>${beam.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-client</artifactId>
-			<version>${hadoop.version}</version>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
 		<!-- rest service -->
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-rest</artifactId>
 			<classifier>lib</classifier>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-tomcat</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.ops4j.pax.url</groupId>
 			<artifactId>pax-url-aether</artifactId>
 			<version>2.4.7</version>
 		</dependency>
-		<dependency><!-- this overrides the parent definition that limited the artifact
-				to tests -->
-			<groupId>org.talend.daikon</groupId>
-			<artifactId>daikon-spring-utils</artifactId>
-			<scope>compile</scope>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-maven-repo</artifactId>
+			<version>${project.version}</version>
+			<type>zip</type>
+			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.talend.components</groupId>
+			<artifactId>components-maven-repo</artifactId>
+			<version>${project.version}</version>
+			<type>zip</type>
+			<classifier>config</classifier>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- test dependencies -->
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-api-service-rest</artifactId>
@@ -275,60 +110,69 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>${spring.boot.version}</version>
-				<configuration>
-					<mainClass>org.talend.components.service.rest.Application</mainClass>
-				</configuration>
+
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.0.0</version>
 				<executions>
 					<execution>
-						<id>make-standalone-jar</id>
+						<id>unpack</id>
+						<phase>package</phase>
 						<goals>
-							<goal>repackage</goal>
+							<goal>unpack</goal>
 						</goals>
+						<configuration>
+							<artifactItems>
+								<!-- import the components maven repo -->
+								<artifactItem>
+									<groupId>org.talend.components</groupId>
+									<artifactId>components-maven-repo</artifactId>
+									<type>zip</type>
+									<outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
+								</artifactItem>
+								<!-- import the components list -->
+								<artifactItem>
+									<groupId>org.talend.components</groupId>
+									<artifactId>components-maven-repo</artifactId>
+									<classifier>config</classifier>
+									<type>zip</type>
+									<outputDirectory>${project.build.directory}/external-resources</outputDirectory>
+									<excludes>META-INF/**</excludes>
+								</artifactItem>
+								<!-- import the service scripts and configuration files -->
+								<artifactItem>
+									<groupId>org.talend.components</groupId>
+									<artifactId>components-api-service-rest</artifactId>
+									<version>${project.version}</version>
+									<classifier>config</classifier>
+									<type>zip</type>
+									<outputDirectory>${project.build.directory}/external-resources</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
+
 			<plugin>
-				<!-- this will create the mave repository for the application runtime
-					resolution -->
-				<!-- you must specify the runtime artifacts if the are not part of dependencies
-					of this pom. -->
+				<!-- this will add the Rest service artifacts to the local maven repo  -->
 				<artifactId>maven-invoker-plugin</artifactId>
-				<version>2.0.0-TALEND</version>
+				<version>2.0.1-TALEND</version>
 				<configuration>
-					<localRepositoryPath>target/local-repo</localRepositoryPath>
+					<localRepositoryPath>target/mvn-repo/.m2</localRepositoryPath>
 					<skipTestScopeForExtraArtifacts>true</skipTestScopeForExtraArtifacts>
 					<projectsDirectory>src/it</projectsDirectory>
 					<cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+		            <onlyResolveDependencies>true</onlyResolveDependencies>
 				</configuration>
 				<executions>
 					<execution>
-						<id>generate-maven-repo</id>
+						<id>generate-app-maven-repo</id>
 						<phase>package</phase>
 						<goals>
 							<goal>install</goal>
 						</goals>
 						<configuration>
-							<extraArtifacts>
-								<extraArtifact>org.talend.components:components-salesforce-runtime:0.19.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:components-jira:0.19.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:jms-runtime_1_1:0.19.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:kafka-runtime:0.19.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:elasticsearch-runtime_2_4:0.19.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:simplefileio-runtime:0.19.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:s3-runtime-di:0.19.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:components-jdbc-runtime:0.19.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:components-jdbc-runtime-beam:0.19.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:processing-runtime:0.19.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:bigquery-runtime:0.19.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.components:pubsub-runtime:0.19.0-SNAPSHOT:jar</extraArtifact>
-								<extraArtifact>org.talend.libraries:mysql-connector-java-5.1.30-bin:6.0.0:jar</extraArtifact>
-								<extraArtifact>org.apache.derby:derby:10.12.1.1:jar</extraArtifact>
-								<extraArtifact>org.apache.beam:beam-sdks-java-io-hdfs:${beam.version}:jar</extraArtifact>
-								<extraArtifact>org.apache.hadoop:hadoop-client:${hadoop.version}:jar</extraArtifact>
-							</extraArtifacts>
 							<pomIncludes>
 								<pomInclude>*/pom.xml</pomInclude>
 							</pomIncludes>
@@ -363,18 +207,20 @@
 							<goal>integration-test</goal>
 						</goals>
 						<configuration>
-							<argLine>-Dorg.ops4j.pax.url.mvn.localRepository=${project.basedir}/target/local-repo}</argLine>
+							<argLine>-Dorg.ops4j.pax.url.mvn.localRepository=${project.basedir}/target/mvn-repo/.m2</argLine>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 			<plugin>
-			<!-- create a class path with all the compile scope dependencies of this pom using the local maven repository -->
+				<!-- create a class path with all the compile scope dependencies of this 
+					pom using the local maven repository -->
 				<groupId>com.github.veithen.alta</groupId>
 				<artifactId>alta-maven-plugin</artifactId>
 				<version>0.5.2-TALEND</version>
 				<executions>
 					<execution>
+					    <id>generate-components-classpath</id>
 						<goals>
 							<goal>generate-properties</goal>
 						</goals>

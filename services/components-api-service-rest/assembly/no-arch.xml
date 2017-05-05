@@ -8,17 +8,19 @@
     <fileSets>
         <!-- configuration files -->
         <fileSet>
-            <directory>${project.basedir}/target/external-resources/config</directory>
+            <directory>${project.basedir}/target/classes</directory>
             <outputDirectory>${file.separator}config</outputDirectory>
+            <excludes>
+            	<exclude>banner.txt</exclude>
+            </excludes>
             <includes>
                 <include>*.*</include>
             </includes>
         </fileSet>
-        
         <!-- Start up scripts -->
         <fileSet>
-            <directory>${project.basedir}/target/external-resources</directory>
-            <outputDirectory>/</outputDirectory>
+            <directory>${project.basedir}/scripts</directory>
+            <outputDirectory>${file.separator}</outputDirectory>
             <filtered>true</filtered>
             <fileMode>0755</fileMode>
             <includes>
@@ -28,7 +30,7 @@
         </fileSet>
         <!-- Maven repo for runtime -->
         <fileSet>
-            <directory>${project.basedir}/target/mvn-repo/.m2</directory>
+            <directory>${project.basedir}/target/mvn-repo</directory>
             <outputDirectory>${file.separator}.m2</outputDirectory>
         </fileSet>
     </fileSets>

@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.talend.components</groupId>
@@ -55,7 +56,6 @@
 			<groupId>org.ops4j.pax.url</groupId>
 			<artifactId>pax-url-aether</artifactId>
 			<version>2.4.7</version>
-			<scope>test</scope>
 		</dependency>
 		<!-- the following dependencies may be removed once we get rid off the 
 			spring implementation and create a specific project for that. -->
@@ -135,11 +135,11 @@
 								<Bundle-SymbolicName>org.talend.components.api</Bundle-SymbolicName>
 								<Service-Component>*</Service-Component>
 								<Import-Package>org.osgi*,javax.net.ssl,javax.security.auth.x500,
-									org.slf4j*,org.talend.daikon*,org.apache.avro,org.apache.commons.lang3
+									org.slf4j*,org.talend.daikon*,org.apache.avro,org.apache.commons.lang3,org.ops4j.pax.url.mvn*
 								</Import-Package>
 								<Embed-Transitive>true</Embed-Transitive>
 								<Embed-Dependency>
-									!org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api|javax.servlet-api|javax.inject|daikon
+									!org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api|javax.servlet-api|javax.inject|daikon|pax-url-aether
 								</Embed-Dependency>
 								<_exportcontents>!*.internal,!*.osgi,org.talend.*</_exportcontents>
 								<!-- used to remove the spring classes -->

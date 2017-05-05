@@ -1,4 +1,4 @@
-//==============================================================================
+// ==============================================================================
 //
 // Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
@@ -9,7 +9,7 @@
 // along with this program; if not, write to Talend SA
 // 9 rue Pages 92150 Suresnes, France
 //
-//==============================================================================
+// ==============================================================================
 
 package org.talend.components.service.rest.impl;
 
@@ -54,20 +54,19 @@ public class RuntimeControllerImpl implements RuntimesController {
 
     private static final Logger log = LoggerFactory.getLogger(RuntimeControllerImpl.class);
 
-    private static final ClassLoader classLoader = RuntimeControllerImpl.class.getClassLoader();
-
     @Autowired
     private PropertiesHelpers propertiesHelpers;
 
     @Override
     public ResponseEntity<ValidationResultsDto> validateDataStoreConnection(String dataStoreDefinitionName,
-                                                                            PropertiesDto propertiesContainer) {
-        final DatastoreDefinition<DatastoreProperties> definition = propertiesHelpers.getDataStoreDefinition(
-                dataStoreDefinitionName);
+            PropertiesDto propertiesContainer) {
+        final DatastoreDefinition<DatastoreProperties> definition = propertiesHelpers
+                .getDataStoreDefinition(dataStoreDefinitionName);
         notNull(definition, "Could not find data store definition of name %s", dataStoreDefinitionName);
         DatastoreProperties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
 
-        try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(definition.getRuntimeInfo(properties), classLoader)) {
+        try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(definition.getRuntimeInfo(properties),
+                properties.getClass().getClassLoader())) {
             DatastoreRuntime<DatastoreProperties> datastoreRuntime = (DatastoreRuntime) instance.getInstance();
             datastoreRuntime.initialize(null, properties);
             Iterable<ValidationResult> healthChecks = datastoreRuntime.doHealthChecks(null);
@@ -87,25 +86,25 @@ public class RuntimeControllerImpl implements RuntimesController {
 
     @Override
     public Void getDatasetData(String datasetDefinitionName, //
-                               PropertiesDto connectionInfo, //
-                               Integer from, //
-                               Integer limit, //
-                               OutputStream response) {
+            PropertiesDto connectionInfo, //
+            Integer from, //
+            Integer limit, //
+            OutputStream response) {
         return useDatasetRuntime(datasetDefinitionName, connectionInfo, new DatasetContentWriter(response, limit, true));
     }
 
     @Override
     public Void getDatasetDataAsBinary(String datasetDefinitionName, //
-                                       PropertiesDto connectionInfo, //
-                                       Integer from,  //
-                                       Integer limit,  //
-                                        OutputStream response) {
+            PropertiesDto connectionInfo, //
+            Integer from, //
+            Integer limit, //
+            OutputStream response) {
         return useDatasetRuntime(datasetDefinitionName, connectionInfo, new DatasetContentWriter(response, limit, false));
     }
 
     private <T> T useDatasetRuntime(String datasetDefinitionName, //
-                                    PropertiesDto formData, //
-                                    Function<DatasetRuntime<DatasetProperties<DatastoreProperties>>, T> consumer) {
+            PropertiesDto formData, //
+            Function<DatasetRuntime<DatasetProperties<DatastoreProperties>>, T> consumer) {
 
         // 1) get dataset properties from supplied data
         DatasetProperties datasetProperties = propertiesHelpers.propertiesFromDto(formData);
@@ -115,7 +114,8 @@ public class RuntimeControllerImpl implements RuntimesController {
                 propertiesHelpers.getDataSetDefinition(datasetDefinitionName);
 
         // 3) create the runtime
-        try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(datasetDefinition.getRuntimeInfo(datasetProperties), classLoader)) {
+        try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(datasetDefinition.getRuntimeInfo(datasetProperties),
+                datasetProperties.getClass().getClassLoader())) {
             DatasetRuntime<DatasetProperties<DatastoreProperties>> datasetRuntimeInstance = (DatasetRuntime<DatasetProperties<DatastoreProperties>>) instance
                     .getInstance();
 
@@ -136,7 +136,7 @@ public class RuntimeControllerImpl implements RuntimesController {
 
         /**
          * @param limit the number of records to write
-         * @param json  true to write JSon, false for binary Avro
+         * @param json true to write JSon, false for binary Avro
          */
         DatasetContentWriter(OutputStream output, Integer limit, boolean json) {
             this.output = output;
