@@ -168,6 +168,11 @@ public class MarketoSource extends MarketoSourceOrSink implements BoundedSource 
                         vr.setMessage(messages.getMessage("error.validation.sincedatetime"));
                         return vr;
                     }
+                    if (StringUtils.isEmpty(p.fieldList.getValue())) {
+                        vr.setStatus(Result.ERROR);
+                        vr.setMessage(messages.getMessage("error.validation.fieldlist"));
+                        return vr;
+                    }
                 }
             }
             /////////////////////
