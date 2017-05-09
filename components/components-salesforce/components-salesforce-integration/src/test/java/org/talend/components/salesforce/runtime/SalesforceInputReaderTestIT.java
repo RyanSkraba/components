@@ -371,6 +371,30 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
 
     }
 
+    /*
+     * Test salesforce input manual query with dynamic return fields order same with SOQL fields order
+     */
+    @Test
+    public void testDynamicFieldsOrder() throws Throwable {
+        TSalesforceInputProperties props = createTSalesforceInputProperties(true, false);
+        LOGGER.debug(props.module.main.schema.getStringValue());
+        props.manualQuery.setValue(true);
+        props.query.setValue(
+                "Select Name,IsDeleted,Id, Type,ParentId,MasterRecordId ,CreatedDate from Account order by CreatedDate limit 1 ");
+        List<IndexedRecord> rows = readRows(props);
+        assertEquals("No record returned!", 1, rows.size());
+        List<Schema.Field> fields = rows.get(0).getSchema().getFields();
+        assertEquals(7, fields.size());
+        assertEquals("Name", fields.get(0).name());
+        assertEquals("IsDeleted", fields.get(1).name());
+        assertEquals("Id", fields.get(2).name());
+        assertEquals("Type", fields.get(3).name());
+        assertEquals("ParentId", fields.get(4).name());
+        assertEquals("MasterRecordId", fields.get(5).name());
+        assertEquals("CreatedDate", fields.get(6).name());
+
+    }
+
     protected void testBulkQueryNullValue(SalesforceConnectionModuleProperties props, String random) throws Throwable {
         ComponentDefinition sfInputDef = new TSalesforceInputDefinition();
         TSalesforceInputProperties sfInputProps = (TSalesforceInputProperties) sfInputDef.createRuntimeProperties();

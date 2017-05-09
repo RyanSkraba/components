@@ -58,13 +58,23 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
                     SObject currentSObject = getCurrentSObject();
                     Iterator<XmlObject> children = currentSObject.getChildren();
                     List<String> columnsName = new ArrayList<>();
+                    int idCount = 0;
                     while (children.hasNext()) {
-                        columnsName.add(children.next().getName().getLocalPart());
+                        String elementName = children.next().getName().getLocalPart();
+                        if ("Id".equals(elementName) && idCount == 0) {
+                            // Ignore the first 'Id' field which always return for query.
+                            idCount++;
+                            continue;
+                        }
+                        if (!columnsName.contains(elementName)) {
+                            columnsName.add(elementName);
+                        }
                     }
 
                     List<Schema.Field> copyFieldList = new ArrayList<>();
-                    for (Schema.Field se : querySchema.getFields()) {
-                        if (columnsName.contains(se.name())) {
+                    for (String columnName : columnsName) {
+                        Schema.Field se = querySchema.getField(columnName);
+                        if (se != null) {
                             Schema.Field field = new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal());
                             Map<String, Object> fieldProps = se.getObjectProps();
                             for (String propName : fieldProps.keySet()) {
