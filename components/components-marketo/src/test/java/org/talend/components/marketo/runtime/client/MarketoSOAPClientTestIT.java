@@ -389,7 +389,8 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         inputProperties.inputOperation.setValue(getLeadActivity);
         inputProperties.leadKeyTypeSOAP.setValue(EMAIL);
         inputProperties.leadSelectorSOAP.setValue(LeadKeySelector);
-        inputProperties.updateSchemaRelated();
+        inputProperties.afterInputOperation();
+        inputProperties.beforeMappingInput();
         inputProperties.batchSize.setValue(11);
         //
         inputProperties.leadKeyValue.setValue(EMAIL_LEAD_MANY_INFOS);
@@ -401,7 +402,12 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         MarketoRecordResult result = client.getLeadActivity(inputProperties, null);
         LOG.debug("{}", result);
         assertTrue(result.isSuccess());
-        assertTrue(result.getRecordCount() > 0);
+        List<IndexedRecord> records = result.getRecords();
+        assertTrue(records.size() > 0);
+        for (IndexedRecord r : records) {
+            assertNotNull(r.get(0));
+            assertTrue(r.get(0) instanceof Long);
+        }
     }
 
     @Test
@@ -481,7 +487,8 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
     @Test
     public void testGetLeadsChanges() throws Exception {
         inputProperties.inputOperation.setValue(getLeadChanges);
-        inputProperties.updateSchemaRelated();
+        inputProperties.afterInputOperation();
+        inputProperties.beforeMappingInput();
         inputProperties.batchSize.setValue(1000);
         //
         inputProperties.oldestCreateDate.setValue(DATE_OLDEST_CREATE);
@@ -494,6 +501,12 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         List<IndexedRecord> changes = result.getRecords();
         assertTrue(changes.size() > 0);
         assertTrue(result.getRemainCount() > 0);
+        List<IndexedRecord> records = result.getRecords();
+        assertTrue(records.size() > 0);
+        for (IndexedRecord r : records) {
+            assertNotNull(r.get(0));
+            assertTrue(r.get(0) instanceof Long);
+        }
     }
 
     @Test
