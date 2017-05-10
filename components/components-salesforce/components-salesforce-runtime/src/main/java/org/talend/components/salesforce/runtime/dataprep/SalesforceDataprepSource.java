@@ -247,7 +247,7 @@ public final class SalesforceDataprepSource
         try {
             describeSObjectResult = connectionHolder.connection.describeSObject(drivingEntityName);
         } catch (ConnectionException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e);
         }
 
         Schema runtimeSchema = SalesforceAvroRegistryString.get().inferSchema(describeSObjectResult);
