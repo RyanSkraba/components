@@ -78,10 +78,9 @@ public class FilterRowDoFnTest {
         assertEquals(0, outputs.size());
         List<IndexedRecord> rejects = fnTester.takeSideOutputElements(FilterRowRuntime.rejectOutput);
         assertEquals(1, rejects.size());
-        assertEquals("aaa", ((IndexedRecord) rejects.get(0).get(0)).get(0));
-        assertEquals("BBB", ((IndexedRecord) rejects.get(0).get(0)).get(1));
-        assertEquals("Ccc", ((IndexedRecord) rejects.get(0).get(0)).get(2));
-        assertEquals("error message", rejects.get(0).get(1));
+        assertEquals("aaa", rejects.get(0).get(0));
+        assertEquals("BBB", rejects.get(0).get(1));
+        assertEquals("Ccc", rejects.get(0).get(2));
     }
 
     private void checkNumericInputNoOutput(DoFnTester<Object, IndexedRecord> fnTester) throws Exception {
@@ -106,10 +105,9 @@ public class FilterRowDoFnTest {
         List<IndexedRecord> rejects = fnTester.takeSideOutputElements(FilterRowRuntime.rejectOutput);
         assertEquals(0, outputs.size());
         assertEquals(1, rejects.size());
-        assertEquals(10, ((IndexedRecord) rejects.get(0).get(0)).get(0));
-        assertEquals(-100, ((IndexedRecord) rejects.get(0).get(0)).get(1));
-        assertEquals(1000, ((IndexedRecord) rejects.get(0).get(0)).get(2));
-        assertEquals("error message", rejects.get(0).get(1));
+        assertEquals(10, rejects.get(0).get(0));
+        assertEquals(-100, rejects.get(0).get(1));
+        assertEquals(1000, rejects.get(0).get(2));
     }
 
     private void runSimpleTestValidSession(FilterRowProperties properties) throws Exception {

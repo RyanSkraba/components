@@ -18,14 +18,12 @@ import java.util.List;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData.Record;
-import org.apache.avro.generic.GenericRecordBuilder;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.commons.lang3.StringUtils;
 import org.talend.components.processing.filterrow.ConditionsRowConstant;
 import org.talend.components.processing.filterrow.FilterRowProperties;
 import org.talend.daikon.avro.AvroRegistry;
-import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
@@ -40,8 +38,6 @@ public class FilterRowDoFn extends DoFn<Object, IndexedRecord> {
 
     private IndexedRecordConverter converter = null;
 
-    private transient Schema rejectSchema = null;
-
     @Setup
     public void setup() throws Exception {
     }
@@ -53,10 +49,6 @@ public class FilterRowDoFn extends DoFn<Object, IndexedRecord> {
             converter = registry.createIndexedRecordConverter(context.element().getClass());
         }
         IndexedRecord inputRecord = (IndexedRecord) converter.convertToAvro(context.element());
-
-        if (rejectSchema == null) {
-            rejectSchema = AvroUtils.createRejectSchema(inputRecord.getSchema(), "rejectOutput");
-        }
 
         boolean returnedBooleanValue = true;
         String columnName = properties.columnName.getValue();
@@ -81,11 +73,7 @@ public class FilterRowDoFn extends DoFn<Object, IndexedRecord> {
             }
         } else {
             if (hasRejectSchema) {
-                GenericRecordBuilder rejectRecord = new GenericRecordBuilder(rejectSchema);
-                rejectRecord.set(AvroUtils.REJECT_FIELD_INPUT, inputRecord);
-                // TODO define what we want into the error message
-                rejectRecord.set(AvroUtils.REJECT_FIELD_ERROR_MESSAGE, "error message");
-                context.sideOutput(FilterRowRuntime.rejectOutput, rejectRecord.build());
+                context.sideOutput(FilterRowRuntime.rejectOutput, inputRecord);
             }
         }
     }

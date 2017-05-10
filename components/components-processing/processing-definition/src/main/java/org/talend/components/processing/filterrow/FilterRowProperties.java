@@ -22,7 +22,6 @@ import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.common.FixedConnectorsComponentProperties;
 import org.talend.components.common.SchemaProperties;
-import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
@@ -157,9 +156,8 @@ public class FilterRowProperties extends FixedConnectorsComponentProperties {
         Schema inputSchema = main.schema.getValue();
         schemaFlow.schema.setValue(inputSchema);
 
-        // Add error field to create the "reject" schema
-        Schema rejectSchema = AvroUtils.createRejectSchema(inputSchema, "rejectOutput");
-        schemaReject.schema.setValue(rejectSchema);
+        // Copy the "main" schema in to the "reject" schema
+        schemaReject.schema.setValue(inputSchema);
     }
 
     /**

@@ -78,11 +78,6 @@ public class FilterRowPropertiesTest {
                 Arrays.asList(inputValue1Field, inputValue2Field));
         properties.main.schema.setValue(inputSchema);
 
-        Schema.Field rejectValue1Field = new Schema.Field("input", inputSchema, null, null, Order.ASCENDING);
-        Schema.Field rejectValue2Field = new Schema.Field("errorMessage", stringSchema, null, null, Order.ASCENDING);
-        Schema rejectSchema = Schema.createRecord("rejectOutput", null, null, false,
-                Arrays.asList(rejectValue1Field, rejectValue2Field));
-
         properties.columnName.setValue("invalid");
         properties.function.setValue("invalid");
         properties.operator.setValue("invalid");
@@ -94,7 +89,7 @@ public class FilterRowPropertiesTest {
 
         assertThat(properties.main.schema.getValue(), equalTo(inputSchema));
         assertThat(properties.schemaFlow.schema.getValue(), equalTo(inputSchema));
-        assertThat(properties.schemaReject.schema.getValue(), equalTo(rejectSchema));
+        assertThat(properties.schemaReject.schema.getValue(), equalTo(inputSchema));
 
         // the afterScheam trigger an update to the columnName
         assertEquals("inputValue1", properties.columnName.getValue());
