@@ -71,9 +71,6 @@ public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
         if (remoteBlobsGet.prefix.getValue().isEmpty()) {
 
             errorMessage = messages.getMessage("error.EmptyBlobs"); //$NON-NLS-1$
-        } else if (!new File(localFolder).exists()) {
-
-            errorMessage = messages.getMessage("error.NonentityLocal"); //$NON-NLS-1$
         }
 
         if (errorMessage.isEmpty()) { // everything is OK.

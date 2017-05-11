@@ -81,17 +81,6 @@ public class AzureStorageGetRuntimeTest {
     }
 
     @Test
-    public void testInitializeNonentityLocal() {
-        properties.remoteBlobsGet = new RemoteBlobsGetTable("RemoteBlobsGetTable");
-        properties.remoteBlobsGet.prefix.setValue(new ArrayList<String>());
-        properties.remoteBlobsGet.prefix.getValue().add("");
-        properties.localFolder.setValue("NonExistingFolder");
-        ValidationResult validationResult = storageGet.initialize(runtimeContainer, properties);
-        assertEquals(ValidationResult.Result.ERROR, validationResult.getStatus());
-        assertEquals(messages.getMessage("error.NonentityLocal"), validationResult.getMessage());
-    }
-
-    @Test
     public void testInitializeValidProperties() {
         properties.remoteBlobsGet = new RemoteBlobsGetTable("RemoteBlobsGetTable");
         properties.remoteBlobsGet.prefix.setValue(new ArrayList<String>());

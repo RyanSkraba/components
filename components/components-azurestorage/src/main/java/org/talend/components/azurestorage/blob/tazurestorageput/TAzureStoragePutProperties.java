@@ -51,7 +51,7 @@ public class TAzureStoragePutProperties extends AzureStorageBlobProperties {
         super.setupLayout();
 
         Form mainForm = getForm(Form.MAIN);
-        mainForm.addRow(localFolder);
+        mainForm.addRow(widget(localFolder).setWidgetType(Widget.FILE_WIDGET_TYPE));
         mainForm.addRow(remoteFolder);
         mainForm.addRow(useFileList);
         mainForm.addRow(widget(files).setWidgetType(Widget.TABLE_WIDGET_TYPE));
