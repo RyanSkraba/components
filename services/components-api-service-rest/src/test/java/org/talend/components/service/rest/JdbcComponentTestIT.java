@@ -37,6 +37,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -59,6 +60,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
 
+@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 @TestPropertySource(properties = { "server.contextPath=" })
