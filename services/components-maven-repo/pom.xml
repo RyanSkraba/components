@@ -254,7 +254,7 @@
 					pom using the local maven repository -->
 				<groupId>com.github.veithen.alta</groupId>
 				<artifactId>alta-maven-plugin</artifactId>
-				<version>0.5.2-TALEND</version>
+				<version>0.5.3-TALEND</version>
 				<executions>
 					<execution>
 						<id>generate-components-list</id>
@@ -263,7 +263,7 @@
 						</goals>
 						<configuration>
 							<name>components.list</name>
-							<value>mvn:%groupId%/%artifactId%/%version%/%type%%classifier?/@:%</value>
+							<value>mvn:%groupId%/%artifactId%/%baseVersion%/%type%%classifier?/@:%</value>
 							<separator>,</separator>
 							<artifacts>
 								<artifact>
