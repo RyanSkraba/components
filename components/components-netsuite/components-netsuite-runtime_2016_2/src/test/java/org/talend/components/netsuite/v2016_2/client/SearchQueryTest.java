@@ -17,7 +17,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
 
 import javax.xml.datatype.DatatypeFactory;
 
@@ -28,14 +31,23 @@ import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.netsuite.avro.converter.XMLGregorianCalendarToLongConverter;
+import org.talend.components.netsuite.client.EmptyCustomMetaDataSource;
 import org.talend.components.netsuite.client.NetSuiteClientService;
+import org.talend.components.netsuite.client.NetSuiteException;
+import org.talend.components.netsuite.client.model.CustomFieldDesc;
+import org.talend.components.netsuite.client.model.CustomRecordTypeInfo;
+import org.talend.components.netsuite.client.model.RecordTypeInfo;
 import org.talend.components.netsuite.client.search.SearchCondition;
 import org.talend.components.netsuite.client.search.SearchQuery;
+import org.talend.components.netsuite.test.TestUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netsuite.webservices.v2016_2.lists.accounting.AccountSearch;
 import com.netsuite.webservices.v2016_2.platform.NetSuitePortType;
 import com.netsuite.webservices.v2016_2.platform.common.AccountSearchBasic;
 import com.netsuite.webservices.v2016_2.platform.common.AddressSearchBasic;
+import com.netsuite.webservices.v2016_2.platform.common.CustomRecordSearchBasic;
 import com.netsuite.webservices.v2016_2.platform.common.TransactionSearchBasic;
 import com.netsuite.webservices.v2016_2.platform.core.SearchBooleanCustomField;
 import com.netsuite.webservices.v2016_2.platform.core.SearchBooleanField;
@@ -45,6 +57,7 @@ import com.netsuite.webservices.v2016_2.platform.core.SearchDateField;
 import com.netsuite.webservices.v2016_2.platform.core.SearchDoubleField;
 import com.netsuite.webservices.v2016_2.platform.core.SearchEnumMultiSelectField;
 import com.netsuite.webservices.v2016_2.platform.core.SearchLongCustomField;
+import com.netsuite.webservices.v2016_2.platform.core.SearchMultiSelectField;
 import com.netsuite.webservices.v2016_2.platform.core.SearchRecord;
 import com.netsuite.webservices.v2016_2.platform.core.SearchStringCustomField;
 import com.netsuite.webservices.v2016_2.platform.core.SearchStringField;
@@ -55,12 +68,15 @@ import com.netsuite.webservices.v2016_2.platform.core.types.SearchDoubleFieldOpe
 import com.netsuite.webservices.v2016_2.platform.core.types.SearchEnumMultiSelectFieldOperator;
 import com.netsuite.webservices.v2016_2.platform.core.types.SearchLongFieldOperator;
 import com.netsuite.webservices.v2016_2.platform.core.types.SearchStringFieldOperator;
+import com.netsuite.webservices.v2016_2.setup.customization.CustomRecordSearch;
 import com.netsuite.webservices.v2016_2.transactions.sales.TransactionSearch;
 
 /**
  *
  */
 public class SearchQueryTest {
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private NetSuiteClientService<NetSuitePortType> clientService = new NetSuiteClientServiceImpl();
 
@@ -269,5 +285,72 @@ public class SearchQueryTest {
         assertNull(customField1.getSearchValue2());
         assertNotNull(customField1.getPredefinedSearchValue());
         assertEquals(SearchDate.LAST_BUSINESS_WEEK, customField1.getPredefinedSearchValue());
+    }
+
+    @Test
+    public void testSearchMultiSelectField() throws Exception {
+        clientService.getMetaDataSource().setCustomMetaDataSource(new TestCustomMetaDataSource());
+
+        SearchQuery s1 = clientService.newSearch();
+        s1.target("custom_record_type_1");
+        s1.condition(new SearchCondition("Owner", "List.anyOf", Arrays.asList(
+                "123456789"
+        )));
+
+        SearchRecord sr1 = (SearchRecord) s1.toNativeQuery();
+        assertNotNull(sr1);
+        assertEquals(CustomRecordSearch.class, sr1.getClass());
+
+        CustomRecordSearch search = (CustomRecordSearch) sr1;
+        assertNotNull(search.getBasic());
+
+        CustomRecordSearchBasic searchBasic = search.getBasic();
+        assertNotNull(searchBasic.getOwner());
+
+        SearchMultiSelectField sf1 = searchBasic.getOwner();
+        assertNotNull(sf1.getSearchValue());
+        assertEquals(1, sf1.getSearchValue().size());
+        assertEquals("123456789", sf1.getSearchValue().get(0).getInternalId());
+    }
+
+    protected class TestCustomMetaDataSource extends EmptyCustomMetaDataSource {
+
+        @Override
+        public Collection<CustomRecordTypeInfo> getCustomRecordTypes() {
+            return Arrays.asList(getCustomRecordType("custom_record_type_1"));
+        }
+
+        @Override
+        public CustomRecordTypeInfo getCustomRecordType(String typeName) {
+            try {
+                if (typeName.equals("custom_record_type_1")) {
+                    JsonNode recordTypeNode = objectMapper.readTree(SearchQueryTest.class.getResource(
+                            "/test-data/customRecord-1.json"));
+                    CustomRecordTypeInfo customRecordTypeInfo =
+                            TestUtils.readCustomRecord(clientService.getBasicMetaData(), recordTypeNode);
+                    return customRecordTypeInfo;
+                }
+                return null;
+            } catch (IOException e) {
+                throw new NetSuiteException(e.getMessage(), e);
+            }
+        }
+
+        @Override
+        public Map<String, CustomFieldDesc> getCustomFields(RecordTypeInfo recordTypeInfo) {
+            try {
+                if (recordTypeInfo.getName().equals("custom_record_type_1")) {
+                    JsonNode fieldListNode = objectMapper.readTree(SearchQueryTest.class.getResource(
+                            "/test-data/customRecordFields-1.json"));
+                    Map<String, CustomFieldDesc> customFieldDescMap =
+                            TestUtils.readCustomFields(fieldListNode);
+                    return customFieldDescMap;
+                }
+                return null;
+            } catch (IOException e) {
+                throw new NetSuiteException(e.getMessage(), e);
+            }
+        }
+
     }
 }

@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ import org.talend.components.netsuite.output.NetSuiteOutputProperties;
 import org.talend.components.netsuite.output.NetSuiteOutputWriter;
 import org.talend.components.netsuite.output.NetSuiteWriteOperation;
 import org.talend.components.netsuite.output.OutputAction;
+import org.talend.components.netsuite.test.TestUtils;
 import org.talend.components.netsuite.v2016_2.NetSuiteRuntimeImpl;
 import org.talend.components.netsuite.v2016_2.NetSuiteSinkImpl;
 import org.talend.components.netsuite.v2016_2.client.NetSuiteClientFactoryImpl;
@@ -69,10 +71,13 @@ import com.netsuite.webservices.v2016_2.platform.common.SubsidiarySearchBasic;
 import com.netsuite.webservices.v2016_2.platform.core.BooleanCustomFieldRef;
 import com.netsuite.webservices.v2016_2.platform.core.CustomFieldList;
 import com.netsuite.webservices.v2016_2.platform.core.CustomFieldRef;
+import com.netsuite.webservices.v2016_2.platform.core.CustomRecordRef;
 import com.netsuite.webservices.v2016_2.platform.core.RecordRef;
 import com.netsuite.webservices.v2016_2.platform.core.RecordRefList;
+import com.netsuite.webservices.v2016_2.platform.core.StringCustomFieldRef;
 import com.netsuite.webservices.v2016_2.platform.core.types.RecordType;
 import com.netsuite.webservices.v2016_2.platform.messages.GetListRequest;
+import com.netsuite.webservices.v2016_2.setup.customization.CustomRecord;
 
 /**
  *
@@ -443,6 +448,120 @@ public class NetSuiteOutputWriterIT extends AbstractNetSuiteTestBase {
             // success=false means that NetSuite Record was not found because it was deleted
             assertFalse(readResponse.getStatus().isSuccess());
         }
+    }
+
+    @Test
+    public void testAddCustomRecord() throws Exception {
+        final NetSuiteClientService<NetSuitePortType> clientService = webServiceTestFixture.getClientService();
+        clientService.getMetaDataSource().setCustomizationEnabled(true);
+
+        RuntimeContainer container = mock(RuntimeContainer.class);
+
+        NetSuiteOutputProperties properties = new NetSuiteOutputProperties("test");
+        properties.init();
+        properties.connection.endpoint.setValue(webServiceTestFixture.getEndpointUrl());
+        properties.connection.email.setValue(webServiceTestFixture.getCredentials().getEmail());
+        properties.connection.password.setValue(webServiceTestFixture.getCredentials().getPassword());
+        properties.connection.account.setValue(webServiceTestFixture.getCredentials().getAccount());
+        properties.connection.role.setValue(Integer.valueOf(webServiceTestFixture.getCredentials().getRoleId()));
+        properties.connection.applicationId.setValue(webServiceTestFixture.getCredentials().getApplicationId());
+
+        properties.module.moduleName.setValue("customrecordqacomp_custom_recordtype");
+        properties.module.action.setValue(OutputAction.ADD);
+
+        NetSuiteRuntimeImpl runtime = new NetSuiteRuntimeImpl();
+        runtime.setClientFactory(clientFactory);
+
+        NetSuiteDatasetRuntime dataSetRuntime = runtime.getDatasetRuntime(properties.getConnectionProperties());
+
+        Schema schema = dataSetRuntime.getSchema(properties.module.moduleName.getValue());
+        Schema targetSchema = TestUtils.makeRecordSchema(schema, Arrays.asList(
+                "name", "custrecord79", "custrecord80"
+        ));
+        properties.module.main.schema.setValue(targetSchema);
+
+        Schema targetFlowSchema = dataSetRuntime.getSchemaForUpdateFlow(
+                properties.module.moduleName.getValue(), targetSchema);
+        properties.module.flowSchema.schema.setValue(targetFlowSchema);
+
+        Schema targetRejectSchema = dataSetRuntime.getSchemaForUpdateReject(
+                properties.module.moduleName.getValue(), targetSchema);
+        properties.module.rejectSchema.schema.setValue(targetRejectSchema);
+
+        GenericRecord indexedRecordToAdd = new GenericData.Record(targetSchema);
+
+        String testId = Long.toString(System.currentTimeMillis());
+        indexedRecordToAdd.put("Name", "Test Project " + testId);
+        indexedRecordToAdd.put("Custrecord79", "Test Project " +  testId);
+        indexedRecordToAdd.put("Custrecord80", "0.1.0");
+
+        List<IndexedRecord> indexedRecordList = new ArrayList<>();
+        indexedRecordList.add(indexedRecordToAdd);
+
+        // Add records
+
+        NetSuiteSink sink = new NetSuiteSinkImpl();
+        sink.setClientFactory(clientFactory);
+        sink.initialize(container, properties);
+
+        NetSuiteWriteOperation writeOperation = (NetSuiteWriteOperation) sink.createWriteOperation();
+        NetSuiteOutputWriter<?, CustomRecordRef> writer = (NetSuiteOutputWriter) writeOperation.createWriter(container);
+        writer.open(UUID.randomUUID().toString());
+
+        for (IndexedRecord indexedRecord : indexedRecordList) {
+            writer.write(indexedRecord);
+        }
+
+        Result writerResult = writer.close();
+        assertNotNull(writerResult);
+        assertEquals(indexedRecordList.size(), writerResult.totalCount);
+        assertEquals(indexedRecordList.size(), writerResult.successCount);
+
+        final List<CustomRecordRef> refList = new ArrayList<>(indexedRecordList.size());
+
+        for (NsWriteResponse<CustomRecordRef> response : writer.getWriteResponses()) {
+            CustomRecordRef recordRef = response.getRef();
+            refList.add(recordRef);
+        }
+
+        // Re-read updated records
+
+        List<NsReadResponse<CustomRecord>> readResponseList = clientService.execute(
+                new NetSuiteClientService.PortOperation<List<NsReadResponse<CustomRecord>>, NetSuitePortType>() {
+                    @Override public List<NsReadResponse<CustomRecord>> execute(NetSuitePortType port) throws Exception {
+                        GetListRequest request = new GetListRequest();
+                        request.getBaseRef().addAll(refList);
+                        return NetSuiteClientServiceImpl.toNsReadResponseList(port.getList(request).getReadResponseList());
+                    }
+                });
+        int index = 0;
+        for (NsReadResponse<CustomRecord> readResponse : readResponseList) {
+            assertTrue(readResponse.getStatus().isSuccess());
+
+            GenericRecord inputRecord = (GenericRecord) indexedRecordList.get(index);
+
+            CustomRecord record = readResponse.getRecord();
+
+            CustomFieldList customFieldList = record.getCustomFieldList();
+            assertNotNull(customFieldList);
+
+            Map<String, CustomFieldRef> customFieldRefMap = new HashMap<>();
+            for (CustomFieldRef fieldRef : customFieldList.getCustomField()) {
+                customFieldRefMap.put(fieldRef.getScriptId(), fieldRef);
+            }
+
+            StringCustomFieldRef customFieldRef1 =
+                    (StringCustomFieldRef) customFieldRefMap.get("custrecord79");
+            assertNotNull(customFieldRef1);
+            assertEquals(inputRecord.get("Custrecord79"), customFieldRef1.getValue());
+
+            StringCustomFieldRef customFieldRef2 =
+                    (StringCustomFieldRef) customFieldRefMap.get("custrecord80");
+            assertNotNull(customFieldRef2);
+            assertEquals(inputRecord.get("Custrecord80"), customFieldRef2.getValue());
+        }
+
+        clientService.deleteList(refList);
     }
 
     private static List<Message> makeMessageRecords(int count) {

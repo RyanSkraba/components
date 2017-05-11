@@ -17,11 +17,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.avro.Schema;
 import org.talend.components.netsuite.NetSuiteDatasetRuntimeImpl;
 import org.talend.components.netsuite.client.NsRef;
 import org.talend.components.netsuite.client.model.BasicMetaData;
@@ -77,7 +80,7 @@ public class TestUtils {
         return properties;
     }
 
-    public CustomRecordTypeInfo readCustomRecord(BasicMetaData basicMetaData, JsonNode node) {
+    public static CustomRecordTypeInfo readCustomRecord(BasicMetaData basicMetaData, JsonNode node) {
         String scriptId = node.get("scriptId").asText();
         String internalId = node.get("internalId").asText();
         String customizationType = node.get("customizationType").asText();
@@ -129,4 +132,26 @@ public class TestUtils {
         return fieldDesc;
     }
 
+    public static Schema makeRecordSchema(Schema sourceSchema, Collection<String> targetFieldNames) {
+        Schema targetSchema = Schema.createRecord(sourceSchema.getName(),
+                sourceSchema.getDoc(), sourceSchema.getNamespace(),
+                sourceSchema.isError());
+
+        List<Schema.Field> copyFieldList = new ArrayList<>();
+        for (String targetFieldName : targetFieldNames) {
+            Schema.Field field = NetSuiteDatasetRuntimeImpl.getNsFieldByName(sourceSchema, targetFieldName);
+            if (field != null) {
+                Schema.Field targetField = NetSuiteDatasetRuntimeImpl.copyField(field);
+                copyFieldList.add(targetField);
+            }
+        }
+
+        targetSchema.setFields(copyFieldList);
+
+        for (Map.Entry<String, Object> entry : sourceSchema.getObjectProps().entrySet()) {
+            targetSchema.addProp(entry.getKey(), entry.getValue());
+        }
+
+        return targetSchema;
+    }
 }

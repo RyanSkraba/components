@@ -91,16 +91,7 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
             final TypeDesc typeDesc = metaDataSource.getTypeInfo(typeName);
 
             List<FieldDesc> fieldDescList = new ArrayList<>(typeDesc.getFields());
-            Collections.sort(fieldDescList, new Comparator<FieldDesc>() {
-                @Override public int compare(FieldDesc o1, FieldDesc o2) {
-                    int result = Boolean.compare(o1.isKey(), o2.isKey());
-                    if (result != 0) {
-                        return result * -1;
-                    }
-                    result = o1.getName().compareTo(o2.getName());
-                    return result;
-                }
-            });
+            Collections.sort(fieldDescList, FieldDescComparator.INSTANCE);
 
             Schema schema = inferSchemaForType(typeDesc.getTypeName(), fieldDescList);
             augmentSchemaWithCustomMetaData(schema, recordTypeInfo, fieldDescList);
@@ -161,7 +152,10 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
             final RecordTypeInfo recordTypeInfo = metaDataSource.getRecordType(typeName);
             final TypeDesc typeDesc = metaDataSource.getTypeInfo(typeName);
 
-            Schema schema = inferSchemaForType(typeDesc.getTypeName(), typeDesc.getFields());
+            List<FieldDesc> fieldDescList = new ArrayList<>(typeDesc.getFields());
+            Collections.sort(fieldDescList, FieldDescComparator.INSTANCE);
+
+            Schema schema = inferSchemaForType(typeDesc.getTypeName(), fieldDescList);
             augmentSchemaWithCustomMetaData(schema, recordTypeInfo, typeDesc.getFields());
 
             return schema;
@@ -181,7 +175,10 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
             final RefType refType = referencedRecordTypeInfo.getRefType();
             final TypeDesc typeDesc = metaDataSource.getTypeInfo(refType.getTypeName());
 
-            Schema schema = inferSchemaForType(typeDesc.getTypeName(), typeDesc.getFields());
+            List<FieldDesc> fieldDescList = new ArrayList<>(typeDesc.getFields());
+            Collections.sort(fieldDescList, FieldDescComparator.INSTANCE);
+
+            Schema schema = inferSchemaForType(typeDesc.getTypeName(), fieldDescList);
             augmentSchemaWithCustomMetaData(schema, referencedRecordTypeInfo, null);
 
             return schema;
@@ -337,6 +334,7 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
                     inferSchemaForField(fieldDesc), null, (Object) null);
 
             // Add some Talend6 custom properties to the schema.
+
             Schema avroFieldSchema = AvroUtils.unwrapIfNullable(avroField.schema());
 
             avroField.addProp(DiSchemaConstants.TALEND6_COLUMN_ORIGINAL_DB_COLUMN_NAME, fieldDesc.getName());
@@ -356,6 +354,12 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
                 if (customFieldRefType == CustomFieldRefType.DATE) {
                     avroField.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'.000Z'");
                 }
+
+                NsRef ref = customFieldInfo.getRef();
+                if (StringUtils.isNotEmpty(ref.getName())) {
+                    avroField.addProp(DiSchemaConstants.TALEND6_COMMENT, ref.getName());
+                }
+
             } else {
                 Class<?> fieldType = fieldDesc.getValueType();
 
@@ -456,9 +460,8 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
         // Add custom record type meta data to a key field
         if (recordTypeInfo instanceof CustomRecordTypeInfo) {
             CustomRecordTypeInfo customRecordTypeInfo = (CustomRecordTypeInfo) recordTypeInfo;
-            Schema.Field keyField = getNsFieldByName(schema, "internalId");
-            if (keyField != null) {
-                writeCustomRecord(metaDataSource.getBasicMetaData(), keyField, customRecordTypeInfo);
+            for (Schema.Field field : schema.getFields()) {
+                writeCustomRecord(metaDataSource.getBasicMetaData(), field, customRecordTypeInfo);
             }
         }
 
@@ -700,4 +703,19 @@ public class NetSuiteDatasetRuntimeImpl implements NetSuiteDatasetRuntime {
         return null;
     }
 
+    public static class FieldDescComparator implements Comparator<FieldDesc> {
+
+        public static final FieldDescComparator INSTANCE = new FieldDescComparator();
+
+        @Override
+        public int compare(FieldDesc o1, FieldDesc o2) {
+            int result = Boolean.compare(o1.isKey(), o2.isKey());
+            if (result != 0) {
+                return result * -1;
+            }
+            result = o1.getName().compareTo(o2.getName());
+            return result;
+        }
+
+    }
 }

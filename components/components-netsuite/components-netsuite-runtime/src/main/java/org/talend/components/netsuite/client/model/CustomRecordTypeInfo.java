@@ -39,12 +39,13 @@ public class CustomRecordTypeInfo extends RecordTypeInfo {
     }
 
     public RefType getRefType() {
-        return RefType.CUSTOMIZATION_REF;
+        return RefType.CUSTOM_RECORD_REF;
     }
 
-    public NsRef createRef(String internalId, String externalId, String scriptId) {
+    public NsRef createRef(String internalId, String externalId, String scriptId, String typeId) {
         NsRef ref = createRef(internalId, externalId);
         ref.setScriptId(scriptId);
+        ref.setTypeId(typeId);
         return ref;
     }
 

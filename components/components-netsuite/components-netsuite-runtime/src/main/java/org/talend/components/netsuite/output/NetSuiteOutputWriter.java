@@ -51,8 +51,13 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
 
     private final NetSuiteWriteOperation writeOperation;
 
+    // Holds accumulated write responses for a current batch
+    private final List<NsWriteResponse<RefT>> writeResponses = new ArrayList<>();
+
+    // Holds accumulated successful write result records for a current batch
     private final List<IndexedRecord> successfulWrites = new ArrayList<>();
 
+    // Holds accumulated rejected write result records for a current batch
     private final List<IndexedRecord> rejectedWrites = new ArrayList<>();
 
     private boolean exceptionForErrors = true;
@@ -115,6 +120,14 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
         // This is required due to bug in DI job which is not aware of bulk writes.
         flush();
         return rejectedWrites;
+    }
+
+    public Iterable<NsWriteResponse<RefT>> getWriteResponses() {
+        // If write feedback is requested before submitting of current batch
+        // then write accumulated records to provide feedback to a caller.
+        // This is required due to bug in DI job which is not aware of bulk writes.
+        flush();
+        return writeResponses;
     }
 
     @Override
@@ -195,6 +208,7 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
     }
 
     private void processWriteResponse(NsWriteResponse<RefT> response, IndexedRecord indexedRecord) {
+        writeResponses.add(response);
         if (response.getStatus().isSuccess()) {
             IndexedRecord targetRecord = createSuccessRecord(response, indexedRecord);
             successfulWrites.add(targetRecord);
@@ -211,6 +225,7 @@ public abstract class NetSuiteOutputWriter<T, RefT> implements WriterWithFeedbac
     }
 
     private void clearWriteFeedback() {
+        writeResponses.clear();
         successfulWrites.clear();
         rejectedWrites.clear();
     }

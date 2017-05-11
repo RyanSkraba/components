@@ -13,8 +13,6 @@
 
 package org.talend.components.netsuite;
 
-import static org.talend.components.netsuite.NetSuiteDatasetRuntimeImpl.getNsFieldByName;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,9 +39,12 @@ import org.talend.daikon.avro.AvroUtils;
  * <code>schema</code> as source of meta data and redirects a request to <code>default source</code>.
  */
 public class SchemaCustomMetaDataSource implements CustomMetaDataSource {
-    protected BasicMetaData basicMetaData;
-    protected CustomMetaDataSource defaultSource;
-    protected Schema schema;
+    private BasicMetaData basicMetaData;
+    private CustomMetaDataSource defaultSource;
+    private Schema schema;
+
+    private CustomRecordTypeInfo customRecordTypeInfo;
+    private Map<String, CustomFieldDesc> customFieldDescMap;
 
     /**
      * Create <code>SchemaCustomMetaDataSource</code> using given <code>basic meta data</code>,
@@ -68,12 +69,8 @@ public class SchemaCustomMetaDataSource implements CustomMetaDataSource {
     @Override
     public Map<String, CustomFieldDesc> getCustomFields(RecordTypeInfo recordTypeInfo) {
         if (!AvroUtils.isIncludeAllFields(schema)) {
-            Map<String, CustomFieldDesc> customFieldDescMap = new HashMap<>();
-            for (Schema.Field field : schema.getFields()) {
-                CustomFieldDesc customFieldDesc = NetSuiteDatasetRuntimeImpl.readCustomField(field);
-                if (customFieldDesc != null) {
-                    customFieldDescMap.put(customFieldDesc.getName(), customFieldDesc);
-                }
+            if (customFieldDescMap == null) {
+                customFieldDescMap = loadCustomFieldDescMap();
             }
             return customFieldDescMap;
         }
@@ -81,17 +78,37 @@ public class SchemaCustomMetaDataSource implements CustomMetaDataSource {
         return defaultSource.getCustomFields(recordTypeInfo);
     }
 
+    private Map<String, CustomFieldDesc> loadCustomFieldDescMap() {
+        Map<String, CustomFieldDesc> customFieldDescMap = new HashMap<>();
+        for (Schema.Field field : schema.getFields()) {
+            CustomFieldDesc customFieldDesc = NetSuiteDatasetRuntimeImpl.readCustomField(field);
+            if (customFieldDesc != null) {
+                customFieldDescMap.put(customFieldDesc.getName(), customFieldDesc);
+            }
+        }
+        return customFieldDescMap;
+    }
+
     @Override
     public CustomRecordTypeInfo getCustomRecordType(String typeName) {
-        Schema.Field keyField = getNsFieldByName(schema, "internalId");
-        if (keyField != null) {
+        if (customRecordTypeInfo == null) {
+            customRecordTypeInfo = loadCustomRecordTypeInfo();
+        }
+        if (customRecordTypeInfo != null && customRecordTypeInfo.getName().equals(typeName)) {
+            return customRecordTypeInfo;
+        }
+
+        return defaultSource.getCustomRecordType(typeName);
+    }
+
+    private CustomRecordTypeInfo loadCustomRecordTypeInfo() {
+        for (Schema.Field field : schema.getFields()) {
             CustomRecordTypeInfo customRecordTypeInfo =
-                    NetSuiteDatasetRuntimeImpl.readCustomRecord(basicMetaData, keyField);
+                    NetSuiteDatasetRuntimeImpl.readCustomRecord(basicMetaData, field);
             if (customRecordTypeInfo != null) {
                 return customRecordTypeInfo;
             }
         }
-
-        return defaultSource.getCustomRecordType(typeName);
+        return null;
     }
 }
