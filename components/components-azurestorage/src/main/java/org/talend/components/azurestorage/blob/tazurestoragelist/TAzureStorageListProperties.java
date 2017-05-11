@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.Schema.Field;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.azurestorage.blob.AzureStorageBlobProperties;
@@ -32,6 +33,17 @@ public class TAzureStorageListProperties extends AzureStorageBlobProperties {
     private static final long serialVersionUID = 8673604530837504643L;
 
     protected transient PropertyPathConnector MAIN_NAME = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
+
+	public static final Schema outOfBandSchema;
+    
+	/**
+     * Sets Out of band schema. This schema is not supposed to be changed by user
+     */
+    static {       
+        Field currentBlobField = new Field("CURRENT_BLOB", Schema.create(Schema.Type.STRING), null, (Object) null);
+        outOfBandSchema = Schema.createRecord("OutOfBand", null, null, false);
+        outOfBandSchema.setFields(Collections.singletonList(currentBlobField));
+    }
 
     public TAzureStorageListProperties(String name) {
         super(name);
