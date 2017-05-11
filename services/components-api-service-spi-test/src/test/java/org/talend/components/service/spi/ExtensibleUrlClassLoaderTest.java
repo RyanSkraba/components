@@ -1,6 +1,6 @@
 package org.talend.components.service.spi;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -10,7 +10,6 @@ import org.hamcrest.collection.IsIterableWithSize;
 import org.junit.Test;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.daikon.runtime.RuntimeUtil;
-
 
 public class ExtensibleUrlClassLoaderTest {
 
@@ -25,7 +24,7 @@ public class ExtensibleUrlClassLoaderTest {
                 IsIterableWithSize.<ComponentInstaller> iterableWithSize(2));
 
         // when
-        urlClassLoader.addURL(new URL("mvn:org.talend.components/multiple-runtime-comp"));
+        urlClassLoader.addURL(new URL("mvn:org.talend.components/multiple-runtime-comp/0.18.0"));
 
         // then
         // 3 comp installer
@@ -33,6 +32,5 @@ public class ExtensibleUrlClassLoaderTest {
                 IsIterableWithSize.<ComponentInstaller> iterableWithSize(3));
 
     }
-
 
 }

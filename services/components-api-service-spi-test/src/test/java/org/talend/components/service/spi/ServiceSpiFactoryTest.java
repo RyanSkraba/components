@@ -1,7 +1,13 @@
 package org.talend.components.service.spi;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,7 +33,6 @@ import org.talend.daikon.runtime.RuntimeUtil;
  * Unit tests for {@link ServiceSpiFactory}.
  */
 public class ServiceSpiFactoryTest {
-
 
     @BeforeClass
     public static void registryMvnHandler() {
@@ -65,18 +70,19 @@ public class ServiceSpiFactoryTest {
         // given
         DefinitionRegistry definitionRegistry = ServiceSpiFactory.getDefinitionRegistry();
         assertThat(definitionRegistry.getComponentFamilies(), not(hasKey(is("MultiRuntimeExample"))));
-        
-        //when
-        DefinitionRegistry definitionRegistry2 = ServiceSpiFactory.createDefinitionRegistry(new URL[]{new URL("mvn:org.talend.components/multiple-runtime-comp")});
 
-        //then
+        // when
+        DefinitionRegistry definitionRegistry2 = ServiceSpiFactory
+                .createDefinitionRegistry(new URL[] { new URL("mvn:org.talend.components/multiple-runtime-comp/0.18.0") });
+
+        // then
         assertThat(definitionRegistry2.getComponentFamilies(), hasKey(is("MultiRuntimeExample")));
         assertThat(definitionRegistry, not(equalTo(definitionRegistry2)));
 
         // this will check that same registry is returned if no classpath is passed
         assertThat(definitionRegistry2, equalTo(ServiceSpiFactory.createDefinitionRegistry(null)));
         assertThat(definitionRegistry2, equalTo(ServiceSpiFactory.createDefinitionRegistry(new URL[0])));
-        
+
     }
 
     @Test
@@ -84,13 +90,13 @@ public class ServiceSpiFactoryTest {
         // this will check that create an update registry with the new url
         // given
         DefinitionRegistry definitionRegistry = ServiceSpiFactory
-                .createDefinitionRegistry(new URL[] { new URL("mvn:org.talend.components/multiple-runtime-comp") });
+                .createDefinitionRegistry(new URL[] { new URL("mvn:org.talend.components/multiple-runtime-comp/0.18.0") });
         assertThat(definitionRegistry.getComponentFamilies(), hasKey(is("MultiRuntimeExample")));
         assertThat(definitionRegistry.getComponentFamilies(), not(hasKey(is("Jdbc"))));
 
         // when
-        DefinitionRegistry definitionRegistry2 = ServiceSpiFactory
-                .createUpdatedDefinitionRegistry(new URL[] { new URL("mvn:org.talend.components/components-jdbc-definition") });
+        DefinitionRegistry definitionRegistry2 = ServiceSpiFactory.createUpdatedDefinitionRegistry(
+                new URL[] { new URL("mvn:org.talend.components/components-jdbc-definition/0.18.0") });
 
         // then
         assertThat(definitionRegistry2.getComponentFamilies(), hasKey(is("MultiRuntimeExample")));

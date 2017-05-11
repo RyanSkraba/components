@@ -22,26 +22,26 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>localio-definition</artifactId>
-			<version>${project.version}</version>
+			<version>0.18.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>simplefileio-definition</artifactId>
-			<version>${project.version}</version>
+			<version>0.18.0</version>
 			<scope>test</scope>
 		</dependency>
         <!-- added to make sure it is built before but dynamically used see the plugin element below. -->
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>multiple-runtime-comp</artifactId>
-			<version>${project.version}</version>
+			<version>0.18.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-jdbc-definition</artifactId>
-			<version>${project.version}</version>
+			<version>0.18.0</version>
 			<scope>test</scope>
 		</dependency>
 
