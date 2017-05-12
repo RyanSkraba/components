@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -126,11 +125,7 @@ public class HadoopAmbariClusterService implements HadoopClusterService {
 
     @Override
     public Set<String> getConfFiles() {
-        Set<String> fileNames = new HashSet<>();
-        for (ApiConfigFile file : configFiles) {
-            fileNames.add(file.getType());
-        }
-        return fileNames;
+        return confs.keySet();
     }
 
     @Override
