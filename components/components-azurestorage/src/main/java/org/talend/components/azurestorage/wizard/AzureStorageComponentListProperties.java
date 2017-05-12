@@ -106,14 +106,14 @@ public class AzureStorageComponentListProperties extends ComponentPropertiesImpl
         selectedContainerNames.setPossibleValues(connection.BlobSchema);
         getForm(FORM_CONTAINER).setAllowBack(true);
         getForm(FORM_CONTAINER).setAllowForward(true);
-        getForm(FORM_CONTAINER).setAllowFinish(true);
+        getForm(FORM_CONTAINER).setAllowFinish(false);
     }
 
     public void beforeFormPresentQueue(){
         selectedQueueNames.setPossibleValues(connection.QueueSchema);
         getForm(FORM_QUEUE).setAllowBack(true);
         getForm(FORM_QUEUE).setAllowForward(true);
-        getForm(FORM_QUEUE).setAllowFinish(true);
+        getForm(FORM_QUEUE).setAllowFinish(false);
     }
 
     public void beforeFormPresentTable(){
@@ -124,6 +124,7 @@ public class AzureStorageComponentListProperties extends ComponentPropertiesImpl
 
     public ValidationResult afterFormFinishTable(Repository<Properties> repo) throws Exception {
         String repoLoc = repo.storeProperties(connection, connection.name.getValue(), repositoryLocation, null);
+
         String storeId;
         if (selectedContainerNames.getValue() != null) {
             for (NamedThing nl : selectedContainerNames.getValue()) {
