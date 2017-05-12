@@ -63,15 +63,15 @@ public class JDBCInputDefinition extends AbstractComponentDefinition {
         String runtimeClass = "";
         switch (engine) {
         case BEAM:
-            return new JdbcRuntimeInfo((JDBCInputProperties) properties, JDBCFamilyDefinition.MAVEN_RUNTIME_BEAM_URI,
-                    DependenciesReader.computeDependenciesFilePath(JDBCFamilyDefinition.MAVEN_GROUP_ID,
-                            JDBCFamilyDefinition.MAVEN_RUNTIME_BEAM_ARTIFACT_ID),
+            return new JdbcRuntimeInfo((JDBCInputProperties) properties, JDBCFamilyDefinition.getBeamRuntimeMavenURI(),
+                    DependenciesReader.computeDependenciesFilePath(JDBCFamilyDefinition.getBeamRuntimeGroupId(),
+                            JDBCFamilyDefinition.getBeamRuntimeArtifactId()),
                     BEAM_RUNTIME);
         case DI:
         default:
-            return new JdbcRuntimeInfo((JDBCInputProperties) properties, JDBCFamilyDefinition.MAVEN_RUNTIME_URI,
-                    DependenciesReader.computeDependenciesFilePath(JDBCFamilyDefinition.MAVEN_GROUP_ID,
-                            JDBCFamilyDefinition.MAVEN_RUNTIME_ARTIFACT_ID),
+            return new JdbcRuntimeInfo((JDBCInputProperties) properties, JDBCFamilyDefinition.getDIRuntimeMavenURI(),
+                    DependenciesReader.computeDependenciesFilePath(JDBCFamilyDefinition.getDIRuntimeGroupId(),
+                            JDBCFamilyDefinition.getDIRuntimeArtifactId()),
                     DI_RUNTIME);
         }
     }

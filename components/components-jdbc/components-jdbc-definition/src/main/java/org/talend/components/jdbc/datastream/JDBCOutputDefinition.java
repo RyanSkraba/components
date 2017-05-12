@@ -45,9 +45,9 @@ public class JDBCOutputDefinition extends AbstractComponentDefinition {
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
-        return new JdbcRuntimeInfo((JDBCOutputProperties) properties, JDBCFamilyDefinition.MAVEN_RUNTIME_BEAM_URI,
-                DependenciesReader.computeDependenciesFilePath(JDBCFamilyDefinition.MAVEN_GROUP_ID,
-                        JDBCFamilyDefinition.MAVEN_RUNTIME_BEAM_ARTIFACT_ID),
+        return new JdbcRuntimeInfo((JDBCOutputProperties) properties, JDBCFamilyDefinition.getBeamRuntimeMavenURI(),
+                DependenciesReader.computeDependenciesFilePath(JDBCFamilyDefinition.getBeamRuntimeGroupId(),
+                        JDBCFamilyDefinition.getBeamRuntimeArtifactId()),
                 BEAM_RUNTIME);
     }
 

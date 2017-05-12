@@ -35,8 +35,8 @@ public class JdbcRuntimeInfo extends JarRuntimeInfo {
      */
     public JdbcRuntimeInfo(RuntimeSettingProvider props, String runtimeClassName) {
         // add the version to fix the issue, not good, could we avoid it?
-        super(JDBCFamilyDefinition.MAVEN_RUNTIME_URI, DependenciesReader.computeDependenciesFilePath(
-                JDBCFamilyDefinition.MAVEN_GROUP_ID, JDBCFamilyDefinition.MAVEN_RUNTIME_ARTIFACT_ID), runtimeClassName);
+        super(JDBCFamilyDefinition.getDIRuntimeMavenURI(), DependenciesReader.computeDependenciesFilePath(
+                JDBCFamilyDefinition.getDIRuntimeGroupId(), JDBCFamilyDefinition.getDIRuntimeArtifactId()), runtimeClassName);
         this.props = props;
     }
 

@@ -12,6 +12,9 @@
 // ============================================================================
 package org.talend.components.jdbc;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
 import org.talend.components.api.Constants;
@@ -29,9 +32,9 @@ import org.talend.components.jdbc.tjdbcrollback.TJDBCRollbackDefinition;
 import org.talend.components.jdbc.tjdbcrow.TJDBCRowDefinition;
 import org.talend.components.jdbc.wizard.JDBCConnectionWizardDefinition;
 
-import aQute.bnd.annotation.component.Component;
-
 import com.google.auto.service.AutoService;
+
+import aQute.bnd.annotation.component.Component;
 
 /**
  * Install all of the definitions provided for the JDBC family of components.
@@ -42,21 +45,40 @@ public class JDBCFamilyDefinition extends AbstractComponentFamilyDefinition impl
 
     public static final String NAME = "Jdbc";
 
-    public static final String MAVEN_GROUP_ID = "org.talend.components";
+    // DI Runtime informations
+    public static final String RUNTIME_DI_MAVEN_GROUP_ID = "runtime.di.maven.groupId";
 
-    public static final String MAVEN_RUNTIME_ARTIFACT_ID = "components-jdbc-runtime";
+    public static final String RUNTIME_DI_MAVEN_ARTIFACT_ID = "runtime.di.maven.artifactId";
 
-    public static final String MAVEN_RUNTIME_BEAM_ARTIFACT_ID = "components-jdbc-runtime-beam";
+    public static final String RUNTIME_DI_MAVEN_VERSION = "runtime.di.maven.version";
 
-    public static final String MAVEN_RUNTIME_URI = "mvn:" + MAVEN_GROUP_ID + "/" +
-            MAVEN_RUNTIME_ARTIFACT_ID;
+    // Beam Runtime informations
+    public static final String RUNTIME_BEAM_MAVEN_GROUP_ID = "runtime.beam.maven.groupId";
 
-    public static final String MAVEN_RUNTIME_BEAM_URI = "mvn:" + MAVEN_GROUP_ID + "/" +
-            MAVEN_RUNTIME_BEAM_ARTIFACT_ID;
+    public static final String RUNTIME_BEAM_MAVEN_ARTIFACT_ID = "runtime.beam.maven.artifactId";
+
+    public static final String RUNTIME_BEAM_MAVEN_VERSION = "runtime.beam.maven.version";
+
+    private static final java.util.Properties runtimeProperties;
+
+    /**
+     * Bootstrap runtime information form the <code>runtime.properties</code> file.
+     * This file should be in src/main/runtime folder of the definition part of a component
+     * and should contains the runtime properties defined above
+     */
+    static {
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        runtimeProperties = new java.util.Properties();
+        try (InputStream resourceStream = loader
+                .getResourceAsStream("META-INF/runtime/org.talend.components/components-jdbc-definition/runtime.properties")) {
+            runtimeProperties.load(resourceStream);
+        } catch (IOException e) {
+            throw new RuntimeException("Error while bootstraping runtime properties", e);
+        }
+    }
 
     public JDBCFamilyDefinition() {
-        super(
-                NAME,
+        super(NAME,
                 // Components
                 new TJDBCCloseDefinition(), new TJDBCCommitDefinition(), new TJDBCConnectionDefinition(),
                 new TJDBCInputDefinition(), new TJDBCOutputDefinition(), new TJDBCRollbackDefinition(), new TJDBCRowDefinition(),
@@ -64,11 +86,45 @@ public class JDBCFamilyDefinition extends AbstractComponentFamilyDefinition impl
                 // Component wizards
                 new JDBCConnectionWizardDefinition(),
                 // Datastore, Dataset and the component
-                new JDBCDatastoreDefinition(), new JDBCDatasetDefinition(), new JDBCInputDefinition(), new JDBCOutputDefinition());
+                new JDBCDatastoreDefinition(), new JDBCDatasetDefinition(), new JDBCInputDefinition(),
+                new JDBCOutputDefinition());
     }
 
     @Override
     public void install(ComponentFrameworkContext ctx) {
         ctx.registerComponentFamilyDefinition(this);
     }
+
+    public static String getDIRuntimeGroupId() {
+        return runtimeProperties.getProperty(RUNTIME_DI_MAVEN_GROUP_ID);
+    }
+
+    public static String getDIRuntimeArtifactId() {
+        return runtimeProperties.getProperty(RUNTIME_DI_MAVEN_ARTIFACT_ID);
+    }
+
+    public static String getDIRuntimeVersion() {
+        return runtimeProperties.getProperty(RUNTIME_DI_MAVEN_VERSION);
+    }
+
+    public static String getDIRuntimeMavenURI() {
+        return "mvn:" + getDIRuntimeGroupId() + "/" + getDIRuntimeArtifactId() + "/" + getDIRuntimeVersion();
+    }
+
+    public static String getBeamRuntimeArtifactId() {
+        return runtimeProperties.getProperty(RUNTIME_BEAM_MAVEN_ARTIFACT_ID);
+    }
+
+    public static String getBeamRuntimeGroupId() {
+        return runtimeProperties.getProperty(RUNTIME_BEAM_MAVEN_GROUP_ID);
+    }
+
+    public static String getBeamRuntimeVersion() {
+        return runtimeProperties.getProperty(RUNTIME_BEAM_MAVEN_VERSION);
+    }
+
+    public static String getBeamRuntimeMavenURI() {
+        return "mvn:" + getDIRuntimeGroupId() + "/" + getBeamRuntimeArtifactId() + "/" + getBeamRuntimeVersion();
+    }
+
 }
