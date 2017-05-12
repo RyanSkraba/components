@@ -67,7 +67,7 @@ public class JDBCFamilyDefinition extends AbstractComponentFamilyDefinition impl
      * and should contains the runtime properties defined above
      */
     static {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        ClassLoader loader = JDBCFamilyDefinition.class.getClassLoader();
         runtimeProperties = new java.util.Properties();
         try (InputStream resourceStream = loader
                 .getResourceAsStream("META-INF/runtime/org.talend.components/components-jdbc-definition/runtime.properties")) {
