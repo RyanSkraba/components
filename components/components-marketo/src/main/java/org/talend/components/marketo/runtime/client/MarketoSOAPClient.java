@@ -24,6 +24,8 @@ import static org.apache.avro.Schema.Field;
 import static org.apache.avro.generic.GenericData.Record;
 import static org.apache.commons.codec.binary.Hex.encodeHex;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.talend.components.marketo.MarketoConstants.FIELD_ERROR_MSG;
+import static org.talend.components.marketo.MarketoConstants.FIELD_STATUS;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.LastUpdateAtSelector;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.LeadKeySelector;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.StaticListSelector;
@@ -864,6 +866,10 @@ public class MarketoSOAPClient extends MarketoClient {
                     lead.setForeignSysType(objectFactory.createLeadRecordForeignSysType(ForeignSysType.valueOf(fst)));
                 }
             } else {
+                // skip status & error fields
+                if (FIELD_STATUS.equals(col) || FIELD_ERROR_MSG.equals(col)) {
+                    continue;
+                }
                 Attribute attr = new Attribute();
                 attr.setAttrName(col);
                 attr.setAttrValue((String) record.get(f.pos()));

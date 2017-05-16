@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode.REST;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -40,6 +41,7 @@ import org.talend.components.marketo.runtime.client.type.MarketoError;
 import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
 import org.talend.components.marketo.runtime.client.type.MarketoSyncResult;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
+import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.CustomObjectAction;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.CustomObjectDeleteBy;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties.CustomObjectSyncAction;
@@ -49,6 +51,8 @@ public class MarketoClientCustomObjectsTestIT extends MarketoBaseTestIT {
     private transient static final Logger LOG = LoggerFactory.getLogger(MarketoRESTClientTestIT.class);
 
     public static final String TEST_CO_NAME_SMARTPHONE = "smartphone_c";
+
+    public static final String TEST_CO_NAME_CAR = "car_c";
 
     public static final String FIELD_CO_SMARTPHONE_MODEL = "model";
 
@@ -180,7 +184,7 @@ public class MarketoClientCustomObjectsTestIT extends MarketoBaseTestIT {
         irProps.customObjectNames.setValue("smartphone_c,roadShow_c,car_c");
         MarketoRecordResult result = client.listCustomObjects(irProps);
         assertNotNull(result.getRecords());
-        assertEquals(2, result.getRecords().size());
+        assertEquals(3, result.getRecords().size());
         for (IndexedRecord r : result.getRecords()) {
             checkCustomObject(r, false);
             LOG.debug("r = {}.", r);
@@ -417,5 +421,37 @@ public class MarketoClientCustomObjectsTestIT extends MarketoBaseTestIT {
             assertEquals(STATUS_DELETED, r.getStatus());
             LOG.debug("r = {}.", r);
         }
+    }
+
+    @Test
+    public void testFetchCompoundKey() throws Exception {
+        irProps.customObjectName.setValue(TEST_CO_NAME_CAR);
+        irProps.useCompoundKey.setValue(true);
+        irProps.validateFetchCompoundKey();
+        String keys = "[{\"customerId\":\"\",\"VIN\":\"\"}]";
+        assertEquals(keys, irProps.compoundKey.getKeyValuesAsJson().toString());
+    }
+
+    @Test
+    public void testGetCustomObjectWithCompoundKey() throws Exception {
+        irProps.customObjectAction.setValue(CustomObjectAction.get);
+        irProps.customObjectName.setValue(TEST_CO_NAME_CAR);
+        irProps.validateFetchCustomObjectSchema();
+        irProps.useCompoundKey.setValue(true);
+        // "searchableFields": "[[\"customerId\",\"VIN\"],[\"marketoGUID\"],[\"customerId\"]]"
+        irProps.compoundKey.keyName.setValue(Arrays.asList("customerId", "VIN"));
+        irProps.compoundKey.keyValue.setValue(Arrays.asList("4137181", "WBA4R7C30HK896061"));// WBA4R7C55HK895912
+        MarketoSource source = new MarketoSource();
+        source.initialize(null, irProps);
+        MarketoRESTClient client = (MarketoRESTClient) source.getClientService(null);
+        MarketoRecordResult result = client.getCustomObjects(irProps, null);
+        LOG.debug("result = {}.", result);
+        assertNotNull(result.getRecords());
+        assertEquals(1, result.getRecords().size());
+        IndexedRecord record = result.getRecords().get(0);
+        Schema s = record.getSchema();
+        assertEquals(4137181, record.get(s.getField("customerId").pos()));
+        assertEquals("WBA4R7C30HK896061", record.get(s.getField("VIN").pos()));
+        assertEquals("FIT", record.get(s.getField("brand").pos()));
     }
 }

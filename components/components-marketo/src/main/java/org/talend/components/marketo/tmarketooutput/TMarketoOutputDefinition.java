@@ -41,7 +41,8 @@ public class TMarketoOutputDefinition extends MarketoComponentDefinition {
 
     @Override
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
-        return EnumSet.of(ConnectorTopology.INCOMING, ConnectorTopology.INCOMING_AND_OUTGOING);
+        return EnumSet.of(ConnectorTopology.INCOMING, ConnectorTopology.INCOMING_AND_OUTGOING, ConnectorTopology.NONE,
+                ConnectorTopology.OUTGOING);
     }
 
     @Override
@@ -53,6 +54,11 @@ public class TMarketoOutputDefinition extends MarketoComponentDefinition {
 
     @Override
     public boolean isConditionalInputs() {
+        return true;
+    }
+
+    @Override
+    public boolean isRejectAfterClose() {
         return true;
     }
 

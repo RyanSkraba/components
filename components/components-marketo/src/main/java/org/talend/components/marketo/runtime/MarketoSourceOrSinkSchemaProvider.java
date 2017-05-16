@@ -13,6 +13,7 @@
 package org.talend.components.marketo.runtime;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.SourceOrSink;
@@ -20,4 +21,12 @@ import org.talend.components.api.component.runtime.SourceOrSink;
 public interface MarketoSourceOrSinkSchemaProvider extends SourceOrSink {
 
     Schema getSchemaForCustomObject(String customObjectName) throws IOException;
+
+    Schema getSchemaForCompany() throws IOException;
+
+    Schema getSchemaForOpportunity() throws IOException;
+
+    Schema getSchemaForOpportunityRole() throws IOException;
+
+    List<String> getCompoundKeyFields(String resource) throws IOException;
 }

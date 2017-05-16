@@ -44,7 +44,6 @@ public class MarketoColumnMappingsTable extends BasedOnSchemaTable {
     @Override
     public void setupProperties() {
         super.setupProperties();
-        marketoColumnName.setTaggedValue(ADD_QUOTES, true);
     }
 
     @Override

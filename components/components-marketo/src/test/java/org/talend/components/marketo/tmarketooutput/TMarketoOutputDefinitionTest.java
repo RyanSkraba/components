@@ -39,9 +39,8 @@ public class TMarketoOutputDefinitionTest {
 
     @Test
     public void testGetSupportedConnectorTopologies() throws Exception {
-        assertEquals(
-                new HashSet<ConnectorTopology>(
-                        Arrays.asList(ConnectorTopology.INCOMING, ConnectorTopology.INCOMING_AND_OUTGOING)),
+        assertEquals(new HashSet<ConnectorTopology>(Arrays.asList(ConnectorTopology.INCOMING,
+                ConnectorTopology.INCOMING_AND_OUTGOING, ConnectorTopology.NONE, ConnectorTopology.OUTGOING)),
                 def.getSupportedConnectorTopologies());
     }
 

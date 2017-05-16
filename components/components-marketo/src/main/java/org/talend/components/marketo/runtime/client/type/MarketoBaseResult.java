@@ -68,7 +68,7 @@ public abstract class MarketoBaseResult<T> {
     public String getErrorsString() {
         StringBuilder errs = new StringBuilder("");
         for (MarketoError err : getErrors()) {
-            errs.append("{ ");
+            errs.append("{");
             if (!StringUtils.isEmpty(err.getCode())) {
                 errs.append("[").append(err.getCode()).append("] ");
             }

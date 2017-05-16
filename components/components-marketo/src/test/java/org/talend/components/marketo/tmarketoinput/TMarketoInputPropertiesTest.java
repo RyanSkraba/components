@@ -16,10 +16,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.Company;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.CustomObject;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLead;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLeadActivity;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getLeadChanges;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.getMultipleLeads;
+import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.StandardAction.get;
 
 import java.util.Collections;
 
@@ -842,5 +845,66 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         props.refreshLayout(props.getForm(Form.ADVANCED));
         assertTrue(props.isApiSOAP());
         assertEquals("getLeadOrGetMultipleLeadsSOAP", props.schemaInput.schema.getValue().getName());
+    }
+
+    @Test
+    public void testCompany() throws Exception {
+        props.refreshLayout(props.getForm(Form.MAIN));
+        Form f = props.getForm(Form.MAIN);
+        assertFalse(f.getWidget(props.standardAction).isVisible());
+        assertFalse(f.getWidget(props.customObjectFilterType).isVisible());
+        assertFalse(f.getWidget(props.customObjectFilterValues).isVisible());
+        //
+        props.inputOperation.setValue(Company);
+        props.afterInputOperation();
+        assertEquals(MarketoConstants.getCustomObjectDescribeSchema(), props.schemaInput.schema.getValue());
+        props.standardAction.setValue(get);
+        props.afterStandardAction();
+        assertEquals(MarketoConstants.getCompanySchema(), props.schemaInput.schema.getValue());
+        assertTrue(f.getWidget(props.standardAction).isVisible());
+        assertTrue(f.getWidget(props.customObjectFilterType).isVisible());
+        assertTrue(f.getWidget(props.customObjectFilterValues).isVisible());
+    }
+
+    @Test
+    public void testCompoundKey() throws Exception {
+        props.refreshLayout(props.getForm(Form.MAIN));
+        Form f = props.getForm(Form.MAIN);
+        assertFalse(f.getWidget(props.customObjectAction).isVisible());
+        assertFalse(f.getWidget(props.customObjectName).isVisible());
+        assertFalse(f.getWidget(props.customObjectNames).isVisible());
+        assertFalse(f.getWidget(props.customObjectFilterType).isVisible());
+        assertFalse(f.getWidget(props.customObjectFilterValues).isVisible());
+        assertFalse(f.getWidget(props.useCompoundKey).isVisible());
+        assertFalse(f.getWidget(props.compoundKey).isVisible());
+        assertFalse(f.getWidget(props.fetchCustomObjectSchema).isVisible());
+        assertFalse(f.getWidget(props.fetchCompoundKey).isVisible());
+
+        props.inputOperation.setValue(CustomObject);
+        props.customObjectAction.setValue(CustomObjectAction.get);
+        props.afterInputOperation();
+        props.refreshLayout(props.getForm(Form.MAIN));
+        assertEquals(MarketoConstants.getCustomObjectRecordSchema(), props.schemaInput.schema.getValue());
+        assertTrue(f.getWidget(props.customObjectAction).isVisible());
+        assertTrue(f.getWidget(props.customObjectName).isVisible());
+        assertFalse(f.getWidget(props.customObjectNames).isVisible());
+        assertTrue(f.getWidget(props.customObjectFilterType).isVisible());
+        assertTrue(f.getWidget(props.customObjectFilterValues).isVisible());
+        assertTrue(f.getWidget(props.useCompoundKey).isVisible());
+        assertFalse(f.getWidget(props.compoundKey).isVisible());
+        assertTrue(f.getWidget(props.fetchCustomObjectSchema).isVisible());
+        assertFalse(f.getWidget(props.fetchCompoundKey).isVisible());
+
+        props.useCompoundKey.setValue(true);
+        props.refreshLayout(props.getForm(Form.MAIN));
+        assertTrue(f.getWidget(props.customObjectAction).isVisible());
+        assertTrue(f.getWidget(props.customObjectName).isVisible());
+        assertFalse(f.getWidget(props.customObjectNames).isVisible());
+        assertFalse(f.getWidget(props.customObjectFilterType).isVisible());
+        assertFalse(f.getWidget(props.customObjectFilterValues).isVisible());
+        assertTrue(f.getWidget(props.useCompoundKey).isVisible());
+        assertTrue(f.getWidget(props.compoundKey).isVisible());
+        assertTrue(f.getWidget(props.fetchCustomObjectSchema).isVisible());
+        assertTrue(f.getWidget(props.fetchCompoundKey).isVisible());
     }
 }

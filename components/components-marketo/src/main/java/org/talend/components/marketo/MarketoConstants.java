@@ -50,6 +50,8 @@ public class MarketoConstants {
 
     public static final String FIELD_MARKETO_GUID = "marketoGUID";
 
+    public static final String FIELD_ID = "id";
+
     public static final String FIELD_SEQ = "seq";
 
     public static final String FIELD_REASON = "reason";
@@ -59,6 +61,8 @@ public class MarketoConstants {
     public static final String FIELD_UPDATED_AT = "updatedAt";
 
     public static final String FIELD_DEDUPE_FIELDS = "dedupeFields";
+
+    public static final String FIELD_CAMPAIGN_ID = "campaignId";
 
     public static final String DATETIME_PATTERN_PARAM = "yyyy-MM-dd HH:mm:ss";
 
@@ -370,6 +374,150 @@ public class MarketoConstants {
                 .endRecord();
         s.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
         return s;
+    }
+
+    /**
+     * Campaign Operations
+     */
+    public static Schema getCampaignSchema() {
+        Schema s = SchemaBuilder.builder().record("campaign").fields() //
+                .name("id").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().nullable().intType().noDefault() //
+                .name("name").type().nullable().stringType().noDefault() //
+                .name("active").type().nullable().booleanType().noDefault() //
+                .name("description").type().nullable().stringType().noDefault() //
+                .name("programId").type().nullable().intType().noDefault() //
+                .name("programName").type().nullable().stringType().noDefault() //
+                .name("type").type().nullable().stringType().noDefault() //
+                .name("workspaceName").type().nullable().stringType().noDefault() //
+                .name(FIELD_CREATED_AT)//
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_REST)//
+                .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
+                .type(AvroUtils._date()).noDefault()//
+                .name(FIELD_UPDATED_AT)//
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_REST)//
+                .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
+                .type(AvroUtils._date()).noDefault()//
+                .endRecord();
+        s.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
+        return s;
+    }
+
+    public static Schema scheduleCampaignSchema() {
+        Schema s = SchemaBuilder.builder().record("scheduleCampaign").fields() //
+                .name(FIELD_CAMPAIGN_ID)//
+                .prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().intType().noDefault() //
+                .name(FIELD_STATUS).type().nullable().stringType().noDefault()//
+                .endRecord();
+        s.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
+        return s;
+    }
+
+    public static Schema triggerCampaignSchema() {
+        Schema s = SchemaBuilder.builder().record("triggerCampaign").fields() //
+                .name("leadId")//
+                .prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().intType().noDefault() //
+                .endRecord();
+        s.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
+        return s;
+    }
+
+    public static Schema triggerCampaignSchemaFlow() {
+        Schema s = SchemaBuilder.builder().record("triggerCampaign").fields() //
+                .name("leadId")//
+                .prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().intType().noDefault() //
+                .name(FIELD_CAMPAIGN_ID)//
+                .prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")//
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//
+                .type().nullable().intType().noDefault() //
+                .name(FIELD_STATUS).type().nullable().stringType().noDefault()//
+                .endRecord();
+        s.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
+        return s;
+    }
+
+    /*
+     * Companies
+     */
+    public static Schema getCompanySchema() {
+        return record("CompanyREST").fields()//
+                .name(FIELD_ID).prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().intType().noDefault()//
+                .name(FIELD_SEQ).type().intType().noDefault()//
+                .name("externalCompanyId").type().stringType().noDefault()//
+                .name("company").type().stringType().noDefault()//
+                .name(FIELD_CREATED_AT) //
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_REST)//
+                .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
+                .type(AvroUtils._date()).noDefault()//
+                .name(FIELD_UPDATED_AT) //
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_REST)//
+                .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
+                .type(AvroUtils._date()).noDefault()//
+                .endRecord();
+    }
+
+    public static Schema getCompanySyncSchema() {
+        return record("CompanySyncREST").fields()//
+                .name("externalCompanyId").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().intType().noDefault()//
+                .name("company").type().stringType().noDefault()//
+                .endRecord();
+    }
+
+    /*
+     * Opportunities / O roles
+     */
+
+    public static Schema getOpportunitySchema() {
+        return record("OpportunityREST").fields()//
+                .name(FIELD_MARKETO_GUID).prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().intType().noDefault()//
+                .name(FIELD_SEQ).type().intType().noDefault()//
+                .name("externalOpportunityId").type().stringType().noDefault()//
+                .name(FIELD_CREATED_AT) //
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_REST)//
+                .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
+                .type(AvroUtils._date()).noDefault()//
+                .name(FIELD_UPDATED_AT) //
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_REST)//
+                .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
+                .type(AvroUtils._date()).noDefault()//
+                .endRecord();
+    }
+
+    public static Schema getOpportunitySyncSchema() {
+        return record("OpportunitySyncREST").fields()//
+                .name("externalOpportunityId").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().stringType().noDefault()//
+                .endRecord();
+    }
+
+    public static Schema getOpportunityRoleSchema() {
+        return record("OpportunityRoleREST").fields()//
+                .name(FIELD_MARKETO_GUID).prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().intType().noDefault()//
+                .name(FIELD_SEQ).type().intType().noDefault()//
+                .name("externalOpportunityId").type().stringType().noDefault()//
+                .name("leadId").type().intType().noDefault()//
+                .name("role").type().stringType().noDefault()//
+                .name(FIELD_CREATED_AT) //
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_REST)//
+                .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
+                .type(AvroUtils._date()).noDefault()//
+                .name(FIELD_UPDATED_AT) //
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, DATETIME_PATTERN_REST)//
+                .prop(SchemaConstants.JAVA_CLASS_FLAG, Date.class.getCanonicalName()) //
+                .type(AvroUtils._date()).noDefault()//
+                .endRecord();
+    }
+
+    public static Schema getOpportunityRoleSyncSchema() {
+        return record("OpportunityRoleSyncREST").fields()//
+                .name("externalOpportunityId").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().stringType().noDefault()//
+                .name("leadId").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().intType().noDefault()//
+                .name("role").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true").type().stringType().noDefault()//
+                .endRecord();
     }
 
 }

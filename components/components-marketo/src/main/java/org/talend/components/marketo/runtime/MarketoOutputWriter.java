@@ -18,9 +18,7 @@ import static org.talend.components.marketo.MarketoConstants.FIELD_STATUS;
 import static org.talend.components.marketo.MarketoConstants.FIELD_SUCCESS;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -48,13 +46,7 @@ public class MarketoOutputWriter extends MarketoWriter {
 
     private OutputOperation operation;
 
-    private Boolean dieOnError;
-
-    private int batchSize = 1;
-
-    private List<IndexedRecord> recordsToProcess = new ArrayList<>();
-
-    private transient static final Logger LOG = LoggerFactory.getLogger(MarketoOutputWriter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MarketoOutputWriter.class);
 
     public MarketoOutputWriter(WriteOperation writeOperation, RuntimeContainer runtime) {
         super(writeOperation, runtime);
@@ -119,6 +111,20 @@ public class MarketoOutputWriter extends MarketoWriter {
         case deleteCustomObjects:
             processResult(((MarketoRESTClient) client).deleteCustomObjects(properties, Arrays.asList(inputRecord)));
             break;
+        case syncCompanies:
+            processResult(((MarketoRESTClient) client).syncCompanies(properties, Arrays.asList(inputRecord)));
+            break;
+        case deleteCompanies:
+            processResult(((MarketoRESTClient) client).deleteCompany(properties, Arrays.asList(inputRecord)));
+            break;
+        case syncOpportunities:
+        case syncOpportunityRoles:
+            processResult(((MarketoRESTClient) client).syncOpportunities(properties, Arrays.asList(inputRecord)));
+            break;
+        case deleteOpportunities:
+        case deleteOpportunityRoles:
+            processResult(((MarketoRESTClient) client).deleteOpportunities(properties, Arrays.asList(inputRecord)));
+            break;
         }
     }
 
@@ -145,7 +151,8 @@ public class MarketoOutputWriter extends MarketoWriter {
             LOG.error(mktoResult.getErrorsString());
         }
         for (SyncStatus status : mktoResult.getRecords()) {
-            if (Arrays.asList("created", "updated", "deleted").contains(status.getStatus().toLowerCase())) {
+            if (Arrays.asList("created", "updated", "deleted", "scheduled", "triggered")
+                    .contains(status.getStatus().toLowerCase())) {
                 handleSuccess(fillRecord(status, flowSchema));
             } else {
                 if (dieOnError) {
@@ -178,6 +185,8 @@ public class MarketoOutputWriter extends MarketoWriter {
             } else if (f.name().equals(FIELD_ID_REST)) {
                 record.put(f.pos(), status.getId());
             } else if (f.name().equals(FIELD_LEAD_ID)) {
+                record.put(f.pos(), status.getId());
+            } else if (f.name().equals(MarketoConstants.FIELD_CAMPAIGN_ID)) {
                 record.put(f.pos(), status.getId());
             } else if (f.name().equals(FIELD_SUCCESS)) {
                 record.put(f.pos(), Boolean.parseBoolean(status.getStatus()));

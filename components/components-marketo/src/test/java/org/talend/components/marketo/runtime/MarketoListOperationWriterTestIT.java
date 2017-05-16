@@ -15,10 +15,12 @@ package org.talend.components.marketo.runtime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.talend.components.marketo.MarketoConstants.FIELD_STATUS;
 import static org.talend.components.marketo.MarketoConstants.FIELD_SUCCESS;
 import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode.REST;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,7 +124,7 @@ public class MarketoListOperationWriterTestIT extends MarketoBaseTestIT {
         assertEquals(1, writer.result.getApiCalls());
     }
 
-    @Test
+    @Test(expected = IOException.class)
     public void testIsMemberOfSOAPFail() throws Exception {
         props = getSOAPProperties();
         props.listOperation.setValue(ListOperation.isMemberOf);
@@ -138,10 +140,7 @@ public class MarketoListOperationWriterTestIT extends MarketoBaseTestIT {
         writer = getWriter(props);
         writer.open("test");
         writer.write(record);
-        assertEquals(1, writer.result.getTotalCount());
-        assertEquals(0, writer.result.getSuccessCount());
-        assertEquals(1, writer.result.getRejectCount());
-        assertEquals(1, writer.result.getApiCalls());
+        fail("Should not be here");
     }
 
     @Test
@@ -237,7 +236,7 @@ public class MarketoListOperationWriterTestIT extends MarketoBaseTestIT {
         record.put(1, UNDX_TEST_LIST_SMALL);
         record.put(2, "IDNUM");
         // record.put(3, 2767254);
-        record.put(3, createdLeads.get(4));
+        record.put(3, createdLeads.get(3));
         //
         writer = getWriter(props);
         writer.open("test");

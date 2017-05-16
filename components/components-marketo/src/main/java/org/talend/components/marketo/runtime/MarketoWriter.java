@@ -56,6 +56,12 @@ public abstract class MarketoWriter implements WriterWithFeedback<Result, Indexe
 
     protected final List<IndexedRecord> rejectedWrites = new ArrayList<>();
 
+    protected Boolean dieOnError;
+
+    protected int batchSize = 1;
+
+    protected List<IndexedRecord> recordsToProcess = new ArrayList<>();
+
     protected String API_SOAP = "SOAP";
 
     public MarketoWriter(WriteOperation writeOperation, RuntimeContainer runtime) {

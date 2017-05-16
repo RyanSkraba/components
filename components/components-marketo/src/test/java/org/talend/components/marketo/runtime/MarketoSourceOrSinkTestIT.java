@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.avro.Schema;
@@ -105,5 +106,34 @@ public class MarketoSourceOrSinkTestIT extends MarketoBaseTestIT {
         props.connection.endpoint.setValue("https://www.marketo.com");
         sos.initialize(null, props);
         assertEquals("Marketo SOAP API Client [null].", sos.getClientService(null).toString());
+    }
+
+    @Test
+    public void testEndpointSchemaForResources() throws Exception {
+        sos.initialize(null, props);
+        Schema s = sos.getEndpointSchema(null, "car_c");
+        assertNotNull(s);
+        // TODO fails now, test when APIs enabled.
+        s = sos.getSchemaForCompany();
+        assertNull(s);
+        s = sos.getSchemaForOpportunity();
+        assertNull(s);
+        s = sos.getSchemaForOpportunityRole();
+        assertNull(s);
+    }
+
+    @Test
+    public void testGetCompoundKeyFields() throws Exception {
+        sos.initialize(null, props);
+        List<String> keys = sos.getCompoundKeyFields("car_c");
+        assertNotNull(keys);
+        assertEquals(keys, Arrays.asList("customerId", "VIN"));// Arrays.asList("VIN", "customerId")));
+        // TODO fails now, test when APIs enabled.
+        keys = sos.getCompoundKeyFields(MarketoSourceOrSink.RESOURCE_COMPANY);
+        assertNull(keys);
+        keys = sos.getCompoundKeyFields(MarketoSourceOrSink.RESOURCE_OPPORTUNITY);
+        assertNull(keys);
+        keys = sos.getCompoundKeyFields(MarketoSourceOrSink.RESOURCE_OPPORTUNITY_ROLE);
+        assertNull(keys);
     }
 }
