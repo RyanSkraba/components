@@ -7,6 +7,10 @@ http://www.talend.com
 > Contents
 
 This repository contains the Talend Component Framework and implementations of Talend components.
+WARNING : when cloning this repo on Windows, please setup git to accept long paths using the following command:
+```
+git config core.longpaths true
+```
 
 ## Folders/Modules/Maven
 
