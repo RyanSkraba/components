@@ -33,6 +33,7 @@ import org.talend.components.marketo.runtime.client.MarketoClientService;
 import org.talend.components.marketo.runtime.client.MarketoRESTClient;
 import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
+import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.IncludeExcludeFieldsREST;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.i18n.GlobalI18N;
@@ -58,9 +59,27 @@ public class MarketoInputReader extends AbstractBoundedReader<IndexedRecord> {
 
     private Boolean isDynamic = Boolean.FALSE;
 
+    private Boolean useActivitiesList = Boolean.FALSE;
+
+    private List<List<String>> activities;
+
+    private int activitiesListIndex = 0;
+
     private static final Logger LOG = LoggerFactory.getLogger(MarketoInputReader.class);
 
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(MarketoInputReader.class);
+
+    public static <T> List<List<T>> splitList(List<T> objList, int subSize) {
+        int listMaxSize = objList.size() % subSize == 0 ? objList.size() / subSize : objList.size() / subSize + 1;
+        List<List<T>> returnList = new ArrayList<>();
+        for (int i = 0; i < listMaxSize; i++) {
+            returnList.add(new ArrayList<T>());
+        }
+        for (int index = 0; index < objList.size(); index++) {
+            returnList.get(index / subSize).add(objList.get(index));
+        }
+        return returnList;
+    }
 
     public MarketoInputReader(RuntimeContainer adaptor, MarketoSource source, TMarketoInputProperties properties) {
         super(source);
@@ -68,6 +87,20 @@ public class MarketoInputReader extends AbstractBoundedReader<IndexedRecord> {
         this.properties = properties;
         // check if we've a dynamic schema...
         isDynamic = AvroUtils.isIncludeAllFields(this.properties.schemaInput.schema.getValue());
+        if (properties.isApiREST() && InputOperation.getLeadActivity.equals(properties.inputOperation.getValue())) {
+            useActivitiesList = true;
+            // include all activities
+            if (!properties.setIncludeTypes.getValue()) {
+                List<String> tmp = new ArrayList<>();
+                for (IncludeExcludeFieldsREST a : IncludeExcludeFieldsREST.values()) {
+                    tmp.add(a.name());
+                }
+                activities = splitList(tmp, 10);
+            } else {
+                activities = splitList(properties.includeTypes.type.getValue(), 10);
+            }
+            LOG.debug("activities to process = {}.", activities);
+        }
     }
 
     public void adaptSchemaToDynamic() throws IOException {
@@ -101,7 +134,6 @@ public class MarketoInputReader extends AbstractBoundedReader<IndexedRecord> {
             LOG.error(e.getMessage());
             throw e;
         }
-
     }
 
     public MarketoRecordResult executeOperation(String position) throws IOException {
@@ -132,6 +164,7 @@ public class MarketoInputReader extends AbstractBoundedReader<IndexedRecord> {
                 }
                 return ((MarketoRESTClient) client).getCustomObjects(properties, position);
             }
+            break;
         case Opportunity:
         case OpportunityRole:
             switch (properties.standardAction.getValue()) {
@@ -149,9 +182,28 @@ public class MarketoInputReader extends AbstractBoundedReader<IndexedRecord> {
     public boolean start() throws IOException {
         Boolean startable;
         client = source.getClientService(null);
+        if (useActivitiesList) {
+            if (activities.size() == 0) {
+                throw new IOException(messages.getMessage("error.runtime.leadactivity.activities.empty"));
+            }
+            properties.includeTypes.type.setValue(activities.get(activitiesListIndex++));
+        }
         mktoResult = executeOperation(null);
         startable = mktoResult.getRecordCount() > 0;
         apiCalls++;
+        // check for activities, first batch may be empty
+        if (!startable && useActivitiesList && activitiesListIndex != activities.size()) {
+            while (activitiesListIndex != activities.size()) {
+                properties.includeTypes.type.setValue(activities.get(activitiesListIndex++));
+                mktoResult = executeOperation(null);
+                startable = mktoResult.getRecordCount() > 0;
+                apiCalls++;
+                if (startable) {
+                    break;
+                }
+            }
+        }
+        //
         if (startable) {
             records = mktoResult.getRecords();
             recordIndex = 0;
@@ -166,12 +218,32 @@ public class MarketoInputReader extends AbstractBoundedReader<IndexedRecord> {
             return true;
         }
         if (mktoResult.getRemainCount() == 0) {
-            return false;
+            if (useActivitiesList) {
+                // we have processed all activities
+                if (activitiesListIndex == activities.size()) {
+                    return false;
+                }
+                properties.includeTypes.type.setValue(activities.get(activitiesListIndex++));
+                mktoResult.setStreamPosition(null);
+            } else {
+                return false;
+            }
         }
         // fetch more data
         mktoResult = executeOperation(mktoResult.getStreamPosition());
         boolean advanceable = mktoResult.getRecordCount() > 0;
         apiCalls++;
+        if (!advanceable && useActivitiesList && activitiesListIndex != activities.size()) {
+            while (activitiesListIndex != activities.size()) {
+                properties.includeTypes.type.setValue(activities.get(activitiesListIndex++));
+                mktoResult = executeOperation(mktoResult.getStreamPosition());
+                advanceable = mktoResult.getRecordCount() > 0;
+                apiCalls++;
+                if (advanceable) {
+                    break;
+                }
+            }
+        }
         if (advanceable) {
             records = mktoResult.getRecords();
             recordIndex = 0;
@@ -187,7 +259,6 @@ public class MarketoInputReader extends AbstractBoundedReader<IndexedRecord> {
     @Override
     public Map<String, Object> getReturnValues() {
         Result result = new Result();
-        result.totalCount = apiCalls;
         Map<String, Object> res = result.toMap();
         res.put(RETURN_NB_CALL, apiCalls);
         res.put(RETURN_ERROR_MESSAGE, errorMessage);

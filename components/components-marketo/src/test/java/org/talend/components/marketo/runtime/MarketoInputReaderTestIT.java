@@ -12,11 +12,17 @@
 // ============================================================================
 package org.talend.components.marketo.runtime;
 
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.talend.components.marketo.MarketoComponentDefinition.RETURN_NB_CALL;
+import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_PARAM;
 import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode.REST;
 import static org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode.SOAP;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.InputOperation.CustomObject;
@@ -29,7 +35,11 @@ import static org.talend.components.marketo.tmarketoinput.TMarketoInputPropertie
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.StaticListSelector;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.ListParam.STATIC_LIST_NAME;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -150,7 +160,7 @@ public class MarketoInputReaderTestIT extends MarketoBaseTestIT {
         props.leadSelectorSOAP.setValue(StaticListSelector);
         props.listParam.setValue(STATIC_LIST_NAME);
         props.listParamValue.setValue(UNDX_TEST_LIST_SMALL);
-        props.batchSize.setValue(10);
+        props.batchSize.setValue(50);
         props.afterInputOperation();
         reader = getReader(props);
         assertTrue(reader.start());
@@ -192,7 +202,7 @@ public class MarketoInputReaderTestIT extends MarketoBaseTestIT {
         TMarketoInputProperties props = getSOAPProperties();
         props.inputOperation.setValue(getLeadChanges);
         props.afterInputOperation();
-        props.batchSize.setValue(5);
+        props.batchSize.setValue(50);
         //
         props.oldestCreateDate.setValue(DATE_OLDEST_CREATE);
         props.latestCreateDate.setValue(DATE_LATEST_CREATE);
@@ -250,6 +260,104 @@ public class MarketoInputReaderTestIT extends MarketoBaseTestIT {
         assertNotNull(r);
         assertTrue(r.getSchema().getFields().size() > 6);
         assertFalse(reader.advance());
+    }
+
+    @Test
+    public void testLeadActivityREST() throws Exception {
+        TMarketoInputProperties props = getRESTProperties();
+        props.inputOperation.setValue(getLeadActivity);
+        String since = new SimpleDateFormat(DATETIME_PATTERN_PARAM).format(new Date(new Date().getTime() - 10000000));
+        props.sinceDateTime.setValue(since);
+        props.batchSize.setValue(300);
+        props.afterInputOperation();
+        props.beforeMappingInput();
+        reader = getReader(props);
+        assertTrue(reader.start());
+        IndexedRecord r = reader.getCurrent();
+        assertNotNull(r);
+        assertTrue(r.getSchema().getFields().size() > 6);
+        while (reader.advance()) {
+            r = reader.getCurrent();
+            assertNotNull(r);
+        }
+        assertTrue(((int) reader.getReturnValues().get(RETURN_NB_CALL)) >= 6); // 62 activities (62/10 API Limit)
+        // test pagination
+        props.batchSize.setValue(5);
+        reader = getReader(props);
+        assertTrue(reader.start());
+        r = reader.getCurrent();
+        assertNotNull(r);
+        assertTrue(r.getSchema().getFields().size() > 6);
+        while (reader.advance()) {
+            r = reader.getCurrent();
+            assertNotNull(r);
+        }
+        assertTrue(((int) reader.getReturnValues().get(RETURN_NB_CALL)) >= 20);
+    }
+
+    @Test
+    public void testLeadActivityExcludeREST() throws Exception {
+        TMarketoInputProperties props = getRESTProperties();
+        props.inputOperation.setValue(getLeadActivity);
+        String since = new SimpleDateFormat(DATETIME_PATTERN_PARAM).format(new Date(new Date().getTime() - 10000000));
+        props.sinceDateTime.setValue(since);
+        props.batchSize.setValue(300);
+        props.afterInputOperation();
+        props.beforeMappingInput();
+        props.setExcludeTypes.setValue(true);
+        props.excludeTypes.type.setValue(Arrays.asList("NewLead", "ChangeDataValue"));
+        reader = getReader(props);
+        assertTrue(reader.start());
+        IndexedRecord r = reader.getCurrent();
+        assertNotNull(r);
+        assertTrue(r.getSchema().getFields().size() > 6);
+        while (reader.advance()) {
+            r = reader.getCurrent();
+            assertNotNull(r);
+            assertNotEquals(12, r.get(3)); // activityTypeId != NewLead
+            assertNotEquals(13, r.get(3)); // activityTypeId != ChangeDataValue
+        }
+        assertTrue(((int) reader.getReturnValues().get(RETURN_NB_CALL)) >= 6);
+    }
+
+    @Test
+    public void testLeadActivityWithSpecificActivitiesREST() throws Exception {
+        TMarketoInputProperties props = getRESTProperties();
+        props.inputOperation.setValue(getLeadActivity);
+        String since = new SimpleDateFormat(DATETIME_PATTERN_PARAM).format(new Date(new Date().getTime() - 10000000));
+        props.sinceDateTime.setValue(since);
+        props.batchSize.setValue(300);
+        props.afterInputOperation();
+        props.beforeMappingInput();
+        props.setIncludeTypes.setValue(true);
+        props.includeTypes.type.setValue(Arrays.asList("DeleteLead", "AddToList"));
+        reader = getReader(props);
+        assertTrue(reader.start());
+        IndexedRecord r = reader.getCurrent();
+        assertNotNull(r);
+        assertTrue(r.getSchema().getFields().size() > 6);
+        while (reader.advance()) {
+            r = reader.getCurrent();
+            assertNotNull(r);
+            assertThat(Integer.parseInt(r.get(3).toString()), anyOf(is(24), is(37)));
+        }
+        assertTrue(((int) reader.getReturnValues().get(RETURN_NB_CALL)) >= 1);
+    }
+
+    @Test(expected = IOException.class)
+    public void testLeadActivityWithEmptyActivitiesREST() throws Exception {
+        TMarketoInputProperties props = getRESTProperties();
+        props.inputOperation.setValue(getLeadActivity);
+        String since = new SimpleDateFormat(DATETIME_PATTERN_PARAM).format(new Date(new Date().getTime() - 10000000));
+        props.sinceDateTime.setValue(since);
+        props.batchSize.setValue(300);
+        props.afterInputOperation();
+        props.beforeMappingInput();
+        props.setIncludeTypes.setValue(true);
+        // props.includeTypes.type.setValue(Arrays.asList());
+        reader = getReader(props);
+        assertTrue(reader.start());
+        fail("Shouldn't be here");
     }
 
 }

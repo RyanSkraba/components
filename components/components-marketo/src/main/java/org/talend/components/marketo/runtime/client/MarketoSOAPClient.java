@@ -24,6 +24,7 @@ import static org.apache.avro.Schema.Field;
 import static org.apache.avro.generic.GenericData.Record;
 import static org.apache.commons.codec.binary.Hex.encodeHex;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_PARAM;
 import static org.talend.components.marketo.MarketoConstants.FIELD_ERROR_MSG;
 import static org.talend.components.marketo.MarketoConstants.FIELD_STATUS;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.LastUpdateAtSelector;
@@ -169,7 +170,7 @@ public class MarketoSOAPClient extends MarketoClient {
             MktMktowsApiService service = new MktMktowsApiService(marketoSoapEndPoint, serviceName);
             port = service.getMktowsApiSoapPort();
             // Create Signature
-            DateFormat df = new SimpleDateFormat(SCHEMA_DATETIME_PATTERN);
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
             String text = df.format(new Date());
             String requestTimestamp = text.substring(0, 22) + ":" + text.substring(22);
             String encryptString = requestTimestamp + userId;
@@ -424,7 +425,7 @@ public class MarketoSOAPClient extends MarketoClient {
             try {
                 DatatypeFactory factory = newInstance();
                 ObjectFactory objectFactory = new ObjectFactory();
-                DateFormat df = new SimpleDateFormat(DATETIME_PATTERN_FROM_PARAMS);
+                DateFormat df = new SimpleDateFormat(DATETIME_PATTERN_PARAM);
                 Date oldest = df.parse(parameters.oldestUpdateDate.getValue());
                 Date latest = df.parse(parameters.latestUpdateDate.getValue());
                 GregorianCalendar gc = new GregorianCalendar();
@@ -643,7 +644,7 @@ public class MarketoSOAPClient extends MarketoClient {
         ParamsGetLeadChanges request = new ParamsGetLeadChanges();
         LastUpdateAtSelector leadSelector = new LastUpdateAtSelector();
         try {
-            DateFormat df = new SimpleDateFormat(DATETIME_PATTERN_FROM_PARAMS);
+            DateFormat df = new SimpleDateFormat(DATETIME_PATTERN_PARAM);
             Date oldest = df.parse(sOldest);
             Date latest = df.parse(sLatest);
             GregorianCalendar gc = new GregorianCalendar();

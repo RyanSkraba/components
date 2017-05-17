@@ -284,51 +284,6 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
         return null;
     }
 
-    public MarketoRecordResult getLeadDynamic(TMarketoInputProperties parameters, String offset) {
-        String filter = parameters.leadKeyTypeREST.getValue().toString();
-        String filterValue = parameters.leadKeyValue.getValue();
-        String[] fields = parameters.mappingInput.getMarketoColumns(parameters.schemaInput.schema.getValue())
-                .toArray(new String[] {});
-        int batchLimit = parameters.batchSize.getValue() > REST_API_BATCH_LIMIT ? REST_API_BATCH_LIMIT
-                : parameters.batchSize.getValue();
-        MarketoRecordResult mkto = new MarketoRecordResult();
-        LeadResult result;
-        try {
-            current_uri = new StringBuilder(basicPath) //
-                    .append(API_PATH_LEADS)//
-                    .append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true));
-            StringBuilder input = new StringBuilder();
-            input.append(FIELD_FILTER_TYPE + "=" + filter);
-            input.append(fmtParams(FIELD_FILTER_VALUES, filterValue));
-            input.append(fmtParams(FIELD_BATCH_SIZE, batchLimit));
-            if (offset != null && offset.length() > 0) {
-                input.append(fmtParams(FIELD_NEXT_PAGE_TOKEN, offset));
-            }
-            if (fields != null && fields.length > 0) {
-                input.append(fmtParams(FIELD_FIELDS, csvString(fields)));
-            }
-            LOG.debug("getLeadDynamic: {} body : {}", current_uri, input);
-            result = (LeadResult) executeFakeGetRequest(LeadResult.class, input.toString());
-            mkto.setSuccess(result.isSuccess());
-            if (mkto.isSuccess()) {
-                mkto.setRecordCount(result.getResult().isEmpty() ? 0 : result.getResult().size());
-                mkto.setRemainCount((result.getNextPageToken() != null && result.isMoreResult()) ? batchLimit : 0);
-                mkto.setStreamPosition(result.getNextPageToken());
-                if (mkto.getRecordCount() > 0) {
-                    mkto.setRecords(convertLeadRecords(result.getResult(), parameters.schemaInput.schema.getValue(),
-                            parameters.mappingInput.getNameMappingsForMarketo()));
-                }
-            } else {
-                mkto.setErrors(Arrays.asList(result.getErrors().get(0)));
-            }
-        } catch (MarketoException e) {
-            LOG.error("Lead error {}.", e.toString());
-            mkto.setSuccess(false);
-            mkto.setErrors(Arrays.asList(e.toMarketoError()));
-        }
-        return mkto;
-    }
-
     @Override
     public MarketoRecordResult getLead(TMarketoInputProperties parameters, String offset) {
         String filter = parameters.leadKeyTypeREST.getValue().toString();
@@ -354,7 +309,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                 input.append(fmtParams(FIELD_FIELDS, csvString(fields)));
             }
             LOG.debug("getLead: {} body : {}", current_uri, input);
-            result = (LeadResult) executeFakeGetRequest(LeadResult.class, input.toString());
+            result = executeFakeGetRequestForLead(input.toString());
             mkto.setSuccess(result.isSuccess());
             if (mkto.isSuccess()) {
                 mkto.setRecordCount(result.getResult().isEmpty() ? 0 : result.getResult().size());
@@ -407,7 +362,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                     input.append(fmtParams(FIELD_NEXT_PAGE_TOKEN, offset));
                 }
                 LOG.debug("MultipleLeads: {} body{}", current_uri, input);
-                result = (LeadResult) executeFakeGetRequest(LeadResult.class, input.toString());
+                result = executeFakeGetRequestForLead(input.toString());
             } else {
                 int listId;
                 if (parameters.listParam.getValue().equals(ListParam.STATIC_LIST_NAME)) {
@@ -428,7 +383,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                     input.append(fmtParams(FIELD_NEXT_PAGE_TOKEN, offset));
                 }
                 LOG.debug("LeadsByList : {} body: {}.", current_uri, input);
-                result = (LeadResult) executeFakeGetRequest(LeadResult.class, input.toString());
+                result = executeFakeGetRequestForLead(input.toString());
             }
             mkto.setSuccess(result.isSuccess());
             if (mkto.isSuccess()) {
@@ -453,8 +408,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
     @Override
     public MarketoRecordResult getLeadActivity(TMarketoInputProperties parameters, String offset) {
         String sinceDateTime = parameters.sinceDateTime.getValue();
-        List<String> incs = parameters.setIncludeTypes.getValue() ? parameters.includeTypes.type.getValue()
-                : new ArrayList<String>();
+        List<String> incs = parameters.includeTypes.type.getValue();
         List<String> excs = parameters.setExcludeTypes.getValue() ? parameters.excludeTypes.type.getValue()
                 : new ArrayList<String>();
         int batchLimit = parameters.batchSize.getValue() > REST_API_BATCH_LIMIT ? REST_API_BATCH_LIMIT

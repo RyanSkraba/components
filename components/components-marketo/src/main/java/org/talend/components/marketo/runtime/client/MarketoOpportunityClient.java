@@ -130,8 +130,6 @@ public class MarketoOpportunityClient extends MarketoCompanyClient {
         MarketoRecordResult mkto = new MarketoRecordResult();
         try {
             if (useCompoundKey) {
-                current_uri.append(fmtParams(QUERY_METHOD, QUERY_METHOD_GET));
-
                 JsonObject inputJson = new JsonObject();
                 Gson gson = new Gson();
                 if (!fields.isEmpty()) {

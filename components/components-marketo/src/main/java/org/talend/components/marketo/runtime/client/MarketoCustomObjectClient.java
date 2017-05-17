@@ -150,7 +150,6 @@ public class MarketoCustomObjectClient extends MarketoLeadClient {
         try {
             // Compound Key use
             if (parameters.useCompoundKey.getValue()) {
-                current_uri.append(fmtParams(QUERY_METHOD, QUERY_METHOD_GET));
                 JsonObject inputJson = new JsonObject();
                 Gson gson = new Gson();
                 if (offset != null) {

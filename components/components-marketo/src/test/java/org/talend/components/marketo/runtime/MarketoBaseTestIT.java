@@ -62,13 +62,13 @@ public class MarketoBaseTestIT {
 
     public static final String DATE_FARFARAWAY = "2016-01-01 00:00:00";
 
-    public static final String DATE_OLDEST_CREATE = "2016-12-01 00:00:00";
+    public static final String DATE_OLDEST_CREATE = "2016-12-01 00:00:00 +0100";
 
-    public static final String DATE_LATEST_CREATE = "2016-12-31 00:00:00";
+    public static final String DATE_LATEST_CREATE = "2016-12-31 00:00:00 +0100";
 
-    public static final String DATE_OLDEST_UPDATE = "2016-12-01 00:00:00";
+    public static final String DATE_OLDEST_UPDATE = "2016-12-01 00:00:00 +0100";
 
-    public static final String DATE_LATEST_UPDATE = "2017-01-31 00:00:00";
+    public static final String DATE_LATEST_UPDATE = "2017-01-31 00:00:00 +0100";
 
     public static final String EMAIL_UNDX00 = "undx00@undx.net";
 
@@ -90,7 +90,7 @@ public class MarketoBaseTestIT {
 
     public static final String EMAIL_PREFIX = "undx";
 
-    public static final String EMAIL_DOMAIN = "@undx.net";
+    public static final String EMAIL_DOMAIN = "@undx0.net";
 
     public static final String LIST_KEY_TYPE_MKTOLISTNAME = "MKTOLISTNAME";
 

@@ -14,10 +14,6 @@ package org.talend.components.marketo.runtime.client;
 
 public abstract class MarketoClient implements MarketoClientService {
 
-    protected final String SCHEMA_DATETIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ssZ";
-
-    protected final String DATETIME_PATTERN_FROM_PARAMS = "yyyy-MM-dd HH:mm:ss";
-
     protected String endpoint = null;
 
     protected String userId = null;

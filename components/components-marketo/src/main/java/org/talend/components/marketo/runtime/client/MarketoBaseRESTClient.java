@@ -125,6 +125,8 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
 
     public static final String REQUEST_PROPERTY_CONTENT_TYPE = "Content-type";
 
+    public static final String REQUEST_VALUE_APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
+
     private Map<Integer, String> supportedActivities;
 
     protected StringBuilder current_uri;
@@ -266,12 +268,17 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
         }
     }
 
-    public InputStreamReader httpFakeGet(String content) throws MarketoException {
+    public InputStreamReader httpFakeGet(String content, boolean isForLead) throws MarketoException {
         try {
+            current_uri.append(fmtParams(QUERY_METHOD, QUERY_METHOD_GET));
             URL url = new URL(current_uri.toString());
             HttpsURLConnection urlConn = (HttpsURLConnection) url.openConnection();
             urlConn.setRequestMethod(QUERY_METHOD_POST);
-            urlConn.setRequestProperty(REQUEST_PROPERTY_CONTENT_TYPE, REQUEST_VALUE_APPLICATION_JSON);
+            if (isForLead) {
+                urlConn.setRequestProperty(REQUEST_PROPERTY_CONTENT_TYPE, REQUEST_VALUE_APPLICATION_X_WWW_FORM_URLENCODED);
+            } else {
+                urlConn.setRequestProperty(REQUEST_PROPERTY_CONTENT_TYPE, REQUEST_VALUE_APPLICATION_JSON);
+            }
             urlConn.setRequestProperty(REQUEST_PROPERTY_ACCEPT, REQUEST_VALUE_TEXT_JSON);
             urlConn.setDoOutput(true);
             OutputStreamWriter wr = new OutputStreamWriter(urlConn.getOutputStream());
@@ -293,12 +300,16 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
         }
     }
 
+    public LeadResult executeFakeGetRequestForLead(String input) throws MarketoException {
+        return new Gson().fromJson(httpFakeGet(input, true), LeadResult.class);
+    }
+
     public RequestResult executeFakeGetRequest(Class<?> resultClass, String input) throws MarketoException {
-        return (RequestResult) new Gson().fromJson(httpFakeGet(input), resultClass);
+        return (RequestResult) new Gson().fromJson(httpFakeGet(input, false), resultClass);
     }
 
     public MarketoRecordResult executeFakeGetRequest(Schema schema, String input) throws MarketoException {
-        InputStreamReader reader = httpFakeGet(input);
+        InputStreamReader reader = httpFakeGet(input, false);
         // TODO refactor this part with method executeGetRequest(Schema s);
         Gson gson = new Gson();
         MarketoRecordResult mkr = new MarketoRecordResult();

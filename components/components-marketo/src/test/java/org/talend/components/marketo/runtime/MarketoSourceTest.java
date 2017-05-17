@@ -16,8 +16,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.text.DateFormat;
+import java.util.TimeZone;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.talend.components.common.runtime.FastDateParser;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.daikon.properties.ValidationResult;
 
@@ -74,4 +78,22 @@ public class MarketoSourceTest {
         assertEquals(ValidationResult.Result.ERROR, vr.getStatus());
         assertTrue(vr.getMessage().contains("refused"));
     }
+
+    @Test
+    public void testIsInvalidDate() throws Exception {
+        assertTrue(source.isInvalidDate("20170516 112417"));
+        assertTrue(source.isInvalidDate("20170516 11:24:17"));
+        assertTrue(source.isInvalidDate("20170516 11:24:17 0000"));
+        assertTrue(source.isInvalidDate("2017-05-16 11:24:17 0000"));
+        assertTrue(source.isInvalidDate("2017-05-16 11:24:17"));
+        assertTrue(source.isInvalidDate("2017-05-16'T'11:24:17 +0100"));
+        DateFormat format = FastDateParser.getInstance("yyyy-MM-dd HH:mm:ss Z");
+        format.setTimeZone(TimeZone.getTimeZone("Europe/England"));
+        assertFalse(source.isInvalidDate(FastDateParser.getInstance("yyyy-MM-dd HH:mm:ss Z").format(new java.util.Date())));
+        format.setTimeZone(TimeZone.getTimeZone("Europe/Lisbon"));
+        assertFalse(source.isInvalidDate(FastDateParser.getInstance("yyyy-MM-dd HH:mm:ss Z").format(new java.util.Date())));
+        assertFalse(source.isInvalidDate("2017-05-16 11:24:17 +0100"));
+        assertFalse(source.isInvalidDate("2017-05-16 11:24:17 -0100"));
+    }
+
 }
