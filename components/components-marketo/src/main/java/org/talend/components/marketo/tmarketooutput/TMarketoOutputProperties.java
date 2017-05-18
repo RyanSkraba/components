@@ -445,7 +445,7 @@ public class TMarketoOutputProperties extends MarketoComponentProperties {
             f.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
             rejectFields.add(f);
         }
-        if (inputSchema.getField(MarketoConstants.FIELD_ERROR_MSG) == null && !syncLead.equals(outputOperation.getValue())) {
+        if (inputSchema.getField(MarketoConstants.FIELD_ERROR_MSG) == null) {
             f = new Field(MarketoConstants.FIELD_ERROR_MSG, Schema.create(Schema.Type.STRING), null, (Object) null);
             f.addProp(SchemaConstants.TALEND_FIELD_GENERATED, "true");
             f.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");

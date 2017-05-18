@@ -103,8 +103,8 @@ public class TMarketoOutputPropertiesTest {
         assertEquals(MarketoConstants.getSOAPOutputSchemaForSyncLead(), props.schemaInput.schema.getValue());
         assertEquals(MarketoConstants.getSOAPOutputSchemaForSyncLead().getFields(),
                 props.schemaFlow.schema.getValue().getFields());
-        assertEquals(MarketoConstants.getSOAPOutputSchemaForSyncLead().getFields(),
-                props.schemaReject.schema.getValue().getFields());
+        assertEquals(MarketoConstants.getSOAPOutputSchemaForSyncLead().getFields().size() + 1,
+                props.schemaReject.schema.getValue().getFields().size());
         props.outputOperation.setValue(OutputOperation.syncMultipleLeads);
         props.afterOutputOperation();
         assertEquals(MarketoConstants.getSOAPOutputSchemaForSyncMultipleLeads(), props.schemaInput.schema.getValue());
