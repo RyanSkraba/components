@@ -15,6 +15,7 @@ package org.talend.components.azurestorage.blob.runtime;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
@@ -88,6 +89,7 @@ public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
     }
 
     private void download(RuntimeContainer runtimeContainer) {
+        FileOutputStream fos = null ;
 
         try {
             CloudBlobContainer blobContainer = getAzureStorageBlobContainerReference(runtimeContainer, containerName);
@@ -99,7 +101,8 @@ public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
                         if (rmtb.create) {
                             new File(localFolder + "/" + ((CloudBlob) blob).getName()).getParentFile().mkdirs();
                         }
-                        ((CloudBlob) blob).download(new FileOutputStream(localFolder + "/" + ((CloudBlob) blob).getName()));
+                        fos = new FileOutputStream(localFolder + "/" + ((CloudBlob) blob).getName());
+                        ((CloudBlob) blob).download(fos);
 
                     }
                 }
@@ -108,6 +111,12 @@ public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
             LOGGER.error(e.getLocalizedMessage());
             if (dieOnError) {
                 throw new ComponentException(e);
+            }
+        }finally{
+            try {
+                fos.close();
+            } catch (Exception e) {
+                //ignore
             }
         }
 
