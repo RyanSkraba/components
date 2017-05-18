@@ -12,11 +12,6 @@
 // ============================================================================
 package org.talend.components.processing.pythonrow;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.EnumSet;
-import java.util.Set;
-
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.DependenciesReader;
@@ -27,6 +22,11 @@ import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.processing.ProcessingFamilyDefinition;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.runtime.RuntimeInfo;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.EnumSet;
+import java.util.Set;
 
 public class PythonRowDefinition extends AbstractComponentDefinition {
 
@@ -57,7 +57,7 @@ public class PythonRowDefinition extends AbstractComponentDefinition {
             return new JarRuntimeInfo(new URL("mvn:org.talend.components/processing-runtime"),
                     DependenciesReader.computeDependenciesFilePath(ProcessingFamilyDefinition.MAVEN_GROUP_ID,
                             ProcessingFamilyDefinition.MAVEN_ARTIFACT_ID),
-                    "org.talend.components.processing.runtime.pythonrow.PythonRowRDoFn");
+                    "org.talend.components.processing.runtime.pythonrow.PythonRowDoFn");
         } catch (MalformedURLException e) {
             throw new ComponentException(e);
         }

@@ -12,22 +12,19 @@
 // ============================================================================
 package org.talend.components.processing.pythonrow;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContaining;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Set;
-
 import org.junit.Test;
 import org.talend.components.api.component.ComponentImageType;
 import org.talend.components.api.component.ConnectorTopology;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.processing.ProcessingFamilyDefinition;
 import org.talend.daikon.runtime.RuntimeInfo;
+
+import java.util.Set;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayContaining;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.*;
 
 public class PythonRowDefinitionTest {
 
@@ -86,7 +83,7 @@ public class PythonRowDefinitionTest {
     @Test
     public void testGetRuntimeInfo() {
         RuntimeInfo runtimeInfo = definition.getRuntimeInfo(ExecutionEngine.BEAM, null, ConnectorTopology.INCOMING_AND_OUTGOING);
-        assertEquals("org.talend.components.processing.runtime.pythonrow.PythonRowRDoFn",
+        assertEquals("org.talend.components.processing.runtime.pythonrow.PythonRowDoFn",
                 runtimeInfo.getRuntimeClassName());
     }
 
