@@ -12,13 +12,18 @@
 // ============================================================================
 package org.talend.components.marketo.runtime;
 
+import static org.talend.components.marketo.MarketoConstants.FIELD_CAMPAIGN_ID;
 import static org.talend.components.marketo.MarketoConstants.FIELD_ERROR_MSG;
 import static org.talend.components.marketo.MarketoConstants.FIELD_LEAD_ID;
+import static org.talend.components.marketo.MarketoConstants.FIELD_MARKETO_GUID;
+import static org.talend.components.marketo.MarketoConstants.FIELD_REASON;
+import static org.talend.components.marketo.MarketoConstants.FIELD_SEQ;
 import static org.talend.components.marketo.MarketoConstants.FIELD_STATUS;
 import static org.talend.components.marketo.MarketoConstants.FIELD_SUCCESS;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -29,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.runtime.client.MarketoRESTClient;
 import org.talend.components.marketo.runtime.client.rest.type.SyncStatus;
 import org.talend.components.marketo.runtime.client.type.MarketoSyncResult;
@@ -148,7 +152,17 @@ public class MarketoOutputWriter extends MarketoWriter {
             if (dieOnError) {
                 throw new IOException(mktoResult.getErrorsString());
             }
-            LOG.error(mktoResult.getErrorsString());
+            // build a SyncStatus for record which failed
+            SyncStatus status = new SyncStatus();
+            status.setStatus("failed");
+            status.setErrorMessage(mktoResult.getErrorsString());
+            if (mktoResult.getRecords().isEmpty()) {
+                mktoResult.setRecords(Arrays.asList(status));
+            } else {
+                List<SyncStatus> tmp = mktoResult.getRecords();
+                tmp.add(status);
+                mktoResult.setRecords(tmp);
+            }
         }
         for (SyncStatus status : mktoResult.getRecords()) {
             if (Arrays.asList("created", "updated", "deleted", "scheduled", "triggered")
@@ -180,28 +194,39 @@ public class MarketoOutputWriter extends MarketoWriter {
     public IndexedRecord fillRecord(SyncStatus status, Schema schema) {
         IndexedRecord record = new Record(schema);
         for (Field f : schema.getFields()) {
-            if (f.name().equals(FIELD_ID_SOAP)) {
-                record.put(f.pos(), status.getId());
-            } else if (f.name().equals(FIELD_ID_REST)) {
-                record.put(f.pos(), status.getId());
-            } else if (f.name().equals(FIELD_LEAD_ID)) {
-                record.put(f.pos(), status.getId());
-            } else if (f.name().equals(MarketoConstants.FIELD_CAMPAIGN_ID)) {
-                record.put(f.pos(), status.getId());
-            } else if (f.name().equals(FIELD_SUCCESS)) {
+            switch (f.name()) {
+            case FIELD_LEAD_ID:
+            case FIELD_ID_SOAP:
+            case FIELD_ID_REST:
+            case FIELD_CAMPAIGN_ID:
+                // when the request failed, get it from input record
+                if (status.getId() == null) {
+                    try {
+                        record.put(schema.getField(f.name()).pos(), inputRecord.get(inputSchema.getField(f.name()).pos()));
+                    } catch (NullPointerException e) {
+                        LOG.error("Could not find field `{}` in schema : {}.", f.name(), e.getMessage());
+                    }
+                } else {
+                    record.put(f.pos(), status.getId());
+                }
+                break;
+            case FIELD_SUCCESS:
                 record.put(f.pos(), Boolean.parseBoolean(status.getStatus()));
-            } else if (f.name().equals(FIELD_STATUS)) {
+                break;
+            case FIELD_STATUS:
                 record.put(f.pos(), status.getStatus());
-            } else if (f.name().equals(FIELD_ERROR_MSG)) {
+                break;
+            case FIELD_ERROR_MSG:
+            case FIELD_REASON:
                 record.put(f.pos(), status.getAvailableReason());
-                // manage CO fields
-            } else if (f.name().equals(MarketoConstants.FIELD_MARKETO_GUID)) {
+                break;
+            case FIELD_MARKETO_GUID:
                 record.put(f.pos(), status.getMarketoGUID());
-            } else if (f.name().equals(MarketoConstants.FIELD_SEQ)) {
+                break;
+            case FIELD_SEQ:
                 record.put(f.pos(), status.getSeq());
-            } else if (f.name().equals(MarketoConstants.FIELD_REASON)) {
-                record.put(f.pos(), status.getAvailableReason());
-            } else {
+                break;
+            default:
                 record.put(schema.getField(f.name()).pos(), inputRecord.get(inputSchema.getField(f.name()).pos()));
             }
         }

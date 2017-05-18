@@ -132,15 +132,16 @@ public class MarketoOutputWriterTestIT extends MarketoBaseTestIT {
         Schema s = props.newSchema(props.schemaInput.schema.getValue(), "leadAttribute", fields);
         props.schemaInput.schema.setValue(s);
         props.updateOutputSchemas();
+        props.beforeMappingInput();
         //
         IndexedRecord record = new GenericData.Record(s);
         record.put(0, null);
         record.put(1, "test0@test-test.net");
         record.put(2, "Foreign0Person_Sys_Id");
         record.put(3, "SFDC");// CUSTOM, SFDC, NETSUITE;
-        record.put(4, "My0firstName");
-        record.put(5, "My1lastName");
-        record.put(6, "Conservative customer1");
+        record.put(5, "My0firstName");
+        record.put(6, "My1lastName");
+        record.put(7, "Conservative customer1");
         //
         testSyncLead(record);
     }
@@ -176,8 +177,8 @@ public class MarketoOutputWriterTestIT extends MarketoBaseTestIT {
         MarketoResult result = (MarketoResult) writer.close();
         assertEquals(1, result.getApiCalls());
         assertEquals(0, result.getSuccessCount());
-        assertEquals(0, result.getRejectCount());
-        assertEquals(Collections.emptyList(), writer.getRejectedWrites());
+        assertEquals(1, result.getRejectCount());
+        assertEquals("failed", writer.getRejectedWrites().get(0).get(2).toString());
         assertEquals(Collections.emptyList(), writer.getSuccessfulWrites());
     }
 
@@ -205,6 +206,51 @@ public class MarketoOutputWriterTestIT extends MarketoBaseTestIT {
         record.put(4, "Anti conservative0");
         //
         testSyncLead(record);
+    }
+
+    @Test
+    public void testSyncMultipleLeadFailREST() throws Exception {
+        props = getRESTProperties();
+        props.operationType.setValue(OperationType.updateOnly);
+        props.lookupField.setValue(RESTLookupFields.id);
+        props.deDupeEnabled.setValue(false);
+        props.batchSize.setValue(1);
+        props.outputOperation.setValue(OutputOperation.syncMultipleLeads);
+        // test attributes
+        List<Field> fields = new ArrayList<>();
+        Field field = new Schema.Field("accountType", Schema.create(Schema.Type.STRING), null, (Object) null);
+        fields.add(field);
+        Schema s = props.newSchema(props.schemaInput.schema.getValue(), "leadAttribute", fields);
+        props.schemaInput.schema.setValue(s);
+        props.updateOutputSchemas();
+        //
+        IndexedRecord record = new GenericData.Record(s);
+        record.put(0, 01234);
+        record.put(1, "testx0X1@test-test.net");
+        record.put(2, "Foreig+nPerson_Sys)Id  FIRSTN1");
+        record.put(3, "SFDC41 LAST0");// CUSTOM, SFDC, NETSUITE;
+        record.put(5, "Anti conservative0");
+        //
+        try {
+            writer = getWriter(props);
+            writer.open("testDieOnError");
+            writer.write(record);
+        } catch (IOException e) {
+            assertNotNull(e);
+            assertTrue(e.getMessage().contains("1004"));
+        }
+        props.dieOnError.setValue(false);
+        writer = getWriter(props);
+        writer.open("test");
+        writer.write(record);
+        MarketoResult result = (MarketoResult) writer.close();
+        assertEquals(1, result.getApiCalls());
+        assertEquals(0, result.getSuccessCount());
+        assertEquals(1, result.getRejectCount());
+        List<IndexedRecord> successes = writer.getSuccessfulWrites();
+        List<IndexedRecord> rejects = writer.getRejectedWrites();
+        assertNotNull(rejects);
+        assertEquals(rejects.get(0).get(6), "[1004] Lead not found.");
     }
 
 }
