@@ -369,35 +369,44 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
         }
     }
 
-    private void setProxy(ConnectorConfig config) {
+    private synchronized void setProxy(ConnectorConfig config) {
         final ProxyPropertiesRuntimeHelper proxyHelper = new ProxyPropertiesRuntimeHelper(
                 properties.getConnectionProperties().proxy);
 
+        resetAuthenticator();
+        
         if (proxyHelper.getProxyHost() != null) {
             if (proxyHelper.getSocketProxy() != null) {
                 config.setProxy(proxyHelper.getSocketProxy());
             } else {
                 config.setProxy(proxyHelper.getProxyHost(), Integer.parseInt(proxyHelper.getProxyPort()));
             }
-
+            
             if (proxyHelper.getProxyUser() != null && proxyHelper.getProxyUser().length() > 0) {
                 config.setProxyUsername(proxyHelper.getProxyUser());
 
                 if (proxyHelper.getProxyPwd() != null && proxyHelper.getProxyPwd().length() > 0) {
                     config.setProxyPassword(proxyHelper.getProxyPwd());
 
-                    Authenticator.setDefault(new Authenticator() {
-
-                        @Override
-                        public PasswordAuthentication getPasswordAuthentication() {
-                            return new PasswordAuthentication(proxyHelper.getProxyUser(),
-                                    proxyHelper.getProxyPwd().toCharArray());
-                        }
-
-                    });
+                    setAuthenticator(proxyHelper.getProxyUser(), proxyHelper.getProxyPwd());
                 }
             }
         }
+    }
+
+    private void resetAuthenticator() {
+        Authenticator.setDefault(null);// null is a common value for this
+    }
+
+    private void setAuthenticator(final String username, final String password) {
+        Authenticator.setDefault(new Authenticator() {
+
+            @Override
+            public PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password.toCharArray());
+            }
+
+        });
     }
 
     /**
