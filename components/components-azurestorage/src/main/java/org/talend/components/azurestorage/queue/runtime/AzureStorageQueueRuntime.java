@@ -22,7 +22,7 @@ public class AzureStorageQueueRuntime extends AzureStorageRuntime {
 
     private static final long serialVersionUID = 6643780058392016608L;
 
-    private final Pattern queueCheckNamePattern = Pattern.compile("^[a-z][a-z0-9]{2,61}[a-z]$");
+    private final Pattern queueCheckNamePattern = Pattern.compile("[a-z0-9]{2,63}");
 
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(AzureStorageQueueRuntime.class);

@@ -114,6 +114,11 @@ public class AzureStorageQueueCreateRuntimeTest {
         ValidationResult validationResult = azureStorageQueueCreate.initialize(runtimeContainer, properties);
         assertNull(validationResult.getMessage());
         assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
+        
+        properties.queueName.setValue("2queue-name-with-numbers2");
+        ValidationResult validationResult2 = azureStorageQueueCreate.initialize(runtimeContainer, properties);
+        assertNull(validationResult2.getMessage());
+        assertEquals(ValidationResult.OK.getStatus(), validationResult2.getStatus());
     }
 
 }
