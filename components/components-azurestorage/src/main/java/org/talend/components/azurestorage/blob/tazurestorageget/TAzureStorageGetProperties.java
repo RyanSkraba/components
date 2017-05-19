@@ -38,7 +38,7 @@ public class TAzureStorageGetProperties extends AzureStorageBlobProperties {
         super.setupLayout();
 
         Form mainForm = getForm(Form.MAIN);
-        mainForm.addRow(widget(localFolder).setWidgetType(Widget.FILE_WIDGET_TYPE));
+        mainForm.addRow(widget(localFolder).setWidgetType(Widget.DIRECTORY_WIDGET_TYPE));
         mainForm.addRow(widget(remoteBlobsGet).setWidgetType(Widget.TABLE_WIDGET_TYPE));
         mainForm.addRow(dieOnError);
     }
