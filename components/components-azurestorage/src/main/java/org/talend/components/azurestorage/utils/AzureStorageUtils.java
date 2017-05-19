@@ -72,7 +72,12 @@ public class AzureStorageUtils {
                 }
             }
         } else {
-            map.put(file.getAbsolutePath(), keyParent);
+            if("".equals(keyParent)||keyParent==null){
+                map.put(file.getAbsolutePath(), file.getName());
+            }else{
+                map.put(file.getAbsolutePath(), keyParent);
+            }
+
         }
         return map;
     }

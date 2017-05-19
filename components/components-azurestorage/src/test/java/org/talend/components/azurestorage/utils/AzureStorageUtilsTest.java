@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.azurestorage.utils;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
@@ -57,6 +58,8 @@ public class AzureStorageUtilsTest {
         file = new File(folder + "/blob1.txt");
         result = azureStorageUtils.genAzureObjectList(file, keyparent);
         assertNotNull("result cannot be null", result);
+        result = azureStorageUtils.genAzureObjectList(file, null);
+        assertEquals("blob1.txt", result.get(file.getAbsolutePath()));
 
     }
 
