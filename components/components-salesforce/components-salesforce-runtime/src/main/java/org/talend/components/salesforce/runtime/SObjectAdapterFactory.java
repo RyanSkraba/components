@@ -21,7 +21,6 @@ import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.daikon.avro.converter.AvroConverter;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
-import org.talend.daikon.avro.converter.IndexedRecordConverter.UnmodifiableAdapterException;
 
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.bind.XmlObject;
@@ -81,7 +80,7 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
                         + schema.getProp(SalesforceSchemaConstants.COLUMNNAME_DELIMTER) + field.getName().getLocalPart()))) {
                     continue;
                 } else {
-                    processXmlObject(field, rootType);
+                    processXmlObject(field, rootType, null);
                 }
             }
         }
@@ -116,7 +115,18 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
             return fieldConverter[i].convertToAvro(value);
         }
 
-        protected void processXmlObject(XmlObject xo, String prefixName) {
+        /**
+         * Parse XML object and store found values into value map.
+         * During iterations <code>prefixName</code> concatenates with current local part of input object.
+         * On the last iteration prefixName will become as a column name.
+         * <code>Id</code> and <code>type</code> elements are skipped, except type of child relation.
+         *
+         *
+         * @param xo - XML object to be processed.
+         * @param prefixName - name of all parent branches, appended with underscore.
+         * @param prefixTypeName - name of child relation.
+         */
+        protected void processXmlObject(XmlObject xo, String prefixName, String prefixTypeName) {
             if (valueMap == null) {
                 valueMap = new HashMap<>();
             }
@@ -125,6 +135,7 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
                 // delete the fixed id and type elements when find firstly
                 int typeCount = 0;
                 int idCount = 0;
+                String typeName = null;
                 while (xos.hasNext()) {
                     XmlObject objectValue = xos.next();
                     if (objectValue != null) {
@@ -132,41 +143,70 @@ public class SObjectAdapterFactory implements IndexedRecordConverter<SObject, In
 
                         if ("type".equals(xmlObject.getName().getLocalPart()) && typeCount == 0) {
                             typeCount++;
+                            typeName = xmlObject.getValue().toString();
                             continue;
                         }
                         if ("Id".equals(xmlObject.getName().getLocalPart()) && idCount == 0) {
                             idCount++;
                             continue;
                         }
-                        if (prefixName != null) {
-                            processXmlObject(xmlObject, prefixName + schema.getProp(SalesforceSchemaConstants.COLUMNNAME_DELIMTER)
-                                    + xo.getName().getLocalPart());
+                        if (null != prefixName) {
+                            String tempPrefixName = prefixName + schema.getProp(SalesforceSchemaConstants.COLUMNNAME_DELIMTER)
+                                    + xo.getName().getLocalPart();
+                            String tempPrefixTypeName = null;
+                            if (null != prefixTypeName) {
+                                tempPrefixTypeName = prefixTypeName + schema.getProp(SalesforceSchemaConstants.COLUMNNAME_DELIMTER)
+                                        + xo.getName().getLocalPart();
+                            } else if (typeCount != 0 && null != typeName) {
+                                // Initialize type prefix name only for child relation object.
+                                tempPrefixTypeName = tempPrefixName + schema.getProp(SalesforceSchemaConstants.COLUMNNAME_DELIMTER)
+                                        + typeName;
+                            }
+                            processXmlObject(xmlObject, tempPrefixName, tempPrefixTypeName);
                         } else {
-                            processXmlObject(xmlObject, xo.getName().getLocalPart());
+                            processXmlObject(xmlObject, xo.getName().getLocalPart(), prefixTypeName);
                         }
                     }
                 }
             } else {
-                Object value = xo.getValue();
-                if (value == null || "".equals(value)) {
-                    return;
+                placeValueInFieldMap(prefixName, xo);
+                // Extended columns for parent-to-child relation with the same values.
+                if (null != prefixTypeName) {
+                    placeValueInFieldMap(prefixTypeName, xo);
                 }
-                String columnName = null;
-                if (prefixName != null && prefixName.length() > 0) {
-                    columnName = prefixName + schema.getProp(SalesforceSchemaConstants.COLUMNNAME_DELIMTER)
-                            + xo.getName().getLocalPart();
-                } else {
-                    columnName = xo.getName().getLocalPart();
-                }
-                if (valueMap.get(columnName) == null) {
-                    valueMap.put(columnName, value);
-                } else {
-                    if (!columnName.equals(xo.getName().getLocalPart())) {
-                        valueMap.put(columnName,
-                                valueMap.get(columnName) + schema.getProp(SalesforceSchemaConstants.VALUE_DELIMITER) + value);
-                    }
+            }
+        }
+
+        /**
+         * Puts parsed values into value map by column names or complex column names.<br/>
+         * For <b>Parent-to-Child</b> relation stores duplicates to grant a possibility<br/>
+         * to get values by such column names in child table:
+         * <code>Contact.Name, Contact.Account.Name</code>
+         *
+         * @param prefixName - name to be appended to column name.
+         * @param xo - XML object that contains column value.
+         */
+        private void placeValueInFieldMap(String prefixName, XmlObject xo) {
+            Object value = xo.getValue();
+            if (value == null || "".equals(value)) {
+                return;
+            }
+            String columnName = null;
+            if (prefixName != null && prefixName.length() > 0) {
+                columnName = prefixName + schema.getProp(SalesforceSchemaConstants.COLUMNNAME_DELIMTER)
+                + xo.getName().getLocalPart();
+            } else {
+                columnName = xo.getName().getLocalPart();
+            }
+            if (valueMap.get(columnName) == null) {
+                valueMap.put(columnName, value);
+            } else {
+                if (!columnName.equals(xo.getName().getLocalPart())) {
+                    valueMap.put(columnName,
+                            valueMap.get(columnName) + schema.getProp(SalesforceSchemaConstants.VALUE_DELIMITER) + value);
                 }
             }
         }
     }
+
 }

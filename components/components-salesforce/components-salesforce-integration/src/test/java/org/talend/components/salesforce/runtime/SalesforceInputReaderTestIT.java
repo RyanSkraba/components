@@ -280,54 +280,36 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
     }
 
     /*
-     * Test nested query of SOQL
+     * Test nested query of SOQL. Checking if data was placed correctly by guessed schema method.
      */
     @Test
     public void testComplexSOQLQuery() throws Throwable {
         TSalesforceInputProperties props = createTSalesforceInputProperties(false, false);
         props.manualQuery.setValue(true);
         // Manual query with foreign key
-        props.module.main.schema.setValue(SchemaBuilder.builder().record("MakeRowRecord").fields().name("Id").type().nullable()
-                .stringType().noDefault().name("Account_Id").type().nullable().stringType().noDefault().name("Name").type()
-                .nullable().stringType().noDefault().name("Account_Name").type().nullable().stringType().noDefault()
-                .name("Contacts_records_Id").type().nullable().stringType().noDefault().name("Account_Contacts_records_Id").type()
-                .nullable().stringType().noDefault().name("Contacts_records_Name").type().nullable().stringType().noDefault()
-                .name("Account_Contacts_records_Name").type().nullable().stringType().noDefault().endRecord());
-        props.query.setValue("Select Id, Name,(Select Id,Contact.Name from Contacts Limit 1) from Account Limit 10");
+        // Need to specify where clause to be sure that this record exists and has parent-to-child relation.
+        props.query.setValue("Select Id, Name,(Select Contact.Id,Contact.Name from Account.Contacts) from Account Limit 1");
+        props.validateGuessSchema();
         List<IndexedRecord> rows = readRows(props);
 
         if (rows.size() > 0) {
-            boolean isSubQueryResultEmpty = true;
             for (IndexedRecord row : rows) {
                 Schema schema = row.getSchema();
                 assertNotNull(schema.getField("Id"));
-                assertNotNull(schema.getField("Account_Id"));
                 assertNotNull(schema.getField("Name"));
-                assertNotNull(schema.getField("Account_Name"));
-                assertNotNull(schema.getField("Contacts_records_Id"));
-                assertNotNull(schema.getField("Account_Contacts_records_Id"));
-                assertNotNull(schema.getField("Contacts_records_Name"));
-                assertNotNull(schema.getField("Account_Contacts_records_Name"));
+                assertNotNull(schema.getField("Account_Contacts_records_Contact_Id"));
+                assertNotNull(schema.getField("Account_Contacts_records_Contact_Name"));
 
-                assertEquals(row.get(schema.getField("Id").pos()), row.get(schema.getField("Account_Id").pos()));
-                assertEquals(row.get(schema.getField("Name").pos()), row.get(schema.getField("Account_Name").pos()));
-                assertEquals(row.get(schema.getField("Contacts_records_Id").pos()),
-                        row.get(schema.getField("Account_Contacts_records_Id").pos()));
-                assertEquals(row.get(schema.getField("Contacts_records_Name").pos()),
-                        row.get(schema.getField("Account_Contacts_records_Name").pos()));
-                if (row.get(schema.getField("Contacts_records_Id").pos()) != null
-                        || row.get(schema.getField("Contacts_records_Name").pos()) != null) {
-                    isSubQueryResultEmpty = false;
-                }
+                assertNotNull(row.get(schema.getField("Id").pos()));
+                assertNotNull(row.get(schema.getField("Name").pos()));
+                assertNotNull(row.get(schema.getField("Account_Contacts_records_Contact_Id").pos()));
+                assertNotNull(row.get(schema.getField("Account_Contacts_records_Contact_Name").pos()));
 
                 LOGGER.debug("check: [Name && Account_Name]:" + row.get(schema.getField("Name").pos()) + " [Id && Account_Id]: "
                         + row.get(schema.getField("Id").pos()) + " [Contacts_records_Id && Contacts_records_Id]: "
-                        + row.get(schema.getField("Contacts_records_Id").pos())
+                        + row.get(schema.getField("Account_Contacts_records_Contact_Id").pos())
                         + " [Account_Contacts_records_Name && Contacts_records_Name]: "
-                        + row.get(schema.getField("Account_Contacts_records_Name").pos()));
-            }
-            if (isSubQueryResultEmpty) {
-                LOGGER.warn("Nested query result is empty!");
+                        + row.get(schema.getField("Account_Contacts_records_Contact_Name").pos()));
             }
         } else {
             LOGGER.warn("Query result is empty!");

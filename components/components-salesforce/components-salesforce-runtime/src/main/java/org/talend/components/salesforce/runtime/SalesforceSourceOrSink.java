@@ -504,13 +504,12 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
 
             SchemaBuilder.FieldBuilder builder = fieldAssembler.name(fieldDescription.getFullName());
 
-            Map<String, Object> props = schemaField.getObjectProps();
-            for (Map.Entry<String, Object> entry : props.entrySet()) {
-                builder.prop(entry.getKey(), String.valueOf(entry.getValue()));
-            }
-
             Schema fieldType = null;
             if (schemaField != null) {
+                Map<String, Object> props = schemaField.getObjectProps();
+                for (Map.Entry<String, Object> entry : props.entrySet()) {
+                    builder.prop(entry.getKey(), String.valueOf(entry.getValue()));
+                }
                 fieldType = schemaField.schema();
             } else {
                 fieldType = DEFAULT_GUESS_SCHEMA_TYPE;

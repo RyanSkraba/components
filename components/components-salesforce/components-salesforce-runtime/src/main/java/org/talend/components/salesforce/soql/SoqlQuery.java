@@ -146,7 +146,7 @@ public class SoqlQuery {
             // only one soql object is allowed in FROM clause
             FromClauseContext fromClause = subQueryContext.fromClause();
             ObjectContext soqlObject = fromClause.object();
-            String entityName = soqlObject.getText();
+            String entityName = soqlObject.getText().replace(".", "_");
 
             for (FieldContext field : fields) {
                 String simpleName = buildSimpleName(field);
