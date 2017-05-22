@@ -70,7 +70,7 @@ import org.apache.beam.sdk.repackaged.com.google.common.collect.Sets;
  * Copied from https://github.com/apache/beam/commit/89cf4613465647e2711983674879afd5f67c519d
  * 
  * This class was modified to add the {@link HDFSWriter#configure(Job)} method, and to use the path when getting the
- * filesystem.
+ * filesystem, and to prevent the filesystem from being cached in the components service.
  *
  * A {@code Sink} for writing records to a Hadoop filesystem using a Hadoop file-based output
  * format.
@@ -130,6 +130,7 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
         for (Map.Entry<String, String> entry : map.entrySet()) {
             conf.set(entry.getKey(), entry.getValue());
         }
+        conf.set("fs.hdfs.impl.disable.cache", "true");
         job.setJobID(jobId);
         return job;
     }

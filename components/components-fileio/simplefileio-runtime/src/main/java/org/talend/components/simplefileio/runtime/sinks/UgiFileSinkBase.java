@@ -13,6 +13,7 @@
 package org.talend.components.simplefileio.runtime.sinks;
 
 import java.io.IOException;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 
 import org.apache.beam.sdk.io.hdfs.ConfigurableHDFSFileSink;
@@ -51,6 +52,22 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
             this.extraConfig.set(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY,
                     CommonConfigurationKeysPublic.FS_DEFAULT_NAME_DEFAULT);
         }
+    }
+
+    @Override
+    public void validate(final PipelineOptions options) {
+        doAs.doAs(new PrivilegedAction<Void>() {
+
+            @Override
+            public Void run() {
+                ugiDoAsValidate(options);
+                return null;
+            }
+        });
+    }
+
+    protected void ugiDoAsValidate(final PipelineOptions options) {
+        super.validate(options);
     }
 
     public ExtraHadoopConfiguration getExtraHadoopConfiguration() {
@@ -94,6 +111,22 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
         }
 
         @Override
+        public void finalize(final Iterable<String> writerResults, final PipelineOptions options) throws Exception {
+                this.sink.doAs.doAs(new PrivilegedExceptionAction<Void>() {
+
+                    @Override
+                    public Void run() throws Exception {
+                        ugiDoAsFinalize(writerResults, options);
+                        return null;
+                    }
+                });
+        }
+
+        protected void ugiDoAsFinalize(Iterable<String> writerResults, PipelineOptions options) throws Exception {
+            super.finalize(writerResults, options);
+        }
+
+        @Override
         public Writer<KV<K, V>, String> createWriter(PipelineOptions options) throws Exception {
             return sink.createWriter(this, options);
         }
@@ -102,36 +135,55 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
 
             private final UgiWriteOperation<K, V> writeOperation;
 
+            private final String path;
+
             public UgiWriter(UgiWriteOperation<K, V> writeOperation, String path) {
                 super(writeOperation, path, writeOperation.formatClass);
                 this.writeOperation = writeOperation;
+                this.path = path;
             }
 
             @Override
-            public void open(final String uId) throws Exception {
-                this.writeOperation.sink.doAs.doAs(new PrivilegedExceptionAction<Void>() {
+            protected void superOpen(final String uId) throws Exception {
+                    this.writeOperation.sink.doAs.doAs(new PrivilegedExceptionAction<Void>() {
 
-                    @Override
-                    public Void run() throws Exception {
-                        ugiDoAsOpen(uId);
-                        return null;
-                    }
-                });
+                        @Override
+                        public Void run() throws Exception {
+                            ugiDoAsSuperOpen(uId);
+                            return null;
+                        }
+                    });
             }
 
-            protected void ugiDoAsOpen(final String uId) throws Exception {
-                super.open(uId);
+            protected void ugiDoAsSuperOpen(final String uId) throws Exception {
+                super.superOpen(uId);
+            }
+
+            @Override
+            public void write(final KV<K, V> value) throws Exception {
+                    this.writeOperation.sink.doAs.doAs(new PrivilegedExceptionAction<Void>() {
+
+                        @Override
+                        public Void run() throws Exception {
+                            ugiDoAsWrite(value);
+                            return null;
+                        }
+                    });
+            }
+
+            protected void ugiDoAsWrite(KV<K, V> value) throws Exception {
+                super.write(value);
             }
 
             @Override
             public String close() throws Exception {
-                return this.writeOperation.sink.doAs.doAs(new PrivilegedExceptionAction<String>() {
+                    return this.writeOperation.sink.doAs.doAs(new PrivilegedExceptionAction<String>() {
 
-                    @Override
-                    public String run() throws Exception {
-                        return ugiDoAsClose();
-                    }
-                });
+                        @Override
+                        public String run() throws Exception {
+                            return ugiDoAsClose();
+                        }
+                    });
             }
 
             protected String ugiDoAsClose() throws Exception {

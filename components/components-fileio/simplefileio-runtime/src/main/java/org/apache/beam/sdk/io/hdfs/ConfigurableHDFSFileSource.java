@@ -172,6 +172,7 @@ public class ConfigurableHDFSFileSource<K, V> extends BoundedSource<KV<K, V>> {
         for (Map.Entry<String, String> entry : map.entrySet()) {
             conf.set(entry.getKey(), entry.getValue());
         }
+        conf.set("fs.hdfs.impl.disable.cache", "true");
         return job;
     }
 

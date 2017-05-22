@@ -41,6 +41,10 @@ public class ConfigureWithSampleHDFSWriter<K, V> extends ConfigurableHDFSFileSin
         this.uId = uId;
     }
 
+    protected void superOpen(String uId) throws Exception {
+        super.open(uId);
+    }
+
     @Override
     public void write(KV<K, V> value) throws Exception {
         // Open on the first write.
@@ -48,7 +52,7 @@ public class ConfigureWithSampleHDFSWriter<K, V> extends ConfigurableHDFSFileSin
             opened = true;
             // Ensure that a sample is available during open, and clean it up after.
             sample = value;
-            super.open(uId);
+            superOpen(uId);
             sample = null;
         }
         super.write(value);

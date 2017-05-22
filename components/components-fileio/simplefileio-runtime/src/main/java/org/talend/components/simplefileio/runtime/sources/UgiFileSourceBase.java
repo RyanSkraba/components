@@ -88,14 +88,13 @@ public abstract class UgiFileSourceBase<K, V, SourceT extends UgiFileSourceBase<
     @Override
     public final List<? extends BoundedSource<KV<K, V>>> splitIntoBundles(final long desiredBundleSizeBytes,
             final PipelineOptions options) throws Exception {
-        return doAs.doAs(new PrivilegedExceptionAction<List<? extends BoundedSource<KV<K, V>>>>() {
+            return doAs.doAs(new PrivilegedExceptionAction<List<? extends BoundedSource<KV<K, V>>>>() {
 
-            @Override
-            public List<? extends BoundedSource<KV<K, V>>> run() throws Exception {
-                return doAsSplitIntoBundles(desiredBundleSizeBytes, options);
-            }
-        });
-
+                @Override
+                public List<? extends BoundedSource<KV<K, V>>> run() throws Exception {
+                    return doAsSplitIntoBundles(desiredBundleSizeBytes, options);
+                }
+            });
     }
 
     private long doAsGetEstimatedSizeBytes(final PipelineOptions options) {
