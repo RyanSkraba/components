@@ -34,11 +34,11 @@ public class OAthDepsTestIT {
 
     @Configuration
     public Option[] config() {
-        return OsgiSalesfoceComponentTestIT.getSalesforcePaxExamOption();
+        return OsgiSalesforceComponentTestIT.getSalesforcePaxExamOption();
     }
 
     @Test(expected = NullPointerException.class)
-    public void setypComponentService() {
+    public void setupComponentService() {
         // this the only checks that all import and export for OAuth ahtentication are correctly set for OSGI.
         SalesforceOAuthConnection salesforceOAuthConnection = new SalesforceOAuthConnection(new OauthProperties("foo"),
                 "http://localhost", null);

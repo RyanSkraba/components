@@ -12,19 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 
-import org.apache.avro.Schema;
 import org.junit.Assert;
 import org.junit.Test;
 import org.talend.components.api.component.PropertyPathConnector;
@@ -33,7 +24,6 @@ import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceDefinition;
 import org.talend.components.salesforce.integration.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
-import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.runtime.RuntimeUtil;
@@ -93,33 +83,6 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
         };
         salesforceSourceOrSink.initialize(null, scmp);
         assertEquals(scmp.connection, salesforceSourceOrSink.getConnectionProperties());
-    }
-
-    @Test
-    public void testGetSchemaNames() throws IOException {
-        SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
-        List<NamedThing> schemaNames = SalesforceSourceOrSink.getSchemaNames(null, scp);
-        assertTrue(schemaNames.size() > 50);
-    }
-
-    @Test
-    public void testGetSchema() throws IOException {
-        SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
-        Schema schema = SalesforceSourceOrSink.getSchema(null, scp, EXISTING_MODULE_NAME);
-        assertNotNull(schema);
-        assertThat(schema.getFields(), hasSize(greaterThan(10)));
-        // assertTrue(schema.getRoot().getChildren().size() > 10);
-    }
-
-    @Test
-    public void testGetSchemaFail() throws IOException {
-        SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
-        try {
-            Schema schema = SalesforceSourceOrSink.getSchema(null, scp, "module that does not exist");
-            fail("Should have throw an exception when not finding the module");
-        } catch (IOException ce) {
-            assertTrue(ce.getMessage().contains("does not exist"));
-        }
     }
 
 }
